@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { Charity } from "@favpoll/types"
 
@@ -256,15 +257,24 @@ export function CharityStep({
       )}
 
       {registerActive && !noMatches && (
-        <p className="px-5 py-3 text-xs text-muted-foreground">
-          {registerLoading
-            ? "Searching the Charity Commission register…"
-            : registerTotal > freshResults.length
-              ? `Results from the Charity Commission register · ${registerTotal} matches — keep typing to narrow`
-              : freshResults.length > 0
-                ? "Results from the Charity Commission register"
-                : null}
-        </p>
+        <div className="px-5 py-3">
+          {registerLoading ? (
+            /* A proper status row, not a whisper (founder, 2026-09-08) —
+               row-sized text with a spinner while the register responds. */
+            <p className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+              Searching the Charity Commission register…
+            </p>
+          ) : registerTotal > freshResults.length ? (
+            <p className="text-xs text-muted-foreground">
+              {`Results from the Charity Commission register · ${registerTotal} matches — keep typing to narrow`}
+            </p>
+          ) : freshResults.length > 0 ? (
+            <p className="text-xs text-muted-foreground">
+              Results from the Charity Commission register
+            </p>
+          ) : null}
+        </div>
       )}
     </div>
   )
