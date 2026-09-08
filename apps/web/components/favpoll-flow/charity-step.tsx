@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Chip } from "@/components/ui/chip"
 import type { Charity } from "@favpoll/types"
 
 const MAX_CHARITIES = 3
@@ -24,6 +25,21 @@ type CharityStepProps = {
    *  picks a charity from the Charity Commission register results.
    *  Omit to hide the register results entirely. */
   onRegisterAdd?: (pick: RegisterPick) => Promise<void>
+  /** Seed a search from the empty-shelf prompts (fills the header input). */
+  onSeedSearch?: (q: string) => void
+  /** Flavours the seed prompts — the wizard already knows the Event. */
+  eventCategory?: "celebration" | "memorial" | "fundraiser" | null
+}
+
+// SEED SEARCHES (founder, 2026-09-09): an undecided organiser faces an
+// empty box, so offer cause-WORDS — queries, not organisations — that
+// convert "I don't know who" into "oh, the hospice". Zero endorsement:
+// nothing specific is privileged, the earned-shelf doctrine holds.
+const SEED_SEARCHES: Record<string, string[]> = {
+  memorial: ["hospice", "air ambulance", "cancer research", "alzheimer"],
+  celebration: ["children", "animal rescue", "dogs", "wildlife"],
+  fundraiser: ["foodbank", "hospice", "rescue", "community"],
+  default: ["hospice", "foodbank", "animal rescue", "cancer research"],
 }
 
 function websiteHref(website: string): string {
@@ -61,6 +77,8 @@ export function CharityStep({
   onChange,
   search,
   onRegisterAdd,
+  onSeedSearch,
+  eventCategory,
 }: CharityStepProps) {
   const atMax = value.length >= MAX_CHARITIES
   const trimmed = (search ?? "").trim()
@@ -192,14 +210,37 @@ export function CharityStep({
 
   return (
     <div>
-      {noMatches ? (
+      {noMatches && (trimmed || !onRegisterAdd) ? (
         <p className="py-3 text-center text-sm text-muted-foreground">
           {registerActive
             ? `No registered charity matches “${trimmed}”.`
-            : trimmed || !onRegisterAdd
-              ? "No results."
-              : "Search any UK charity — the whole Charity Commission register."}
+            : "No results."}
         </p>
+      ) : noMatches ? (
+        /* The empty shelf — a cold start, so the prompt comes with seed
+           searches, wearing the topic dialog's suggestion grammar. */
+        <div className="px-5 py-6">
+          <p className="text-center text-sm text-muted-foreground">
+            Search any UK charity — the whole Charity Commission register.
+          </p>
+          {onSeedSearch && (
+            <div className="mt-4 flex flex-col items-center gap-2">
+              <span className="text-[11px] font-medium tracking-widest text-primary uppercase">
+                Not sure? Try
+              </span>
+              <div className="flex flex-wrap justify-center gap-1.5">
+                {(
+                  SEED_SEARCHES[eventCategory ?? "default"] ??
+                  SEED_SEARCHES.default
+                ).map((q) => (
+                  <Chip key={q} size="lg" onClick={() => onSeedSearch(q)}>
+                    {q}
+                  </Chip>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       ) : (
         <div className="flex flex-col divide-y divide-border">
           {visible.map((c) => {

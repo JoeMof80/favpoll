@@ -466,6 +466,8 @@ export function NewFavpollWizard({
             onChange={w.setCharityIds}
             search={charitySearch}
             onRegisterAdd={handleRegisterAdd}
+            onSeedSearch={setCharitySearch}
+            eventCategory={w.category}
           />
         </ResponsiveOverlay>
 

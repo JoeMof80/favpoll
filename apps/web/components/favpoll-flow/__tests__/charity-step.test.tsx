@@ -93,6 +93,25 @@ describe("CharityStep — the earned shelf", () => {
       )
     ).toBeInTheDocument()
   })
+
+  it("the empty shelf offers seed searches, flavoured by event", () => {
+    const onSeedSearch = vi.fn()
+    render(
+      <CharityStep
+        charities={[]}
+        value={[]}
+        onChange={vi.fn()}
+        onRegisterAdd={vi.fn()}
+        onSeedSearch={onSeedSearch}
+        eventCategory="memorial"
+      />
+    )
+    expect(screen.getByText("Not sure? Try")).toBeInTheDocument()
+    fireEvent.click(screen.getByRole("button", { name: "hospice" }))
+    expect(onSeedSearch).toHaveBeenCalledWith("hospice")
+    expect(screen.getByText("air ambulance")).toBeInTheDocument()
+    expect(screen.queryByText("wildlife")).not.toBeInTheDocument()
+  })
 })
 
 describe("CharityStep — search rows", () => {
