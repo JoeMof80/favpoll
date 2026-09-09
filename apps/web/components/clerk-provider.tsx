@@ -10,7 +10,9 @@ type ClerkProviderProps = React.ComponentProps<typeof ClerkNextJSProvider>
 // input surface, our button radii and weights. One layer here covers
 // SignIn, SignUp, and every Clerk popover.
 const FAVPOLL_ELEMENTS = {
-  card: "rounded-xl shadow-lg ring-1 ring-border",
+  // The slot is cardBox in the @clerk/ui pipeline (measured 2026-09-09 —
+  // "card" silently no-ops there).
+  cardBox: "rounded-xl shadow-lg ring-1 ring-border",
   headerTitle: "font-medium",
   headerSubtitle: "text-muted-foreground",
   formButtonPrimary: "rounded-lg font-medium shadow-none",
