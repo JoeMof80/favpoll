@@ -54,6 +54,7 @@ export const SCALE = {
   a4: {
     stack: false,
     charityFooter: false,
+    placeCard: false,
     card: "h-full w-full rounded-3xl",
     headerPad: "px-[12mm] pt-[8mm] pb-[5mm]",
     eyebrow: "text-[13pt] tracking-[0.12em]",
@@ -63,6 +64,7 @@ export const SCALE = {
     brandGap: "gap-[2mm]",
     topicRow: "px-[12mm] py-[4mm]",
     topic: "text-[20pt] tracking-[0.09em]",
+    topicEyebrow: "text-[13pt] tracking-[0.12em]",
     bodyPad: "px-[12mm] pt-[8mm] pb-[6mm]",
     bodyGap: "gap-[12mm]",
     steps: "gap-[5mm] text-[15pt] leading-relaxed",
@@ -75,6 +77,7 @@ export const SCALE = {
   a5: {
     stack: false,
     charityFooter: false,
+    placeCard: false,
     card: "h-[125mm] w-full max-w-[190mm] rounded-2xl",
     headerPad: "px-[8mm] pt-[5mm] pb-[3.5mm]",
     eyebrow: "text-[10.5pt] tracking-[0.12em]",
@@ -84,6 +87,7 @@ export const SCALE = {
     brandGap: "gap-[1.5mm]",
     topicRow: "px-[8mm] py-[3mm]",
     topic: "text-[16pt] tracking-[0.09em]",
+    topicEyebrow: "text-[10.5pt] tracking-[0.12em]",
     bodyPad: "px-[8mm] pt-[5mm] pb-[4mm]",
     bodyGap: "gap-[6mm]",
     steps: "gap-[3.5mm] text-[13pt] leading-relaxed",
@@ -107,6 +111,7 @@ export const SCALE = {
   a6: {
     stack: false,
     charityFooter: false,
+    placeCard: false,
     card: "h-[95mm] w-[138.5mm] rounded-2xl",
     headerPad: "px-[6mm] pt-[4mm] pb-[2.5mm]",
     eyebrow: "text-[8pt] tracking-[0.12em]",
@@ -116,6 +121,7 @@ export const SCALE = {
     brandGap: "gap-[1.2mm]",
     topicRow: "px-[6mm] py-[2mm]",
     topic: "text-[12pt] tracking-[0.09em]",
+    topicEyebrow: "text-[8pt] tracking-[0.12em]",
     bodyPad: "px-[6mm] pt-[3.5mm] pb-[2.5mm]",
     bodyGap: "gap-[4.5mm]",
     steps: "gap-[2.5mm] text-[10pt] leading-relaxed",
@@ -138,6 +144,7 @@ export const SCALE = {
   averyTent: {
     stack: false,
     charityFooter: false,
+    placeCard: true,
     card: "h-[45mm] w-[120mm] rounded-none",
     headerPad: "px-[5mm] pt-[2mm] pb-[1.5mm]",
     eyebrow: "text-[6pt] tracking-[0.14em]",
@@ -147,6 +154,7 @@ export const SCALE = {
     brandGap: "gap-[1mm]",
     topicRow: "px-[5mm] py-[1mm]",
     topic: "text-[8.5pt] tracking-[0.09em]",
+    topicEyebrow: "text-[6pt] tracking-[0.14em]",
     bodyPad: "px-[5mm] pt-[1.5mm] pb-[1mm]",
     bodyGap: "gap-[4mm]",
     steps: "gap-[1.5mm] text-[7pt] leading-snug",
@@ -163,6 +171,7 @@ export const SCALE = {
   averyTentLarge: {
     stack: false,
     charityFooter: false,
+    placeCard: true,
     card: "h-[60mm] w-[210mm] rounded-none",
     headerPad: "px-[8mm] pt-[2.5mm] pb-[2mm]",
     eyebrow: "text-[8pt] tracking-[0.14em]",
@@ -172,6 +181,7 @@ export const SCALE = {
     brandGap: "gap-[1.5mm]",
     topicRow: "px-[8mm] py-[1.5mm]",
     topic: "text-[12pt] tracking-[0.09em]",
+    topicEyebrow: "text-[8pt] tracking-[0.14em]",
     bodyPad: "px-[8mm] pt-[2mm] pb-[1.5mm]",
     bodyGap: "gap-[8mm]",
     steps: "gap-[2mm] text-[9pt] leading-snug",
@@ -188,6 +198,7 @@ export const SCALE = {
   averyPlace: {
     stack: false,
     charityFooter: false,
+    placeCard: true,
     card: "h-[40mm] w-[110mm] rounded-none",
     headerPad: "px-[5mm] pt-[1.5mm] pb-[1mm]",
     eyebrow: "text-[6pt] tracking-[0.14em]",
@@ -197,6 +208,7 @@ export const SCALE = {
     brandGap: "gap-[1mm]",
     topicRow: "px-[5mm] py-[1mm]",
     topic: "text-[8.5pt] tracking-[0.09em]",
+    topicEyebrow: "text-[6pt] tracking-[0.14em]",
     bodyPad: "px-[5mm] pt-[1mm] pb-[0.5mm]",
     bodyGap: "gap-[3mm]",
     steps: "gap-[1.5mm] text-[7pt] leading-snug",
@@ -218,6 +230,7 @@ export const SCALE = {
   l7418: {
     stack: false,
     charityFooter: false,
+    placeCard: false,
     card: "h-[55mm] w-[86mm] rounded-none",
     headerPad: "px-[3mm] pt-[2.5mm] pb-[2mm]",
     eyebrow: "text-[6pt] tracking-[0.14em]",
@@ -227,6 +240,7 @@ export const SCALE = {
     brandGap: "gap-[1mm]",
     topicRow: "px-[3mm] py-[1.5mm]",
     topic: "text-[8.5pt] tracking-[0.09em]",
+    topicEyebrow: "text-[6pt] tracking-[0.14em]",
     bodyPad: "px-[3mm] pt-[3mm] pb-[1mm]",
     bodyGap: "gap-[3mm]",
     steps: "gap-[1.5mm] text-[6.5pt] leading-snug",
@@ -246,6 +260,7 @@ export const SCALE = {
   l7160: {
     stack: false,
     charityFooter: true,
+    placeCard: false,
     // THE CHARITY, not the shared-fund line. This face is 38mm and cannot
     // hold the steps, and the steps are where every other format names where
     // the money goes. A public artefact that shows a code and a topic but
@@ -259,6 +274,7 @@ export const SCALE = {
     brandGap: "gap-[0.7mm]",
     topicRow: "px-[2.5mm] py-[0.8mm]",
     topic: "text-[6.5pt] tracking-[0.08em]",
+    topicEyebrow: "text-[5pt] tracking-[0.12em]",
     bodyPad: "px-[2.5mm] pt-[1.5mm] pb-[1mm]",
     bodyGap: "gap-[2mm]",
     steps: "gap-[1mm] text-[5pt] leading-snug",
@@ -336,6 +352,64 @@ export function PackCard({
   // Strip the radius with the border: a rounded corner on a card you cut from
   // a shared sheet leaves a white nick at every corner.
   const box = bleed ? "h-full w-full" : `border border-border ${s.card}`
+
+  // ── Two-line topic: "FAVOURITE" eyebrow above the topic title ────────────
+  const topicBlock = data.topicTitle ? (
+    <div className={`border-t border-border ${s.topicRow}`}>
+      <p className={`font-medium text-primary uppercase ${s.topicEyebrow}`}>
+        Favourite
+      </p>
+      <p className={`truncate font-medium text-primary ${s.topic}`}>
+        {data.topicTitle}
+      </p>
+    </div>
+  ) : null
+
+  // ── Place-card scales: blank name zone left, content right ───────────────
+  if (s.placeCard) {
+    return (
+      <div
+        className={`flex overflow-hidden bg-white [print-color-adjust:exact] ${box}`}
+      >
+        {/* Left blank zone — ~35% width for handwriting a guest name */}
+        <div className="w-[35%] shrink-0" />
+        {/* Right content zone — header, topic, QR */}
+        <div className="flex w-[65%] flex-col border-l border-border">
+          {/* Header */}
+          <div className={`flex flex-col ${s.headerPad}`}>
+            <div className="flex items-end justify-between gap-2">
+              <span
+                className={`font-medium text-muted-foreground uppercase ${s.eyebrow}`}
+              >
+                {data.prefix}
+              </span>
+              <BrandMark size={s} />
+            </div>
+            <span
+              className={`truncate leading-snug font-medium text-foreground ${s.name}`}
+            >
+              {data.name}
+            </span>
+          </div>
+          {/* Topic */}
+          {topicBlock}
+          {/* QR only — no steps, no footer on place settings */}
+          <div
+            className={`flex flex-1 items-center justify-center border-t border-border ${s.bodyPad}`}
+          >
+            <BrandedQR
+              value={data.qrUrl}
+              size={s.qr}
+              aria-label={`QR code to pledge for ${data.name}`}
+              className="shrink-0"
+            />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Standard scales: full content ────────────────────────────────────────
   return (
     <div
       className={`flex flex-col overflow-hidden bg-white [print-color-adjust:exact] ${box}`}
@@ -356,16 +430,8 @@ export function PackCard({
           {data.name}
         </span>
       </div>
-      {/* Topic ribbon row */}
-      {data.topicTitle && (
-        <div className={`border-t border-border ${s.topicRow}`}>
-          <p
-            className={`truncate font-medium text-primary uppercase ${s.topic}`}
-          >
-            Favourite {data.topicTitle.toLowerCase()}
-          </p>
-        </div>
-      )}
+      {/* Topic ribbon row — two lines */}
+      {topicBlock}
       {/* Steps beside the QR */}
       <div
         className={`flex flex-1 flex-col border-t border-border ${s.bodyPad}`}
