@@ -365,21 +365,24 @@ export function PackCard({
     </div>
   ) : null
 
-  // ── Place-card scales: blank name zone left, content right ───────────────
+  // ── Place-card scales: blank name zone LEFT, content RIGHT ───────────────
+  // Founder, 2026-09-10: the name zone is the card's primary job (guests
+  // read left-to-right: their name first, then context). Content can
+  // truncate — everything overflows as single-line ellipsis.
   if (s.placeCard) {
     return (
       <div
         className={`flex overflow-hidden bg-white [print-color-adjust:exact] ${box}`}
       >
-        {/* Left blank zone — ~35% width for handwriting a guest name */}
-        <div className="w-[35%] shrink-0" />
-        {/* Right content zone — header, topic, QR */}
-        <div className="flex w-[65%] flex-col border-l border-border">
-          {/* Header */}
+        {/* Left: blank name zone — ~65% */}
+        <div className="flex-1" />
+        {/* Right: content (~35%) */}
+        <div className="flex w-[35%] shrink-0 flex-col border-l border-border">
+          {/* Header — opening line truncated to one line */}
           <div className={`flex flex-col ${s.headerPad}`}>
-            <div className="flex items-end justify-between gap-2">
+            <div className="flex items-end justify-between gap-1">
               <span
-                className={`font-medium text-muted-foreground uppercase ${s.eyebrow}`}
+                className={`min-w-0 truncate font-medium text-muted-foreground uppercase ${s.eyebrow}`}
               >
                 {data.prefix}
               </span>
