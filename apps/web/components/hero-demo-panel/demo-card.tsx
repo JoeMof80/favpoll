@@ -25,7 +25,10 @@ import {
   PickerHeader,
   PickerItems,
 } from "@/components/pledge-dialog/step-pick-favourites"
-import { StepAmount } from "@/components/pledge-dialog/step-amount"
+import {
+  StepAmount,
+  StepAmountHeader,
+} from "@/components/pledge-dialog/step-amount"
 import { PollHeading } from "@/components/poll-heading"
 import type { Favourite } from "@favpoll/types"
 import type { HeroScene, Phase } from "./scenes"
@@ -230,18 +233,32 @@ export function DemoCard({
   const dispAmount = amountActive ? amountNum : 0
   const dispAmountStr = amountActive ? amountStr : ""
 
-  // The amount step went LEAN 2026-09-06 (the four-step flow): the split
-  // and the tip moved to their own later steps, so this beat shows what a
-  // guest now meets here — the amount, the presets, the fund tabs. The
-  // 2026-08-09 shown-WHOLE doctrine moved with them.
-  const renderAmountStep = (_amt: number, amtStr: string) => (
-    <StepAmount
-      pledgeAmount={amtStr}
-      updatePledgeAmount={() => {}}
-      useSharedFund={false}
-      hasFund
-      toggleFund={() => {}}
-    />
+  // TWO-PART ENTRY (founder, 2026-09-09: "the artefact needs updating to
+  // show the real experience"): the beat mounts what a guest actually
+  // meets — the FAVOURITE / SHARED POT figures, the rebalance slider,
+  // the presets, the re-pricing list. Same REAL components as the dialog
+  // (StepAmountHeader + StepAmount), demo-frozen via no-op handlers; the
+  // fund tabs stay off, as on a favpoll whose pot holds nothing.
+  const renderAmountStep = (amt: number, amtStr: string) => (
+    <>
+      <StepAmountHeader
+        pledgeAmount={amtStr}
+        updatePledgeAmount={() => {}}
+        fundAmount="0"
+        onFundAmountChange={() => {}}
+        favouriteCount={1}
+      />
+      <StepAmount
+        pledgeAmount={amtStr}
+        updatePledgeAmount={() => {}}
+        useSharedFund={false}
+        hasFund={false}
+        toggleFund={() => {}}
+        favouriteBreakdown={[{ label: selected.label, amount: amt }]}
+        fundPart={0}
+        onFavShare={() => {}}
+      />
+    </>
   )
 
   const renderPledgeFooter = (
@@ -262,7 +279,7 @@ export function DemoCard({
           pressed ? "scale-[0.98] brightness-95" : ""
         )}
       >
-        Pledge
+        Next →
       </Button>
     </div>
   )
@@ -626,7 +643,7 @@ export function DemoCard({
                           : ""
                   )}
                 >
-                  {pickerOpen ? "Next" : "Pledge"}
+                  {pickerOpen ? "Next" : "Next →"}
                 </Button>
               </div>
             )}

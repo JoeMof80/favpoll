@@ -66,6 +66,7 @@ vi.mock("@/components/pledge-dialog/step-pick-favourites", () => ({
 
 vi.mock("@/components/pledge-dialog/step-amount", () => ({
   StepAmount: () => <div data-testid="step-amount" />,
+  StepAmountHeader: () => <div data-testid="step-amount-header" />,
 }))
 
 import { DemoCard } from "../demo-card"
@@ -327,7 +328,7 @@ describe("DemoCard — dialog mimics", () => {
   it("Pledge uses secondary variant (no amount chosen) in pledge-panel phase", () => {
     renderCard("pledge-panel")
     const pledgeBtns = screen.getAllByRole("button", {
-      name: /^Pledge$/,
+      name: /^Next →$/,
       hidden: true,
     })
     const liveBtn = pledgeBtns[pledgeBtns.length - 1]
@@ -337,7 +338,7 @@ describe("DemoCard — dialog mimics", () => {
   it("Pledge uses default variant (amount picked, Pledge enabled) in amount-picked phase", () => {
     renderCard("amount-picked")
     const pledgeBtns = screen.getAllByRole("button", {
-      name: /^Pledge$/,
+      name: /^Next →$/,
       hidden: true,
     })
     const liveBtn = pledgeBtns[pledgeBtns.length - 1]
