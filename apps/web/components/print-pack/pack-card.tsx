@@ -371,10 +371,10 @@ export function PackCard({
       <div
         className={`flex overflow-hidden bg-white [print-color-adjust:exact] ${box}`}
       >
-        {/* Left blank zone — ~35% width for handwriting a guest name */}
-        <div className="w-[35%] shrink-0" />
-        {/* Right content zone — header, topic, QR */}
-        <div className="flex w-[65%] flex-col border-l border-border">
+        {/* Left: content (~35%). Right: blank name zone (~65%).
+            Founder, 2026-09-10: reversed from the first cut — the name
+            is the card's primary job, and content can truncate. */}
+        <div className="flex w-[35%] shrink-0 flex-col border-r border-border">
           {/* Header */}
           <div className={`flex flex-col ${s.headerPad}`}>
             <div className="flex items-end justify-between gap-2">
@@ -405,6 +405,8 @@ export function PackCard({
             />
           </div>
         </div>
+        {/* Right: blank name zone — the remaining ~65% */}
+        <div className="flex-1" />
       </div>
     )
   }
