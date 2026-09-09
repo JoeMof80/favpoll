@@ -239,3 +239,17 @@ button:not(:disabled),
 select:not(:disabled) {
   cursor: pointer;
 }
+
+/* CLERK, DRESSED (founder, 2026-09-09): two targeted strikes on what made
+   the auth card feel foreign — the theme's grey input fill and the tinted
+   footer bands. The @clerk/ui shadcn.css paints both directly on .cl-*
+   classes, so utility classes in the appearance layer lose; these rules
+   are unlayered on purpose to win over the import. Headless auth (Clerk
+   Elements, fully favpoll-designed) is the post-launch answer — see
+   references/outstanding-tasks §3. */
+.cl-formFieldInput {
+  background-color: var(--background);
+}
+.cl-footer {
+  background-color: transparent;
+}

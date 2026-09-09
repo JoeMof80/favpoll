@@ -56,6 +56,13 @@ with `vercel env pull`.
 
 ## 3. Buildable code features (still open)
 
+- **Headless Clerk auth — parked deliberately (2026-09-09).** Themed
+  Clerk is the launch state (shadcn theme + elements layer + the grey-input
+  and footer-band CSS strikes). A fully favpoll-designed sign-in/sign-up
+  via Clerk Elements — our card idiom, our copy, no badge — is post-launch
+  work, queued alongside PayPal. ("Secured by Clerk" removal is the
+  separate Pro-plan dashboard toggle.)
+
 - **CSV exports — parked deliberately (2026-09-06).** A favpolls-level
   export is near-valueless at current volumes; the pledge-level export
   people would actually want (per-guest amounts, emails) is a GDPR
