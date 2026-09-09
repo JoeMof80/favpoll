@@ -368,44 +368,54 @@ export function PackCard({
   // ── Place-card scales: blank name zone LEFT, content RIGHT ───────────────
   // Founder, 2026-09-10: the name zone is the card's primary job (guests
   // read left-to-right: their name first, then context). Content can
-  // truncate — everything overflows as single-line ellipsis.
+  // truncate — everything overflows as single-line ellipsis. The content
+  // is framed in a rounded rectangle; branding sits below the QR; QR
+  // enlarged (×1.4) since steps no longer compete for the vertical space.
   if (s.placeCard) {
     return (
       <div
-        className={`flex overflow-hidden bg-white [print-color-adjust:exact] ${box}`}
+        className={`flex items-center overflow-hidden bg-white [print-color-adjust:exact] ${box}`}
       >
         {/* Left: blank name zone — ~65% */}
         <div className="flex-1" />
-        {/* Right: content (~35%) */}
-        <div className="flex w-[35%] shrink-0 flex-col border-l border-border">
-          {/* Header — opening line truncated to one line */}
-          <div className={`flex flex-col ${s.headerPad}`}>
-            <div className="flex items-end justify-between gap-1">
-              <span
-                className={`min-w-0 truncate font-medium text-muted-foreground uppercase ${s.eyebrow}`}
-              >
-                {data.prefix}
-              </span>
-              <BrandMark size={s} />
-            </div>
-            <span
-              className={`truncate leading-snug font-medium text-foreground ${s.name}`}
-            >
-              {data.name}
-            </span>
-          </div>
-          {/* Topic */}
-          {topicBlock}
-          {/* QR only — no steps, no footer on place settings */}
-          <div
-            className={`flex flex-1 items-center justify-center border-t border-border ${s.bodyPad}`}
+        {/* Right: content (~35%) in a rounded frame */}
+        <div className="flex w-[35%] shrink-0 flex-col items-center rounded-xl border border-border p-[3mm]">
+          {/* Opening line + name — centred, truncated */}
+          <span
+            className={`w-full truncate text-center font-medium text-muted-foreground uppercase ${s.eyebrow}`}
           >
+            {data.prefix}
+          </span>
+          <span
+            className={`w-full truncate text-center leading-snug font-medium text-foreground ${s.name}`}
+          >
+            {data.name}
+          </span>
+          {/* Topic — two lines, centred */}
+          {data.topicTitle && (
+            <div className="mt-[1.5mm] w-full text-center">
+              <p
+                className={`font-medium text-muted-foreground uppercase ${s.topicEyebrow}`}
+              >
+                Favourite
+              </p>
+              <p className={`truncate font-medium text-primary ${s.topic}`}>
+                {data.topicTitle}
+              </p>
+            </div>
+          )}
+          {/* QR — enlarged for place cards */}
+          <div className="mt-[2mm]">
             <BrandedQR
               value={data.qrUrl}
-              size={s.qr}
+              size={Math.round(s.qr * 1.4)}
               aria-label={`QR code to pledge for ${data.name}`}
               className="shrink-0"
             />
+          </div>
+          {/* Branding below the QR */}
+          <div className="mt-[1.5mm]">
+            <BrandMark size={s} />
           </div>
         </div>
       </div>
