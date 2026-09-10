@@ -235,71 +235,55 @@ export const SCALE = {
     footerPad: "px-[3.5mm]",
   },
 
-  // L7418 label, 86 x 55mm, 8 to a sheet. Avery's self-adhesive business
-  // card — the wallet card that sticks to things: an order of service, a
-  // favour bag, a menu, a bottle. Portrait sheet, so no orientation problem.
-  // Wallet's density, since the face is within a millimetre of it.
+  // L7418 wallet card, 86 x 55mm — standard layout (steps beside QR+brand).
   l7418: {
     stack: false,
     charityFooter: false,
     placeCard: false,
     card: "h-[55mm] w-[86mm] rounded-none",
-    headerPad: "px-[3mm] pt-[2.5mm] pb-[2mm]",
-    eyebrow: "text-[6pt] tracking-[0.14em]",
-    name: "text-[10pt]",
-    brandSvg: { width: 12, height: 11 },
-    brandText: "text-[8pt]",
-    brandGap: "gap-[1mm]",
-    topicRow: "px-[3mm] py-[1.5mm]",
-    topic: "text-[8.5pt] tracking-[0.09em]",
-    topicEyebrow: "text-[6pt] tracking-[0.14em]",
-    bodyPad: "px-[3mm] pt-[3mm] pb-[1mm]",
-    bodyGap: "gap-[3mm]",
-    steps: "gap-[1.5mm] text-[6.5pt] leading-snug",
-    stepGap: "gap-[1.5mm]",
-    numWidth: "w-[3.5mm]",
-    // 92px = 24.3mm — 0.74mm a module, the same as the wallet card.
-    qr: 92,
-    footer: "pb-[2mm] text-[5.5pt]",
-    footerPad: "px-[3mm]",
-  },
-
-  // L7160 label, 63.5 x 38.1mm, 21 to a sheet. The small one — for favour
-  // bags and place settings, where you want a lot of them.
-  //
-  // NO STEPS at this size: 38mm holds the name, the topic, a scannable code
-  // and one line. That line is the CHARITY — see charityFooter below.
-  // L7160 small labels — two-column (founder, 2026-09-10: "completely
-  // wrong"). 63.5 x 38.1mm is wide enough for a proper split; the QR
-  // fills its column, the charity footer names the destination.
-  l7160: {
-    stack: false,
-    twoColumn: true,
-    charityFooter: true,
-    placeCard: false,
-    // THE CHARITY, not the shared-fund line. This face is 38mm and cannot
-    // hold the steps, and the steps are where every other format names where
-    // the money goes. A public artefact that shows a code and a topic but
-    // never says which charity is not one favpoll should print.
-    card: "h-[38.1mm] w-[63.5mm] rounded-none",
-    headerPad: "px-[2.5mm] pt-[2mm] pb-[1mm]",
-    eyebrow: "text-[5pt] tracking-[0.12em]",
-    name: "text-[8pt]",
+    headerPad: "px-[3mm] pt-[2mm] pb-[1mm]",
+    eyebrow: "text-[5pt] tracking-[0.14em]",
+    name: "text-[9pt]",
     brandSvg: { width: 12, height: 11 },
     brandText: "text-[7pt]",
     brandGap: "gap-[0.8mm]",
-    topicRow: "px-[2.5mm] py-[0.8mm]",
-    topic: "text-[6.5pt] tracking-[0.08em]",
-    topicEyebrow: "text-[5pt] tracking-[0.12em]",
-    bodyPad: "px-[2.5mm] pt-[1.5mm] pb-[1mm]",
-    bodyGap: "gap-[2mm]",
-    steps: "gap-[1mm] text-[5pt] leading-snug",
+    topicRow: "px-[3mm] py-[1mm]",
+    topic: "text-[7.5pt] tracking-[0.09em]",
+    topicEyebrow: "text-[5pt] tracking-[0.14em]",
+    bodyPad: "px-[3mm] pt-[2mm] pb-[1mm]",
+    bodyGap: "gap-[3mm]",
+    steps: "gap-[1mm] text-[6pt] leading-snug",
     stepGap: "gap-[1mm]",
+    numWidth: "w-[3mm]",
+    // 92px = 24.3mm — 0.74mm a module.
+    qr: 92,
+    footer: "pb-[1mm] text-[5.5pt]",
+    footerPad: "px-[3mm]",
+  },
+
+  // L7160 small labels, 63.5 x 38.1mm — standard layout (steps beside QR+brand).
+  l7160: {
+    stack: false,
+    charityFooter: false,
+    placeCard: false,
+    card: "h-[38.1mm] w-[63.5mm] rounded-none",
+    headerPad: "px-[2.5mm] pt-[1.5mm] pb-[0.5mm]",
+    eyebrow: "text-[4.5pt] tracking-[0.12em]",
+    name: "text-[7pt]",
+    brandSvg: { width: 9, height: 8 },
+    brandText: "text-[5.5pt]",
+    brandGap: "gap-[0.6mm]",
+    topicRow: "px-[2.5mm] py-[0.5mm]",
+    topic: "text-[5.5pt] tracking-[0.08em]",
+    topicEyebrow: "text-[4.5pt] tracking-[0.12em]",
+    bodyPad: "px-[2.5mm] pt-[1mm] pb-[0.5mm]",
+    bodyGap: "gap-[2mm]",
+    steps: "gap-[0.8mm] text-[5pt] leading-snug",
+    stepGap: "gap-[0.8mm]",
     numWidth: "w-[2.5mm]",
-    // 96px = 25.4mm — fills the right column (~32mm usable).
-    // 0.77mm a module — comfortable for print.
-    qr: 96,
-    footer: "pb-[1mm] text-[4.5pt]",
+    // 64px = 16.9mm — 0.52mm a module.
+    qr: 64,
+    footer: "pb-[0.5mm] text-[4.5pt]",
     footerPad: "px-[2.5mm]",
   },
 } as const
@@ -385,7 +369,9 @@ export function PackCard({
   // different size for the eyebrow — that was tried and reverted on the app
   // side too (#627).
   const topicBlock = data.topicTitle ? (
-    <div className={`border-y border-border ${s.topicRow}`}>
+    <div
+      className={`border-y border-border bg-primary/5 [print-color-adjust:exact] ${s.topicRow}`}
+    >
       <p
         className={`font-medium tracking-[0.09em] text-primary/55 uppercase ${s.topic}`}
       >
@@ -496,7 +482,9 @@ export function PackCard({
       {/* Header — eyebrow + name. Brand mark moved to the body beside the
           QR (founder, 2026-09-09). Opening line truncated (founder,
           2026-09-10 — was wrapping on wallet cards). */}
-      <div className={`flex flex-col ${s.headerPad}`}>
+      <div
+        className={`flex flex-col bg-muted/50 [print-color-adjust:exact] ${s.headerPad}`}
+      >
         <span
           className={`min-w-0 truncate font-medium text-muted-foreground uppercase ${s.eyebrow}`}
         >
@@ -508,55 +496,47 @@ export function PackCard({
           {data.name}
         </span>
       </div>
-      {/* Topic ribbon row — two lines, primary-tinted wash */}
       {topicBlock}
-      {/* Steps beside the QR + brand mark */}
+      {/* Body: two internal columns, top-aligned.
+          Left: steps + footer text (mt-auto).
+          Right: QR + brand (mt-auto).
+          (Founder wireframe, 2026-09-10.) */}
       <div
-        className={`flex flex-1 flex-col border-t border-border ${s.bodyPad}`}
+        className={`flex flex-1 ${s.bodyPad} ${"stack" in s && s.stack ? "flex-col items-center" : "items-start"} ${s.bodyGap}`}
       >
+        {/* Left column: steps + footer */}
         <div
-          className={`flex flex-1 ${"stack" in s && s.stack ? "flex-col items-center" : "items-start"} ${s.bodyGap}`}
+          className={`flex min-w-0 flex-1 flex-col text-left text-muted-foreground ${s.steps}`}
         >
-          {steps && (
-            <div
-              className={`flex flex-1 flex-col text-left text-muted-foreground ${s.steps}`}
-            >
-              {steps.map((step, j) => (
-                <p key={j} className={`flex ${s.stepGap}`}>
-                  <span
-                    className={`shrink-0 text-right font-semibold text-primary ${s.numWidth}`}
-                  >
-                    {j + 1}.
-                  </span>
-                  <span className="flex-1">{step}</span>
-                </p>
-              ))}
-            </div>
+          {steps &&
+            steps.map((step, j) => (
+              <p key={j} className={`flex ${s.stepGap}`}>
+                <span
+                  className={`shrink-0 text-right font-semibold text-primary ${s.numWidth}`}
+                >
+                  {j + 1}.
+                </span>
+                <span className="flex-1">{step}</span>
+              </p>
+            ))}
+          {data.topicTitle && (
+            <p className={`mt-auto text-muted-foreground/80 ${s.footer}`}>
+              {mechanicFooter(data.topicTitle)}
+            </p>
           )}
-          {/* QR + brand mark grouped on the right */}
-          <div className="flex shrink-0 flex-col items-center">
-            <BrandedQR
-              value={data.qrUrl}
-              size={s.qr}
-              aria-label={`QR code to pledge for ${data.name}`}
-              className="shrink-0"
-            />
-            <div className="mt-[1.5mm]">
-              <BrandMark size={s} />
-            </div>
+        </div>
+        {/* Right column: QR + brand */}
+        <div className="flex shrink-0 flex-col items-center">
+          <BrandedQR
+            value={data.qrUrl}
+            size={s.qr}
+            aria-label={`QR code to pledge for ${data.name}`}
+            className="shrink-0"
+          />
+          <div className="mt-auto pt-[1.5mm]">
+            <BrandMark size={s} />
           </div>
         </div>
-        {(data.topicTitle || s.charityFooter) && (
-          <p
-            className={`mt-auto text-center text-muted-foreground/80 ${s.footer}`}
-          >
-            {s.charityFooter
-              ? charityLabel(data.charityNames)
-              : data.topicTitle
-                ? mechanicFooter(data.topicTitle)
-                : null}
-          </p>
-        )}
       </div>
     </div>
   )
