@@ -153,9 +153,9 @@ export const SCALE = {
     headerPad: "px-[4mm] pt-[1.5mm] pb-[1mm]",
     eyebrow: "text-[5pt] tracking-[0.14em]",
     name: "text-[9pt]",
-    brandSvg: { width: 10, height: 9 },
-    brandText: "text-[6pt]",
-    brandGap: "gap-[0.8mm]",
+    brandSvg: { width: 18, height: 16 },
+    brandText: "text-[9pt]",
+    brandGap: "gap-[1mm]",
     topicRow: "px-[4mm] py-[0.8mm]",
     topic: "text-[6.5pt] tracking-[0.09em]",
     topicEyebrow: "text-[5pt] tracking-[0.14em]",
@@ -164,8 +164,9 @@ export const SCALE = {
     steps: "gap-[1mm] text-[5.5pt] leading-snug",
     stepGap: "gap-[1mm]",
     numWidth: "w-[3mm]",
-    // 52px = 13.8mm — 0.42mm a module, just over the ~0.4mm floor.
-    qr: 52,
+    // 140px = 37mm — fills the 45mm column height (minus padding).
+    // 1.13mm a module — very comfortable for print.
+    qr: 140,
     footer: "pb-[1mm] text-[5pt]",
     footerPad: "px-[4mm]",
   },
@@ -182,9 +183,9 @@ export const SCALE = {
     headerPad: "px-[7mm] pt-[2mm] pb-[1.5mm]",
     eyebrow: "text-[7pt] tracking-[0.14em]",
     name: "text-[14pt]",
-    brandSvg: { width: 14, height: 13 },
-    brandText: "text-[9pt]",
-    brandGap: "gap-[1.2mm]",
+    brandSvg: { width: 24, height: 22 },
+    brandText: "text-[12pt]",
+    brandGap: "gap-[1.5mm]",
     topicRow: "px-[7mm] py-[1mm]",
     topic: "text-[10pt] tracking-[0.09em]",
     topicEyebrow: "text-[7pt] tracking-[0.14em]",
@@ -193,8 +194,9 @@ export const SCALE = {
     steps: "gap-[1.5mm] text-[7.5pt] leading-snug",
     stepGap: "gap-[1.5mm]",
     numWidth: "w-[4.5mm]",
-    // 72px = 19mm — 0.58mm a module.
-    qr: 72,
+    // 188px = 50mm — fills the 60mm column height (minus padding).
+    // 1.52mm a module — generous for print.
+    qr: 188,
     footer: "pb-[1.5mm] text-[6.5pt]",
     footerPad: "px-[7mm]",
   },
@@ -376,9 +378,7 @@ export function PackCard({
   // different size for the eyebrow — that was tried and reverted on the app
   // side too (#627).
   const topicBlock = data.topicTitle ? (
-    <div
-      className={`border-t border-border bg-primary/5 [print-color-adjust:exact] ${s.topicRow}`}
-    >
+    <div className={`border-t border-border ${s.topicRow}`}>
       <p
         className={`font-medium tracking-[0.09em] text-primary/55 uppercase ${s.topic}`}
       >
