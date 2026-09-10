@@ -281,8 +281,8 @@ export const SCALE = {
     steps: "gap-[0.8mm] text-[5pt] leading-snug",
     stepGap: "gap-[0.8mm]",
     numWidth: "w-[2.5mm]",
-    // 56px = 14.8mm — moderate size beside steps, room for brand below.
-    qr: 56,
+    // 68px = 18mm — 0.55mm a module.
+    qr: 68,
     footer: "text-[4.5pt]",
     footerPad: "px-[2.5mm]",
   },
@@ -529,7 +529,7 @@ export function PackCard({
             aria-label={`QR code to pledge for ${data.name}`}
             className="shrink-0"
           />
-          <div className="mt-auto pt-[1.5mm]">
+          <div className="pt-[1mm]">
             <BrandMark size={s} />
           </div>
         </div>
