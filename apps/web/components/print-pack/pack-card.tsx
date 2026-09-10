@@ -281,8 +281,8 @@ export const SCALE = {
     steps: "gap-[0.8mm] text-[5pt] leading-snug",
     stepGap: "gap-[0.8mm]",
     numWidth: "w-[2.5mm]",
-    // 68px = 18mm — 0.55mm a module.
-    qr: 68,
+    // 60px = 15.9mm — safe fit with brand below in 38mm card.
+    qr: 60,
     footer: "text-[4.5pt]",
     footerPad: "px-[2.5mm]",
   },
@@ -498,11 +498,12 @@ export function PackCard({
           Right: QR + brand (mt-auto).
           (Founder wireframe, 2026-09-10.) */}
       <div
-        className={`flex flex-1 ${s.bodyPad} ${"stack" in s && s.stack ? "flex-col items-center" : "items-start"} ${s.bodyGap}`}
+        className={`flex min-h-0 flex-1 ${s.bodyPad} ${"stack" in s && s.stack ? "flex-col items-center" : "items-start"} ${s.bodyGap}`}
       >
-        {/* Left column: steps + footer */}
+        {/* Left column: steps + footer — overflow-hidden so long text
+            clips here rather than pushing the card past its height */}
         <div
-          className={`flex min-w-0 flex-1 flex-col text-left text-muted-foreground ${s.steps}`}
+          className={`flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden text-left text-muted-foreground ${s.steps}`}
         >
           {steps &&
             steps.map((step, j) => (
