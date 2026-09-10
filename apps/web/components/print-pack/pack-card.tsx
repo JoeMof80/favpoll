@@ -271,9 +271,9 @@ export const SCALE = {
     headerPad: "px-[2.5mm] py-[1mm]",
     eyebrow: "text-[4.5pt] tracking-[0.12em]",
     name: "text-[7pt]",
-    brandSvg: { width: 11, height: 10 },
-    brandText: "text-[6pt]",
-    brandGap: "gap-[0.6mm]",
+    brandSvg: { width: 10, height: 9 },
+    brandText: "text-[5.5pt]",
+    brandGap: "gap-[0.5mm]",
     topicRow: "px-[2.5mm] py-[1mm]",
     topic: "text-[5.5pt] tracking-[0.08em]",
     topicEyebrow: "text-[4.5pt] tracking-[0.12em]",
@@ -282,7 +282,7 @@ export const SCALE = {
     steps: "gap-[0.8mm] text-[5pt] leading-snug",
     stepGap: "gap-[0.8mm]",
     numWidth: "w-[2.5mm]",
-    qr: 63,
+    qr: 66,
     footer: "text-[4.5pt]",
     footerPad: "px-[2.5mm]",
   },
@@ -527,7 +527,7 @@ export function PackCard({
             = body height minus padding, brand gets minimum, QR gets the
             rest"). Render the QR large; the aspect-square constraint and
             max-h-full keep it fitting. */}
-        <div className="flex shrink-0 flex-col items-center self-stretch pb-[1mm]">
+        <div className="flex shrink-0 flex-col items-center self-stretch pb-[0.5mm]">
           <div className="flex flex-1 items-center">
             <BrandedQR
               value={data.qrUrl}
