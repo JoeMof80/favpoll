@@ -252,11 +252,11 @@ export const SCALE = {
     topicEyebrow: "text-[5pt] tracking-[0.14em]",
     bodyPad: "px-[3mm] pt-[2mm] pb-[1mm]",
     bodyGap: "gap-[3mm]",
-    steps: "gap-[1mm] text-[6pt] leading-snug",
+    steps: "gap-[1mm] text-[7pt] leading-snug",
     stepGap: "gap-[1mm]",
     numWidth: "w-[3mm]",
     // 92px = 24.3mm — 0.74mm a module.
-    qr: 92,
+    qr: 116,
     footer: "pb-[1mm] text-[5.5pt]",
     footerPad: "px-[3mm]",
   },
@@ -267,23 +267,22 @@ export const SCALE = {
     charityFooter: false,
     placeCard: false,
     card: "h-[38.1mm] w-[63.5mm] rounded-none",
-    headerPad: "px-[2.5mm] pt-[1.5mm] pb-[1mm]",
+    // Consistent py-[1mm] vertical padding (founder, 2026-09-10).
+    headerPad: "px-[2.5mm] py-[1mm]",
     eyebrow: "text-[4.5pt] tracking-[0.12em]",
     name: "text-[7pt]",
-    brandSvg: { width: 9, height: 8 },
-    brandText: "text-[5pt]",
+    brandSvg: { width: 10, height: 9 },
+    brandText: "text-[5.5pt]",
     brandGap: "gap-[0.5mm]",
     topicRow: "px-[2.5mm] py-[1mm]",
     topic: "text-[5.5pt] tracking-[0.08em]",
     topicEyebrow: "text-[4.5pt] tracking-[0.12em]",
-    bodyPad: "px-[2.5mm] pt-[1.5mm] pb-[1mm]",
+    bodyPad: "px-[2.5mm] py-[1mm]",
     bodyGap: "gap-[2mm]",
     steps: "gap-[0.8mm] text-[5pt] leading-snug",
     stepGap: "gap-[0.8mm]",
     numWidth: "w-[2.5mm]",
-    // 48px = 12.7mm + brand 2.5mm + gap 0.5mm = 15.7mm. In 23mm
-    // available body that is 7.3mm margin. Cannot clip.
-    qr: 48,
+    qr: 66,
     footer: "text-[4.5pt]",
     footerPad: "px-[2.5mm]",
   },
@@ -371,16 +370,24 @@ export function PackCard({
   // side too (#627).
   const topicBlock = data.topicTitle ? (
     <div className={`border-y border-border ${s.topicRow}`}>
-      <p
-        className={`font-medium tracking-[0.09em] text-primary/55 uppercase ${s.topic}`}
-      >
-        Favourite
-      </p>
-      <p
-        className={`truncate font-medium tracking-[0.09em] text-primary uppercase ${s.topic}`}
-      >
-        {data.topicTitle}
-      </p>
+      <div className="flex items-start justify-between gap-1">
+        <div className="min-w-0 flex-1">
+          <p
+            className={`font-medium tracking-[0.09em] text-primary/55 uppercase ${s.topic}`}
+          >
+            Favourite
+          </p>
+          <p
+            className={`truncate font-medium tracking-[0.09em] text-primary uppercase ${s.topic}`}
+          >
+            {data.topicTitle}
+          </p>
+        </div>
+        {/* Brand in the topic row — "Favourite" never changes so there
+            is always space here (founder, 2026-09-10). Frees the QR
+            column from needing to fit the brand below it. */}
+        <BrandMark size={s} />
+      </div>
     </div>
   ) : null
 
@@ -440,18 +447,9 @@ export function PackCard({
                 ))}
               </div>
             )}
-            {(data.topicTitle || s.charityFooter) && (
-              <p className={`mt-auto text-muted-foreground/80 ${s.footer}`}>
-                {s.charityFooter
-                  ? charityLabel(data.charityNames)
-                  : data.topicTitle
-                    ? mechanicFooter(data.topicTitle)
-                    : null}
-              </p>
-            )}
           </div>
         </div>
-        {/* Right column: QR + brand, centred vertically */}
+        {/* Right column: QR, centred vertically */}
         <div
           className={`flex shrink-0 flex-col items-center justify-center border-l border-border ${s.bodyPad}`}
         >
@@ -461,9 +459,6 @@ export function PackCard({
             aria-label={`QR code to pledge for ${data.name}`}
             className="shrink-0"
           />
-          <div className="mt-[1.5mm]">
-            <BrandMark size={s} />
-          </div>
         </div>
       </div>
     )
@@ -499,7 +494,7 @@ export function PackCard({
           Right: QR + brand (mt-auto).
           (Founder wireframe, 2026-09-10.) */}
       <div
-        className={`flex min-h-0 flex-1 ${s.bodyPad} ${"stack" in s && s.stack ? "flex-col items-center" : "items-start"} ${s.bodyGap}`}
+        className={`flex min-h-0 flex-1 ${s.bodyPad} ${"stack" in s && s.stack ? "flex-col items-center" : "items-center"} ${s.bodyGap}`}
       >
         {/* Left column: steps + footer — overflow-hidden so long text
             clips here rather than pushing the card past its height */}
@@ -517,24 +512,14 @@ export function PackCard({
                 <span className="flex-1">{step}</span>
               </p>
             ))}
-          {data.topicTitle && (
-            <p className={`mt-auto text-muted-foreground/80 ${s.footer}`}>
-              {mechanicFooter(data.topicTitle)}
-            </p>
-          )}
         </div>
-        {/* Right column: QR + brand */}
-        <div className="flex shrink-0 flex-col items-center">
-          <BrandedQR
-            value={data.qrUrl}
-            size={s.qr}
-            aria-label={`QR code to pledge for ${data.name}`}
-            className="shrink-0"
-          />
-          <div className="pt-[0.5mm]">
-            <BrandMark size={s} />
-          </div>
-        </div>
+        {/* QR — brand is in the topic row */}
+        <BrandedQR
+          value={data.qrUrl}
+          size={s.qr}
+          aria-label={`QR code to pledge for ${data.name}`}
+          className="shrink-0"
+        />
       </div>
     </div>
   )
