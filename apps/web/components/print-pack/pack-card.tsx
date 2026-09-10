@@ -166,7 +166,8 @@ export const SCALE = {
     numWidth: "w-[3mm]",
     // 140px = 37mm — fills the 45mm column height (minus padding).
     // 1.13mm a module — very comfortable for print.
-    qr: 140,
+    // 120px = 31.7mm — ~80% of column, room for brand below.
+    qr: 120,
     footer: "pb-[1mm] text-[5pt]",
     footerPad: "px-[4mm]",
   },
@@ -196,7 +197,8 @@ export const SCALE = {
     numWidth: "w-[4.5mm]",
     // 188px = 50mm — fills the 60mm column height (minus padding).
     // 1.52mm a module — generous for print.
-    qr: 188,
+    // 160px = 42.3mm — ~75% of column, room for brand below.
+    qr: 160,
     footer: "pb-[1.5mm] text-[6.5pt]",
     footerPad: "px-[7mm]",
   },
@@ -204,32 +206,33 @@ export const SCALE = {
   // C32253 place card, 110 x 40mm — TIGHTENED (founder, 2026-09-10).
   // 40mm is the absolute tightest face; every value squeezed to fit
   // header + topic + 3 steps beside a scannable QR.
+  // C32253 place card, 110 x 40mm — now two-column like the tent cards
+  // (founder, 2026-09-10: "repeat design of tent card for place card").
   averyPlace: {
     stack: false,
+    twoColumn: true,
     charityFooter: false,
     placeCard: true,
     card: "h-[40mm] w-[110mm] rounded-none",
-    headerPad: "px-[4mm] pt-[1mm] pb-[0.5mm]",
+    headerPad: "px-[3.5mm] pt-[1mm] pb-[0.5mm]",
     eyebrow: "text-[4.5pt] tracking-[0.14em]",
     name: "text-[8pt]",
-    brandSvg: { width: 9, height: 8 },
-    brandText: "text-[5.5pt]",
-    brandGap: "gap-[0.7mm]",
-    topicRow: "px-[4mm] py-[0.5mm]",
+    brandSvg: { width: 14, height: 13 },
+    brandText: "text-[7pt]",
+    brandGap: "gap-[0.8mm]",
+    topicRow: "px-[3.5mm] py-[0.5mm]",
     topic: "text-[6pt] tracking-[0.09em]",
     topicEyebrow: "text-[4.5pt] tracking-[0.14em]",
-    bodyPad: "px-[4mm] pt-[0.8mm] pb-[0.5mm]",
-    bodyGap: "gap-[2.5mm]",
+    bodyPad: "px-[3.5mm] pt-[0.8mm] pb-[0.5mm]",
+    bodyGap: "gap-[2mm]",
     steps: "gap-[0.8mm] text-[5pt] leading-snug",
     stepGap: "gap-[0.8mm]",
     numWidth: "w-[2.5mm]",
-    // 52px = 13.8mm — 0.42mm a module. That is the tightest code favpoll
-    // prints: over the ~0.4mm floor, but only just. The face is 40mm and the
-    // shared-fund line is worth keeping, so this is where the millimetres
-    // went. Test one before a batch.
-    qr: 52,
-    footer: "pb-[1.5mm] text-[6pt]",
-    footerPad: "px-[5mm]",
+    // 100px = 26.5mm — ~70% of the 40mm column, room for brand.
+    // 0.81mm a module — over the ~0.4mm floor.
+    qr: 100,
+    footer: "pb-[0.5mm] text-[4.5pt]",
+    footerPad: "px-[3.5mm]",
   },
 
   // L7418 label, 86 x 55mm, 8 to a sheet. Avery's self-adhesive business
@@ -378,7 +381,7 @@ export function PackCard({
   // different size for the eyebrow — that was tried and reverted on the app
   // side too (#627).
   const topicBlock = data.topicTitle ? (
-    <div className={`border-t border-border ${s.topicRow}`}>
+    <div className={`border-y border-border ${s.topicRow}`}>
       <p
         className={`font-medium tracking-[0.09em] text-primary/55 uppercase ${s.topic}`}
       >

@@ -96,6 +96,6 @@ export function buildMechanicSteps({
 
 /** The escape hatch beneath the steps — a favourite-less guest can still
  *  give, via the shared pot (a pledge itself requires a pick). */
-export function mechanicFooter(topicTitle: string): string {
-  return `Don't have a favourite ${topicTitle.toLowerCase()}? That's okay — you can still give to the shared pot.`
+export function mechanicFooter(_topicTitle: string): string {
+  return "Don\u2019t have a favourite? Give to the shared pot instead"
 }
