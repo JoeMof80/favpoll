@@ -282,9 +282,7 @@ export const SCALE = {
     steps: "gap-[0.8mm] text-[5pt] leading-snug",
     stepGap: "gap-[0.8mm]",
     numWidth: "w-[2.5mm]",
-    // Rendered large, constrained by max-h-full to fill the remaining
-    // space after brand + padding.
-    qr: 120,
+    qr: 72,
     footer: "text-[4.5pt]",
     footerPad: "px-[2.5mm]",
   },
@@ -535,7 +533,7 @@ export function PackCard({
               value={data.qrUrl}
               size={s.qr}
               aria-label={`QR code to pledge for ${data.name}`}
-              className="aspect-square max-h-full shrink"
+              className="shrink-0"
             />
           </div>
           <BrandMark size={s} />
