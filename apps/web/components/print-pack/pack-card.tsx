@@ -146,6 +146,7 @@ export const SCALE = {
   // carries steps; every mm of padding matters here.
   averyTent: {
     stack: false,
+    twoColumn: true,
     charityFooter: false,
     placeCard: true,
     card: "h-[45mm] w-[120mm] rounded-none",
@@ -174,6 +175,7 @@ export const SCALE = {
   // cut to keep every line single-line.
   averyTentLarge: {
     stack: false,
+    twoColumn: true,
     charityFooter: false,
     placeCard: true,
     card: "h-[60mm] w-[210mm] rounded-none",
@@ -398,6 +400,80 @@ export function PackCard({
       <div
         className={`overflow-hidden bg-white [print-color-adjust:exact] ${box}`}
       />
+    )
+  }
+
+  // ── Two-column layout for wide tent cards ──────────────────────────────
+  // Founder, 2026-09-10: "for longer stationery, we should use a two
+  // column layout and put the QR code and branding in the second column."
+  // Left column: header + topic + steps + footer. Right column: QR + brand
+  // centred vertically. Makes better use of the 120–210mm width.
+  if ("twoColumn" in s && s.twoColumn) {
+    return (
+      <div
+        className={`flex overflow-hidden bg-white [print-color-adjust:exact] ${box}`}
+      >
+        {/* Left column: all text content */}
+        <div className="flex min-w-0 flex-1 flex-col">
+          {/* Header */}
+          <div className={`flex flex-col ${s.headerPad}`}>
+            <span
+              className={`min-w-0 truncate font-medium text-muted-foreground uppercase ${s.eyebrow}`}
+            >
+              {data.prefix}
+            </span>
+            <span
+              className={`truncate leading-snug font-medium text-foreground ${s.name}`}
+            >
+              {data.name}
+            </span>
+          </div>
+          {/* Topic wash */}
+          {topicBlock}
+          {/* Steps */}
+          <div className={`flex flex-1 flex-col ${s.bodyPad}`}>
+            {steps && (
+              <div
+                className={`flex flex-1 flex-col text-left text-muted-foreground ${s.steps}`}
+              >
+                {steps.map((step, j) => (
+                  <p key={j} className={`flex ${s.stepGap}`}>
+                    <span
+                      className={`shrink-0 text-right font-semibold text-primary ${s.numWidth}`}
+                    >
+                      {j + 1}.
+                    </span>
+                    <span className="flex-1">{step}</span>
+                  </p>
+                ))}
+              </div>
+            )}
+            {(data.topicTitle || s.charityFooter) && (
+              <p className={`mt-auto text-muted-foreground/80 ${s.footer}`}>
+                {s.charityFooter
+                  ? charityLabel(data.charityNames)
+                  : data.topicTitle
+                    ? mechanicFooter(data.topicTitle)
+                    : null}
+              </p>
+            )}
+          </div>
+        </div>
+        {/* Right column: QR + brand, centred vertically */}
+        <div
+          className={`flex shrink-0 flex-col items-center justify-center border-l border-border ${s.bodyPad}`}
+        >
+          <BrandedQR
+            value={data.qrUrl}
+            size={s.qr}
+            aria-label={`QR code to pledge for ${data.name}`}
+            className="shrink-0"
+          />
+          <div className="mt-[1.5mm]">
+            <BrandMark size={s} />
+          </div>
+        </div>
+      </div>
     )
   }
 
