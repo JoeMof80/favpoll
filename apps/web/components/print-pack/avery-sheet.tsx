@@ -139,24 +139,27 @@ export function AverySheet({
         {Array.from({ length: count }).map((_, i) =>
           sheet.folded ? (
             <div key={i} className="flex flex-col">
-              {/* Upper face inverted — it comes the right way up as the card
-                  is folded back over itself, so both sides of a tent card
-                  stand upright and a guest either side of a table gets a
-                  code. */}
+              {/* Upper face inverted — the NAME face. It comes the right way
+                  up as the card is folded back over itself, facing the
+                  guest's seat. */}
               <div className="h-1/2 w-full rotate-180">
                 <PackCard
                   data={data}
                   steps={cardSteps}
                   scale={sheet.face}
                   bleed
+                  face="name"
                 />
               </div>
+              {/* Lower face — the CONTENT face, facing the table / other
+                  guests. Uses the standard card layout. */}
               <div className="h-1/2 w-full">
                 <PackCard
                   data={data}
                   steps={cardSteps}
                   scale={sheet.face}
                   bleed
+                  face="content"
                 />
               </div>
               {guides && (
