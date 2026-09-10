@@ -35,30 +35,17 @@ export type AverySheetDef = {
 // For folded formats the grid counts CARDS and each cell holds two faces —
 // which is what reconciles Avery's template pages (panels: 8, 2, 8) with
 // their product pages (cards: 4, 1, 4).
+// Ordered largest-first by card area (founder, 2026-09-10).
 export const AVERY_SHEETS: Record<string, AverySheetDef> = {
-  L7418: {
-    // Two uses, one layout: cut lines on plain card and it is the wallet-card
-    // sheet; cut lines off on L7418 stock and it is a sheet of labels.
-    label: "Wallet cards & labels",
-    code: "L7418",
-    note: "86 × 55 mm · 8 to a sheet",
-    face: "l7418",
-    orientation: "portrait",
-    folded: false,
-    grid: { cols: 2, rows: 4 },
-    box: { w: "172mm", h: "220mm" },
-    steps: true,
-  },
-  L7160: {
-    label: "Small labels",
-    code: "L7160",
-    note: "63.5 × 38.1 mm · 21 to a sheet · self-adhesive",
-    face: "l7160",
-    orientation: "portrait",
-    folded: false,
-    grid: { cols: 3, rows: 7 },
-    box: { w: "190.5mm", h: "266.7mm" },
-    // Instructions, same as wallet cards (founder, 2026-09-10).
+  L4796: {
+    label: "Large tent cards",
+    code: "L4796",
+    note: "210 × 60 mm · 1 to a sheet · folded",
+    face: "averyTentLarge",
+    orientation: "landscape",
+    folded: true,
+    grid: { cols: 1, rows: 1 },
+    box: { w: "210mm", h: "120mm" },
     steps: true,
   },
   L4794: {
@@ -72,15 +59,17 @@ export const AVERY_SHEETS: Record<string, AverySheetDef> = {
     box: { w: "240mm", h: "180mm" },
     steps: true,
   },
-  L4796: {
-    label: "Large tent cards",
-    code: "L4796",
-    note: "210 × 60 mm · 1 to a sheet · folded",
-    face: "averyTentLarge",
-    orientation: "landscape",
-    folded: true,
-    grid: { cols: 1, rows: 1 },
-    box: { w: "210mm", h: "120mm" },
+  L7418: {
+    // Two uses, one layout: cut lines on plain card and it is the wallet-card
+    // sheet; cut lines off on L7418 stock and it is a sheet of labels.
+    label: "Wallet cards & labels",
+    code: "L7418",
+    note: "86 × 55 mm · 8 to a sheet",
+    face: "l7418",
+    orientation: "portrait",
+    folded: false,
+    grid: { cols: 2, rows: 4 },
+    box: { w: "172mm", h: "220mm" },
     steps: true,
   },
   C32253: {
@@ -95,6 +84,18 @@ export const AVERY_SHEETS: Record<string, AverySheetDef> = {
     // Was false — the two-panel fold gives the content face the full
     // card height (founder, 2026-09-10: "no reason not to include
     // instructions").
+    steps: true,
+  },
+  L7160: {
+    label: "Small labels",
+    code: "L7160",
+    note: "63.5 × 38.1 mm · 21 to a sheet · self-adhesive",
+    face: "l7160",
+    orientation: "portrait",
+    folded: false,
+    grid: { cols: 3, rows: 7 },
+    box: { w: "190.5mm", h: "266.7mm" },
+    // Instructions, same as wallet cards (founder, 2026-09-10).
     steps: true,
   },
 }
