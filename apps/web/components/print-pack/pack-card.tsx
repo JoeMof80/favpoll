@@ -447,18 +447,9 @@ export function PackCard({
                 ))}
               </div>
             )}
-            {(data.topicTitle || s.charityFooter) && (
-              <p className={`mt-auto text-muted-foreground/80 ${s.footer}`}>
-                {s.charityFooter
-                  ? charityLabel(data.charityNames)
-                  : data.topicTitle
-                    ? mechanicFooter(data.topicTitle)
-                    : null}
-              </p>
-            )}
           </div>
         </div>
-        {/* Right column: QR + brand, centred vertically */}
+        {/* Right column: QR, centred vertically */}
         <div
           className={`flex shrink-0 flex-col items-center justify-center border-l border-border ${s.bodyPad}`}
         >
@@ -521,27 +512,14 @@ export function PackCard({
                 <span className="flex-1">{step}</span>
               </p>
             ))}
-          {data.topicTitle && (
-            <p className={`mt-auto text-muted-foreground/80 ${s.footer}`}>
-              {mechanicFooter(data.topicTitle)}
-            </p>
-          )}
         </div>
-        {/* Right column: fills body height. QR takes the remaining
-            space after the brand (founder, 2026-09-10: "make the container
-            = body height minus padding, brand gets minimum, QR gets the
-            rest"). Render the QR large; the aspect-square constraint and
-            max-h-full keep it fitting. */}
-        {/* QR — brand is in the topic row. Negative margin crops the
-            library's internal quiet zone so the code fills its space. */}
-        <div className="shrink-0 overflow-hidden">
-          <BrandedQR
-            value={data.qrUrl}
-            size={Math.round(s.qr * 1.08)}
-            aria-label={`QR code to pledge for ${data.name}`}
-            className="-m-[4%]"
-          />
-        </div>
+        {/* QR — brand is in the topic row */}
+        <BrandedQR
+          value={data.qrUrl}
+          size={s.qr}
+          aria-label={`QR code to pledge for ${data.name}`}
+          className="shrink-0"
+        />
       </div>
     </div>
   )
