@@ -267,7 +267,8 @@ export const SCALE = {
     charityFooter: false,
     placeCard: false,
     card: "h-[38.1mm] w-[63.5mm] rounded-none",
-    headerPad: "px-[2.5mm] pt-[1.5mm] pb-[1mm]",
+    // ALL vertical padding py-[1mm] for consistency (founder, 2026-09-10).
+    headerPad: "px-[2.5mm] py-[1mm]",
     eyebrow: "text-[4.5pt] tracking-[0.12em]",
     name: "text-[7pt]",
     brandSvg: { width: 9, height: 8 },
@@ -276,14 +277,14 @@ export const SCALE = {
     topicRow: "px-[2.5mm] py-[1mm]",
     topic: "text-[5.5pt] tracking-[0.08em]",
     topicEyebrow: "text-[4.5pt] tracking-[0.12em]",
-    bodyPad: "px-[2.5mm] pt-[1.5mm] pb-[1mm]",
+    bodyPad: "px-[2.5mm] py-[1mm]",
     bodyGap: "gap-[2mm]",
     steps: "gap-[0.8mm] text-[5pt] leading-snug",
     stepGap: "gap-[0.8mm]",
     numWidth: "w-[2.5mm]",
-    // 48px = 12.7mm + brand 2.5mm + gap 0.5mm = 15.7mm. In 23mm
-    // available body that is 7.3mm margin. Cannot clip.
-    qr: 48,
+    // 56px = 14.8mm + brand 2.5mm + gap 0.5mm = 17.8mm. Fits in the
+    // available body with ~5mm margin.
+    qr: 56,
     footer: "text-[4.5pt]",
     footerPad: "px-[2.5mm]",
   },
