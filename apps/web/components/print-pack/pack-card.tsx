@@ -494,7 +494,7 @@ export function PackCard({
           Right: QR + brand (mt-auto).
           (Founder wireframe, 2026-09-10.) */}
       <div
-        className={`flex min-h-0 flex-1 ${s.bodyPad} ${"stack" in s && s.stack ? "flex-col items-center" : "items-start"} ${s.bodyGap}`}
+        className={`flex min-h-0 flex-1 ${s.bodyPad} ${"stack" in s && s.stack ? "flex-col items-center" : "items-center"} ${s.bodyGap}`}
       >
         {/* Left column: steps + footer — overflow-hidden so long text
             clips here rather than pushing the card past its height */}
