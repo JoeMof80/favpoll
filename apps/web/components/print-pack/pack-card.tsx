@@ -256,7 +256,7 @@ export const SCALE = {
     stepGap: "gap-[1mm]",
     numWidth: "w-[3mm]",
     // 92px = 24.3mm — 0.74mm a module.
-    qr: 99,
+    qr: 116,
     footer: "pb-[1mm] text-[5.5pt]",
     footerPad: "px-[3mm]",
   },
