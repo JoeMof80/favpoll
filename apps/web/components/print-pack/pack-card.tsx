@@ -257,12 +257,12 @@ export const SCALE = {
     topicEyebrow: "text-[5pt] tracking-[0.14em]",
     bodyPad: "px-[3mm] pt-[2mm] pb-[0.5mm]",
     bodyGap: "gap-[2.5mm]",
-    steps: "gap-[1mm] text-[5.5pt] leading-snug",
+    steps: "gap-[1mm] text-[6pt] leading-snug",
     stepGap: "gap-[1mm]",
     numWidth: "w-[3mm]",
-    // 100px = 26.5mm — 0.81mm a module, generous for print.
-    qr: 100,
-    footer: "pb-[1mm] text-[5pt]",
+    // 88px = 23.3mm — 0.71mm a module.
+    qr: 88,
+    footer: "pb-[1mm] text-[5.5pt]",
     footerPad: "px-[3mm]",
   },
 
@@ -535,33 +535,30 @@ export function PackCard({
               ))}
             </div>
           )}
-          {/* QR + brand mark grouped on the right */}
-          <div className="flex shrink-0 flex-col items-center">
-            <BrandedQR
-              value={data.qrUrl}
-              size={s.qr}
-              aria-label={`QR code to pledge for ${data.name}`}
-              className="shrink-0"
-            />
-            <div className="mt-[1.5mm]">
-              <BrandMark size={s} />
-            </div>
-          </div>
+          {/* QR on the right — brand mark lives OUTSIDE the overflow-clipped
+              row so it can never be eaten (founder, 2026-09-10: "wallet card
+              branding STILL missing"). */}
+          <BrandedQR
+            value={data.qrUrl}
+            size={s.qr}
+            aria-label={`QR code to pledge for ${data.name}`}
+            className="shrink-0"
+          />
         </div>
-        {/* Footer at the bottom of the card, left-aligned with the steps
-            (founder, 2026-09-10: "move the footer to the bottom, like
-            the other stationery. Line the text up.") */}
-        {(data.topicTitle || s.charityFooter) && (
-          <p
-            className={`mt-auto text-left text-muted-foreground/80 ${s.footer}`}
-          >
-            {s.charityFooter
-              ? charityLabel(data.charityNames)
-              : data.topicTitle
-                ? mechanicFooter(data.topicTitle)
-                : null}
-          </p>
-        )}
+        {/* Bottom row: footer left, brand right — both outside the
+            overflow clip, always visible. */}
+        <div className="mt-auto flex items-end justify-between">
+          {data.topicTitle || s.charityFooter ? (
+            <p className={`text-left text-muted-foreground/80 ${s.footer}`}>
+              {s.charityFooter
+                ? charityLabel(data.charityNames)
+                : mechanicFooter(data.topicTitle!)}
+            </p>
+          ) : (
+            <span />
+          )}
+          <BrandMark size={s} />
+        </div>
       </div>
     </div>
   )
