@@ -58,8 +58,8 @@ export const AVERY_SHEETS: Record<string, AverySheetDef> = {
     folded: false,
     grid: { cols: 3, rows: 7 },
     box: { w: "190.5mm", h: "266.7mm" },
-    // Two-column layout handles steps at 5pt — tight but legible.
-    steps: true,
+    // 38mm is too short for steps; the charityFooter names the destination.
+    steps: false,
   },
   L4794: {
     label: "Tent cards",

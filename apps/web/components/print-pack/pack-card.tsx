@@ -269,12 +269,11 @@ export const SCALE = {
   //
   // NO STEPS at this size: 38mm holds the name, the topic, a scannable code
   // and one line. That line is the CHARITY — see charityFooter below.
-  // L7160 small labels — two-column (founder, 2026-09-10: "completely
-  // wrong"). 63.5 x 38.1mm is wide enough for a proper split; the QR
-  // fills its column, the charity footer names the destination.
+  // L7160 small labels — single-column (founder, 2026-09-10: "shouldn't
+  // use two column layout"). 38.1mm tall; the standard layout stacks
+  // header + topic + steps-beside-QR + charity footer.
   l7160: {
     stack: false,
-    twoColumn: true,
     charityFooter: true,
     placeCard: false,
     // THE CHARITY, not the shared-fund line. This face is 38mm and cannot
@@ -285,9 +284,9 @@ export const SCALE = {
     headerPad: "px-[2.5mm] pt-[2mm] pb-[1mm]",
     eyebrow: "text-[5pt] tracking-[0.12em]",
     name: "text-[8pt]",
-    brandSvg: { width: 12, height: 11 },
-    brandText: "text-[7pt]",
-    brandGap: "gap-[0.8mm]",
+    brandSvg: { width: 9, height: 8 },
+    brandText: "text-[6pt]",
+    brandGap: "gap-[0.7mm]",
     topicRow: "px-[2.5mm] py-[0.8mm]",
     topic: "text-[6.5pt] tracking-[0.08em]",
     topicEyebrow: "text-[5pt] tracking-[0.12em]",
@@ -296,9 +295,8 @@ export const SCALE = {
     steps: "gap-[1mm] text-[5pt] leading-snug",
     stepGap: "gap-[1mm]",
     numWidth: "w-[2.5mm]",
-    // 96px = 25.4mm — fills the right column (~32mm usable).
-    // 0.77mm a module — comfortable for print.
-    qr: 96,
+    // 56px = 14.8mm — 0.45mm a module. Over the ~0.4mm floor.
+    qr: 56,
     footer: "pb-[1mm] text-[4.5pt]",
     footerPad: "px-[2.5mm]",
   },
@@ -510,12 +508,15 @@ export function PackCard({
       </div>
       {/* Topic ribbon row — two lines, primary-tinted wash */}
       {topicBlock}
-      {/* Steps beside the QR + brand mark */}
+      {/* Steps beside the QR + brand mark. min-h-0 constrains the body
+          within the card's fixed height — without it, long charity names
+          in step 2 push the brand + footer below the overflow clip
+          (founder, 2026-09-10: wallet cards missing branding + footer). */}
       <div
-        className={`flex flex-1 flex-col border-t border-border ${s.bodyPad}`}
+        className={`flex min-h-0 flex-1 flex-col border-t border-border ${s.bodyPad}`}
       >
         <div
-          className={`flex flex-1 ${"stack" in s && s.stack ? "flex-col items-center" : "items-start"} ${s.bodyGap}`}
+          className={`flex min-h-0 flex-1 overflow-hidden ${"stack" in s && s.stack ? "flex-col items-center" : "items-start"} ${s.bodyGap}`}
         >
           {steps && (
             <div
