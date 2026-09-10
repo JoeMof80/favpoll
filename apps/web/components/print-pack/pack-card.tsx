@@ -369,7 +369,9 @@ export function PackCard({
   // different size for the eyebrow — that was tried and reverted on the app
   // side too (#627).
   const topicBlock = data.topicTitle ? (
-    <div className={`border-y border-border ${s.topicRow}`}>
+    <div
+      className={`border-y border-border bg-primary/5 [print-color-adjust:exact] ${s.topicRow}`}
+    >
       <p
         className={`font-medium tracking-[0.09em] text-primary/55 uppercase ${s.topic}`}
       >
@@ -480,7 +482,9 @@ export function PackCard({
       {/* Header — eyebrow + name. Brand mark moved to the body beside the
           QR (founder, 2026-09-09). Opening line truncated (founder,
           2026-09-10 — was wrapping on wallet cards). */}
-      <div className={`flex flex-col ${s.headerPad}`}>
+      <div
+        className={`flex flex-col bg-muted/50 [print-color-adjust:exact] ${s.headerPad}`}
+      >
         <span
           className={`min-w-0 truncate font-medium text-muted-foreground uppercase ${s.eyebrow}`}
         >
@@ -492,16 +496,10 @@ export function PackCard({
           {data.name}
         </span>
       </div>
-      {/* Topic ribbon row — two lines, primary-tinted wash */}
       {topicBlock}
-      {/* Steps beside the QR + brand mark. min-h-0 constrains the body
-          within the card's fixed height — without it, long charity names
-          in step 2 push the brand + footer below the overflow clip
-          (founder, 2026-09-10: wallet cards missing branding + footer). */}
-      {/* Body: steps left, QR+brand right — brand UNDER QR, same as
-          tent cards. */}
+      {/* Body: steps left, QR right — QR BOTTOM-ALIGNED with steps */}
       <div
-        className={`flex flex-1 border-t border-border ${s.bodyPad} ${"stack" in s && s.stack ? "flex-col items-center" : "items-start"} ${s.bodyGap}`}
+        className={`flex flex-1 ${s.bodyPad} ${"stack" in s && s.stack ? "flex-col items-center" : "items-end"} ${s.bodyGap}`}
       >
         {steps && (
           <div
@@ -519,28 +517,26 @@ export function PackCard({
             ))}
           </div>
         )}
-        {/* Right: QR + brand under it */}
-        <div className="flex shrink-0 flex-col items-center">
-          <BrandedQR
-            value={data.qrUrl}
-            size={s.qr}
-            aria-label={`QR code to pledge for ${data.name}`}
-            className="shrink-0"
-          />
-          <div className="mt-[1.5mm]">
-            <BrandMark size={s} />
-          </div>
-        </div>
+        <BrandedQR
+          value={data.qrUrl}
+          size={s.qr}
+          aria-label={`QR code to pledge for ${data.name}`}
+          className="shrink-0"
+        />
       </div>
-      {/* Footer at the BOTTOM of the card, full width (founder,
-          2026-09-10: "move the footer to the bottom"). */}
-      {data.topicTitle && (
-        <p
-          className={`text-left text-muted-foreground/80 ${s.footer} ${s.footerPad}`}
-        >
-          {mechanicFooter(data.topicTitle)}
-        </p>
-      )}
+      {/* Bottom row: footer text left, brand right */}
+      <div
+        className={`flex items-end justify-between ${s.footerPad} ${s.footer}`}
+      >
+        {data.topicTitle ? (
+          <p className="text-muted-foreground/80">
+            {mechanicFooter(data.topicTitle)}
+          </p>
+        ) : (
+          <span />
+        )}
+        <BrandMark size={s} />
+      </div>
     </div>
   )
 }
