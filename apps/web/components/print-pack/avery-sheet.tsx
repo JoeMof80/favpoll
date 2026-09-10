@@ -59,19 +59,6 @@ export const AVERY_SHEETS: Record<string, AverySheetDef> = {
     box: { w: "240mm", h: "180mm" },
     steps: true,
   },
-  L7418: {
-    // Two uses, one layout: cut lines on plain card and it is the wallet-card
-    // sheet; cut lines off on L7418 stock and it is a sheet of labels.
-    label: "Wallet cards & labels",
-    code: "L7418",
-    note: "86 × 55 mm · 8 to a sheet",
-    face: "l7418",
-    orientation: "portrait",
-    folded: false,
-    grid: { cols: 2, rows: 4 },
-    box: { w: "172mm", h: "220mm" },
-    steps: true,
-  },
   C32253: {
     label: "Place cards",
     code: "C32253",
@@ -84,6 +71,19 @@ export const AVERY_SHEETS: Record<string, AverySheetDef> = {
     // Was false — the two-panel fold gives the content face the full
     // card height (founder, 2026-09-10: "no reason not to include
     // instructions").
+    steps: true,
+  },
+  L7418: {
+    // Two uses, one layout: cut lines on plain card and it is the wallet-card
+    // sheet; cut lines off on L7418 stock and it is a sheet of labels.
+    label: "Wallet cards & labels",
+    code: "L7418",
+    note: "86 × 55 mm · 8 to a sheet",
+    face: "l7418",
+    orientation: "portrait",
+    folded: false,
+    grid: { cols: 2, rows: 4 },
+    box: { w: "172mm", h: "220mm" },
     steps: true,
   },
   L7160: {
