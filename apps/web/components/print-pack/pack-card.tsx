@@ -370,16 +370,24 @@ export function PackCard({
   // side too (#627).
   const topicBlock = data.topicTitle ? (
     <div className={`border-y border-border ${s.topicRow}`}>
-      <p
-        className={`font-medium tracking-[0.09em] text-primary/55 uppercase ${s.topic}`}
-      >
-        Favourite
-      </p>
-      <p
-        className={`truncate font-medium tracking-[0.09em] text-primary uppercase ${s.topic}`}
-      >
-        {data.topicTitle}
-      </p>
+      <div className="flex items-start justify-between gap-1">
+        <div className="min-w-0 flex-1">
+          <p
+            className={`font-medium tracking-[0.09em] text-primary/55 uppercase ${s.topic}`}
+          >
+            Favourite
+          </p>
+          <p
+            className={`truncate font-medium tracking-[0.09em] text-primary uppercase ${s.topic}`}
+          >
+            {data.topicTitle}
+          </p>
+        </div>
+        {/* Brand in the topic row — "Favourite" never changes so there
+            is always space here (founder, 2026-09-10). Frees the QR
+            column from needing to fit the brand below it. */}
+        <BrandMark size={s} />
+      </div>
     </div>
   ) : null
 
@@ -460,9 +468,6 @@ export function PackCard({
             aria-label={`QR code to pledge for ${data.name}`}
             className="shrink-0"
           />
-          <div className="mt-[1.5mm]">
-            <BrandMark size={s} />
-          </div>
         </div>
       </div>
     )
@@ -527,17 +532,13 @@ export function PackCard({
             = body height minus padding, brand gets minimum, QR gets the
             rest"). Render the QR large; the aspect-square constraint and
             max-h-full keep it fitting. */}
-        <div className="flex shrink-0 flex-col items-center self-stretch pb-[0.5mm]">
-          <div className="flex flex-1 items-center">
-            <BrandedQR
-              value={data.qrUrl}
-              size={s.qr}
-              aria-label={`QR code to pledge for ${data.name}`}
-              className="shrink-0"
-            />
-          </div>
-          <BrandMark size={s} />
-        </div>
+        {/* QR — brand is in the topic row now */}
+        <BrandedQR
+          value={data.qrUrl}
+          size={s.qr}
+          aria-label={`QR code to pledge for ${data.name}`}
+          className="shrink-0"
+        />
       </div>
     </div>
   )
