@@ -161,7 +161,7 @@ export const SCALE = {
     topicEyebrow: "text-[5pt] tracking-[0.14em]",
     bodyPad: "px-[4mm] pt-[1mm] pb-[0.5mm]",
     bodyGap: "gap-[3mm]",
-    steps: "gap-[1mm] text-[5.5pt] leading-snug",
+    steps: "gap-[1.2mm] text-[7pt] leading-snug",
     stepGap: "gap-[1mm]",
     numWidth: "w-[3mm]",
     // 140px = 37mm — fills the 45mm column height (minus padding).
