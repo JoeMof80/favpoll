@@ -370,26 +370,39 @@ export function PackCard({
   // side too (#627).
   const topicBlock = data.topicTitle ? (
     <div className={`border-y border-border ${s.topicRow}`}>
-      <div className="flex items-start justify-between gap-1">
-        <div className="min-w-0 flex-1">
-          <p
-            className={`font-medium tracking-[0.09em] text-primary/55 uppercase ${s.topic}`}
-          >
-            Favourite
-          </p>
-          <p
-            className={`truncate font-medium tracking-[0.09em] text-primary uppercase ${s.topic}`}
-          >
-            {data.topicTitle}
-          </p>
-        </div>
-        {/* Brand in the topic row — "Favourite" never changes so there
-            is always space here (founder, 2026-09-10). Frees the QR
-            column from needing to fit the brand below it. */}
-        <BrandMark size={s} />
-      </div>
+      <p
+        className={`font-medium tracking-[0.09em] text-primary/55 uppercase ${s.topic}`}
+      >
+        Favourite
+      </p>
+      <p
+        className={`truncate font-medium tracking-[0.09em] text-primary uppercase ${s.topic}`}
+      >
+        {data.topicTitle}
+      </p>
     </div>
   ) : null
+
+  // Header row: opening line left, brand top-right (founder, 2026-09-10:
+  // "move the brand into the top right corner throughout"). The opening
+  // line truncates if it gets too close.
+  const headerBlock = (
+    <div className={`flex flex-col ${s.headerPad}`}>
+      <div className="flex items-start justify-between gap-1">
+        <span
+          className={`min-w-0 truncate font-medium text-muted-foreground uppercase ${s.eyebrow}`}
+        >
+          {data.prefix}
+        </span>
+        <BrandMark size={s} />
+      </div>
+      <span
+        className={`truncate leading-snug font-medium text-foreground ${s.name}`}
+      >
+        {data.name}
+      </span>
+    </div>
+  )
 
   // ── Name face (folded cards): blank surface for the guest's name ────────
   // Panel 1 of a tent/place card — what faces the guest's seat. Just the
@@ -414,26 +427,14 @@ export function PackCard({
       >
         {/* Left column: all text content */}
         <div className="flex min-w-0 flex-1 flex-col">
-          {/* Header */}
-          <div className={`flex flex-col ${s.headerPad}`}>
-            <span
-              className={`min-w-0 truncate font-medium text-muted-foreground uppercase ${s.eyebrow}`}
-            >
-              {data.prefix}
-            </span>
-            <span
-              className={`truncate leading-snug font-medium text-foreground ${s.name}`}
-            >
-              {data.name}
-            </span>
-          </div>
-          {/* Topic wash */}
+          {headerBlock}
           {topicBlock}
-          {/* Steps */}
-          <div className={`flex flex-1 flex-col ${s.bodyPad}`}>
+          {/* Steps — vertically centred for tent/place cards (founder,
+              2026-09-10) */}
+          <div className={`flex flex-1 flex-col justify-center ${s.bodyPad}`}>
             {steps && (
               <div
-                className={`flex flex-1 flex-col text-left text-muted-foreground ${s.steps}`}
+                className={`flex flex-col text-left text-muted-foreground ${s.steps}`}
               >
                 {steps.map((step, j) => (
                   <p key={j} className={`flex ${s.stepGap}`}>
@@ -473,21 +474,7 @@ export function PackCard({
     <div
       className={`flex flex-col overflow-hidden bg-white [print-color-adjust:exact] ${box}`}
     >
-      {/* Header — eyebrow + name. Brand mark moved to the body beside the
-          QR (founder, 2026-09-09). Opening line truncated (founder,
-          2026-09-10 — was wrapping on wallet cards). */}
-      <div className={`flex flex-col ${s.headerPad}`}>
-        <span
-          className={`min-w-0 truncate font-medium text-muted-foreground uppercase ${s.eyebrow}`}
-        >
-          {data.prefix}
-        </span>
-        <span
-          className={`truncate leading-snug font-medium text-foreground ${s.name}`}
-        >
-          {data.name}
-        </span>
-      </div>
+      {headerBlock}
       {topicBlock}
       {/* Body: two internal columns, top-aligned.
           Left: steps + footer text (mt-auto).
