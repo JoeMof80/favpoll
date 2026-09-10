@@ -269,8 +269,12 @@ export const SCALE = {
   //
   // NO STEPS at this size: 38mm holds the name, the topic, a scannable code
   // and one line. That line is the CHARITY — see charityFooter below.
+  // L7160 small labels — two-column (founder, 2026-09-10: "completely
+  // wrong"). 63.5 x 38.1mm is wide enough for a proper split; the QR
+  // fills its column, the charity footer names the destination.
   l7160: {
     stack: false,
+    twoColumn: true,
     charityFooter: true,
     placeCard: false,
     // THE CHARITY, not the shared-fund line. This face is 38mm and cannot
@@ -281,9 +285,9 @@ export const SCALE = {
     headerPad: "px-[2.5mm] pt-[2mm] pb-[1mm]",
     eyebrow: "text-[5pt] tracking-[0.12em]",
     name: "text-[8pt]",
-    brandSvg: { width: 9, height: 8 },
-    brandText: "text-[6pt]",
-    brandGap: "gap-[0.7mm]",
+    brandSvg: { width: 12, height: 11 },
+    brandText: "text-[7pt]",
+    brandGap: "gap-[0.8mm]",
     topicRow: "px-[2.5mm] py-[0.8mm]",
     topic: "text-[6.5pt] tracking-[0.08em]",
     topicEyebrow: "text-[5pt] tracking-[0.12em]",
@@ -292,9 +296,9 @@ export const SCALE = {
     steps: "gap-[1mm] text-[5pt] leading-snug",
     stepGap: "gap-[1mm]",
     numWidth: "w-[2.5mm]",
-    // 56px = 14.8mm — 0.45mm a module. Over the ~0.4mm floor; the smallest
-    // code favpoll prints after C32253.
-    qr: 56,
+    // 96px = 25.4mm — fills the right column (~32mm usable).
+    // 0.77mm a module — comfortable for print.
+    qr: 96,
     footer: "pb-[1mm] text-[4.5pt]",
     footerPad: "px-[2.5mm]",
   },
