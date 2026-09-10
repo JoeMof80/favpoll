@@ -239,28 +239,30 @@ export const SCALE = {
   // card — the wallet card that sticks to things: an order of service, a
   // favour bag, a menu, a bottle. Portrait sheet, so no orientation problem.
   // Wallet's density, since the face is within a millimetre of it.
+  // L7418 wallet card — TIGHTENED (founder, 2026-09-10: steps and footer
+  // overlapped at the old sizes with long charity names in step 2).
   l7418: {
     stack: false,
     charityFooter: false,
     placeCard: false,
     card: "h-[55mm] w-[86mm] rounded-none",
-    headerPad: "px-[3mm] pt-[2.5mm] pb-[2mm]",
-    eyebrow: "text-[6pt] tracking-[0.14em]",
-    name: "text-[10pt]",
-    brandSvg: { width: 12, height: 11 },
-    brandText: "text-[8pt]",
-    brandGap: "gap-[1mm]",
-    topicRow: "px-[3mm] py-[1.5mm]",
-    topic: "text-[8.5pt] tracking-[0.09em]",
-    topicEyebrow: "text-[6pt] tracking-[0.14em]",
-    bodyPad: "px-[3mm] pt-[3mm] pb-[1mm]",
-    bodyGap: "gap-[3mm]",
-    steps: "gap-[1.5mm] text-[6.5pt] leading-snug",
-    stepGap: "gap-[1.5mm]",
-    numWidth: "w-[3.5mm]",
-    // 92px = 24.3mm — 0.74mm a module, the same as the wallet card.
-    qr: 92,
-    footer: "pb-[2mm] text-[5.5pt]",
+    headerPad: "px-[3mm] pt-[1.5mm] pb-[1mm]",
+    eyebrow: "text-[5pt] tracking-[0.14em]",
+    name: "text-[8pt]",
+    brandSvg: { width: 10, height: 9 },
+    brandText: "text-[6pt]",
+    brandGap: "gap-[0.8mm]",
+    topicRow: "px-[3mm] py-[1mm]",
+    topic: "text-[7pt] tracking-[0.09em]",
+    topicEyebrow: "text-[5pt] tracking-[0.14em]",
+    bodyPad: "px-[3mm] pt-[2mm] pb-[0.5mm]",
+    bodyGap: "gap-[2.5mm]",
+    steps: "gap-[1mm] text-[5.5pt] leading-snug",
+    stepGap: "gap-[1mm]",
+    numWidth: "w-[3mm]",
+    // 80px = 21.2mm — 0.64mm a module.
+    qr: 80,
+    footer: "pb-[1mm] text-[5pt]",
     footerPad: "px-[3mm]",
   },
 
@@ -272,31 +274,30 @@ export const SCALE = {
   // L7160 small labels — single-column (founder, 2026-09-10: "shouldn't
   // use two column layout"). 38.1mm tall; the standard layout stacks
   // header + topic + steps-beside-QR + charity footer.
+  // L7160 small labels — TIGHTENED (founder, 2026-09-10). 38.1mm tall;
+  // no steps; the charity footer names the destination. Everything
+  // reduced so header + topic + QR + charity fit without clipping.
   l7160: {
     stack: false,
     charityFooter: true,
     placeCard: false,
-    // THE CHARITY, not the shared-fund line. This face is 38mm and cannot
-    // hold the steps, and the steps are where every other format names where
-    // the money goes. A public artefact that shows a code and a topic but
-    // never says which charity is not one favpoll should print.
     card: "h-[38.1mm] w-[63.5mm] rounded-none",
-    headerPad: "px-[2.5mm] pt-[2mm] pb-[1mm]",
-    eyebrow: "text-[5pt] tracking-[0.12em]",
-    name: "text-[8pt]",
-    brandSvg: { width: 9, height: 8 },
-    brandText: "text-[6pt]",
-    brandGap: "gap-[0.7mm]",
-    topicRow: "px-[2.5mm] py-[0.8mm]",
-    topic: "text-[6.5pt] tracking-[0.08em]",
-    topicEyebrow: "text-[5pt] tracking-[0.12em]",
-    bodyPad: "px-[2.5mm] pt-[1.5mm] pb-[1mm]",
-    bodyGap: "gap-[2mm]",
-    steps: "gap-[1mm] text-[5pt] leading-snug",
-    stepGap: "gap-[1mm]",
-    numWidth: "w-[2.5mm]",
-    // 56px = 14.8mm — 0.45mm a module. Over the ~0.4mm floor.
-    qr: 56,
+    headerPad: "px-[2mm] pt-[1.5mm] pb-[0.5mm]",
+    eyebrow: "text-[4pt] tracking-[0.12em]",
+    name: "text-[6.5pt]",
+    brandSvg: { width: 8, height: 7 },
+    brandText: "text-[5pt]",
+    brandGap: "gap-[0.5mm]",
+    topicRow: "px-[2mm] py-[0.5mm]",
+    topic: "text-[5pt] tracking-[0.08em]",
+    topicEyebrow: "text-[4pt] tracking-[0.12em]",
+    bodyPad: "px-[2mm] pt-[1mm] pb-[0.5mm]",
+    bodyGap: "gap-[1.5mm]",
+    steps: "gap-[0.8mm] text-[4pt] leading-snug",
+    stepGap: "gap-[0.8mm]",
+    numWidth: "w-[2mm]",
+    // 48px = 12.7mm — 0.39mm a module, at the printed floor.
+    qr: 48,
     footer: "pb-[1mm] text-[4.5pt]",
     footerPad: "px-[2.5mm]",
   },
