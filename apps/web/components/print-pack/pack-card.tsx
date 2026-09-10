@@ -513,15 +513,17 @@ export function PackCard({
           within the card's fixed height — without it, long charity names
           in step 2 push the brand + footer below the overflow clip
           (founder, 2026-09-10: wallet cards missing branding + footer). */}
+      {/* Body: steps left, QR+brand right — BRAND UNDER QR, same as
+          tent cards (founder, 2026-09-10: "put the fucking branding under
+          the QR code like you have with the tent cards"). */}
       <div
-        className={`flex min-h-0 flex-1 flex-col border-t border-border ${s.bodyPad}`}
+        className={`flex flex-1 border-t border-border ${s.bodyPad} ${"stack" in s && s.stack ? "flex-col items-center" : "items-start"} ${s.bodyGap}`}
       >
-        <div
-          className={`flex min-h-0 flex-1 overflow-hidden ${"stack" in s && s.stack ? "flex-col items-center" : "items-start"} ${s.bodyGap}`}
-        >
+        {/* Left: steps + footer stacked */}
+        <div className="flex min-w-0 flex-1 flex-col">
           {steps && (
             <div
-              className={`flex min-h-0 min-w-0 flex-1 flex-col text-left text-muted-foreground ${s.steps}`}
+              className={`flex flex-1 flex-col text-left text-muted-foreground ${s.steps}`}
             >
               {steps.map((step, j) => (
                 <p key={j} className={`flex ${s.stepGap}`}>
@@ -535,29 +537,27 @@ export function PackCard({
               ))}
             </div>
           )}
-          {/* QR on the right — brand mark lives OUTSIDE the overflow-clipped
-              row so it can never be eaten (founder, 2026-09-10: "wallet card
-              branding STILL missing"). */}
+          {(data.topicTitle || s.charityFooter) && (
+            <p
+              className={`mt-auto text-left text-muted-foreground/80 ${s.footer}`}
+            >
+              {s.charityFooter
+                ? charityLabel(data.charityNames)
+                : mechanicFooter(data.topicTitle!)}
+            </p>
+          )}
+        </div>
+        {/* Right: QR + brand under it */}
+        <div className="flex shrink-0 flex-col items-center">
           <BrandedQR
             value={data.qrUrl}
             size={s.qr}
             aria-label={`QR code to pledge for ${data.name}`}
             className="shrink-0"
           />
-        </div>
-        {/* Bottom row: footer left, brand right — both outside the
-            overflow clip, always visible. */}
-        <div className="mt-auto flex items-end justify-between">
-          {data.topicTitle || s.charityFooter ? (
-            <p className={`text-left text-muted-foreground/80 ${s.footer}`}>
-              {s.charityFooter
-                ? charityLabel(data.charityNames)
-                : mechanicFooter(data.topicTitle!)}
-            </p>
-          ) : (
-            <span />
-          )}
-          <BrandMark size={s} />
+          <div className="mt-[1.5mm]">
+            <BrandMark size={s} />
+          </div>
         </div>
       </div>
     </div>
