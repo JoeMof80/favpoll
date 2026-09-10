@@ -282,7 +282,7 @@ export const SCALE = {
     steps: "gap-[0.8mm] text-[5pt] leading-snug",
     stepGap: "gap-[0.8mm]",
     numWidth: "w-[2.5mm]",
-    qr: 66,
+    qr: 63,
     footer: "text-[4.5pt]",
     footerPad: "px-[2.5mm]",
   },
