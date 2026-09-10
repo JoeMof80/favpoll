@@ -332,6 +332,7 @@ export function PackCard({
   steps,
   scale,
   bleed = false,
+  face = "content",
 }: {
   data: PackData
   steps: string[] | null
@@ -347,114 +348,87 @@ export function PackCard({
    * individually and there is nothing else to aim at.
    */
   bleed?: boolean
+  /**
+   * Which face of a folded card to render.
+   *
+   * - `"content"` (default) — the full favpoll content: header, topic wash,
+   *    QR + branding. This is the only face non-folded cards use.
+   * - `"name"` — a blank surface for the guest's name (place/tent cards).
+   *    Renders just the card chrome with no content.
+   */
+  face?: "content" | "name"
 }) {
   const s = SCALE[scale]
   // Strip the radius with the border: a rounded corner on a card you cut from
   // a shared sheet leaves a white nick at every corner.
   const box = bleed ? "h-full w-full" : `border border-border ${s.card}`
 
-  // ── Two-line topic: "FAVOURITE" eyebrow above the topic title ────────────
+  // ── Two-line topic: app-canonical grammar (PollHeading) ──────────────────
+  // Both lines UPPERCASE with tracking, same size — "Favourite" quieter by
+  // OPACITY (the PollHeading settlement, founder 2026-09-01). Don't use a
+  // different size for the eyebrow — that was tried and reverted on the app
+  // side too (#627).
   const topicBlock = data.topicTitle ? (
-    <div className={`border-t border-border ${s.topicRow}`}>
-      <p className={`font-medium text-primary uppercase ${s.topicEyebrow}`}>
+    <div
+      className={`border-t border-border bg-primary/5 [print-color-adjust:exact] ${s.topicRow}`}
+    >
+      <p
+        className={`font-medium tracking-[0.09em] text-primary/55 uppercase ${s.topic}`}
+      >
         Favourite
       </p>
-      <p className={`truncate font-medium text-primary ${s.topic}`}>
+      <p
+        className={`truncate font-medium tracking-[0.09em] text-primary uppercase ${s.topic}`}
+      >
         {data.topicTitle}
       </p>
     </div>
   ) : null
 
-  // ── Place-card scales: blank name zone LEFT, content RIGHT ───────────────
-  // Founder, 2026-09-10: the name zone is the card's primary job (guests
-  // read left-to-right: their name first, then context). Content can
-  // truncate — everything overflows as single-line ellipsis. The content
-  // is framed in a rounded rectangle; branding sits below the QR; QR
-  // enlarged (×1.4) since steps no longer compete for the vertical space.
-  if (s.placeCard) {
+  // ── Name face (folded cards): blank surface for the guest's name ────────
+  // Panel 1 of a tent/place card — what faces the guest's seat. Just the
+  // card chrome, no content.
+  if (face === "name" && s.placeCard) {
     return (
       <div
-        className={`flex items-center overflow-hidden bg-white [print-color-adjust:exact] ${box}`}
-      >
-        {/* Left: blank name zone — ~65% */}
-        <div className="flex-1" />
-        {/* Right: content (~35%) in a rounded frame */}
-        <div className="flex w-[35%] shrink-0 flex-col items-center rounded-xl border border-border p-[3mm]">
-          {/* Opening line + name — centred, truncated */}
-          <span
-            className={`w-full truncate text-center font-medium text-muted-foreground uppercase ${s.eyebrow}`}
-          >
-            {data.prefix}
-          </span>
-          <span
-            className={`w-full truncate text-center leading-snug font-medium text-foreground ${s.name}`}
-          >
-            {data.name}
-          </span>
-          {/* Topic — two lines, centred */}
-          {data.topicTitle && (
-            <div className="mt-[1.5mm] w-full text-center">
-              <p
-                className={`font-medium text-muted-foreground uppercase ${s.topicEyebrow}`}
-              >
-                Favourite
-              </p>
-              <p className={`truncate font-medium text-primary ${s.topic}`}>
-                {data.topicTitle}
-              </p>
-            </div>
-          )}
-          {/* QR — enlarged for place cards */}
-          <div className="mt-[2mm]">
-            <BrandedQR
-              value={data.qrUrl}
-              size={Math.round(s.qr * 1.4)}
-              aria-label={`QR code to pledge for ${data.name}`}
-              className="shrink-0"
-            />
-          </div>
-          {/* Branding below the QR */}
-          <div className="mt-[1.5mm]">
-            <BrandMark size={s} />
-          </div>
-        </div>
-      </div>
+        className={`overflow-hidden bg-white [print-color-adjust:exact] ${box}`}
+      />
     )
   }
 
-  // ── Standard scales: full content ────────────────────────────────────────
+  // ── Standard / content-face layout ──────────────────────────────────────
+  // Place-card content faces hide steps (the face is too small) but use
+  // the same structural layout as every other scale.
+  const showSteps = !s.placeCard
   return (
     <div
       className={`flex flex-col overflow-hidden bg-white [print-color-adjust:exact] ${box}`}
     >
-      {/* Header — eyebrow + name, brand bottom-aligned with the eyebrow */}
+      {/* Header — eyebrow + name. Brand mark moved to the body beside the
+          QR (founder, 2026-09-09). Opening line truncated (founder,
+          2026-09-10 — was wrapping on wallet cards). */}
       <div className={`flex flex-col ${s.headerPad}`}>
-        <div className="flex items-end justify-between gap-2">
-          <span
-            className={`font-medium text-muted-foreground uppercase ${s.eyebrow}`}
-          >
-            {data.prefix}
-          </span>
-          <BrandMark size={s} />
-        </div>
+        <span
+          className={`min-w-0 truncate font-medium text-muted-foreground uppercase ${s.eyebrow}`}
+        >
+          {data.prefix}
+        </span>
         <span
           className={`truncate leading-snug font-medium text-foreground ${s.name}`}
         >
           {data.name}
         </span>
       </div>
-      {/* Topic ribbon row — two lines */}
+      {/* Topic ribbon row — two lines, primary-tinted wash */}
       {topicBlock}
-      {/* Steps beside the QR */}
+      {/* Steps beside the QR + brand mark */}
       <div
         className={`flex flex-1 flex-col border-t border-border ${s.bodyPad}`}
       >
-        {/* Portrait cards stack: the steps and a 34mm code will not sit side
-            by side in a 95mm-wide card. */}
         <div
           className={`flex flex-1 ${"stack" in s && s.stack ? "flex-col items-center" : "items-start"} ${s.bodyGap}`}
         >
-          {steps && (
+          {showSteps && steps && (
             <div
               className={`flex flex-1 flex-col text-left text-muted-foreground ${s.steps}`}
             >
@@ -470,12 +444,18 @@ export function PackCard({
               ))}
             </div>
           )}
-          <BrandedQR
-            value={data.qrUrl}
-            size={s.qr}
-            aria-label={`QR code to pledge for ${data.name}`}
-            className="shrink-0"
-          />
+          {/* QR + brand mark grouped on the right */}
+          <div className="flex shrink-0 flex-col items-center">
+            <BrandedQR
+              value={data.qrUrl}
+              size={s.qr}
+              aria-label={`QR code to pledge for ${data.name}`}
+              className="shrink-0"
+            />
+            <div className="mt-[1.5mm]">
+              <BrandMark size={s} />
+            </div>
+          </div>
         </div>
         {(data.topicTitle || s.charityFooter) && (
           <p
