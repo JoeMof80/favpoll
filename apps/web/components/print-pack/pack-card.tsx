@@ -397,9 +397,10 @@ export function PackCard({
   }
 
   // ── Standard / content-face layout ──────────────────────────────────────
-  // Place-card content faces hide steps (the face is too small) but use
-  // the same structural layout as every other scale.
-  const showSteps = !s.placeCard
+  // Every content face gets the same layout — steps included. The founder
+  // (2026-09-10): "no reason for the tent and place cards not to include
+  // instructions." The two-panel fold gives the content face the full card
+  // height, so there is room.
   return (
     <div
       className={`flex flex-col overflow-hidden bg-white [print-color-adjust:exact] ${box}`}
@@ -428,7 +429,7 @@ export function PackCard({
         <div
           className={`flex flex-1 ${"stack" in s && s.stack ? "flex-col items-center" : "items-start"} ${s.bodyGap}`}
         >
-          {showSteps && steps && (
+          {steps && (
             <div
               className={`flex flex-1 flex-col text-left text-muted-foreground ${s.steps}`}
             >
