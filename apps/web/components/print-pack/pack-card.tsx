@@ -267,23 +267,22 @@ export const SCALE = {
     charityFooter: false,
     placeCard: false,
     card: "h-[38.1mm] w-[63.5mm] rounded-none",
-    // CONSISTENT PADDING: 2.5mm horizontal, 1mm vertical throughout.
-    headerPad: "px-[2.5mm] py-[1mm]",
+    headerPad: "px-[2.5mm] pt-[1.5mm] pb-[1mm]",
     eyebrow: "text-[4.5pt] tracking-[0.12em]",
     name: "text-[7pt]",
-    brandSvg: { width: 10, height: 9 },
-    brandText: "text-[5.5pt]",
-    brandGap: "gap-[0.6mm]",
+    brandSvg: { width: 9, height: 8 },
+    brandText: "text-[5pt]",
+    brandGap: "gap-[0.5mm]",
     topicRow: "px-[2.5mm] py-[1mm]",
     topic: "text-[5.5pt] tracking-[0.08em]",
     topicEyebrow: "text-[4.5pt] tracking-[0.12em]",
-    bodyPad: "px-[2.5mm] py-[1mm]",
+    bodyPad: "px-[2.5mm] pt-[1.5mm] pb-[1mm]",
     bodyGap: "gap-[2mm]",
     steps: "gap-[0.8mm] text-[5pt] leading-snug",
     stepGap: "gap-[0.8mm]",
     numWidth: "w-[2.5mm]",
-    // 80px = 21.2mm — fills the body column height. 0.64mm a module.
-    qr: 80,
+    // 56px = 14.8mm — moderate size beside steps, room for brand below.
+    qr: 56,
     footer: "text-[4.5pt]",
     footerPad: "px-[2.5mm]",
   },
@@ -370,9 +369,7 @@ export function PackCard({
   // different size for the eyebrow — that was tried and reverted on the app
   // side too (#627).
   const topicBlock = data.topicTitle ? (
-    <div
-      className={`border-y border-border bg-primary/5 [print-color-adjust:exact] ${s.topicRow}`}
-    >
+    <div className={`border-y border-border ${s.topicRow}`}>
       <p
         className={`font-medium tracking-[0.09em] text-primary/55 uppercase ${s.topic}`}
       >
@@ -483,9 +480,7 @@ export function PackCard({
       {/* Header — eyebrow + name. Brand mark moved to the body beside the
           QR (founder, 2026-09-09). Opening line truncated (founder,
           2026-09-10 — was wrapping on wallet cards). */}
-      <div
-        className={`flex flex-col bg-muted/50 [print-color-adjust:exact] ${s.headerPad}`}
-      >
+      <div className={`flex flex-col ${s.headerPad}`}>
         <span
           className={`min-w-0 truncate font-medium text-muted-foreground uppercase ${s.eyebrow}`}
         >
