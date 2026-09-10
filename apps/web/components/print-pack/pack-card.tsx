@@ -267,23 +267,23 @@ export const SCALE = {
     charityFooter: false,
     placeCard: false,
     card: "h-[38.1mm] w-[63.5mm] rounded-none",
-    headerPad: "px-[2.5mm] pt-[1.5mm] pb-[0.5mm]",
+    headerPad: "px-[2.5mm] pt-[1.5mm] pb-[1mm]",
     eyebrow: "text-[4.5pt] tracking-[0.12em]",
     name: "text-[7pt]",
     brandSvg: { width: 9, height: 8 },
-    brandText: "text-[5.5pt]",
-    brandGap: "gap-[0.6mm]",
-    topicRow: "px-[2.5mm] py-[0.5mm]",
+    brandText: "text-[5pt]",
+    brandGap: "gap-[0.5mm]",
+    topicRow: "px-[2.5mm] py-[1mm]",
     topic: "text-[5.5pt] tracking-[0.08em]",
     topicEyebrow: "text-[4.5pt] tracking-[0.12em]",
-    bodyPad: "px-[2.5mm] pt-[1mm] pb-[0.5mm]",
+    bodyPad: "px-[2.5mm] pt-[1.5mm] pb-[1mm]",
     bodyGap: "gap-[2mm]",
     steps: "gap-[0.8mm] text-[5pt] leading-snug",
     stepGap: "gap-[0.8mm]",
     numWidth: "w-[2.5mm]",
-    // 64px = 16.9mm — 0.52mm a module.
-    qr: 64,
-    footer: "pb-[0.5mm] text-[4.5pt]",
+    // 68px = 18mm — 0.55mm a module.
+    qr: 68,
+    footer: "text-[4.5pt]",
     footerPad: "px-[2.5mm]",
   },
 } as const
@@ -369,9 +369,7 @@ export function PackCard({
   // different size for the eyebrow — that was tried and reverted on the app
   // side too (#627).
   const topicBlock = data.topicTitle ? (
-    <div
-      className={`border-y border-border bg-primary/5 [print-color-adjust:exact] ${s.topicRow}`}
-    >
+    <div className={`border-y border-border ${s.topicRow}`}>
       <p
         className={`font-medium tracking-[0.09em] text-primary/55 uppercase ${s.topic}`}
       >
@@ -482,9 +480,7 @@ export function PackCard({
       {/* Header — eyebrow + name. Brand mark moved to the body beside the
           QR (founder, 2026-09-09). Opening line truncated (founder,
           2026-09-10 — was wrapping on wallet cards). */}
-      <div
-        className={`flex flex-col bg-muted/50 [print-color-adjust:exact] ${s.headerPad}`}
-      >
+      <div className={`flex flex-col ${s.headerPad}`}>
         <span
           className={`min-w-0 truncate font-medium text-muted-foreground uppercase ${s.eyebrow}`}
         >
@@ -533,7 +529,7 @@ export function PackCard({
             aria-label={`QR code to pledge for ${data.name}`}
             className="shrink-0"
           />
-          <div className="mt-auto pt-[1.5mm]">
+          <div className="pt-[1mm]">
             <BrandMark size={s} />
           </div>
         </div>
