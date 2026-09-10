@@ -252,7 +252,7 @@ export const SCALE = {
     topicEyebrow: "text-[5pt] tracking-[0.14em]",
     bodyPad: "px-[3mm] pt-[2mm] pb-[1mm]",
     bodyGap: "gap-[3mm]",
-    steps: "gap-[1mm] text-[6pt] leading-snug",
+    steps: "gap-[1mm] text-[7pt] leading-snug",
     stepGap: "gap-[1mm]",
     numWidth: "w-[3mm]",
     // 92px = 24.3mm — 0.74mm a module.
@@ -532,13 +532,16 @@ export function PackCard({
             = body height minus padding, brand gets minimum, QR gets the
             rest"). Render the QR large; the aspect-square constraint and
             max-h-full keep it fitting. */}
-        {/* QR — brand is in the topic row now */}
-        <BrandedQR
-          value={data.qrUrl}
-          size={s.qr}
-          aria-label={`QR code to pledge for ${data.name}`}
-          className="shrink-0"
-        />
+        {/* QR — brand is in the topic row. Negative margin crops the
+            library's internal quiet zone so the code fills its space. */}
+        <div className="shrink-0 overflow-hidden">
+          <BrandedQR
+            value={data.qrUrl}
+            size={Math.round(s.qr * 1.08)}
+            aria-label={`QR code to pledge for ${data.name}`}
+            className="-m-[4%]"
+          />
+        </div>
       </div>
     </div>
   )
