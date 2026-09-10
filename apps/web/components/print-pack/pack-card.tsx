@@ -282,9 +282,9 @@ export const SCALE = {
     steps: "gap-[0.8mm] text-[5pt] leading-snug",
     stepGap: "gap-[0.8mm]",
     numWidth: "w-[2.5mm]",
-    // 64px rendered, constrained by max-h-full — slightly smaller to
-    // give the larger brand + bottom padding room.
-    qr: 64,
+    // Rendered large, constrained by max-h-full to fill the remaining
+    // space after brand + padding.
+    qr: 120,
     footer: "text-[4.5pt]",
     footerPad: "px-[2.5mm]",
   },
