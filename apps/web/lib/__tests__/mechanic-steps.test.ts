@@ -43,7 +43,7 @@ describe("buildMechanicSteps", () => {
 
   it("footer routes the favourite-less guest to the shared pot", () => {
     expect(mechanicFooter("Seaside town")).toBe(
-      "Don't have a favourite seaside town? That's okay — you can still give to the shared pot."
+      "Don’t have a favourite? Give to the shared pot instead"
     )
   })
 })
