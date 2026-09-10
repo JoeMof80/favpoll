@@ -353,13 +353,21 @@ export function PackCard({
   // a shared sheet leaves a white nick at every corner.
   const box = bleed ? "h-full w-full" : `border border-border ${s.card}`
 
-  // ── Two-line topic: "FAVOURITE" eyebrow above the topic title ────────────
+  // ── Two-line topic: app-canonical grammar (PollHeading) ──────────────────
+  // Both lines UPPERCASE with tracking, same size — "Favourite" quieter by
+  // OPACITY (the PollHeading settlement, founder 2026-09-01). Don't use a
+  // different size for the eyebrow — that was tried and reverted on the app
+  // side too (#627).
   const topicBlock = data.topicTitle ? (
     <div className={`border-t border-border ${s.topicRow}`}>
-      <p className={`font-medium text-primary uppercase ${s.topicEyebrow}`}>
+      <p
+        className={`font-medium tracking-[0.09em] text-primary/55 uppercase ${s.topic}`}
+      >
         Favourite
       </p>
-      <p className={`truncate font-medium text-primary ${s.topic}`}>
+      <p
+        className={`truncate font-medium tracking-[0.09em] text-primary uppercase ${s.topic}`}
+      >
         {data.topicTitle}
       </p>
     </div>
@@ -391,15 +399,17 @@ export function PackCard({
           >
             {data.name}
           </span>
-          {/* Topic — two lines, centred */}
+          {/* Topic — app-canonical grammar, centred */}
           {data.topicTitle && (
             <div className="mt-[1.5mm] w-full text-center">
               <p
-                className={`font-medium text-muted-foreground uppercase ${s.topicEyebrow}`}
+                className={`font-medium tracking-[0.09em] text-primary/55 uppercase ${s.topic}`}
               >
                 Favourite
               </p>
-              <p className={`truncate font-medium text-primary ${s.topic}`}>
+              <p
+                className={`truncate font-medium tracking-[0.09em] text-primary uppercase ${s.topic}`}
+              >
                 {data.topicTitle}
               </p>
             </div>
@@ -427,11 +437,13 @@ export function PackCard({
     <div
       className={`flex flex-col overflow-hidden bg-white [print-color-adjust:exact] ${box}`}
     >
-      {/* Header — eyebrow + name, brand bottom-aligned with the eyebrow */}
+      {/* Header — eyebrow + name, brand bottom-aligned with the eyebrow.
+          Opening line truncated (founder, 2026-09-10 — was wrapping on
+          wallet cards). */}
       <div className={`flex flex-col ${s.headerPad}`}>
         <div className="flex items-end justify-between gap-2">
           <span
-            className={`font-medium text-muted-foreground uppercase ${s.eyebrow}`}
+            className={`min-w-0 truncate font-medium text-muted-foreground uppercase ${s.eyebrow}`}
           >
             {data.prefix}
           </span>
