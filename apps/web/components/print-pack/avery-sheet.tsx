@@ -91,7 +91,10 @@ export const AVERY_SHEETS: Record<string, AverySheetDef> = {
     folded: true,
     grid: { cols: 2, rows: 2 },
     box: { w: "220mm", h: "160mm" },
-    steps: false,
+    // Was false — the two-panel fold gives the content face the full
+    // card height (founder, 2026-09-10: "no reason not to include
+    // instructions").
+    steps: true,
   },
 }
 
