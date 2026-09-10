@@ -141,79 +141,84 @@ export const SCALE = {
   // card rather than between them.
 
   // L4794 tent card, 120 x 45mm. Two panels make a card, 4 cards to a sheet.
+  // L4794 tent card, 120 x 45mm — TIGHTENED (founder, 2026-09-10: "reduce
+  // the text size to fit every line"). 45mm is the tightest face that
+  // carries steps; every mm of padding matters here.
   averyTent: {
     stack: false,
     charityFooter: false,
     placeCard: true,
     card: "h-[45mm] w-[120mm] rounded-none",
-    headerPad: "px-[5mm] pt-[2mm] pb-[1.5mm]",
-    eyebrow: "text-[6pt] tracking-[0.14em]",
-    name: "text-[11pt]",
-    brandSvg: { width: 12, height: 11 },
-    brandText: "text-[8pt]",
-    brandGap: "gap-[1mm]",
-    topicRow: "px-[5mm] py-[1mm]",
-    topic: "text-[8.5pt] tracking-[0.09em]",
-    topicEyebrow: "text-[6pt] tracking-[0.14em]",
-    bodyPad: "px-[5mm] pt-[1.5mm] pb-[1mm]",
-    bodyGap: "gap-[4mm]",
-    steps: "gap-[1.5mm] text-[7pt] leading-snug",
-    stepGap: "gap-[1.5mm]",
-    numWidth: "w-[4mm]",
-    // 60px = 15.9mm — 0.48mm a module, over the ~0.4mm printed floor.
-    qr: 60,
-    footer: "pb-[1.5mm] text-[6pt]",
-    footerPad: "px-[5mm]",
+    headerPad: "px-[4mm] pt-[1.5mm] pb-[1mm]",
+    eyebrow: "text-[5pt] tracking-[0.14em]",
+    name: "text-[9pt]",
+    brandSvg: { width: 10, height: 9 },
+    brandText: "text-[6pt]",
+    brandGap: "gap-[0.8mm]",
+    topicRow: "px-[4mm] py-[0.8mm]",
+    topic: "text-[6.5pt] tracking-[0.09em]",
+    topicEyebrow: "text-[5pt] tracking-[0.14em]",
+    bodyPad: "px-[4mm] pt-[1mm] pb-[0.5mm]",
+    bodyGap: "gap-[3mm]",
+    steps: "gap-[1mm] text-[5.5pt] leading-snug",
+    stepGap: "gap-[1mm]",
+    numWidth: "w-[3mm]",
+    // 52px = 13.8mm — 0.42mm a module, just over the ~0.4mm floor.
+    qr: 52,
+    footer: "pb-[1mm] text-[5pt]",
+    footerPad: "px-[4mm]",
   },
 
-  // L4796 tent card, 210 x 60mm. Two panels, 1 card to a sheet — the big one,
-  // for a welcome table.
+  // L4796 tent card, 210 x 60mm — TIGHTENED (founder, 2026-09-10). More
+  // generous than L4794 (60mm face), but still reduced from the first
+  // cut to keep every line single-line.
   averyTentLarge: {
     stack: false,
     charityFooter: false,
     placeCard: true,
     card: "h-[60mm] w-[210mm] rounded-none",
-    headerPad: "px-[8mm] pt-[2.5mm] pb-[2mm]",
-    eyebrow: "text-[8pt] tracking-[0.14em]",
-    name: "text-[17pt]",
-    brandSvg: { width: 18, height: 16 },
-    brandText: "text-[11pt]",
-    brandGap: "gap-[1.5mm]",
-    topicRow: "px-[8mm] py-[1.5mm]",
-    topic: "text-[12pt] tracking-[0.09em]",
-    topicEyebrow: "text-[8pt] tracking-[0.14em]",
-    bodyPad: "px-[8mm] pt-[2mm] pb-[1.5mm]",
-    bodyGap: "gap-[8mm]",
-    steps: "gap-[2mm] text-[9pt] leading-snug",
-    stepGap: "gap-[2mm]",
-    numWidth: "w-[5mm]",
-    // 84px = 22.2mm — 0.67mm a module.
-    qr: 84,
-    footer: "pb-[2mm] text-[7.5pt]",
-    footerPad: "px-[8mm]",
+    headerPad: "px-[7mm] pt-[2mm] pb-[1.5mm]",
+    eyebrow: "text-[7pt] tracking-[0.14em]",
+    name: "text-[14pt]",
+    brandSvg: { width: 14, height: 13 },
+    brandText: "text-[9pt]",
+    brandGap: "gap-[1.2mm]",
+    topicRow: "px-[7mm] py-[1mm]",
+    topic: "text-[10pt] tracking-[0.09em]",
+    topicEyebrow: "text-[7pt] tracking-[0.14em]",
+    bodyPad: "px-[7mm] pt-[1.5mm] pb-[1mm]",
+    bodyGap: "gap-[6mm]",
+    steps: "gap-[1.5mm] text-[7.5pt] leading-snug",
+    stepGap: "gap-[1.5mm]",
+    numWidth: "w-[4.5mm]",
+    // 72px = 19mm — 0.58mm a module.
+    qr: 72,
+    footer: "pb-[1.5mm] text-[6.5pt]",
+    footerPad: "px-[7mm]",
   },
 
-  // C32253 place card, 110 x 40mm. Two panels, 4 cards to a sheet. Same
-  // reduced content as the plain place card: no steps in a 40mm face.
+  // C32253 place card, 110 x 40mm — TIGHTENED (founder, 2026-09-10).
+  // 40mm is the absolute tightest face; every value squeezed to fit
+  // header + topic + 3 steps beside a scannable QR.
   averyPlace: {
     stack: false,
     charityFooter: false,
     placeCard: true,
     card: "h-[40mm] w-[110mm] rounded-none",
-    headerPad: "px-[5mm] pt-[1.5mm] pb-[1mm]",
-    eyebrow: "text-[6pt] tracking-[0.14em]",
-    name: "text-[11pt]",
-    brandSvg: { width: 13, height: 12 },
-    brandText: "text-[8.5pt]",
-    brandGap: "gap-[1mm]",
-    topicRow: "px-[5mm] py-[1mm]",
-    topic: "text-[8.5pt] tracking-[0.09em]",
-    topicEyebrow: "text-[6pt] tracking-[0.14em]",
-    bodyPad: "px-[5mm] pt-[1mm] pb-[0.5mm]",
-    bodyGap: "gap-[3mm]",
-    steps: "gap-[1.5mm] text-[7pt] leading-snug",
-    stepGap: "gap-[1.5mm]",
-    numWidth: "w-[4mm]",
+    headerPad: "px-[4mm] pt-[1mm] pb-[0.5mm]",
+    eyebrow: "text-[4.5pt] tracking-[0.14em]",
+    name: "text-[8pt]",
+    brandSvg: { width: 9, height: 8 },
+    brandText: "text-[5.5pt]",
+    brandGap: "gap-[0.7mm]",
+    topicRow: "px-[4mm] py-[0.5mm]",
+    topic: "text-[6pt] tracking-[0.09em]",
+    topicEyebrow: "text-[4.5pt] tracking-[0.14em]",
+    bodyPad: "px-[4mm] pt-[0.8mm] pb-[0.5mm]",
+    bodyGap: "gap-[2.5mm]",
+    steps: "gap-[0.8mm] text-[5pt] leading-snug",
+    stepGap: "gap-[0.8mm]",
+    numWidth: "w-[2.5mm]",
     // 52px = 13.8mm — 0.42mm a module. That is the tightest code favpoll
     // prints: over the ~0.4mm floor, but only just. The face is 40mm and the
     // shared-fund line is worth keeping, so this is where the millimetres
