@@ -235,71 +235,64 @@ export const SCALE = {
     footerPad: "px-[3.5mm]",
   },
 
-  // L7418 label, 86 x 55mm, 8 to a sheet. Avery's self-adhesive business
-  // card — the wallet card that sticks to things: an order of service, a
-  // favour bag, a menu, a bottle. Portrait sheet, so no orientation problem.
-  // Wallet's density, since the face is within a millimetre of it.
-  // L7418 wallet card — TIGHTENED (founder, 2026-09-10: steps and footer
-  // overlapped at the old sizes with long charity names in step 2).
+  // L7418 wallet card, 86 x 55mm — TWO-COLUMN like tent cards (founder,
+  // 2026-09-10: "normalise the design across stationery. The tent cards
+  // seem good"). Proportions from the averyTent (120×45mm), scaled for
+  // the wallet's 86mm width and 55mm height.
   l7418: {
     stack: false,
+    twoColumn: true,
     charityFooter: false,
     placeCard: false,
     card: "h-[55mm] w-[86mm] rounded-none",
-    headerPad: "px-[3mm] pt-[1.5mm] pb-[1mm]",
+    headerPad: "px-[4mm] pt-[2mm] pb-[1mm]",
     eyebrow: "text-[5pt] tracking-[0.14em]",
-    name: "text-[8pt]",
-    brandSvg: { width: 10, height: 9 },
-    brandText: "text-[6pt]",
-    brandGap: "gap-[0.8mm]",
-    topicRow: "px-[3mm] py-[1mm]",
+    name: "text-[9pt]",
+    brandSvg: { width: 14, height: 13 },
+    brandText: "text-[8pt]",
+    brandGap: "gap-[1mm]",
+    topicRow: "px-[4mm] py-[1mm]",
     topic: "text-[7pt] tracking-[0.09em]",
     topicEyebrow: "text-[5pt] tracking-[0.14em]",
-    bodyPad: "px-[3mm] pt-[2mm] pb-[0.5mm]",
-    bodyGap: "gap-[2.5mm]",
+    bodyPad: "px-[4mm] pt-[2mm] pb-[1mm]",
+    bodyGap: "gap-[3mm]",
     steps: "gap-[1mm] text-[6pt] leading-snug",
     stepGap: "gap-[1mm]",
     numWidth: "w-[3mm]",
-    // 88px = 23.3mm — 0.71mm a module.
-    qr: 88,
+    // 140px = 37mm — fills the 55mm column (minus padding/brand).
+    qr: 140,
     footer: "pb-[1mm] text-[5.5pt]",
-    footerPad: "px-[3mm]",
+    footerPad: "px-[4mm]",
   },
 
-  // L7160 label, 63.5 x 38.1mm, 21 to a sheet. The small one — for favour
-  // bags and place settings, where you want a lot of them.
-  //
-  // NO STEPS at this size: 38mm holds the name, the topic, a scannable code
-  // and one line. That line is the CHARITY — see charityFooter below.
-  // L7160 small labels — single-column (founder, 2026-09-10: "shouldn't
-  // use two column layout"). 38.1mm tall; the standard layout stacks
-  // header + topic + steps-beside-QR + charity footer.
-  // L7160 small labels — TIGHTENED (founder, 2026-09-10). 38.1mm tall;
-  // no steps; the charity footer names the destination. Everything
-  // reduced so header + topic + QR + charity fit without clipping.
+  // L7160 small labels, 63.5 x 38.1mm — TWO-COLUMN like tent cards
+  // (founder, 2026-09-10: "normalise the design across stationery").
+  // Proportions from the averyPlace (110×40mm), scaled for 63.5mm width.
   l7160: {
     stack: false,
+    twoColumn: true,
     charityFooter: false,
     placeCard: false,
     card: "h-[38.1mm] w-[63.5mm] rounded-none",
-    headerPad: "px-[2mm] pt-[1.5mm] pb-[0.5mm]",
-    eyebrow: "text-[4pt] tracking-[0.12em]",
-    name: "text-[6.5pt]",
-    brandSvg: { width: 8, height: 7 },
-    brandText: "text-[5pt]",
-    brandGap: "gap-[0.5mm]",
-    topicRow: "px-[2mm] py-[0.5mm]",
-    topic: "text-[5pt] tracking-[0.08em]",
-    topicEyebrow: "text-[4pt] tracking-[0.12em]",
-    bodyPad: "px-[2mm] pt-[1mm] pb-[0.5mm]",
-    bodyGap: "gap-[1.5mm]",
-    steps: "gap-[0.8mm] text-[4pt] leading-snug",
+    headerPad: "px-[3mm] pt-[1.5mm] pb-[0.5mm]",
+    eyebrow: "text-[4.5pt] tracking-[0.12em]",
+    name: "text-[7pt]",
+    brandSvg: { width: 10, height: 9 },
+    brandText: "text-[6pt]",
+    brandGap: "gap-[0.7mm]",
+    topicRow: "px-[3mm] py-[0.5mm]",
+    topic: "text-[5.5pt] tracking-[0.08em]",
+    topicEyebrow: "text-[4.5pt] tracking-[0.12em]",
+    bodyPad: "px-[3mm] pt-[1mm] pb-[0.5mm]",
+    bodyGap: "gap-[2mm]",
+    steps: "gap-[0.8mm] text-[5pt] leading-snug",
     stepGap: "gap-[0.8mm]",
-    numWidth: "w-[2mm]",
-    // 48px = 12.7mm — 0.39mm a module, at the printed floor.
-    qr: 48,
-    footer: "pb-[1mm] text-[4.5pt]",
-    footerPad: "px-[2.5mm]",
+    numWidth: "w-[2.5mm]",
+    // 88px = 23.3mm — fills the 38mm column (minus padding/brand).
+    // 0.71mm a module — comfortable for print.
+    qr: 88,
+    footer: "pb-[0.5mm] text-[4.5pt]",
+    footerPad: "px-[3mm]",
   },
 } as const
 
