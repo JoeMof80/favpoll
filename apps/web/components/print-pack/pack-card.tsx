@@ -260,8 +260,8 @@ export const SCALE = {
     steps: "gap-[1mm] text-[5.5pt] leading-snug",
     stepGap: "gap-[1mm]",
     numWidth: "w-[3mm]",
-    // 80px = 21.2mm — 0.64mm a module.
-    qr: 80,
+    // 100px = 26.5mm — 0.81mm a module, generous for print.
+    qr: 100,
     footer: "pb-[1mm] text-[5pt]",
     footerPad: "px-[3mm]",
   },
@@ -519,37 +519,22 @@ export function PackCard({
         <div
           className={`flex min-h-0 flex-1 overflow-hidden ${"stack" in s && s.stack ? "flex-col items-center" : "items-start"} ${s.bodyGap}`}
         >
-          {/* Left column: steps + footer underneath (founder, 2026-09-10:
-              "move the footer to the left, underneath the instructions") */}
-          <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-            {steps && (
-              <div
-                className={`flex flex-1 flex-col text-left text-muted-foreground ${s.steps}`}
-              >
-                {steps.map((step, j) => (
-                  <p key={j} className={`flex ${s.stepGap}`}>
-                    <span
-                      className={`shrink-0 text-right font-semibold text-primary ${s.numWidth}`}
-                    >
-                      {j + 1}.
-                    </span>
-                    <span className="flex-1">{step}</span>
-                  </p>
-                ))}
-              </div>
-            )}
-            {(data.topicTitle || s.charityFooter) && (
-              <p
-                className={`mt-auto text-left text-muted-foreground/80 ${s.footer}`}
-              >
-                {s.charityFooter
-                  ? charityLabel(data.charityNames)
-                  : data.topicTitle
-                    ? mechanicFooter(data.topicTitle)
-                    : null}
-              </p>
-            )}
-          </div>
+          {steps && (
+            <div
+              className={`flex min-h-0 min-w-0 flex-1 flex-col text-left text-muted-foreground ${s.steps}`}
+            >
+              {steps.map((step, j) => (
+                <p key={j} className={`flex ${s.stepGap}`}>
+                  <span
+                    className={`shrink-0 text-right font-semibold text-primary ${s.numWidth}`}
+                  >
+                    {j + 1}.
+                  </span>
+                  <span className="flex-1">{step}</span>
+                </p>
+              ))}
+            </div>
+          )}
           {/* QR + brand mark grouped on the right */}
           <div className="flex shrink-0 flex-col items-center">
             <BrandedQR
@@ -563,6 +548,20 @@ export function PackCard({
             </div>
           </div>
         </div>
+        {/* Footer at the bottom of the card, left-aligned with the steps
+            (founder, 2026-09-10: "move the footer to the bottom, like
+            the other stationery. Line the text up.") */}
+        {(data.topicTitle || s.charityFooter) && (
+          <p
+            className={`mt-auto text-left text-muted-foreground/80 ${s.footer}`}
+          >
+            {s.charityFooter
+              ? charityLabel(data.charityNames)
+              : data.topicTitle
+                ? mechanicFooter(data.topicTitle)
+                : null}
+          </p>
+        )}
       </div>
     </div>
   )
