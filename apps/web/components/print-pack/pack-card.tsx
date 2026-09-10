@@ -524,17 +524,21 @@ export function PackCard({
             </p>
           )}
         </div>
-        {/* Right column: QR + brand */}
-        <div className="flex shrink-0 flex-col items-center">
-          <BrandedQR
-            value={data.qrUrl}
-            size={s.qr}
-            aria-label={`QR code to pledge for ${data.name}`}
-            className="shrink-0"
-          />
-          <div className="pt-[1mm]">
-            <BrandMark size={s} />
+        {/* Right column: fills body height. QR takes the remaining
+            space after the brand (founder, 2026-09-10: "make the container
+            = body height minus padding, brand gets minimum, QR gets the
+            rest"). Render the QR large; the aspect-square constraint and
+            max-h-full keep it fitting. */}
+        <div className="flex shrink-0 flex-col items-center self-stretch">
+          <div className="flex flex-1 items-center">
+            <BrandedQR
+              value={data.qrUrl}
+              size={s.qr}
+              aria-label={`QR code to pledge for ${data.name}`}
+              className="aspect-square max-h-full shrink"
+            />
           </div>
+          <BrandMark size={s} />
         </div>
       </div>
     </div>
