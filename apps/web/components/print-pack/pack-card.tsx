@@ -267,7 +267,8 @@ export const SCALE = {
     charityFooter: false,
     placeCard: false,
     card: "h-[38.1mm] w-[63.5mm] rounded-none",
-    headerPad: "px-[2.5mm] pt-[1.5mm] pb-[1mm]",
+    // Consistent py-[1mm] vertical padding (founder, 2026-09-10).
+    headerPad: "px-[2.5mm] py-[1mm]",
     eyebrow: "text-[4.5pt] tracking-[0.12em]",
     name: "text-[7pt]",
     brandSvg: { width: 9, height: 8 },
@@ -276,13 +277,14 @@ export const SCALE = {
     topicRow: "px-[2.5mm] py-[1mm]",
     topic: "text-[5.5pt] tracking-[0.08em]",
     topicEyebrow: "text-[4.5pt] tracking-[0.12em]",
-    bodyPad: "px-[2.5mm] pt-[1.5mm] pb-[1mm]",
+    bodyPad: "px-[2.5mm] py-[1mm]",
     bodyGap: "gap-[2mm]",
     steps: "gap-[0.8mm] text-[5pt] leading-snug",
     stepGap: "gap-[0.8mm]",
     numWidth: "w-[2.5mm]",
-    // 60px = 15.9mm — safe fit with brand below in 38mm card.
-    qr: 60,
+    // 72px = 19mm — fills the right column. Left column has min-h-0 +
+    // overflow-hidden so its content can't push the body past the card.
+    qr: 72,
     footer: "text-[4.5pt]",
     footerPad: "px-[2.5mm]",
   },
