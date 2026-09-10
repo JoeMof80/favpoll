@@ -497,15 +497,19 @@ export function PackCard({
         </span>
       </div>
       {topicBlock}
-      {/* Body: steps left, QR right — QR BOTTOM-ALIGNED with steps */}
+      {/* Body: two internal columns, top-aligned.
+          Left: steps + footer text (mt-auto).
+          Right: QR + brand (mt-auto).
+          (Founder wireframe, 2026-09-10.) */}
       <div
-        className={`flex flex-1 ${s.bodyPad} ${"stack" in s && s.stack ? "flex-col items-center" : "items-end"} ${s.bodyGap}`}
+        className={`flex flex-1 ${s.bodyPad} ${"stack" in s && s.stack ? "flex-col items-center" : "items-start"} ${s.bodyGap}`}
       >
-        {steps && (
-          <div
-            className={`flex min-w-0 flex-1 flex-col text-left text-muted-foreground ${s.steps}`}
-          >
-            {steps.map((step, j) => (
+        {/* Left column: steps + footer */}
+        <div
+          className={`flex min-w-0 flex-1 flex-col text-left text-muted-foreground ${s.steps}`}
+        >
+          {steps &&
+            steps.map((step, j) => (
               <p key={j} className={`flex ${s.stepGap}`}>
                 <span
                   className={`shrink-0 text-right font-semibold text-primary ${s.numWidth}`}
@@ -515,27 +519,24 @@ export function PackCard({
                 <span className="flex-1">{step}</span>
               </p>
             ))}
+          {data.topicTitle && (
+            <p className={`mt-auto text-muted-foreground/80 ${s.footer}`}>
+              {mechanicFooter(data.topicTitle)}
+            </p>
+          )}
+        </div>
+        {/* Right column: QR + brand */}
+        <div className="flex shrink-0 flex-col items-center">
+          <BrandedQR
+            value={data.qrUrl}
+            size={s.qr}
+            aria-label={`QR code to pledge for ${data.name}`}
+            className="shrink-0"
+          />
+          <div className="mt-auto pt-[1.5mm]">
+            <BrandMark size={s} />
           </div>
-        )}
-        <BrandedQR
-          value={data.qrUrl}
-          size={s.qr}
-          aria-label={`QR code to pledge for ${data.name}`}
-          className="shrink-0"
-        />
-      </div>
-      {/* Bottom row: footer text left, brand right */}
-      <div
-        className={`flex items-end justify-between ${s.footerPad} ${s.footer}`}
-      >
-        {data.topicTitle ? (
-          <p className="text-muted-foreground/80">
-            {mechanicFooter(data.topicTitle)}
-          </p>
-        ) : (
-          <span />
-        )}
-        <BrandMark size={s} />
+        </div>
       </div>
     </div>
   )
