@@ -281,8 +281,9 @@ export const SCALE = {
     steps: "gap-[0.8mm] text-[5pt] leading-snug",
     stepGap: "gap-[0.8mm]",
     numWidth: "w-[2.5mm]",
-    // 68px = 18mm — 0.55mm a module.
-    qr: 68,
+    // 48px = 12.7mm + brand 2.5mm + gap 0.5mm = 15.7mm. In 23mm
+    // available body that is 7.3mm margin. Cannot clip.
+    qr: 48,
     footer: "text-[4.5pt]",
     footerPad: "px-[2.5mm]",
   },
@@ -498,11 +499,12 @@ export function PackCard({
           Right: QR + brand (mt-auto).
           (Founder wireframe, 2026-09-10.) */}
       <div
-        className={`flex flex-1 ${s.bodyPad} ${"stack" in s && s.stack ? "flex-col items-center" : "items-start"} ${s.bodyGap}`}
+        className={`flex min-h-0 flex-1 ${s.bodyPad} ${"stack" in s && s.stack ? "flex-col items-center" : "items-start"} ${s.bodyGap}`}
       >
-        {/* Left column: steps + footer */}
+        {/* Left column: steps + footer — overflow-hidden so long text
+            clips here rather than pushing the card past its height */}
         <div
-          className={`flex min-w-0 flex-1 flex-col text-left text-muted-foreground ${s.steps}`}
+          className={`flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden text-left text-muted-foreground ${s.steps}`}
         >
           {steps &&
             steps.map((step, j) => (
@@ -529,7 +531,7 @@ export function PackCard({
             aria-label={`QR code to pledge for ${data.name}`}
             className="shrink-0"
           />
-          <div className="pt-[1mm]">
+          <div className="pt-[0.5mm]">
             <BrandMark size={s} />
           </div>
         </div>
