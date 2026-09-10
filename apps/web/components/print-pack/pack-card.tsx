@@ -279,7 +279,7 @@ export const SCALE = {
   // reduced so header + topic + QR + charity fit without clipping.
   l7160: {
     stack: false,
-    charityFooter: true,
+    charityFooter: false,
     placeCard: false,
     card: "h-[38.1mm] w-[63.5mm] rounded-none",
     headerPad: "px-[2mm] pt-[1.5mm] pb-[0.5mm]",
@@ -513,40 +513,27 @@ export function PackCard({
           within the card's fixed height — without it, long charity names
           in step 2 push the brand + footer below the overflow clip
           (founder, 2026-09-10: wallet cards missing branding + footer). */}
-      {/* Body: steps left, QR+brand right — BRAND UNDER QR, same as
-          tent cards (founder, 2026-09-10: "put the fucking branding under
-          the QR code like you have with the tent cards"). */}
+      {/* Body: steps left, QR+brand right — brand UNDER QR, same as
+          tent cards. */}
       <div
         className={`flex flex-1 border-t border-border ${s.bodyPad} ${"stack" in s && s.stack ? "flex-col items-center" : "items-start"} ${s.bodyGap}`}
       >
-        {/* Left: steps + footer stacked */}
-        <div className="flex min-w-0 flex-1 flex-col">
-          {steps && (
-            <div
-              className={`flex flex-1 flex-col text-left text-muted-foreground ${s.steps}`}
-            >
-              {steps.map((step, j) => (
-                <p key={j} className={`flex ${s.stepGap}`}>
-                  <span
-                    className={`shrink-0 text-right font-semibold text-primary ${s.numWidth}`}
-                  >
-                    {j + 1}.
-                  </span>
-                  <span className="flex-1">{step}</span>
-                </p>
-              ))}
-            </div>
-          )}
-          {(data.topicTitle || s.charityFooter) && (
-            <p
-              className={`mt-auto text-left text-muted-foreground/80 ${s.footer}`}
-            >
-              {s.charityFooter
-                ? charityLabel(data.charityNames)
-                : mechanicFooter(data.topicTitle!)}
-            </p>
-          )}
-        </div>
+        {steps && (
+          <div
+            className={`flex min-w-0 flex-1 flex-col text-left text-muted-foreground ${s.steps}`}
+          >
+            {steps.map((step, j) => (
+              <p key={j} className={`flex ${s.stepGap}`}>
+                <span
+                  className={`shrink-0 text-right font-semibold text-primary ${s.numWidth}`}
+                >
+                  {j + 1}.
+                </span>
+                <span className="flex-1">{step}</span>
+              </p>
+            ))}
+          </div>
+        )}
         {/* Right: QR + brand under it */}
         <div className="flex shrink-0 flex-col items-center">
           <BrandedQR
@@ -560,6 +547,15 @@ export function PackCard({
           </div>
         </div>
       </div>
+      {/* Footer at the BOTTOM of the card, full width (founder,
+          2026-09-10: "move the footer to the bottom"). */}
+      {data.topicTitle && (
+        <p
+          className={`text-left text-muted-foreground/80 ${s.footer} ${s.footerPad}`}
+        >
+          {mechanicFooter(data.topicTitle)}
+        </p>
+      )}
     </div>
   )
 }
