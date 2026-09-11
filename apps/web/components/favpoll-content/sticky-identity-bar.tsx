@@ -47,12 +47,12 @@ export function StickyIdentityBar({ name, eyebrow, photoUrl, heroRef }: Props) {
         { threshold: 0.2 }
       )
       observer.observe(el)
-      // Store for cleanup
-      ;(el as any).__identityObserver = observer
+      observerRef = observer
     })
+    let observerRef: IntersectionObserver | null = null
     return () => {
       cancelAnimationFrame(raf)
-      ;(el as any).__identityObserver?.disconnect()
+      observerRef?.disconnect()
     }
   }, [heroRef])
 
