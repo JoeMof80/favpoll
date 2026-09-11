@@ -12,6 +12,9 @@ type Props = {
   favpollName: string
   isOrganiser: boolean
   isClosed?: boolean
+  /** Whether the viewer has pledged / is entitled — hides the Pledge FAB
+   *  pre-pledge so the lock card is the sole CTA. */
+  entitled?: boolean
 }
 
 // Floating action cluster, bottom right. Share is for EVERYONE — a guest
@@ -25,6 +28,7 @@ export function FavpollSubheader({
   favpollName,
   isOrganiser,
   isClosed,
+  entitled,
 }: Props) {
   // Mark this favpoll as the list's return target (founder, 2026-09-06
   // v3): the outbound click-capture save proved unverifiable on the
@@ -67,7 +71,7 @@ export function FavpollSubheader({
           </Link>
         </Button>
       )}
-      {!isClosed && (
+      {!isClosed && entitled && (
         <Button
           type="button"
           size="icon"

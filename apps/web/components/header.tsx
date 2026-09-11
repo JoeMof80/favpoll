@@ -108,7 +108,7 @@ export function Header() {
            in view). A scrim blurs and freezes the page behind it; the header
            stays sharp because the scrim starts at its bottom edge (top-14).
            Tapping the scrim dismisses the menu. Rendered INSIDE <header>, so
-           it keeps the sticky, z-40 element it is positioned against. */
+           it keeps the sticky, z-50 element it is positioned against. */
         menuOpen ? (
           <>
             <div

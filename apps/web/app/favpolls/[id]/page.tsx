@@ -361,6 +361,7 @@ export default async function FavpollPage({ params }: Props) {
           }
           isOrganiser={isOrganiser}
           isClosed={isClosed}
+          entitled={entitled}
         />
         <FavpollContent
           favpoll={typedFavpoll}
