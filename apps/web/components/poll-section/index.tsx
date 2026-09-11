@@ -130,61 +130,56 @@ export function PollSection({
     >
       {/* Merged header: "Favourite {topic}" — button pre-pledge, static post-pledge */}
       <div className="sticky top-[6.6875rem] z-20 bg-background py-4 md:top-(--hero-stuck-bottom,13.75rem)">
-        {/* ── MOBILE: compact one-line header ── */}
-        <div className="flex min-h-9 items-center gap-2 md:hidden">
+        {/* ONE heading row for all breakpoints — PollHeading left,
+            ... dropdown right. Same pattern mobile and desktop. */}
+        <div className="flex min-h-9 items-center gap-2">
           <div className="min-w-0 flex-1">
             <PollHeading topicTitle={poll.topics.title} inert />
           </div>
-          {/* Pledge-again + overflow menu — only post-pledge (entitled) */}
           {entitled && (
-            <div className="flex shrink-0 items-center gap-1">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon-sm"
-                    aria-label="View options"
-                  >
-                    <EllipsisVertical className="size-4" aria-hidden="true" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onSelect={() => setRankingView("amount")}>
-                    Amount
-                    {rankingView === "amount" && (
-                      <Check className="ml-auto size-4" aria-hidden="true" />
-                    )}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => setRankingView("count")}>
-                    Pledges
-                    {rankingView === "count" && (
-                      <Check className="ml-auto size-4" aria-hidden="true" />
-                    )}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onSelect={() => {
-                      if (navigator.share) {
-                        navigator
-                          .share({
-                            title: `Favourite ${poll.topics.title}`,
-                            url: window.location.href,
-                          })
-                          .catch(() => {})
-                      }
-                    }}
-                  >
-                    Share
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  aria-label="View options"
+                  className="shrink-0"
+                >
+                  <EllipsisVertical className="size-5" aria-hidden="true" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onSelect={() => setRankingView("amount")}>
+                  Amount
+                  {rankingView === "amount" && (
+                    <Check className="ml-auto size-4" aria-hidden="true" />
+                  )}
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setRankingView("count")}>
+                  Pledges
+                  {rankingView === "count" && (
+                    <Check className="ml-auto size-4" aria-hidden="true" />
+                  )}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="md:hidden"
+                  onSelect={() => {
+                    if (navigator.share) {
+                      navigator
+                        .share({
+                          title: `Favourite ${poll.topics.title}`,
+                          url: window.location.href,
+                        })
+                        .catch(() => {})
+                    }
+                  }}
+                >
+                  Share
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
-        </div>
-
-        {/* ── DESKTOP: full-width heading (unchanged) ── */}
-        <div className="hidden md:block">
-          <PollHeading topicTitle={poll.topics.title} inert />
         </div>
       </div>
 
@@ -201,52 +196,8 @@ export function PollSection({
 
           {hasItems && (
             <>
-              {/* mt-12: the seal band below reaches 48px up (-top-12) and
-                  overpainted the reveal's second line (founder's Elizabeth
-                  memorial, 2026-09-07). NOT additive with the section's
-                  space-y-4 — adjacent block margins COLLAPSE to the larger
-                  (the first mt-8 attempt yielded 32px and a half-eaten
-                  line), so the margin itself must equal the band. */}
-              <div className="sticky top-[calc(7.5rem+3rem)] z-10 mt-12 hidden items-center justify-end gap-2 md:top-[calc(var(--hero-stuck-bottom,13.75rem)+3rem)] md:flex">
-                {/* Opaque shelf (founder, 2026-09-06: standings should
-                    disappear behind the Amount/Pledges controls, not
-                    thread past them to the ribbon). Same panel trick as
-                    the ribbon above; -top-12 seals the slit between the
-                    two sticky boxes. The row sits at z-10 — one layer
-                    BELOW the ribbon — so the over-extension tucks under
-                    the ribbon's panel instead of painting over the
-                    topic header (founder screenshot, first attempt). */}
-                <div className="pointer-events-none absolute -inset-x-1 -top-12 bottom-0 -z-10 bg-background" />
-                {onOpenPledgeDialog && (
-                  <TooltipProvider>
-                    <Tooltip content="Pledge again" side="left">
-                      <Button
-                        type="button"
-                        size="icon-sm"
-                        aria-label="Pledge again"
-                        onClick={onOpenPledgeDialog}
-                      >
-                        <Gift aria-hidden="true" />
-                      </Button>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
-                <Tabs
-                  value={rankingView}
-                  onValueChange={(v: string) =>
-                    setRankingView(v as RankingView)
-                  }
-                >
-                  <TabsList className="h-7 shadow">
-                    <TabsTrigger value="amount" className="px-3 text-xs">
-                      Amount
-                    </TabsTrigger>
-                    <TabsTrigger value="count" className="px-3 text-xs">
-                      Pledges
-                    </TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </div>
+              {/* Old desktop tabs row removed — Amount/Pledges now
+                  live in the ... dropdown on the topic heading. */}
               <RankingList
                 initialItems={initialItems}
                 favpollPollId={poll.id}

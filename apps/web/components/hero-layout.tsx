@@ -250,7 +250,7 @@ export function HeroLayout({
         // mb-10 = the upper gap's 40px (SETTLE_SCROLL 24 + pb 16), so
         // the about sits equidistant. If SETTLE_SCROLL moves, move this
         // with it.
-        className="relative z-0 mb-10"
+        className="relative z-0 mb-6"
         // gap0 = the settle scroll: contact exactly at full settle
         // (measured: slope exactly -1), so the cut line is the name
         // edge from first touch — and the rest gap is as small as the
