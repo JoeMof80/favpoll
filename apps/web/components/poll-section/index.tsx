@@ -129,7 +129,7 @@ export function PollSection({
       className="space-y-4"
     >
       {/* Merged header: "Favourite {topic}" — button pre-pledge, static post-pledge */}
-      <div className="sticky top-[6.5rem] z-20 md:top-[var(--hero-stuck-bottom,13.75rem)]">
+      <div className="sticky top-[7.5rem] z-20 md:top-[var(--hero-stuck-bottom,13.75rem)]">
         {/* Opaque backdrop: the stuck hero and ribbon are separate boxes,
             so the slit between them, the ribbon's rounded corners, and the
             decoy's blur bleed (filters paint past their box) all showed
@@ -216,7 +216,7 @@ export function PollSection({
                   space-y-4 — adjacent block margins COLLAPSE to the larger
                   (the first mt-8 attempt yielded 32px and a half-eaten
                   line), so the margin itself must equal the band. */}
-              <div className="sticky top-[calc(6.5rem+3rem)] z-10 mt-12 hidden items-center justify-end gap-2 md:top-[calc(var(--hero-stuck-bottom,13.75rem)+3rem)] md:flex">
+              <div className="sticky top-[calc(7.5rem+3rem)] z-10 mt-12 hidden items-center justify-end gap-2 md:top-[calc(var(--hero-stuck-bottom,13.75rem)+3rem)] md:flex">
                 {/* Opaque shelf (founder, 2026-09-06: standings should
                     disappear behind the Amount/Pledges controls, not
                     thread past them to the ribbon). Same panel trick as
@@ -340,7 +340,7 @@ export function PollSection({
                wrapper passes events through; the card hovers with the
                list cards' lift idiom. */
             <div className="pointer-events-none z-10 flex flex-col items-center pt-4 [grid-area:1/1]">
-              <span className="sticky top-[calc(6.5rem+4.25rem)] flex w-full flex-col items-center md:top-[calc(var(--hero-stuck-bottom,13.75rem)+4.25rem)]">
+              <span className="sticky top-[calc(7.5rem+4.25rem)] flex w-full flex-col items-center md:top-[calc(var(--hero-stuck-bottom,13.75rem)+4.25rem)]">
                 <Button
                   type="button"
                   variant="ghost"
@@ -365,7 +365,7 @@ export function PollSection({
                sticky geometry as the lock card so it sits where guests
                expect the way in to be. */
             <div className="pointer-events-none z-10 flex flex-col items-center pt-4 [grid-area:1/1]">
-              <span className="sticky top-[calc(6.5rem+4.25rem)] flex w-full flex-col items-center md:top-[calc(var(--hero-stuck-bottom,13.75rem)+4.25rem)]">
+              <span className="sticky top-[calc(7.5rem+4.25rem)] flex w-full flex-col items-center md:top-[calc(var(--hero-stuck-bottom,13.75rem)+4.25rem)]">
                 <div className="pointer-events-auto w-full max-w-sm rounded-xl bg-background/95 px-5 py-4 text-center shadow-xl ring-1 ring-border">
                   <p className="text-sm text-muted-foreground">
                     {pledgesGatedNotice}
