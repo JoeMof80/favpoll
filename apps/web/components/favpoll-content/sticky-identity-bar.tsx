@@ -36,7 +36,7 @@ export function StickyIdentityBar({ name, eyebrow, photoUrl }: Props) {
           <p className="truncate text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
             {eyebrow}
           </p>
-          <p className="truncate text-base leading-tight font-medium text-foreground">
+          <p className="truncate text-lg leading-tight font-medium text-foreground">
             {name}
           </p>
         </div>
