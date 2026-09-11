@@ -250,12 +250,10 @@ export function HeroLayout({
         // mb-10 = the upper gap's 40px (SETTLE_SCROLL 24 + pb 16), so
         // the about sits equidistant. If SETTLE_SCROLL moves, move this
         // with it.
-        className="relative z-0 mb-6"
-        // gap0 = the settle scroll: contact exactly at full settle
-        // (measured: slope exactly -1), so the cut line is the name
-        // edge from first touch — and the rest gap is as small as the
-        // settle window allows.
-        style={{ marginTop: SETTLE_SCROLL }}
+        // Mobile: tighter gaps (no settle animation, hero scrolls away).
+        // Desktop: the settle gap (SETTLE_SCROLL) + mb-6.
+        className="relative z-0 mb-3 md:mb-6"
+        style={{ marginTop: isMobile ? 8 : SETTLE_SCROLL }}
       >
         {about}
       </div>

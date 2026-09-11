@@ -59,7 +59,7 @@ export function CauseHero({ favpoll }: Props) {
   ) : undefined
 
   const about = favpoll.description ? (
-    <p className="text-base leading-relaxed wrap-break-word text-muted-foreground">
+    <p className="text-sm leading-relaxed wrap-break-word text-muted-foreground">
       {favpoll.description}
     </p>
   ) : undefined
