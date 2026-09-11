@@ -126,7 +126,7 @@ export function PollSection({
       className="space-y-4"
     >
       {/* Merged header: "Favourite {topic}" — button pre-pledge, static post-pledge */}
-      <div className="sticky top-[6.6875rem] z-20 bg-background py-4 md:top-(--hero-stuck-bottom,13.75rem)">
+      <div className="sticky top-[6.6875rem] z-20 bg-background md:top-(--hero-stuck-bottom,13.75rem)">
         {/* ONE heading row for all breakpoints — PollHeading left,
             ... dropdown right. Same pattern mobile and desktop. */}
         <div className="flex min-h-9 items-center gap-2">
@@ -139,11 +139,11 @@ export function PollSection({
                 <Button
                   type="button"
                   variant="ghost"
-                  size="icon"
+                  size="icon-sm"
                   aria-label="View options"
                   className="shrink-0"
                 >
-                  <EllipsisVertical className="size-5" aria-hidden="true" />
+                  <EllipsisVertical className="size-4" aria-hidden="true" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
