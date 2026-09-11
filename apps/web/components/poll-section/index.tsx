@@ -129,16 +129,7 @@ export function PollSection({
       className="space-y-4"
     >
       {/* Merged header: "Favourite {topic}" — button pre-pledge, static post-pledge */}
-      <div className="sticky top-[7.5rem] z-20 md:top-[var(--hero-stuck-bottom,13.75rem)]">
-        {/* Opaque backdrop: the stuck hero and ribbon are separate boxes,
-            so the slit between them, the ribbon's rounded corners, and the
-            decoy's blur bleed (filters paint past their box) all showed
-            scrolling content. One panel behind the ribbon covers the lot. */}
-        {/* Decorative, empty — deliberately NO aria-hidden: the reveal
-            tests (and AT heuristics) locate TypedReveal's hidden copy via
-            [aria-hidden], and an empty div announces nothing anyway. */}
-        <div className="pointer-events-none absolute -inset-x-1 -top-3 bottom-0 -z-10 bg-background" />
-
+      <div className="sticky top-[6.6875rem] z-20 bg-background py-4 md:top-(--hero-stuck-bottom,13.75rem)">
         {/* ── MOBILE: compact one-line header ── */}
         <div className="flex min-h-9 items-center gap-2 md:hidden">
           <div className="min-w-0 flex-1">
