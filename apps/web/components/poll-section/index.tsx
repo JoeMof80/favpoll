@@ -173,8 +173,8 @@ export function PollSection({
                     }
                   }}
                 >
-                  <Share2 className="size-4" aria-hidden="true" />
                   Share
+                  <Share2 className="ml-auto size-4" aria-hidden="true" />
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
