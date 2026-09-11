@@ -321,9 +321,8 @@ export function FavpollContent({
           getFavpollHeadline({
             occasionType: favpoll.occasion_type ?? null,
             name: "",
-            openingLine: null,
+            openingLine: favpoll.opening_line ?? null,
             subject: favpoll.subject,
-            dateLabel: null,
           }).prefix
         }
         photoUrl={favpoll.protagonists?.photo_url}
