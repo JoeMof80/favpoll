@@ -165,7 +165,9 @@ export function HeroLayout({
         // about now lives INSIDE the band as a third collapsing clip
         // (below), so the band hides poll content at its bottom exactly
         // as the original design did.
-        className="sticky top-14 z-30 bg-background pt-6 pb-4 before:absolute before:inset-x-0 before:-top-14 before:h-14 before:bg-background md:pt-16"
+        // Mobile: the hero scrolls away naturally — the sticky identity
+        // bar replaces it (founder, 2026-09-11). Desktop: still sticky.
+        className="z-30 bg-background pt-6 pb-4 md:sticky md:top-14 md:pt-16 md:before:absolute md:before:inset-x-0 md:before:-top-14 md:before:h-14 md:before:bg-background"
       >
         {/* min-h = the settled avatar size (0.9×80 / 0.635×132): heroes
             WITHOUT an avatar (causes) otherwise settle a few px higher
