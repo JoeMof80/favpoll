@@ -121,22 +121,41 @@ export function HeroLayout({
   // way around": both gaps at the ribbon's 40) minus the band's pb 16.
   // The whole composition settles in the first 24px of scroll — brisk,
   // but every law holds (contact at settle, slope -1).
+  // Mobile: no animation — the hero scrolls away and the identity bar
+  // takes over (founder, 2026-09-11).
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)")
+    setIsMobile(mq.matches)
+    const h = (e: MediaQueryListEvent) => setIsMobile(e.matches)
+    mq.addEventListener("change", h)
+    return () => mq.removeEventListener("change", h)
+  }, [])
+
   const SETTLE_SCROLL = 24
   const t = [0, SETTLE_SCROLL]
-  const subtitleOpacity = useTransform(scrollY, t, [1, 0])
+  const subtitleOpacity = useTransform(scrollY, t, isMobile ? [1, 1] : [1, 0])
   // The line rides the SCROLL, 1:1 (founder, 2026-09-05: "move the
   // Context at the same pace as the About so the space between them
   // remains constant") — the collapse alone moved it at maxHeight's
   // rate (0.4x), so the about visibly gained on it. A transform inside
   // the clip, so layout never depends on it: if it fails the line
   // merely sits still and clips as before.
-  const subtitleY = useTransform(scrollY, t, [0, -SETTLE_SCROLL])
+  const subtitleY = useTransform(
+    scrollY,
+    t,
+    isMobile ? [0, 0] : [0, -SETTLE_SCROLL]
+  )
   // Collapses to 0 (the old design kept a 12px sliver of air; that job
   // is now done by the band's static pb-3).
-  const subtitleMaxHeight = useTransform(scrollY, t, [48, 0])
+  const subtitleMaxHeight = useTransform(
+    scrollY,
+    t,
+    isMobile ? [48, 48] : [48, 0]
+  )
   const avatarSize = useTransform(scrollY, t, [
     avatarCfg.rest,
-    avatarCfg.settled,
+    isMobile ? avatarCfg.rest : avatarCfg.settled,
   ])
 
   return (
