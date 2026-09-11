@@ -15,7 +15,7 @@ import { ShareFavpollButton } from "@/components/share-favpoll-button"
 import { decoyWidth } from "@/lib/decoys"
 import { buildMechanicSteps } from "@/lib/mechanic-steps"
 import { LockCardContent } from "@/components/lock-card-content"
-import { Check, EllipsisVertical } from "lucide-react"
+import { Check, EllipsisVertical, Share2 } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -173,6 +173,7 @@ export function PollSection({
                     }
                   }}
                 >
+                  <Share2 className="size-4" aria-hidden="true" />
                   Share
                 </DropdownMenuItem>
               </DropdownMenuContent>
