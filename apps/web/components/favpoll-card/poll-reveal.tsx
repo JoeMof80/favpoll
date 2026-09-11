@@ -24,7 +24,7 @@ export function PollReveal({
       aria-label={ariaLabel ?? `${protagonistFirstName ?? "Their"}'s reveal`}
     >
       <blockquote
-        className="h-full border-l-[2.5px] border-primary-muted pl-3 text-[18px] leading-relaxed font-normal text-reveal-foreground/70 italic"
+        className="h-full border-l-[2.5px] border-primary-muted pl-3 text-[18px] leading-relaxed font-normal text-muted-foreground italic"
         role={role}
         aria-live={ariaLive}
       >

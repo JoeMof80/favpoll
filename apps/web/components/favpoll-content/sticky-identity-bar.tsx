@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 type Props = {
   name: string
@@ -9,26 +9,43 @@ type Props = {
 }
 
 /**
- * Mobile-only identity bar. Shows when scrolled past 200px (roughly
+ * Mobile-only identity bar. Shows when scrolled past 93px (roughly
  * the hero height). Uses a plain scroll listener — no
  * IntersectionObserver, no CSS vars, no ref wiring. md:hidden keeps
  * desktop untouched. Fixed height (~48px) so downstream offsets can
  * be hardcoded.
  */
 export function StickyIdentityBar({ name, eyebrow, photoUrl }: Props) {
-  const [show, setShow] = useState(false)
+  const [show, setShow] = useState<boolean | null>(null)
+  // Two-phase mount: render off-screen, then slide in on the next frame
+  const [entered, setEntered] = useState(false)
+  const rafRef = useRef(0)
 
   useEffect(() => {
-    const onScroll = () => setShow(window.scrollY > 200)
+    const onScroll = () => setShow(window.scrollY > 93)
     onScroll()
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => window.removeEventListener("scroll", onScroll)
   }, [])
 
+  useEffect(() => {
+    if (show) {
+      // Double rAF ensures the browser has painted the off-screen frame
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = requestAnimationFrame(() => setEntered(true))
+      })
+    } else {
+      setEntered(false)
+    }
+    return () => cancelAnimationFrame(rafRef.current)
+  }, [show])
+
+  if (!show) return null
+
   return (
     <div
-      className={`fixed top-14 right-0 left-0 z-30 border-b border-border bg-background px-6 py-1.5 transition-transform duration-200 md:hidden ${
-        show ? "translate-y-0" : "-translate-y-full"
+      className={`fixed top-14 right-0 left-0 z-30 border-b border-border bg-background px-6 py-1.5 transition-transform duration-200 ease-out md:hidden ${
+        entered ? "translate-y-0" : "-translate-y-full"
       }`}
     >
       <div className="flex items-center gap-2.5">
