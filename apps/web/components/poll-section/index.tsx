@@ -11,20 +11,17 @@ import { EmptyPollAlert } from "./empty-poll-alert"
 import { PollReveal } from "../favpoll-card/poll-reveal"
 import { TypedReveal } from "./typed-reveal"
 import { Button } from "../ui/button"
-import { Tooltip, TooltipProvider } from "../ui/tooltip"
 import { ShareFavpollButton } from "@/components/share-favpoll-button"
 import { decoyWidth } from "@/lib/decoys"
 import { buildMechanicSteps } from "@/lib/mechanic-steps"
 import { LockCardContent } from "@/components/lock-card-content"
-import { Check, EllipsisVertical, Gift } from "lucide-react"
+import { Check, EllipsisVertical } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu"
-
-type RankingView = "amount" | "count"
 
 type Props = {
   poll: FavpollPollWithItems
