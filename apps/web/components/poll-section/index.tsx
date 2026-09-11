@@ -160,7 +160,6 @@ export function PollSection({
                   )}
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  className="md:hidden"
                   onSelect={() => {
                     if (navigator.share) {
                       navigator
