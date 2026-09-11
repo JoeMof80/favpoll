@@ -331,7 +331,8 @@ export function FavpollContent({
       )}
       <StickyIdentityBar
         name={heroIdentityName}
-        openingLine={heroHeadline.prefix}
+        eyebrow={heroHeadline.prefix}
+        photoUrl={favpoll.protagonists?.photo_url}
         heroRef={heroRef}
       />
       <MobileCharityFooter

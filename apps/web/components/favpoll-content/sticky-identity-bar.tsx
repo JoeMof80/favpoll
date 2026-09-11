@@ -1,10 +1,18 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useLayoutEffect, useRef, useState } from "react"
+
+// The bar's rendered height is published so downstream sticky elements
+// (the poll heading, the lock card) can account for it — same pattern
+// as the charity footer's --charity-footer-h.
+export const IDENTITY_BAR_HEIGHT_VAR = "--identity-bar-h"
 
 type Props = {
   name: string
-  openingLine: string
+  /** The eyebrow above the name (e.g. "Celebrating", "In memory of") */
+  eyebrow: string
+  /** Protagonist photo — null for cause-type favpolls */
+  photoUrl?: string | null
   heroRef: React.RefObject<HTMLElement | null>
 }
 
@@ -13,23 +21,26 @@ type Props = {
  * the hero scrolls out of view. Uses an IntersectionObserver on the hero
  * element — no scroll listeners, no layout dependency on the animation
  * (transform only, same doctrine as the charity footer).
+ *
+ * Layout: small avatar (left) + eyebrow above name (right), two lines.
+ * (Founder, 2026-09-11: "include a small avatar and the eyebrow should
+ * be above the name.")
  */
-export function StickyIdentityBar({ name, openingLine, heroRef }: Props) {
+export function StickyIdentityBar({ name, eyebrow, photoUrl, heroRef }: Props) {
   const [visible, setVisible] = useState(false)
+  const barRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const el = heroRef.current
     if (!el) return
 
+    if (typeof IntersectionObserver === "undefined") return
+
     const observer = new IntersectionObserver(
       ([entry]) => {
-        // Bar visible when hero is NOT intersecting (scrolled away)
         setVisible(!entry.isIntersecting)
       },
       {
-        // The app header is 56px (h-14). Shrink the root margin so the
-        // observer fires when the hero leaves the viewport below the header,
-        // not below the true viewport top.
         rootMargin: "-56px 0px 0px 0px",
         threshold: 0,
       }
@@ -39,18 +50,57 @@ export function StickyIdentityBar({ name, openingLine, heroRef }: Props) {
     return () => observer.disconnect()
   }, [heroRef])
 
+  // Publish the bar's height so the poll heading sticks below it.
+  useLayoutEffect(() => {
+    const el = barRef.current
+    const root = document.documentElement
+    if (!el || typeof ResizeObserver === "undefined") return
+    const publish = () =>
+      root.style.setProperty(
+        IDENTITY_BAR_HEIGHT_VAR,
+        visible ? `${el.getBoundingClientRect().height}px` : "0px"
+      )
+    publish()
+    const observer = new ResizeObserver(publish)
+    observer.observe(el)
+    return () => {
+      observer.disconnect()
+      root.style.removeProperty(IDENTITY_BAR_HEIGHT_VAR)
+    }
+  }, [visible])
+
   return (
     <div
-      className={`fixed top-14 right-0 left-0 z-25 border-b border-border bg-background px-6 py-2 transition-transform duration-200 md:hidden ${
+      ref={barRef}
+      className={`fixed top-14 right-0 left-0 z-25 border-b border-border bg-background px-6 py-1.5 transition-transform duration-200 md:hidden ${
         visible ? "translate-y-0" : "-translate-y-full"
       }`}
     >
-      <p className="truncate text-sm font-medium text-foreground">
-        {name}
-        <span className="ml-2 font-normal text-muted-foreground">
-          {openingLine}
-        </span>
-      </p>
+      <div className="flex items-center gap-2.5">
+        {photoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={photoUrl}
+            alt=""
+            className="size-8 shrink-0 rounded-full object-cover"
+          />
+        ) : (
+          <div
+            className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary"
+            aria-hidden="true"
+          >
+            {name.charAt(0)}
+          </div>
+        )}
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
+            {eyebrow}
+          </p>
+          <p className="truncate text-sm leading-tight font-medium text-foreground">
+            {name}
+          </p>
+        </div>
+      </div>
     </div>
   )
 }
