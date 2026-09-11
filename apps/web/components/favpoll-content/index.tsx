@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Countdown } from "@/components/countdown"
@@ -14,7 +14,6 @@ import type { RankHistory } from "@/lib/rank-history"
 import { FavpollHero } from "@/components/favpoll-hero"
 import { CauseHero } from "@/components/cause-hero"
 import { CharityBanner } from "@/components/charity-banner"
-import { ShareFavpollButton } from "@/components/share-favpoll-button"
 import { PollSection } from "@/components/poll-section"
 import { PledgeDialog } from "@/components/pledge-dialog"
 import { SeedFundModal } from "@/components/favpoll-form/seed-fund-modal"
@@ -24,9 +23,13 @@ import type {
   FavpollPot,
   PotAllocation,
 } from "@favpoll/types"
-import { charityNames as joinCharityNames } from "@/lib/display"
+import {
+  charityNames as joinCharityNames,
+  getFavpollHeadline,
+} from "@/lib/display"
 import { useFavpollContent } from "./use-favpoll-content"
 import { MobileCharityFooter } from "./mobile-charity-footer"
+import { StickyIdentityBar } from "./sticky-identity-bar"
 import { PageLayout } from "../page-layout"
 import { Gift, FileText } from "lucide-react"
 import { formatPoundsExact } from "@/lib/i18n"
@@ -75,6 +78,15 @@ export function FavpollContent({
   const router = useRouter()
   const [showGuestFund, setShowGuestFund] = useState(false)
   const [pledgeDialogOpen, setPledgeDialogOpen] = useState(false)
+
+  // The Pledge FAB (in FavpollSubheader, a sibling) dispatches this
+  // event to open the dialog without prop-drilling through the server
+  // component that renders both.
+  useEffect(() => {
+    const handler = () => setPledgeDialogOpen(true)
+    window.addEventListener("favpoll:pledge", handler)
+    return () => window.removeEventListener("favpoll:pledge", handler)
+  }, [])
 
   const {
     handlePledgeSuccess,
@@ -207,11 +219,6 @@ export function FavpollContent({
     </>
   )
 
-  const displayTitle =
-    favpoll.subject === "cause"
-      ? (favpoll.cause_label ?? "favpoll")
-      : (favpoll.protagonists?.name ?? "favpoll")
-
   const right = (
     <>
       {isClosed ? (
@@ -251,12 +258,8 @@ export function FavpollContent({
         goalAmount={favpoll.goal_amount ?? null}
       />
 
-      {/* Desktop share lives in the rail (the actions column); the FAB
-          remains the mobile surface */}
-      <ShareFavpollButton
-        shareTitle={`${displayTitle} — favpoll`}
-        className="w-full"
-      />
+      {/* Share removed from the rail — it lives in the ... dropdown
+          on the topic heading now (founder, 2026-09-11). */}
 
       <WallOfFavourites
         entries={wallEntries}
@@ -308,6 +311,22 @@ export function FavpollContent({
           onCancel={() => setShowGuestFund(false)}
         />
       )}
+      <StickyIdentityBar
+        name={
+          favpoll.subject === "cause"
+            ? (favpoll.cause_label ?? "")
+            : (favpoll.protagonists?.name ?? "")
+        }
+        eyebrow={
+          getFavpollHeadline({
+            occasionType: favpoll.occasion_type ?? null,
+            name: "",
+            openingLine: favpoll.opening_line ?? null,
+            subject: favpoll.subject,
+          }).prefix
+        }
+        photoUrl={favpoll.protagonists?.photo_url}
+      />
       <MobileCharityFooter
         charities={favpoll.favpoll_charities.map((ec) => ec.charities)}
         totalRaised={totalRaised}

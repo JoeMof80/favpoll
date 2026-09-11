@@ -2,7 +2,7 @@
 
 import { useEffect } from "react"
 import Link from "next/link"
-import { Settings2 } from "lucide-react"
+import { Gift, Settings2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ShareFavpollButton } from "@/components/share-favpoll-button"
 
@@ -51,22 +51,33 @@ export function FavpollSubheader({
       // for the paint before hydration. Desktop (md+) has no bar.
       className="fixed right-4 bottom-[calc(max(var(--charity-footer-visible-h,calc(env(safe-area-inset-bottom)+3.1rem)),env(safe-area-inset-bottom))+1rem)] z-30 flex flex-col items-end gap-2 transition-[bottom] duration-300 md:right-5 md:bottom-5"
     >
-      {/* Mobile only — desktop share lives in the right rail */}
-      <ShareFavpollButton
-        variant="fab"
-        shareTitle={`${favpollName} — favpoll`}
-        className="md:hidden"
-      />
+      {/* Manage (secondary) above Pledge (primary) — reversed so the
+          primary action sits closest to the thumb. Manage is secondary
+          variant (founder, 2026-09-11). */}
       {isOrganiser && (
         <Button
           asChild
           size="icon"
+          variant="secondary"
           aria-label="Manage favpoll"
           className="size-14 rounded-full shadow-lg [&_svg]:size-6"
         >
           <Link href={`/favpolls/${favpollId}/manage`}>
             <Settings2 aria-hidden="true" />
           </Link>
+        </Button>
+      )}
+      {!isClosed && (
+        <Button
+          type="button"
+          size="icon"
+          aria-label="Pledge"
+          onClick={() =>
+            window.dispatchEvent(new CustomEvent("favpoll:pledge"))
+          }
+          className="size-14 rounded-full shadow-lg md:hidden [&_svg]:size-6"
+        >
+          <Gift aria-hidden="true" />
         </Button>
       )}
     </div>

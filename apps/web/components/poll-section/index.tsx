@@ -11,14 +11,18 @@ import { EmptyPollAlert } from "./empty-poll-alert"
 import { PollReveal } from "../favpoll-card/poll-reveal"
 import { TypedReveal } from "./typed-reveal"
 import { Button } from "../ui/button"
-import { Tooltip, TooltipProvider } from "../ui/tooltip"
 import { ShareFavpollButton } from "@/components/share-favpoll-button"
 import { decoyWidth } from "@/lib/decoys"
 import { buildMechanicSteps } from "@/lib/mechanic-steps"
 import { LockCardContent } from "@/components/lock-card-content"
-import { Gift } from "lucide-react"
-
-type RankingView = "amount" | "count"
+import { Check, EllipsisVertical, Share2 } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
 
 type Props = {
   poll: FavpollPollWithItems
@@ -123,84 +127,78 @@ export function PollSection({
       className="space-y-4"
     >
       {/* Merged header: "Favourite {topic}" — button pre-pledge, static post-pledge */}
-      <div className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+var(--identity-bar-h,0px))] z-20 md:top-[var(--hero-stuck-bottom,13.75rem)]">
-        {/* Opaque backdrop: the stuck hero and ribbon are separate boxes,
-            so the slit between them, the ribbon's rounded corners, and the
-            decoy's blur bleed (filters paint past their box) all showed
-            scrolling content. One panel behind the ribbon covers the lot. */}
-        {/* Decorative, empty — deliberately NO aria-hidden: the reveal
-            tests (and AT heuristics) locate TypedReveal's hidden copy via
-            [aria-hidden], and an empty div announces nothing anyway. */}
-        <div className="pointer-events-none absolute -inset-x-1 -top-3 bottom-0 -z-10 bg-background" />
-        {/* The ribbon is a HEADER, not a button (founder, 2026-08-02) —
-            pre-pledge the lock card is the one CTA, so a second full-
-            width button was redundant. Once entitled, a quiet icon at
-            the ribbon's edge reopens the dialog to pledge again. */}
-        {/* The ribbon is a pure header now — the pledge-again action
-            moved to the controls row beside the tabs (founder,
-            2026-09-05). */}
-        <PollHeading topicTitle={poll.topics.title} inert />
+      <div className="sticky top-[6.6875rem] z-20 bg-background md:top-(--hero-stuck-bottom,13.75rem)">
+        {/* ONE heading row for all breakpoints — PollHeading left,
+            ... dropdown right. Same pattern mobile and desktop. */}
+        <div className="flex min-h-9 items-center gap-2 py-3">
+          <div className="min-w-0 flex-1">
+            <PollHeading topicTitle={poll.topics.title} inert />
+          </div>
+          {entitled && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  aria-label="View options"
+                  className="shrink-0"
+                >
+                  <EllipsisVertical className="size-5" aria-hidden="true" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onSelect={() => setRankingView("amount")}>
+                  Amount
+                  {rankingView === "amount" && (
+                    <Check className="ml-auto size-4" aria-hidden="true" />
+                  )}
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setRankingView("count")}>
+                  Pledges
+                  {rankingView === "count" && (
+                    <Check className="ml-auto size-4" aria-hidden="true" />
+                  )}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onSelect={() => {
+                    if (navigator.share) {
+                      navigator
+                        .share({
+                          title: `Favourite ${poll.topics.title}`,
+                          url: window.location.href,
+                        })
+                        .catch(() => {})
+                    }
+                  }}
+                >
+                  Share
+                  <Share2 className="ml-auto size-4" aria-hidden="true" />
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
       </div>
 
       {/* Post-pledge: real reveal + real ranking list */}
       {entitled ? (
         <>
           {personalReveal && (
-            <TypedReveal
-              text={personalReveal}
-              active={pledgeJustConfirmed ?? false}
-              protagonistFirstName={personFirstName}
-            />
+            <div className="pb-2">
+              <TypedReveal
+                text={personalReveal}
+                active={pledgeJustConfirmed ?? false}
+                protagonistFirstName={personFirstName}
+              />
+            </div>
           )}
 
           {hasItems && (
             <>
-              {/* mt-12: the seal band below reaches 48px up (-top-12) and
-                  overpainted the reveal's second line (founder's Elizabeth
-                  memorial, 2026-09-07). NOT additive with the section's
-                  space-y-4 — adjacent block margins COLLAPSE to the larger
-                  (the first mt-8 attempt yielded 32px and a half-eaten
-                  line), so the margin itself must equal the band. */}
-              <div className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+var(--identity-bar-h,0px)+3rem)] z-10 mt-12 flex items-center justify-end gap-2 md:top-[calc(var(--hero-stuck-bottom,13.75rem)+3rem)]">
-                {/* Opaque shelf (founder, 2026-09-06: standings should
-                    disappear behind the Amount/Pledges controls, not
-                    thread past them to the ribbon). Same panel trick as
-                    the ribbon above; -top-12 seals the slit between the
-                    two sticky boxes. The row sits at z-10 — one layer
-                    BELOW the ribbon — so the over-extension tucks under
-                    the ribbon's panel instead of painting over the
-                    topic header (founder screenshot, first attempt). */}
-                <div className="pointer-events-none absolute -inset-x-1 -top-12 bottom-0 -z-10 bg-background" />
-                {onOpenPledgeDialog && (
-                  <TooltipProvider>
-                    <Tooltip content="Pledge again" side="left">
-                      <Button
-                        type="button"
-                        size="icon-sm"
-                        aria-label="Pledge again"
-                        onClick={onOpenPledgeDialog}
-                      >
-                        <Gift aria-hidden="true" />
-                      </Button>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
-                <Tabs
-                  value={rankingView}
-                  onValueChange={(v: string) =>
-                    setRankingView(v as RankingView)
-                  }
-                >
-                  <TabsList className="h-7 shadow">
-                    <TabsTrigger value="amount" className="px-3 text-xs">
-                      Amount
-                    </TabsTrigger>
-                    <TabsTrigger value="count" className="px-3 text-xs">
-                      Pledges
-                    </TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </div>
+              {/* Old desktop tabs row removed — Amount/Pledges now
+                  live in the ... dropdown on the topic heading. */}
               <RankingList
                 initialItems={initialItems}
                 favpollPollId={poll.id}
@@ -285,7 +283,7 @@ export function PollSection({
                wrapper passes events through; the card hovers with the
                list cards' lift idiom. */
             <div className="pointer-events-none z-10 flex flex-col items-center pt-4 [grid-area:1/1]">
-              <span className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+var(--identity-bar-h,0px)+4.25rem)] flex w-full flex-col items-center md:top-[calc(var(--hero-stuck-bottom,13.75rem)+4.25rem)]">
+              <span className="sticky top-[calc(7.5rem+4.25rem)] flex w-full flex-col items-center md:top-[calc(var(--hero-stuck-bottom,13.75rem)+4.25rem)]">
                 <Button
                   type="button"
                   variant="ghost"
@@ -310,7 +308,7 @@ export function PollSection({
                sticky geometry as the lock card so it sits where guests
                expect the way in to be. */
             <div className="pointer-events-none z-10 flex flex-col items-center pt-4 [grid-area:1/1]">
-              <span className="sticky top-[calc(var(--hero-stuck-bottom,10rem)+var(--identity-bar-h,0px)+4.25rem)] flex w-full flex-col items-center md:top-[calc(var(--hero-stuck-bottom,13.75rem)+4.25rem)]">
+              <span className="sticky top-[calc(7.5rem+4.25rem)] flex w-full flex-col items-center md:top-[calc(var(--hero-stuck-bottom,13.75rem)+4.25rem)]">
                 <div className="pointer-events-auto w-full max-w-sm rounded-xl bg-background/95 px-5 py-4 text-center shadow-xl ring-1 ring-border">
                   <p className="text-sm text-muted-foreground">
                     {pledgesGatedNotice}

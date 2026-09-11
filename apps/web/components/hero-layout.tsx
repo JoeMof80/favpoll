@@ -121,22 +121,40 @@ export function HeroLayout({
   // way around": both gaps at the ribbon's 40) minus the band's pb 16.
   // The whole composition settles in the first 24px of scroll — brisk,
   // but every law holds (contact at settle, slope -1).
+  // Mobile: no animation (hero scrolls away). Desktop: settle.
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)")
+    setIsMobile(mq.matches)
+    const h = (e: MediaQueryListEvent) => setIsMobile(e.matches)
+    mq.addEventListener("change", h)
+    return () => mq.removeEventListener("change", h)
+  }, [])
+
   const SETTLE_SCROLL = 24
   const t = [0, SETTLE_SCROLL]
-  const subtitleOpacity = useTransform(scrollY, t, [1, 0])
+  const subtitleOpacity = useTransform(scrollY, t, isMobile ? [1, 1] : [1, 0])
   // The line rides the SCROLL, 1:1 (founder, 2026-09-05: "move the
   // Context at the same pace as the About so the space between them
   // remains constant") — the collapse alone moved it at maxHeight's
   // rate (0.4x), so the about visibly gained on it. A transform inside
   // the clip, so layout never depends on it: if it fails the line
   // merely sits still and clips as before.
-  const subtitleY = useTransform(scrollY, t, [0, -SETTLE_SCROLL])
+  const subtitleY = useTransform(
+    scrollY,
+    t,
+    isMobile ? [0, 0] : [0, -SETTLE_SCROLL]
+  )
   // Collapses to 0 (the old design kept a 12px sliver of air; that job
   // is now done by the band's static pb-3).
-  const subtitleMaxHeight = useTransform(scrollY, t, [48, 0])
+  const subtitleMaxHeight = useTransform(
+    scrollY,
+    t,
+    isMobile ? [48, 48] : [48, 0]
+  )
   const avatarSize = useTransform(scrollY, t, [
     avatarCfg.rest,
-    avatarCfg.settled,
+    isMobile ? avatarCfg.rest : avatarCfg.settled,
   ])
 
   return (
@@ -165,7 +183,7 @@ export function HeroLayout({
         // about now lives INSIDE the band as a third collapsing clip
         // (below), so the band hides poll content at its bottom exactly
         // as the original design did.
-        className="sticky top-14 z-30 bg-background pt-6 pb-4 before:absolute before:inset-x-0 before:-top-14 before:h-14 before:bg-background md:pt-16"
+        className="z-30 bg-background pt-6 pb-4 md:sticky md:top-14 md:pt-16 md:before:absolute md:before:inset-x-0 md:before:-top-14 md:before:h-14 md:before:bg-background"
       >
         {/* min-h = the settled avatar size (0.9×80 / 0.635×132): heroes
             WITHOUT an avatar (causes) otherwise settle a few px higher
@@ -232,12 +250,10 @@ export function HeroLayout({
         // mb-10 = the upper gap's 40px (SETTLE_SCROLL 24 + pb 16), so
         // the about sits equidistant. If SETTLE_SCROLL moves, move this
         // with it.
-        className="relative z-0 mb-10"
-        // gap0 = the settle scroll: contact exactly at full settle
-        // (measured: slope exactly -1), so the cut line is the name
-        // edge from first touch — and the rest gap is as small as the
-        // settle window allows.
-        style={{ marginTop: SETTLE_SCROLL }}
+        // Mobile: tighter gaps (no settle animation, hero scrolls away).
+        // Desktop: the settle gap (SETTLE_SCROLL) + mb-6.
+        className="relative z-0 mb-3 md:mb-6"
+        style={{ marginTop: isMobile ? 8 : SETTLE_SCROLL }}
       >
         {about}
       </div>

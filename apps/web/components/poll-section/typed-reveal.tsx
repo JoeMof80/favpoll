@@ -64,7 +64,7 @@ export function TypedReveal({ text, active, protagonistFirstName }: Props) {
         {text}
       </span>
       <blockquote
-        className="absolute inset-0 border-l-[2.5px] border-primary-muted pl-3 text-[18px] leading-relaxed font-normal text-reveal-foreground italic"
+        className="absolute inset-0 border-l-[2.5px] border-primary-muted pl-3 text-[18px] leading-relaxed font-normal text-muted-foreground italic"
         aria-hidden="true"
       >
         {shown || " "}
