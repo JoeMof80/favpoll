@@ -68,7 +68,7 @@ export function BaseFavpollHero({
 
   const about =
     protagonist.about || aboutPlaceholder ? (
-      <p className="text-sm leading-relaxed wrap-break-word text-muted-foreground/80">
+      <p className="text-sm leading-relaxed wrap-break-word text-muted-foreground/80 md:text-base">
         {protagonist.about || aboutPlaceholder}
       </p>
     ) : undefined

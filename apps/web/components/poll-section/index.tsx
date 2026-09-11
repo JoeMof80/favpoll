@@ -140,11 +140,11 @@ export function PollSection({
                 <Button
                   type="button"
                   variant="ghost"
-                  size="icon-sm"
+                  size="icon"
                   aria-label="View options"
                   className="shrink-0"
                 >
-                  <EllipsisVertical className="size-4" aria-hidden="true" />
+                  <EllipsisVertical className="size-5" aria-hidden="true" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
