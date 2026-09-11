@@ -129,7 +129,7 @@ export function PollSection({
       <div className="sticky top-[6.6875rem] z-20 bg-background md:top-(--hero-stuck-bottom,13.75rem)">
         {/* ONE heading row for all breakpoints — PollHeading left,
             ... dropdown right. Same pattern mobile and desktop. */}
-        <div className="flex min-h-9 items-center gap-2">
+        <div className="flex min-h-9 items-center gap-2 py-3">
           <div className="min-w-0 flex-1">
             <PollHeading topicTitle={poll.topics.title} inert />
           </div>
