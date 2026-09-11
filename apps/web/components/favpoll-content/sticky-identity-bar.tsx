@@ -27,7 +27,7 @@ export function StickyIdentityBar({ name, eyebrow, photoUrl }: Props) {
 
   return (
     <div
-      className={`fixed top-14 right-0 left-0 z-30 border-b border-border bg-background px-6 py-1.5 transition-transform duration-200 md:hidden ${
+      className={`fixed top-14 right-0 left-0 z-30 border-b border-border bg-background px-6 py-2.5 transition-transform duration-200 md:hidden ${
         show ? "translate-y-0" : "-translate-y-full"
       }`}
     >
