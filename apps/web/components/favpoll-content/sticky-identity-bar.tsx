@@ -33,15 +33,24 @@ export function StickyIdentityBar({ name, eyebrow, photoUrl, heroRef }: Props) {
   useEffect(() => {
     const el = heroRef.current
     if (!el) return
-
     if (typeof IntersectionObserver === "undefined") return
+    // md+ has a sticky hero — the bar is md:hidden so we only care
+    // about mobile. Skip observation on desktop.
+    if (window.matchMedia("(min-width: 768px)").matches) return
 
+    // Wait for the hero to be confirmed IN VIEW before tracking its
+    // exit — otherwise the first observer callback fires "not
+    // intersecting" before the hero is laid out, and the bar shows
+    // permanently (founder, 2026-09-11).
+    let seenInView = false
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setVisible(!entry.isIntersecting)
+        if (entry.isIntersecting) seenInView = true
+        if (seenInView) setVisible(!entry.isIntersecting)
       },
       {
-        rootMargin: "-56px 0px 0px 0px",
+        // No rootMargin: fire when the hero's top leaves the actual
+        // viewport top (the header is a separate sticky layer).
         threshold: 0,
       }
     )
