@@ -21,6 +21,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 
 type Props = {
@@ -159,6 +160,7 @@ export function PollSection({
                     <Check className="ml-auto size-4" aria-hidden="true" />
                   )}
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onSelect={() => {
                     if (navigator.share) {
