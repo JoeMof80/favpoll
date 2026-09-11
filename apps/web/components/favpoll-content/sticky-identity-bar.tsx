@@ -34,26 +34,25 @@ export function StickyIdentityBar({ name, eyebrow, photoUrl, heroRef }: Props) {
     const el = heroRef.current
     if (!el) return
     if (typeof IntersectionObserver === "undefined") return
-    // md+ has a sticky hero — the bar is md:hidden so skip on desktop
     if (window.matchMedia("(min-width: 768px)").matches) return
 
-    // Wait for the hero to be confirmed IN VIEW before tracking its
-    // exit — otherwise the first callback fires "not intersecting"
-    // before layout, and the bar shows permanently (founder, 2026-09-11).
-    let seenInView = false
+    // Show the bar when the hero is mostly gone (20% still visible =
+    // 80% scrolled out). The hero isn't sticky on mobile, so no
+    // seenInView gate needed — the observer fires correctly.
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) seenInView = true
-        if (seenInView) setVisible(!entry.isIntersecting)
+        setVisible(!entry.isIntersecting)
       },
-      { threshold: 0 }
+      { threshold: 0.2 }
     )
 
     observer.observe(el)
     return () => observer.disconnect()
   }, [heroRef])
 
-  // Publish the bar's height so the poll heading sticks below it.
+  // ALWAYS publish the bar's full height — by the time the topic
+  // heading reaches its stick point on mobile, the bar is visible, so
+  // the offset must account for it from the start.
   useLayoutEffect(() => {
     const el = barRef.current
     const root = document.documentElement
@@ -61,7 +60,7 @@ export function StickyIdentityBar({ name, eyebrow, photoUrl, heroRef }: Props) {
     const publish = () =>
       root.style.setProperty(
         IDENTITY_BAR_HEIGHT_VAR,
-        visible ? `${el.getBoundingClientRect().height}px` : "0px"
+        `${el.getBoundingClientRect().height}px`
       )
     publish()
     const observer = new ResizeObserver(publish)
@@ -70,7 +69,7 @@ export function StickyIdentityBar({ name, eyebrow, photoUrl, heroRef }: Props) {
       observer.disconnect()
       root.style.removeProperty(IDENTITY_BAR_HEIGHT_VAR)
     }
-  }, [visible])
+  }, [])
 
   return (
     <div
