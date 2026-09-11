@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Countdown } from "@/components/countdown"
@@ -24,13 +24,9 @@ import type {
   FavpollPot,
   PotAllocation,
 } from "@favpoll/types"
-import {
-  charityNames as joinCharityNames,
-  getFavpollHeadline,
-} from "@/lib/display"
+import { charityNames as joinCharityNames } from "@/lib/display"
 import { useFavpollContent } from "./use-favpoll-content"
 import { MobileCharityFooter } from "./mobile-charity-footer"
-import { StickyIdentityBar } from "./sticky-identity-bar"
 import { PageLayout } from "../page-layout"
 import { Gift, FileText } from "lucide-react"
 import { formatPoundsExact } from "@/lib/i18n"
@@ -96,8 +92,6 @@ export function FavpollContent({
     entitled,
   })
 
-  const heroRef = useRef<HTMLDivElement>(null)
-
   const isCause = favpoll.subject === "cause"
   const isListed = favpoll.is_listed ?? true
 
@@ -158,28 +152,13 @@ export function FavpollContent({
       />
     ) : null
 
-  const heroIdentityName = isCause
-    ? (favpoll.cause_label ?? "")
-    : (favpoll.protagonists?.name ?? "")
-  const heroHeadline = getFavpollHeadline({
-    occasionType: favpoll.occasion_type ?? null,
-    name: heroIdentityName,
-    openingLine: favpoll.opening_line ?? null,
-    subject: favpoll.subject,
-    dateLabel: isCause
-      ? (favpoll.context ?? null)
-      : (favpoll.protagonists?.context ?? null),
-  })
-
   const left = (
     <>
-      <div ref={heroRef}>
-        {isCause ? (
-          <CauseHero favpoll={favpoll} />
-        ) : (
-          <FavpollHero favpoll={favpoll} protagonist={favpoll.protagonists!} />
-        )}
-      </div>
+      {isCause ? (
+        <CauseHero favpoll={favpoll} />
+      ) : (
+        <FavpollHero favpoll={favpoll} protagonist={favpoll.protagonists!} />
+      )}
 
       {pollWithItems ? (
         <>
@@ -329,12 +308,6 @@ export function FavpollContent({
           onCancel={() => setShowGuestFund(false)}
         />
       )}
-      <StickyIdentityBar
-        name={heroIdentityName}
-        eyebrow={heroHeadline.prefix}
-        photoUrl={favpoll.protagonists?.photo_url}
-        heroRef={heroRef}
-      />
       <MobileCharityFooter
         charities={favpoll.favpoll_charities.map((ec) => ec.charities)}
         totalRaised={totalRaised}
