@@ -121,8 +121,7 @@ export function HeroLayout({
   // way around": both gaps at the ribbon's 40) minus the band's pb 16.
   // The whole composition settles in the first 24px of scroll — brisk,
   // but every law holds (contact at settle, slope -1).
-  // Mobile: no animation — the hero scrolls away and the identity bar
-  // takes over (founder, 2026-09-11).
+  // Mobile: no animation (hero scrolls away). Desktop: settle.
   const [isMobile, setIsMobile] = useState(false)
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 767px)")
@@ -184,8 +183,6 @@ export function HeroLayout({
         // about now lives INSIDE the band as a third collapsing clip
         // (below), so the band hides poll content at its bottom exactly
         // as the original design did.
-        // Mobile: the hero scrolls away naturally — the sticky identity
-        // bar replaces it (founder, 2026-09-11). Desktop: still sticky.
         className="z-30 bg-background pt-6 pb-4 md:sticky md:top-14 md:pt-16 md:before:absolute md:before:inset-x-0 md:before:-top-14 md:before:h-14 md:before:bg-background"
       >
         {/* min-h = the settled avatar size (0.9×80 / 0.635×132): heroes

@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Countdown } from "@/components/countdown"
@@ -96,8 +96,6 @@ export function FavpollContent({
     entitled,
   })
 
-  const heroRef = useRef<HTMLDivElement>(null)
-
   const isCause = favpoll.subject === "cause"
   const isListed = favpoll.is_listed ?? true
 
@@ -158,28 +156,13 @@ export function FavpollContent({
       />
     ) : null
 
-  const heroIdentityName = isCause
-    ? (favpoll.cause_label ?? "")
-    : (favpoll.protagonists?.name ?? "")
-  const heroHeadline = getFavpollHeadline({
-    occasionType: favpoll.occasion_type ?? null,
-    name: heroIdentityName,
-    openingLine: favpoll.opening_line ?? null,
-    subject: favpoll.subject,
-    dateLabel: isCause
-      ? (favpoll.context ?? null)
-      : (favpoll.protagonists?.context ?? null),
-  })
-
   const left = (
     <>
-      <div ref={heroRef}>
-        {isCause ? (
-          <CauseHero favpoll={favpoll} />
-        ) : (
-          <FavpollHero favpoll={favpoll} protagonist={favpoll.protagonists!} />
-        )}
-      </div>
+      {isCause ? (
+        <CauseHero favpoll={favpoll} />
+      ) : (
+        <FavpollHero favpoll={favpoll} protagonist={favpoll.protagonists!} />
+      )}
 
       {pollWithItems ? (
         <>
@@ -330,10 +313,21 @@ export function FavpollContent({
         />
       )}
       <StickyIdentityBar
-        name={heroIdentityName}
-        eyebrow={heroHeadline.prefix}
+        name={
+          favpoll.subject === "cause"
+            ? (favpoll.cause_label ?? "")
+            : (favpoll.protagonists?.name ?? "")
+        }
+        eyebrow={
+          getFavpollHeadline({
+            occasionType: favpoll.occasion_type ?? null,
+            name: "",
+            openingLine: null,
+            subject: favpoll.subject,
+            dateLabel: null,
+          }).prefix
+        }
         photoUrl={favpoll.protagonists?.photo_url}
-        heroRef={heroRef}
       />
       <MobileCharityFooter
         charities={favpoll.favpoll_charities.map((ec) => ec.charities)}
