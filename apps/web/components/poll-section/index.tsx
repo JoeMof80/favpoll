@@ -123,7 +123,7 @@ export function PollSection({
       className="space-y-4"
     >
       {/* Merged header: "Favourite {topic}" — button pre-pledge, static post-pledge */}
-      <div className="sticky top-[calc(var(--hero-stuck-bottom,10rem))] z-20 md:top-[var(--hero-stuck-bottom,13.75rem)]">
+      <div className="sticky top-[6.5rem] z-20 md:top-[var(--hero-stuck-bottom,13.75rem)]">
         {/* Opaque backdrop: the stuck hero and ribbon are separate boxes,
             so the slit between them, the ribbon's rounded corners, and the
             decoy's blur bleed (filters paint past their box) all showed

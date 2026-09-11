@@ -32,29 +32,29 @@ export function StickyIdentityBar({ name, eyebrow, photoUrl }: Props) {
       }`}
     >
       <div className="flex items-center gap-2.5">
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
+            {eyebrow}
+          </p>
+          <p className="truncate text-base leading-tight font-medium text-foreground">
+            {name}
+          </p>
+        </div>
         {photoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={photoUrl}
             alt=""
-            className="size-8 shrink-0 rounded-full object-cover"
+            className="size-9 shrink-0 rounded-lg object-cover"
           />
         ) : (
           <div
-            className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary"
+            className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-sm font-medium text-primary"
             aria-hidden="true"
           >
             {name.charAt(0)}
           </div>
         )}
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
-            {eyebrow}
-          </p>
-          <p className="truncate text-sm leading-tight font-medium text-foreground">
-            {name}
-          </p>
-        </div>
       </div>
     </div>
   )
