@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
@@ -119,6 +119,14 @@ export function ManageClient({
   wallEntries: WallEntry[]
 }) {
   const router = useRouter()
+
+  // The manage page opens mid-scroll on some navigations — the browser
+  // restores a stale position or the layout shifts before paint. Reset
+  // to the top on mount (useLayoutEffect = pre-paint, no flash).
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
   const isClosed = isFavpollClosed(favpoll)
   const days = daysRemaining(favpoll.closes_at)
   const isWarning = !isClosed && days <= WARNING_THRESHOLD_DAYS
