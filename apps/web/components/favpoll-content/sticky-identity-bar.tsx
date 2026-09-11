@@ -36,18 +36,24 @@ export function StickyIdentityBar({ name, eyebrow, photoUrl, heroRef }: Props) {
     if (typeof IntersectionObserver === "undefined") return
     if (window.matchMedia("(min-width: 768px)").matches) return
 
-    // Show the bar when the hero is mostly gone (20% still visible =
-    // 80% scrolled out). The hero isn't sticky on mobile, so no
-    // seenInView gate needed — the observer fires correctly.
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setVisible(!entry.isIntersecting)
-      },
-      { threshold: 0.2 }
-    )
-
-    observer.observe(el)
-    return () => observer.disconnect()
+    // The observer's first callback can fire before the hero is laid
+    // out, reporting "not intersecting" and showing the bar on mount.
+    // Delay observation by one frame so the hero has been measured.
+    const raf = requestAnimationFrame(() => {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          setVisible(!entry.isIntersecting)
+        },
+        { threshold: 0.2 }
+      )
+      observer.observe(el)
+      observerRef = observer
+    })
+    let observerRef: IntersectionObserver | null = null
+    return () => {
+      cancelAnimationFrame(raf)
+      observerRef?.disconnect()
+    }
   }, [heroRef])
 
   // ALWAYS publish the bar's full height — by the time the topic
