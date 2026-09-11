@@ -16,7 +16,13 @@ import { ShareFavpollButton } from "@/components/share-favpoll-button"
 import { decoyWidth } from "@/lib/decoys"
 import { buildMechanicSteps } from "@/lib/mechanic-steps"
 import { LockCardContent } from "@/components/lock-card-content"
-import { Gift } from "lucide-react"
+import { Check, EllipsisVertical, Gift } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu"
 
 type RankingView = "amount" | "count"
 
@@ -123,7 +129,7 @@ export function PollSection({
       className="space-y-4"
     >
       {/* Merged header: "Favourite {topic}" — button pre-pledge, static post-pledge */}
-      <div className="sticky top-[6.5rem] z-20 py-2 md:top-[var(--hero-stuck-bottom,13.75rem)] md:py-0">
+      <div className="sticky top-[6.5rem] z-20 md:top-[var(--hero-stuck-bottom,13.75rem)]">
         {/* Opaque backdrop: the stuck hero and ribbon are separate boxes,
             so the slit between them, the ribbon's rounded corners, and the
             decoy's blur bleed (filters paint past their box) all showed
@@ -132,14 +138,63 @@ export function PollSection({
             tests (and AT heuristics) locate TypedReveal's hidden copy via
             [aria-hidden], and an empty div announces nothing anyway. */}
         <div className="pointer-events-none absolute -inset-x-1 -top-3 bottom-0 -z-10 bg-background" />
-        {/* The ribbon is a HEADER, not a button (founder, 2026-08-02) —
-            pre-pledge the lock card is the one CTA, so a second full-
-            width button was redundant. Once entitled, a quiet icon at
-            the ribbon's edge reopens the dialog to pledge again. */}
-        {/* The ribbon is a pure header now — the pledge-again action
-            moved to the controls row beside the tabs (founder,
-            2026-09-05). */}
-        <PollHeading topicTitle={poll.topics.title} inert />
+
+        {/* ── MOBILE: compact one-line header ── */}
+        <div className="flex min-h-9 items-center gap-2 md:hidden">
+          <div className="min-w-0 flex-1">
+            <PollHeading topicTitle={poll.topics.title} inert />
+          </div>
+          {/* Pledge-again + overflow menu — only post-pledge (entitled) */}
+          {entitled && (
+            <div className="flex shrink-0 items-center gap-1">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-label="View options"
+                  >
+                    <EllipsisVertical className="size-4" aria-hidden="true" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onSelect={() => setRankingView("amount")}>
+                    Amount
+                    {rankingView === "amount" && (
+                      <Check className="ml-auto size-4" aria-hidden="true" />
+                    )}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => setRankingView("count")}>
+                    Pledges
+                    {rankingView === "count" && (
+                      <Check className="ml-auto size-4" aria-hidden="true" />
+                    )}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={() => {
+                      if (navigator.share) {
+                        navigator
+                          .share({
+                            title: `Favourite ${poll.topics.title}`,
+                            url: window.location.href,
+                          })
+                          .catch(() => {})
+                      }
+                    }}
+                  >
+                    Share
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
+        </div>
+
+        {/* ── DESKTOP: full-width heading (unchanged) ── */}
+        <div className="hidden md:block">
+          <PollHeading topicTitle={poll.topics.title} inert />
+        </div>
       </div>
 
       {/* Post-pledge: real reveal + real ranking list */}
@@ -161,7 +216,7 @@ export function PollSection({
                   space-y-4 — adjacent block margins COLLAPSE to the larger
                   (the first mt-8 attempt yielded 32px and a half-eaten
                   line), so the margin itself must equal the band. */}
-              <div className="sticky top-[calc(6.5rem+3rem)] z-10 mt-12 flex items-center justify-end gap-2 md:top-[calc(var(--hero-stuck-bottom,13.75rem)+3rem)]">
+              <div className="sticky top-[calc(6.5rem+3rem)] z-10 mt-12 hidden items-center justify-end gap-2 md:top-[calc(var(--hero-stuck-bottom,13.75rem)+3rem)] md:flex">
                 {/* Opaque shelf (founder, 2026-09-06: standings should
                     disappear behind the Amount/Pledges controls, not
                     thread past them to the ribbon). Same panel trick as

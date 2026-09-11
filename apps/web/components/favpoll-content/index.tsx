@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Countdown } from "@/components/countdown"
@@ -79,6 +79,15 @@ export function FavpollContent({
   const router = useRouter()
   const [showGuestFund, setShowGuestFund] = useState(false)
   const [pledgeDialogOpen, setPledgeDialogOpen] = useState(false)
+
+  // The Pledge FAB (in FavpollSubheader, a sibling) dispatches this
+  // event to open the dialog without prop-drilling through the server
+  // component that renders both.
+  useEffect(() => {
+    const handler = () => setPledgeDialogOpen(true)
+    window.addEventListener("favpoll:pledge", handler)
+    return () => window.removeEventListener("favpoll:pledge", handler)
+  }, [])
 
   const {
     handlePledgeSuccess,

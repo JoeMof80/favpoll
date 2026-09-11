@@ -61,9 +61,10 @@ export function ShareFavpollButton({
         onClick={handleShare}
         aria-label={copied ? "Link copied" : `Share ${shareTitle}`}
         className={cn(
-          // size-14 + size-6 icon = the FAB standard (new-favpoll +
+          // size-10 on mobile (subordinate to the pledge action in the
+          // sticky heading), size-14 at md+ = the FAB standard (new-favpoll +
           // publish/save FABs; unified 2026-07-30)
-          "size-14 rounded-full border border-border shadow-lg [&_svg]:size-6",
+          "size-10 rounded-full border border-border shadow-lg md:size-14 [&_svg]:size-4 md:[&_svg]:size-6",
           className
         )}
       >
