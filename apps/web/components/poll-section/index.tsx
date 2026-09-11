@@ -183,11 +183,13 @@ export function PollSection({
       {entitled ? (
         <>
           {personalReveal && (
-            <TypedReveal
-              text={personalReveal}
-              active={pledgeJustConfirmed ?? false}
-              protagonistFirstName={personFirstName}
-            />
+            <div className="py-2">
+              <TypedReveal
+                text={personalReveal}
+                active={pledgeJustConfirmed ?? false}
+                protagonistFirstName={personFirstName}
+              />
+            </div>
           )}
 
           {hasItems && (
