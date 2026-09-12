@@ -14,7 +14,8 @@ const INCLUDED = [
   /^\/about$/,
   /^\/features$/,
   /^\/record$/,
-  /^\/favpolls$/, // the listing only — not favpolls/[id] or the wizard
+  // /favpolls removed (2026-09-12): an organiser surface, not marketing —
+  // the footer made short lists scroll unnecessarily.
   /^\/celebration$/, // register landing pages — marketing/trust surfaces
   /^\/fundraiser$/,
   /^\/memorial$/,
