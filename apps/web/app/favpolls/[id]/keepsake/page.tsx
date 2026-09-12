@@ -190,7 +190,7 @@ export default async function KeepsakePage({ params }: Props) {
     // a differently-tinted page. It was bg-muted/30: close enough to look like
     // a mistake, far enough to show a seam under the band.
     <RegisterScope palette={paletteForRegister(register)}>
-      <div className="min-h-screen bg-muted pb-8 print:min-h-0 print:bg-background print:pb-0">
+      <div className="min-h-[calc(100vh-3.5rem)] bg-muted pb-8 print:min-h-0 print:bg-background print:pb-0">
         {/* Wide enough for a LANDSCAPE A4 at 100% (1123px) plus the desk's
           padding — the keepsake is landscape now. */}
         <div className="print:max-w-none">

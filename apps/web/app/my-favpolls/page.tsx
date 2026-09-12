@@ -46,7 +46,7 @@ export default async function MyFavpollsPage() {
   return (
     // The favpoll surfaces' shared ground (PageLayout's register wash;
     // default blue here — the list spans registers, so no scope).
-    <main className="min-h-screen bg-primary/5">
+    <main className="min-h-[calc(100vh-3.5rem)] bg-primary/5">
       {favpolls.length > 0 ? (
         <OrganizerPageClient favpolls={favpolls} />
       ) : (
