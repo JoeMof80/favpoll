@@ -8,7 +8,7 @@ import { withLiveTotals } from "@/lib/live-totals"
 import { pollSetStandings } from "@/lib/poll-standings"
 import { NewFavpollFab } from "@/components/new-favpoll-fab"
 import { FavpollsListClient } from "./favpolls-list-client"
-import { LockOverscroll } from "./lock-overscroll"
+import { PageGround } from "@/components/page-ground"
 import type { PublicStatusFilter } from "./list-utils"
 
 export const metadata = {
@@ -317,7 +317,7 @@ export default async function FavpollsPage({
 
   return (
     <main className="bg-muted">
-      <LockOverscroll />
+      <PageGround color="var(--muted)" />
       {showingExemplars && (
         <div className="sticky top-14 z-30 border-b border-border bg-muted">
           {rail}
