@@ -8,7 +8,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { MenuButton } from "@favpoll/ui"
+import { MenuButton, AppearanceButton } from "@favpoll/ui"
 import { HeaderBar } from "@/components/header-bar"
 import type { RegisterPalette } from "@/lib/register-palette"
 import {
@@ -163,12 +163,9 @@ export function Header() {
                 </Link>
               </nav>
 
-              {/* Appearance — the theme switch */}
-              <div className="mt-2 flex items-center justify-between border-t border-border px-3 pt-3">
-                <span className="text-sm text-muted-foreground">
-                  Appearance
-                </span>
-                <MenuButton />
+              {/* Appearance — the theme switch (full row is the button) */}
+              <div className="mt-2 border-t border-border pt-2">
+                <AppearanceButton />
               </div>
 
               {/* Account — sign in/up when signed out, manage/sign out when in */}
