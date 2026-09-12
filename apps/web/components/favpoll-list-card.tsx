@@ -264,7 +264,12 @@ export function FavpollListCard({
           if ((e.target as HTMLElement).closest("button,a")) return
           router.push(`/favpolls/${favpoll.id}`)
         }}
-        className="group relative flex h-full cursor-pointer flex-col rounded-xl border border-border bg-background shadow-sm transition-all duration-300 hover:border-border-strong hover:shadow-lg motion-safe:hover:-translate-y-1"
+        // Tap feedback: the stretched Link is the actual touch target, so
+        // :active on this div never fires from a tap — has-[a:active]
+        // tints the card when the link is pressed. transition-none on the
+        // pressed state makes the tint instant (the 300ms transition would
+        // swallow a quick tap); the fade-out still animates.
+        className="group relative flex h-full cursor-pointer flex-col rounded-xl border border-border bg-background shadow-sm transition-all duration-300 hover:border-border-strong hover:shadow-lg active:bg-primary/10 active:transition-none has-[a:active]:bg-primary/10 has-[a:active]:transition-none motion-safe:hover:-translate-y-1"
       >
         {/* Stretched link — covers the card; positioned siblings paint and
             hit-test above it. */}
