@@ -31,3 +31,24 @@ export function MenuButton() {
     </button>
   )
 }
+
+/** Full-width appearance toggle for mobile menus — label + icon in one row. */
+export function AppearanceButton() {
+  const { resolvedTheme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+  const isDark = mounted && resolvedTheme === "dark"
+
+  return (
+    <button
+      type="button"
+      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+      className="flex w-full items-center justify-between rounded-md px-3 py-2.5 text-left text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+    >
+      Appearance
+      {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+    </button>
+  )
+}
