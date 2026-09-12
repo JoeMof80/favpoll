@@ -138,7 +138,7 @@ export function FavpollsListClient({
         />
       </ToolbarBand>
 
-      <div className="mx-auto max-w-330 px-4 pt-8 pb-16">
+      <div className="mx-auto max-w-330 px-4 pt-8 pb-4">
         {favpolls.length === 0 ? (
           <FavpollListCardEmpty />
         ) : displayed.length === 0 ? (
