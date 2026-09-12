@@ -315,7 +315,7 @@ export default async function FavpollsPage({
   )
 
   return (
-    <main className="bg-muted">
+    <main className="flex min-h-[calc(100dvh-3.5rem)] flex-col bg-muted">
       {showingExemplars && (
         <div className="sticky top-14 z-30 border-b border-border bg-muted">
           {rail}
