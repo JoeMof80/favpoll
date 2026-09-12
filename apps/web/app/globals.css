@@ -168,6 +168,17 @@
   }
   html {
     @apply font-sans;
+    /* Tailwind preflight sets -webkit-tap-highlight-color: transparent,
+       killing iOS's native tap flash app-wide — and CSS :active states
+       don't fire reliably on quick taps in iOS Safari, so buttons and
+       cards showed NO feedback at all (founder, 2026-09-13). Restoring
+       the native highlight in the register colour is the only feedback
+       whose timing iOS always gets right. */
+    -webkit-tap-highlight-color: color-mix(
+      in oklab,
+      var(--primary) 15%,
+      transparent
+    );
   }
   input,
   textarea,
