@@ -230,7 +230,7 @@ export function PollSection({
           {/* overflow-hidden on a WRAPPER clips the blur filter's painted
               bleed (filters draw past the element's box) */}
           <div
-            className="pointer-events-none overflow-hidden [grid-area:1/1]"
+            className="pointer-events-none max-h-80 overflow-hidden [grid-area:1/1]"
             aria-hidden="true"
           >
             <div className="space-y-4 opacity-60 blur-xs select-none">

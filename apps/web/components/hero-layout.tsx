@@ -174,7 +174,7 @@ export function HeroLayout({
         // The before-cover seals the 56px header zone above the band:
         // iOS Safari intermittently drops the app header's sticky,
         // letting the about scroll visibly over that gap (founder-caught
-        // on-device, 2026-08-02). Under a working header (z-40) the
+        // on-device, 2026-08-02). Under a working header (z-50) the
         // cover is invisible.
         // FULLY OPAQUE AGAIN (2026-09-05, ending the transparent-zone
         // experiment): a see-through lower band could not tell the
@@ -183,7 +183,7 @@ export function HeroLayout({
         // about now lives INSIDE the band as a third collapsing clip
         // (below), so the band hides poll content at its bottom exactly
         // as the original design did.
-        className="z-30 bg-background pt-6 pb-4 md:sticky md:top-14 md:pt-16 md:before:absolute md:before:inset-x-0 md:before:-top-14 md:before:h-14 md:before:bg-background"
+        className="bg-background pt-6 pb-4 md:sticky md:top-14 md:z-30 md:pt-16 md:before:absolute md:before:inset-x-0 md:before:-top-14 md:before:h-14 md:before:bg-background"
       >
         {/* min-h = the settled avatar size (0.9×80 / 0.635×132): heroes
             WITHOUT an avatar (causes) otherwise settle a few px higher
@@ -252,7 +252,7 @@ export function HeroLayout({
         // with it.
         // Mobile: tighter gaps (no settle animation, hero scrolls away).
         // Desktop: the settle gap (SETTLE_SCROLL) + mb-6.
-        className="relative z-0 mb-3 md:mb-6"
+        className="mb-3 md:mb-6"
         style={{ marginTop: isMobile ? 8 : SETTLE_SCROLL }}
       >
         {about}
