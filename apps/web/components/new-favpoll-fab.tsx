@@ -7,7 +7,7 @@ import { NewFavpollButton } from "@/components/new-favpoll-button"
 // button. NewFavpollButton already handles the signed-out redirect.
 export function NewFavpollFab() {
   return (
-    <NewFavpollButton className="fixed right-6 bottom-6 z-40 size-14 rounded-full shadow-lg [&_svg]:size-6">
+    <NewFavpollButton className="fixed right-4 bottom-4 z-40 size-14 rounded-full shadow-lg [&_svg]:size-6">
       <Plus aria-hidden="true" />
       <span className="sr-only">New favpoll</span>
     </NewFavpollButton>
