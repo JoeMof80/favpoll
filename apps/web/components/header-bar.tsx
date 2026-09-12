@@ -45,10 +45,7 @@ export function HeaderBar({
 }) {
   if (staticMenu) {
     return (
-      <header
-        data-site-chrome
-        className="border-b border-border bg-background"
-      >
+      <header data-site-chrome className="border-b border-border bg-background">
         <div className="mx-auto flex h-14 items-center justify-between px-6">
           <div className="flex items-center gap-3">
             <FavpollLogo />
