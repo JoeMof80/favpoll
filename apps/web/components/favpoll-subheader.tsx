@@ -53,7 +53,7 @@ export function FavpollSubheader({
       // (founder, 2026-09-09 — "move down too but stay visible, slightly
       // further into the corner"). Fallback is the footer's no-goal height,
       // for the paint before hydration. Desktop (md+) has no bar.
-      className="fixed right-4 bottom-[calc(max(var(--charity-footer-visible-h,calc(env(safe-area-inset-bottom)+3.1rem)),env(safe-area-inset-bottom))+1rem)] z-30 flex flex-col items-end gap-2 transition-[bottom] duration-300 md:right-5 md:bottom-5"
+      className="fixed right-3 bottom-[calc(max(var(--charity-footer-visible-h,calc(env(safe-area-inset-bottom)+3.1rem)),env(safe-area-inset-bottom))+0.5rem)] z-30 flex flex-col items-end gap-2 transition-[bottom] duration-300 md:right-5 md:bottom-5"
     >
       {/* Manage (secondary) above Pledge (primary) — reversed so the
           primary action sits closest to the thumb. Manage is secondary
