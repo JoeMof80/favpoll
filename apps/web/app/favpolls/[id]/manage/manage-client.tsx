@@ -248,7 +248,7 @@ export function ManageClient({
     // is the destination that shows the full value.
     <div className="flex min-w-0 items-baseline gap-3">
       <p className="w-24 shrink-0 text-xs text-muted-foreground">{label}</p>
-      <div className="min-w-0 flex-1 break-words text-sm text-foreground">
+      <div className="min-w-0 flex-1 text-sm break-words text-foreground">
         {value}
       </div>
     </div>
