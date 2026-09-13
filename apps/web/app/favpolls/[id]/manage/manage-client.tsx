@@ -238,7 +238,11 @@ export function ManageClient({
 
   // Label and value share a line — the record's gutter grammar.
   const inlineFact = (label: string, value: React.ReactNode) => (
-    <div className="flex items-baseline gap-3">
+    // min-w-0 on the ROW too, not just the value: the row is a grid item
+    // (min-width:auto) and iOS Safari resolves that through the nested
+    // flex differently from Chrome — the value overran the avatar instead
+    // of truncating (founder screenshot, 2026-09-14).
+    <div className="flex min-w-0 items-baseline gap-3">
       <p className="w-24 shrink-0 text-xs text-muted-foreground">{label}</p>
       <div className="min-w-0 flex-1 truncate text-sm text-foreground">
         {value}
