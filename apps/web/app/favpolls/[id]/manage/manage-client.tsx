@@ -240,11 +240,15 @@ export function ManageClient({
   const inlineFact = (label: string, value: React.ReactNode) => (
     // min-w-0 on the ROW too, not just the value: the row is a grid item
     // (min-width:auto) and iOS Safari resolves that through the nested
-    // flex differently from Chrome — the value overran the avatar instead
-    // of truncating (founder screenshot, 2026-09-14).
+    // flex differently from Chrome — the value overran the avatar
+    // (founder screenshot, 2026-09-14).
+    // WRAP, NOT TRUNCATE (founder, 2026-09-14): this card IS the record —
+    // a truncated value hides the very data the card exists to show, with
+    // no recovery on touch. Truncation belongs in list rows, where manage
+    // is the destination that shows the full value.
     <div className="flex min-w-0 items-baseline gap-3">
       <p className="w-24 shrink-0 text-xs text-muted-foreground">{label}</p>
-      <div className="min-w-0 flex-1 truncate text-sm text-foreground">
+      <div className="min-w-0 flex-1 break-words text-sm text-foreground">
         {value}
       </div>
     </div>
