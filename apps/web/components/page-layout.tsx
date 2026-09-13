@@ -1,3 +1,5 @@
+import { PageGround, PRIMARY_WASH } from "@/components/page-ground"
+
 type Props = {
   left: React.ReactNode
   right?: React.ReactNode
@@ -20,6 +22,7 @@ export function PageLayout({
     // fighting the scroll-linked collapse in discrete jumps (founder:
     // "glitching"). Anchoring off for this scroller.
     <div className="overflow-x-clip bg-primary/5 [overflow-anchor:none]">
+      <PageGround color={PRIMARY_WASH} />
       <main // Mobile bottom padding clears the fixed charity footer by 1.5rem when
         // one is mounted (it publishes --charity-footer-h), and is the old
         // 6rem otherwise.
