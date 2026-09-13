@@ -66,10 +66,23 @@ export function SegmentedControl<T extends string>({
 }
 
 // The small uppercase label that sits before a control in a toolbar band.
-// Hidden below md, where the band needs its width for the controls.
-export function ToolbarLabel({ children }: { children: React.ReactNode }) {
+// Hidden below md by default, where the band needs its width for the
+// controls. `always` keeps it at every width — for controls that are
+// meaningless without their label, like a bare switch (founder,
+// 2026-09-13: "otherwise we don't know what it means").
+export function ToolbarLabel({
+  children,
+  always = false,
+}: {
+  children: React.ReactNode
+  always?: boolean
+}) {
   return (
-    <span className="hidden text-[11px] font-medium tracking-widest text-muted-foreground uppercase md:inline">
+    <span
+      className={`text-[11px] font-medium tracking-widest text-muted-foreground uppercase ${
+        always ? "" : "hidden md:inline"
+      }`}
+    >
       {children}
     </span>
   )

@@ -137,7 +137,14 @@ export function HowItWorksSteps({
               <p className="mb-2 text-sm font-medium tracking-widest text-primary uppercase">
                 {step.label}
               </p>
-              <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_auto] xl:gap-0">
+              {/* TWO EQUAL COLUMNS below xl (founder, 2026-09-13 —
+                  superseding the xl-only split, then the fixed w-40 hint:
+                  at ~768px the text track hogged the row and the hint sat
+                  squeezed at the edge). Prose and hint split the beat
+                  half-and-half at every width below xl; the hints are
+                  chips, bars and a bill grid, all of which flex. At xl the
+                  three-across layout keeps its measured text/auto split. */}
+              <div className="grid grid-cols-2 items-start gap-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:gap-0">
                 <div className="min-w-0 xl:pr-2">
                   <p className="leading-relaxed text-muted-foreground">
                     {linkifyOnce(step.body, { done: false })}
@@ -172,7 +179,7 @@ export function HowItWorksSteps({
                     an element inside one expression is two roots, which is
                     a parse error tsc does not catch. Third time tonight. */}
                 {(step.media ?? DEFAULT_MEDIA[i]) && (
-                  <div className="w-48 shrink-0 pt-5 xl:pt-0 xl:pl-2">
+                  <div className="min-w-0 xl:w-48 xl:shrink-0 xl:pl-2">
                     {step.media ?? DEFAULT_MEDIA[i]}
                   </div>
                 )}

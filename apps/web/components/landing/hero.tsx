@@ -557,7 +557,10 @@ export function LandingHero({
           )}
         >
           {still ? (
-            <div className={PHONE_SCALED_BOX}>
+            /* mx-auto below md: stacked under the pitch the phone sat on
+               the left edge — centre it (founder, 2026-09-13). On md+ it
+               keeps its place in the media column. */
+            <div className={cn(PHONE_SCALED_BOX, "mx-auto md:mx-0")}>
               <div className={cn("origin-top-left", PHONE_SCALE)}>
                 <PhoneFrame>
                   <DemoCard
