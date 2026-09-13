@@ -1,4 +1,5 @@
 import { RegisterScope } from "@/components/register-scope"
+import { PageGround } from "@/components/page-ground"
 import { paletteForRegister } from "@/lib/register-palette"
 import { notFound } from "next/navigation"
 import Link from "next/link"
@@ -191,6 +192,7 @@ export default async function KeepsakePage({ params }: Props) {
     // a mistake, far enough to show a seam under the band.
     <RegisterScope palette={paletteForRegister(register)}>
       <div className="min-h-[calc(100vh-3.5rem)] bg-muted pb-8 print:min-h-0 print:bg-background print:pb-0">
+        <PageGround color="var(--muted)" />
         {/* Wide enough for a LANDSCAPE A4 at 100% (1123px) plus the desk's
           padding — the keepsake is landscape now. */}
         <div className="print:max-w-none">

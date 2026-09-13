@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { withLiveTotals } from "@/lib/live-totals"
 import { RegisterScope } from "@/components/register-scope"
+import { PageGround, PRIMARY_WASH } from "@/components/page-ground"
 import { paletteForFavpoll } from "@/lib/register-palette"
 import {
   ORGANIZER_FAVPOLL_COLUMNS,
@@ -174,6 +175,7 @@ export default async function ManageFavpollPage({
           manage and the favpoll it manages read as one place
           (founder, 2026-09-03). */}
       <main className="min-h-[calc(100vh-3.5rem)] bg-primary/5">
+        <PageGround color={PRIMARY_WASH} />
         <ManageClient favpoll={favpoll} wallEntries={wallEntries} />
       </main>
     </RegisterScope>

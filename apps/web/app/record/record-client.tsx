@@ -10,6 +10,7 @@ import type { Category, Topic, Favourite } from "@favpoll/types"
 import { PollHeading } from "@/components/poll-heading"
 import { PollResults } from "@/components/favpoll-card/poll-results"
 import { isEstablishedRecord, topicPledgedTotal } from "@/lib/record"
+import { PageGround } from "@/components/page-ground"
 import { formatCount, formatPounds } from "@/lib/i18n"
 
 type TopicWithItems = Topic & {
@@ -163,6 +164,7 @@ export function RankingsClient({ categories, topics }: Props) {
 
   return (
     <main className="min-h-[calc(100vh-3.5rem)] bg-muted">
+      <PageGround color="var(--muted)" />
       {/* One sticky band: category rail + the list controls — everything
           that narrows the list lives together (header is h-14 = 3.5rem) */}
       <div className="sticky top-14 z-30 border-b border-border bg-muted">

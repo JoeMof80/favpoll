@@ -10,7 +10,18 @@
  *
  * Server-rendered <style> so the ground is painted on first paint — no
  * flash. React removes the tag on client-side navigation away.
+ *
+ * @media screen: the ground is a screen concern — the print surfaces
+ * (keepsake, stationery) must keep printing on white.
  */
 export function PageGround({ color }: { color: string }) {
-  return <style>{`html{background-color:${color}}`}</style>
+  return <style>{`@media screen{html{background-color:${color}}}`}</style>
 }
+
+/**
+ * bg-primary/5 as a SOLID colour — mixed over the background token, not
+ * transparent: an unpainted <html> is browser-white even in dark mode, so
+ * a translucent wash would compose over the wrong canvas there.
+ */
+export const PRIMARY_WASH =
+  "color-mix(in oklab, var(--primary) 5%, var(--background))"

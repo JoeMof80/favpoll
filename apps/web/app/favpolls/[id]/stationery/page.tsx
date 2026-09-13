@@ -1,4 +1,5 @@
 import { RegisterScope } from "@/components/register-scope"
+import { PageGround } from "@/components/page-ground"
 import { paletteForFavpoll } from "@/lib/register-palette"
 import { notFound } from "next/navigation"
 import Link from "next/link"
@@ -80,6 +81,7 @@ export default async function PackPage({ params }: Props) {
     // a mistake, far enough to show a seam under the band.
     <RegisterScope palette={paletteForFavpoll(favpoll)}>
       <div className="min-h-[calc(100vh-3.5rem)] bg-muted pb-8 print:min-h-0 print:bg-background print:pb-0">
+        <PageGround color="var(--muted)" />
         {/* Wide enough for a full landscape A4 PAGE (297mm = 1123px) plus
           padding — every sheet renders at true page size now, so nothing is
           scaled to fit and what you see is what prints. */}

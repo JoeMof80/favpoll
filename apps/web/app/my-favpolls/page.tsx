@@ -10,6 +10,7 @@ import {
   type RawOrganizerRow,
 } from "@/lib/organizer-favpolls"
 import { OrganizerPageClient } from "./organizer-page-client"
+import { PageGround, PRIMARY_WASH } from "@/components/page-ground"
 
 export const metadata = {
   title: "Your favpolls — favpoll",
@@ -47,6 +48,7 @@ export default async function MyFavpollsPage() {
     // The favpoll surfaces' shared ground (PageLayout's register wash;
     // default blue here — the list spans registers, so no scope).
     <main className="min-h-[calc(100vh-3.5rem)] bg-primary/5">
+      <PageGround color={PRIMARY_WASH} />
       {favpolls.length > 0 ? (
         <OrganizerPageClient favpolls={favpolls} />
       ) : (
