@@ -40,10 +40,15 @@ const DEMO_GUEST_URL =
 
 export function ShareVignette() {
   return (
-    <Vignette className="flex justify-center">
+    // NOT flex justify-center: a flex item sizes to max-content, and the
+    // unbreakable 65-char mono URL made the box lock at 560px and spill
+    // both screen edges on phones — truncate never got a chance to act
+    // (measured on-device, 2026-09-14). mx-auto centres within the real
+    // container width instead.
+    <Vignette>
       <div
         data-artefact-box
-        className="w-full max-w-lg rounded-xl border border-border bg-background p-6 shadow-lg"
+        className="mx-auto w-full max-w-lg rounded-xl border border-border bg-background p-6 shadow-lg"
       >
         <p className="text-xs font-medium text-foreground">favpoll</p>
         <div className="mt-1 flex items-center gap-1.5">
