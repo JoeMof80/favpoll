@@ -113,7 +113,11 @@ export function IdeasSection({
                     // Vignette lost its visible chrome globally (2026-09-03),
                     // so only the width release is still this page's own:
                     // beside a column of text the artefact takes the column.
-                    "min-w-0 [&_[data-vignette]]:max-w-none",
+                    // lg: ONLY — below lg the artefact stacks full-width and
+                    // the released TV filled the whole content column, way
+                    // oversized (founder, 2026-09-13). Stacked, the
+                    // Vignette's own max-w-2xl caps it again.
+                    "min-w-0 lg:[&_[data-vignette]]:max-w-none",
                     mediaLeft && "lg:order-1"
                   )}
                 >

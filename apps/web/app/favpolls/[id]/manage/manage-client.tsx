@@ -318,130 +318,136 @@ export function ManageClient({
           right, nothing else in it. Identity lives below, at the top
           of the record column. */}
       <ToolbarBand className="flex flex-wrap items-center gap-x-3 gap-y-2">
-        <Link
-          href="/my-favpolls"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft size={14} aria-hidden="true" />
-          Your favpolls
-        </Link>
-        <div className="ml-auto flex flex-wrap items-center gap-x-3 gap-y-2">
-          <ToolbarLabel>Visibility</ToolbarLabel>
-          <SegmentedControl
-            label="Who can see this favpoll"
-            value={visibility}
-            onChange={(v) => {
-              if (!visibilityPending) handleVisibility(v as Visibility)
-            }}
-            options={[
-              { value: "listed", label: "Listed" },
-              { value: "unlisted", label: "Link only" },
-              { value: "private", label: "Private" },
-            ]}
-          />
-          <ToolbarLabel>Guest additions</ToolbarLabel>
-          <Switch
-            checked={guestItems}
-            onCheckedChange={handleToggleGuestItems}
-            disabled={guestItemsPending}
-            aria-label={
-              guestItems
-                ? "Guests can add favourites — click to stop them"
-                : "Guests cannot add favourites — click to allow it"
-            }
-          />
-          <div className="flex flex-wrap items-center gap-2">
-            {/* The authoring actions fuse into one control and show
+        {/* The back door, the visibility tabs and the guest switch share
+            one group so on mobile they sit on the same row rather than
+            the tabs wrapping alone (founder, 2026-09-13). Ghost Button,
+            not a bare link — same ask. */}
+        <Button asChild variant="ghost" size="sm" className="-ml-2">
+          <Link href="/my-favpolls">
+            <ArrowLeft data-icon="inline-start" aria-hidden="true" />
+            Your favpolls
+          </Link>
+        </Button>
+        <ToolbarLabel>Visibility</ToolbarLabel>
+        <SegmentedControl
+          label="Who can see this favpoll"
+          value={visibility}
+          onChange={(v) => {
+            if (!visibilityPending) handleVisibility(v as Visibility)
+          }}
+          options={[
+            { value: "listed", label: "Listed" },
+            { value: "unlisted", label: "Link only" },
+            { value: "private", label: "Private" },
+          ]}
+        />
+        <ToolbarLabel always>Guest additions</ToolbarLabel>
+        <Switch
+          checked={guestItems}
+          onCheckedChange={handleToggleGuestItems}
+          disabled={guestItemsPending}
+          aria-label={
+            guestItems
+              ? "Guests can add favourites — click to stop them"
+              : "Guests cannot add favourites — click to allow it"
+          }
+        />
+        {/* lg:ml-auto, not ml-auto: below lg the cluster wraps to its own
+            line, and ml-auto kept it right-aligned there — the wrapped
+            line reads left-aligned like everything else (founder,
+            2026-09-13). At lg+ the whole band fits one line and the
+            cluster sits flush right as before. */}
+        <div className="flex w-full flex-wrap items-center gap-2 lg:ml-auto lg:w-auto">
+          {/* The authoring actions fuse into one control and show
                 only while the favpoll is OPEN — editing a finished
                 favpoll is a nonsense action, and Delete's zero-pledges
                 guard made it an open-favpoll action anyway. View is
                 gone: the share popover's guest link is that door
                 (founder, 2026-09-03). The surface doors (Stationery,
                 Keepsake, Share) stand alone. */}
-            {!isClosed && (
-              <ButtonGroup>
-                <Button asChild variant="outline">
-                  <Link href={`/favpolls/${favpoll.id}/edit`}>
-                    <Pencil data-icon="inline-start" aria-hidden="true" />
-                    Edit
-                  </Link>
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={!canDelete || deleting}
-                  onClick={handleDelete}
-                  title={
-                    canDelete
-                      ? undefined
-                      : "Favpolls with pledges can't be deleted."
-                  }
-                  className="text-destructive hover:text-destructive"
-                >
-                  <Trash2 data-icon="inline-start" aria-hidden="true" />
-                  {deleting ? "Deleting…" : "Delete"}
-                </Button>
-              </ButtonGroup>
-            )}
-            <Button asChild variant="outline">
-              <a href={`/favpolls/${favpoll.id}/stationery`}>
-                <Printer data-icon="inline-start" aria-hidden="true" />
-                Stationery
-              </a>
-            </Button>
-            {isClosed && (
+          {!isClosed && (
+            <ButtonGroup>
               <Button asChild variant="outline">
-                <Link href={`/favpolls/${favpoll.id}/keepsake`}>
-                  <Sparkles data-icon="inline-start" aria-hidden="true" />
-                  Keepsake
+                <Link href={`/favpolls/${favpoll.id}/edit`}>
+                  <Pencil data-icon="inline-start" aria-hidden="true" />
+                  Edit
                 </Link>
               </Button>
-            )}
-            {/* SHARE AS A POPOVER (founder, 2026-09-03): sharing is an
+              <Button
+                type="button"
+                variant="outline"
+                disabled={!canDelete || deleting}
+                onClick={handleDelete}
+                title={
+                  canDelete
+                    ? undefined
+                    : "Favpolls with pledges can't be deleted."
+                }
+                className="text-destructive hover:text-destructive"
+              >
+                <Trash2 data-icon="inline-start" aria-hidden="true" />
+                {deleting ? "Deleting…" : "Delete"}
+              </Button>
+            </ButtonGroup>
+          )}
+          <Button asChild variant="outline">
+            <a href={`/favpolls/${favpoll.id}/stationery`}>
+              <Printer data-icon="inline-start" aria-hidden="true" />
+              Stationery
+            </a>
+          </Button>
+          {isClosed && (
+            <Button asChild variant="outline">
+              <Link href={`/favpolls/${favpoll.id}/keepsake`}>
+                <Sparkles data-icon="inline-start" aria-hidden="true" />
+                Keepsake
+              </Link>
+            </Button>
+          )}
+          {/* SHARE AS A POPOVER (founder, 2026-09-03): sharing is an
                 action, so it rides the toolbar — a Popover, not a
                 menu, because the content is interactive (copy
                 buttons, QR). */}
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline">
-                  <Share2 data-icon="inline-start" aria-hidden="true" />
-                  Share
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent align="end" className="w-55 p-5">
-                {/* QR leads, near-full width — the thing handed
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline">
+                <Share2 data-icon="inline-start" aria-hidden="true" />
+                Share
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-55 p-5">
+              {/* QR leads, near-full width — the thing handed
                     across a table; links stack beneath (founder,
                     2026-09-03). 288 read as too big; 180 settled. */}
-                <div className="flex flex-col gap-4">
-                  <div className="flex justify-center" suppressHydrationWarning>
-                    <BrandedQR
-                      value={qrUrl}
-                      size={180}
-                      aria-label="QR code for the guest-facing favpoll page"
-                    />
-                  </div>
-                  <div className="flex min-w-0 flex-col gap-3">
-                    {linkRow(
-                      "guest",
-                      "favpoll",
-                      ExternalLink,
-                      guestUrl,
-                      guestUrl,
-                      true
-                    )}
-                    {linkRow(
-                      "display",
-                      "Live favpoll",
-                      Monitor,
-                      displayUrl,
-                      displayUrl,
-                      true
-                    )}
-                  </div>
+              <div className="flex flex-col gap-4">
+                <div className="flex justify-center" suppressHydrationWarning>
+                  <BrandedQR
+                    value={qrUrl}
+                    size={180}
+                    aria-label="QR code for the guest-facing favpoll page"
+                  />
                 </div>
-              </PopoverContent>
-            </Popover>
-          </div>
+                <div className="flex min-w-0 flex-col gap-3">
+                  {linkRow(
+                    "guest",
+                    "favpoll",
+                    ExternalLink,
+                    guestUrl,
+                    guestUrl,
+                    true
+                  )}
+                  {linkRow(
+                    "display",
+                    "Live favpoll",
+                    Monitor,
+                    displayUrl,
+                    displayUrl,
+                    true
+                  )}
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </ToolbarBand>
 
