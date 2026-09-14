@@ -7,7 +7,6 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { buildQrOptions } from "@/components/branded-qr"
@@ -34,13 +33,6 @@ import { buildQrOptions } from "@/components/branded-qr"
 // argument. SVG is the better answer for a designer and is offered first.
 const PNG_SIZE = 1024
 
-// 33 modules at the ~0.4mm floor a domestic printer needs, plus the 4-module
-// quiet zone the spec requires: (33 + 8) x 0.4 = 16.4mm of code and margin,
-// of which the code itself is 13.2mm. Stated on screen because an exported
-// file lands somewhere favpoll cannot check it — this is the one number that
-// decides whether it scans.
-const MIN_MM = 13
-
 // The design tokens resolve to lab()/oklch(), which every browser reads and a
 // lot of print software does not. An exported SVG is the one artefact favpoll
 // hands to a stranger's toolchain — Illustrator, a shop's RIP, Word — so the
@@ -61,7 +53,22 @@ function toSrgbHex(color: string): string {
   return `#${[r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("")}`
 }
 
-export function QrExport({ value, name }: { value: string; name: string }) {
+export function QrExport({
+  value,
+  name,
+  label = "Download code",
+  variant = "ghost",
+  size = "sm",
+}: {
+  value: string
+  name: string
+  /** Trigger text — "Download" when this IS the toolbar's action
+   *  (the stationery page's QR selection), the fuller default where
+   *  it sits beside other tools (keepsake). */
+  label?: string
+  variant?: "ghost" | "secondary"
+  size?: "sm" | "default"
+}) {
   const scopeRef = useRef<HTMLDivElement>(null)
   const [busy, setBusy] = useState<"png" | "svg" | null>(null)
 
@@ -98,35 +105,24 @@ export function QrExport({ value, name }: { value: string; name: string }) {
         <DropdownMenuTrigger asChild>
           <Button
             type="button"
-            variant="ghost"
-            size="sm"
+            variant={variant}
+            size={size}
             disabled={busy !== null}
           >
             <Download data-icon="inline-start" aria-hidden="true" />
-            {busy ? "Preparing…" : "Download code"}
+            {busy ? "Preparing…" : label}
             <ChevronDown data-icon="inline-end" aria-hidden="true" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-72">
+        {/* Bare formats, no helper text (founder, 2026-09-14) — the
+            SVG blurb and the 13mm paragraph both retired. */}
+        <DropdownMenuContent align="end">
           <DropdownMenuItem onSelect={() => download("svg")}>
-            <span className="flex min-w-0 flex-col">
-              <span>Download SVG</span>
-              <span className="text-xs text-muted-foreground">
-                Stays sharp at any size — give a printer this one
-              </span>
-            </span>
+            Download SVG
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={() => download("png")}>
             Download PNG
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          {/* The one number that decides whether an exported code works, kept
-              with the thing it governs. */}
-          <p className="px-2 py-1.5 text-xs leading-relaxed text-muted-foreground">
-            Put it on anything — an order of service, a stationer&rsquo;s own
-            design, a menu. Print it at least {MIN_MM}mm across with clear space
-            around it, or it will scan reluctantly.
-          </p>
         </DropdownMenuContent>
       </DropdownMenu>
     </>
