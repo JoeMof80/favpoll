@@ -482,10 +482,15 @@ export function ManageClient({
             })}
             dialogClassName="max-w-sm"
             footer={
-              <>
+              /* The overlay footer house pattern (hero-photo-overlay):
+                 ghost Cancel + the action as h-11 flex-1 twins
+                 (founder, 2026-09-15: the small-button footer varied
+                 from every other dialog). */
+              <div className="flex gap-2">
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="ghost"
+                  className="h-11 flex-1 md:text-base"
                   disabled={deleting}
                   onClick={() => setConfirmDeleteOpen(false)}
                 >
@@ -494,13 +499,14 @@ export function ManageClient({
                 <Button
                   type="button"
                   variant="destructive"
+                  className="h-11 flex-1 md:text-base"
                   disabled={deleting}
                   onClick={performDelete}
                 >
                   <Trash2 data-icon="inline-start" aria-hidden="true" />
                   {deleting ? "Deleting…" : "Delete favpoll"}
                 </Button>
-              </>
+              </div>
             }
           />
         </div>
