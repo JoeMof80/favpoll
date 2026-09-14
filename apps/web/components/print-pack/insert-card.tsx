@@ -34,25 +34,25 @@ export function InsertCard({ data }: { data: PackData }) {
     // extends downward; nothing here truncates — print is a record
     // surface.
     <div
-      className="paper paper-screen rounded-lg border border-border bg-background px-5 pt-4 pb-5"
+      className="paper paper-screen relative rounded-lg border border-border bg-background px-5 pt-4 pb-5"
       style={{ width: INSERT_CARD_WIDTH }}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-[9px] font-medium tracking-[0.2em] text-muted-foreground uppercase">
-            {data.prefix}
-          </p>
-          <p className="mt-1 text-lg leading-tight font-medium text-foreground">
-            {data.name}
-          </p>
-        </div>
-        {/* Scaled, not just set smaller: FavpollLogo's mark is a fixed
-            24x22 svg, so a transform shrinks mark and wordmark together
-            (the vignette's hard-won footnote sizing). origin-top-right
-            keeps it hugging the corner at half size. */}
-        <div className="flex h-4 shrink-0 items-center">
-          <FavpollLogo className="origin-top-right scale-[0.5] text-xs font-medium" />
-        </div>
+      {/* ABSOLUTE, not a flex sibling: a transform paints smaller but
+          the logo's LAYOUT box stays full size, and as a flex item it
+          squeezed the text column until "IN MEMORY OF" wrapped
+          (founder screenshot, 2026-09-14). Pinned to the corner it
+          costs the text nothing; origin-top-right keeps the shrink
+          anchored there. Scaled, not set smaller: the mark is a fixed
+          24x22 svg, so a transform shrinks mark and wordmark
+          together. */}
+      <FavpollLogo className="absolute top-4 right-5 origin-top-right scale-[0.4] text-xs font-medium" />
+      <div className="pr-10">
+        <p className="text-[9px] font-medium tracking-[0.2em] text-muted-foreground uppercase">
+          {data.prefix}
+        </p>
+        <p className="mt-1 text-lg leading-tight font-medium text-foreground">
+          {data.name}
+        </p>
       </div>
       {data.topicTitle && (
         <div className="mt-3 border-t border-b border-border py-2">
