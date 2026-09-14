@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Printer } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ChevronDown, Download, ScanLine } from "lucide-react"
@@ -15,7 +15,9 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover"
-import { SCALE, buildPackSteps } from "./pack-card"
+import { buildPackSteps } from "./pack-card"
+import { InsertCard, INSERT_CARD_WIDTH } from "./insert-card"
+import { ExportImageButton } from "@/components/keepsake/export-image-button"
 import { PackSheet, PLAIN_ORIENTATION } from "./pack-sheet"
 import { AverySheet, AVERY_SHEETS } from "./avery-sheet"
 import type { AveryCode } from "./avery-sheet"
@@ -40,10 +42,12 @@ import type { PackData } from "./pack-card"
 
 export type { PackData } from "./pack-card"
 
-type Target = keyof typeof PLAIN_ORIENTATION | AveryCode
+type Target = keyof typeof PLAIN_ORIENTATION | AveryCode | "insert"
 
 // One tab per sheet, in the order an organiser meets them: the big things
 // for the room first, then the things for a table, then the small things.
+// The insert card last — not a printed sheet but a downloadable block to
+// set into stationery the family already has (founder, 2026-09-14).
 const SHEETS: { id: Target; label: string; note: string }[] = [
   { id: "a4", label: "Poster", note: "A4 · 1 to a sheet" },
   { id: "a5", label: "Table cards", note: "A5 · 2 to a sheet" },
@@ -53,6 +57,11 @@ const SHEETS: { id: Target; label: string; note: string }[] = [
     label: AVERY_SHEETS[code].label,
     note: `${AVERY_SHEETS[code].note} · fits Avery ${AVERY_SHEETS[code].code}`,
   })),
+  {
+    id: "insert",
+    label: "Insert card",
+    note: "image · for your own stationery",
+  },
 ]
 
 export function PackDocument({
@@ -92,11 +101,16 @@ export function PackDocument({
     }
   }, [printing])
 
+  const insertRef = useRef<HTMLDivElement>(null)
+
+  const isInsert = selected === "insert"
   const isAvery = selected in AVERY_SHEETS
-  const landscape = isAvery
-    ? AVERY_SHEETS[selected as AveryCode].orientation === "landscape"
-    : PLAIN_ORIENTATION[selected as keyof typeof PLAIN_ORIENTATION] ===
-      "landscape"
+  const landscape = isInsert
+    ? false
+    : isAvery
+      ? AVERY_SHEETS[selected as AveryCode].orientation === "landscape"
+      : PLAIN_ORIENTATION[selected as keyof typeof PLAIN_ORIENTATION] ===
+        "landscape"
   const current = SHEETS.find((s) => s.id === selected)!
 
   return (
@@ -115,8 +129,11 @@ export function PackDocument({
           written; it shows one at a time now, so the envelope has no one left
           to protect. The same `landscape` that sets @page sets this. */}
       <PrintWorkspace
-        widestPx={landscape ? 1123 : 794}
-        tallestPx={landscape ? 794 : 1123}
+        // The insert is its own small object, not a sheet — sized to the
+        // card so the desk doesn't scale it down to A4's envelope. Height
+        // is a ceiling estimate: the card grows with the topic's wrap.
+        widestPx={isInsert ? INSERT_CARD_WIDTH : landscape ? 1123 : 794}
+        tallestPx={isInsert ? 500 : landscape ? 794 : 1123}
         leading={leading}
         toolbar={
           <>
@@ -155,12 +172,18 @@ export function PackDocument({
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <ToolbarLabel>Cut lines</ToolbarLabel>
-            <Switch
-              aria-label="Cut lines"
-              checked={guides}
-              onCheckedChange={setGuides}
-            />
+            {/* Cut lines and Print are sheet concerns — the insert card
+                is a download, not a printed page (founder, 2026-09-14). */}
+            {!isInsert && (
+              <>
+                <ToolbarLabel>Cut lines</ToolbarLabel>
+                <Switch
+                  aria-label="Cut lines"
+                  checked={guides}
+                  onCheckedChange={setGuides}
+                />
+              </>
+            )}
 
             {qrExport}
 
@@ -192,20 +215,34 @@ export function PackDocument({
               </PopoverContent>
             </Popover>
 
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              onClick={() => setPrinting(true)}
-            >
-              <Printer data-icon="inline-start" aria-hidden="true" />
-              Print
-            </Button>
+            {isInsert ? (
+              <ExportImageButton
+                sheetRef={insertRef}
+                filename="favpoll-insert-card.png"
+              />
+            ) : (
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() => setPrinting(true)}
+              >
+                <Printer data-icon="inline-start" aria-hidden="true" />
+                Print
+              </Button>
+            )}
           </>
         }
       >
         <div data-sheet={String(selected)}>
-          {isAvery ? (
+          {isInsert ? (
+            // inline-block wrapper: the export captures the ref node's
+            // layout box, and a block div would hand it the workspace's
+            // full width of empty desk.
+            <div ref={insertRef} className="inline-block">
+              <InsertCard data={data} />
+            </div>
+          ) : isAvery ? (
             <AverySheet
               data={data}
               steps={steps}
