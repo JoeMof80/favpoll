@@ -23,6 +23,19 @@ import type { PackData } from "./pack-card"
 /** Layout width — the export captures at 2x this (html-to-image). */
 export const INSERT_CARD_WIDTH = 240
 
+// The topic steps DOWN as it grows (founder, 2026-09-14: "larger in
+// this example where there are fewer characters") — the hero's
+// step-down grammar (heroNameSizeClass), not continuous scaling.
+// FAVOURITE steps with it: the two lines share one size by decision
+// (same day), split by ink alone. Thresholds against the 200px content
+// column: 16px tracked uppercase runs ~13 chars a line, 13px ~17.
+// Beyond the last step the line simply wraps and the card extends.
+function topicSizeClass(topic: string): string {
+  if (topic.length <= 12) return "text-base"
+  if (topic.length <= 18) return "text-[13px]"
+  return "text-[11px]"
+}
+
 export function InsertCard({ data }: { data: PackData }) {
   return (
     // .paper pins light tokens: ink on paper must not follow the
@@ -56,10 +69,14 @@ export function InsertCard({ data }: { data: PackData }) {
       </div>
       {data.topicTitle && (
         <div className="mt-3 border-t border-b border-border py-2">
-          <p className="text-[11px] leading-snug font-medium tracking-[0.14em] text-primary/70 uppercase">
+          <p
+            className={`${topicSizeClass(data.topicTitle)} leading-snug font-medium tracking-[0.14em] text-primary/70 uppercase`}
+          >
             Favourite
           </p>
-          <p className="text-[11px] leading-snug font-medium tracking-[0.14em] text-primary uppercase">
+          <p
+            className={`${topicSizeClass(data.topicTitle)} leading-snug font-medium tracking-[0.14em] text-primary uppercase`}
+          >
             {data.topicTitle}
           </p>
         </div>
