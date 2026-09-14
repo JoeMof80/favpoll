@@ -1,6 +1,7 @@
-import { getCharities } from "@/lib/actions/charities";
+import { getCharities, getConsentQueue } from "@/lib/actions/charities";
 import { getTopics } from "@/lib/actions/topics";
 import { CharitiesTable, AddCharityForm } from "@/components/charities-table";
+import { ConsentQueue } from "@/components/consent-queue";
 
 const MARKETS = ["en-GB"];
 
@@ -12,10 +13,12 @@ export default async function CharitiesPage({ searchParams }: Props) {
   const { market } = await searchParams;
   const activeMarket = MARKETS.includes(market ?? "") ? market : undefined;
 
-  const [{ data: charities, error }, { data: topics }] = await Promise.all([
-    getCharities(activeMarket),
-    getTopics(),
-  ]);
+  const [{ data: charities, error }, { data: topics }, { data: queue }] =
+    await Promise.all([
+      getCharities(activeMarket),
+      getTopics(),
+      getConsentQueue(),
+    ]);
 
   return (
     <div className="space-y-6">
@@ -55,6 +58,8 @@ export default async function CharitiesPage({ searchParams }: Props) {
       </div>
 
       {error && <p className="text-sm text-destructive">{error}</p>}
+
+      <ConsentQueue rows={queue ?? []} />
 
       <CharitiesTable charities={charities ?? []} allTopics={topics ?? []} />
     </div>
