@@ -600,7 +600,7 @@ export function ManageClient({
                         <p className="text-xs text-muted-foreground">
                           {charity.consent_status === "declined"
                             ? "The charity has declined — pledges here are paused."
-                            : `We're asking ${charity.name} to confirm they're happy to receive pledges — pledges are held until they do.`}
+                            : `Pledges are held until ${charity.name} agrees to receive them.`}
                         </p>
                       )}
                   </div>

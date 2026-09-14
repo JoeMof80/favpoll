@@ -277,6 +277,77 @@ export async function setCharityTopics(
   return { error: null };
 }
 
+export type ConsentQueueRow = {
+  id: string;
+  name: string;
+  registered_number: string | null;
+  registered_email: string | null;
+  consent_contacted_at: string | null;
+  favpoll_count: number;
+};
+
+/** CONSENT OUTREACH QUEUE — pending charities in use on at least one
+ * favpoll: the ones where pledges are actually waiting on an agreement.
+ * favpoll owns outreach (the organiser invite path was retired, web
+ * #868); this is the team's list to work. Not-yet-contacted first. */
+export async function getConsentQueue(): Promise<{
+  data: ConsentQueueRow[] | null;
+  error: string | null;
+}> {
+  const supabase = createAdminClient();
+
+  const { data: links, error: linkError } = await supabase
+    .from("favpoll_charities")
+    .select("charity_id");
+  if (linkError) return { data: null, error: linkError.message };
+
+  const counts = new Map<string, number>();
+  for (const l of (links ?? []) as { charity_id: string }[]) {
+    counts.set(l.charity_id, (counts.get(l.charity_id) ?? 0) + 1);
+  }
+  if (counts.size === 0) return { data: [], error: null };
+
+  const { data, error } = await supabase
+    .from("charities")
+    .select(
+      "id, name, registered_number, registered_email, consent_contacted_at",
+    )
+    .eq("consent_status", "pending")
+    .in("id", [...counts.keys()])
+    .order("name", { ascending: true });
+  if (error) return { data: null, error: error.message };
+
+  const rows = (data ?? [])
+    .map((c) => ({
+      ...(c as Omit<ConsentQueueRow, "favpoll_count">),
+      favpoll_count: counts.get((c as { id: string }).id) ?? 0,
+    }))
+    .sort(
+      (a, b) =>
+        Number(!!a.consent_contacted_at) - Number(!!b.consent_contacted_at),
+    );
+  return { data: rows, error: null };
+}
+
+/** Stamps the team's outreach — called when a drafted invite is opened.
+ * Unconditional, unlike the retired organiser path's first-only rule:
+ * the stamp records the MOST RECENT contact, so re-invites re-stamp. */
+export async function markCharityContacted(
+  id: string,
+): Promise<{ error: string | null }> {
+  const supabase = createAdminClient();
+
+  const { error } = await supabase
+    .from("charities")
+    .update({ consent_contacted_at: new Date().toISOString() })
+    .eq("id", id);
+
+  if (error) return { error: error.message };
+
+  revalidatePath("/charities");
+  return { error: null };
+}
+
 /** CONSENT — approve or decline a charity for receiving pledges (the
  * PF/CP posture machinery; see apps/web/lib/charity-consent.ts). Approval
  * also lists the charity — register-added ones arrive is_active=false —
