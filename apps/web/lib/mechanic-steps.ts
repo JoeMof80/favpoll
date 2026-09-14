@@ -9,12 +9,20 @@
 //
 // STEP 3 NO LONGER REFERENCES THE REVEAL (founder, 2026-09-01): the
 // reveal can be a favourite, a quote, a message or absent, and the step
-// had grown five variants trying to explain it. "The standings will be
-// revealed" is true of every favpoll; whatever else was held back
-// arrives as the surprise it was written to be. The unlock LABELS
+// had grown five variants trying to explain it. The unlock LABELS
 // (reveal-lock.tsx, poll-section's aria copy) still speak about the
 // reveal — that is their job, and isQuoteReveal/isMessageReveal below
 // still serve them.
+//
+// STEP 3 IS THE COMPARISON (founder, 2026-09-15, after the Bates Wells
+// meeting surfaced the gambling misread): "The standings will be
+// revealed" read as an outcome you'd staked on. "See where your
+// favourite stands among the others" extends the headline's own third
+// beat ("See where it stands"), makes YOUR pick sitting in a ranking
+// the point — social, for-fun, implied rather than stated — and stays
+// true of every favpoll. Explicit denials ("nothing is won") were
+// drafted and REJECTED: an unprompted denial plants the frame it
+// denies ("who suggested something would be?").
 
 export type MechanicStepsInput = {
   topicTitle: string
@@ -90,7 +98,7 @@ export function buildMechanicSteps({
   return [
     `Pick your favourite ${topic}`,
     `Pledge what it's worth — all money will go to ${charityLine ?? "charity"}`,
-    "The standings will be revealed",
+    "See where your favourite stands among the others",
   ]
 }
 

@@ -19,7 +19,7 @@ describe("buildMechanicSteps", () => {
     ).toEqual([
       "Pick your favourite seaside town",
       "Pledge what it's worth — all money will go to Samaritans",
-      "The standings will be revealed",
+      "See where your favourite stands among the others",
     ])
   })
 
@@ -29,7 +29,7 @@ describe("buildMechanicSteps", () => {
       charityLine: null,
     })
     expect(steps[1]).toContain("all money will go to charity")
-    expect(steps[2]).toBe("The standings will be revealed")
+    expect(steps[2]).toBe("See where your favourite stands among the others")
   })
 
   it("detects quote reveals by their opening mark only", () => {
