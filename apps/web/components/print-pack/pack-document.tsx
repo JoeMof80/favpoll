@@ -23,6 +23,7 @@ import { PackSheet, PLAIN_ORIENTATION } from "./pack-sheet"
 import { AverySheet, AVERY_SHEETS } from "./avery-sheet"
 import type { AveryCode } from "./avery-sheet"
 import { Switch } from "@/components/ui/switch"
+import { ButtonGroup } from "@/components/ui/button-group"
 import { PrintWorkspace } from "@/components/print-workspace"
 import { ToolbarLabel } from "@/components/ui/segmented-control"
 import type { PackData } from "./pack-card"
@@ -202,21 +203,45 @@ export function PackDocument({
                   checked={guides}
                   onCheckedChange={setGuides}
                 />
+              </>
+            )}
 
-                {/* The printing advice was a full-width alert taking a
-                    third of the screen above the paper. It is worth
-                    saying — it was born of a card that scanned
-                    reluctantly — but it is worth saying ONCE, to
-                    whoever asks. */}
+            {isInsert ? (
+              <ExportImageButton
+                sheetRef={insertRef}
+                filename="favpoll-insert-card.png"
+                variant="outline"
+                size="default"
+              />
+            ) : isQr ? (
+              qrExport
+            ) : (
+              /* A SPLIT BUTTON (founder, 2026-09-14): Print with the
+                 before-you-print advice fused onto its edge — the
+                 advice was a standalone toolbar button before, and it
+                 belongs on the control it governs. It was born of a
+                 card that scanned reluctantly, and it is worth saying
+                 once, to whoever asks. Outline, not secondary (same
+                 day): white like the rest of the form UI — the
+                 toolbar's edge position already says "the action". */
+              <ButtonGroup>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setPrinting(true)}
+                >
+                  <Printer data-icon="inline-start" aria-hidden="true" />
+                  Print
+                </Button>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       type="button"
-                      variant="ghost"
+                      variant="outline"
+                      size="icon"
                       aria-label="Before you print a batch"
                     >
-                      <Info data-icon="inline-start" aria-hidden="true" />
-                      Before you print
+                      <Info aria-hidden="true" />
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent
@@ -230,27 +255,7 @@ export function PackDocument({
                     struggle, it is that one.
                   </PopoverContent>
                 </Popover>
-              </>
-            )}
-
-            {isInsert ? (
-              <ExportImageButton
-                sheetRef={insertRef}
-                filename="favpoll-insert-card.png"
-                variant="secondary"
-                size="default"
-              />
-            ) : isQr ? (
-              qrExport
-            ) : (
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => setPrinting(true)}
-              >
-                <Printer data-icon="inline-start" aria-hidden="true" />
-                Print
-              </Button>
+              </ButtonGroup>
             )}
           </>
         }

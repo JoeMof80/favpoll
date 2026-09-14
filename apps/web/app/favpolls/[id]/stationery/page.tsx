@@ -101,7 +101,7 @@ export default async function PackPage({ params }: Props) {
                 value={data.qrUrl}
                 name={`favpoll-qr-${favpoll.short_code}`}
                 label="Export image"
-                variant="secondary"
+                variant="outline"
                 size="default"
               />
             }

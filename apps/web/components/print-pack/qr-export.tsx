@@ -66,7 +66,7 @@ export function QrExport({
    *  (the stationery page's QR selection), the fuller default where
    *  it sits beside other tools (keepsake). */
   label?: string
-  variant?: "ghost" | "secondary"
+  variant?: "ghost" | "secondary" | "outline"
   size?: "sm" | "default"
 }) {
   const scopeRef = useRef<HTMLDivElement>(null)

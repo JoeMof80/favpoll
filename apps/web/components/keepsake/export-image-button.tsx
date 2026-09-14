@@ -30,7 +30,7 @@ export function ExportImageButton({
   filename: string
   /** Styling knobs — the stationery toolbar renders this as THE
    *  action at full size; the keepsake keeps the quiet sm default. */
-  variant?: "ghost" | "secondary"
+  variant?: "ghost" | "secondary" | "outline"
   size?: "sm" | "default"
 }) {
   const [busy, setBusy] = useState(false)
