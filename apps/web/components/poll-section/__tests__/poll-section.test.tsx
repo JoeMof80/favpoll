@@ -406,7 +406,7 @@ describe("PollSection — lock explainer", () => {
       )
     ).toBeInTheDocument()
     expect(
-      screen.getByText("The standings will be revealed")
+      screen.getByText("See where your favourite stands among the others")
     ).toBeInTheDocument()
     expect(
       screen.getByText("Don’t have a favourite? Give to the shared pot instead")

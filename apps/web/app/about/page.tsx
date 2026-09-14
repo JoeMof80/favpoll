@@ -57,6 +57,18 @@ const BASICS: { label: string; body: string }[] = [
 // link to their /features sections — the reference the FAQ leans on.
 const FAQ_ITEMS: { q: string; a: React.ReactNode }[] = [
   {
+    // The Bates Wells finding (founder, 2026-09-15): a cold reader —
+    // a charity lawyer, via the website — pattern-matched the
+    // mechanic to gambling and had to check. The FAQ is the ONE place
+    // the question gets answered explicitly: here the question is the
+    // reader's own, so answering it plants nothing — unlike the
+    // "nothing is won" marketing lines that were drafted and rejected
+    // for exactly that reason. First in the list: it is the identity
+    // question. Founder note: may be revised.
+    q: "Is this a raffle or a competition?",
+    a: "No. Nothing is won and nothing is at stake. A pledge is a gift to the charity, made in the name of a favourite — the standings only show where the giving went. There are no prizes, no odds and no draw, and every pledge reaches the charity in full, whichever favourite leads.",
+  },
+  {
     q: "If I set a goal, does pledging stop once it's reached?",
     a: "No. A goal is a milestone, not a finish line. The favpoll stays open until its closing date, and every pledge after the goal still counts.",
   },
