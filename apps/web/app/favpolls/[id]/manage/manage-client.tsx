@@ -8,6 +8,7 @@ import {
   ArrowLeft,
   Check,
   Copy,
+  EllipsisVertical,
   ExternalLink,
   Monitor,
   Pencil,
@@ -23,18 +24,21 @@ import {
 } from "@/components/wall-of-favourites"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { ToolbarBand } from "@/components/ui/toolbar-band"
-import {
-  SegmentedControl,
-  ToolbarLabel,
-} from "@/components/ui/segmented-control"
+import { SegmentedControl } from "@/components/ui/segmented-control"
 import { Button } from "@/components/ui/button"
-import { ButtonGroup } from "@/components/ui/button-group"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Switch } from "@/components/ui/switch"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
 import { Chip } from "@/components/ui/chip"
 import { CharityRow } from "@/components/charity-row"
 import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
@@ -70,6 +74,16 @@ export type ManageFavpoll = OrganizerFavpoll & {
 }
 
 type Visibility = "listed" | "unlisted" | "private"
+
+// The room the toolbar never had (founder, 2026-09-14): one honest
+// sentence per state, shown under the control for the CURRENT value.
+// "private" is a sign-in gate, not organiser-only — the guest page
+// redirects signed-out visitors to sign in.
+const VISIBILITY_NOTES: Record<Visibility, string> = {
+  listed: "Anyone can find this favpoll on the All favpolls list.",
+  unlisted: "Hidden from the list — only people with the link can find it.",
+  private: "Hidden from the list, and guests must sign in to view it.",
+}
 
 // A card in either lane. ONE Edit door for the whole page — the
 // toolbar's (founder, 2026-09-03); per-card doors all led to the same
@@ -335,82 +349,14 @@ export function ManageClient({
             Your favpolls
           </Link>
         </Button>
-        <ToolbarLabel>Visibility</ToolbarLabel>
-        <SegmentedControl
-          label="Who can see this favpoll"
-          value={visibility}
-          onChange={(v) => {
-            if (!visibilityPending) handleVisibility(v as Visibility)
-          }}
-          options={[
-            { value: "listed", label: "Listed" },
-            { value: "unlisted", label: "Link only" },
-            { value: "private", label: "Private" },
-          ]}
-        />
-        <ToolbarLabel always>Guest additions</ToolbarLabel>
-        <Switch
-          checked={guestItems}
-          onCheckedChange={handleToggleGuestItems}
-          disabled={guestItemsPending}
-          aria-label={
-            guestItems
-              ? "Guests can add favourites — click to stop them"
-              : "Guests cannot add favourites — click to allow it"
-          }
-        />
-        {/* lg:ml-auto, not ml-auto: below lg the cluster wraps to its own
-            line, and ml-auto kept it right-aligned there — the wrapped
-            line reads left-aligned like everything else (founder,
-            2026-09-13). At lg+ the whole band fits one line and the
-            cluster sits flush right as before. */}
-        <div className="flex w-full flex-wrap items-center gap-2 lg:ml-auto lg:w-auto">
-          {/* The authoring actions fuse into one control and show
-                only while the favpoll is OPEN — editing a finished
-                favpoll is a nonsense action, and Delete's zero-pledges
-                guard made it an open-favpoll action anyway. View is
-                gone: the share popover's guest link is that door
-                (founder, 2026-09-03). The surface doors (Stationery,
-                Keepsake, Share) stand alone. */}
-          {!isClosed && (
-            <ButtonGroup>
-              <Button asChild variant="outline">
-                <Link href={`/favpolls/${favpoll.id}/edit`}>
-                  <Pencil data-icon="inline-start" aria-hidden="true" />
-                  Edit
-                </Link>
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                disabled={!canDelete || deleting}
-                onClick={handleDelete}
-                title={
-                  canDelete
-                    ? undefined
-                    : "Favpolls with pledges can't be deleted."
-                }
-                className="text-destructive hover:text-destructive"
-              >
-                <Trash2 data-icon="inline-start" aria-hidden="true" />
-                {deleting ? "Deleting…" : "Delete"}
-              </Button>
-            </ButtonGroup>
-          )}
-          <Button asChild variant="outline">
-            <a href={`/favpolls/${favpoll.id}/stationery`}>
-              <Printer data-icon="inline-start" aria-hidden="true" />
-              Stationery
-            </a>
-          </Button>
-          {isClosed && (
-            <Button asChild variant="outline">
-              <Link href={`/favpolls/${favpoll.id}/keepsake`}>
-                <Sparkles data-icon="inline-start" aria-hidden="true" />
-                Keepsake
-              </Link>
-            </Button>
-          )}
+        {/* SHARE + … ONLY (founder, 2026-09-14, superseding the door
+            buttons of the same morning): Share is the one action that
+            earns permanent visibility — the growth lever. The doors
+            (Edit/Stationery/Keepsake) and Delete live in the …
+            overflow, the idiom the poll page's heading established.
+            Settings moved to the "Visibility & guests" card; the
+            share popover's guest link is the View door (2026-09-03). */}
+        <div className="ml-auto flex items-center gap-2">
           {/* SHARE AS A POPOVER (founder, 2026-09-03): sharing is an
                 action, so it rides the toolbar — a Popover, not a
                 menu, because the content is interactive (copy
@@ -455,6 +401,64 @@ export function ManageClient({
               </div>
             </PopoverContent>
           </Popover>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                aria-label="More actions"
+              >
+                <EllipsisVertical className="size-5" aria-hidden="true" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {!isClosed && (
+                <DropdownMenuItem asChild>
+                  <Link href={`/favpolls/${favpoll.id}/edit`}>
+                    <Pencil aria-hidden="true" />
+                    Edit
+                  </Link>
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem asChild>
+                <a href={`/favpolls/${favpoll.id}/stationery`}>
+                  <Printer aria-hidden="true" />
+                  Stationery
+                </a>
+              </DropdownMenuItem>
+              {isClosed && (
+                <DropdownMenuItem asChild>
+                  <Link href={`/favpolls/${favpoll.id}/keepsake`}>
+                    <Sparkles aria-hidden="true" />
+                    Keepsake
+                  </Link>
+                </DropdownMenuItem>
+              )}
+              {/* Delete is menu-resident, the standard home for a rare
+                  destructive action — after a separator, destructive
+                  variant, guarded by handleDelete's confirm. Only
+                  while OPEN (the zero-pledges guard made it an
+                  open-favpoll action anyway). */}
+              {!isClosed && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    disabled={!canDelete || deleting}
+                    onSelect={handleDelete}
+                    className="text-destructive focus:bg-destructive/10 focus:text-destructive [&_svg]:text-destructive"
+                  >
+                    <Trash2 aria-hidden="true" />
+                    {canDelete
+                      ? deleting
+                        ? "Deleting…"
+                        : "Delete favpoll"
+                      : "Delete (has pledges)"}
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </ToolbarBand>
 
@@ -662,6 +666,52 @@ export function ManageClient({
                     <span className="text-muted-foreground">Empty</span>
                   )
                 )}
+              </div>
+            </Card>
+
+            {/* SETTINGS AS A CARD, not toolbar controls (founder,
+                2026-09-14): the settings need a sentence of
+                explanation each, and a card keeps the current state
+                glanceable — a dialog would hide it. */}
+            <Card title="Visibility & guests">
+              <div className="grid gap-5">
+                <div className="grid gap-2">
+                  <SegmentedControl
+                    label="Who can see this favpoll"
+                    value={visibility}
+                    onChange={(v) => {
+                      if (!visibilityPending) handleVisibility(v as Visibility)
+                    }}
+                    options={[
+                      { value: "listed", label: "Listed" },
+                      { value: "unlisted", label: "Link only" },
+                      { value: "private", label: "Private" },
+                    ]}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {VISIBILITY_NOTES[visibility]}
+                  </p>
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <div className="min-w-0">
+                    <p className="text-sm text-foreground">Guest additions</p>
+                    <p className="text-xs text-muted-foreground">
+                      {guestItems
+                        ? "Guests can add their own favourites to the poll."
+                        : "Guests pick from your list only."}
+                    </p>
+                  </div>
+                  <Switch
+                    checked={guestItems}
+                    onCheckedChange={handleToggleGuestItems}
+                    disabled={guestItemsPending}
+                    aria-label={
+                      guestItems
+                        ? "Guests can add favourites — click to stop them"
+                        : "Guests cannot add favourites — click to allow it"
+                    }
+                  />
+                </div>
               </div>
             </Card>
 
