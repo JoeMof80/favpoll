@@ -201,7 +201,7 @@ export default async function KeepsakePage({ params }: Props) {
             favpollId={id}
             defaultVariant={defaultVariant}
             leading={
-              <Button asChild variant="ghost" size="sm">
+              <Button asChild variant="ghost">
                 <Link href={`/favpolls/${id}/manage`}>
                   <ArrowLeft data-icon="inline-start" aria-hidden="true" />
                   Manage

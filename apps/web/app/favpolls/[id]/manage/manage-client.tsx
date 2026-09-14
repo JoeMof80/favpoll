@@ -343,7 +343,9 @@ export function ManageClient({
             one group so on mobile they sit on the same row rather than
             the tabs wrapping alone (founder, 2026-09-13). Ghost Button,
             not a bare link — same ask. */}
-        <Button asChild variant="ghost" size="sm" className="-ml-2">
+        {/* Default size, not sm — level with the other toolbar
+            buttons (founder, 2026-09-14, applied on every toolbar). */}
+        <Button asChild variant="ghost" className="-ml-2">
           <Link href="/my-favpolls">
             <ArrowLeft data-icon="inline-start" aria-hidden="true" />
             Your favpolls
@@ -678,6 +680,11 @@ export function ManageClient({
                 <div className="grid gap-2">
                   <SegmentedControl
                     label="Who can see this favpoll"
+                    // w-fit: a grid item stretches, and the control at
+                    // full card width read as broken (founder,
+                    // 2026-09-14). Toolbar-size sm kept on purpose —
+                    // the founder declined the lg form scale here.
+                    className="w-fit"
                     value={visibility}
                     onChange={(v) => {
                       if (!visibilityPending) handleVisibility(v as Visibility)

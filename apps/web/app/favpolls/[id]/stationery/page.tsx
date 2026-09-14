@@ -89,7 +89,7 @@ export default async function PackPage({ params }: Props) {
           <PackDocument
             data={data}
             leading={
-              <Button asChild variant="ghost" size="sm">
+              <Button asChild variant="ghost">
                 <Link href={`/favpolls/${id}/manage`}>
                   <ArrowLeft data-icon="inline-start" aria-hidden="true" />
                   Manage
