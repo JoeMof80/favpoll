@@ -141,10 +141,13 @@ export function RevealVignettePhone({
       <div
         data-artefact-box
         data-register={palette}
-        className="h-[243px] w-[185px] sm:h-[365px] sm:w-[278px] lg:h-[434px] lg:w-[330px]"
+        // Base 0.40 (was 0.28 — founder, 2026-09-15: "too small on
+        // mobile compared to the other vignettes"). 264px still fits a
+        // 320px phone's 272px content column; sm/lg unchanged.
+        className="h-[347px] w-[264px] sm:h-[365px] sm:w-[278px] lg:h-[434px] lg:w-[330px]"
       >
         <div
-          className="relative origin-top-left scale-[0.28] sm:scale-[0.42] lg:scale-[0.5]"
+          className="relative origin-top-left scale-[0.4] sm:scale-[0.42] lg:scale-[0.5]"
           style={{ width: SCENE_W, height: SCENE_H }}
         >
           {/* Wrapped rather than positioned directly: PhoneFrame takes a

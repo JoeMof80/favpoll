@@ -28,7 +28,7 @@
 // reassurance louder than the thing it reassures about.
 //
 // Scripted loop; reduced motion gets the final frame.
-import { useEffect, useState } from "react"
+import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { PollHeading } from "@/components/poll-heading"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { Chip } from "@/components/ui/chip"
@@ -297,6 +297,23 @@ export function TopicPickerVignette({
     "Later, a guest adds one nobody thought of",
   ]
 
+  // The front (depth 0) layer sizes the frame — see the frame note.
+  const frontRef = useRef<HTMLDivElement>(null)
+  const [frameHeight, setFrameHeight] = useState<number | null>(null)
+  useLayoutEffect(() => {
+    const el = frontRef.current
+    if (!el) return
+    const headroom = still ? 0 : 32 // the animated stack's top-8 inset
+    const update = () => {
+      const h = el.offsetHeight
+      if (h > 0) setFrameHeight(h + headroom)
+    }
+    update()
+    const observer = new ResizeObserver(update)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [step, still])
+
   // Where a layer sits in the stack. Front (depth 0) is the live dialog:
   // full size, full opacity, untilted. Each spent step recedes 14px upward,
   // shrinks 3.5% and dims — enough of its top edge stays proud of the dialog
@@ -337,18 +354,24 @@ export function TopicPickerVignette({
         </div>
       )}
 
-      {/* One height for every step, so the section below never jumps: the
-          tallest dialog (items, ~212px with its footer) plus the top-8 the
-          stack is inset by, so two spent layers can recede upward inside the
-          frame instead of clipping against Vignette's overflow-hidden.
-          min-h-72 was tried first and left a dead band under the SHORTEST
-          step, which is the one the section opens on — the frame has to fit
-          the tallest dialog and not a pixel more. */}
-      <div className="relative min-h-64">
+      {/* MEASURED, not min-h-64 (founder screenshot, 2026-09-15): the
+          layers are absolute, so the frame never grew with them — and
+          the old 256px constant was the DESKTOP items dialog. On a
+          phone the chips wrap to four rows and the dialog runs ~600px,
+          spilling over the next beat's heading. The front layer's
+          height sizes the frame (plus the top-8 recede headroom when
+          animating); min-h-64 survives only as the pre-measure
+          fallback. The charity carousel took the same fix (#873):
+          never hardcode a frame to one call site's content height. */}
+      <div
+        className="relative min-h-64"
+        style={frameHeight ? { minHeight: frameHeight } : undefined}
+      >
         <AnimatePresence initial={false}>
           {step >= 0 && !still && (
             <motion.div
               key="topic"
+              ref={step === 0 ? frontRef : undefined}
               initial={reduced ? false : { opacity: 0, y: 8 }}
               animate={layer(0).animate}
               style={layer(0).style}
@@ -427,6 +450,7 @@ export function TopicPickerVignette({
           {step >= 1 && (
             <motion.div
               key="items"
+              ref={step === 1 ? frontRef : undefined}
               initial={reduced ? false : { opacity: 0, y: 8 }}
               animate={layer(1).animate}
               style={layer(1).style}
@@ -500,6 +524,7 @@ export function TopicPickerVignette({
           {step >= 2 && (
             <motion.div
               key="guest"
+              ref={step === 2 ? frontRef : undefined}
               initial={reduced ? false : { opacity: 0, y: 8 }}
               animate={layer(2).animate}
               style={layer(2).style}
