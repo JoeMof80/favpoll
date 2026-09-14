@@ -64,7 +64,13 @@ export function IdeasSection({
             track is sized to the media instead (39rem = 624px), and the text
             track takes what is left, with minmax(0,·) so IT can shrink rather
             than the page. */}
-        <div className="space-y-16 lg:space-y-24">
+        {/* space-y-24 at every width (founder, 2026-09-15: "not enough
+            space between the Shared link header and the vignette
+            above"): stacked, a beat's artefact sat 64px from the NEXT
+            beat's heading while a caption sits 32px from its own
+            artefact — the boundary needs to clearly outweigh the
+            inside gap. 96 between vs 32 inside is 1:3. */}
+        <div className="space-y-24">
           {ideas.map(({ key, label, body, artefact, feature }, i) => {
             // ALTERNATING SIDES. Four rows the same way round is a column of
             // text with a column of pictures beside it; the eye stops reading
