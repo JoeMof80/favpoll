@@ -233,12 +233,9 @@ export function FavpollContent({
             {formatPoundsExact(favpoll.total_raised ?? totalRaised)}
           </p>
           <p className="text-xs text-muted-foreground">raised in total</p>
-          <Button
-            asChild
-            variant="ghost"
-            size="sm"
-            className="mt-3 flex w-full"
-          >
+          {/* Outline at default height, matching the pot card's
+              top-up button (founder, 2026-09-14: "larger too"). */}
+          <Button asChild variant="outline" className="mt-3 flex w-full">
             <a href={`/favpolls/${favpoll.id}/keepsake`}>
               <FileText data-icon="inline-start" aria-hidden="true" />
               Keepsake
@@ -273,24 +270,28 @@ export function FavpollContent({
           how to GIVE to it (the button). */}
       {!isClosed && !pledgesGated && pot && (
         <div className="rounded-lg border border-border bg-background px-5 py-4">
+          {/* ONE sentence of purpose (founder, 2026-09-14: "a lot of
+              repetition") — the empty state's old second line restated
+              the first, and the button restated "shared pot" a third
+              time. The non-empty second line stays: how to USE the pot
+              is the one thing the first line doesn't say. */}
           <p className="mt-1 text-sm text-muted-foreground">
             <b>{formatPoundsExact(fundAvailable)}</b> in the shared pot, for any
             guest who needs help to pledge.
           </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            {fundAvailable > 0
-              ? "To use it, pick “Use shared pot” when you pledge — or top it up for others."
-              : "Top it up so every guest can take part."}
-          </p>
+          {fundAvailable > 0 && (
+            <p className="mt-1 text-xs text-muted-foreground">
+              To use it, pick &ldquo;Use shared pot&rdquo; when you pledge.
+            </p>
+          )}
           <Button
             type="button"
-            variant="ghost"
-            size="sm"
+            variant="outline"
             className="mt-3 flex w-full"
             onClick={() => setShowGuestFund(true)}
           >
-            <Gift size={4} />
-            Add to the shared pot
+            <Gift data-icon="inline-start" aria-hidden="true" />
+            Top up the pot
           </Button>
         </div>
       )}
