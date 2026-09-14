@@ -86,11 +86,12 @@ export function Header() {
       nav={REGISTER_LINKS.map((r) => {
         const active = pathname === r.href
         return (
+          // Default size — level with All/Your favpolls on the right
+          // (founder, 2026-09-14).
           <Button
             key={r.href}
             asChild
             variant="ghost"
-            size="sm"
             className={cn(REGISTER_LINK_INK, active && REGISTER_LINK_ACTIVE)}
           >
             <Link
