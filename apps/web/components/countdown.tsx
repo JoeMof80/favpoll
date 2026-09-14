@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react"
 import type { FavpollCardSize } from "@/components/favpoll-card/types"
 
-const PLACEHOLDER_PARTS = ["days", "hrs", "min", "sec"] as const
+// Three, matching the live maximum below — four wrapped at 3-digit days
+const PLACEHOLDER_PARTS = ["days", "hrs", "min"] as const
 
 type Props = {
   closesAt?: string
@@ -151,13 +152,16 @@ export function Countdown({
     )
   }
 
+  // AT MOST THREE UNITS, the subtitle variant's own rule (founder,
+  // 2026-09-14: four segments wrapped at 3-digit days): seconds are
+  // noise while days remain and return for the last-day drama once
+  // the days unit drops away.
   const parts =
     days > 0
       ? [
           { value: days, label: days === 1 ? "day" : "days" },
           { value: hours, label: hours === 1 ? "hr" : "hrs" },
           { value: minutes, label: "min" },
-          { value: seconds, label: "sec" },
         ]
       : hours > 0
         ? [
