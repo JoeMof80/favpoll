@@ -3,10 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ToolbarBand } from "@/components/ui/toolbar-band"
-import {
-  SegmentedControl,
-  ToolbarLabel,
-} from "@/components/ui/segmented-control"
+import { SegmentedControl } from "@/components/ui/segmented-control"
 
 // A print workspace: the sheet stops being a card in a scrolling page and
 // becomes a piece of paper on a desk, with the controls of a print app round
@@ -103,7 +100,8 @@ export function PrintWorkspace({
           beneath it rather than sitting inside the page's. */}
       <ToolbarBand className="flex flex-wrap items-center gap-x-3 gap-y-2">
         {leading}
-        <ToolbarLabel>Zoom</ToolbarLabel>
+        {/* No visible label (founder, 2026-09-14, with the Sheet label):
+            "Fit · 50% · 100%" describes itself. label= stays for AT. */}
         <SegmentedControl
           label="Zoom"
           value={String(zoom)}

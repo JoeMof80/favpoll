@@ -1,9 +1,9 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Printer } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { ChevronDown, Download, ScanLine } from "lucide-react"
+import { ChevronDown, Info } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -15,11 +15,15 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover"
-import { SCALE, buildPackSteps } from "./pack-card"
+import { buildPackSteps } from "./pack-card"
+import { BrandedQR } from "@/components/branded-qr"
+import { InsertCard, INSERT_CARD_WIDTH } from "./insert-card"
+import { ExportImageButton } from "@/components/keepsake/export-image-button"
 import { PackSheet, PLAIN_ORIENTATION } from "./pack-sheet"
 import { AverySheet, AVERY_SHEETS } from "./avery-sheet"
 import type { AveryCode } from "./avery-sheet"
 import { Switch } from "@/components/ui/switch"
+import { ButtonGroup } from "@/components/ui/button-group"
 import { PrintWorkspace } from "@/components/print-workspace"
 import { ToolbarLabel } from "@/components/ui/segmented-control"
 import type { PackData } from "./pack-card"
@@ -40,10 +44,12 @@ import type { PackData } from "./pack-card"
 
 export type { PackData } from "./pack-card"
 
-type Target = keyof typeof PLAIN_ORIENTATION | AveryCode
+type Target = keyof typeof PLAIN_ORIENTATION | AveryCode | "insert" | "qr"
 
 // One tab per sheet, in the order an organiser meets them: the big things
 // for the room first, then the things for a table, then the small things.
+// The insert card last — not a printed sheet but a downloadable block to
+// set into stationery the family already has (founder, 2026-09-14).
 const SHEETS: { id: Target; label: string; note: string }[] = [
   { id: "a4", label: "Poster", note: "A4 · 1 to a sheet" },
   { id: "a5", label: "Table cards", note: "A5 · 2 to a sheet" },
@@ -53,6 +59,18 @@ const SHEETS: { id: Target; label: string; note: string }[] = [
     label: AVERY_SHEETS[code].label,
     note: `${AVERY_SHEETS[code].note} · fits Avery ${AVERY_SHEETS[code].code}`,
   })),
+  {
+    id: "insert",
+    label: "Insert card",
+    note: "image · for your own stationery",
+  },
+  // The code alone, folded in from its own toolbar dropdown (founder,
+  // 2026-09-14): one menu = every artefact, the action button adapts.
+  {
+    id: "qr",
+    label: "QR code",
+    note: "code alone · put it on anything",
+  },
 ]
 
 export function PackDocument({
@@ -63,7 +81,8 @@ export function PackDocument({
   data: PackData
   /** The way back, rendered at the far left of the one toolbar. */
   leading?: React.ReactNode
-  /** The download-the-code control, folded in from its own card. */
+  /** The download-the-code control — rendered as THE action when the
+   *  QR code is the selected artefact (founder, 2026-09-14). */
   qrExport?: React.ReactNode
 }) {
   const steps = buildPackSteps(data)
@@ -92,11 +111,18 @@ export function PackDocument({
     }
   }, [printing])
 
+  const insertRef = useRef<HTMLDivElement>(null)
+
+  const isInsert = selected === "insert"
+  const isQr = selected === "qr"
   const isAvery = selected in AVERY_SHEETS
-  const landscape = isAvery
-    ? AVERY_SHEETS[selected as AveryCode].orientation === "landscape"
-    : PLAIN_ORIENTATION[selected as keyof typeof PLAIN_ORIENTATION] ===
-      "landscape"
+  const landscape =
+    isInsert || isQr
+      ? false
+      : isAvery
+        ? AVERY_SHEETS[selected as AveryCode].orientation === "landscape"
+        : PLAIN_ORIENTATION[selected as keyof typeof PLAIN_ORIENTATION] ===
+          "landscape"
   const current = SHEETS.find((s) => s.id === selected)!
 
   return (
@@ -115,18 +141,27 @@ export function PackDocument({
           written; it shows one at a time now, so the envelope has no one left
           to protect. The same `landscape` that sets @page sets this. */}
       <PrintWorkspace
-        widestPx={landscape ? 1123 : 794}
-        tallestPx={landscape ? 794 : 1123}
+        // The insert is its own small object, not a sheet — sized to the
+        // card so the desk doesn't scale it down to A4's envelope. Height
+        // is a ceiling estimate: the card grows with the topic's wrap.
+        widestPx={
+          isQr ? 306 : isInsert ? INSERT_CARD_WIDTH : landscape ? 1123 : 794
+        }
+        tallestPx={isQr ? 306 : isInsert ? 500 : landscape ? 794 : 1123}
         leading={leading}
         toolbar={
           <>
             {/* A dropdown, not tabs (founder, 2026-08-15). Eight tabs is a
                 scrolling strip that pushed the paper down the page; the
-                sheet you want is a choice, and a choice is a menu. */}
-            <ToolbarLabel>Sheet</ToolbarLabel>
+                sheet you want is a choice, and a choice is a menu.
+                NO LABEL (founder, 2026-09-14): with the insert card and
+                the QR in here "Sheet" stopped being true, and the
+                dropdown's own value explains itself. */}
             <DropdownMenu>
+              {/* Default size throughout the toolbar — level with the
+                  leading back button (founder, 2026-09-14). */}
               <DropdownMenuTrigger asChild>
-                <Button type="button" variant="outline" size="sm">
+                <Button type="button" variant="outline">
                   {current.label}
                   <ChevronDown data-icon="inline-end" aria-hidden="true" />
                 </Button>
@@ -155,57 +190,96 @@ export function PackDocument({
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <ToolbarLabel>Cut lines</ToolbarLabel>
-            <Switch
-              aria-label="Cut lines"
-              checked={guides}
-              onCheckedChange={setGuides}
-            />
+            {/* Cut lines and the print advice are PRINT concerns — they
+                show only when Print is the action (founder, 2026-09-14:
+                advice lives with the control it governs; the insert
+                downloads and the QR has its own 13mm note in its
+                Download menu). */}
+            {!isInsert && !isQr && (
+              <>
+                <ToolbarLabel>Cut lines</ToolbarLabel>
+                <Switch
+                  aria-label="Cut lines"
+                  checked={guides}
+                  onCheckedChange={setGuides}
+                />
+              </>
+            )}
 
-            {qrExport}
-
-            {/* The printing advice was a full-width alert taking a third of
-                the screen above the paper. It is worth saying — it was born
-                of a card that scanned reluctantly — but it is worth saying
-                ONCE, to whoever asks. */}
-            <Popover>
-              <PopoverTrigger asChild>
+            {isInsert ? (
+              <ExportImageButton
+                sheetRef={insertRef}
+                filename="favpoll-insert-card.png"
+                variant="outline"
+                size="default"
+              />
+            ) : isQr ? (
+              qrExport
+            ) : (
+              /* A SPLIT BUTTON (founder, 2026-09-14): Print with the
+                 before-you-print advice fused onto its edge — the
+                 advice was a standalone toolbar button before, and it
+                 belongs on the control it governs. It was born of a
+                 card that scanned reluctantly, and it is worth saying
+                 once, to whoever asks. Outline, not secondary (same
+                 day): white like the rest of the form UI — the
+                 toolbar's edge position already says "the action". */
+              <ButtonGroup>
                 <Button
                   type="button"
-                  variant="ghost"
-                  size="sm"
-                  aria-label="Before you print a batch"
+                  variant="outline"
+                  onClick={() => setPrinting(true)}
                 >
-                  <ScanLine data-icon="inline-start" aria-hidden="true" />
-                  Before you print
+                  <Printer data-icon="inline-start" aria-hidden="true" />
+                  Print
                 </Button>
-              </PopoverTrigger>
-              <PopoverContent
-                align="end"
-                className="w-80 text-sm leading-relaxed"
-              >
-                Print a single card and scan it with a phone camera, held at the
-                distance and in the light your guests will have. Home printers
-                vary more than you would expect, and the wallet card carries the
-                smallest code — if any card is going to struggle, it is that
-                one.
-              </PopoverContent>
-            </Popover>
-
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              onClick={() => setPrinting(true)}
-            >
-              <Printer data-icon="inline-start" aria-hidden="true" />
-              Print
-            </Button>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      aria-label="Before you print a batch"
+                    >
+                      <Info aria-hidden="true" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    align="end"
+                    className="w-80 text-sm leading-relaxed"
+                  >
+                    Print a single card and scan it with a phone camera, held at
+                    the distance and in the light your guests will have. Home
+                    printers vary more than you would expect, and the wallet
+                    card carries the smallest code — if any card is going to
+                    struggle, it is that one.
+                  </PopoverContent>
+                </Popover>
+              </ButtonGroup>
+            )}
           </>
         }
       >
         <div data-sheet={String(selected)}>
-          {isAvery ? (
+          {isQr ? (
+            // The code as it downloads, on a paper panel — .paper pins
+            // light tokens so the preview matches the exported file
+            // whatever theme the organiser views in.
+            <div className="paper paper-screen inline-block rounded-lg border border-border bg-background p-6">
+              <BrandedQR
+                value={data.qrUrl}
+                size={256}
+                aria-label="QR code for the favpoll"
+              />
+            </div>
+          ) : isInsert ? (
+            // inline-block wrapper: the export captures the ref node's
+            // layout box, and a block div would hand it the workspace's
+            // full width of empty desk.
+            <div ref={insertRef} className="inline-block">
+              <InsertCard data={data} />
+            </div>
+          ) : isAvery ? (
             <AverySheet
               data={data}
               steps={steps}

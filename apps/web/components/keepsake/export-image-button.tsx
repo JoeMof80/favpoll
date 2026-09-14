@@ -23,9 +23,15 @@ import { toast } from "sonner"
 export function ExportImageButton({
   sheetRef,
   filename,
+  variant = "ghost",
+  size = "sm",
 }: {
   sheetRef: React.RefObject<HTMLDivElement | null>
   filename: string
+  /** Styling knobs — the stationery toolbar renders this as THE
+   *  action at full size; the keepsake keeps the quiet sm default. */
+  variant?: "ghost" | "secondary" | "outline"
+  size?: "sm" | "default"
 }) {
   const [busy, setBusy] = useState(false)
 
@@ -49,7 +55,7 @@ export function ExportImageButton({
   }
 
   return (
-    <Button variant="ghost" size="sm" onClick={download} disabled={busy}>
+    <Button variant={variant} size={size} onClick={download} disabled={busy}>
       <ImageDown data-icon="inline-start" aria-hidden="true" />
       {busy ? "Exporting…" : "Export image"}
     </Button>
