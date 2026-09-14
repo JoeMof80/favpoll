@@ -7,22 +7,25 @@
 // Copy is the founder's card text (2026-08-02); the no-fee fact lives on
 // the poster and page microcopy rather than in step 2.
 //
-// STEP 3 NO LONGER REFERENCES THE REVEAL (founder, 2026-09-01): the
-// reveal can be a favourite, a quote, a message or absent, and the step
-// had grown five variants trying to explain it. The unlock LABELS
-// (reveal-lock.tsx, poll-section's aria copy) still speak about the
-// reveal — that is their job, and isQuoteReveal/isMessageReveal below
-// still serve them.
+// STEP 3 NEVER PROMISES THE PERSONAL REVEAL (founder, 2026-09-01): it
+// can be a favourite, a quote, a message or absent, and the step had
+// grown five variants trying to explain it. The unlock LABELS
+// (reveal-lock.tsx, poll-section's aria copy) still speak about it —
+// that is their job, and isQuoteReveal/isMessageReveal below still
+// serve them.
 //
 // STEP 3 IS THE COMPARISON (founder, 2026-09-15, after the Bates Wells
 // meeting surfaced the gambling misread): "The standings will be
-// revealed" read as an outcome you'd staked on. "See where your
-// favourite stands among the others" extends the headline's own third
-// beat ("See where it stands"), makes YOUR pick sitting in a ranking
-// the point — social, for-fun, implied rather than stated — and stays
-// true of every favpoll. Explicit denials ("nothing is won") were
-// drafted and REJECTED: an unprompted denial plants the frame it
-// denies ("who suggested something would be?").
+// revealed" read as an outcome you'd staked on. "Reveal where your
+// favourite stands among the others" makes YOUR pick sitting in a
+// ranking the point — social, for-fun, implied rather than stated —
+// and restores the Pick / Pledge / Reveal triad as three acts that are
+// all the guest's. "Reveal" is CAUSATIVE (the pledge is the revealing
+// act; the founder weighed the platform-does-it pedantry and dismissed
+// it) and attaches to the STANDINGS, true of every favpoll — never the
+// personal reveal. Explicit denials ("nothing is won") were drafted
+// and REJECTED: an unprompted denial plants the frame it denies ("who
+// suggested something would be?").
 
 export type MechanicStepsInput = {
   topicTitle: string
@@ -98,7 +101,7 @@ export function buildMechanicSteps({
   return [
     `Pick your favourite ${topic}`,
     `Pledge what it's worth — all money will go to ${charityLine ?? "charity"}`,
-    "See where your favourite stands among the others",
+    "Reveal where your favourite stands among the others",
   ]
 }
 
