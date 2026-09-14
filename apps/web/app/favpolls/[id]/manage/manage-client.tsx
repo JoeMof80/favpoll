@@ -45,7 +45,6 @@ import {
   deleteFavpoll,
   setFavpollVisibility,
   setFavpollGuestItems,
-  inviteCharityConsent,
 } from "@/app/favpolls/[id]/actions"
 import {
   type OrganizerFavpoll,
@@ -591,34 +590,17 @@ export function ManageClient({
                       amountRaised={perCharity}
                       size="sm"
                     />
+                    {/* STATUS ONLY — favpoll owns the consent outreach, not
+                        the organiser (founder, 2026-09-14): consent_status
+                        lives on charities, one agreement per charity across
+                        every favpoll, so the invitation is a platform-level
+                        relationship. The organiser mailto path is gone. */}
                     {charity.consent_status &&
                       charity.consent_status !== "approved" && (
                         <p className="text-xs text-muted-foreground">
-                          {charity.consent_status === "declined" ? (
-                            "The charity has declined — pledges here are paused."
-                          ) : charity.consent_contacted_at ? (
-                            "Invited — awaiting the charity's confirmation."
-                          ) : (
-                            <>
-                              Awaiting the charity&apos;s agreement to receive
-                              pledges.{" "}
-                              <a
-                                href={charityInviteMailto(
-                                  charity.name,
-                                  charity.registered_email ?? null
-                                )}
-                                className="font-medium text-foreground underline underline-offset-2"
-                                onClick={() =>
-                                  void inviteCharityConsent(
-                                    favpoll.id,
-                                    charity.id
-                                  )
-                                }
-                              >
-                                Invite {charity.name}
-                              </a>
-                            </>
-                          )}
+                          {charity.consent_status === "declined"
+                            ? "The charity has declined — pledges here are paused."
+                            : `We're asking ${charity.name} to confirm they're happy to receive pledges — pledges are held until they do.`}
                         </p>
                       )}
                   </div>
@@ -691,27 +673,4 @@ export function ManageClient({
       </div>
     </>
   )
-}
-
-// CONSENT OUTREACH — the organiser's invite email, drafted for them. We
-// prefill the recipient from the register's public enquiries email when
-// we hold it (fetchRegisterContact), else leave it for the organiser;
-// hello@favpoll.com rides along in cc so the team can follow up.
-function charityInviteMailto(
-  charityName: string,
-  email: string | null
-): string {
-  const subject = `Receiving pledges through favpoll — ${charityName}`
-  const body = [
-    "Hello,",
-    "",
-    `I'm organising a favpoll — a pledge poll where guests pick a favourite and pledge money to charity — and I've picked ${charityName} to receive what it raises.`,
-    "",
-    "Before collecting any money, favpoll (https://favpoll.com) asks each charity to confirm it's happy to receive donations this way. Could you confirm by reply, keeping hello@favpoll.com in copy? The favpoll team will follow up with the details.",
-    "",
-    "Thank you!",
-  ].join("\n")
-  return `mailto:${encodeURIComponent(email ?? "")}?cc=hello@favpoll.com&subject=${encodeURIComponent(
-    subject
-  )}&body=${encodeURIComponent(body)}`
 }
