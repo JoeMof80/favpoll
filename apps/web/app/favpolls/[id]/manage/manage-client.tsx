@@ -39,15 +39,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
+import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
+import { paletteForFavpoll } from "@/lib/register-palette"
+import type { FavpollCategory, FavpollSubject } from "@favpoll/types"
 import { Chip } from "@/components/ui/chip"
 import { CharityRow } from "@/components/charity-row"
 import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
@@ -470,23 +464,33 @@ export function ManageClient({
             </DropdownMenuContent>
           </DropdownMenu>
           {/* CONTROLLED, a sibling of the menu — the menu closes on
-              select and the dialog lives outside it, so Radix's focus
-              return can't snap it shut. */}
-          <Dialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
-            <DialogContent className="max-w-sm">
-              <DialogHeader>
-                <DialogTitle>Delete {name || "this favpoll"}?</DialogTitle>
-                <DialogDescription>
-                  The favpoll and its poll will be gone for good — this
-                  can&apos;t be undone.
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button type="button" variant="outline" disabled={deleting}>
-                    Cancel
-                  </Button>
-                </DialogClose>
+              select and the overlay lives outside it, so Radix's focus
+              return can't snap it shut. ResponsiveOverlay, not a raw
+              Dialog: the app's convention is bottom sheet on mobile /
+              centred dialog on desktop, register palette carried
+              through the portal (founder, 2026-09-14). */}
+          <ResponsiveOverlay
+            open={confirmDeleteOpen}
+            onOpenChange={setConfirmDeleteOpen}
+            title={`Delete ${name || "this favpoll"}?`}
+            description="The favpoll and its poll will be gone for good — this can't be undone."
+            dataRegister={paletteForFavpoll({
+              category: (favpoll.category ?? null) as FavpollCategory | null,
+              subject: (favpoll.subject ?? undefined) as
+                | FavpollSubject
+                | undefined,
+            })}
+            dialogClassName="max-w-sm"
+            footer={
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={deleting}
+                  onClick={() => setConfirmDeleteOpen(false)}
+                >
+                  Cancel
+                </Button>
                 <Button
                   type="button"
                   variant="destructive"
@@ -496,9 +500,9 @@ export function ManageClient({
                   <Trash2 data-icon="inline-start" aria-hidden="true" />
                   {deleting ? "Deleting…" : "Delete favpoll"}
                 </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+              </>
+            }
+          />
         </div>
       </ToolbarBand>
 

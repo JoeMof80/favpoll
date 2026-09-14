@@ -7,6 +7,7 @@ import { HeaderMount } from "@/components/header-mount"
 import { SiteFooterMount } from "@/components/site-footer-mount"
 import { cn } from "@/lib/utils"
 import { Toaster } from "sonner"
+import NextTopLoader from "nextjs-toploader"
 import {
   OG_SITE,
   SITE_DESCRIPTION,
@@ -67,6 +68,16 @@ export default function RootLayout({
       >
         <body>
           <ThemeProvider>
+            {/* Navigation feedback (founder, 2026-09-14): a quiet 2px
+                bar in the register colour — pairs with the native tap
+                highlight so a tap answers twice: at the finger, then
+                at the top edge while the page streams. No spinner. */}
+            <NextTopLoader
+              color="var(--primary)"
+              height={2}
+              showSpinner={false}
+              shadow={false}
+            />
             <HeaderMount />
             {children}
             <SiteFooterMount />
