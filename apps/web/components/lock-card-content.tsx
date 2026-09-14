@@ -1,4 +1,4 @@
-import { Lock } from "lucide-react"
+import { Gift } from "lucide-react"
 import { mechanicFooter } from "@/lib/mechanic-steps"
 
 // The inside of the pre-pledge lock card, shared by the REAL guest page
@@ -50,7 +50,11 @@ export function LockCardContent({
             : "flex items-center justify-center gap-2 bg-primary px-4 py-2.5 text-base font-medium text-primary-foreground"
         }
       >
-        <Lock
+        {/* Gift, not Lock (founder, 2026-09-15): a padlock on the CTA
+            is paywall grammar — "pay to unlock", which the brand
+            forbids framing the reveal as. The pledge FAB already uses
+            Gift, so pledge = gift is one icon app-wide. */}
+        <Gift
           className={compact ? "h-3.5 w-3.5" : "h-4 w-4"}
           aria-hidden="true"
         />
