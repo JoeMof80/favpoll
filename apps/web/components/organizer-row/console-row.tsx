@@ -2,10 +2,11 @@
 
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
-import { Check, ChevronRight, Clock, Copy } from "lucide-react"
+import { Check, Clock, Copy, Monitor, Settings2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { formatAmount } from "@/lib/display"
 import { Button } from "@/components/ui/button"
+import { Tooltip, TooltipProvider } from "@/components/ui/tooltip"
 import { paletteForFavpoll } from "@/lib/register-palette"
 import type { FavpollCategory, FavpollSubject } from "@favpoll/types"
 import {
@@ -18,9 +19,20 @@ import {
 // THE CONSOLE ROW (candidate A of the my-favpolls redesign, drafted
 // 2026-09-02): one favpoll as a scannable operations line — no
 // accordion, every vital inline — for the professional holding many
-// (funeral directors, event coordinators). The whole row opens the
-// favpoll's manage hub (candidate B); the one inline action is the
-// thing needed mid-conversation: copy the guest link.
+// (funeral directors, event coordinators).
+//
+// A HUB OF DESTINATIONS (founder, 2026-09-14, superseding row→manage):
+// the row tap opens the FAVPOLL PAGE — tap the thing, see the thing,
+// matching the public list. The right cluster carries the other
+// surfaces: Copy (the mid-conversation share grab), Live (the
+// projector, new tab) and Manage. Manage stays the one door for
+// OPERATIONS (edit/delete/settings/stationery/keepsake) — the console
+// is a hub of destinations, not a second operations surface.
+//
+// STRETCHED LINK, not a Link row: links inside an anchor are invalid
+// HTML (browsers split nested <a>s), so the row uses the list cards'
+// pattern — an absolute inset-0 Link, with the action cluster
+// `relative` so it hit-tests above it.
 export function ConsoleRow({ favpoll }: { favpoll: OrganizerFavpoll }) {
   const isClosed = isFavpollClosed(favpoll)
   const days = daysRemaining(favpoll.closes_at)
@@ -66,14 +78,19 @@ export function ConsoleRow({ favpoll }: { favpoll: OrganizerFavpoll }) {
 
   return (
     <li className="list-none" data-register={palette ?? undefined}>
-      <Link
-        href={`/favpolls/${favpoll.id}/manage`}
+      <div
         className={cn(
-          "grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 px-4 py-3 transition-colors hover:bg-primary/5",
+          "relative grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 px-4 py-3 transition-colors hover:bg-primary/5",
           "sm:grid-cols-[minmax(0,3fr)_minmax(0,1fr)_minmax(0,1.2fr)_auto]",
           isClosed && "opacity-70"
         )}
       >
+        {/* Stretched link — the row tap opens the favpoll page. */}
+        <Link
+          href={`/favpolls/${favpoll.id}`}
+          aria-label={`View favpoll: ${name}`}
+          className="absolute inset-0"
+        />
         {/* Identity — register ink on the eyebrow, like the cards. The
             full triple on one line (founder, 2026-09-03): name · topic
             · charity is how a professional recognises the row. Pledges
@@ -146,35 +163,66 @@ export function ConsoleRow({ favpoll }: { favpoll: OrganizerFavpoll }) {
           ) : null}
         </span>
 
-        {/* Actions: copy guest link without leaving the scan; the row
-            itself is the door to the hub. */}
-        <span className="flex items-center gap-1">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="size-7 text-muted-foreground hover:text-foreground"
-            aria-label="Copy guest link"
-            onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              navigator.clipboard.writeText(guestUrl).then(() => {
-                setCopied(true)
-                timerRef.current = setTimeout(() => setCopied(false), 2000)
-              })
-            }}
-          >
-            {copied ? (
-              <Check size={13} aria-hidden="true" />
-            ) : (
-              <Copy size={13} aria-hidden="true" />
-            )}
-          </Button>
-          <ChevronRight
-            size={16}
-            className="text-muted-foreground"
-            aria-hidden="true"
-          />
+        {/* The destination cluster — relative, so it hit-tests above
+            the stretched link. Copy · Live · Manage; manage nearest
+            the edge, the operations door. No chevron: three explicit
+            destinations replace the "this row goes somewhere" hint. */}
+        <span className="relative flex items-center gap-1">
+          <TooltipProvider>
+            <Tooltip content={copied ? "Copied" : "Copy guest link"}>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="size-7 text-muted-foreground hover:text-foreground"
+                aria-label="Copy guest link"
+                onClick={() => {
+                  navigator.clipboard.writeText(guestUrl).then(() => {
+                    setCopied(true)
+                    timerRef.current = setTimeout(() => setCopied(false), 2000)
+                  })
+                }}
+              >
+                {copied ? (
+                  <Check size={13} aria-hidden="true" />
+                ) : (
+                  <Copy size={13} aria-hidden="true" />
+                )}
+              </Button>
+            </Tooltip>
+            <Tooltip content="Open the live display">
+              <Button
+                asChild
+                variant="ghost"
+                size="icon"
+                className="size-7 text-muted-foreground hover:text-foreground"
+              >
+                <a
+                  href={`/live/${favpoll.live_slug}`}
+                  target="_blank"
+                  rel="noopener"
+                  aria-label="Open the live display"
+                >
+                  <Monitor size={13} aria-hidden="true" />
+                </a>
+              </Button>
+            </Tooltip>
+            <Tooltip content="Manage favpoll">
+              <Button
+                asChild
+                variant="ghost"
+                size="icon"
+                className="size-7 text-muted-foreground hover:text-foreground"
+              >
+                <Link
+                  href={`/favpolls/${favpoll.id}/manage`}
+                  aria-label="Manage favpoll"
+                >
+                  <Settings2 size={13} aria-hidden="true" />
+                </Link>
+              </Button>
+            </Tooltip>
+          </TooltipProvider>
         </span>
 
         {/* Mobile second line: the vitals the grid hides. */}
@@ -186,7 +234,7 @@ export function ConsoleRow({ favpoll }: { favpoll: OrganizerFavpoll }) {
             {formatAmount(favpoll.total_raised)}
           </span>
         </span>
-      </Link>
+      </div>
     </li>
   )
 }

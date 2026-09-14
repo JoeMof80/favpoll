@@ -39,6 +39,15 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Chip } from "@/components/ui/chip"
 import { CharityRow } from "@/components/charity-row"
 import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
@@ -182,6 +191,7 @@ export function ManageClient({
   )
   const [guestItemsPending, setGuestItemsPending] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
   const [copied, setCopied] = useState<string | null>(null)
 
   const copyTimersRef = useRef<ReturnType<typeof setTimeout>[]>([])
@@ -225,11 +235,9 @@ export function ManageClient({
   const canDelete =
     favpoll.pledge_count === 0 && (favpoll.pot?.total_deposited ?? 0) === 0
 
-  async function handleDelete() {
-    if (
-      !window.confirm(`Delete ${name || "this favpoll"}? This can't be undone.`)
-    )
-      return
+  // The … menu item opens the confirm dialog (shadcn Dialog, replacing
+  // window.confirm — founder, 2026-09-14); this performs the deletion.
+  async function performDelete() {
     setDeleting(true)
     try {
       await deleteFavpoll(favpoll.id)
@@ -343,7 +351,9 @@ export function ManageClient({
             one group so on mobile they sit on the same row rather than
             the tabs wrapping alone (founder, 2026-09-13). Ghost Button,
             not a bare link — same ask. */}
-        <Button asChild variant="ghost" size="sm" className="-ml-2">
+        {/* Default size, not sm — level with the other toolbar
+            buttons (founder, 2026-09-14, applied on every toolbar). */}
+        <Button asChild variant="ghost" className="-ml-2">
           <Link href="/my-favpolls">
             <ArrowLeft data-icon="inline-start" aria-hidden="true" />
             Your favpolls
@@ -445,7 +455,7 @@ export function ManageClient({
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     disabled={!canDelete || deleting}
-                    onSelect={handleDelete}
+                    onSelect={() => setConfirmDeleteOpen(true)}
                     className="text-destructive focus:bg-destructive/10 focus:text-destructive [&_svg]:text-destructive"
                   >
                     <Trash2 aria-hidden="true" />
@@ -459,6 +469,36 @@ export function ManageClient({
               )}
             </DropdownMenuContent>
           </DropdownMenu>
+          {/* CONTROLLED, a sibling of the menu — the menu closes on
+              select and the dialog lives outside it, so Radix's focus
+              return can't snap it shut. */}
+          <Dialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
+            <DialogContent className="max-w-sm">
+              <DialogHeader>
+                <DialogTitle>Delete {name || "this favpoll"}?</DialogTitle>
+                <DialogDescription>
+                  The favpoll and its poll will be gone for good — this
+                  can&apos;t be undone.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button type="button" variant="outline" disabled={deleting}>
+                    Cancel
+                  </Button>
+                </DialogClose>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  disabled={deleting}
+                  onClick={performDelete}
+                >
+                  <Trash2 data-icon="inline-start" aria-hidden="true" />
+                  {deleting ? "Deleting…" : "Delete favpoll"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </ToolbarBand>
 
@@ -678,6 +718,11 @@ export function ManageClient({
                 <div className="grid gap-2">
                   <SegmentedControl
                     label="Who can see this favpoll"
+                    // w-fit: a grid item stretches, and the control at
+                    // full card width read as broken (founder,
+                    // 2026-09-14). Toolbar-size sm kept on purpose —
+                    // the founder declined the lg form scale here.
+                    className="w-fit"
                     value={visibility}
                     onChange={(v) => {
                       if (!visibilityPending) handleVisibility(v as Visibility)
