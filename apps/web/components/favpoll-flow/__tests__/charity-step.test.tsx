@@ -55,7 +55,7 @@ describe("CharityStep — the earned shelf", () => {
       <CharityStep
         charities={[approved, pending]}
         value={[]}
-        onChange={vi.fn()}
+        onPick={vi.fn()}
       />
     )
     expect(screen.getByText("Age UK")).toBeInTheDocument()
@@ -72,7 +72,7 @@ describe("CharityStep — the earned shelf", () => {
       <CharityStep
         charities={[approved, pending]}
         value={["c-pending"]}
-        onChange={vi.fn()}
+        onPick={vi.fn()}
       />
     )
     expect(screen.getByText("Dogs Trust")).toBeInTheDocument()
@@ -83,7 +83,7 @@ describe("CharityStep — the earned shelf", () => {
       <CharityStep
         charities={[pending]}
         value={[]}
-        onChange={vi.fn()}
+        onPick={vi.fn()}
         onRegisterAdd={vi.fn()}
       />
     )
@@ -100,7 +100,7 @@ describe("CharityStep — the earned shelf", () => {
       <CharityStep
         charities={[]}
         value={[]}
-        onChange={vi.fn()}
+        onPick={vi.fn()}
         onRegisterAdd={vi.fn()}
         onSeedSearch={onSeedSearch}
         eventCategory="memorial"
@@ -120,7 +120,7 @@ describe("CharityStep — search rows", () => {
       <CharityStep
         charities={[approved, pending]}
         value={[]}
-        onChange={vi.fn()}
+        onPick={vi.fn()}
         search="age"
       />
     )
@@ -130,12 +130,26 @@ describe("CharityStep — search rows", () => {
     expect(link).toHaveAttribute("href", "https://www.ageuk.org.uk")
   })
 
+  it("tapping a catalogue row picks it — single-select, no toggle", () => {
+    const onPick = vi.fn()
+    render(
+      <CharityStep
+        charities={[approved, pending]}
+        value={[]}
+        onPick={onPick}
+        search="age"
+      />
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Age UK" }))
+    expect(onPick).toHaveBeenCalledWith("c-approved")
+  })
+
   it("register rows show place and a website link", async () => {
     render(
       <CharityStep
         charities={[]}
         value={[]}
-        onChange={vi.fn()}
+        onPick={vi.fn()}
         search="st lukes"
         onRegisterAdd={vi.fn()}
       />
@@ -156,7 +170,7 @@ describe("CharityStep — search rows", () => {
       <CharityStep
         charities={[]}
         value={[]}
-        onChange={vi.fn()}
+        onPick={vi.fn()}
         search="st lukes"
         onRegisterAdd={onRegisterAdd}
       />
@@ -198,7 +212,7 @@ describe("CharityStep — search rows", () => {
       <CharityStep
         charities={[]}
         value={[]}
-        onChange={vi.fn()}
+        onPick={vi.fn()}
         search="charity"
         onRegisterAdd={vi.fn()}
       />
@@ -231,7 +245,7 @@ describe("CharityStep — search rows", () => {
       <CharityStep
         charities={[]}
         value={[]}
-        onChange={vi.fn()}
+        onPick={vi.fn()}
         search="charity"
         onRegisterAdd={vi.fn()}
       />

@@ -158,10 +158,9 @@ describe("NewFavpollWizard — step order is Event → Charity → Topic", () =>
     // Event
     fireEvent.click(screen.getByRole("radio", { name: "Celebration" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
-    // Charity: open sheet, pick, Done
+    // Charity: open sheet, tap — the pick closes the overlay itself
     fireEvent.click(screen.getByRole("button", { name: "Pick a charity" }))
     fireEvent.click(screen.getByRole("button", { name: "Charity One" }))
-    fireEvent.click(screen.getByRole("button", { name: "Done" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
     expect(
       screen.getByRole("button", { name: "Pick a topic" })
@@ -184,7 +183,6 @@ describe("NewFavpollWizard — the wizard continues past Topic", () => {
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
     fireEvent.click(screen.getByRole("button", { name: "Pick a charity" }))
     fireEvent.click(screen.getByRole("button", { name: "Charity One" }))
-    fireEvent.click(screen.getByRole("button", { name: "Done" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
     fireEvent.click(screen.getByRole("button", { name: "Pick a topic" }))
     fireEvent.click(screen.getByRole("button", { name: "Colour" }))
@@ -267,7 +265,6 @@ describe("NewFavpollWizard — subject-neutral copy", () => {
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
     fireEvent.click(screen.getByRole("button", { name: "Pick a charity" }))
     fireEvent.click(screen.getByRole("button", { name: "Charity One" }))
-    fireEvent.click(screen.getByRole("button", { name: "Done" }))
     fireEvent.click(screen.getByRole("button", { name: "Next" }))
   }
 

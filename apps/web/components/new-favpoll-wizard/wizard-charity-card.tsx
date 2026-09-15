@@ -6,7 +6,9 @@ import type { Charity } from "@favpoll/types"
 
 type Props = {
   charities: Charity[]
-  onEdit?: () => void
+  /** Per-row pencil = REPLACE that charity (single-select picker,
+      2026-09-15): the overlay opens in replace mode for this id. */
+  onEdit?: (id: string) => void
   onRemove?: (id: string) => void
   onPickAnother?: () => void
   /** Locked mode (founder, 2026-09-06): same card, but the edit icon
@@ -63,7 +65,7 @@ export function WizardCharityCard({
                     type="button"
                     size="icon-sm"
                     variant="ghost"
-                    onClick={onEdit}
+                    onClick={() => onEdit?.(c.id)}
                   >
                     <Edit className="h-4 w-4" />
                   </Button>
@@ -94,7 +96,7 @@ export function WizardCharityCard({
             onClick={onPickAnother}
             className="border-t border-border pt-3 text-left text-sm text-primary hover:underline"
           >
-            + Pick another charity
+            + Add another charity
           </button>
         )
       )}

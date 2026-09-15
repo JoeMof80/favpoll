@@ -6,8 +6,6 @@ import { Button } from "@/components/ui/button"
 import { Chip } from "@/components/ui/chip"
 import type { Charity } from "@favpoll/types"
 
-const MAX_CHARITIES = 3
-
 export type RegisterPick = {
   registeredNumber: string
   displayName: string
@@ -18,8 +16,13 @@ export type RegisterPick = {
 
 type CharityStepProps = {
   charities: Charity[]
+  /** Currently selected ids — highlighted, and kept visible off-search */
   value: string[]
-  onChange: (v: string[]) => void
+  /** SINGLE-SELECT (founder, 2026-09-15): a tap picks one charity and
+   *  the parent closes the overlay — add vs replace is the parent's
+   *  entry-point context (the card's "Add another charity" link vs a
+   *  row's pencil). The set itself is managed on the wizard card. */
+  onPick: (id: string) => void
   search?: string
   /** Any-charity picker (consent-gate PR C): called when the organiser
    *  picks a charity from the Charity Commission register results.
@@ -74,13 +77,12 @@ function Avatar({ name, logoUrl }: { name: string; logoUrl?: string | null }) {
 export function CharityStep({
   charities,
   value,
-  onChange,
+  onPick,
   search,
   onRegisterAdd,
   onSeedSearch,
   eventCategory,
 }: CharityStepProps) {
-  const atMax = value.length >= MAX_CHARITIES
   const trimmed = (search ?? "").trim()
   const isApproved = (c: Charity) => c.consent_status === "approved"
   const visible = trimmed
@@ -152,19 +154,11 @@ export function CharityStep({
       !knownNames.has(r.displayName.toLowerCase())
   )
 
-  function toggle(id: string) {
-    if (value.includes(id)) {
-      onChange(value.filter((x) => x !== id))
-    } else if (!atMax) {
-      onChange([...value, id])
-    }
-  }
-
   // A tap selects (founder, 2026-09-08: "if we're clicking, we're
   // selecting") — the row itself already carries the identity line
   // (number · place · website), so there is no confirm step.
   async function addFromRegister(pick: RegisterPick) {
-    if (!onRegisterAdd || atMax || busyNumber) return
+    if (!onRegisterAdd || busyNumber) return
     setBusyNumber(pick.registeredNumber)
     try {
       await onRegisterAdd(pick)
@@ -262,13 +256,8 @@ export function CharityStep({
             {visible.map((c) => {
               const selected = value.includes(c.id)
               return (
-                <div
-                  key={c.id}
-                  className={rowClass(selected, !selected && atMax)}
-                >
-                  {overlayButton(c.name, !selected && atMax, () =>
-                    toggle(c.id)
-                  )}
+                <div key={c.id} className={rowClass(selected, false)}>
+                  {overlayButton(c.name, false, () => onPick(c.id))}
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-medium text-foreground">
                       {c.name}
@@ -290,11 +279,11 @@ export function CharityStep({
               freshResults.map((r) => (
                 <div
                   key={r.registeredNumber}
-                  className={rowClass(false, atMax || busyNumber !== null)}
+                  className={rowClass(false, busyNumber !== null)}
                 >
                   {overlayButton(
                     r.displayName,
-                    atMax || busyNumber !== null,
+                    busyNumber !== null,
                     () => void addFromRegister(r)
                   )}
                   <span className="min-w-0 flex-1">
