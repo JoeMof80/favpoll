@@ -13,6 +13,8 @@ export type OversightFavpoll = {
   closed_at: string | null;
   closes_at: string | null;
   created_at: string;
+  /** Ascending by id — the deterministic order the Gift Aid split uses */
+  charities: { id: string; name: string }[];
 };
 
 export async function getAllFavpolls(): Promise<{
@@ -25,7 +27,8 @@ export async function getAllFavpolls(): Promise<{
     .from("favpolls")
     .select(
       `id, category, total_raised, is_listed, is_exemplar, closed_at,
-       closes_at, created_at, cause_label, protagonist:protagonists ( name )`,
+       closes_at, created_at, cause_label, protagonist:protagonists ( name ),
+       favpoll_charities ( charity_id, charities ( name ) )`,
     )
     .order("created_at", { ascending: false })
     .limit(200);
@@ -43,6 +46,14 @@ export async function getAllFavpolls(): Promise<{
     closed_at: ev.closed_at,
     closes_at: ev.closes_at,
     created_at: ev.created_at,
+    charities: (
+      (ev.favpoll_charities ?? []) as unknown as {
+        charity_id: string;
+        charities: { name: string } | null;
+      }[]
+    )
+      .map((fc) => ({ id: fc.charity_id, name: fc.charities?.name ?? "—" }))
+      .sort((a, b) => a.id.localeCompare(b.id)),
   }));
   return { data: rows, error: null };
 }

@@ -20,6 +20,43 @@ type PledgeAllocationInput = {
   amount: number
 }
 
+// Gift Aid declaration (founder go, 2026-09-15): the four fields HMRC's
+// claim schedule needs. The CHARITY claims from HMRC — favpoll is not a
+// Gift Aid agent and takes no cut of the uplift. Applies to the pledge
+// amount only, never the tip. Card pledges only: the fund path never
+// offers it (a pot allocation isn't the participant's own gift).
+type GiftAidInput = {
+  firstName: string
+  lastName: string
+  houseNameOrNumber: string
+  postcode: string
+}
+
+// Inserted after the pledge row exists (like allocations, the charge has
+// already happened by now — but a silently dropped declaration would be
+// an unclaimable pledge forever, so failure surfaces rather than logs).
+async function insertGiftAidDeclaration(
+  supabase: ReturnType<typeof createAdminClient>,
+  pledgeId: string,
+  giftAid: GiftAidInput
+) {
+  const firstName = giftAid.firstName.trim()
+  const lastName = giftAid.lastName.trim()
+  const house = giftAid.houseNameOrNumber.trim()
+  const postcode = giftAid.postcode.trim().toUpperCase()
+  if (!firstName || !lastName || !house || !postcode) {
+    throw new Error("Gift Aid needs your name, house and postcode.")
+  }
+  const { error } = await supabase.from("gift_aid_declarations").insert({
+    pledge_id: pledgeId,
+    first_name: firstName,
+    last_name: lastName,
+    house_name_or_number: house,
+    postcode,
+  })
+  if (error) throw new Error(error.message)
+}
+
 // A card pledge is recorded only after its PaymentIntent is verified against
 // Stripe (status succeeded, bound to this poll, amounts matching what was
 // actually charged — lib/stripe-verify). The PI id is stored so each payment
@@ -49,6 +86,8 @@ type CreatePledgeInput = {
   allocations: PledgeAllocationInput[]
   /** The Stripe PaymentIntent that charged this pledge */
   paymentIntentId: string
+  /** Optional Gift Aid declaration — pledge amount only, never the tip */
+  giftAid?: GiftAidInput | null
 }
 
 export async function createPledge(input: CreatePledgeInput) {
@@ -103,6 +142,10 @@ export async function createPledge(input: CreatePledgeInput) {
       .insert(allocations)
     if (allocErr) throw new Error(allocErr.message)
   }
+
+  if (input.giftAid) {
+    await insertGiftAidDeclaration(supabase, pledge.id, input.giftAid)
+  }
 }
 
 type CreateGuestPledgeInput = {
@@ -118,6 +161,8 @@ type CreateGuestPledgeInput = {
   allocations: PledgeAllocationInput[]
   /** The Stripe PaymentIntent that charged this pledge */
   paymentIntentId: string
+  /** Optional Gift Aid declaration — pledge amount only, never the tip */
+  giftAid?: GiftAidInput | null
 }
 
 /**
@@ -245,6 +290,10 @@ export async function createGuestPledge(input: CreateGuestPledgeInput) {
       .from("pledge_allocations")
       .insert(allocations)
     if (allocErr) throw new Error(allocErr.message)
+  }
+
+  if (input.giftAid) {
+    await insertGiftAidDeclaration(supabase, pledge.id, input.giftAid)
   }
 
   // Fetch favpoll data for confirmation email

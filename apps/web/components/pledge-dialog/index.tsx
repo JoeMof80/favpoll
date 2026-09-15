@@ -197,8 +197,13 @@ export function PledgeDialog({
     </div>
   )
 
+  // giftAidComplete: switch off passes; on requires all four fields —
+  // a half-filled declaration must not ride into the charge.
   const payDisabled =
-    stripeSubmitting || !stripeReady || dialog.refreshingIntent
+    stripeSubmitting ||
+    !stripeReady ||
+    dialog.refreshingIntent ||
+    !dialog.giftAidComplete
   const step3Footer = (
     <div className="flex gap-3">
       <Button
@@ -342,6 +347,16 @@ export function PledgeDialog({
             onDisplayNameChange={dialog.setDisplayName}
             isAnonymous={dialog.isAnonymous}
             onIsAnonymousChange={dialog.setIsAnonymous}
+            giftAid={dialog.giftAid}
+            onGiftAidChange={dialog.setGiftAid}
+            giftAidFirstName={dialog.giftAidFirstName}
+            onGiftAidFirstNameChange={dialog.setGiftAidFirstName}
+            giftAidLastName={dialog.giftAidLastName}
+            onGiftAidLastNameChange={dialog.setGiftAidLastName}
+            giftAidHouse={dialog.giftAidHouse}
+            onGiftAidHouseChange={dialog.setGiftAidHouse}
+            giftAidPostcode={dialog.giftAidPostcode}
+            onGiftAidPostcodeChange={dialog.setGiftAidPostcode}
           />
         )}
       </ResponsiveOverlay>
