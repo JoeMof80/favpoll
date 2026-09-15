@@ -254,36 +254,14 @@ export function PledgeDialog({
               ? step2Header
               : undefined
         }
+        /* Transactions commit at the BOTTOM (overlay doctrine,
+           2026-09-15): the pledge flow is a checkout, so Back/Next/Pay
+           live in a bottom footer on every viewport — the big bottom
+           Pay is the convention guests know. No top-bar actions: the
+           fullscreen bar carries the title alone, and the keyboard
+           inset keeps the footer above the keys. */
         footer={footerByStep[dialog.step]}
         fullscreenOnMobile
-        mobileBack={
-          dialog.step === 1
-            ? { label: "Cancel", onClick: () => handleOpenChange(false) }
-            : {
-                label: "Back",
-                onClick: dialog.handleBack,
-                disabled: dialog.step === 3 && stripeSubmitting,
-              }
-        }
-        mobileSave={
-          dialog.step === 1
-            ? {
-                label: "Next",
-                onClick: () => dialog.handleNext(),
-                disabled: !dialog.canAdvanceStep1,
-              }
-            : dialog.step === 2
-              ? {
-                  label: step2Label,
-                  onClick: () => dialog.handleNext(),
-                  disabled: isNextDisabled,
-                }
-              : {
-                  label: stripeSubmitting ? "Processing…" : "Pay now",
-                  form: "pledge-checkout-form",
-                  disabled: payDisabled,
-                }
-        }
         headerClassName={
           dialog.step === 1 || dialog.step === 2 ? "p-0" : "px-5 py-4"
         }
