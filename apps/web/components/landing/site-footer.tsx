@@ -17,6 +17,7 @@ const EXPLORE = [
   ["/about", "About"],
   ["/about#faq", "FAQ"],
   ["/about#contact", "Contact"],
+  ["/privacy", "Privacy"],
 ] as const
 
 // Brand glyphs inline (lucide removed brand icons); paths from simple-icons,

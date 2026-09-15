@@ -12,6 +12,7 @@ import { SiteFooter } from "@/components/landing/site-footer"
 const INCLUDED = [
   /^\/$/, // landing
   /^\/about$/,
+  /^\/privacy$/,
   /^\/features$/,
   /^\/record$/,
   // /favpolls removed (2026-09-12): an organiser surface, not marketing —
