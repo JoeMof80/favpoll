@@ -105,7 +105,11 @@ function useKeyboardInset() {
   return inset
 }
 
-function useIsMobile() {
+// Exported: the canonical mobile breakpoint for overlay-shape decisions
+// (e.g. DateTimePicker renders a Popover on desktop, a bottom sheet on
+// mobile). Viewport-keyed — do not use inside drawn "phones" on desktop
+// pages (see demo-card's device prop for that trap).
+export function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false)
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 767px)")
