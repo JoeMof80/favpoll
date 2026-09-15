@@ -83,6 +83,16 @@ export function usePledge({
     string | null
   >(null)
   const [pendingTopUp, setPendingTopUp] = useState(false)
+  // Gift Aid declaration (founder go, 2026-09-15): captured at pledge,
+  // claimed by the CHARITY — favpoll is not an agent and takes no cut.
+  // Off by default; the four fields are HMRC's claim-schedule minimum.
+  // Card pledges only — the fund path never offers it (a pot allocation
+  // isn't the participant's own gift).
+  const [giftAid, setGiftAid] = useState(false)
+  const [giftAidFirstName, setGiftAidFirstName] = useState("")
+  const [giftAidLastName, setGiftAidLastName] = useState("")
+  const [giftAidHouse, setGiftAidHouse] = useState("")
+  const [giftAidPostcode, setGiftAidPostcode] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   // A step-4 tip change re-prices the PaymentIntent (see refreshIntentWithTip)
@@ -137,6 +147,14 @@ export function usePledge({
   const isGuestEmailValid = !clerkUserId
     ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestEmail)
     : true
+
+  // Switch off = nothing to validate; on = all four fields present.
+  const giftAidComplete =
+    !giftAid ||
+    (giftAidFirstName.trim().length > 0 &&
+      giftAidLastName.trim().length > 0 &&
+      giftAidHouse.trim().length > 0 &&
+      giftAidPostcode.trim().length > 0)
 
   const hasAnySelection = (pollSelections[pollWithItems.id]?.length ?? 0) > 0
   const baseCanConfirm =
@@ -194,6 +212,15 @@ export function usePledge({
     // The actions verify this PaymentIntent against Stripe before recording;
     // an empty id is rejected server-side.
     const paymentIntentId = pledgePaymentIntentId ?? ""
+    const giftAidDeclaration =
+      giftAid && giftAidComplete
+        ? {
+            firstName: giftAidFirstName.trim(),
+            lastName: giftAidLastName.trim(),
+            houseNameOrNumber: giftAidHouse.trim(),
+            postcode: giftAidPostcode.trim().toUpperCase(),
+          }
+        : null
     if (clerkUserId) {
       await createPledge({
         favpollPollId: pollWithItems.id,
@@ -207,6 +234,7 @@ export function usePledge({
           numericPledge
         ),
         paymentIntentId,
+        giftAid: giftAidDeclaration,
       })
       return undefined
     } else {
@@ -224,6 +252,7 @@ export function usePledge({
           numericPledge
         ),
         paymentIntentId,
+        giftAid: giftAidDeclaration,
       })
       return token
     }
@@ -406,6 +435,17 @@ export function usePledge({
     setDisplayName,
     isAnonymous,
     setIsAnonymous,
+    giftAid,
+    setGiftAid,
+    giftAidFirstName,
+    setGiftAidFirstName,
+    giftAidLastName,
+    setGiftAidLastName,
+    giftAidHouse,
+    setGiftAidHouse,
+    giftAidPostcode,
+    setGiftAidPostcode,
+    giftAidComplete,
     setGuestEmail,
     toggleFund,
     setPledgeClientSecret,

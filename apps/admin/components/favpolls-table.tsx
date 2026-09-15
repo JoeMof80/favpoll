@@ -150,6 +150,29 @@ function FavpollRow({
             >
               {favpoll.is_listed ? "Unlist" : "List"}
             </Button>
+            {/* HMRC claim-schedule CSV — declarations captured at pledge;
+                the charity claims. Empty file = no declarations yet.
+                Multi-charity favpolls get one schedule PER charity: each
+                may only claim on its penny-even share, so the route needs
+                to know which charity's schedule this is. */}
+            {favpoll.charities.length <= 1 ? (
+              <Button size="xs" variant="ghost" asChild>
+                <a href={`/api/gift-aid-schedule/${favpoll.id}`} download>
+                  Gift Aid
+                </a>
+              </Button>
+            ) : (
+              favpoll.charities.map((charity) => (
+                <Button key={charity.id} size="xs" variant="ghost" asChild>
+                  <a
+                    href={`/api/gift-aid-schedule/${favpoll.id}?charity=${charity.id}`}
+                    download
+                  >
+                    Gift Aid ({charity.name})
+                  </a>
+                </Button>
+              ))
+            )}
           </span>
         </TableCell>
       </TableRow>

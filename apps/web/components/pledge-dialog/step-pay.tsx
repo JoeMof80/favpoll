@@ -46,6 +46,18 @@ type Props = {
   onDisplayNameChange: (v: string) => void
   isAnonymous: boolean
   onIsAnonymousChange: (v: boolean) => void
+  /** Gift Aid declaration (2026-09-15) — the charity claims, favpoll
+   *  only captures. Pledge amount only, never the tip. */
+  giftAid: boolean
+  onGiftAidChange: (v: boolean) => void
+  giftAidFirstName: string
+  onGiftAidFirstNameChange: (v: string) => void
+  giftAidLastName: string
+  onGiftAidLastNameChange: (v: string) => void
+  giftAidHouse: string
+  onGiftAidHouseChange: (v: string) => void
+  giftAidPostcode: string
+  onGiftAidPostcodeChange: (v: string) => void
 }
 
 export function StepPay({
@@ -72,6 +84,16 @@ export function StepPay({
   onDisplayNameChange,
   isAnonymous,
   onIsAnonymousChange,
+  giftAid,
+  onGiftAidChange,
+  giftAidFirstName,
+  onGiftAidFirstNameChange,
+  giftAidLastName,
+  onGiftAidLastNameChange,
+  giftAidHouse,
+  onGiftAidHouseChange,
+  giftAidPostcode,
+  onGiftAidPostcodeChange,
 }: Props) {
   return (
     <div className="px-5 py-4">
@@ -150,6 +172,95 @@ export function StepPay({
           </label>
         </div>
       )}
+      {/* Gift Aid (2026-09-15): opt-in, collapsed by default — declining
+          adds zero friction. The four fields are HMRC's claim-schedule
+          minimum; the statement is HMRC's model declaration, required
+          visible text, so it stays despite the minimal-chrome rule. The
+          charity claims — favpoll only holds the record. */}
+      <div className="mb-4">
+        <label className="flex items-center gap-2 text-sm text-foreground">
+          <Switch
+            checked={giftAid}
+            onCheckedChange={onGiftAidChange}
+            aria-label="Add Gift Aid to your pledge"
+          />
+          Add Gift Aid — worth 25% more at no cost to you
+        </label>
+        {giftAid && (
+          <div className="mt-3 space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label
+                  htmlFor="gift-aid-first-name"
+                  className="mb-1 block text-[15px] text-foreground"
+                >
+                  First name
+                </label>
+                <Input
+                  id="gift-aid-first-name"
+                  autoComplete="given-name"
+                  value={giftAidFirstName}
+                  onChange={(e) => onGiftAidFirstNameChange(e.target.value)}
+                  className="h-11 rounded-[10px] md:text-base"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="gift-aid-last-name"
+                  className="mb-1 block text-[15px] text-foreground"
+                >
+                  Last name
+                </label>
+                <Input
+                  id="gift-aid-last-name"
+                  autoComplete="family-name"
+                  value={giftAidLastName}
+                  onChange={(e) => onGiftAidLastNameChange(e.target.value)}
+                  className="h-11 rounded-[10px] md:text-base"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label
+                  htmlFor="gift-aid-house"
+                  className="mb-1 block text-[15px] text-foreground"
+                >
+                  House name or number
+                </label>
+                <Input
+                  id="gift-aid-house"
+                  autoComplete="address-line1"
+                  value={giftAidHouse}
+                  onChange={(e) => onGiftAidHouseChange(e.target.value)}
+                  className="h-11 rounded-[10px] md:text-base"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="gift-aid-postcode"
+                  className="mb-1 block text-[15px] text-foreground"
+                >
+                  Postcode
+                </label>
+                <Input
+                  id="gift-aid-postcode"
+                  autoComplete="postal-code"
+                  value={giftAidPostcode}
+                  onChange={(e) => onGiftAidPostcodeChange(e.target.value)}
+                  className="h-11 rounded-[10px] uppercase md:text-base"
+                />
+              </div>
+            </div>
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              I am a UK taxpayer. If I pay less Income Tax and/or Capital Gains
+              Tax in this tax year than the amount of Gift Aid claimed on all my
+              donations, it is my responsibility to pay any difference. Gift Aid
+              applies to the pledge only, not the tip.
+            </p>
+          </div>
+        )}
+      </div>
       {/* Keyed on the secret: a tip change re-prices the intent, and the
           Elements provider must remount onto the new one. */}
       {/* Guest fields ride INSIDE the payment block (founder, 2026-09-07):
