@@ -87,7 +87,7 @@ test.describe("wizard → publish flow (cause)", () => {
     await expect(marieCurieOption).toBeVisible({ timeout: 5_000 })
     await marieCurieOption.click()
 
-    await charityDialog.getByRole("button", { name: /^done$/i }).click()
+    // Single-select (2026-09-15): the pick itself closes the overlay
     await expect(charityDialog).not.toBeVisible({ timeout: 5_000 })
     // .first(): the rail summary echoes the charity name.
     await expect(page.getByText("Marie Curie").first()).toBeVisible()
