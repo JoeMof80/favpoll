@@ -79,6 +79,39 @@ export function NewFavpollWizard({
   )
   const [topicSearch, setTopicSearch] = useState("")
   const [charitySearch, setCharitySearch] = useState("")
+  // SINGLE-SELECT PICKER (founder, 2026-09-15): a tap picks and closes.
+  // The entry point sets the meaning — the card's "Add another charity"
+  // appends; a row's pencil REPLACES that charity (charityReplaceId).
+  // The set is managed on the card (remove icons), never in the overlay.
+  const [charityReplaceId, setCharityReplaceId] = useState<string | null>(null)
+
+  function openCharityPicker(replaceId?: string) {
+    setCharityReplaceId(replaceId ?? null)
+    w.setCharityOpen(true)
+  }
+
+  function closeCharityPicker() {
+    w.setCharityOpen(false)
+    setCharitySearch("")
+    setCharityReplaceId(null)
+  }
+
+  function pickCharity(id: string) {
+    if (!w.charityIds.includes(id)) {
+      if (charityReplaceId) {
+        // Replace in place — the row keeps its position on the card
+        w.setCharityIds((ids) =>
+          ids.map((i) => (i === charityReplaceId ? id : i))
+        )
+      } else if (w.charityIds.length < 3) {
+        w.setCharityIds((ids) => [...ids, id])
+      }
+    }
+    // Tapping an already-selected charity just closes — deselection
+    // lives on the card
+    closeCharityPicker()
+  }
+
   async function handleRegisterAdd(pick: {
     registeredNumber: string
     displayName: string
@@ -87,9 +120,7 @@ export function NewFavpollWizard({
     setExtraCharities((prev) =>
       prev.some((x) => x.id === c.id) ? prev : [...prev, c]
     )
-    if (!w.charityIds.includes(c.id) && w.charityIds.length < 3) {
-      w.setCharityIds([...w.charityIds, c.id])
-    }
+    pickCharity(c.id)
   }
 
   const trimmedTopicSearch = topicSearch.trim()
@@ -202,18 +233,18 @@ export function NewFavpollWizard({
                   ) : w.selectedCharities.length > 0 ? (
                     <WizardCharityCard
                       charities={w.selectedCharities}
-                      onEdit={() => w.setCharityOpen(true)}
+                      onEdit={(id) => openCharityPicker(id)}
                       onRemove={(id) =>
                         w.setCharityIds((ids) => ids.filter((i) => i !== id))
                       }
-                      onPickAnother={() => w.setCharityOpen(true)}
+                      onPickAnother={() => openCharityPicker()}
                     />
                   ) : (
                     <Button
                       variant="secondary"
                       size="lg"
                       className="h-11 w-full md:text-base"
-                      onClick={() => w.setCharityOpen(true)}
+                      onClick={() => openCharityPicker()}
                     >
                       Pick a charity
                     </Button>
@@ -404,25 +435,23 @@ export function NewFavpollWizard({
           />
         </ResponsiveOverlay>
 
-        {/* Charity overlay */}
+        {/* Charity overlay — single-select: a tap picks and closes, so
+            there is no Done; Cancel is the only footer act. */}
         <ResponsiveOverlay
           separators
           open={w.charityOpen}
           onOpenChange={(o) => {
-            w.setCharityOpen(o)
-            if (!o) setCharitySearch("")
+            if (!o) closeCharityPicker()
+            else w.setCharityOpen(true)
           }}
           title="Pick a charity"
           hideCloseButton
           headerClassName="px-5 pt-4 pb-2"
           bodyClassName="p-0"
           fullscreenOnMobile
-          mobileSave={{
-            label: "Done",
-            onClick: () => {
-              w.setCharityOpen(false)
-              setCharitySearch("")
-            },
+          mobileBack={{
+            label: "Cancel",
+            onClick: closeCharityPicker,
           }}
           header={
             <input
@@ -435,35 +464,20 @@ export function NewFavpollWizard({
             />
           }
           footer={
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant="ghost"
-                className="h-11 flex-1 md:text-base"
-                onClick={() => {
-                  w.setCharityOpen(false)
-                  setCharitySearch("")
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                className="h-11 flex-1 md:text-base"
-                onClick={() => {
-                  w.setCharityOpen(false)
-                  setCharitySearch("")
-                }}
-              >
-                Done
-              </Button>
-            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              className="h-11 w-full md:text-base"
+              onClick={closeCharityPicker}
+            >
+              Cancel
+            </Button>
           }
         >
           <CharityStep
             charities={wizardData.charities}
             value={w.charityIds}
-            onChange={w.setCharityIds}
+            onPick={pickCharity}
             search={charitySearch}
             onRegisterAdd={handleRegisterAdd}
             onSeedSearch={setCharitySearch}
