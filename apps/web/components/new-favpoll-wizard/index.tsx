@@ -347,7 +347,9 @@ export function NewFavpollWizard({
           </div>
         </div>
 
-        {/* Topic overlay */}
+        {/* Topic overlay — single-select like the charity picker
+            (founder, 2026-09-15): a tap (or custom-topic Add) picks and
+            closes, so there is no Done; Cancel is the only other act. */}
         <ResponsiveOverlay
           open={w.topicOpen}
           onOpenChange={(o) => {
@@ -359,8 +361,8 @@ export function NewFavpollWizard({
           headerClassName="px-5 pt-4 pb-2"
           bodyClassName="p-0"
           fullscreenOnMobile
-          mobileSave={{
-            label: "Done",
+          mobileBack={{
+            label: "Cancel",
             onClick: () => {
               w.setTopicOpen(false)
               setTopicSearch("")
@@ -393,29 +395,17 @@ export function NewFavpollWizard({
             </div>
           }
           footer={
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant="ghost"
-                className="h-11 flex-1 md:text-base"
-                onClick={() => {
-                  w.setTopicOpen(false)
-                  setTopicSearch("")
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                className="h-11 flex-1 md:text-base"
-                onClick={() => {
-                  w.setTopicOpen(false)
-                  setTopicSearch("")
-                }}
-              >
-                Done
-              </Button>
-            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              className="h-11 w-full md:text-base"
+              onClick={() => {
+                w.setTopicOpen(false)
+                setTopicSearch("")
+              }}
+            >
+              Cancel
+            </Button>
           }
         >
           <TopicStep
@@ -423,7 +413,10 @@ export function NewFavpollWizard({
             categories={data.categories}
             value={w.topics}
             onChange={(v) => {
-              w.setTopics(v)
+              // A tap on the already-selected topic arrives as [] (the
+              // step's toggle) — under the single-select grammar that tap
+              // just closes; the pick is never cleared from the overlay.
+              if (v.length > 0) w.setTopics(v)
               w.setTopicOpen(false)
               setTopicSearch("")
             }}
