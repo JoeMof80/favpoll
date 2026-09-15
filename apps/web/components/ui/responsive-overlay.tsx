@@ -56,10 +56,10 @@ type Props = {
    * Mobile: take over the whole screen instead of a bottom sheet, with a
    * top action bar (Cancel · title · save). For keyboard-summoning dialogs:
    * content anchors at the TOP, so the keyboard can never cover the input
-   * or the actions — no visualViewport lifting needed. With `mobileSave`
-   * the bar carries the actions and `footer` is not rendered; without it
-   * the consumer's `footer` renders at the bottom of the panel (multi-step
-   * and search flows whose footers carry navigation). Desktop unaffected.
+   * or the actions. With `mobileSave` OR `mobileBack` the bar carries the
+   * action(s) and `footer` is not rendered; with neither, the consumer's
+   * `footer` renders at the bottom of the panel (multi-step flows whose
+   * footers carry navigation). Desktop unaffected.
    */
   fullscreenOnMobile?: boolean
   /**
@@ -150,13 +150,19 @@ export function ResponsiveOverlay({
           onOpenAutoFocus={(e) => e.preventDefault()}
           className="flex flex-col gap-0 p-0"
           // Inline style beats the side-variant's h-auto. Full height with
-          // the content at the top: on iOS the keyboard COVERS the layout
-          // viewport's bottom rather than resizing it, so only bottom-
-          // anchored UI ever needs dodging — this mode has none.
+          // the content at the top. The top bar and inputs never need
+          // keyboard dodging here — but the SCROLL BODY and any footer do:
+          // on iOS the keyboard COVERS the layout viewport's bottom without
+          // resizing it, so a 100dvh sheet keeps its last rows and footer
+          // behind the keys (found on-device, 2026-09-15: topic pills
+          // unreachable). Padding the sheet by the measured inset compresses
+          // the flex column above the keyboard, so the list can scroll its
+          // end into view and footers stay tappable.
           style={{
             height: "100dvh",
             maxHeight: "100dvh",
             paddingTop: "env(safe-area-inset-top)",
+            paddingBottom: keyboardInset,
           }}
         >
           {/* Top action bar. Two shapes: with mobileSave it's the
@@ -222,7 +228,13 @@ export function ResponsiveOverlay({
               {children}
             </div>
           )}
-          {footer && !mobileSave && (
+          {/* The footer renders only when the top bar carries NO action —
+              with mobileSave the bar holds Cancel · Save, and with
+              mobileBack alone (single-select pickers) the bar's Cancel
+              already covers the footer's, so rendering both stacked two
+              Cancels on one screen (found 2026-09-15). Desktop always
+              keeps the footer. */}
+          {footer && !mobileSave && !mobileBack && (
             <div
               className="shrink-0 border-t border-border px-4 py-3"
               style={{
