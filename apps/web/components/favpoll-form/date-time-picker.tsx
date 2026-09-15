@@ -11,6 +11,10 @@ import {
 } from "@/components/ui/popover"
 import { Card, CardContent } from "@/components/ui/card"
 import {
+  ResponsiveOverlay,
+  useIsMobile,
+} from "@/components/ui/responsive-overlay"
+import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
@@ -32,6 +36,9 @@ export function DateTimePicker({
 }) {
   const [open, setOpen] = useState(false)
   const [month, setMonth] = useState<Date>(() => value ?? new Date())
+  // Popover on desktop, bottom sheet on mobile (overlay review,
+  // 2026-09-15): an anchored calendar is cramped on a phone.
+  const isMobile = useIsMobile()
 
   function handleOpenChange(next: boolean) {
     setOpen(next)
@@ -88,70 +95,102 @@ export function DateTimePicker({
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
-  return (
-    <div className="flex gap-2">
-      {/* Date picker */}
-      <Popover open={open} onOpenChange={handleOpenChange}>
-        <PopoverTrigger asChild>
+  const trigger = (
+    <Button
+      type="button"
+      variant="outline"
+      onClick={isMobile ? () => handleOpenChange(true) : undefined}
+      className={cn(
+        // FIXED at 175px (founder, 2026-09-06): date 175 + gap 8 +
+        // time 128 = 311 — the popover's measured natural width —
+        // so the PAIR spans exactly the dropdown, in any context,
+        // whatever the value. flex-1 made the width depend on the
+        // container (wizard stretched) or the text (appeal drifted
+        // once a date was picked).
+        "w-[175px] min-w-0 shrink-0 cursor-pointer justify-start gap-2 bg-background! font-normal",
+        INPUT_SIZE[size],
+        !value && "text-muted-foreground"
+      )}
+    >
+      <CalendarIcon
+        className="h-4 w-4 shrink-0 text-muted-foreground/50"
+        aria-hidden
+      />
+      <span className={cn(!value && "text-muted-foreground/50")}>
+        {dateStr}
+      </span>
+    </Button>
+  )
+
+  const calendar = (
+    <Calendar
+      mode="single"
+      captionLayout="dropdown"
+      selected={value}
+      month={month}
+      onMonthChange={setMonth}
+      startMonth={today}
+      endMonth={new Date(new Date().getFullYear() + 5, 11)}
+      disabled={{ before: today }}
+      onSelect={handleDaySelect}
+      className="p-0"
+    />
+  )
+
+  const presetButtons = (className: string) =>
+    presets && (
+      <div className={className}>
+        {presets.map((p) => (
           <Button
+            key={p.label}
             type="button"
             variant="outline"
-            className={cn(
-              // FIXED at 175px (founder, 2026-09-06): date 175 + gap 8 +
-              // time 128 = 311 — the popover's measured natural width —
-              // so the PAIR spans exactly the dropdown, in any context,
-              // whatever the value. flex-1 made the width depend on the
-              // container (wizard stretched) or the text (appeal drifted
-              // once a date was picked).
-              "w-[175px] min-w-0 shrink-0 cursor-pointer justify-start gap-2 bg-background! font-normal",
-              INPUT_SIZE[size],
-              !value && "text-muted-foreground"
-            )}
+            size="sm"
+            className="rounded-full"
+            onClick={() => handlePreset(p.days)}
           >
-            <CalendarIcon
-              className="h-4 w-4 shrink-0 text-muted-foreground/50"
-              aria-hidden
-            />
-            <span className={cn(!value && "text-muted-foreground/50")}>
-              {dateStr}
-            </span>
+            {p.label}
           </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-          <Card size="sm" className="w-fit shadow-none ring-0">
-            <CardContent className={presets ? "flex gap-3" : undefined}>
-              <Calendar
-                mode="single"
-                captionLayout="dropdown"
-                selected={value}
-                month={month}
-                onMonthChange={setMonth}
-                startMonth={today}
-                endMonth={new Date(new Date().getFullYear() + 5, 11)}
-                disabled={{ before: today }}
-                onSelect={handleDaySelect}
-                className="p-0"
-              />
-              {presets && (
-                <div className="flex flex-col gap-1.5">
-                  {presets.map((p) => (
-                    <Button
-                      key={p.label}
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="rounded-full"
-                      onClick={() => handlePreset(p.days)}
-                    >
-                      {p.label}
-                    </Button>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </PopoverContent>
-      </Popover>
+        ))}
+      </div>
+    )
+
+  return (
+    <div className="flex gap-2">
+      {/* Date picker: popover on desktop; bottom sheet on mobile — a
+          day tap picks and closes (the single-select grammar); a preset
+          keeps it open so the pick lands visibly on the calendar, and
+          the × dismisses. */}
+      {isMobile ? (
+        <>
+          {trigger}
+          <ResponsiveOverlay
+            open={open}
+            onOpenChange={handleOpenChange}
+            title="Close date"
+            bodyClassName="flex items-start justify-center gap-3 px-4 pt-1 pb-4"
+          >
+            {calendar}
+            {/* One preset column on narrow phones; two from 420px —
+                covers both Pro Max generations (428pt and 430pt) */}
+            {presetButtons(
+              "grid shrink-0 grid-cols-1 gap-1.5 min-[420px]:grid-cols-2"
+            )}
+          </ResponsiveOverlay>
+        </>
+      ) : (
+        <Popover open={open} onOpenChange={handleOpenChange}>
+          <PopoverTrigger asChild>{trigger}</PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Card size="sm" className="w-fit shadow-none ring-0">
+              <CardContent className={presets ? "flex gap-3" : undefined}>
+                {calendar}
+                {presetButtons("flex flex-col gap-1.5")}
+              </CardContent>
+            </Card>
+          </PopoverContent>
+        </Popover>
+      )}
 
       {/* Time picker */}
       <InputGroup className={cn(INPUT_SIZE[size], "w-32 bg-background")}>
