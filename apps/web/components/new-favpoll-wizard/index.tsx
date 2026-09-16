@@ -10,6 +10,11 @@ import { EventStep } from "@/components/favpoll-flow/event-step"
 import { RegisterScope } from "@/components/register-scope"
 import { paletteForRegister } from "@/lib/register-palette"
 import { deriveRegister } from "@/lib/registers"
+// Keyboard on INTENT only (2026-09-16, the pledge picker's recipe): an
+// unconditional autoFocus summoned the iOS keyboard the moment the topic/
+// charity overlays opened, over a sheet still settling — the reported
+// broken-scroll state. Fine pointers keep the instant focus.
+import { hasFinePointer } from "@/lib/pointer"
 import { TopicStep } from "@/components/favpoll-flow/topic-step"
 import { CharityStep } from "@/components/favpoll-flow/charity-step"
 import { findOrCreateRegisterCharity } from "@/app/favpolls/new/actions"
@@ -358,47 +363,49 @@ export function NewFavpollWizard({
           }}
           title="Pick a topic"
           hideCloseButton
+          hideMobileTitleBar
           separators
           headerClassName="px-5 pt-4 pb-3"
           bodyClassName="p-0"
           fullscreenOnMobile
-          mobileBack={{
-            label: "Cancel",
-            onClick: () => {
-              w.setTopicOpen(false)
-              setTopicSearch("")
-            },
-          }}
           header={
-            <div className="flex items-center gap-2">
-              {/* Field-not-subtitle treatment (2026-09-16): search glyph
+            <div>
+              {/* The eyebrow IS the ask (pledge-dialog treatment,
+                  2026-09-16) — no mobile title bar; Cancel rides the
+                  bottom footer. */}
+              <span className="mb-2 block text-xs font-medium tracking-widest text-muted-foreground uppercase">
+                Pick a topic
+              </span>
+              <div className="flex items-center gap-2">
+                {/* Field-not-subtitle treatment (2026-09-16): search glyph
                   + hairline give the bare input shape across pickers */}
-              <Search
-                className="size-4 shrink-0 text-muted-foreground/50"
-                aria-hidden="true"
-              />
-              <input
-                type="text"
-                autoFocus
-                placeholder="Search topics…"
-                value={topicSearch}
-                onChange={(e) => setTopicSearch(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && topicShowCreate) {
-                    e.preventDefault()
-                    handleCreateTopic()
-                  }
-                }}
-                className="flex-1 bg-transparent text-lg outline-none placeholder:text-muted-foreground/50"
-              />
-              {topicShowCreate && (
-                <InputGroupButton
-                  variant="secondary"
-                  onClick={handleCreateTopic}
-                >
-                  Add
-                </InputGroupButton>
-              )}
+                <Search
+                  className="size-4 shrink-0 text-muted-foreground/50"
+                  aria-hidden="true"
+                />
+                <input
+                  type="text"
+                  autoFocus={hasFinePointer()}
+                  placeholder="Search topics…"
+                  value={topicSearch}
+                  onChange={(e) => setTopicSearch(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && topicShowCreate) {
+                      e.preventDefault()
+                      handleCreateTopic()
+                    }
+                  }}
+                  className="flex-1 bg-transparent text-lg outline-none placeholder:text-muted-foreground/50"
+                />
+                {topicShowCreate && (
+                  <InputGroupButton
+                    variant="secondary"
+                    onClick={handleCreateTopic}
+                  >
+                    Add
+                  </InputGroupButton>
+                )}
+              </div>
             </div>
           }
           footer={
@@ -446,27 +453,29 @@ export function NewFavpollWizard({
           }}
           title="Pick a charity"
           hideCloseButton
+          hideMobileTitleBar
           headerClassName="px-5 pt-4 pb-3"
           bodyClassName="p-0"
           fullscreenOnMobile
-          mobileBack={{
-            label: "Cancel",
-            onClick: closeCharityPicker,
-          }}
           header={
-            <div className="flex items-center gap-2">
-              <Search
-                className="size-4 shrink-0 text-muted-foreground/50"
-                aria-hidden="true"
-              />
-              <input
-                type="text"
-                autoFocus
-                placeholder="Search charities…"
-                value={charitySearch}
-                onChange={(e) => setCharitySearch(e.target.value)}
-                className="w-full bg-transparent text-lg outline-none placeholder:text-muted-foreground/50"
-              />
+            <div>
+              <span className="mb-2 block text-xs font-medium tracking-widest text-muted-foreground uppercase">
+                Pick a charity
+              </span>
+              <div className="flex items-center gap-2">
+                <Search
+                  className="size-4 shrink-0 text-muted-foreground/50"
+                  aria-hidden="true"
+                />
+                <input
+                  type="text"
+                  autoFocus={hasFinePointer()}
+                  placeholder="Search charities…"
+                  value={charitySearch}
+                  onChange={(e) => setCharitySearch(e.target.value)}
+                  className="w-full bg-transparent text-lg outline-none placeholder:text-muted-foreground/50"
+                />
+              </div>
             </div>
           }
           footer={
