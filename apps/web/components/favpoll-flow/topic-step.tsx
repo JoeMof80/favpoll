@@ -3,13 +3,6 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Chip } from "@/components/ui/chip"
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from "@/components/ui/input-group"
-import { ItemAddField } from "@/components/favpoll-form/item-add-field"
 import { shortTopicLabel } from "@/lib/registers"
 import { cn } from "@/lib/utils"
 import type { Category, Favourite, TopicWithMeta } from "@favpoll/types"
@@ -20,7 +13,6 @@ type TopicStepProps = {
   categories: Category[]
   value: FavpollFormValues["topics"]
   onChange: (v: FavpollFormValues["topics"]) => void
-  hideItemsPanel?: boolean
   suggestedTopics?: TopicWithMeta[]
   primaryCharityName?: string
   /** When provided, search state is controlled externally (input lives in the overlay header). */
@@ -42,7 +34,6 @@ export function TopicStep({
   categories,
   value,
   onChange,
-  hideItemsPanel = false,
   suggestedTopics,
   primaryCharityName,
   search: externalSearch,
@@ -90,19 +81,6 @@ export function TopicStep({
     return matchesCat && matchesSearch && matchesType
   })
 
-  const trimmedSearch = search.trim()
-  const showCreate =
-    trimmedSearch.length > 0 &&
-    !filtered.some((t) => t.title.toLowerCase() === trimmedSearch.toLowerCase())
-
-  // Items panel: show for canonical (non-custom) selected topic
-  const selectedTopic =
-    selectedId && !isCustomSelected
-      ? (activeTopics.find((t) => t.id === selectedId) ?? null)
-      : null
-
-  const customLabels = value[0]?.customLabels ?? []
-
   function handleSelect(id: string) {
     if (id === "__custom__") return
     if (id === selectedId) {
@@ -121,39 +99,6 @@ export function TopicStep({
       },
     ])
     setSearch("")
-  }
-
-  function handleCreateTopic() {
-    if (!trimmedSearch) return
-    onChange([
-      {
-        topicId: "",
-        title: trimmedSearch,
-        isCustom: true,
-        items: [],
-        customLabels: [],
-      },
-    ])
-    setSearch("")
-  }
-
-  function handleAddItem(label: string) {
-    const current = value[0]
-    if (!current) return
-    const existing = current.customLabels ?? []
-    if (existing.some((l) => l.toLowerCase() === label.toLowerCase())) return
-    onChange([{ ...current, customLabels: [...existing, label] }])
-  }
-
-  function handleRemoveItem(label: string) {
-    const current = value[0]
-    if (!current) return
-    onChange([
-      {
-        ...current,
-        customLabels: (current.customLabels ?? []).filter((l) => l !== label),
-      },
-    ])
   }
 
   const filters = [
@@ -190,39 +135,6 @@ export function TopicStep({
     <div className="min-h-64 space-y-0">
       {/* Sticky search (when uncontrolled) + filters + suggested */}
       <div className="sticky top-0 z-10 border-b border-border bg-background px-5 py-4">
-        {externalSearch === undefined && (
-          <InputGroup className="mb-3 h-auto rounded-md">
-            <InputGroupInput
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault()
-                  handleCreateTopic()
-                }
-              }}
-              placeholder="Search topics…"
-              autoFocus
-              className="h-auto px-3 py-2 text-lg md:text-lg"
-            />
-            {showCreate && (
-              <InputGroupAddon align="inline-end">
-                <InputGroupButton
-                  variant="secondary"
-                  onClick={handleCreateTopic}
-                  data-testid="create-topic-chip"
-                >
-                  Add
-                </InputGroupButton>
-              </InputGroupAddon>
-            )}
-          </InputGroup>
-        )}
-
-        {/* The "type it and click Add" hint retired 2026-09-16 (option E):
-            adding a topic is the CARD's act now ("+ Add your own topic"),
-            and the picker is pure select. */}
-
         <div className="flex items-center gap-2">
           <span className="shrink-0 text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
             Filters
@@ -289,62 +201,10 @@ export function TopicStep({
         )}
       </div>
 
-      {/* Read-only items panel — shown when a canonical topic is selected */}
-      {!hideItemsPanel && selectedTopic && (
-        <div
-          className="border-t border-border px-5 py-4"
-          data-testid="items-panel"
-        >
-          <div className="mb-3 flex items-baseline justify-between gap-2">
-            <p className="text-[11px] font-medium tracking-widest text-primary uppercase">
-              What people vote on
-            </p>
-            {!selectedTopic.is_finite && (
-              <p className="text-xs text-muted-foreground">
-                Guests can add their own
-              </p>
-            )}
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            {sortItems(selectedTopic.favourites).map((item) => (
-              <Chip key={item.id} size="lg" readOnly>
-                {item.label}
-              </Chip>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Editable items panel — shown when a custom (new) topic is selected */}
-      {!hideItemsPanel && isCustomSelected && (
-        <div
-          className="border-t border-border px-5 py-4"
-          data-testid="items-panel"
-        >
-          <div className="mb-3 flex items-baseline justify-between gap-2">
-            <p className="text-[11px] font-medium tracking-widest text-primary uppercase">
-              What people can pledge against
-            </p>
-          </div>
-          <ItemAddField
-            canonicalItems={[]}
-            customLabels={customLabels}
-            topicTitle={value[0]?.title ?? ""}
-            isFinite={false}
-            onAdd={handleAddItem}
-            onRemove={handleRemoveItem}
-            size="sm"
-          />
-          {customLabels.length < 2 && (
-            <p
-              className="mt-2 text-xs text-muted-foreground"
-              data-testid="items-validation"
-            >
-              Add at least two options people can pledge against
-            </p>
-          )}
-        </div>
-      )}
+      {/* Items panels (read-only canonical + ItemAddField custom) removed
+          2026-09-17: the wizard — this component's only consumer — always
+          passed hideItemsPanel, so they were dead branches keeping retired
+          add-grammar alive. Items live in the card's items dialog. */}
     </div>
   )
 }

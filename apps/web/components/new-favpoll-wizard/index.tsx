@@ -48,12 +48,16 @@ type Props = {
   appeal?: WizardAppeal
   /** Create mode: the charity page's create tile preselects it. */
   initialCharityId?: string
+  /** consent-first posture (server env): unapproved charities gate
+   *  pledges, and the card says so at the point of choice. */
+  consentGatingActive?: boolean
 }
 
 export function NewFavpollWizard({
   data,
   edit,
   initialCategory,
+  consentGatingActive = false,
   appeal,
   initialCharityId,
 }: Props) {
@@ -265,6 +269,7 @@ export function NewFavpollWizard({
                   ) : w.selectedCharities.length > 0 ? (
                     <WizardCharityCard
                       charities={w.selectedCharities}
+                      consentGatingActive={consentGatingActive}
                       onEdit={(id) => openCharityPicker(id)}
                       onRemove={(id) =>
                         w.setCharityIds((ids) => ids.filter((i) => i !== id))
@@ -457,7 +462,6 @@ export function NewFavpollWizard({
               w.setTopicOpen(false)
               setTopicSearch("")
             }}
-            hideItemsPanel
             suggestedTopics={w.suggestedTopics}
             primaryCharityName={w.primaryCharity?.name}
             search={topicSearch}
