@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation"
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { NewFavpollWizard } from "@/components/new-favpoll-wizard"
+import { consentPosture } from "@/lib/charity-consent"
 import type { WizardEditConfig } from "@/components/new-favpoll-wizard/use-wizard-state"
 import { getWizardData } from "@/app/favpolls/new/wizard-data"
 import type {
@@ -168,5 +169,11 @@ export default async function EditFavpollPage({ params }: Props) {
     },
   }
 
-  return <NewFavpollWizard data={data} edit={edit} />
+  return (
+    <NewFavpollWizard
+      data={data}
+      edit={edit}
+      consentGatingActive={consentPosture() === "consent-first"}
+    />
+  )
 }

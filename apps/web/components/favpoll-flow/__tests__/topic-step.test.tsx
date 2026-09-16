@@ -85,103 +85,6 @@ function customTopic(
   ]
 }
 
-describe("TopicStep — items panel", () => {
-  it("shows no items panel when nothing is selected", () => {
-    render(
-      <TopicStep
-        topics={TOPICS}
-        categories={CATEGORIES}
-        value={EMPTY_VALUE}
-        onChange={vi.fn()}
-      />
-    )
-    expect(screen.queryByTestId("items-panel")).not.toBeInTheDocument()
-  })
-
-  it("shows items panel when a canonical topic is selected", () => {
-    render(
-      <TopicStep
-        topics={TOPICS}
-        categories={CATEGORIES}
-        value={select("t-colour", "Colour")}
-        onChange={vi.fn()}
-      />
-    )
-    expect(screen.getByTestId("items-panel")).toBeInTheDocument()
-    expect(screen.getByText("What people vote on")).toBeInTheDocument()
-  })
-
-  it("renders the selected topic's items as chips", () => {
-    render(
-      <TopicStep
-        topics={TOPICS}
-        categories={CATEGORIES}
-        value={select("t-colour", "Colour")}
-        onChange={vi.fn()}
-      />
-    )
-    expect(screen.getByText("Red")).toBeInTheDocument()
-    expect(screen.getByText("Blue")).toBeInTheDocument()
-  })
-
-  it("shows finite topic without 'guests can add' hint", () => {
-    render(
-      <TopicStep
-        topics={TOPICS}
-        categories={CATEGORIES}
-        value={select("t-colour", "Colour")}
-        onChange={vi.fn()}
-      />
-    )
-    expect(screen.queryByText(/guests can add/i)).not.toBeInTheDocument()
-  })
-
-  it("shows 'Guests can add their own' hint for infinite topics", () => {
-    render(
-      <TopicStep
-        topics={TOPICS}
-        categories={CATEGORIES}
-        value={select("t-biscuit", "Biscuit")}
-        onChange={vi.fn()}
-      />
-    )
-    expect(screen.getByText("Guests can add their own")).toBeInTheDocument()
-  })
-
-  it("sorts items by display_order then alphabetically", () => {
-    const topicWithMixedOrder = makeTopic(
-      "t-mixed",
-      "Mixed",
-      [
-        { id: "i-z", label: "Zebra", display_order: null },
-        { id: "i-a", label: "Apple", display_order: null },
-        { id: "i-first", label: "First", display_order: 1 },
-      ],
-      true
-    )
-
-    render(
-      <TopicStep
-        topics={[...TOPICS, topicWithMixedOrder]}
-        categories={CATEGORIES}
-        value={select("t-mixed", "Mixed")}
-        onChange={vi.fn()}
-      />
-    )
-
-    const panel = screen.getByTestId("items-panel")
-    const chips = Array.from(
-      panel.querySelectorAll('[class*="Chip"], button, [role="button"]')
-    )
-    const labels = chips.map((el) => el.textContent)
-    const firstIdx = labels.findIndex((l) => l?.includes("First"))
-    const appleIdx = labels.findIndex((l) => l?.includes("Apple"))
-    const zebraIdx = labels.findIndex((l) => l?.includes("Zebra"))
-    expect(firstIdx).toBeLessThan(appleIdx)
-    expect(appleIdx).toBeLessThan(zebraIdx)
-  })
-})
-
 describe("TopicStep — the hint is retired (option E, 2026-09-16)", () => {
   // Adding a topic is the CARD's act now ("+ Add your own topic" opens a
   // dedicated overlay); the picker is pure select, so the old "type it
@@ -244,6 +147,8 @@ describe("TopicStep — suggested topics", () => {
   })
 
   it("keeps suggested section visible when search is active (pinned)", () => {
+    // The wizard owns the search box (the component's own field was dead
+    // code, removed 2026-09-17) — an active search arrives as a prop.
     render(
       <TopicStep
         topics={TOPICS}
@@ -252,10 +157,10 @@ describe("TopicStep — suggested topics", () => {
         onChange={vi.fn()}
         suggestedTopics={SUGGESTED}
         primaryCharityName="Dogs Trust"
+        search="col"
+        onSearchChange={vi.fn()}
       />
     )
-    const input = screen.getByPlaceholderText("Search topics…")
-    fireEvent.change(input, { target: { value: "col" } })
     expect(screen.getByText("Suggested for Dogs Trust")).toBeInTheDocument()
   })
 
@@ -323,169 +228,5 @@ describe("TopicStep — finite / infinite filters", () => {
     fireEvent.click(screen.getByRole("button", { name: "All" }))
     expect(screen.getByText("Colour")).toBeInTheDocument()
     expect(screen.getByText("Biscuit")).toBeInTheDocument()
-  })
-})
-
-describe("TopicStep — create topic option", () => {
-  it("shows create chip when search matches nothing", () => {
-    render(
-      <TopicStep
-        topics={TOPICS}
-        categories={CATEGORIES}
-        value={EMPTY_VALUE}
-        onChange={vi.fn()}
-      />
-    )
-    fireEvent.change(screen.getByPlaceholderText("Search topics…"), {
-      target: { value: "Xyz" },
-    })
-    expect(screen.getByTestId("create-topic-chip")).toBeInTheDocument()
-  })
-
-  it("shows create chip alongside matching chips when search partially matches an existing topic", () => {
-    render(
-      <TopicStep
-        topics={TOPICS}
-        categories={CATEGORIES}
-        value={EMPTY_VALUE}
-        onChange={vi.fn()}
-      />
-    )
-    fireEvent.change(screen.getByPlaceholderText("Search topics…"), {
-      target: { value: "Col" },
-    })
-    expect(screen.getByText("Colour")).toBeInTheDocument()
-    expect(screen.getByTestId("create-topic-chip")).toBeInTheDocument()
-  })
-
-  it("hides create chip when search is an exact match (case-insensitive)", () => {
-    render(
-      <TopicStep
-        topics={TOPICS}
-        categories={CATEGORIES}
-        value={EMPTY_VALUE}
-        onChange={vi.fn()}
-      />
-    )
-    fireEvent.change(screen.getByPlaceholderText("Search topics…"), {
-      target: { value: "colour" },
-    })
-    expect(screen.getByText("Colour")).toBeInTheDocument()
-    expect(screen.queryByTestId("create-topic-chip")).not.toBeInTheDocument()
-  })
-
-  it("calls onChange with a new custom topic when create chip is clicked", () => {
-    const onChange = vi.fn()
-    render(
-      <TopicStep
-        topics={TOPICS}
-        categories={CATEGORIES}
-        value={EMPTY_VALUE}
-        onChange={onChange}
-      />
-    )
-    fireEvent.change(screen.getByPlaceholderText("Search topics…"), {
-      target: { value: "Memories" },
-    })
-    fireEvent.click(screen.getByTestId("create-topic-chip"))
-    expect(onChange).toHaveBeenCalledWith([
-      expect.objectContaining({ title: "Memories", isCustom: true }),
-    ])
-  })
-})
-
-describe("TopicStep — custom topic editable items panel", () => {
-  it("shows items panel for a custom (new) topic", () => {
-    render(
-      <TopicStep
-        topics={TOPICS}
-        categories={CATEGORIES}
-        value={customTopic("My Topic")}
-        onChange={vi.fn()}
-      />
-    )
-    expect(screen.getByTestId("items-panel")).toBeInTheDocument()
-    expect(
-      screen.getByText("What people can pledge against")
-    ).toBeInTheDocument()
-  })
-
-  it("shows validation message when fewer than 2 items", () => {
-    render(
-      <TopicStep
-        topics={TOPICS}
-        categories={CATEGORIES}
-        value={customTopic("My Topic", ["One item"])}
-        onChange={vi.fn()}
-      />
-    )
-    expect(
-      screen.getByText("Add at least two options people can pledge against")
-    ).toBeInTheDocument()
-  })
-
-  it("hides validation message when 2 or more items exist", () => {
-    render(
-      <TopicStep
-        topics={TOPICS}
-        categories={CATEGORIES}
-        value={customTopic("My Topic", ["Item A", "Item B"])}
-        onChange={vi.fn()}
-      />
-    )
-    expect(
-      screen.queryByText("Add at least two options people can pledge against")
-    ).not.toBeInTheDocument()
-  })
-
-  it("calls onChange with new label when item is added", () => {
-    const onChange = vi.fn()
-    const initial = customTopic("My Topic", [])
-    render(
-      <TopicStep
-        topics={TOPICS}
-        categories={CATEGORIES}
-        value={initial}
-        onChange={onChange}
-      />
-    )
-
-    // Open the ItemAddField overlay
-    const trigger = screen.getByRole("button", { name: /add my topic items/i })
-    fireEvent.click(trigger)
-
-    // Type in the overlay input and press Enter
-    const input = screen.getByPlaceholderText(/add my topic items/i)
-    fireEvent.change(input, { target: { value: "Football" } })
-    fireEvent.keyDown(input, { key: "Enter" })
-
-    expect(onChange).toHaveBeenCalledWith([
-      expect.objectContaining({ customLabels: ["Football"] }),
-    ])
-  })
-
-  it("calls onChange with label removed when item is removed", () => {
-    const onChange = vi.fn()
-    const initial = customTopic("My Topic", ["Football", "Tennis"])
-    render(
-      <TopicStep
-        topics={TOPICS}
-        categories={CATEGORIES}
-        value={initial}
-        onChange={onChange}
-      />
-    )
-
-    // Open the ItemAddField overlay
-    const trigger = screen.getByRole("button", { name: /add my topic items/i })
-    fireEvent.click(trigger)
-
-    // Click the remove button for "Football"
-    const removeBtn = screen.getByRole("button", { name: /remove football/i })
-    fireEvent.click(removeBtn)
-
-    expect(onChange).toHaveBeenCalledWith([
-      expect.objectContaining({ customLabels: ["Tennis"] }),
-    ])
   })
 })

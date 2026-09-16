@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { NewFavpollWizard } from "@/components/new-favpoll-wizard"
 import type { FavpollCategory } from "@favpoll/types"
 import { getWizardData } from "./wizard-data"
+import { consentPosture } from "@/lib/charity-consent"
 
 const CATEGORIES: FavpollCategory[] = ["celebration", "memorial", "fundraiser"]
 
@@ -82,6 +83,7 @@ export default async function NewFavpollPage({
       initialCategory={initialCategory}
       initialCharityId={initialCharityId}
       appeal={appeal}
+      consentGatingActive={consentPosture() === "consent-first"}
     />
   )
 }

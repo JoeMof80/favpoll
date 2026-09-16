@@ -15,6 +15,10 @@ type Props = {
       becomes a lock and the pick-another line becomes the REASON the
       charity is locked — the appeal that set it, or pledged guests. */
   lockedReason?: string
+  /** consent-first posture: unapproved charities gate pledges — say so
+      at the point of choice (founder, 2026-09-17), not only after
+      publish. */
+  consentGatingActive?: boolean
 }
 
 export function WizardCharityCard({
@@ -23,8 +27,16 @@ export function WizardCharityCard({
   onRemove,
   onPickAnother,
   lockedReason,
+  consentGatingActive = false,
 }: Props) {
   const locked = !!lockedReason
+  // The consequence of picking a charity that hasn't yet agreed: pledges
+  // are held until it confirms. Same grammar as the guest-facing notice.
+  const gatedNames = consentGatingActive
+    ? charities
+        .filter((c) => c.consent_status !== "approved")
+        .map((c) => c.name)
+    : []
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-border bg-background p-4">
       {charities.map((c) => (
@@ -85,6 +97,12 @@ export function WizardCharityCard({
           </div>
         </div>
       ))}
+      {gatedNames.length > 0 && (
+        <p className="text-sm text-muted-foreground">
+          Pledges open once {gatedNames.join(" & ")}{" "}
+          {gatedNames.length > 1 ? "confirm" : "confirms"}.
+        </p>
+      )}
       {locked ? (
         <p className="border-t border-border pt-3 text-sm text-muted-foreground">
           {lockedReason}
