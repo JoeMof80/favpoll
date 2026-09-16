@@ -537,11 +537,12 @@ export function TopicPickerVignette({
               transition={{ duration: 0.3, ease: "easeOut" }}
               className="absolute inset-x-0 top-8 overflow-hidden rounded-xl border border-border bg-background shadow-lg"
             >
-              {/* The settled guest picker (#889): eyebrow carries the ask,
-                  glyph + "Search or add your own…" combobox beneath, and
-                  the typed no-match becomes an "+ Add ‘X’" pill in the
-                  grid — which lands SELECTED. No chip-in-search-bar, no
-                  field Add button, no hint line: all retired grammar. */}
+              {/* The settled guest picker (#889 + option C, 2026-09-16):
+                  eyebrow carries the ask, pure search beneath; adding is
+                  its own view, reached by the list-end "Can't find
+                  yours?" row — the dashed "+ Add" combobox pill is
+                  retired grammar. The vignette elides the add view
+                  itself: link, then the new chip lands selected. */}
               <div className="border-b border-border px-5 pt-4 pb-3">
                 <span className="mb-2 block text-xs font-medium tracking-widest text-muted-foreground uppercase">
                   Pick your favourite {TOPIC.toLowerCase()}
@@ -554,12 +555,19 @@ export function TopicPickerVignette({
                   <span
                     className={`min-w-30 flex-1 text-base ${guestText && !guestPicked ? "text-foreground" : "text-muted-foreground/50"}`}
                   >
-                    {guestPicked
-                      ? "Search or add your own…"
-                      : guestText || "Search or add your own…"}
+                    {guestPicked ? "Search…" : guestText || "Search…"}
                     {guestTyping && <span className="opacity-40">|</span>}
                   </span>
                 </div>
+                {/* The add ENTRY lives in the pinned header — highlighted
+                    while the scripted guest "presses" it */}
+                <span
+                  className={`mt-2 block text-sm text-primary ${
+                    guestAddPressed ? "underline" : ""
+                  }`}
+                >
+                  Can&rsquo;t find yours? Add your own →
+                </span>
               </div>
               <div className="flex min-h-8 flex-wrap gap-2 px-5 pt-4 pb-4">
                 {guestPicked && (
@@ -567,16 +575,7 @@ export function TopicPickerVignette({
                     {GUEST_ITEM}
                   </Chip>
                 )}
-                {guestNoMatch && !guestPicked && (
-                  <Chip
-                    size="lg"
-                    className={`border-dashed bg-background text-primary ${
-                      guestAddPressed ? "scale-[0.96] brightness-95" : ""
-                    }`}
-                  >
-                    + Add &ldquo;{guestText}&rdquo;
-                  </Chip>
-                )}
+
                 <AnimatePresence initial={false}>
                   {!guestNoMatch &&
                     ITEMS.map((label) => (

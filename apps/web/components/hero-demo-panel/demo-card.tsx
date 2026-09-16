@@ -645,23 +645,17 @@ export function DemoCard({
                       <PickerHeader
                         search=""
                         onSearchChange={() => {}}
-                        onAdd={() => {}}
                         topicTitle={topicTitle}
-                        showCreate={false}
                       />
                     </div>
                     <div className="min-h-0 flex-1 overflow-y-auto px-5 pt-4 pb-2">
                       <PickerPills
                         filteredItems={items}
                         selectedIds={selectedIds}
-                        showCreate={false}
                         search=""
-                        addingItem={false}
-                        addError={null}
                         isInfinite={false}
                         hasAddItem={false}
                         onToggle={() => {}}
-                        onAdd={() => {}}
                       />
                     </div>
                     {/* The real step-1 footer twins: the primary's label
