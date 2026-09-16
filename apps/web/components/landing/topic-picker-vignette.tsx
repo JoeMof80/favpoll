@@ -32,11 +32,8 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { PollHeading } from "@/components/poll-heading"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { Chip } from "@/components/ui/chip"
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-} from "@/components/ui/input-group"
+import { Search as SearchIcon } from "lucide-react"
+import { InputGroupButton } from "@/components/ui/input-group"
 import { Button } from "@/components/ui/button"
 import { Vignette } from "@/components/landing/vignette"
 
@@ -123,9 +120,9 @@ type Phase =
   // `step` had to be told about it.
   | { kind: "still" }
 
-// The word Add in the hint, wearing the button's own chrome — the
-// instruction says "click Add", so it has to point at something the
-// reader will recognise when they see it.
+// The word Add in beat 1's hint, wearing the button's own chrome — the
+// real TopicStep still shows this line (the WIZARD picker kept its Add
+// button; only the GUEST picker's hint retired in #889).
 const ADD_TOKEN = (
   <span className="rounded-md bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-secondary-foreground">
     Add
@@ -394,6 +391,10 @@ export function TopicPickerVignette({
                   strip, which sit between the field and the chips. */}
               <div className="border-b border-border px-5 py-4">
                 <div className="mb-3 flex items-center gap-2">
+                  <SearchIcon
+                    className="size-4 shrink-0 text-muted-foreground/50"
+                    aria-hidden="true"
+                  />
                   <span
                     className={`flex-1 text-base ${searchText ? "text-foreground" : "text-muted-foreground/50"}`}
                   >
@@ -468,6 +469,10 @@ export function TopicPickerVignette({
               <div className="space-y-2 px-4 py-4">
                 <PollHeading topicTitle={TOPIC} size="lg" inert />
                 <div className="flex items-center gap-2">
+                  <SearchIcon
+                    className="size-4 shrink-0 text-muted-foreground/50"
+                    aria-hidden="true"
+                  />
                   <span
                     className={`flex-1 text-base ${inputText ? "text-foreground" : "text-muted-foreground/50"}`}
                   >
@@ -532,51 +537,46 @@ export function TopicPickerVignette({
               transition={{ duration: 0.3, ease: "easeOut" }}
               className="absolute inset-x-0 top-8 overflow-hidden rounded-xl border border-border bg-background shadow-lg"
             >
-              {/* PickerHeader's own shape: a block-start addon carrying the
-                  eyebrow, then a wrapping row of chips and the field. */}
-              <InputGroup className="h-auto rounded-none border-0 shadow-none">
-                <InputGroupAddon align="block-start" className="px-5 pt-4 pb-0">
-                  <span className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
-                    Your favourite
+              {/* The settled guest picker (#889): eyebrow carries the ask,
+                  glyph + "Search or add your own…" combobox beneath, and
+                  the typed no-match becomes an "+ Add ‘X’" pill in the
+                  grid — which lands SELECTED. No chip-in-search-bar, no
+                  field Add button, no hint line: all retired grammar. */}
+              <div className="border-b border-border px-5 pt-4 pb-3">
+                <span className="mb-2 block text-xs font-medium tracking-widest text-muted-foreground uppercase">
+                  Pick your favourite {TOPIC.toLowerCase()}
+                </span>
+                <div className="flex items-center gap-2">
+                  <SearchIcon
+                    className="size-4 shrink-0 text-muted-foreground/50"
+                    aria-hidden="true"
+                  />
+                  <span
+                    className={`min-w-30 flex-1 text-base ${guestText && !guestPicked ? "text-foreground" : "text-muted-foreground/50"}`}
+                  >
+                    {guestPicked
+                      ? "Search or add your own…"
+                      : guestText || "Search or add your own…"}
+                    {guestTyping && <span className="opacity-40">|</span>}
                   </span>
-                </InputGroupAddon>
-                <div className="flex w-full flex-wrap items-center gap-2 px-5 py-3">
-                  {guestPicked ? (
-                    <Chip size="lg" selected>
-                      {GUEST_ITEM}
-                    </Chip>
-                  ) : (
-                    <span
-                      className={`min-w-30 flex-1 text-base ${guestText ? "text-foreground" : "text-muted-foreground/50"}`}
-                    >
-                      {guestText ||
-                        `Search for your favourite ${TOPIC.toLowerCase()}…`}
-                      {guestTyping && <span className="opacity-40">|</span>}
-                    </span>
-                  )}
-                  {guestNoMatch && !guestPicked && (
-                    <InputGroupButton
-                      className={
-                        guestAddPressed
-                          ? "shrink-0 scale-[0.96] brightness-95"
-                          : "shrink-0"
-                      }
-                    >
-                      Add
-                    </InputGroupButton>
-                  )}
                 </div>
-                {!guestNoMatch && (
-                  <InputGroupAddon align="block-end" className="px-5 pt-0 pb-3">
-                    <span className="text-xs text-muted-foreground">
-                      Is yours missing? Type it and click {ADD_TOKEN}
-                    </span>
-                  </InputGroupAddon>
+              </div>
+              <div className="flex min-h-8 flex-wrap gap-2 px-5 pt-4 pb-4">
+                {guestPicked && (
+                  <Chip size="lg" selected>
+                    {GUEST_ITEM}
+                  </Chip>
                 )}
-              </InputGroup>
-              {/* The organiser's three, which the guest reads before finding
-                  theirs is not among them. */}
-              <div className="flex min-h-8 flex-wrap gap-1.5 px-5 pb-4">
+                {guestNoMatch && !guestPicked && (
+                  <Chip
+                    size="lg"
+                    className={`border-dashed bg-background text-primary ${
+                      guestAddPressed ? "scale-[0.96] brightness-95" : ""
+                    }`}
+                  >
+                    + Add &ldquo;{guestText}&rdquo;
+                  </Chip>
+                )}
                 <AnimatePresence initial={false}>
                   {!guestNoMatch &&
                     ITEMS.map((label) => (
@@ -586,12 +586,22 @@ export function TopicPickerVignette({
                         exit={reduced ? undefined : { opacity: 0, scale: 0.9 }}
                         transition={{ duration: 0.2, ease: "easeIn" }}
                       >
-                        <Chip size="lg" readOnly>
+                        <Chip size="lg" className="pointer-events-none">
                           {label}
                         </Chip>
                       </motion.span>
                     ))}
                 </AnimatePresence>
+              </div>
+              {/* The real step-1 footer twins — the primary's label carries
+                  the selection state */}
+              <div className="flex gap-3 border-t border-border px-4 py-3">
+                <Button type="button" variant="ghost" className="flex-1">
+                  Cancel
+                </Button>
+                <Button type="button" className="flex-1">
+                  {guestPicked ? "Next" : "Give without picking"}
+                </Button>
               </div>
             </motion.div>
           )}

@@ -261,25 +261,36 @@ export function DemoCard({
     </>
   )
 
+  // The real dialog's footer twins (#887/#889): ghost secondary + primary,
+  // no arrows, on EVERY viewport — the phone no longer has a top action bar.
   const renderPledgeFooter = (
     enabled: boolean,
     hover: boolean,
-    pressed: boolean
+    pressed: boolean,
+    secondaryLabel = "Back",
+    primaryLabel = "Next"
   ) => (
-    <div className="shrink-0 px-4 py-3">
+    <div className="flex shrink-0 gap-3 px-4 py-3">
       <Button
         type="button"
         tabIndex={-1}
-        variant={enabled ? "default" : "secondary"}
+        variant="ghost"
+        className="pointer-events-none h-11 flex-1 text-base"
+      >
+        {secondaryLabel}
+      </Button>
+      <Button
+        type="button"
+        tabIndex={-1}
         className={cn(
-          "pointer-events-none w-full text-base transition-all duration-150",
+          "pointer-events-none h-11 flex-1 text-base transition-all duration-150",
           enabled && hover && !pressed
             ? "ring-2 ring-primary/30 brightness-105"
             : "",
           pressed ? "scale-[0.98] brightness-95" : ""
         )}
       >
-        Next →
+        {primaryLabel}
       </Button>
     </div>
   )
@@ -595,58 +606,10 @@ export function DemoCard({
             )}
             aria-hidden="true"
           >
-            {/* Top action bar — ResponsiveOverlay's fullscreen shape:
-                back/cancel, the step title, and the primary action. On a
-                handset the NAVIGATION LIVES HERE, and the consumer's footer
-                is dropped entirely (`footer && !mobileSave`), which is why
-                the picker's Next and the amount step's Pledge move up here
-                rather than sitting at the bottom of the sheet. */}
-            {isPhone && !confirmedInDialog && (
-              // border-t as well as -b: the sheet's own top edge, which the
-              // photograph shows as a rule under the status bar. Without it
-              // the safe-area strip and the bar were one undivided white
-              // block and the sheet had no visible beginning.
-              <div className="flex shrink-0 items-center justify-between gap-2 border-y border-border px-2 py-1.5">
-                <Button
-                  type="button"
-                  tabIndex={-1}
-                  variant="ghost"
-                  className="pointer-events-none"
-                >
-                  {pickerOpen ? "Cancel" : "Back"}
-                </Button>
-                <p className="min-w-0 truncate py-1.5 text-base font-medium">
-                  {pickerOpen
-                    ? `Pick your favourite ${topicTitle.toLowerCase()}`
-                    : "Your pledge"}
-                </p>
-                <Button
-                  type="button"
-                  tabIndex={-1}
-                  variant={
-                    (pickerOpen ? nextEnabled : amountActive)
-                      ? "default"
-                      : "secondary"
-                  }
-                  className={cn(
-                    "pointer-events-none transition-all duration-150",
-                    pickerOpen
-                      ? nextEnabled && nextHover && !nextPressed
-                        ? "ring-2 ring-primary/30 brightness-105"
-                        : nextPressed
-                          ? "scale-[0.98] brightness-95"
-                          : ""
-                      : amountActive && pledgeHover && !pledgePressed
-                        ? "ring-2 ring-primary/30 brightness-105"
-                        : pledgePressed
-                          ? "scale-[0.98] brightness-95"
-                          : ""
-                  )}
-                >
-                  {pickerOpen ? "Next" : "Next →"}
-                </Button>
-              </div>
-            )}
+            {/* No top action bar (#887/#889): the real dialog leads with
+                its header slot's eyebrow on every viewport and commits in
+                the bottom footer twins — the phone photograph shows the
+                same shape as the browser dialog now. */}
             <div inert className="flex min-h-0 flex-1 flex-col">
               <AnimatePresence mode="wait">
                 {confirmedInDialog ? (
@@ -677,7 +640,8 @@ export function DemoCard({
                     transition={{ duration: 0.18 }}
                     className="flex min-h-0 flex-1 flex-col"
                   >
-                    <div className="shrink-0 px-5 pt-4 pb-2">
+                    {/* border-b: the step-1 separators hairline */}
+                    <div className="shrink-0 border-b border-border px-5 pt-4 pb-3">
                       <PickerHeader
                         search=""
                         onSearchChange={() => {}}
@@ -686,7 +650,7 @@ export function DemoCard({
                         showCreate={false}
                       />
                     </div>
-                    <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-2">
+                    <div className="min-h-0 flex-1 overflow-y-auto px-5 pt-4 pb-2">
                       <PickerPills
                         filteredItems={items}
                         selectedIds={selectedIds}
@@ -700,26 +664,15 @@ export function DemoCard({
                         onAdd={() => {}}
                       />
                     </div>
-                    {/* Bottom Next only in the browser dialog — on a
-                        handset it lives in the top bar above. */}
-                    <div
-                      className={cn("shrink-0 px-5 py-3", isPhone && "hidden")}
-                    >
-                      <Button
-                        type="button"
-                        tabIndex={-1}
-                        variant={nextEnabled ? "default" : "secondary"}
-                        className={cn(
-                          "pointer-events-none w-full text-base transition-all duration-150",
-                          nextEnabled && nextHover && !nextPressed
-                            ? "ring-2 ring-primary/30 brightness-105"
-                            : "",
-                          nextPressed ? "scale-[0.98] brightness-95" : ""
-                        )}
-                      >
-                        Next →
-                      </Button>
-                    </div>
+                    {/* The real step-1 footer twins: the primary's label
+                        carries the selection state (#889) */}
+                    {renderPledgeFooter(
+                      nextEnabled,
+                      nextHover,
+                      nextPressed,
+                      "Cancel",
+                      chipSelected ? "Next" : "Give without picking"
+                    )}
                   </motion.div>
                 ) : (
                   <motion.div
@@ -733,12 +686,11 @@ export function DemoCard({
                     <div className="min-h-0 flex-1 overflow-y-auto">
                       {renderAmountStep(dispAmount, dispAmountStr)}
                     </div>
-                    {!isPhone &&
-                      renderPledgeFooter(
-                        amountActive,
-                        pledgeHover,
-                        pledgePressed
-                      )}
+                    {renderPledgeFooter(
+                      amountActive,
+                      pledgeHover,
+                      pledgePressed
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>

@@ -268,21 +268,19 @@ describe("DemoCard — dialog mimics", () => {
     )
   })
 
-  it("Next uses secondary variant while browsing (picking), default once selected", () => {
+  it("the picker primary carries the state in its LABEL (#889): Give without picking while browsing, Next once selected", () => {
     const { unmount: u1 } = renderCard("picking")
-    const nextBrowsing = screen.getAllByRole("button", {
-      name: /^Next/,
-      hidden: true,
-    })
-    expect(nextBrowsing[nextBrowsing.length - 1]).toHaveAttribute(
-      "data-variant",
-      "secondary"
-    )
+    expect(
+      screen.getAllByRole("button", {
+        name: /^Give without picking$/,
+        hidden: true,
+      }).length
+    ).toBeGreaterThan(0)
     u1()
 
     const { unmount: u2 } = renderCard("selected")
     const nextSelected = screen.getAllByRole("button", {
-      name: /^Next/,
+      name: /^Next$/,
       hidden: true,
     })
     expect(nextSelected[nextSelected.length - 1]).toHaveAttribute(
@@ -300,24 +298,19 @@ describe("DemoCard — dialog mimics", () => {
     expect(steps[steps.length - 1]).toBeInTheDocument()
   })
 
-  it("Pledge uses secondary variant (no amount chosen) in pledge-panel phase", () => {
+  it("the amount step's footer is the Back/Next twins (no arrows, #887/#889)", () => {
     renderCard("pledge-panel")
-    const pledgeBtns = screen.getAllByRole("button", {
-      name: /^Next →$/,
+    const nexts = screen.getAllByRole("button", {
+      name: /^Next$/,
       hidden: true,
     })
-    const liveBtn = pledgeBtns[pledgeBtns.length - 1]
-    expect(liveBtn).toHaveAttribute("data-variant", "secondary")
-  })
-
-  it("Pledge uses default variant (amount picked, Pledge enabled) in amount-picked phase", () => {
-    renderCard("amount-picked")
-    const pledgeBtns = screen.getAllByRole("button", {
-      name: /^Next →$/,
-      hidden: true,
-    })
-    const liveBtn = pledgeBtns[pledgeBtns.length - 1]
-    expect(liveBtn).toHaveAttribute("data-variant", "default")
+    expect(nexts.length).toBeGreaterThan(0)
+    expect(
+      screen.getAllByRole("button", { name: /^Back$/, hidden: true }).length
+    ).toBeGreaterThan(0)
+    expect(
+      screen.queryByRole("button", { name: /Next →/, hidden: true })
+    ).toBeNull()
   })
 
   it("shows confirmation tick and amount in confirmed phase", () => {
