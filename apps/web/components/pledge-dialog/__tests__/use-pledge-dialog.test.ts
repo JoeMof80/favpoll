@@ -107,50 +107,96 @@ beforeEach(() => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("usePledgeDialog — initial state", () => {
-  it("starts at step 1", () => {
+  it("starts at step 1", async () => {
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
     expect(result.current.step).toBe(1)
   })
 
-  it("starts with empty draftIds", () => {
+  it("starts with nothing selected", async () => {
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
-    expect(result.current.draftIds).toEqual([])
-  })
-
-  it("canAdvanceStep1 is true with no selections — picking is optional", () => {
-    // Inverted 2026-08-17. It required a favourite, which left a guest who
-    // could not decide stuck on step 1 behind a dead Next button. Giving
-    // without backing anything is a shape the product already has, and the
-    // pledge lands with a total and no allocations.
-    const { result } = renderHook(() => usePledgeDialog(baseOptions))
-    expect(result.current.canAdvanceStep1).toBe(true)
+    expect(result.current.selectedIds).toEqual([])
   })
 })
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Step 1: picker draft
+// Step 1: the picker (settled 2026-09-16 — chips toggle, the footer commits)
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe("usePledgeDialog — step 1 picker draft", () => {
-  it("toggleDraft adds an id", () => {
+describe("usePledgeDialog — the picker", () => {
+  it("toggleFavourite selects without advancing", async () => {
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
-    act(() => result.current.toggleDraft("red"))
-    expect(result.current.draftIds).toEqual(["red"])
-    expect(result.current.canAdvanceStep1).toBe(true)
+    act(() => result.current.toggleFavourite("red"))
+    expect(result.current.selectedIds).toEqual(["red"])
+    expect(result.current.step).toBe(1)
   })
 
-  it("toggleDraft removes an id already present", () => {
+  it("toggling an already-selected favourite deselects it", async () => {
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
-    act(() => result.current.toggleDraft("red"))
-    act(() => result.current.toggleDraft("red"))
-    expect(result.current.draftIds).toEqual([])
+    act(() => result.current.toggleFavourite("red"))
+    act(() => result.current.toggleFavourite("red"))
+    expect(result.current.selectedIds).toEqual([])
   })
 
-  it("filteredItems filters by search", () => {
+  it("chips stack — multi-select is the picker's own grammar", async () => {
+    const { result } = renderHook(() => usePledgeDialog(baseOptions))
+    act(() => result.current.toggleFavourite("red"))
+    act(() => result.current.toggleFavourite("blue"))
+    expect(result.current.selectedIds).toEqual(["red", "blue"])
+  })
+
+  it("handleNext with nothing selected advances — the Give anyway path", async () => {
+    // Inverted 2026-08-17: giving without backing anything is a shape the
+    // product already has; the pledge lands with a total and no allocations.
+    const { result } = renderHook(() => usePledgeDialog(baseOptions))
+    await act(async () => result.current.handleNext())
+    expect(result.current.step).toBe(2)
+    expect(result.current.selectedIds).toEqual([])
+  })
+
+  it("removeFavourite deselects from step 2's lines", async () => {
+    const { result } = renderHook(() => usePledgeDialog(baseOptions))
+    act(() => result.current.toggleFavourite("red"))
+    await act(async () => result.current.handleNext())
+    act(() => result.current.removeFavourite("red"))
+    expect(result.current.selectedIds).toEqual([])
+    expect(result.current.step).toBe(2)
+  })
+
+  it("filteredItems filters by search", async () => {
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
     act(() => result.current.setSearch("re"))
     expect(result.current.filteredItems.map((i) => i.id)).toContain("red")
     expect(result.current.filteredItems.map((i) => i.id)).not.toContain("blue")
+  })
+
+  it("handleAdd auto-selects the new favourite and stays on step 1", async () => {
+    const onAddItem = vi.fn().mockResolvedValue("new-fav")
+    const { result } = renderHook(() =>
+      usePledgeDialog({ ...baseOptions, onAddItem })
+    )
+    act(() => result.current.setSearch("Marmalade"))
+    await act(async () => result.current.handleAdd())
+    expect(onAddItem).toHaveBeenCalledWith("Marmalade")
+    expect(result.current.selectedIds).toEqual(["new-fav"])
+    expect(result.current.step).toBe(1)
+    expect(result.current.search).toBe("")
+    // The optimistic row carries the label into the breakdown
+    act(() => result.current.updatePledgeAmount("10"))
+    expect(result.current.favouriteBreakdown).toEqual([
+      { id: "new-fav", label: "Marmalade", amount: 10 },
+    ])
+  })
+
+  it("a failed add surfaces addError and stays on step 1", async () => {
+    const onAddItem = vi.fn().mockRejectedValue(new Error("Too many"))
+    const { result } = renderHook(() =>
+      usePledgeDialog({ ...baseOptions, onAddItem })
+    )
+    act(() => result.current.setSearch("Marmalade"))
+    await act(async () => result.current.handleAdd())
+    expect(result.current.addError).toBe("Too many")
+    expect(result.current.step).toBe(1)
+    expect(result.current.selectedIds).toEqual([])
   })
 })
 
@@ -159,25 +205,18 @@ describe("usePledgeDialog — step 1 picker draft", () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("usePledgeDialog — step navigation", () => {
-  it("handleNext at step 1 commits draftIds and advances to step 2", async () => {
+  it("handleBack from step 2 keeps the selection and returns to step 1", async () => {
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
-    act(() => result.current.toggleDraft("red"))
-    await act(async () => result.current.handleNext())
-    expect(result.current.step).toBe(2)
-  })
-
-  it("handleBack from step 2 restores draft and returns to step 1", async () => {
-    const { result } = renderHook(() => usePledgeDialog(baseOptions))
-    act(() => result.current.toggleDraft("red"))
+    act(() => result.current.toggleFavourite("red"))
     await act(async () => result.current.handleNext())
     act(() => result.current.handleBack())
     expect(result.current.step).toBe(1)
-    expect(result.current.draftIds).toEqual(["red"])
+    expect(result.current.selectedIds).toEqual(["red"])
   })
 
   it("card path prices the intent at step 2 and advances to the review", async () => {
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
-    act(() => result.current.toggleDraft("blue"))
+    act(() => result.current.toggleFavourite("blue"))
     await act(async () => result.current.handleNext())
     act(() => result.current.updatePledgeAmount("10"))
     await act(async () => result.current.handleNext())
@@ -195,7 +234,7 @@ describe("usePledgeDialog — step navigation", () => {
 
   it("handleBack from the review clears clientSecret, returns to step 2", async () => {
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
-    act(() => result.current.toggleDraft("blue"))
+    act(() => result.current.toggleFavourite("blue"))
     await act(async () => result.current.handleNext())
     act(() => result.current.updatePledgeAmount("10"))
     await act(async () => result.current.handleNext())
@@ -205,13 +244,13 @@ describe("usePledgeDialog — step navigation", () => {
     expect(result.current.pledgeClientSecret).toBeNull()
   })
 
-  it("handleClose resets to step 1 and clears draftIds", async () => {
+  it("handleClose resets to step 1 and clears the selection", async () => {
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
-    act(() => result.current.toggleDraft("red"))
+    act(() => result.current.toggleFavourite("red"))
     await act(async () => result.current.handleNext())
     act(() => result.current.handleClose())
     expect(result.current.step).toBe(1)
-    expect(result.current.draftIds).toEqual([])
+    expect(result.current.selectedIds).toEqual([])
   })
 })
 
@@ -220,25 +259,25 @@ describe("usePledgeDialog — step navigation", () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("usePledgeDialog — favouriteBreakdown", () => {
-  it("returns empty when no selections", () => {
+  it("returns empty when no selections", async () => {
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
     expect(result.current.favouriteBreakdown).toEqual([])
   })
 
   it("single selection gets 100% of pledge", async () => {
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
-    act(() => result.current.toggleDraft("red"))
+    act(() => result.current.toggleFavourite("red"))
     await act(async () => result.current.handleNext())
     act(() => result.current.updatePledgeAmount("10"))
     expect(result.current.favouriteBreakdown).toEqual([
-      { label: "Red", amount: 10 },
+      { id: "red", label: "Red", amount: 10 },
     ])
   })
 
   it("two selections split evenly", async () => {
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
-    act(() => result.current.toggleDraft("red"))
-    act(() => result.current.toggleDraft("blue"))
+    act(() => result.current.toggleFavourite("red"))
+    act(() => result.current.toggleFavourite("blue"))
     await act(async () => result.current.handleNext())
     act(() => result.current.updatePledgeAmount("10"))
     const breakdown = result.current.favouriteBreakdown
@@ -251,7 +290,7 @@ describe("usePledgeDialog — favouriteBreakdown", () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("usePledgeDialog — two-part entry (favourites + fund)", () => {
-  it("favourites and fund are independent additive parts", () => {
+  it("favourites and fund are independent additive parts", async () => {
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
     act(() => result.current.handleFavChange("20"))
     act(() => result.current.handleFundChange("5"))
@@ -260,7 +299,7 @@ describe("usePledgeDialog — two-part entry (favourites + fund)", () => {
     expect(result.current.fundPart).toBe(5)
   })
 
-  it("setFavShare rebalances the sum without changing it (slider)", () => {
+  it("setFavShare rebalances the sum without changing it (slider)", async () => {
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
     act(() => result.current.handleFavChange("20"))
     act(() => result.current.handleFundChange("5"))
@@ -274,7 +313,7 @@ describe("usePledgeDialog — two-part entry (favourites + fund)", () => {
 
   it("keeps a picked favourite at least £1 of worth", async () => {
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
-    act(() => result.current.toggleDraft("red"))
+    act(() => result.current.toggleFavourite("red"))
     await act(async () => result.current.handleNext())
     act(() => result.current.handleFavChange("20"))
     act(() => result.current.setFavShare(0))
@@ -282,7 +321,7 @@ describe("usePledgeDialog — two-part entry (favourites + fund)", () => {
     expect(result.current.topUpAmount).toBe("19")
   })
 
-  it("switching to the shared-fund tab zeroes the fund part", () => {
+  it("switching to the shared-fund tab zeroes the fund part", async () => {
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
     act(() => result.current.handleFavChange("20"))
     act(() => result.current.handleFundChange("2"))
@@ -309,7 +348,7 @@ describe("usePledgeDialog — shared pot path", () => {
         onPledgeSuccess,
       })
     )
-    act(() => result.current.toggleDraft("red"))
+    act(() => result.current.toggleFavourite("red"))
     await act(async () => result.current.handleNext())
     act(() => result.current.updatePledgeAmount("10"))
     act(() => result.current.toggleFund())
@@ -329,7 +368,7 @@ describe("usePledgeDialog — payment success", () => {
     const { result } = renderHook(() =>
       usePledgeDialog({ ...baseOptions, onPledgeSuccess })
     )
-    act(() => result.current.toggleDraft("red"))
+    act(() => result.current.toggleFavourite("red"))
     await act(async () => result.current.handleNext())
     act(() => result.current.updatePledgeAmount("10"))
     await act(async () => result.current.handleNext()) // → review
@@ -347,7 +386,7 @@ describe("usePledgeDialog — payment success", () => {
 describe("usePledgeDialog — review tip", () => {
   it("updateTip re-prices the PaymentIntent with the new tip", async () => {
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
-    act(() => result.current.toggleDraft("red"))
+    act(() => result.current.toggleFavourite("red"))
     await act(async () => result.current.handleNext())
     act(() => result.current.updatePledgeAmount("10"))
     await act(async () => result.current.handleNext())

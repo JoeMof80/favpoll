@@ -74,15 +74,20 @@ export function useFavpollContent({
     // flags the favourite for review instead.
     if (poll.topics.is_finite || isClosed) return undefined
     const isOrganiser = clerkUserId === favpoll.created_by
+    // Returns the favourite's id so the pledge picker can auto-pick it
+    // (tap-advance grammar, 2026-09-16) — router.refresh reconciles the
+    // optimistic local item with the real row.
     if (isOrganiser) {
       return async (label: string) => {
-        await addOrganizerItem(favpoll.id, label)
+        const id = await addOrganizerItem(favpoll.id, label)
         router.refresh()
+        return id
       }
     }
     return async (label: string) => {
-      await addGuestItem(poll.id, poll.topic_id, label)
+      const id = await addGuestItem(poll.id, poll.topic_id, label)
       router.refresh()
+      return id
     }
   }
 

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Chip } from "@/components/ui/chip"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
@@ -76,6 +77,12 @@ export function TopicItemsDialog({
             {heading}
           </p>
           <div className="flex items-center gap-2">
+            {/* Field-not-subtitle treatment (2026-09-16), shared across
+                the picker overlays */}
+            <Search
+              className="size-4 shrink-0 text-muted-foreground/50"
+              aria-hidden="true"
+            />
             <input
               type="text"
               autoFocus={hasFinePointer()}

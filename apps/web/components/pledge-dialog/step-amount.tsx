@@ -5,11 +5,11 @@ import { Slider } from "@/components/ui/slider"
 import { Button } from "@/components/ui/button"
 import { InputGroup, InputGroupAddon } from "@/components/ui/input-group"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Sparkles } from "lucide-react"
+import { Sparkles, X } from "lucide-react"
 
 const PRESETS = [5, 10, 20, 50]
 
-type FavouriteBreakdownLine = { label: string; amount: number }
+type FavouriteBreakdownLine = { id?: string; label: string; amount: number }
 
 type HeaderProps = {
   pledgeAmount: string
@@ -174,6 +174,8 @@ type Props = {
   fundPart?: number
   /** Set the favourites' share of the current sum (the slider). */
   onFavShare?: (pounds: number) => void
+  /** Remove a favourite line without returning to the picker. */
+  onRemoveFavourite?: (id: string) => void
 }
 
 /**
@@ -193,12 +195,17 @@ export function StepAmount({
   favouriteBreakdown = [],
   fundPart = 0,
   onFavShare,
+  onRemoveFavourite,
 }: Props) {
   const numericFav = parseFloat(pledgeAmount)
   const favShare = !isNaN(numericFav) && numericFav > 0 ? numericFav : 0
   const total = Math.round((favShare + fundPart) * 100) / 100
+  // Visible from £0 (founder, 2026-09-16): the slider and the list no
+  // longer wait for an amount — everything renders at £0 and re-prices
+  // live, so the step's shape never jumps as the figure lands. No default
+  // amount: presuming the gift's size fights "pledge its worth".
   const showSplit =
-    !useSharedFund && !!onFavShare && total > 0 && favouriteBreakdown.length > 0
+    !useSharedFund && !!onFavShare && favouriteBreakdown.length > 0
   return (
     <div className="px-5 py-4">
       <div className="flex flex-col gap-5">
@@ -211,6 +218,8 @@ export function StepAmount({
             min={0}
             max={Math.max(1, total)}
             step={1}
+            // A dead slider must not pretend (£0 = nothing to rebalance)
+            disabled={total === 0}
             onValueChange={([v]) => onFavShare!(v)}
             aria-label="Pounds to your favourites"
             trackClassName="bg-chart-3/40"
@@ -284,22 +293,44 @@ export function StepAmount({
           </Tabs>
         )}
 
-        {/* The list, re-pricing live as either figure moves */}
+        {/* The list, re-pricing live as either figure moves — each line
+            carries a remove ×; adding more means Back to the picker. */}
         {showSplit && (
           <div className="space-y-3 border-t border-border pt-4">
             {favouriteBreakdown.map((line, i) => (
-              <div key={i} className="flex justify-between">
-                <span className="text-base">{line.label}</span>
+              <div key={line.id ?? i} className="flex items-center gap-2">
+                <span className="min-w-0 flex-1 truncate text-base">
+                  {line.label}
+                </span>
                 <span className="text-base font-semibold tabular-nums">
                   {formatPoundsExact(line.amount)}
                 </span>
+                {onRemoveFavourite && line.id && (
+                  <Button
+                    type="button"
+                    size="icon-sm"
+                    variant="ghost"
+                    aria-label={`Remove ${line.label}`}
+                    className="-mr-2 text-muted-foreground"
+                    onClick={() => onRemoveFavourite(line.id!)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
             ))}
-            <div className="flex justify-between">
-              <span className="text-base">Shared pot</span>
+            <div className="flex items-center gap-2">
+              <span className="min-w-0 flex-1 truncate text-base">
+                Shared pot
+              </span>
               <span className="text-base font-semibold tabular-nums">
                 {formatPoundsExact(fundPart)}
               </span>
+              {/* Spacer matching the favourite lines' remove × (size-7,
+                  -mr-2) so every amount sits in the same column */}
+              {onRemoveFavourite && (
+                <span aria-hidden className="-mr-2 size-7 shrink-0" />
+              )}
             </div>
           </div>
         )}

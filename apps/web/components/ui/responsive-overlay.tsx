@@ -79,6 +79,20 @@ type Props = {
    * for multi-step flows.
    */
   mobileBack?: { label?: string; onClick: () => void; disabled?: boolean }
+  /**
+   * Fullscreen mobile only: suppress the top title bar entirely (title
+   * stays sr-only). For steps whose header slot already carries the ask
+   * as an eyebrow — a visible title above it said the same thing twice
+   * (founder, 2026-09-16). Ignored when the bar holds actions.
+   */
+  hideMobileTitleBar?: boolean
+  /**
+   * Render the title sr-only with NO header slot — for steps whose ask
+   * lives inside the scrolling body (an eyebrow that should scroll away
+   * rather than pin; the header slot is outside the scroll container).
+   * Desktop dialog + plain sheet; fullscreen uses hideMobileTitleBar.
+   */
+  hideTitle?: boolean
 }
 
 // iOS pins fixed bottom sheets to the LAYOUT viewport, and the keyboard
@@ -87,13 +101,27 @@ type Props = {
 // picker's min-h floor was the special case of the same bug). Measure the
 // keyboard via visualViewport and lift the sheet above it — the general
 // fix, inherited by every dialog.
-function useKeyboardInset() {
+function useKeyboardInset(counteractViewportScroll = false) {
   const [inset, setInset] = useState(0)
   useEffect(() => {
     const vv = window.visualViewport
     if (!vv) return
-    const update = () =>
+    const update = () => {
       setInset(Math.max(0, window.innerHeight - vv.height - vv.offsetTop))
+      // iOS also SCROLLS the visual viewport (offsetTop > 0) to lift a
+      // focused input — but fixed sheets stay pinned to the LAYOUT
+      // viewport, so the sheet's top slides off-screen unreachably
+      // (found on-device, 2026-09-16, step-3 email focus). While a
+      // fullscreen sheet is open we CANCEL that shift: the sheet's own
+      // scroll body + keyboard padding keep the input visible, so the
+      // viewport must stay put. (Translating the sheet to follow the
+      // shift was tried first and feeds back — the input moves with the
+      // sheet, iOS scrolls again, and the two chase each other off the
+      // screen.)
+      if (counteractViewportScroll && vv.offsetTop > 0) {
+        window.scrollTo(0, 0)
+      }
+    }
     update()
     vv.addEventListener("resize", update)
     vv.addEventListener("scroll", update)
@@ -101,7 +129,7 @@ function useKeyboardInset() {
       vv.removeEventListener("resize", update)
       vv.removeEventListener("scroll", update)
     }
-  }, [])
+  }, [counteractViewportScroll])
   return inset
 }
 
@@ -140,9 +168,13 @@ export function ResponsiveOverlay({
   fullscreenOnMobile = false,
   mobileSave,
   mobileBack,
+  hideMobileTitleBar = false,
+  hideTitle = false,
 }: Props) {
   const isMobile = useIsMobile()
-  const keyboardInset = useKeyboardInset()
+  // Counteract iOS's focus scroll only while a fullscreen sheet is OPEN —
+  // globally it would fight normal page inputs.
+  const keyboardInset = useKeyboardInset(open && isMobile && fullscreenOnMobile)
 
   if (isMobile && fullscreenOnMobile) {
     return (
@@ -174,45 +206,51 @@ export function ResponsiveOverlay({
               footer prop is dropped; without it the bar is a plain centred
               title and the consumer's footer renders at the bottom — for
               multi-step / search flows whose footers carry the navigation
-              (Cancel · Next, Back · Pledge). */}
-          <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border px-2 py-1.5">
-            {mobileBack ? (
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={mobileBack.onClick}
-                disabled={mobileBack.disabled}
-              >
-                {mobileBack.label ?? "Back"}
-              </Button>
-            ) : mobileSave ? (
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => onOpenChange(false)}
-              >
-                Cancel
-              </Button>
-            ) : (
-              <span aria-hidden className="w-16" />
-            )}
-            <SheetTitle className="min-w-0 truncate py-1.5 text-base font-medium">
-              {title}
-            </SheetTitle>
-            {mobileSave ? (
-              <Button
-                type={mobileSave.form ? "submit" : "button"}
-                form={mobileSave.form}
-                onClick={mobileSave.onClick}
-                disabled={mobileSave.disabled}
-              >
-                {mobileSave.label ?? "Save"}
-              </Button>
-            ) : (
-              // Balance the bar so the title stays centred
-              <span aria-hidden className="w-16" />
-            )}
-          </div>
+              (Cancel · Next, Back · Pledge). An action-less bar can be
+              suppressed entirely (hideMobileTitleBar) when the header slot
+              already carries the ask. */}
+          {hideMobileTitleBar && !mobileBack && !mobileSave ? (
+            <SheetTitle className="sr-only">{title}</SheetTitle>
+          ) : (
+            <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border px-2 py-1.5">
+              {mobileBack ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={mobileBack.onClick}
+                  disabled={mobileBack.disabled}
+                >
+                  {mobileBack.label ?? "Back"}
+                </Button>
+              ) : mobileSave ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => onOpenChange(false)}
+                >
+                  Cancel
+                </Button>
+              ) : (
+                <span aria-hidden className="w-16" />
+              )}
+              <SheetTitle className="min-w-0 truncate py-1.5 text-base font-medium">
+                {title}
+              </SheetTitle>
+              {mobileSave ? (
+                <Button
+                  type={mobileSave.form ? "submit" : "button"}
+                  form={mobileSave.form}
+                  onClick={mobileSave.onClick}
+                  disabled={mobileSave.disabled}
+                >
+                  {mobileSave.label ?? "Save"}
+                </Button>
+              ) : (
+                // Balance the bar so the title stays centred
+                <span aria-hidden className="w-16" />
+              )}
+            </div>
+          )}
           {description && (
             <SheetDescription className="sr-only">
               {description}
@@ -272,7 +310,11 @@ export function ResponsiveOverlay({
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
           <SheetHeader
-            className={`shrink-0 ${separators ? "border-b border-border" : ""} ${headerClassName ?? "px-4 py-4"}`}
+            className={
+              !header && hideTitle
+                ? "sr-only"
+                : `shrink-0 ${separators ? "border-b border-border" : ""} ${headerClassName ?? "px-4 py-4"}`
+            }
           >
             {header ? (
               <>
@@ -280,7 +322,9 @@ export function ResponsiveOverlay({
                 {header}
               </>
             ) : (
-              <SheetTitle>{title}</SheetTitle>
+              <SheetTitle className={hideTitle ? "sr-only" : undefined}>
+                {title}
+              </SheetTitle>
             )}
             {!header && description && (
               <SheetDescription>{description}</SheetDescription>
@@ -320,7 +364,11 @@ export function ResponsiveOverlay({
         showCloseButton={!hideCloseButton}
       >
         <DialogHeader
-          className={`shrink-0 ${separators ? "border-b border-border" : ""} ${headerClassName ?? "px-5 py-4"}`}
+          className={
+            !header && hideTitle
+              ? "sr-only"
+              : `shrink-0 ${separators ? "border-b border-border" : ""} ${headerClassName ?? "px-5 py-4"}`
+          }
         >
           {header ? (
             <>
@@ -328,7 +376,9 @@ export function ResponsiveOverlay({
               {header}
             </>
           ) : (
-            <DialogTitle>{title}</DialogTitle>
+            <DialogTitle className={hideTitle ? "sr-only" : undefined}>
+              {title}
+            </DialogTitle>
           )}
           {!header && description && (
             <DialogDescription>{description}</DialogDescription>

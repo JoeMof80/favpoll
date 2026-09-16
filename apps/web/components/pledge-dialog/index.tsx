@@ -9,7 +9,7 @@ import type {
   PotAllocation,
 } from "@favpoll/types"
 import { usePledgeDialog } from "./use-pledge-dialog"
-import { PickerHeader, PickerItems } from "./step-pick-favourites"
+import { PickerHeader, PickerPills } from "./step-pick-favourites"
 import { StepAmount, StepAmountHeader } from "./step-amount"
 import { StepPay } from "./step-pay"
 import { PollHeading } from "../poll-heading"
@@ -23,7 +23,8 @@ type Props = {
   pot: FavpollPot | null
   userPotAllocation: PotAllocation | null
   onPledgeSuccess?: (guestToken?: string) => void
-  onAddItem?: (label: string) => Promise<void>
+  /** Resolves to the new favourite's id so the picker can auto-pick it */
+  onAddItem?: (label: string) => Promise<string | void>
   /** false defaults the contribution to None (memorials) */
   suggestTip?: boolean
   isListed?: boolean
@@ -126,24 +127,23 @@ export function PledgeDialog({
     />
   )
 
-  // Step 1 header: the chip+search picker field
+  // Step 1 header: the search field (charity-picker idiom, 2026-09-16 —
+  // a tap in the list picks and advances, so the header is search alone)
   const step1Header = (
     <PickerHeader
       search={dialog.search}
       onSearchChange={dialog.setSearch}
       onAdd={dialog.handleAdd}
-      draftIds={dialog.draftIds}
-      items={pollWithItems.topics.favourites}
-      onDeselect={dialog.toggleDraft}
       topicTitle={topicTitle}
       showCreate={dialog.showCreate}
       canAdd={dialog.canAdd}
-      addingItem={dialog.addingItem}
     />
   )
 
-  // Step 1 footer — Cancel gives the dialog a visible exit (the × is
-  // hidden and outside-click dismissal has no affordance)
+  // Step 1 footer — chips toggle, the primary commits. Its label carries
+  // the state: "Next" with a selection; with none it IS the
+  // no-favourite exit ("a gift with no favourite attached", 2026-08-17),
+  // so the can't-decide guest sees their way forward immediately.
   const step1Footer = (
     <div className="flex gap-3">
       <Button
@@ -157,10 +157,9 @@ export function PledgeDialog({
       <Button
         type="button"
         className="h-11 flex-1 text-base"
-        disabled={!dialog.canAdvanceStep1}
         onClick={() => dialog.handleNext()}
       >
-        Next →
+        {dialog.selectedIds.length > 0 ? "Next" : "Give without picking"}
       </Button>
     </div>
   )
@@ -174,17 +173,17 @@ export function PledgeDialog({
     ? "Processing…"
     : dialog.useSharedFund
       ? "Pledge"
-      : "Next →"
+      : "Next"
 
   const step2Footer = (
     <div className="flex gap-3">
       <Button
         type="button"
-        variant="outline"
+        variant="ghost"
         className="h-11 flex-1 md:text-base"
         onClick={dialog.handleBack}
       >
-        ← Back
+        Back
       </Button>
       <Button
         type="button"
@@ -208,12 +207,12 @@ export function PledgeDialog({
     <div className="flex gap-3">
       <Button
         type="button"
-        variant="outline"
+        variant="ghost"
         className="h-11 flex-1 md:text-base"
         disabled={stripeSubmitting}
         onClick={dialog.handleBack}
       >
-        ← Back
+        Back
       </Button>
       <Button
         type="submit"
@@ -252,8 +251,12 @@ export function PledgeDialog({
             ? step1Header
             : dialog.step === 2
               ? step2Header
-              : undefined
+              : // Step 3's eyebrow lives INSIDE the scrolling body (the
+                // header slot pins, which is right for search fields and
+                // wrong for a label — founder, 2026-09-16)
+                undefined
         }
+        hideTitle
         /* Transactions commit at the BOTTOM (overlay doctrine,
            2026-09-15): the pledge flow is a checkout, so Back/Next/Pay
            live in a bottom footer on every viewport — the big bottom
@@ -262,26 +265,33 @@ export function PledgeDialog({
            inset keeps the footer above the keys. */
         footer={footerByStep[dialog.step]}
         fullscreenOnMobile
-        headerClassName={
-          dialog.step === 1 || dialog.step === 2 ? "p-0" : "px-5 py-4"
-        }
+        /* Step 1's search header gets a hairline + air before the pills —
+           the field-not-subtitle treatment (founder, 2026-09-16). ALL
+           steps suppress the mobile title bar: every step's header slot
+           carries its ask as an eyebrow (step 3 gets a plain eyebrow),
+           so a visible title above it said the same thing twice. */
+        separators={dialog.step === 1}
+        hideMobileTitleBar
+        headerClassName={dialog.step === 1 ? "px-5 pt-4 pb-3" : "p-0"}
         bodyClassName="p-0"
         dialogContentClassName="flex-1 overflow-y-auto"
       >
         {dialog.step === 1 && (
-          // min-h: searching filters the chips down and the bottom sheet
+          // min-h: searching filters the pills down and the bottom sheet
           // would shrink with them — on iOS the whole sheet then sinks
           // behind the keyboard. A stable floor keeps the input in view.
-          <div className="flex min-h-80 flex-col gap-2 px-5 pt-1 pb-4">
-            <PickerItems
+          <div className="min-h-80 px-5 pt-4 pb-4">
+            <PickerPills
               filteredItems={dialog.filteredItems}
-              draftIds={dialog.draftIds}
+              selectedIds={dialog.selectedIds}
               showCreate={dialog.showCreate}
               search={dialog.search}
+              addingItem={dialog.addingItem}
+              addError={dialog.addError}
               isInfinite={!pollWithItems.topics.is_finite}
               hasAddItem={!!onAddItem}
-              onToggle={dialog.toggleDraft}
-              addError={dialog.addError}
+              onToggle={dialog.toggleFavourite}
+              onAdd={dialog.handleAdd}
             />
           </div>
         )}
@@ -297,9 +307,15 @@ export function PledgeDialog({
             favouriteBreakdown={dialog.favouriteBreakdown}
             fundPart={dialog.fundPart}
             onFavShare={dialog.setFavShare}
+            onRemoveFavourite={dialog.removeFavourite}
           />
         )}
 
+        {dialog.step === 3 && dialog.pledgeClientSecret && (
+          <p className="px-5 pt-4 text-xs font-medium tracking-widest text-muted-foreground uppercase">
+            Review &amp; pay
+          </p>
+        )}
         {dialog.step === 3 && dialog.pledgeClientSecret && (
           <StepPay
             clientSecret={dialog.pledgeClientSecret}

@@ -23,7 +23,7 @@ import {
 } from "@/lib/display"
 import {
   PickerHeader,
-  PickerItems,
+  PickerPills,
 } from "@/components/pledge-dialog/step-pick-favourites"
 import {
   StepAmount,
@@ -194,7 +194,7 @@ export function DemoCard({
   const nextHover = phase === "next-hover"
   const nextPressed = phase === "next-pressed"
   const nextEnabled = chipSelected
-  const draftIds = chipSelected ? [selected.id] : []
+  const selectedIds = chipSelected ? [selected.id] : []
 
   const amountOpen =
     phase === "pledge-panel" ||
@@ -677,35 +677,27 @@ export function DemoCard({
                     transition={{ duration: 0.18 }}
                     className="flex min-h-0 flex-1 flex-col"
                   >
-                    {/* No wrapper padding — PickerHeader's InputGroup owns its
-                        own since the block-start eyebrow landed (#381) */}
-                    <div className="shrink-0">
-                      {/* draftIds intentionally empty here so the selected chip
-                          does NOT appear in the search bar; the grid below still
-                          highlights the selection. */}
+                    <div className="shrink-0 px-5 pt-4 pb-2">
                       <PickerHeader
                         search=""
                         onSearchChange={() => {}}
                         onAdd={() => {}}
-                        draftIds={[]}
-                        items={items}
-                        onDeselect={() => {}}
                         topicTitle={topicTitle}
                         showCreate={false}
-                        canAdd={false}
-                        addingItem={false}
                       />
                     </div>
                     <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-2">
-                      <PickerItems
+                      <PickerPills
                         filteredItems={items}
-                        draftIds={draftIds}
+                        selectedIds={selectedIds}
                         showCreate={false}
                         search=""
+                        addingItem={false}
+                        addError={null}
                         isInfinite={false}
                         hasAddItem={false}
                         onToggle={() => {}}
-                        addError={null}
+                        onAdd={() => {}}
                       />
                     </div>
                     {/* Bottom Next only in the browser dialog — on a
