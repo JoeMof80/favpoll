@@ -15,6 +15,9 @@ type Props = {
   showItemsSection: boolean
   onEdit: () => void
   onOpenItemsDialog: () => void
+  /** Opens the dedicated add-your-own-topic overlay (option E,
+      2026-09-16) — adding lives on the CARD, the picker is pure select. */
+  onAddOwn?: () => void
   /** Locked mode (founder, 2026-09-06): the edit icon becomes a lock,
       the add affordances go quiet, and the reason sits under a divider
       — the WizardCharityCard treatment. */
@@ -28,6 +31,7 @@ export function WizardTopicCard({
   showItemsSection,
   onEdit,
   onOpenItemsDialog,
+  onAddOwn,
   lockedReason,
 }: Props) {
   const locked = !!lockedReason
@@ -85,11 +89,20 @@ export function WizardTopicCard({
               </Chip>
             )
           ) : (
-            <Chip size="lg" onClick={onOpenItemsDialog}>
-              {!topic.isCustom && sortedExistingItems.length > 5
-                ? `+${sortedExistingItems.length - 5} more`
-                : "+ Add"}
-            </Chip>
+            <>
+              {!topic.isCustom && sortedExistingItems.length > 5 && (
+                <Chip size="lg" onClick={onOpenItemsDialog}>
+                  +{sortedExistingItems.length - 5} more
+                </Chip>
+              )}
+              {/* "+ Add" on EVERY unlocked topic (founder, 2026-09-17):
+                  catalogue topics take your own options too
+                  (customLabels), but the affordance was hidden inside
+                  "+N more" — which promises viewing, not adding. */}
+              <Chip size="lg" onClick={onOpenItemsDialog}>
+                + Add
+              </Chip>
+            </>
           )}
           {!locked && topic.isCustom && customLabels.length < 2 && (
             <span className="text-xs text-muted-foreground">
@@ -100,10 +113,21 @@ export function WizardTopicCard({
           )}
         </div>
       )}
-      {locked && (
+      {locked ? (
         <p className="border-t border-border pt-3 text-sm text-muted-foreground">
           {lockedReason}
         </p>
+      ) : (
+        onAddOwn &&
+        !topic.isCustom && (
+          <button
+            type="button"
+            onClick={onAddOwn}
+            className="border-t border-border pt-3 text-left text-sm text-primary hover:underline"
+          >
+            + Add your own topic
+          </button>
+        )
       )}
     </div>
   )

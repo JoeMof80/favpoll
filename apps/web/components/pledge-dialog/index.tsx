@@ -9,7 +9,11 @@ import type {
   PotAllocation,
 } from "@favpoll/types"
 import { usePledgeDialog } from "./use-pledge-dialog"
-import { PickerHeader, PickerPills } from "./step-pick-favourites"
+import {
+  PickerHeader,
+  PickerPills,
+  AddFavouriteView,
+} from "./step-pick-favourites"
 import { StepAmount, StepAmountHeader } from "./step-amount"
 import { StepPay } from "./step-pay"
 import { PollHeading } from "../poll-heading"
@@ -127,24 +131,48 @@ export function PledgeDialog({
     />
   )
 
-  // Step 1 header: the search field (charity-picker idiom, 2026-09-16 —
-  // a tap in the list picks and advances, so the header is search alone)
-  const step1Header = (
+  // Step 1 has TWO views (option C, 2026-09-16): the pure-select picker,
+  // and the focused add view the list-end row opens.
+  const inAddView = dialog.step === 1 && dialog.pickerView === "add"
+
+  const step1Header = inAddView ? undefined : (
     <PickerHeader
       search={dialog.search}
       onSearchChange={dialog.setSearch}
-      onAdd={dialog.handleAdd}
       topicTitle={topicTitle}
-      showCreate={dialog.showCreate}
       canAdd={dialog.canAdd}
+      onEnterAdd={dialog.enterAddView}
     />
   )
 
-  // Step 1 footer — chips toggle, the primary commits. Its label carries
-  // the state: "Next" with a selection; with none it IS the
-  // no-favourite exit ("a gift with no favourite attached", 2026-08-17),
-  // so the can't-decide guest sees their way forward immediately.
-  const step1Footer = (
+  // Select view footer — chips toggle, the primary commits. Its label
+  // carries the state: "Next" with a selection; with none it IS the
+  // no-favourite exit ("a gift with no favourite attached", 2026-08-17).
+  // Add view footer — Back | Add ‘X’, disabled until there's text.
+  const step1Footer = inAddView ? (
+    <div className="flex gap-3">
+      <Button
+        type="button"
+        variant="ghost"
+        className="h-11 flex-1 md:text-base"
+        onClick={() => dialog.exitAddView()}
+      >
+        Back
+      </Button>
+      <Button
+        type="button"
+        className="h-11 flex-1 text-base"
+        disabled={!dialog.addText.trim() || dialog.addingItem}
+        onClick={() => dialog.handleAdd()}
+      >
+        {dialog.addingItem
+          ? "Adding…"
+          : dialog.addText.trim()
+            ? `Add ${dialog.addText.trim()}`
+            : "Add"}
+      </Button>
+    </div>
+  ) : (
     <div className="flex gap-3">
       <Button
         type="button"
@@ -270,13 +298,15 @@ export function PledgeDialog({
            steps suppress the mobile title bar: every step's header slot
            carries its ask as an eyebrow (step 3 gets a plain eyebrow),
            so a visible title above it said the same thing twice. */
-        separators={dialog.step === 1}
+        separators={dialog.step === 1 && !inAddView}
         hideMobileTitleBar
-        headerClassName={dialog.step === 1 ? "px-5 pt-4 pb-3" : "p-0"}
+        headerClassName={
+          dialog.step === 1 && !inAddView ? "px-5 pt-4 pb-3" : "p-0"
+        }
         bodyClassName="p-0"
         dialogContentClassName="flex-1 overflow-y-auto"
       >
-        {dialog.step === 1 && (
+        {dialog.step === 1 && !inAddView && (
           // min-h: searching filters the pills down and the bottom sheet
           // would shrink with them — on iOS the whole sheet then sinks
           // behind the keyboard. A stable floor keeps the input in view.
@@ -284,13 +314,21 @@ export function PledgeDialog({
             <PickerPills
               filteredItems={dialog.filteredItems}
               selectedIds={dialog.selectedIds}
-              showCreate={dialog.showCreate}
               search={dialog.search}
-              addingItem={dialog.addingItem}
-              addError={dialog.addError}
               isInfinite={!pollWithItems.topics.is_finite}
               hasAddItem={!!onAddItem}
               onToggle={dialog.toggleFavourite}
+            />
+          </div>
+        )}
+        {inAddView && (
+          <div className="min-h-80">
+            <AddFavouriteView
+              topicTitle={topicTitle}
+              addText={dialog.addText}
+              onAddTextChange={dialog.setAddText}
+              addingItem={dialog.addingItem}
+              addError={dialog.addError}
               onAdd={dialog.handleAdd}
             />
           </div>

@@ -7,40 +7,33 @@ import { hasFinePointer } from "@/lib/pointer"
 
 // The settled picker (founder, 2026-09-16, after a tap-advance audition):
 // chips TOGGLE — multi-select visible and self-evident — and the footer's
-// primary commits ("Next →" with a selection, "Give anyway →" with none).
-// Tap-advance was auditioned and rejected: it hid multi-pick behind step 2.
-// Adding your own is the creatable-combobox convention and nothing else:
-// the search PLACEHOLDER advertises the dual purpose ("Search or add…"),
-// and while typing an "+ Add ‘X’" pill appears whenever nothing matches
-// exactly — adding auto-selects the new chip. A standing "+ Add your own"
-// pill was also auditioned and rejected as a fake button (it only moved
-// focus; on a phone its whole effect was "the keyboard appeared").
+// primary commits ("Next" with a selection, "Give without picking" with
+// none). Tap-advance was auditioned and rejected: it hid multi-pick
+// behind step 2. ADD IS SEPARATE (option C, same day): the picker is
+// pure select; a quiet list-end row opens a focused add view (the
+// overlay swaps its content — never nested) where the act gets its
+// consequence copy. The creatable-combobox "+ Add ‘X’" pill was
+// auditioned and retired — one field doing two jobs was the muddle
+// being organised away.
 
 type PickerHeaderProps = {
   search: string
   onSearchChange: (v: string) => void
-  /** Enter in the search adds, when the add pill is showing */
-  onAdd: () => void
   topicTitle?: string
-  showCreate: boolean
-  /** Adding is possible — the placeholder advertises the combobox's
-   *  dual purpose; a finite topic stays search-only. */
+  /** Adding is possible — shows the add-entry link under the search */
   canAdd?: boolean
+  /** Opens the focused add view (seeded with the current search). */
+  onEnterAdd?: () => void
 }
 
 export function PickerHeader({
   search,
   onSearchChange,
-  onAdd,
   topicTitle,
-  showCreate,
   canAdd = false,
+  onEnterAdd,
 }: PickerHeaderProps) {
   const topic = topicTitle?.toLowerCase()
-  // The eyebrow carries the ASK (the step's title is sr-only on mobile —
-  // a visible title above this said the same thing twice), so the
-  // placeholder no longer restates the topic.
-  const placeholder = canAdd ? "Search or add your own…" : "Search…"
   return (
     <div>
       <label
@@ -63,17 +56,24 @@ export function PickerHeader({
           type="text"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && showCreate) {
-              e.preventDefault()
-              onAdd()
-            }
-          }}
           autoFocus={hasFinePointer()}
-          placeholder={placeholder}
+          placeholder="Search…"
           className="w-full bg-transparent text-lg outline-none placeholder:text-muted-foreground/50"
         />
       </div>
+      {/* The add ENTRY lives in the PINNED header (founder, 2026-09-17
+          — a list-end link sat awkwardly and sank on long topics): an
+          honest link, always visible, right where a failed search
+          leaves the eye. */}
+      {canAdd && onEnterAdd && (
+        <button
+          type="button"
+          onClick={onEnterAdd}
+          className="mt-2 block text-sm text-primary hover:underline"
+        >
+          Can&rsquo;t find yours? Add your own →
+        </button>
+      )}
     </div>
   )
 }
@@ -82,28 +82,19 @@ type PickerPillsProps = {
   filteredItems: Favourite[]
   selectedIds: string[]
   search: string
-  /** No exact match for the typed text — the "+ Add ‘X’" pill shows */
-  showCreate: boolean
-  addingItem: boolean
-  addError: string | null
   isInfinite?: boolean
   hasAddItem: boolean
   /** A tap TOGGLES the pill — commit happens in the footer. */
   onToggle: (id: string) => void
-  onAdd: () => void
 }
 
 export function PickerPills({
   filteredItems,
   selectedIds,
   search,
-  showCreate,
-  addingItem,
-  addError,
   isInfinite,
   hasAddItem,
   onToggle,
-  onAdd,
 }: PickerPillsProps) {
   const searching = search.toLowerCase().trim().length > 0
 
@@ -111,7 +102,7 @@ export function PickerPills({
     return (
       <p className="py-3 text-center text-sm text-muted-foreground">
         {isInfinite && hasAddItem
-          ? "No options yet — start typing to add one."
+          ? "No options yet — be the first to add one."
           : "No options available for this topic."}
       </p>
     )
@@ -133,35 +124,67 @@ export function PickerPills({
             {item.label}
           </Chip>
         ))}
-
-        {/* Creatable-combobox affordance: while typing with no exact
-            match, the concrete "+ Add ‘X’" pill. Discovery lives in the
-            search placeholder ("Search or add…"), never a fake button. */}
-        {showCreate && (
-          <Chip
-            size="lg"
-            className="border-dashed bg-background text-primary"
-            disabled={addingItem}
-            onMouseDown={(e) => {
-              e.preventDefault()
-              onAdd()
-            }}
-          >
-            {addingItem ? "Adding…" : `+ Add “${search.trim()}”`}
-          </Chip>
-        )}
       </div>
 
-      {searching && !showCreate && filteredItems.length === 0 && (
+      {searching && filteredItems.length === 0 && (
         <p className="py-3 text-center text-sm text-muted-foreground">
           No options found.
         </p>
       )}
-      {addError && <p className="text-xs text-destructive">{addError}</p>}
+    </div>
+  )
+}
 
-      {/* The no-favourite exit lives in the FOOTER next to Cancel
-          (founder, 2026-09-16): a list-end link sank below the fold on
-          long topics. See step1Footer in index.tsx. */}
+type AddFavouriteViewProps = {
+  topicTitle?: string
+  addText: string
+  onAddTextChange: (v: string) => void
+  addingItem: boolean
+  addError: string | null
+  /** Enter submits, when there is text */
+  onAdd: () => void
+}
+
+/** The focused add view (option C): one input, the consequence copy,
+ *  and the footer's Back | Add twins (rendered by the dialog). */
+export function AddFavouriteView({
+  topicTitle,
+  addText,
+  onAddTextChange,
+  addingItem,
+  addError,
+  onAdd,
+}: AddFavouriteViewProps) {
+  const topic = topicTitle?.toLowerCase()
+  return (
+    <div className="px-5 pt-4 pb-4">
+      <label
+        htmlFor="pledge-picker-add"
+        className="mb-2 block text-xs font-medium tracking-widest text-muted-foreground uppercase"
+      >
+        {topic ? `Add your own ${topic}` : "Add your own"}
+      </label>
+      <input
+        id="pledge-picker-add"
+        type="text"
+        value={addText}
+        onChange={(e) => onAddTextChange(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && addText.trim() && !addingItem) {
+            e.preventDefault()
+            onAdd()
+          }
+        }}
+        // The guest CHOSE to add — the keyboard is wanted, every pointer
+        autoFocus
+        placeholder="Type a favourite…"
+        className="w-full bg-transparent text-lg outline-none placeholder:text-muted-foreground/50"
+      />
+      <p className="mt-3 text-sm text-muted-foreground">
+        Your favourite joins the poll for everyone to pick, and the organiser
+        will see it.
+      </p>
+      {addError && <p className="mt-2 text-xs text-destructive">{addError}</p>}
     </div>
   )
 }

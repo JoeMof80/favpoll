@@ -70,10 +70,10 @@ export function TopicItemsDialog({
       title={heading}
       header={
         <div className="space-y-2">
-          {/* Visible title at block-start — the header slot makes the overlay
-              title sr-only, which left the dialog opening with no visible
-              question (the landing demo showed the intended shape). */}
-          <p className="text-lg font-medium tracking-tight text-foreground">
+          {/* Block-start EYEBROW carrying the ask (founder, 2026-09-17)
+              — consistent with the dialog grammar everywhere else; the
+              overlay title stays sr-only. */}
+          <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
             {heading}
           </p>
           <div className="flex items-center gap-2">

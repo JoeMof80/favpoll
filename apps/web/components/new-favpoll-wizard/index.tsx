@@ -128,24 +128,51 @@ export function NewFavpollWizard({
     pickCharity(c.id)
   }
 
-  const trimmedTopicSearch = topicSearch.trim()
-  const topicShowCreate =
-    trimmedTopicSearch.length > 0 &&
-    !data.topics
-      .filter((t) => t.is_active !== false)
-      .some((t) => t.title.toLowerCase() === trimmedTopicSearch.toLowerCase())
+  // ADD IS ITS OWN OVERLAY (founder, 2026-09-16, option E): the topic
+  // picker is pure select; "Add your own topic" lives on the CARD and
+  // opens this small dedicated overlay — the add act gets its own moment
+  // instead of hiding behind a search dead-end.
+  const [topicAddOpen, setTopicAddOpen] = useState(false)
+  const [topicAddText, setTopicAddText] = useState("")
 
   function handleCreateTopic() {
-    if (!trimmedTopicSearch) return
-    w.setTopics([
-      {
-        topicId: "",
-        title: trimmedTopicSearch,
-        isCustom: true,
-        items: [],
-        customLabels: [],
-      },
-    ])
+    const title = topicAddText.trim()
+    if (!title) return
+    // NEVER create a duplicate of a catalogue topic (founder,
+    // 2026-09-17): typing "Car" when Car exists selects the catalogue
+    // topic instead — strictly better for the organiser (real options,
+    // and canon topics feed the all-time record). Same intent, better
+    // outcome, no error to read.
+    const existing = data.topics.find(
+      (t) =>
+        t.is_active !== false && t.title.toLowerCase() === title.toLowerCase()
+    )
+    if (existing) {
+      w.setTopics([
+        {
+          topicId: existing.id,
+          title: existing.title,
+          isCustom: false,
+          items: existing.favourites.map((i) => ({
+            id: i.id,
+            label: i.label,
+          })),
+          customLabels: [],
+        },
+      ])
+    } else {
+      w.setTopics([
+        {
+          topicId: "",
+          title,
+          isCustom: true,
+          items: [],
+          customLabels: [],
+        },
+      ])
+    }
+    setTopicAddOpen(false)
+    setTopicAddText("")
     w.setTopicOpen(false)
     setTopicSearch("")
   }
@@ -281,16 +308,26 @@ export function NewFavpollWizard({
                       showItemsSection={w.showItemsSection}
                       onEdit={() => w.setTopicOpen(true)}
                       onOpenItemsDialog={() => w.setItemsDialogOpen(true)}
+                      onAddOwn={() => setTopicAddOpen(true)}
                     />
                   ) : (
-                    <Button
-                      variant="secondary"
-                      size="lg"
-                      className="h-11 w-full md:text-base"
-                      onClick={() => w.setTopicOpen(true)}
-                    >
-                      Pick a topic
-                    </Button>
+                    <div className="flex flex-col gap-2">
+                      <Button
+                        variant="secondary"
+                        size="lg"
+                        className="h-11 w-full md:text-base"
+                        onClick={() => w.setTopicOpen(true)}
+                      >
+                        Pick a topic
+                      </Button>
+                      <button
+                        type="button"
+                        onClick={() => setTopicAddOpen(true)}
+                        className="self-start text-sm text-primary hover:underline"
+                      >
+                        + Add your own topic
+                      </button>
+                    </div>
                   )}
                 </WizardStepShell>
               )}
@@ -389,22 +426,8 @@ export function NewFavpollWizard({
                   placeholder="Search topics…"
                   value={topicSearch}
                   onChange={(e) => setTopicSearch(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && topicShowCreate) {
-                      e.preventDefault()
-                      handleCreateTopic()
-                    }
-                  }}
                   className="flex-1 bg-transparent text-lg outline-none placeholder:text-muted-foreground/50"
                 />
-                {topicShowCreate && (
-                  <InputGroupButton
-                    variant="secondary"
-                    onClick={handleCreateTopic}
-                  >
-                    Add
-                  </InputGroupButton>
-                )}
               </div>
             </div>
           }
@@ -498,6 +521,85 @@ export function NewFavpollWizard({
             onSeedSearch={setCharitySearch}
             eventCategory={w.category}
           />
+        </ResponsiveOverlay>
+
+        {/* Add-your-own-topic overlay (option E, 2026-09-16): the add
+            act's own moment — one input, the consequence line, Cancel |
+            Add. Reached from the card, never from inside the picker. */}
+        <ResponsiveOverlay
+          open={topicAddOpen}
+          onOpenChange={(o) => {
+            setTopicAddOpen(o)
+            if (!o) setTopicAddText("")
+          }}
+          title="Add your own topic"
+          hideCloseButton
+          hideMobileTitleBar
+          hideTitle
+          headerClassName="p-0"
+          bodyClassName="p-0"
+          footer={
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="ghost"
+                className="h-11 flex-1 md:text-base"
+                onClick={() => {
+                  setTopicAddOpen(false)
+                  setTopicAddText("")
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                className="h-11 flex-1 md:text-base"
+                disabled={!topicAddText.trim()}
+                onClick={handleCreateTopic}
+              >
+                {topicAddText.trim()
+                  ? `Add ${topicAddText.trim()}`
+                  : "Add topic"}
+              </Button>
+            </div>
+          }
+        >
+          <div className="px-5 pt-4 pb-4">
+            <span className="mb-2 block text-xs font-medium tracking-widest text-muted-foreground uppercase">
+              Add your own topic
+            </span>
+            <input
+              type="text"
+              value={topicAddText}
+              onChange={(e) => setTopicAddText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && topicAddText.trim()) {
+                  e.preventDefault()
+                  handleCreateTopic()
+                }
+              }}
+              // The organiser CHOSE to add — the keyboard is wanted
+              autoFocus
+              placeholder={
+                // Flavoured by the Event, like the charity seed searches —
+                // each example is plausibly OFF-catalogue (the point of a
+                // custom topic)
+                w.category === "fundraiser"
+                  ? "e.g. Marathon snack"
+                  : w.category === "memorial"
+                    ? "e.g. Roast-dinner side"
+                    : w.category === "celebration"
+                      ? "e.g. Party game"
+                      : "e.g. Walking route"
+              }
+              className="w-full bg-transparent text-lg outline-none placeholder:text-muted-foreground/50"
+            />
+            <p className="mt-3 text-sm text-muted-foreground">
+              Your topic is created with this favpoll — you’ll add its options
+              next. Catalogue topics feed the all-time record; your own stays
+              yours.
+            </p>
+          </div>
         </ResponsiveOverlay>
 
         {/* Items dialog */}

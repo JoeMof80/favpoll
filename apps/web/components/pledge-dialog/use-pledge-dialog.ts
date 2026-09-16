@@ -49,6 +49,13 @@ export function usePledgeDialog({
   const [step, setStep] = useState<PledgeDialogStep>(1)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [search, setSearch] = useState("")
+  // ADD IS ITS OWN SCREEN (founder, 2026-09-16, option C): the picker is
+  // pure select; a quiet list-end row opens this focused sub-view (same
+  // overlay, swapped content — never nested), which carries the
+  // consequence copy a one-tap affordance never could ("the organiser
+  // will see this"). The search seeds the add text for continuity.
+  const [pickerView, setPickerView] = useState<"select" | "add">("select")
+  const [addText, setAddText] = useState("")
   const [addingItem, setAddingItem] = useState(false)
   const [addError, setAddError] = useState<string | null>(null)
   // Optimistic rows for guest-added favourites (the wizard's
@@ -82,17 +89,20 @@ export function usePledgeDialog({
     : sortedItems
   // Whether adding is possible AT ALL — an open topic, and a handler, which
   // the page withholds when the organiser has turned guest additions off.
-  // canAdd drives the standing "+ Add your own" pill.
+  // canAdd drives the list-end "Add your own" entry row.
   const canAdd = !!(!mergedPoll.topics.is_finite && onAddItem)
-  // Creatable-combobox rule (2026-09-16): the "+ Add ‘X’" pill shows
-  // whenever the typed text matches nothing EXACTLY — not only when the
-  // search comes back empty. Typing "Marmalade" with "Marmalade jam"
-  // present must still allow adding "Marmalade" itself.
-  const showCreate = !!(
-    canAdd &&
-    lowerSearch &&
-    !sortedItems.some((i) => i.label.toLowerCase() === lowerSearch)
-  )
+
+  function enterAddView() {
+    setAddText(search.trim())
+    setAddError(null)
+    setPickerView("add")
+  }
+
+  function exitAddView() {
+    setAddText("")
+    setAddError(null)
+    setPickerView("select")
+  }
 
   function toggleFavourite(id: string) {
     setSelectedIds((prev) =>
@@ -106,11 +116,11 @@ export function usePledgeDialog({
   }
 
   async function handleAdd() {
-    if (!onAddItem || !search.trim()) return
+    if (!onAddItem || !addText.trim()) return
     setAddingItem(true)
     setAddError(null)
     try {
-      const label = search.trim()
+      const label = addText.trim()
       const id = await onAddItem(label)
       if (id) {
         setAddedItems((prev) =>
@@ -129,13 +139,12 @@ export function usePledgeDialog({
                 } as Favourite,
               ]
         )
-        // Auto-select the new chip; clearing the search brings it into
-        // view selected — the guest stays on step 1 in control.
+        // Auto-select the new chip and return to the picker: search
+        // cleared so the chip is in view, selected.
         setSelectedIds((prev) => (prev.includes(id) ? prev : [...prev, id]))
-        setSearch("")
-      } else {
-        setSearch("")
       }
+      setSearch("")
+      exitAddView()
     } catch (err) {
       setAddError(err instanceof Error ? err.message : "Failed to add")
     } finally {
@@ -270,6 +279,8 @@ export function usePledgeDialog({
     setSelectedIds([])
     setSearch("")
     setAddError(null)
+    setPickerView("select")
+    setAddText("")
     pledge.updatePledgeAmount("")
     pledge.setTopUpAmount("")
   }
@@ -281,6 +292,11 @@ export function usePledgeDialog({
     selectedIds,
     toggleFavourite,
     removeFavourite,
+    pickerView,
+    enterAddView,
+    exitAddView,
+    addText,
+    setAddText,
     search,
     setSearch: (v: string) => {
       setSearch(v)
@@ -289,7 +305,6 @@ export function usePledgeDialog({
     sortedItems,
     filteredItems,
     canAdd,
-    showCreate,
     addingItem,
     addError,
     handleAdd,

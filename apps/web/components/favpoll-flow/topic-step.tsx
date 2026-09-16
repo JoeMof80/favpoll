@@ -37,15 +37,6 @@ function sortItems(items: Favourite[]): Favourite[] {
   })
 }
 
-// The word Add in the hint, wearing the button's own chrome — the
-// instruction says "click Add", so it has to point at something the
-// reader will recognise when they see it.
-const ADD_TOKEN = (
-  <span className="rounded-md bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-secondary-foreground">
-    Add
-  </span>
-)
-
 export function TopicStep({
   topics,
   categories,
@@ -228,20 +219,9 @@ export function TopicStep({
           </InputGroup>
         )}
 
-        {/* A PERSISTENT hint (2026-08-13). The Add only appears once a search
-            matches nothing, so writing your own topic was found only by
-            organisers who already suspected they could. Said plainly, and
-            quietly — the catalogue is still the better answer where it has
-            one, because canon topics aggregate into the record and a one-off
-            does not.
-            OUTSIDE the externalSearch branch, deliberately. The wizard owns
-            the search box and passes it in, so anything inside that branch
-            never renders in the only place this component is actually used. */}
-        {!showCreate && (
-          <p className="mb-3 text-xs text-muted-foreground">
-            Is your topic missing? Type it and click {ADD_TOKEN}
-          </p>
-        )}
+        {/* The "type it and click Add" hint retired 2026-09-16 (option E):
+            adding a topic is the CARD's act now ("+ Add your own topic"),
+            and the picker is pure select. */}
 
         <div className="flex items-center gap-2">
           <span className="shrink-0 text-[11px] font-medium tracking-widest text-muted-foreground uppercase">

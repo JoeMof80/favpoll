@@ -169,16 +169,29 @@ describe("usePledgeDialog — the picker", () => {
     expect(result.current.filteredItems.map((i) => i.id)).not.toContain("blue")
   })
 
-  it("handleAdd auto-selects the new favourite and stays on step 1", async () => {
-    const onAddItem = vi.fn().mockResolvedValue("new-fav")
+  it("enterAddView seeds the add text from the search (option C)", () => {
+    const onAddItem = vi.fn()
     const { result } = renderHook(() =>
       usePledgeDialog({ ...baseOptions, onAddItem })
     )
     act(() => result.current.setSearch("Marmalade"))
+    act(() => result.current.enterAddView())
+    expect(result.current.pickerView).toBe("add")
+    expect(result.current.addText).toBe("Marmalade")
+  })
+
+  it("handleAdd auto-selects the new favourite and returns to the picker", async () => {
+    const onAddItem = vi.fn().mockResolvedValue("new-fav")
+    const { result } = renderHook(() =>
+      usePledgeDialog({ ...baseOptions, onAddItem })
+    )
+    act(() => result.current.enterAddView())
+    act(() => result.current.setAddText("Marmalade"))
     await act(async () => result.current.handleAdd())
     expect(onAddItem).toHaveBeenCalledWith("Marmalade")
     expect(result.current.selectedIds).toEqual(["new-fav"])
     expect(result.current.step).toBe(1)
+    expect(result.current.pickerView).toBe("select")
     expect(result.current.search).toBe("")
     // The optimistic row carries the label into the breakdown
     act(() => result.current.updatePledgeAmount("10"))
@@ -187,15 +200,17 @@ describe("usePledgeDialog — the picker", () => {
     ])
   })
 
-  it("a failed add surfaces addError and stays on step 1", async () => {
+  it("a failed add surfaces addError and stays in the add view", async () => {
     const onAddItem = vi.fn().mockRejectedValue(new Error("Too many"))
     const { result } = renderHook(() =>
       usePledgeDialog({ ...baseOptions, onAddItem })
     )
-    act(() => result.current.setSearch("Marmalade"))
+    act(() => result.current.enterAddView())
+    act(() => result.current.setAddText("Marmalade"))
     await act(async () => result.current.handleAdd())
     expect(result.current.addError).toBe("Too many")
     expect(result.current.step).toBe(1)
+    expect(result.current.pickerView).toBe("add")
     expect(result.current.selectedIds).toEqual([])
   })
 })
