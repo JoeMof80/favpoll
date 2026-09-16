@@ -1,6 +1,6 @@
 "use client"
 
-import { Info } from "lucide-react"
+import { Info, Search } from "lucide-react"
 
 import { useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
@@ -358,7 +358,8 @@ export function NewFavpollWizard({
           }}
           title="Pick a topic"
           hideCloseButton
-          headerClassName="px-5 pt-4 pb-2"
+          separators
+          headerClassName="px-5 pt-4 pb-3"
           bodyClassName="p-0"
           fullscreenOnMobile
           mobileBack={{
@@ -370,6 +371,12 @@ export function NewFavpollWizard({
           }}
           header={
             <div className="flex items-center gap-2">
+              {/* Field-not-subtitle treatment (2026-09-16): search glyph
+                  + hairline give the bare input shape across pickers */}
+              <Search
+                className="size-4 shrink-0 text-muted-foreground/50"
+                aria-hidden="true"
+              />
               <input
                 type="text"
                 autoFocus
@@ -439,7 +446,7 @@ export function NewFavpollWizard({
           }}
           title="Pick a charity"
           hideCloseButton
-          headerClassName="px-5 pt-4 pb-2"
+          headerClassName="px-5 pt-4 pb-3"
           bodyClassName="p-0"
           fullscreenOnMobile
           mobileBack={{
@@ -447,14 +454,20 @@ export function NewFavpollWizard({
             onClick: closeCharityPicker,
           }}
           header={
-            <input
-              type="text"
-              autoFocus
-              placeholder="Search charities…"
-              value={charitySearch}
-              onChange={(e) => setCharitySearch(e.target.value)}
-              className="w-full bg-transparent text-lg outline-none placeholder:text-muted-foreground/50"
-            />
+            <div className="flex items-center gap-2">
+              <Search
+                className="size-4 shrink-0 text-muted-foreground/50"
+                aria-hidden="true"
+              />
+              <input
+                type="text"
+                autoFocus
+                placeholder="Search charities…"
+                value={charitySearch}
+                onChange={(e) => setCharitySearch(e.target.value)}
+                className="w-full bg-transparent text-lg outline-none placeholder:text-muted-foreground/50"
+              />
+            </div>
           }
           footer={
             <Button

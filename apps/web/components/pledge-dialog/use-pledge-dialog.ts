@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { usePledge } from "@/components/pledge-card/use-pledge"
 import { computePledgeAllocations } from "@/lib/pledge-allocations"
 import type {
@@ -20,7 +20,8 @@ export type UsePledgeDialogOptions = {
   pot: FavpollPot | null
   userPotAllocation: PotAllocation | null
   onPledgeSuccess?: (guestToken?: string) => void
-  onAddItem?: (label: string) => Promise<void>
+  /** Resolves to the new favourite's id so the picker can auto-pick it */
+  onAddItem?: (label: string) => Promise<string | void>
   /** false defaults the contribution to None (memorials) */
   suggestTip?: boolean
 }
@@ -36,15 +37,41 @@ export function usePledgeDialog({
   onAddItem,
   suggestTip,
 }: UsePledgeDialogOptions) {
-  // --- step 1: picker draft state ---
+  // --- step 1: the favourite picker (settled 2026-09-16 after a
+  // tap-advance audition): chips TOGGLE — multi-select stays visible and
+  // self-evident — and the footer's primary commits: "Next →" with a
+  // selection, "Give anyway →" with none (the no-favourite gift absorbed
+  // into the primary, so the can't-decide guest sees their exit
+  // immediately). What the rework kept: no draft chips in the search bar,
+  // no standing add gate (creatable combobox — "+ Add ‘X’" auto-selects
+  // its chip), and step 2's per-line remove. No draft ids: toggles commit
+  // directly.
   const [step, setStep] = useState<PledgeDialogStep>(1)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
-  const [draftIds, setDraftIds] = useState<string[]>([])
   const [search, setSearch] = useState("")
   const [addingItem, setAddingItem] = useState(false)
   const [addError, setAddError] = useState<string | null>(null)
+  // Optimistic rows for guest-added favourites (the wizard's
+  // extraCharities pattern): the add action returns the id, the row is
+  // picked immediately, and router.refresh reconciles the real row.
+  // Without this, computePledgeAllocations would silently DROP the new
+  // favourite until the refresh landed.
+  const [addedItems, setAddedItems] = useState<Favourite[]>([])
 
-  const sortedItems: Favourite[] = [...pollWithItems.topics.favourites].sort(
+  const mergedPoll: FavpollPollWithItems = useMemo(() => {
+    const base = pollWithItems.topics.favourites
+    const extras = addedItems.filter((a) => !base.some((f) => f.id === a.id))
+    if (extras.length === 0) return pollWithItems
+    return {
+      ...pollWithItems,
+      topics: {
+        ...pollWithItems.topics,
+        favourites: [...base, ...extras],
+      },
+    }
+  }, [pollWithItems, addedItems])
+
+  const sortedItems: Favourite[] = [...mergedPoll.topics.favourites].sort(
     (a, b) => a.label.localeCompare(b.label)
   )
   const lowerSearch = search.toLowerCase().trim()
@@ -55,15 +82,27 @@ export function usePledgeDialog({
     : sortedItems
   // Whether adding is possible AT ALL — an open topic, and a handler, which
   // the page withholds when the organiser has turned guest additions off.
-  // showCreate is this plus "and the search found nothing", so canAdd is what
-  // the persistent hint keys on.
-  const canAdd = !!(!pollWithItems.topics.is_finite && onAddItem)
-  const showCreate = !!(canAdd && lowerSearch && filteredItems.length === 0)
+  // canAdd drives the standing "+ Add your own" pill.
+  const canAdd = !!(!mergedPoll.topics.is_finite && onAddItem)
+  // Creatable-combobox rule (2026-09-16): the "+ Add ‘X’" pill shows
+  // whenever the typed text matches nothing EXACTLY — not only when the
+  // search comes back empty. Typing "Marmalade" with "Marmalade jam"
+  // present must still allow adding "Marmalade" itself.
+  const showCreate = !!(
+    canAdd &&
+    lowerSearch &&
+    !sortedItems.some((i) => i.label.toLowerCase() === lowerSearch)
+  )
 
-  function toggleDraft(id: string) {
-    setDraftIds((prev) =>
+  function toggleFavourite(id: string) {
+    setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     )
+    setAddError(null)
+  }
+
+  function removeFavourite(id: string) {
+    setSelectedIds((prev) => prev.filter((x) => x !== id))
   }
 
   async function handleAdd() {
@@ -71,8 +110,32 @@ export function usePledgeDialog({
     setAddingItem(true)
     setAddError(null)
     try {
-      await onAddItem(search.trim())
-      setSearch("")
+      const label = search.trim()
+      const id = await onAddItem(label)
+      if (id) {
+        setAddedItems((prev) =>
+          prev.some((x) => x.id === id)
+            ? prev
+            : [
+                ...prev,
+                {
+                  id,
+                  topic_id: mergedPoll.topic_id,
+                  label,
+                  all_time_pledged: 0,
+                  all_time_count: 0,
+                  is_canonical: false,
+                  source: "guest",
+                } as Favourite,
+              ]
+        )
+        // Auto-select the new chip; clearing the search brings it into
+        // view selected — the guest stays on step 1 in control.
+        setSelectedIds((prev) => (prev.includes(id) ? prev : [...prev, id]))
+        setSearch("")
+      } else {
+        setSearch("")
+      }
     } catch (err) {
       setAddError(err instanceof Error ? err.message : "Failed to add")
     } finally {
@@ -85,10 +148,10 @@ export function usePledgeDialog({
     favpollId,
     clerkUserId,
     charityNames,
-    pollWithItems,
+    pollWithItems: mergedPoll,
     pot,
     userPotAllocation,
-    pollSelections: { [pollWithItems.id]: selectedIds },
+    pollSelections: { [mergedPoll.id]: selectedIds },
     onPledgeAmountChange: () => {},
     onPledgeSuccess,
     suggestTip,
@@ -142,40 +205,34 @@ export function usePledgeDialog({
     }
   }, [pledge.pledgeClientSecret, step])
 
-  // --- per-favourite breakdown ---
+  // --- per-favourite breakdown (with ids — step 2's lines carry remove) ---
   function getFavouriteBreakdown() {
     if (selectedIds.length === 0) return []
+    const items = mergedPoll.topics.favourites
     if (!isPledgeValid) {
       return selectedIds.map((id) => {
-        const item = pollWithItems.topics.favourites.find((f) => f.id === id)
-        return { label: item?.label ?? id, amount: 0 }
+        const item = items.find((f) => f.id === id)
+        return { id, label: item?.label ?? id, amount: 0 }
       })
     }
-    return computePledgeAllocations(
-      selectedIds,
-      pollWithItems.topics.favourites,
-      numericPledge
-    ).map((a) => {
-      const item = pollWithItems.topics.favourites.find(
-        (f) => f.id === a.favouriteId
-      )
-      return { label: item?.label ?? a.favouriteId, amount: a.amount }
-    })
+    return computePledgeAllocations(selectedIds, items, numericPledge).map(
+      (a) => {
+        const item = items.find((f) => f.id === a.favouriteId)
+        return {
+          id: a.favouriteId,
+          label: item?.label ?? a.favouriteId,
+          amount: a.amount,
+        }
+      }
+    )
   }
 
   // --- navigation ---
-  // PICKING IS OPTIONAL (founder, 2026-08-17). This required at least one
-  // favourite, so a guest who could not decide was stuck on step 1 with a
-  // dead Next button and no way out but to close the dialog. Giving without
-  // backing anything is already a shape the product has — "a gift with no
-  // favourite attached" is how the shared pot describes it — and the money
-  // reaches the charity either way. A no-pick pledge lands with a total and
-  // no allocations (and sees no slider — nothing to rebalance).
-  const canAdvanceStep1 = true
-
   async function handleNext() {
     if (step === 1) {
-      setSelectedIds(draftIds)
+      // Commits the toggled selection — empty is the no-favourite gift
+      // ("a gift with no favourite attached", 2026-08-17), carried by
+      // the footer's "Give anyway →" label.
       setStep(2)
       return
     }
@@ -196,7 +253,6 @@ export function usePledgeDialog({
       pledge.setSubmitting(false)
       setStep(2)
     } else if (step === 2) {
-      setDraftIds(selectedIds)
       setStep(1)
     }
   }
@@ -211,7 +267,7 @@ export function usePledgeDialog({
 
   function handleClose() {
     setStep(1)
-    setDraftIds([])
+    setSelectedIds([])
     setSearch("")
     setAddError(null)
     pledge.updatePledgeAmount("")
@@ -222,8 +278,9 @@ export function usePledgeDialog({
     // step
     step,
     // step 1
-    draftIds,
-    toggleDraft,
+    selectedIds,
+    toggleFavourite,
+    removeFavourite,
     search,
     setSearch: (v: string) => {
       setSearch(v)
@@ -236,7 +293,6 @@ export function usePledgeDialog({
     addingItem,
     addError,
     handleAdd,
-    canAdvanceStep1,
     // steps 2–3 (delegate to usePledge)
     ...pledge,
     // two-part entry (overrides ride below the spread)

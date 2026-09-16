@@ -42,24 +42,16 @@ vi.mock("@/components/favpoll-hero-avatar", () => ({
   ProtagonistAvatar: () => <div data-testid="protagonist-avatar" />,
 }))
 
-// Stubs expose draftIds.length via data-draft-count so we can assert the
-// "no chip in search bar" invariant without the real Chip implementation.
+// Stubs expose selectedIds.length via data-selected-count so we can assert
+// the selection reaches the rows (charity-idiom picker, 2026-09-16).
 vi.mock("@/components/pledge-dialog/step-pick-favourites", () => ({
-  PickerHeader: ({
-    topicTitle,
-    draftIds,
-  }: {
-    topicTitle: string
-    draftIds: string[]
-  }) => (
-    <div data-testid="picker-header" data-draft-count={String(draftIds.length)}>
-      Pick your favourite {topicTitle}
-    </div>
+  PickerHeader: ({ topicTitle }: { topicTitle: string }) => (
+    <div data-testid="picker-header">Pick your favourite {topicTitle}</div>
   ),
-  PickerItems: ({ draftIds }: { draftIds: string[] }) => (
+  PickerPills: ({ selectedIds }: { selectedIds: string[] }) => (
     <div
       data-testid="picker-items"
-      data-draft-count={String(draftIds.length)}
+      data-selected-count={String(selectedIds.length)}
     />
   ),
 }))
@@ -267,28 +259,11 @@ describe("DemoCard — dialog mimics", () => {
     )
   })
 
-  it("picker header receives empty draftIds in all picker phases (no chip in search bar)", () => {
-    const pickerPhases: Phase[] = [
-      "picking",
-      "selected",
-      "next-hover",
-      "next-pressed",
-    ]
-    for (const phase of pickerPhases) {
-      const { unmount } = renderCard(phase)
-      expect(screen.getByTestId("picker-header")).toHaveAttribute(
-        "data-draft-count",
-        "0"
-      )
-      unmount()
-    }
-  })
-
-  it("picker items receive real draftIds in selected phase (grid highlights)", () => {
+  it("picker rows receive the selection in selected phase (row highlights)", () => {
     renderCard("selected")
-    // One favourite selected → draftIds passed to PickerItems has length 1
+    // One favourite selected → selectedIds passed to PickerPills has length 1
     expect(screen.getByTestId("picker-items")).toHaveAttribute(
-      "data-draft-count",
+      "data-selected-count",
       "1"
     )
   })

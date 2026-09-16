@@ -105,15 +105,12 @@ test.describe("reveal after pledge", () => {
     await expect(dialog).toContainText(/pick your favourite/i)
 
     // ── 4. Step 1: Pick a favourite ───────────────────────────────────────────
-    // Colour is a finite topic. Chips render as <button aria-pressed="false|true">,
-    // not radio inputs — use [aria-pressed] to locate them.
-    const chips = dialog.locator("[aria-pressed]")
-    const firstChip = chips.first()
+    // Chips TOGGLE (settled 2026-09-16) and the footer primary commits —
+    // "Next →" once something is selected.
+    const firstChip = dialog.locator("[aria-pressed]").first()
     await expect(firstChip).toBeVisible({ timeout: 10_000 })
     await firstChip.click()
     await expect(firstChip).toHaveAttribute("aria-pressed", "true")
-
-    // Advance to step 2
     await dialog.getByRole("button", { name: /next/i }).click()
 
     // ── 5. Step 2: Set pledge amount ──────────────────────────────────────────

@@ -471,6 +471,10 @@ export async function addGuestItem(
       emailErr
     )
   }
+
+  // The picker auto-picks the new favourite (tap-advance grammar,
+  // 2026-09-16), so the caller needs its id.
+  return favouriteId
 }
 
 export async function addOrganizerItem(favpollId: string, label: string) {
@@ -538,7 +542,7 @@ export async function addOrganizerItem(favpollId: string, label: string) {
     .eq("favpoll_poll_id", poll.id)
     .eq("favourite_id", favouriteId)
     .maybeSingle()
-  if (existingEpi) return
+  if (existingEpi) return favouriteId
 
   const { error: epiErr } = await supabase
     .from("favpoll_poll_favourites")
@@ -549,6 +553,7 @@ export async function addOrganizerItem(favpollId: string, label: string) {
       added_by: userId,
     })
   if (epiErr) throw new Error(epiErr.message)
+  return favouriteId
 }
 
 export async function pledgeFromFund(input: {
