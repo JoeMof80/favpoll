@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Loader2 } from "lucide-react"
+import { ExternalLink, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Chip } from "@/components/ui/chip"
 import type { Charity } from "@favpoll/types"
@@ -62,11 +62,11 @@ function Avatar({ name, logoUrl }: { name: string; logoUrl?: string | null }) {
     <img
       src={logoUrl}
       alt=""
-      className="size-10 shrink-0 rounded object-contain"
+      className="pointer-events-none relative size-10 shrink-0 rounded object-contain"
     />
   ) : (
     <div
-      className="flex size-10 shrink-0 items-center justify-center rounded bg-primary/10 text-sm font-medium text-primary"
+      className="pointer-events-none relative flex size-10 shrink-0 items-center justify-center rounded bg-primary/10 text-sm font-medium text-primary"
       aria-hidden="true"
     >
       {name.charAt(0)}
@@ -181,6 +181,12 @@ export function CharityStep({
       selected ? "bg-primary/10" : "hover:bg-secondary/40"
     } ${dimmed ? "opacity-50" : ""}`
 
+  // The stretched button paints ABOVE static siblings (positioned beats
+  // non-positioned), so any bg it gains — iOS's persistent tap-highlight —
+  // became an opaque wash hiding the row's content, leaving only the z-10
+  // website link visible (found on-device, 2026-09-16). Content is raised
+  // (relative in rowClass children) and the invisible button's own tap
+  // highlight is silenced — the ROW's tint is the feedback.
   const overlayButton = (
     label: string,
     disabled: boolean,
@@ -192,19 +198,25 @@ export function CharityStep({
       aria-label={label}
       disabled={disabled}
       onClick={onClick}
-      className="absolute inset-0 h-auto rounded-none p-0 hover:bg-transparent"
+      className="absolute inset-0 h-auto rounded-none p-0 [-webkit-tap-highlight-color:transparent] hover:bg-transparent"
     />
   )
 
-  const siteLink = (website: string) => (
+  // ICON, not an inline text link (founder, 2026-09-16): the whole row is
+  // tap-to-pick, and a raw URL floating mid-row was too easy to hit by
+  // mistake — an accidental navigation out of the wizard. A small glyph
+  // beside the name with a padded hit area keeps identity one DELIBERATE
+  // tap away; the number line is plain text now.
+  const siteLink = (website: string, name: string) => (
     <a
       href={websiteHref(website)}
       target="_blank"
       rel="noopener noreferrer"
-      className="relative z-10 hover:text-foreground hover:underline"
+      className="pointer-events-auto relative z-10 shrink-0 text-muted-foreground hover:text-primary"
+      aria-label={`Visit ${name}'s website, ${websiteLabel(website)}`}
       title={`Visit ${websiteLabel(website)}`}
     >
-      {websiteLabel(website)}
+      <ExternalLink className="size-4" aria-hidden="true" />
     </a>
   )
 
@@ -258,17 +270,18 @@ export function CharityStep({
               return (
                 <div key={c.id} className={rowClass(selected, false)}>
                   {overlayButton(c.name, false, () => onPick(c.id))}
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate font-medium text-foreground">
-                      {c.name}
+                  <span className="pointer-events-none relative min-w-0 flex-1">
+                    <span className="flex items-center gap-2">
+                      <span className="min-w-0 truncate font-medium text-foreground">
+                        {c.name}
+                      </span>
+                      {c.registered_website &&
+                        siteLink(c.registered_website, c.name)}
                     </span>
                     <span className="block text-xs text-muted-foreground">
                       {c.registered_number
                         ? `Charity no. ${c.registered_number}`
                         : "On favpoll"}
-                      {c.registered_website && (
-                        <> · {siteLink(c.registered_website)}</>
-                      )}
                     </span>
                   </span>
                   <Avatar name={c.name} logoUrl={c.logo_url} />
@@ -286,16 +299,18 @@ export function CharityStep({
                     busyNumber !== null,
                     () => void addFromRegister(r)
                   )}
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate font-medium text-foreground">
-                      {busyNumber === r.registeredNumber
-                        ? "Adding…"
-                        : r.displayName}
+                  <span className="pointer-events-none relative min-w-0 flex-1">
+                    <span className="flex items-center gap-2">
+                      <span className="min-w-0 truncate font-medium text-foreground">
+                        {busyNumber === r.registeredNumber
+                          ? "Adding…"
+                          : r.displayName}
+                      </span>
+                      {r.website && siteLink(r.website, r.displayName)}
                     </span>
                     <span className="block text-xs text-muted-foreground">
                       Charity no. {r.registeredNumber}
                       {r.place && <> · {r.place}</>}
-                      {r.website && <> · {siteLink(r.website)}</>}
                     </span>
                   </span>
                   <Avatar name={r.displayName} />
