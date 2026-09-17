@@ -53,6 +53,8 @@ type FavpollListCardFavpoll = {
   poll: {
     id: string
     topic_id: string | null
+    /** The poll holds a personal note — step 3 says so. */
+    has_note?: boolean
     topic: {
       title: string
       is_finite: boolean
@@ -426,6 +428,7 @@ export function FavpollListCard({
                             compact
                             steps={buildMechanicSteps({
                               topicTitle: pollWithItems!.topics.title,
+                              hasNote: poll?.has_note ?? false,
                               charityLine:
                                 favpoll.charities.length > 0
                                   ? joinCharities(

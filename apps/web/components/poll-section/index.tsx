@@ -47,8 +47,6 @@ type Props = {
    */
   hasReveal?: boolean
   /** Content-free quote flag — step 3 promises "their own words". */
-  revealIsQuote?: boolean
-  revealIsMessage?: boolean
   /** e.g. "Marie Curie" or "A & B" — renders the pre-pledge trust line */
   charityLine?: string | null
   /** Consent gate — set when pledging is withheld awaiting the charity's
@@ -75,8 +73,6 @@ export function PollSection({
   entitled,
   personalReveal,
   hasReveal = true,
-  revealIsQuote = false,
-  revealIsMessage = false,
   charityLine = null,
   initialItems,
   onOpenPledgeDialog,
@@ -107,19 +103,14 @@ export function PollSection({
   const lockSteps = buildMechanicSteps({
     topicTitle: poll.topics.title,
     charityLine,
+    hasNote: hasReveal,
   })
 
+  // "A note" covers favourite and message reveals alike (founder,
+  // 2026-09-17) — the old favourite/message fork is gone.
   const unlockAriaLabel = !hasReveal
     ? "Pledge your favourite to see the results"
-    : revealIsMessage
-      ? displayFirstName
-        ? `Pledge to reveal ${displayFirstName}'s message and see the results`
-        : "Pledge to see the message and results"
-      : isCause
-        ? "Pledge to reveal our pick and see the results"
-        : displayFirstName
-          ? `Pledge to reveal ${displayFirstName}'s favourite and see the results`
-          : "Pledge to see the reveal and results"
+    : "Pledge to see a personal note and the results"
 
   return (
     <section

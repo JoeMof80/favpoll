@@ -62,6 +62,7 @@ const FAVPOLL_SELECT = `
   favpoll_polls (
     id,
     topic_id,
+    personal_reveal,
     topics (
       title,
       is_finite,
@@ -78,6 +79,7 @@ type RawEpf = { favourites: RawFavourite }
 type RawPoll = {
   id: string
   topic_id: string | null
+  personal_reveal: string | null
   topics: {
     title: string
     is_finite: boolean
@@ -256,6 +258,9 @@ export default async function FavpollsPage({
     let poll: {
       id: string
       topic_id: string | null
+      /** Content-free: the flip card's step 3 promises the personal
+       *  note when one exists (2026-09-17). Never the text itself. */
+      has_note: boolean
       topic: {
         title: string
         is_finite: boolean
@@ -272,6 +277,7 @@ export default async function FavpollsPage({
       poll = {
         id: rawPoll.id,
         topic_id: rawPoll.topic_id,
+        has_note: !!rawPoll.personal_reveal,
         topic: rawPoll.topics
           ? {
               title: rawPoll.topics.title,

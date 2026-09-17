@@ -38,8 +38,8 @@ export function WizardStoryStep({ w }: { w: WizardState }) {
       </WizardField>
 
       <WizardField
-        label="The reveal"
-        info="A quote in their own words, a memory, or a message to guests — one sentence, with a detail only you'd know."
+        label="The note"
+        info="A quote in their own words, a memory, or a message to guests — one sentence, with a detail only you'd know. Guests see it after they pledge."
       >
         <InputGroup className="bg-background">
           <InputGroupTextarea

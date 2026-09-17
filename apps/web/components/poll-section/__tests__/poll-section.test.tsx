@@ -83,7 +83,7 @@ const BASE_PROPS = {
 // ─── Overlay copy ─────────────────────────────────────────────────────────────
 
 describe("PollSection — unlock overlay copy", () => {
-  it("shows the protagonist first name in the accessible label for a person favpoll", () => {
+  it("names the personal note in the accessible label — one string, no name or cause forks (founder, 2026-09-17)", () => {
     render(
       <PollSection
         {...BASE_PROPS}
@@ -92,16 +92,14 @@ describe("PollSection — unlock overlay copy", () => {
         onOpenPledgeDialog={vi.fn()}
       />
     )
-
-    // Accessible name comes from aria-label (name-based); visible text inside the card is generic
     expect(
       screen.getByRole("button", {
-        name: /Pledge to reveal Yusuf's favourite/i,
+        name: /Pledge to see a personal note and the results/i,
       })
     ).toBeInTheDocument()
   })
 
-  it("uses 'our pick' for a cause favpoll — never the possessive label", () => {
+  it("uses the same label for a cause favpoll — 'our pick' retired with the note rename", () => {
     render(
       <PollSection
         {...BASE_PROPS}
@@ -110,27 +108,10 @@ describe("PollSection — unlock overlay copy", () => {
         onOpenPledgeDialog={vi.fn()}
       />
     )
-
-    // The full-label possessive ("…Trussell Trust's favourite") overflowed
-    // the pill and misread — a cause's reveal is "our pick" (2026-07-29)
     expect(
       screen.getByRole("button", {
-        name: /Pledge to reveal our pick and see the results/i,
+        name: /Pledge to see a personal note and the results/i,
       })
-    ).toBeInTheDocument()
-  })
-
-  it("uses 'our pick' even when the cause label is empty", () => {
-    render(
-      <PollSection
-        {...BASE_PROPS}
-        protagonistName=""
-        isCause={true}
-        onOpenPledgeDialog={vi.fn()}
-      />
-    )
-    expect(
-      screen.getByRole("button", { name: /Pledge to reveal our pick/i })
     ).toBeInTheDocument()
   })
 
@@ -161,7 +142,7 @@ describe("PollSection — unlock overlay interaction", () => {
 
     await userEvent.click(
       screen.getByRole("button", {
-        name: /Pledge to reveal Yusuf's favourite/i,
+        name: /Pledge to see a personal note/i,
       })
     )
 
@@ -179,7 +160,7 @@ describe("PollSection — unlock overlay interaction", () => {
     )
 
     const btn = screen.getByRole("button", {
-      name: /Pledge to reveal Belinda's favourite/i,
+      name: /Pledge to see a personal note/i,
     })
     expect(btn).toBeInTheDocument()
     // Button elements are natively keyboard-operable; no tabIndex=-1 should be set
@@ -406,7 +387,9 @@ describe("PollSection — lock explainer", () => {
       )
     ).toBeInTheDocument()
     expect(
-      screen.getByText("Reveal where your favourite stands among the others")
+      screen.getByText(
+        "Reveal where your favourite stands along with a personal note"
+      )
     ).toBeInTheDocument()
     expect(
       screen.getByText("Don’t have a favourite? Give to the shared pot instead")
