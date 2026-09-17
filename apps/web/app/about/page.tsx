@@ -140,7 +140,7 @@ const FAQ_ITEMS: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: "What happens when a favpoll closes?",
-    a: "Pledging ends and the standings are final, and the proceeds go to the charities you chose. The reveal needs no waiting — every guest saw it the moment they pledged.",
+    a: "Pledging ends and the standings are final, and the proceeds go to the charities you chose. The personal note needs no waiting — every guest saw it the moment they pledged.",
   },
 ]
 

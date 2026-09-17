@@ -50,7 +50,8 @@ export function WizardField({
   label: string
   required?: boolean
   info?: string
-  hint?: string
+  /** Always-visible line under the field — may carry a link/action. */
+  hint?: React.ReactNode
   children: React.ReactNode
 }) {
   return (

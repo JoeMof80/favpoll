@@ -54,7 +54,7 @@ export function TypedReveal({ text, active, protagonistFirstName }: Props) {
 
   // Animated: full text announced once via sr-only; typed copy is aria-hidden
   // so AT doesn't read each keystroke individually.
-  const label = "A personal note"
+  const label = "Personal note"
 
   return (
     <div aria-label={label} className="relative">

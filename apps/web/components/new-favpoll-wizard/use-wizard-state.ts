@@ -1,9 +1,12 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { STEPS, STEP_LABELS, type WizardStep } from "@/lib/wizard-copy"
 import { createFavpoll, uploadPersonPhoto } from "@/app/favpolls/new/actions"
 import { updateFavpoll } from "@/app/favpolls/[id]/edit/actions"
-import { safeGenerateDraft } from "@/lib/actions/generate-draft"
+import {
+  safeGenerateDraft,
+  getCachedDraftGhosts,
+} from "@/lib/actions/generate-draft"
 import { groupingForWho, subjectForWho, type WhoValue } from "@/lib/who"
 import { deriveRegister } from "@/lib/registers"
 import type {
@@ -179,6 +182,19 @@ export function useWizardState(
     )
 
   const [generating, setGenerating] = useState(false)
+  // CACHE-ONLY ghost prefetch (founder, 2026-09-17): when a cached
+  // generated draft exists for the current calibration set, its
+  // about/reveal become the Story step's PLACEHOLDERS — contextual
+  // ghosts at zero model cost. Fired as soon as the set is complete
+  // (the cache key includes the name, typed on the Info step), so the
+  // read lands before Story renders; debounced because the name keys
+  // the cache and arrives per keystroke. Never fires for custom topics
+  // (empty topicId would collide in the cache key).
+  const [cachedGhosts, setCachedGhosts] = useState<{
+    about: string
+    reveal: string
+  } | null>(null)
+  const ghostRequestId = useRef(0)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [seedFavpollId, setSeedFavpollId] = useState<string | null>(null)
@@ -426,6 +442,42 @@ export function useWizardState(
       setPronoun(undefined)
     }
   }
+
+  // The prefetch effect — see cachedGhosts above.
+  const prefetchTopic = topics[0]
+  const prefetchTopicId =
+    prefetchTopic && !prefetchTopic.isCustom ? prefetchTopic.topicId : null
+  const prefetchName = name.trim()
+  useEffect(() => {
+    if (!prefetchTopicId || !prefetchName) {
+      setCachedGhosts(null)
+      return
+    }
+    const id = ++ghostRequestId.current
+    const timer = setTimeout(async () => {
+      const result = await getCachedDraftGhosts({
+        register,
+        subject,
+        topicId: prefetchTopicId,
+        primaryCharityId: primaryCharity?.id ?? null,
+        pronoun,
+        grouping,
+        displayName: prefetchName || null,
+      })
+      // Stale-response guard: only the latest request may land
+      if (ghostRequestId.current === id) setCachedGhosts(result)
+    }, 500)
+    return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    prefetchTopicId,
+    prefetchName,
+    register,
+    subject,
+    primaryCharity?.id,
+    pronoun,
+    grouping,
+  ])
 
   // One-click generation: by the Story step the wizard already holds
   // register, charity, topic, name, context and who — the full
@@ -680,6 +732,7 @@ export function useWizardState(
     railDone,
     generating,
     generateExample,
+    cachedGhosts,
     submitting,
     error,
     seedFavpollId,

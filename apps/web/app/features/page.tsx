@@ -89,7 +89,7 @@ const SECTIONS = [
   { id: "display", label: "Live display" },
   { id: "shared-fund", label: "Shared pot" },
   // id stays "reveal" — external links target /features#reveal
-  { id: "reveal", label: "The personal note" },
+  { id: "reveal", label: "Personal note" },
   { id: "keepsake", label: "Keepsake" },
 ]
 
@@ -255,10 +255,12 @@ export default function FeaturesPage() {
               artefact={<FundVignette />}
             />
 
+            {/* Lead is SYNCED with the wizard's Personal note helper
+                text (founder, 2026-09-17) — same facts, same words. */}
             <Feature
               id="reveal"
-              title="The personal note"
-              lead="A message to be shared the moment someone has pledged, along with the standings."
+              title="Personal note"
+              lead="A direct quote, a memory, or a message to guests — revealed the moment someone has pledged, along with the standings."
               bullets={[
                 "Often the subject’s own favourite but could be a message about the topic, the charity, or anything else",
                 "A gift in return for sharing a favourite",

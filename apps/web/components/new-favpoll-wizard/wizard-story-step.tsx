@@ -8,16 +8,25 @@ import type { WizardState } from "./use-wizard-state"
 
 export function WizardStoryStep({ w }: { w: WizardState }) {
   const ph = ghostsFor(w.category)
+  // Cache-only prefetch: a cached generated draft for THIS favpoll's
+  // calibration set beats the static pair — contextual, zero model
+  // cost. The "e.g. " prefix keeps the ghost convention.
+  const aboutGhost = w.cachedGhosts ? `e.g. ${w.cachedGhosts.about}` : ph.about
+  const revealGhost = w.cachedGhosts
+    ? `e.g. ${w.cachedGhosts.reveal}`
+    : ph.reveal
   return (
     <div className="space-y-5">
+      {/* ALWAYS-VISIBLE guidance for the two craft fields (founder,
+          2026-09-17, after the Yvette session): the wizard is an
+          authoring surface — a sentence of guidance changes the output,
+          so it must not hide in a popover. The About hint coaches the
+          note-tease: the withhold is About's job (brand doctrine), and
+          cold guests need to know something is waiting. */}
       <WizardField
         label="About"
         required
-        info={
-          w.isCause
-            ? "What you're raising for — and why it matters to you."
-            : "Introduce them in a sentence or two. Specific, personal details land harder than a list of facts."
-        }
+        hint="Set the scene, link the topic and the cause. Hint at a note, if there is one."
       >
         <InputGroup className="bg-background">
           <InputGroupTextarea
@@ -25,7 +34,7 @@ export function WizardStoryStep({ w }: { w: WizardState }) {
             rows={4}
             maxLength={300}
             value={w.about}
-            placeholder={ph.about}
+            placeholder={aboutGhost}
             onChange={(e) => w.setAbout(e.target.value)}
           />
           <div
@@ -38,8 +47,8 @@ export function WizardStoryStep({ w }: { w: WizardState }) {
       </WizardField>
 
       <WizardField
-        label="The note"
-        info="A quote in their own words, a memory, or a message to guests — one sentence, with a detail only you'd know. Guests see it after they pledge."
+        label="Personal note"
+        hint="A direct quote, a memory, or a message to guests. Revealed only after a guest pledges."
       >
         <InputGroup className="bg-background">
           <InputGroupTextarea
@@ -47,7 +56,7 @@ export function WizardStoryStep({ w }: { w: WizardState }) {
             rows={4}
             maxLength={280}
             value={w.reveal}
-            placeholder={ph.reveal}
+            placeholder={revealGhost}
             onChange={(e) => w.setReveal(e.target.value)}
           />
           <div
