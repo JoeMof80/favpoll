@@ -80,7 +80,7 @@ import { KeepsakeVignette } from "@/components/landing/keepsake-vignette"
 export const metadata: Metadata = {
   title: "Features — favpoll",
   description:
-    "What a favpoll does: homemade topics, QR-coded stationery, a live display, a shared pot, the reveal and a printable keepsake.",
+    "What a favpoll does: homemade topics, QR-coded stationery, a live display, a shared pot, a personal note and a printable keepsake.",
 }
 
 const SECTIONS = [
@@ -88,7 +88,8 @@ const SECTIONS = [
   { id: "stationery", label: "QR-coded stationery" },
   { id: "display", label: "Live display" },
   { id: "shared-fund", label: "Shared pot" },
-  { id: "reveal", label: "The reveal" },
+  // id stays "reveal" — external links target /features#reveal
+  { id: "reveal", label: "The personal note" },
   { id: "keepsake", label: "Keepsake" },
 ]
 
@@ -256,7 +257,7 @@ export default function FeaturesPage() {
 
             <Feature
               id="reveal"
-              title="The reveal"
+              title="The personal note"
               lead="A message to be shared the moment someone has pledged, along with the standings."
               bullets={[
                 "Often the subject’s own favourite but could be a message about the topic, the charity, or anything else",

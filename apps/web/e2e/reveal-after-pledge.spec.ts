@@ -84,7 +84,7 @@ test.describe("reveal after pledge", () => {
     // (global-setup warms the route, but this is the belt to that braces).
     await expect(
       page.getByRole("button", {
-        name: /Pledge to reveal E2E's favourite and see the results/i,
+        name: /Pledge to see a personal note and the results/i,
       })
     ).toBeVisible({ timeout: 30_000 })
 
@@ -92,7 +92,7 @@ test.describe("reveal after pledge", () => {
     // The topic ribbon became a plain header (2026-08-02) — the lock card
     // over the decoy is now the single pre-pledge CTA.
     const pledgeButton = page.getByRole("button", {
-      name: /Pledge to reveal E2E's favourite and see the results/i,
+      name: /Pledge to see a personal note and the results/i,
     })
     await expect(pledgeButton).toBeVisible()
     await pledgeButton.click()

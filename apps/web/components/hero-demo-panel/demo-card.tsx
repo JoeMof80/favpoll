@@ -161,6 +161,9 @@ export function DemoCard({
   const lockSteps = buildMechanicSteps({
     topicTitle,
     charityLine: charityName,
+    // Every demo scene carries a note — the lock card should teach the
+    // same step 3 a real note-bearing poll shows (2026-09-17)
+    hasNote: !!revealText,
   })
 
   const headline = protagonist

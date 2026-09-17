@@ -1,7 +1,6 @@
 import { RegisterScope } from "@/components/register-scope"
 import { paletteForFavpoll } from "@/lib/register-palette"
 import type { Metadata } from "next"
-import { isQuoteReveal, isMessageReveal } from "@/lib/mechanic-steps"
 import { favpollMetadata } from "@/lib/og/favpoll-og"
 import { getFavpollOgSource } from "@/lib/og/favpoll-og-data"
 import { notFound, redirect } from "next/navigation"
@@ -283,15 +282,9 @@ export default async function FavpollPage({ params }: Props) {
   // Safe to send even when un-entitled: whether a reveal exists, without its
   // content — the lock pill must not promise a reveal on favpolls without one.
   const hasReveal = !!pollWithItems?.personal_reveal
-  // Also content-free: quote-or-not, so step 3 can promise "their own
-  // words" without leaking the reveal (founder, 2026-08-03).
-  const revealIsQuote = isQuoteReveal(pollWithItems?.personal_reveal)
-  // Content-free for the same reason: one bit, "does the reveal name one of
-  // the options", never which. See isMessageReveal.
-  const revealIsMessage = isMessageReveal(
-    pollWithItems?.personal_reveal,
-    pollWithItems?.topics.favourites.map((f) => f.label)
-  )
+  // The quote/message detectors (isQuoteReveal/isMessageReveal) retired
+  // 2026-09-17: "a note" covers every reveal shape, so no copy forks on
+  // them any more.
 
   // Gate sensitive data server-side for un-entitled viewers of open polls
   if (!entitled && pollWithItems) {
@@ -377,8 +370,6 @@ export default async function FavpollPage({ params }: Props) {
           isOrganiser={isOrganiser}
           entitled={entitled}
           hasReveal={hasReveal}
-          revealIsQuote={revealIsQuote}
-          revealIsMessage={revealIsMessage}
           gatedCharityNames={gatedCharityNames}
         />
       </>

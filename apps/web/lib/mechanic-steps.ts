@@ -7,12 +7,17 @@
 // Copy is the founder's card text (2026-08-02); the no-fee fact lives on
 // the poster and page microcopy rather than in step 2.
 //
-// STEP 3 NEVER PROMISES THE PERSONAL REVEAL (founder, 2026-09-01): it
-// can be a favourite, a quote, a message or absent, and the step had
-// grown five variants trying to explain it. The unlock LABELS
-// (reveal-lock.tsx, poll-section's aria copy) still speak about it —
-// that is their job, and isQuoteReveal/isMessageReveal below still
-// serve them.
+// THE PERSONAL REVEAL IS "A NOTE" IN USER-FACING COPY (founder,
+// 2026-09-17, after the Yvette session): "Reveal" was always too
+// abstract — too mysterious — and collided with step 3's standings
+// Reveal. "Note" is register-agnostic and self-descriptive, covers a
+// favourite or a message alike, and the possessive survives
+// authorship. Step 3 MAY now carry it, conditionally: on note-bearing
+// polls the step extends to "…along with a personal note"
+// (founder's wording, verbatim; name-forms rejected as
+// authorship-claiming). This supersedes the 2026-09-01
+// "step 3 never promises the personal reveal" rule — the objection
+// then was five awkward variants; "a note" needs one.
 //
 // STEP 3 IS THE COMPARISON (founder, 2026-09-15, after the Bates Wells
 // meeting surfaced the gambling misread): "The standings will be
@@ -31,77 +36,34 @@ export type MechanicStepsInput = {
   topicTitle: string
   /** "Marie Curie", "A & B", … — null falls back to "charity". */
   charityLine: string | null
+  /** The poll holds a personal note — step 3 says so. */
+  hasNote?: boolean
 }
 
-/** Inferred, never asked (founder, 2026-08-03): a reveal that opens with
- *  a quotation mark is a quote — no organiser-facing taxonomy UI. */
-export function isQuoteReveal(reveal: string | null | undefined): boolean {
-  return /^\s*["‘’“”']/.test(reveal ?? "")
-}
-
-/**
- * Does this reveal decline to name a favourite — i.e. is it a MESSAGE rather
- * than the usual disclosure?
- *
- * WHY IT EXISTS (founder, 2026-08-29: "lets have Marcus reveal something
- * other than his favourite"). Most reveals name one: "Purple. She wore it to
- * every important occasion." But a favpoll whose poll DECIDES something —
- * one whose TOPIC IS the outcome — cannot have one. The reveal is written at
- * creation, before any pledge, so the organiser's "favourite" would be a bet
- * on an undecided result rather than a fact about them: unwritable in
- * advance, and reading as either campaigning or losing whichever way it
- * lands.
- *
- * /fundraisers is the one surface demonstrating it: Marcus Bell wears
- * whichever hat the room picks, so his OWN favourite hat would be a hollow
- * thing to disclose, and he gives back a remark instead. If a future edit
- * gives him a favourite again, this capability goes undemonstrated.
- *
- * It stands on its own merits either way: the brand guide says an empty
- * reveal is fine and not to force one, which means those favpolls have
- * nothing at all behind the lock today.
- *
- * DERIVED, NOT STORED, exactly as isQuoteReveal is. No column, no migration
- * and no wizard field: an organiser who writes a message instead of a
- * favourite simply gets copy that says so.
- *
- * THE OPENING SENTENCE ONLY. The house pattern puts the favourite there —
- * "Purple.", "Ours will hopefully be Chengdu." — and
- * testing the whole reveal would misread a message that happens to mention an
- * option in passing.
- *
- * FAILS TOWARDS TODAY. Every uncertain case returns false, which produces the
- * exact copy this function did not exist to produce, so it can only improve
- * on the status quo and never regress it. That includes the empty-labels
- * case: with nothing to match against, a reveal cannot be shown to name
- * nothing.
- *
- * CONTENT-FREE, which matters because it is computed server-side and sent to
- * un-entitled viewers alongside `hasReveal` (see app/favpolls/[id]/page.tsx).
- * It discloses one bit — whether the reveal names an option — and never which
- * one, so it narrows nothing a guest did not already know from the mechanic.
- */
-export function isMessageReveal(
-  reveal: string | null | undefined,
-  favouriteLabels: readonly string[] | null | undefined
-): boolean {
-  const text = (reveal ?? "").trim()
-  if (!text) return false
-  const labels = (favouriteLabels ?? []).filter((l) => l?.trim())
-  if (!labels.length) return false
-  const opener = (text.split(/(?<=[.!?])\s/)[0] ?? text).toLowerCase()
-  return !labels.some((l) => opener.includes(l.trim().toLowerCase()))
-}
+// isQuoteReveal / isMessageReveal DELETED 2026-09-17: they only ever
+// fed copy forks on the unlock labels, and "a note" (the settled
+// user-facing term for the personal reveal) covers every shape —
+// favourite, quote or message — with one string. The message-shaped
+// reveal remains a CONTENT capability (Marcus' hat poll); it just no
+// longer needs detecting.
 
 export function buildMechanicSteps({
   topicTitle,
   charityLine,
+  hasNote = false,
 }: MechanicStepsInput): string[] {
   const topic = topicTitle.toLowerCase()
+  // "A personal note" (founder, 2026-09-17): authorship-neutral — a
+  // personal note can be by them or about them — with no name variants.
+  // "From X" and the possessive were both auditioned and rejected as
+  // authorship-claiming.
+  const step3 = hasNote
+    ? "Reveal where your favourite stands along with a personal note"
+    : "Reveal where your favourite stands among the others"
   return [
     `Pick your favourite ${topic}`,
     `Pledge what it's worth — all money will go to ${charityLine ?? "charity"}`,
-    "Reveal where your favourite stands among the others",
+    step3,
   ]
 }
 

@@ -18,6 +18,8 @@ export type PackData = {
   isCause: boolean
   /** First poll's topic title; null when no poll exists yet. */
   topicTitle: string | null
+  /** The poll holds a personal note — step 3 says so (2026-09-17). */
+  hasNote?: boolean
   charityNames: string[]
   /**
    * What the QR encodes — the SHORT form (/p/<code>), not the shareable
@@ -45,6 +47,7 @@ export function buildPackSteps(data: PackData): string[] | null {
   return buildMechanicSteps({
     topicTitle: data.topicTitle,
     charityLine: charities === "charity" ? null : charities,
+    hasNote: data.hasNote ?? false,
   })
 }
 

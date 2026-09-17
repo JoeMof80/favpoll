@@ -55,14 +55,10 @@ export default async function PackPage({ params }: Props) {
     name,
     isCause,
     topicTitle: firstPoll?.topics?.title ?? null,
-    // The two favourites joins above exist only for this: step 3 has to know
-    // whether the reveal names one of the options or is a message.
-    //
-    // BOTH SOURCES, matching /favpolls. The topic's own list is not the whole
-    // list — a poll also carries favpoll_poll_favourites, which is where a
-    // custom topic's items and anything a guest added live. Checking only the
-    // canonical list would read a reveal naming an ADDED favourite as a
-    // message, and print the wrong promise on the pack.
+    // One content-free bit: the pack's step 3 promises the personal note
+    // when one exists (2026-09-17 — the old message-vs-favourite
+    // detection retired with the "note" rename).
+    hasNote: !!firstPoll?.personal_reveal,
     charityNames: (favpoll.favpoll_charities ?? []).map(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (ec: any) => ec.charities.name
