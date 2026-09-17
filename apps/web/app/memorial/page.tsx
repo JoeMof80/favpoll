@@ -94,7 +94,7 @@ const ARTEFACTS = [
     key: "reveal",
     label: t("memorials.artefacts.reveal.label"),
     body: t("memorials.artefacts.reveal.body"),
-    feature: { label: "the reveal", href: "/features#reveal" },
+    feature: { label: "the personal note", href: "/features#reveal" },
     // The hero's own PhoneFrame at half size, still, holding the reveal
     // already given — so the device at the top of this page and the device
     // here are one object at two scales.

@@ -400,6 +400,7 @@ export async function generateDraft(
 
   await supabase.from("generated_drafts").insert({
     cache_key: cacheKey,
+    display_name: input.displayName ?? null,
     register: input.register,
     topic_id: input.topicId,
     primary_charity_id: input.primaryCharityId ?? null,
@@ -438,4 +439,71 @@ export async function safeGenerateDraft(
     )
     return null
   }
+}
+
+/**
+ * CACHE-ONLY draft lookup for the Story step's ghost prefetch (founder,
+ * 2026-09-17): contextual placeholders when a cached draft exists,
+ * static ghosts when not — NEVER a model call. Fired as soon as the
+ * calibration set is complete (the cache key needs the name, typed on
+ * the Info step), so the read lands before the Story step renders.
+ * Custom topics are excluded by the caller (empty topicId would collide
+ * in the key).
+ */
+export async function getCachedDraftGhosts(
+  input: GenerateDraftInput
+): Promise<{ about: string; reveal: string } | null> {
+  const { userId } = await auth()
+  if (!userId) return null
+  const supabase = createAdminClient()
+  const cacheKey = buildCacheKey(
+    input.register,
+    input.topicId,
+    input.subject,
+    input.primaryCharityId,
+    input.pronoun,
+    input.displayName,
+    input.grouping
+  )
+  const { data: cached } = await supabase
+    .from("generated_drafts")
+    .select("about, reveal")
+    .eq("cache_key", cacheKey)
+    .neq("status", "rejected")
+    .maybeSingle()
+  if (cached?.about && cached?.reveal) {
+    return { about: cached.about, reveal: cached.reveal }
+  }
+
+  // NAME-AGNOSTIC FALLBACK (founder, 2026-09-18): the key's name-hash
+  // siloed the cache per name, so the exact lookup almost always
+  // missed. Drafts are written NAME-FREE by design, so the ghost can
+  // safely borrow any name's draft for the same shape. Pronoun and
+  // grouping stay in the prefix — the copy genuinely inflects on both,
+  // and a wrong-pronoun ghost about YOUR person would read broken.
+  // Generation keeps its strict per-name key (the model's tone
+  // judgement depends on the name); only this read relaxes.
+  // Drafts BAKE THE NAME IN ("Marcus' is Porridge" — the house reveal
+  // pattern is name-first), so a borrowed draft must have its stored
+  // name swapped for the current one. Rows without a stored name
+  // (pre-2026-09-18) are skipped — the cache refreshes as people
+  // generate.
+  const namePrefix = cacheKey.slice(0, cacheKey.lastIndexOf(":") + 1)
+  const { data: sibling } = await supabase
+    .from("generated_drafts")
+    .select("about, reveal, display_name")
+    .like("cache_key", `${namePrefix}%`)
+    .neq("status", "rejected")
+    .not("display_name", "is", null)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  if (sibling?.about && sibling?.reveal) {
+    const from = (sibling.display_name ?? "").trim()
+    const to = (input.displayName ?? "").trim()
+    const swap = (text: string) =>
+      from && to ? text.split(from).join(to) : text
+    return { about: swap(sibling.about), reveal: swap(sibling.reveal) }
+  }
+  return null
 }

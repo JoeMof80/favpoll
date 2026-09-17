@@ -153,7 +153,7 @@ const IDEAS = [
     key: "reveal",
     label: t("fundraisers.artefacts.reveal.label"),
     body: t("fundraisers.artefacts.reveal.body"),
-    feature: { label: "the reveal", href: "/features#reveal" },
+    feature: { label: "the personal note", href: "/features#reveal" },
     // THE ONLY MESSAGE REVEAL ON THE SITE, and the only surface demonstrating
     // isMessageReveal. On a poll with a consequence the protagonist's own
     // favourite is hollow — Marcus wears whatever the room picks — so he gives

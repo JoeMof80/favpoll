@@ -127,7 +127,7 @@ const IDEAS = [
     key: "reveal",
     label: t("celebrations.artefacts.reveal.label"),
     body: t("celebrations.artefacts.reveal.body"),
-    feature: { label: "the reveal", href: "/features#reveal" },
+    feature: { label: "the personal note", href: "/features#reveal" },
     // The couple's answer is not competing with the guests' at all — the
     // room says where it loves, they say where they are GOING — which makes
     // this a better register for the reveal than the memorial it was built
