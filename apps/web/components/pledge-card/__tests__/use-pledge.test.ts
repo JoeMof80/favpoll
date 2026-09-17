@@ -54,7 +54,7 @@ function makePoll(id: string): FavpollPollWithItems {
     id,
     favpoll_id: "favpoll-1",
     topic_id: "topic-1",
-    personal_reveal: null,
+    personal_note: null,
     created_at: "2024-01-01T00:00:00Z",
     topics: {
       id: "topic-1",

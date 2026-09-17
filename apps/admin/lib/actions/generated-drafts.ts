@@ -11,7 +11,7 @@ export type GeneratedDraft = {
   register: string;
   subject: "someone" | "cause";
   about: string;
-  reveal: string;
+  note: string;
   status: DraftStatus;
   topic_title: string;
   charity_name: string | null;
@@ -26,7 +26,7 @@ export async function getGeneratedDrafts(
   const { data, error } = await supabase
     .from("generated_drafts")
     .select(
-      "id, cache_key, register, subject, about, reveal, status, created_at, topics(title), charities(name)",
+      "id, cache_key, register, subject, about, note, status, created_at, topics(title), charities(name)",
     )
     .eq("status", filter)
     .order("created_at", { ascending: false });
@@ -40,7 +40,7 @@ export async function getGeneratedDrafts(
     register: row.register,
     subject: row.subject,
     about: row.about,
-    reveal: row.reveal,
+    note: row.note,
     status: row.status as DraftStatus,
     topic_title: row.topics?.title ?? "",
     charity_name: row.charities?.name ?? null,
@@ -52,11 +52,11 @@ export async function getGeneratedDrafts(
 
 export async function updateGeneratedDraft(
   id: string,
-  fields: { about?: string; reveal?: string },
+  fields: { about?: string; note?: string },
 ): Promise<{ error: string | null }> {
   const update: Record<string, string> = {};
   if (fields.about !== undefined) update.about = fields.about;
-  if (fields.reveal !== undefined) update.reveal = fields.reveal;
+  if (fields.note !== undefined) update.note = fields.note;
 
   if (Object.keys(update).length === 0) return { error: "Nothing to update." };
 

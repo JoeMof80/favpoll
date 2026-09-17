@@ -62,7 +62,7 @@ const FAVPOLL_SELECT = `
   favpoll_polls (
     id,
     topic_id,
-    personal_reveal,
+    personal_note,
     topics (
       title,
       is_finite,
@@ -79,7 +79,7 @@ type RawEpf = { favourites: RawFavourite }
 type RawPoll = {
   id: string
   topic_id: string | null
-  personal_reveal: string | null
+  personal_note: string | null
   topics: {
     title: string
     is_finite: boolean
@@ -277,7 +277,7 @@ export default async function FavpollsPage({
       poll = {
         id: rawPoll.id,
         topic_id: rawPoll.topic_id,
-        has_note: !!rawPoll.personal_reveal,
+        has_note: !!rawPoll.personal_note,
         topic: rawPoll.topics
           ? {
               title: rawPoll.topics.title,

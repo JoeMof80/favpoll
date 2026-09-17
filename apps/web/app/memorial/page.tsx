@@ -6,7 +6,7 @@ import { ProSection } from "@/components/landing/pro-section"
 import { OrderOfServiceVignette } from "@/components/landing/order-of-service-vignette"
 import { MEMORIAL_SCENE } from "@/components/landing/demo-fixture"
 import { LiveVignette } from "@/components/landing/live-vignette"
-import { RevealVignettePhone } from "@/components/landing/reveal-vignette"
+import { NoteVignettePhone } from "@/components/landing/note-vignette"
 import { KeepsakeVignetteDetail } from "@/components/landing/keepsake-vignette"
 import { Button } from "@/components/ui/button"
 import { withQuietTail } from "@/components/landing/quiet-tail"
@@ -87,7 +87,7 @@ const ARTEFACTS = [
     // list ran paper -> room -> paper. On a memorial the reveal is not one
     // artefact among four, it is the one the whole thing is for.
     //
-    // RevealVignette already uses the MEMORIAL scene by its own design —
+    // NoteVignette already uses the MEMORIAL scene by its own design —
     // "a personal reveal needs a person: the cause scene has no
     // protagonist" — so unlike the pack and the display it needs no
     // memorial twin.
@@ -98,7 +98,7 @@ const ARTEFACTS = [
     // The hero's own PhoneFrame at half size, still, holding the reveal
     // already given — so the device at the top of this page and the device
     // here are one object at two scales.
-    artefact: <RevealVignettePhone />,
+    artefact: <NoteVignettePhone />,
   },
   {
     key: "display",

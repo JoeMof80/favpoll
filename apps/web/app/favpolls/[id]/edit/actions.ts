@@ -26,7 +26,7 @@ async function upsertPollForFavpoll(
       .from("favpoll_polls")
       .update({
         topic_id: poll.topicId,
-        personal_reveal: poll.reveal?.trim() || null,
+        personal_note: poll.note?.trim() || null,
       })
       .eq("id", poll.id)
 
@@ -117,7 +117,7 @@ async function upsertPollForFavpoll(
     .insert({
       favpoll_id: favpollId,
       topic_id: topicId,
-      personal_reveal: poll.reveal?.trim() || null,
+      personal_note: poll.note?.trim() || null,
     })
     .select("id")
     .single()
@@ -183,7 +183,7 @@ export async function updateClosesAt(favpollId: string, closesAt: string) {
   if (!favpoll || favpoll.created_by !== userId) throw new Error("Unauthorized")
 
   // A settled favpoll is a record (audit, 2026-09-06): charges are
-  // captured and the reveal has been shown — nothing is editable after
+  // captured and the note has been shown — nothing is editable after
   // close. The manage toolbar already hides Edit; this is the truth.
   if (favpoll.closed_at)
     throw new Error("This favpoll has closed and can no longer be edited.")
@@ -252,7 +252,7 @@ export async function updateFavpoll(
   if (!favpoll || favpoll.created_by !== userId) throw new Error("Unauthorized")
 
   // A settled favpoll is a record (audit, 2026-09-06): charges are
-  // captured and the reveal has been shown — nothing is editable after
+  // captured and the note has been shown — nothing is editable after
   // close. The manage toolbar already hides Edit; this is the truth.
   if (favpoll.closed_at)
     throw new Error("This favpoll has closed and can no longer be edited.")

@@ -107,7 +107,7 @@ describe("ProcessOverview", () => {
     expect(screen.getAllByTestId("phone-frame")).toHaveLength(4)
     expect(
       screen.getAllByTestId("demo-card").map((el) => el.dataset.phase)
-    ).toEqual(["arriving", "selected", "amount-picked", "reveal"])
+    ).toEqual(["arriving", "selected", "amount-picked", "note"])
 
     // The card is paper at wallet size; the display hangs in a TV, not a
     // browser window and not a phone.

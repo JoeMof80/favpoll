@@ -32,9 +32,9 @@ vi.mock("framer-motion", () => {
 })
 
 // ── Sub-component stubs ───────────────────────────────────────────────────────
-vi.mock("@/components/favpoll-card/poll-reveal", () => ({
-  PollReveal: ({ personalReveal }: { personalReveal: string }) => (
-    <blockquote data-testid="poll-reveal">{personalReveal}</blockquote>
+vi.mock("@/components/favpoll-card/poll-note", () => ({
+  PollNote: ({ personalNote }: { personalNote: string }) => (
+    <blockquote data-testid="poll-reveal">{personalNote}</blockquote>
   ),
 }))
 
@@ -137,7 +137,7 @@ describe("DemoCard — locked phases", () => {
 
 // ── Unlocked phases ───────────────────────────────────────────────────────────
 
-const UNLOCKED_PHASES: Phase[] = ["clearing", "results", "reveal"]
+const UNLOCKED_PHASES: Phase[] = ["clearing", "results", "note"]
 
 describe("DemoCard — unlocked phases", () => {
   it.each(UNLOCKED_PHASES)("lock card is absent in '%s' phase", (phase) => {
@@ -146,7 +146,7 @@ describe("DemoCard — unlocked phases", () => {
   })
 
   it("no blur-xs present when unlocked", () => {
-    const { container } = renderCard("reveal", realWidths)
+    const { container } = renderCard("note", realWidths)
     expect(container.querySelector(".blur-xs")).toBeNull()
   })
 
@@ -154,12 +154,12 @@ describe("DemoCard — unlocked phases", () => {
     "reveal text accessible via reserve copy in '%s' phase",
     (phase) => {
       renderCard(phase, realWidths)
-      // Two PollReveal nodes render when unlocked: an invisible reserve (full
+      // Two PollNote nodes render when unlocked: an invisible reserve (full
       // text, always present) and a typed copy (fills via setInterval — starts
       // as NBSP in synchronous tests). The reserve is first in DOM order.
       const reveals = screen.getAllByTestId("poll-reveal")
       expect(reveals.length).toBeGreaterThanOrEqual(2)
-      expect(reveals[0]).toHaveTextContent(scene.poll.personal_reveal)
+      expect(reveals[0]).toHaveTextContent(scene.poll.personal_note)
     }
   )
 })
@@ -203,7 +203,7 @@ describe("DemoCard — bar widths", () => {
   })
 
   it("renders bars at real widths when unlocked", () => {
-    const { container } = renderCard("reveal", realWidths)
+    const { container } = renderCard("note", realWidths)
     const barFills = container.querySelectorAll(
       'ol[aria-label="Current rankings"] [role="presentation"] > div'
     )
@@ -332,19 +332,19 @@ describe("DemoCard — dialog mimics", () => {
 describe("DemoCard — footer", () => {
   it("renders the charity name", () => {
     // Test in unlocked phase so the footer is not aria-hidden.
-    renderCard("reveal", realWidths)
+    renderCard("note", realWidths)
     expect(screen.getByText(charity.name)).toBeInTheDocument()
   })
 
   it("renders the charity registration number", () => {
-    renderCard("reveal", realWidths)
+    renderCard("note", realWidths)
     expect(
       screen.getByText(`Charity no. ${charity.registered_number}`)
     ).toBeInTheDocument()
   })
 
   it("renders the GBP-formatted total raised", () => {
-    renderCard("reveal", realWidths)
+    renderCard("note", realWidths)
     // scene.total = "£1,005" → raisedNum = 1005 → GBP.format(1005) = "£1,005"
     expect(screen.getByText(scene.total)).toBeInTheDocument()
   })
@@ -386,10 +386,10 @@ describe("LandingHero — reduced motion", () => {
   it("shows the real reveal text in the resolved state", () => {
     render(<LandingHero liveCount={6} totalLive={0} />)
     // With prefersReducedMotion=true, useTyped returns full text immediately,
-    // so both the reserve and typed PollReveal nodes carry the full text.
+    // so both the reserve and typed PollNote nodes carry the full text.
     const reveals = screen.getAllByTestId("poll-reveal")
     expect(reveals.length).toBeGreaterThanOrEqual(1)
-    expect(reveals[0]).toHaveTextContent(SCENES[0].poll.personal_reveal)
+    expect(reveals[0]).toHaveTextContent(SCENES[0].poll.personal_note)
   })
 
   // Derived from the scene, not a copy string: this test hardcoded "For young
@@ -454,9 +454,9 @@ describe("DemoCard — cause (faceless) vs fundraiser (has a runner)", () => {
   })
 
   it("shows the cause reveal text when unlocked", () => {
-    renderScene(causeScene, "reveal")
+    renderScene(causeScene, "note")
     const reveals = screen.getAllByTestId("poll-reveal")
-    expect(reveals[0]).toHaveTextContent(causeScene.poll.personal_reveal)
+    expect(reveals[0]).toHaveTextContent(causeScene.poll.personal_note)
   })
 
   it("fundraiser keeps its protagonist — avatar shown, universal lock label", () => {

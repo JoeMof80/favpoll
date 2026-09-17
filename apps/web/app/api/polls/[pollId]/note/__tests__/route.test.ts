@@ -12,13 +12,13 @@ vi.mock("@/lib/supabase/admin", () => ({
   createAdminClient: () => mock.supabase,
 }))
 
-import { GET } from "@/app/api/polls/[pollId]/reveal/route"
+import { GET } from "@/app/api/polls/[pollId]/note/route"
 
 const FUTURE_DATE = "2099-01-01T00:00:00Z"
 const PAST_DATE = "2020-01-01T00:00:00Z"
 
 const POLL_ROW = {
-  personal_reveal: "Belinda's was purple.",
+  personal_note: "Belinda's was purple.",
   topic_id: "topic-1",
   favpoll_id: "favpoll-1",
   topics: { is_finite: true },
@@ -77,7 +77,7 @@ describe("GET /api/polls/[pollId]/reveal — closed poll", () => {
     const res = await GET(makeRequest(), makeParams())
     expect(res.status).toBe(200)
     const body = await res.json()
-    expect(body.personal_reveal).toBe("Belinda's was purple.")
+    expect(body.personal_note).toBe("Belinda's was purple.")
     expect(body.items).toHaveLength(2)
   })
 })
@@ -132,7 +132,7 @@ describe("GET /api/polls/[pollId]/reveal — signed-in with pledge", () => {
     const res = await GET(makeRequest(), makeParams())
     expect(res.status).toBe(200)
     const body = await res.json()
-    expect(body.personal_reveal).toBe("Belinda's was purple.")
+    expect(body.personal_note).toBe("Belinda's was purple.")
     expect(body.items).toHaveLength(2)
     // The overlay must replace the all-time record with THIS poll's sums —
     // with no pledge allocations, every bar is zero (the raw favourites
@@ -158,12 +158,12 @@ describe("GET /api/polls/[pollId]/reveal — guest with valid token", () => {
     const res = await GET(makeRequest("valid-guest-token"), makeParams())
     expect(res.status).toBe(200)
     const body = await res.json()
-    expect(body.personal_reveal).toBe("Belinda's was purple.")
+    expect(body.personal_note).toBe("Belinda's was purple.")
     expect(body.items).toHaveLength(2)
   })
 
-  it("returns null personal_reveal when poll has none", async () => {
-    mock.queue({ ...POLL_ROW, personal_reveal: null })
+  it("returns null personal_note when poll has none", async () => {
+    mock.queue({ ...POLL_ROW, personal_note: null })
     mock.queue(OPEN_FAVPOLL)
     mock.queue([{ id: "pledge-2" }])
     mock.queue(ITEMS)
@@ -172,6 +172,6 @@ describe("GET /api/polls/[pollId]/reveal — guest with valid token", () => {
     const res = await GET(makeRequest("valid-guest-token"), makeParams())
     expect(res.status).toBe(200)
     const body = await res.json()
-    expect(body.personal_reveal).toBeNull()
+    expect(body.personal_note).toBeNull()
   })
 })

@@ -565,7 +565,7 @@ export function LandingHero({
                 <PhoneFrame>
                   <DemoCard
                     scene={scene}
-                    phase="reveal"
+                    phase="note"
                     barWidths={scene.results.map((r) => r.widthPercent)}
                     prefersReducedMotion
                     device="phone"

@@ -161,7 +161,7 @@ export const DEMO_KEEPSAKE_WALKTHROUGH_DATA: KeepsakeData = {
   name: DEMO_HEADLINE.name,
   context: DEMO_SCENE.protagonist?.context ?? DEMO_SCENE.context ?? null,
   topicTitle: DEMO_SCENE.poll.topic.title,
-  reveal: DEMO_SCENE.poll.personal_reveal,
+  reveal: DEMO_SCENE.poll.personal_note,
   totalRaised: pounds(DEMO_SCENE.total),
   charityNames: DEMO_SCENE.charities.map((c) => c.name),
   // House format: ordinal, never ISO. A Sweet Sixteen, so the favpoll closed
@@ -189,7 +189,7 @@ export const DEMO_KEEPSAKE_DATA: KeepsakeData = {
   name: MEMORIAL_SCENE.protagonist?.name ?? "",
   context: MEMORIAL_SCENE.protagonist?.context ?? null,
   topicTitle: MEMORIAL_SCENE.poll.topic.title,
-  reveal: MEMORIAL_SCENE.poll.personal_reveal,
+  reveal: MEMORIAL_SCENE.poll.personal_note,
   totalRaised: pounds(MEMORIAL_SCENE.total),
   charityNames: MEMORIAL_SCENE.charities.map((c) => c.name),
   // The scene carries no dates; Belinda's context ends in 2024, so the
@@ -213,7 +213,7 @@ export const WEDDING_KEEPSAKE_DATA: KeepsakeData = {
   name: WEDDING_HEADLINE.name,
   context: WEDDING_SCENE.protagonist?.context ?? null,
   topicTitle: WEDDING_SCENE.poll.topic.title,
-  reveal: WEDDING_SCENE.poll.personal_reveal,
+  reveal: WEDDING_SCENE.poll.personal_note,
   totalRaised: pounds(WEDDING_SCENE.total),
   charityNames: WEDDING_SCENE.charities.map((c) => c.name),
   // House format: ordinal, never ISO. The favpoll closed a few days after
@@ -251,7 +251,7 @@ export const FUNDRAISER_KEEPSAKE_DATA: KeepsakeData = {
   name: FUNDRAISER_HEADLINE.name,
   context: FUNDRAISER_SCENE.protagonist?.context ?? null,
   topicTitle: FUNDRAISER_SCENE.poll.topic.title,
-  reveal: FUNDRAISER_SCENE.poll.personal_reveal,
+  reveal: FUNDRAISER_SCENE.poll.personal_note,
   totalRaised: pounds(FUNDRAISER_SCENE.total),
   charityNames: FUNDRAISER_SCENE.charities.map((c) => c.name),
   // House format: ordinal, never ISO. The favpoll closed the week AFTER the

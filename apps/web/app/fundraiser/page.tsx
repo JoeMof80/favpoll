@@ -14,7 +14,7 @@ import {
 } from "@/components/landing/how-it-works-hints"
 import { IdeasSection } from "@/components/landing/ideas-section"
 import { ShareVignette } from "@/components/landing/share-vignette"
-import { RevealVignettePhone } from "@/components/landing/reveal-vignette"
+import { NoteVignettePhone } from "@/components/landing/note-vignette"
 import { TopicPickerVignette } from "@/components/landing/topic-picker-vignette"
 import { KeepsakeVignetteDetail } from "@/components/landing/keepsake-vignette"
 import {
@@ -159,7 +159,7 @@ const IDEAS = [
     // favourite is hollow — Marcus wears whatever the room picks — so he gives
     // back a remark instead. The product follows with no field set: the poster
     // one row above promises a message too.
-    artefact: <RevealVignettePhone scene={FUNDRAISER_SCENE} />,
+    artefact: <NoteVignettePhone scene={FUNDRAISER_SCENE} />,
   },
   {
     key: "keepsake",

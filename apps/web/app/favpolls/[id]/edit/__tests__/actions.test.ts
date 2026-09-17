@@ -42,7 +42,7 @@ function makeInput(
       topicIsCustom: false,
       customTopicTitle: "",
       customTopicItems: [],
-      reveal: null,
+      note: null,
       infiniteItems: null,
     },
     ...overrides,

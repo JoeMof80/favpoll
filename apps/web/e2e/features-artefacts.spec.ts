@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test"
 
 // The features page shows REAL components as its artefacts — the printed
-// pack, the pledge dialog's fund split, PollReveal, CharityBanner, WallOfFavourites,
+// pack, the pledge dialog's fund split, PollNote, CharityBanner, WallOfFavourites,
 // and a room with the display in it. That is the point: a page drawn as
 // lookalikes would describe a product it could quietly stop resembling.
 //

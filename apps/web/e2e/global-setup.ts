@@ -8,7 +8,7 @@
  *   - protagonist: "E2E Playwright Test" (memorial, individual)
  *   - topic: Colour (finite — all canonical colour items linked)
  *   - charity: Marie Curie
- *   - personal_reveal: the known reveal text asserted in the spec
+ *   - personal_note: the known reveal text asserted in the spec
  *   - closes_at: 90 days from now (always open when tests run)
  *   - is_listed: false (not shown on /favpolls; reachable by ID)
  *   - created_by: "user_e2e_playwright" (identifies e2e-owned rows)
@@ -103,7 +103,7 @@ export default async function globalSetup() {
     writeState({
       openFavpollId: existing.id,
       openPollId: pollId,
-      revealText: E2E_REVEAL_TEXT,
+      noteText: E2E_REVEAL_TEXT,
     })
     console.log(
       `[e2e/global-setup] ✓ Reusing existing test favpoll: ${existing.id} (closes_at extended)`
@@ -210,7 +210,7 @@ export default async function globalSetup() {
     .insert({
       favpoll_id: favpoll.id,
       topic_id: topic.id,
-      personal_reveal: E2E_REVEAL_TEXT,
+      personal_note: E2E_REVEAL_TEXT,
     })
     .select("id")
     .single()
@@ -243,7 +243,7 @@ export default async function globalSetup() {
   writeState({
     openFavpollId: favpoll.id,
     openPollId: poll.id,
-    revealText: E2E_REVEAL_TEXT,
+    noteText: E2E_REVEAL_TEXT,
   })
   console.log(`[e2e/global-setup] ✓ Created test favpoll: ${favpoll.id}`)
   await warmUpFavpollPage(favpoll.id)
@@ -295,7 +295,7 @@ async function warmUpFavpollPage(favpollId: string) {
 type State = {
   openFavpollId: string
   openPollId: string | null
-  revealText: string
+  noteText: string
 }
 
 function writeState(state: State) {

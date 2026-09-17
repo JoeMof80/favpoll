@@ -20,7 +20,7 @@ export function useDemoLoop(scenes: HeroScene[] = SCENES) {
 
   const [sceneIndex, setSceneIndex] = useState(0)
   // Start resolved so the payoff is visible on first paint.
-  const [phase, setPhase] = useState<Phase>("reveal")
+  const [phase, setPhase] = useState<Phase>("note")
   const [barWidths, setBarWidths] = useState<number[]>(
     scenes[0].results.map((r) => r.widthPercent)
   )
@@ -105,7 +105,7 @@ export function useDemoLoop(scenes: HeroScene[] = SCENES) {
     })
 
     addT(() => setPhase("results"), HOLD + READ + 9800)
-    addT(() => setPhase("reveal"), HOLD + READ + 11200)
+    addT(() => setPhase("note"), HOLD + READ + 11200)
 
     addT(() => setFading(true), HOLD + READ + 13700)
     addT(
@@ -132,7 +132,7 @@ export function useDemoLoop(scenes: HeroScene[] = SCENES) {
     clearAll()
     setFading(false)
     if (prefersReducedMotion) {
-      setPhase("reveal")
+      setPhase("note")
       setBarWidths(scenes[i].results.map((r) => r.widthPercent))
     } else {
       setPhase("arriving")

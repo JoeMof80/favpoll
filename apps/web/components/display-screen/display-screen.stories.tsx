@@ -5,21 +5,21 @@ import { sceneFavourites as makeItems } from "@/components/hero-demo-panel/scene
 
 const MEMORIAL_POLL = {
   id: "poll-memorial",
-  personal_reveal: SCENES[0].poll.personal_reveal,
+  personal_note: SCENES[0].poll.personal_note,
   topic: { id: "topic-colour", title: SCENES[0].poll.topic.title },
   items: makeItems(SCENES[0], "topic-colour"),
 }
 
 const BIRTHDAY_POLL = {
   id: "poll-birthday",
-  personal_reveal: SCENES[1].poll.personal_reveal,
+  personal_note: SCENES[1].poll.personal_note,
   topic: { id: "topic-ice-cream", title: SCENES[1].poll.topic.title },
   items: makeItems(SCENES[1], "topic-ice-cream"),
 }
 
 const FUNDRAISER_POLL = {
   id: "poll-fundraiser",
-  personal_reveal: SCENES[2].poll.personal_reveal,
+  personal_note: SCENES[2].poll.personal_note,
   topic: { id: "topic-dance", title: SCENES[2].poll.topic.title },
   items: makeItems(SCENES[2], "topic-dance"),
 }

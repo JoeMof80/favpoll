@@ -14,7 +14,7 @@ import {
 } from "@/components/landing/how-it-works-hints"
 import { IdeasSection } from "@/components/landing/ideas-section"
 import { FoldedCardVignette } from "@/components/landing/folded-card-vignette"
-import { RevealVignettePhone } from "@/components/landing/reveal-vignette"
+import { NoteVignettePhone } from "@/components/landing/note-vignette"
 import { LiveVignette } from "@/components/landing/live-vignette"
 import { KeepsakeVignetteDetail } from "@/components/landing/keepsake-vignette"
 import {
@@ -132,7 +132,7 @@ const IDEAS = [
     // room says where it loves, they say where they are GOING — which makes
     // this a better register for the reveal than the memorial it was built
     // for.
-    artefact: <RevealVignettePhone scene={WEDDING_SCENE} />,
+    artefact: <NoteVignettePhone scene={WEDDING_SCENE} />,
   },
   {
     key: "display",

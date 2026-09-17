@@ -111,11 +111,11 @@ describe("favpollFormSchema — field length limits", () => {
   it("rejects reveal exceeding 280 characters", () => {
     const result = favpollFormSchema.safeParse({
       ...VALID_BASE,
-      reveal: "A".repeat(281),
+      note: "A".repeat(281),
     })
     expect(result.success).toBe(false)
     if (!result.success) {
-      expect(result.error.issues.some((i) => i.path[0] === "reveal")).toBe(true)
+      expect(result.error.issues.some((i) => i.path[0] === "note")).toBe(true)
     }
   })
 })

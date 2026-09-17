@@ -47,7 +47,7 @@ type Props = {
   isOrganiser: boolean
   entitled: boolean
   /** Whether a personal reveal exists (content withheld until entitled) */
-  hasReveal: boolean
+  hasNote: boolean
   wallEntries: WallEntry[]
   rankHistory: RankHistory | null
   /** Charities that haven't yet consented to receive pledges (consent-first
@@ -66,7 +66,7 @@ export function FavpollContent({
   clerkUserId,
   isOrganiser,
   entitled,
-  hasReveal,
+  hasNote,
   wallEntries,
   rankHistory,
   gatedCharityNames = [],
@@ -90,7 +90,7 @@ export function FavpollContent({
     addItemHandler,
     handleViewChange,
     localEntitled,
-    effectiveReveal,
+    effectiveNote,
     effectiveItems,
   } = useFavpollContent({
     favpoll,
@@ -186,8 +186,8 @@ export function FavpollContent({
             favpollId={favpoll.id}
             onViewChange={handleViewChange}
             entitled={localEntitled}
-            personalReveal={effectiveReveal}
-            hasReveal={hasReveal}
+            personalNote={effectiveNote}
+            hasNote={hasNote}
             charityLine={charityLine || null}
             initialItems={effectiveItems}
             onOpenPledgeDialog={

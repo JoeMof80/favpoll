@@ -132,7 +132,7 @@ const BEATS: Beat[] = [
     key: "reveal",
     label: t("landing.how.reveal.label"),
     body: t("landing.how.reveal.body"),
-    medium: { kind: "phone", phase: "reveal" },
+    medium: { kind: "phone", phase: "note" },
   },
   {
     key: "room",

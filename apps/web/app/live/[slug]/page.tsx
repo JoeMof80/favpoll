@@ -142,7 +142,7 @@ export default async function LiveDisplayPage({ params }: Props) {
   const displayPoll = rawPoll
     ? {
         id: rawPoll.id,
-        personal_reveal: rawPoll.personal_reveal ?? null,
+        personal_note: rawPoll.personal_note ?? null,
         topic: {
           id:
             (rawPoll.topics as { id: string; title: string } | null)?.id ??

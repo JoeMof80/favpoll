@@ -21,7 +21,7 @@ type InfiniteItems = {
 type PollInput = {
   topicId: string | null
   customTopic: CustomTopic | null
-  reveal: string | null
+  note: string | null
   infiniteItems: InfiniteItems | null
   addedItems?: string[]
 }
@@ -155,7 +155,7 @@ async function createPollForFavpoll(
     .insert({
       favpoll_id: favpollId,
       topic_id: topicId,
-      personal_reveal: poll.reveal?.trim() || null,
+      personal_note: poll.note?.trim() || null,
     })
     .select("id")
     .single()

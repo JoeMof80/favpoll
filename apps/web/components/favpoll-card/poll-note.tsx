@@ -1,19 +1,19 @@
-type PollRevealProps = {
-  personalReveal?: string | null
+type PollNoteProps = {
+  personalNote?: string | null
   protagonistFirstName?: string
   role?: string
   "aria-label"?: string
   "aria-live"?: "polite" | "assertive" | "off"
 }
 
-export function PollReveal({
-  personalReveal,
+export function PollNote({
+  personalNote,
   protagonistFirstName,
   role,
   "aria-label": ariaLabel,
   "aria-live": ariaLive,
-}: PollRevealProps) {
-  if (!personalReveal) return null
+}: PollNoteProps) {
+  if (!personalNote) return null
 
   return (
     // h-full is inert in normal auto-height flow; in reserved-height
@@ -28,7 +28,7 @@ export function PollReveal({
         role={role}
         aria-live={ariaLive}
       >
-        {personalReveal}
+        {personalNote}
       </blockquote>
     </div>
   )

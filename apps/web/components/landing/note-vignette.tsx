@@ -1,7 +1,7 @@
 "use client"
 
 import { paletteForSceneKind } from "@/lib/register-palette"
-import { PollReveal } from "@/components/favpoll-card/poll-reveal"
+import { PollNote } from "@/components/favpoll-card/poll-note"
 import { PollHeading } from "@/components/poll-heading"
 import {
   PhoneFrame,
@@ -16,7 +16,7 @@ import type { HeroScene } from "@/components/hero-demo-panel/scenes"
 
 // The personal reveal, locked and then given.
 //
-// PollReveal is the REAL component — the same blockquote, the same rule down
+// PollNote is the REAL component — the same blockquote, the same rule down
 // its left edge, the same reveal-foreground token — under the same blurred
 // decoy the guest page uses before a pledge lands. Both halves of the arc,
 // because the reveal only means anything against what preceded it.
@@ -54,7 +54,7 @@ import type { HeroScene } from "@/components/hero-demo-panel/scenes"
 // that arc IS the feature being described.
 //
 // MAGNIFY scales the WHOLE callout rather than its text, so the padding, the
-// border radius, the shadow and PollReveal's own rule down the left edge all
+// border radius, the shadow and PollNote's own rule down the left edge all
 // grow together. Authored at 1/MAGNIFY of its final width, which is what
 // makes the transform land on exactly the intended box.
 const MAGNIFY = 5 / 3
@@ -119,13 +119,13 @@ const CALLOUT = {
   width: CALLOUT_W,
 }
 
-export function RevealVignettePhone({
+export function NoteVignettePhone({
   scene = MEMORIAL_SCENE,
 }: { scene?: HeroScene } = {}) {
   // Derived per scene rather than from the module consts, so a register page
   // can point this at its own favpoll. The memorial stays the default: this
   // vignette was built for it, and /features expects it.
-  const reveal = scene.poll.personal_reveal ?? ""
+  const reveal = scene.poll.personal_note ?? ""
   const firstName = protagonistShortName(scene.protagonist?.name ?? "")
   // THE PANEL TAKES THE SAME PALETTE AS THE CARD: the artefact box wears the
   // scene's register, so the phone and the magnifier beside it — a sibling,
@@ -157,7 +157,7 @@ export function RevealVignettePhone({
             <PhoneFrame>
               <DemoCard
                 scene={scene}
-                phase="reveal"
+                phase="note"
                 barWidths={scene.results.map((r) => r.widthPercent)}
                 prefersReducedMotion
                 device="phone"
@@ -181,7 +181,7 @@ export function RevealVignettePhone({
                 magified section should resemble exactly the reveal"). The
                 same two components in the same order with the same space-y-4
                 between them, which is how DemoCard and the real poll-section
-                both lay it out — PollHeading's inert ribbon over PollReveal.
+                both lay it out — PollHeading's inert ribbon over PollNote.
                 It was a hand-set eyebrow reading "Belinda's favourite colour"
                 before: right words, wrong object. A magnifier that shows
                 something the screen underneath does not is not a magnifier. */}
@@ -191,8 +191,8 @@ export function RevealVignettePhone({
                 size="lg"
                 inert
               />
-              <PollReveal
-                personalReveal={reveal}
+              <PollNote
+                personalNote={reveal}
                 protagonistFirstName={firstName}
               />
             </div>
