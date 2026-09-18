@@ -200,6 +200,23 @@ describe("usePledgeDialog — the picker", () => {
     ])
   })
 
+  it("adding a duplicate selects the existing chip instead of calling the server", async () => {
+    // Founder, 2026-09-18: same intent, better outcome — no constraint
+    // error to read. Case-insensitive against the merged favourites.
+    const onAddItem = vi.fn()
+    const { result } = renderHook(() =>
+      usePledgeDialog({ ...baseOptions, onAddItem })
+    )
+    act(() => result.current.enterAddView())
+    act(() => result.current.setAddText("  rEd "))
+    await act(async () => result.current.handleAdd())
+    expect(onAddItem).not.toHaveBeenCalled()
+    expect(result.current.selectedIds).toEqual(["red"])
+    expect(result.current.pickerView).toBe("select")
+    expect(result.current.search).toBe("")
+    expect(result.current.addError).toBeNull()
+  })
+
   it("a failed add surfaces addError and stays in the add view", async () => {
     const onAddItem = vi.fn().mockRejectedValue(new Error("Too many"))
     const { result } = renderHook(() =>

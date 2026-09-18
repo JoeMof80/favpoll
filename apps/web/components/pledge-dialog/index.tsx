@@ -140,8 +140,6 @@ export function PledgeDialog({
       search={dialog.search}
       onSearchChange={dialog.setSearch}
       topicTitle={topicTitle}
-      canAdd={dialog.canAdd}
-      onEnterAdd={dialog.enterAddView}
     />
   )
 
@@ -317,7 +315,9 @@ export function PledgeDialog({
               search={dialog.search}
               isInfinite={!pollWithItems.topics.is_finite}
               hasAddItem={!!onAddItem}
+              canAdd={dialog.canAdd}
               onToggle={dialog.toggleFavourite}
+              onEnterAdd={dialog.enterAddView}
             />
           </div>
         )}

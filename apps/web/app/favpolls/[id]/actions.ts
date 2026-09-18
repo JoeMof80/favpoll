@@ -417,6 +417,18 @@ export async function addGuestItem(
     (owner?.favpolls as any)?.allow_guest_items !== false
   if (!allowed) throw new Error("This favpoll is not taking new favourites")
 
+  // Idempotent on the poll link (mirrors the organiser path): a label
+  // that matches an already-linked favourite must not surface the unique
+  // constraint — the client selects the existing chip, and this backstop
+  // covers direct calls.
+  const { data: existingEpi } = await supabase
+    .from("favpoll_poll_favourites")
+    .select("favourite_id")
+    .eq("favpoll_poll_id", favpollPollId)
+    .eq("favourite_id", favouriteId)
+    .maybeSingle()
+  if (existingEpi) return favouriteId
+
   const { error: epiErr } = await supabase
     .from("favpoll_poll_favourites")
     .insert({
