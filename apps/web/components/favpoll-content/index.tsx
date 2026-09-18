@@ -160,6 +160,77 @@ export function FavpollContent({
       />
     ) : null
 
+  // The rail's cards, shared with the MOBILE STACK below the standings
+  // (founder, 2026-09-18): PageLayout hides the right column below md,
+  // which left phones with no countdown, no keepsake link on closed
+  // favpolls, no guest book and no pot card. The charity banner is NOT
+  // in the stack — the fixed mobile charity footer already carries
+  // charity + total + goal, and twice on one screen is noise.
+  const stateCard = isClosed ? (
+    <div className="space-y-1 rounded-lg border border-border bg-card px-5 py-4">
+      <SectionEyebrow variant="muted" className="font-semibold">
+        Poll closed
+      </SectionEyebrow>
+      {closedAt && <p className="text-sm text-muted-foreground">{closedAt}</p>}
+      <p className="text-xl font-medium text-primary">
+        {formatPoundsExact(favpoll.total_raised ?? totalRaised)}
+      </p>
+      <p className="text-xs text-muted-foreground">raised in total</p>
+      {/* Outline at default height, matching the pot card's
+          top-up button (founder, 2026-09-14: "larger too"). */}
+      <Button asChild variant="outline" className="mt-3 flex w-full">
+        <a href={`/favpolls/${favpoll.id}/keepsake`}>
+          <FileText data-icon="inline-start" aria-hidden="true" />
+          Keepsake
+        </a>
+      </Button>
+    </div>
+  ) : (
+    <div className="rounded-lg border border-border bg-card px-5 py-4">
+      <Countdown closesAt={favpoll.closes_at} />
+    </div>
+  )
+
+  const guestBook = (
+    <WallOfFavourites
+      entries={wallEntries}
+      teaseBacked={!localEntitled}
+      animate
+      expandable
+    />
+  )
+
+  /* Guest shared pot contribution card — always shown on open favpolls.
+     Carries both jobs explicitly: how to USE the fund (pledge step) and
+     how to GIVE to it (the button). */
+  const potCard = !isClosed && !pledgesGated && pot && (
+    <div className="rounded-lg border border-border bg-background px-5 py-4">
+      {/* ONE sentence of purpose (founder, 2026-09-14: "a lot of
+          repetition") — the empty state's old second line restated
+          the first, and the button restated "shared pot" a third
+          time. The non-empty second line stays: how to USE the pot
+          is the one thing the first line doesn't say. */}
+      <p className="mt-1 text-sm text-muted-foreground">
+        <b>{formatPoundsExact(fundAvailable)}</b> in the shared pot, for any
+        guest who needs help to pledge.
+      </p>
+      {fundAvailable > 0 && (
+        <p className="mt-1 text-xs text-muted-foreground">
+          To use it, pick &ldquo;Use shared pot&rdquo; when you pledge.
+        </p>
+      )}
+      <Button
+        type="button"
+        variant="outline"
+        className="mt-3 flex w-full"
+        onClick={() => setShowGuestFund(true)}
+      >
+        <Gift data-icon="inline-start" aria-hidden="true" />
+        Top up the pot
+      </Button>
+    </div>
+  )
+
   const left = (
     <>
       {isCause ? (
@@ -210,37 +281,21 @@ export function FavpollContent({
           <BumpChart history={rankHistory} />
         </div>
       )}
+
+      {/* THE MOBILE STACK — the rail's cards, below the standings.
+          State first (and the keepsake route back on closed favpolls),
+          social proof under the results it animates, then the pot. */}
+      <div className="mt-8 space-y-4 md:hidden">
+        {stateCard}
+        {guestBook}
+        {potCard}
+      </div>
     </>
   )
 
   const right = (
     <>
-      {isClosed ? (
-        <div className="space-y-1 rounded-lg border border-border bg-card px-5 py-4">
-          <SectionEyebrow variant="muted" className="font-semibold">
-            Poll closed
-          </SectionEyebrow>
-          {closedAt && (
-            <p className="text-sm text-muted-foreground">{closedAt}</p>
-          )}
-          <p className="text-xl font-medium text-primary">
-            {formatPoundsExact(favpoll.total_raised ?? totalRaised)}
-          </p>
-          <p className="text-xs text-muted-foreground">raised in total</p>
-          {/* Outline at default height, matching the pot card's
-              top-up button (founder, 2026-09-14: "larger too"). */}
-          <Button asChild variant="outline" className="mt-3 flex w-full">
-            <a href={`/favpolls/${favpoll.id}/keepsake`}>
-              <FileText data-icon="inline-start" aria-hidden="true" />
-              Keepsake
-            </a>
-          </Button>
-        </div>
-      ) : (
-        <div className="rounded-lg border border-border bg-card px-5 py-4">
-          <Countdown closesAt={favpoll.closes_at} />
-        </div>
-      )}
+      {stateCard}
 
       <CharityBanner
         charities={favpoll.favpoll_charities.map((ec) => ec.charities)}
@@ -252,43 +307,9 @@ export function FavpollContent({
       {/* Share removed from the rail — it lives in the ... dropdown
           on the topic heading now (founder, 2026-09-11). */}
 
-      <WallOfFavourites
-        entries={wallEntries}
-        teaseBacked={!localEntitled}
-        animate
-        expandable
-      />
+      {guestBook}
 
-      {/* Guest shared pot contribution card — always shown on open favpolls.
-          Carries both jobs explicitly: how to USE the fund (pledge step) and
-          how to GIVE to it (the button). */}
-      {!isClosed && !pledgesGated && pot && (
-        <div className="rounded-lg border border-border bg-background px-5 py-4">
-          {/* ONE sentence of purpose (founder, 2026-09-14: "a lot of
-              repetition") — the empty state's old second line restated
-              the first, and the button restated "shared pot" a third
-              time. The non-empty second line stays: how to USE the pot
-              is the one thing the first line doesn't say. */}
-          <p className="mt-1 text-sm text-muted-foreground">
-            <b>{formatPoundsExact(fundAvailable)}</b> in the shared pot, for any
-            guest who needs help to pledge.
-          </p>
-          {fundAvailable > 0 && (
-            <p className="mt-1 text-xs text-muted-foreground">
-              To use it, pick &ldquo;Use shared pot&rdquo; when you pledge.
-            </p>
-          )}
-          <Button
-            type="button"
-            variant="outline"
-            className="mt-3 flex w-full"
-            onClick={() => setShowGuestFund(true)}
-          >
-            <Gift data-icon="inline-start" aria-hidden="true" />
-            Top up the pot
-          </Button>
-        </div>
-      )}
+      {potCard}
     </>
   )
 
