@@ -32,7 +32,7 @@ function favourite(label: string, pledged: number, i: number): Favourite {
 
 const POLL = {
   id: "poll-1",
-  personal_reveal: null,
+  personal_note: null,
   topic: { id: "topic-1", title: "Hot drink" },
   items: [favourite("Tea", 240, 0), favourite("Coffee", 205, 1)],
 }

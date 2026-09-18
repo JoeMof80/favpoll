@@ -71,7 +71,7 @@ describe("createFavpoll — canonical topic", () => {
       poll: {
         topicId: "topic-1",
         customTopic: null,
-        reveal: null,
+        note: null,
         infiniteItems: null,
       },
     })
@@ -93,7 +93,7 @@ describe("createFavpoll — canonical topic", () => {
         poll: {
           topicId: "topic-1",
           customTopic: null,
-          reveal: null,
+          note: null,
           infiniteItems: null,
         },
       })
@@ -118,7 +118,7 @@ describe("createFavpoll — custom topic", () => {
       poll: {
         topicId: null,
         customTopic: { title: "My Sport", items: ["Football", "Tennis"] },
-        reveal: null,
+        note: null,
         infiniteItems: null,
       },
     })
@@ -151,7 +151,7 @@ describe("createFavpoll — custom topic", () => {
       poll: {
         topicId: null,
         customTopic: { title: "My Sport", items: ["Football", "Tennis"] },
-        reveal: null,
+        note: null,
         infiniteItems: null,
       },
     })
@@ -191,7 +191,7 @@ describe("createFavpoll — custom topic", () => {
       poll: {
         topicId: null,
         customTopic: { title: "Colours", items: ["Red", "Blue"] },
-        reveal: null,
+        note: null,
         infiniteItems: null,
       },
     })
@@ -237,7 +237,7 @@ describe("createFavpoll — custom topic", () => {
       poll: {
         topicId: null,
         customTopic: { title: "Empty Topic", items: [] },
-        reveal: null,
+        note: null,
         infiniteItems: null,
       },
     })
@@ -268,7 +268,7 @@ describe("createFavpoll — canonical topic with organiser additions (addedItems
       poll: {
         topicId: "topic-1",
         customTopic: null,
-        reveal: null,
+        note: null,
         infiniteItems: null,
         addedItems: ["Purple", "Orange"],
       },
@@ -299,7 +299,7 @@ describe("createFavpoll — canonical topic with organiser additions (addedItems
       poll: {
         topicId: "topic-1",
         customTopic: null,
-        reveal: null,
+        note: null,
         infiniteItems: null,
         addedItems: ["Purple", "Orange"],
       },
@@ -332,7 +332,7 @@ describe("createFavpoll — canonical topic with organiser additions (addedItems
       poll: {
         topicId: "topic-1",
         customTopic: null,
-        reveal: null,
+        note: null,
         infiniteItems: null,
         addedItems: [],
       },
@@ -349,7 +349,7 @@ describe("createFavpoll — canonical topic with organiser additions (addedItems
       poll: {
         topicId: "topic-1",
         customTopic: null,
-        reveal: null,
+        note: null,
         infiniteItems: null,
       },
     })
@@ -378,7 +378,7 @@ describe("createFavpoll — cause favpoll (subject='cause')", () => {
       poll: {
         topicId: "topic-1",
         customTopic: null,
-        reveal: null,
+        note: null,
         infiniteItems: null,
       },
     })
@@ -419,7 +419,7 @@ describe("createFavpoll — cause favpoll (subject='cause')", () => {
       poll: {
         topicId: "topic-1",
         customTopic: null,
-        reveal: null,
+        note: null,
         infiniteItems: null,
       },
     })
@@ -433,7 +433,7 @@ describe("createFavpoll — cause favpoll (subject='cause')", () => {
     })
   })
 
-  it("persists cause reveal as personal_reveal on the favpoll poll", async () => {
+  it("persists cause note as personal_note on the favpoll poll", async () => {
     mock.queue({ id: "user-1" }) // users upsert
     mock.queue({ id: "favpoll-1" }) // favpolls insert
     mock.queue(null) // favpoll_charities insert
@@ -451,8 +451,7 @@ describe("createFavpoll — cause favpoll (subject='cause')", () => {
       poll: {
         topicId: "topic-1",
         customTopic: null,
-        reveal:
-          "Their ocean conservation work reflects the breadth of colour in the sea.",
+        note: "Their ocean conservation work reflects the breadth of colour in the sea.",
         infiniteItems: null,
       },
     })
@@ -461,7 +460,7 @@ describe("createFavpoll — cause favpoll (subject='cause')", () => {
       .callsFor("favpoll_polls")
       .find((c) => c.method === "insert")!
     expect(pollInsert.args[0]).toMatchObject({
-      personal_reveal:
+      personal_note:
         "Their ocean conservation work reflects the breadth of colour in the sea.",
     })
   })
@@ -486,7 +485,7 @@ describe("createFavpoll — fundraiser for a person (subject='someone')", () => 
       poll: {
         topicId: "topic-1",
         customTopic: null,
-        reveal: null,
+        note: null,
         infiniteItems: null,
       },
     })

@@ -130,7 +130,7 @@ export type FavpollPoll = {
   id: string;
   favpoll_id: string;
   topic_id: string;
-  personal_reveal: string | null;
+  personal_note: string | null;
   created_at: string;
 };
 
@@ -221,7 +221,7 @@ export type TopicPlaceholders = Record<
   string,
   {
     about?: string;
-    reveal: string;
+    note: string;
     pronouns?: "she" | "he" | "they";
     group?: "pair" | "set";
   }
@@ -241,7 +241,7 @@ export type GeneratedDraft = {
   primary_charity_id: string | null;
   subject: string | null;
   about: string | null;
-  reveal: string | null;
+  note: string | null;
   model: string | null;
   status: "generated" | "curated" | "rejected";
   created_at: string;
@@ -253,7 +253,7 @@ export type CanvasPollInput = {
   topicIsCustom: boolean;
   customTopicTitle: string;
   customTopicItems: string[];
-  reveal: string | null;
+  note: string | null;
   infiniteItems: { canonicalItemIds: string[]; customLabels: string[] } | null;
 };
 

@@ -1,23 +1,23 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import { render, screen, act } from "@testing-library/react"
 
-vi.mock("@/components/favpoll-card/poll-reveal", () => ({
-  PollReveal: ({
-    personalReveal,
+vi.mock("@/components/favpoll-card/poll-note", () => ({
+  PollNote: ({
+    personalNote,
     role,
     "aria-live": ariaLive,
   }: {
-    personalReveal: string
+    personalNote: string
     role?: string
     "aria-live"?: "off" | "assertive" | "polite"
   }) => (
     <blockquote data-testid="poll-reveal" role={role} aria-live={ariaLive}>
-      {personalReveal}
+      {personalNote}
     </blockquote>
   ),
 }))
 
-import { TypedReveal } from "../typed-reveal"
+import { TypedNote } from "../typed-note"
 
 const FULL_TEXT =
   "My favourite colour was purple. I wore it to every occasion that mattered."
@@ -30,12 +30,12 @@ function mockMatchMedia(prefersReduced: boolean) {
   })
 }
 
-describe("TypedReveal — active=false (non-animated path)", () => {
+describe("TypedNote — active=false (non-animated path)", () => {
   beforeEach(() => mockMatchMedia(false))
 
-  it("renders the full text immediately via PollReveal", () => {
+  it("renders the full text immediately via PollNote", () => {
     render(
-      <TypedReveal
+      <TypedNote
         text={FULL_TEXT}
         active={false}
         protagonistFirstName={FIRST_NAME}
@@ -44,9 +44,9 @@ describe("TypedReveal — active=false (non-animated path)", () => {
     expect(screen.getByTestId("poll-reveal")).toHaveTextContent(FULL_TEXT)
   })
 
-  it("PollReveal carries role=status and aria-live=polite", () => {
+  it("PollNote carries role=status and aria-live=polite", () => {
     render(
-      <TypedReveal
+      <TypedNote
         text={FULL_TEXT}
         active={false}
         protagonistFirstName={FIRST_NAME}
@@ -59,7 +59,7 @@ describe("TypedReveal — active=false (non-animated path)", () => {
 
   it("no aria-hidden typing copy is present", () => {
     const { container } = render(
-      <TypedReveal
+      <TypedNote
         text={FULL_TEXT}
         active={false}
         protagonistFirstName={FIRST_NAME}
@@ -69,7 +69,7 @@ describe("TypedReveal — active=false (non-animated path)", () => {
   })
 })
 
-describe("TypedReveal — active=true (animated path)", () => {
+describe("TypedNote — active=true (animated path)", () => {
   beforeEach(() => {
     vi.useFakeTimers()
     mockMatchMedia(false)
@@ -78,7 +78,7 @@ describe("TypedReveal — active=true (animated path)", () => {
 
   it("starts with an empty typed copy (not the full text)", () => {
     const { container } = render(
-      <TypedReveal
+      <TypedNote
         text={FULL_TEXT}
         active={true}
         protagonistFirstName={FIRST_NAME}
@@ -91,7 +91,7 @@ describe("TypedReveal — active=true (animated path)", () => {
 
   it("exposes the full text to AT via sr-only immediately", () => {
     const { container } = render(
-      <TypedReveal
+      <TypedNote
         text={FULL_TEXT}
         active={true}
         protagonistFirstName={FIRST_NAME}
@@ -105,7 +105,7 @@ describe("TypedReveal — active=true (animated path)", () => {
 
   it("types characters progressively as time advances", () => {
     const { container } = render(
-      <TypedReveal
+      <TypedNote
         text={FULL_TEXT}
         active={true}
         protagonistFirstName={FIRST_NAME}
@@ -120,7 +120,7 @@ describe("TypedReveal — active=true (animated path)", () => {
 
   it("completes the full text once all timers run", () => {
     const { container } = render(
-      <TypedReveal
+      <TypedNote
         text={FULL_TEXT}
         active={true}
         protagonistFirstName={FIRST_NAME}
@@ -133,7 +133,7 @@ describe("TypedReveal — active=true (animated path)", () => {
 
   it("does not re-type when re-rendered with the same text", () => {
     const { container, rerender } = render(
-      <TypedReveal
+      <TypedNote
         text={FULL_TEXT}
         active={true}
         protagonistFirstName={FIRST_NAME}
@@ -146,7 +146,7 @@ describe("TypedReveal — active=true (animated path)", () => {
 
     // Simulate a re-render triggered by e.g. RankingList realtime update
     rerender(
-      <TypedReveal
+      <TypedNote
         text={FULL_TEXT}
         active={true}
         protagonistFirstName={FIRST_NAME}
@@ -161,7 +161,7 @@ describe("TypedReveal — active=true (animated path)", () => {
 
   it("the typed copy is aria-hidden (AT does not read each keystroke)", () => {
     const { container } = render(
-      <TypedReveal
+      <TypedNote
         text={FULL_TEXT}
         active={true}
         protagonistFirstName={FIRST_NAME}
@@ -172,16 +172,16 @@ describe("TypedReveal — active=true (animated path)", () => {
   })
 })
 
-describe("TypedReveal — reduced motion", () => {
+describe("TypedNote — reduced motion", () => {
   beforeEach(() => {
     vi.useFakeTimers()
     mockMatchMedia(true) // prefers-reduced-motion: reduce
   })
   afterEach(() => vi.useRealTimers())
 
-  it("renders full text immediately via PollReveal even when active=true", () => {
+  it("renders full text immediately via PollNote even when active=true", () => {
     render(
-      <TypedReveal
+      <TypedNote
         text={FULL_TEXT}
         active={true}
         protagonistFirstName={FIRST_NAME}
@@ -192,7 +192,7 @@ describe("TypedReveal — reduced motion", () => {
 
   it("no aria-hidden typing copy present under reduced motion", () => {
     const { container } = render(
-      <TypedReveal
+      <TypedNote
         text={FULL_TEXT}
         active={true}
         protagonistFirstName={FIRST_NAME}
@@ -204,7 +204,7 @@ describe("TypedReveal — reduced motion", () => {
   it("timers are never started (no interval side-effects)", () => {
     const setInterval = vi.spyOn(window, "setInterval")
     render(
-      <TypedReveal
+      <TypedNote
         text={FULL_TEXT}
         active={true}
         protagonistFirstName={FIRST_NAME}

@@ -14,7 +14,7 @@ const mockUploadPersonPhoto = vi.hoisted(() =>
 const mockSafeGenerateDraft = vi.hoisted(() =>
   vi.fn().mockResolvedValue({
     about: "Generated about.",
-    reveal: "Generated reveal.",
+    note: "Generated note.",
     fromCache: false,
   })
 )
@@ -348,7 +348,7 @@ describe("useWizardState — the rail tracks the answers", () => {
       "Grandmother of six",
     ])
     act(() => result.current.setAbout("She loved every colour."))
-    act(() => result.current.setReveal("Purple. She wore it always."))
+    act(() => result.current.setNote("Purple. She wore it always."))
     expect(result.current.railSummary.story).toEqual([
       "She loved every colour.",
       "Purple. She wore it always.",
@@ -381,7 +381,7 @@ describe("useWizardState — generateExample", () => {
     expect(input.pronoun).toBe("she")
     expect(input.displayName).toBe("Margaret")
     expect(result.current.about).toBe("Generated about.")
-    expect(result.current.reveal).toBe("Generated reveal.")
+    expect(result.current.note).toBe("Generated note.")
   })
 })
 
@@ -391,7 +391,7 @@ describe("useWizardState — handleFinish publishes", () => {
     advanceToDetails(result)
     act(() => result.current.setOpeningLine("Celebrating"))
     act(() => result.current.setContext("Sweet Sixteen"))
-    act(() => result.current.setReveal("Mint choc chip."))
+    act(() => result.current.setNote("Mint choc chip."))
     act(() => result.current.setGoalAmount(250))
     await act(async () => {
       await result.current.handleFinish()
@@ -407,7 +407,7 @@ describe("useWizardState — handleFinish publishes", () => {
     expect(input.goalAmount).toBe(250)
     expect(input.isListed).toBe(true)
     expect(input.poll.topicId).toBe("t1")
-    expect(input.poll.reveal).toBe("Mint choc chip.")
+    expect(input.poll.note).toBe("Mint choc chip.")
     expect(typeof input.closesAt).toBe("string")
     // The fund step comes before navigation — a payment needs the page.
     expect(result.current.seedFavpollId).toBe("f1")
@@ -536,7 +536,7 @@ describe("useWizardState — edit mode (Phase 2)", () => {
       context: "1941 – 2026",
       photoUrl: null,
       about: "A headmistress.",
-      reveal: "Autumn, always.",
+      note: "Autumn, always.",
       goalAmount: 250,
       isListed: false,
       isPrivate: false,
@@ -551,7 +551,7 @@ describe("useWizardState — edit mode (Phase 2)", () => {
     expect(result.current.name).toBe("Mary Whitfield")
     expect(result.current.openingLine).toBe("In loving memory of")
     expect(result.current.about).toBe("A headmistress.")
-    expect(result.current.reveal).toBe("Autumn, always.")
+    expect(result.current.note).toBe("Autumn, always.")
     expect(result.current.who).toBe("she")
     expect(result.current.goalAmount).toBe(250)
     expect(result.current.visibility).toBe("unlisted")

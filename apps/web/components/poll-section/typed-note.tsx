@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { PollReveal } from "@/components/favpoll-card/poll-reveal"
+import { PollNote } from "@/components/favpoll-card/poll-note"
 
 type Props = {
   text: string
@@ -12,7 +12,7 @@ type Props = {
 // Rough total duration regardless of reveal length (mirrors the demo panel).
 const TARGET_MS = 1900
 
-export function TypedReveal({ text, active, protagonistFirstName }: Props) {
+export function TypedNote({ text, active, protagonistFirstName }: Props) {
   const reduced =
     typeof window !== "undefined" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches
@@ -43,8 +43,8 @@ export function TypedReveal({ text, active, protagonistFirstName }: Props) {
   if (!shouldType) {
     // Non-animated: standard accessible render (handles SSR / returning pledger)
     return (
-      <PollReveal
-        personalReveal={text}
+      <PollNote
+        personalNote={text}
         protagonistFirstName={protagonistFirstName}
         role="status"
         aria-live="polite"
@@ -72,8 +72,8 @@ export function TypedReveal({ text, active, protagonistFirstName }: Props) {
           AFTER the typed copy: tests read the first [aria-hidden] element
           as the typing surface. */}
       <div className="invisible" aria-hidden="true">
-        <PollReveal
-          personalReveal={text}
+        <PollNote
+          personalNote={text}
           protagonistFirstName={protagonistFirstName}
         />
       </div>

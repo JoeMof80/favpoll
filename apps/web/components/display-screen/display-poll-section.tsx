@@ -1,12 +1,12 @@
 "use client"
 
 import { RankingList } from "@/components/ranking-list"
-import { TypedReveal } from "@/components/poll-section/typed-reveal"
+import { TypedNote } from "@/components/poll-section/typed-note"
 import type { Favourite } from "@favpoll/types"
 
 export type DisplayPoll = {
   id: string
-  personal_reveal: string | null
+  personal_note: string | null
   topic: {
     id: string
     title: string
@@ -36,7 +36,7 @@ export function DisplayPollSection({
   justClosed = false,
   protagonistFirstName = null,
 }: Props) {
-  const revealText = poll.personal_reveal
+  const noteText = poll.personal_note
 
   return (
     <section className="space-y-4" aria-label={`${poll.topic.title} rankings`}>
@@ -53,9 +53,9 @@ export function DisplayPollSection({
         </span>
       </h2>
 
-      {!!revealText && justClosed && (
-        <TypedReveal
-          text={revealText}
+      {!!noteText && justClosed && (
+        <TypedNote
+          text={noteText}
           active
           protagonistFirstName={protagonistFirstName ?? "Their"}
         />

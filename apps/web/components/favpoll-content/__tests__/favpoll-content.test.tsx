@@ -115,7 +115,7 @@ const POLL: FavpollPollWithItems = {
   id: "poll-1",
   favpoll_id: "favpoll-1",
   topic_id: "topic-1",
-  personal_reveal: "Their ocean work is as vivid and varied as colour itself.",
+  personal_note: "Their ocean work is as vivid and varied as colour itself.",
   created_at: "2024-01-01T00:00:00Z",
   topics: {
     id: "topic-1",
@@ -144,7 +144,7 @@ function renderContent(
       clerkUserId={null}
       isOrganiser={false}
       entitled={opts.entitled ?? false}
-      hasReveal={true}
+      hasNote={true}
       wallEntries={[]}
       rankHistory={null}
     />

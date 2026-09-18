@@ -12,9 +12,7 @@ export function WizardStoryStep({ w }: { w: WizardState }) {
   // calibration set beats the static pair — contextual, zero model
   // cost. The "e.g. " prefix keeps the ghost convention.
   const aboutGhost = w.cachedGhosts ? `e.g. ${w.cachedGhosts.about}` : ph.about
-  const revealGhost = w.cachedGhosts
-    ? `e.g. ${w.cachedGhosts.reveal}`
-    : ph.reveal
+  const revealGhost = w.cachedGhosts ? `e.g. ${w.cachedGhosts.note}` : ph.note
   return (
     <div className="space-y-5">
       {/* ALWAYS-VISIBLE guidance for the two craft fields (founder,
@@ -55,15 +53,15 @@ export function WizardStoryStep({ w }: { w: WizardState }) {
             className="md:text-base"
             rows={4}
             maxLength={280}
-            value={w.reveal}
+            value={w.note}
             placeholder={revealGhost}
-            onChange={(e) => w.setReveal(e.target.value)}
+            onChange={(e) => w.setNote(e.target.value)}
           />
           <div
             data-align="block-end"
             className="order-last flex w-full items-center justify-end px-3 py-1.5"
           >
-            <CharCounter value={w.reveal} max={280} />
+            <CharCounter value={w.note} max={280} />
           </div>
         </InputGroup>
       </WizardField>

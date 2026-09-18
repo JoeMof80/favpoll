@@ -38,7 +38,7 @@ export default async function KeepsakePage({ params }: Props) {
 
   const { data: poll } = await supabase
     .from("favpoll_polls")
-    .select("id, personal_reveal, topic_id, topics(title)")
+    .select("id, personal_note, topic_id, topics(title)")
     .eq("favpoll_id", id)
     .maybeSingle()
 
@@ -159,7 +159,7 @@ export default async function KeepsakePage({ params }: Props) {
     context: isCause ? null : (protagonist?.context ?? null),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     topicTitle: (poll.topics as any)?.title ?? "favourites",
-    reveal: poll.personal_reveal,
+    reveal: poll.personal_note,
     totalRaised: pollTotal,
     goalAmount: favpoll.goal_amount ?? null,
     charityNames: (favpoll.favpoll_charities ?? []).map(

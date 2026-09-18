@@ -175,7 +175,7 @@ export function FavpollListCard({
           id: poll.id,
           favpoll_id: favpoll.id,
           topic_id: poll.topic_id ?? "",
-          personal_reveal: null,
+          personal_note: null,
           created_at: "",
           topics: {
             id: poll.topic_id ?? "",

@@ -49,7 +49,7 @@ function makePoll(sceneIndex: number): FavpollPollWithItems {
     id: pollId,
     favpoll_id: "favpoll-demo",
     topic_id: topicId,
-    personal_reveal: scene.poll.personal_reveal,
+    personal_note: scene.poll.personal_note,
     created_at: "2024-01-01T00:00:00Z",
     topics: {
       id: topicId,
@@ -92,7 +92,7 @@ const meta = {
     isOrganiser: false,
     favpollId: "favpoll-demo",
     entitled: false,
-    personalReveal: null,
+    personalNote: null,
     initialItems: MEMORIAL_POLL.topics.favourites,
   },
 } satisfies Meta<typeof PollSection>
@@ -129,7 +129,7 @@ export const ResultsWithReveal: Story = {
     protagonistName: SCENES[0].protagonist!.name,
     hasPledged: true,
     entitled: true,
-    personalReveal: MEMORIAL_POLL.personal_reveal,
+    personalNote: MEMORIAL_POLL.personal_note,
     initialItems: MEMORIAL_POLL.topics.favourites,
   },
 }
@@ -141,7 +141,7 @@ export const ResultsWithRevealFundraiser: Story = {
     protagonistName: SCENES[2].protagonist!.name,
     hasPledged: true,
     entitled: true,
-    personalReveal: FUNDRAISER_POLL.personal_reveal,
+    personalNote: FUNDRAISER_POLL.personal_note,
     initialItems: FUNDRAISER_POLL.topics.favourites,
   },
 }
@@ -156,7 +156,7 @@ export const Closed: Story = {
     isClosed: true,
     hasPledged: false,
     entitled: true,
-    personalReveal: MEMORIAL_POLL.personal_reveal,
+    personalNote: MEMORIAL_POLL.personal_note,
     initialItems: MEMORIAL_POLL.topics.favourites,
   },
 }

@@ -8,8 +8,8 @@ import { PollHeading } from "@/components/poll-heading"
 import type { FavpollPollWithItems, Favourite } from "@favpoll/types"
 import { usePollSection } from "./use-poll-section"
 import { EmptyPollAlert } from "./empty-poll-alert"
-import { PollReveal } from "../favpoll-card/poll-reveal"
-import { TypedReveal } from "./typed-reveal"
+import { PollNote } from "../favpoll-card/poll-note"
+import { TypedNote } from "./typed-note"
 import { Button } from "../ui/button"
 import { ShareFavpollButton } from "@/components/share-favpoll-button"
 import { decoyWidth } from "@/lib/decoys"
@@ -38,14 +38,14 @@ type Props = {
   onViewChange?: (view: "pledge" | "results") => void
   /** Whether the viewer is entitled to see real reveal + results */
   entitled: boolean
-  /** Real personal_reveal — null until entitled */
-  personalReveal: string | null
+  /** Real personal_note — null until entitled */
+  personalNote: string | null
   /**
    * Whether a reveal exists at all (safe to know pre-pledge). Drives the lock
    * copy: a favpoll without a reveal must offer the results, not promise a
    * disclosure that never comes. Defaults true for existing callers/stories.
    */
-  hasReveal?: boolean
+  hasNote?: boolean
   /** Content-free quote flag — step 3 promises "their own words". */
   /** e.g. "Marie Curie" or "A & B" — renders the pre-pledge trust line */
   charityLine?: string | null
@@ -71,8 +71,8 @@ export function PollSection({
   isOrganiser,
   onViewChange,
   entitled,
-  personalReveal,
-  hasReveal = true,
+  personalNote,
+  hasNote = true,
   charityLine = null,
   initialItems,
   onOpenPledgeDialog,
@@ -103,12 +103,12 @@ export function PollSection({
   const lockSteps = buildMechanicSteps({
     topicTitle: poll.topics.title,
     charityLine,
-    hasNote: hasReveal,
+    hasNote: hasNote,
   })
 
   // "A note" covers favourite and message reveals alike (founder,
   // 2026-09-17) — the old favourite/message fork is gone.
-  const unlockAriaLabel = !hasReveal
+  const unlockAriaLabel = !hasNote
     ? "Pledge your favourite to see the results"
     : "Pledge to see a personal note and the results"
 
@@ -176,10 +176,10 @@ export function PollSection({
       {/* Post-pledge: real reveal + real ranking list */}
       {entitled ? (
         <>
-          {personalReveal && (
+          {personalNote && (
             <div className="pb-2">
-              <TypedReveal
-                text={personalReveal}
+              <TypedNote
+                text={personalNote}
                 active={pledgeJustConfirmed ?? false}
                 protagonistFirstName={personFirstName}
               />
@@ -227,8 +227,8 @@ export function PollSection({
             <div className="space-y-4 opacity-60 blur-xs select-none">
               {/* Decoy quote only when a reveal actually exists — a favpoll
                 without one shows no quote post-pledge, so fake none here. */}
-              {hasReveal && (
-                <PollReveal personalReveal="Pledge to reveal their favourite. Pledge to reveal their favourite. Pledge to reveal their favourite." />
+              {hasNote && (
+                <PollNote personalNote="Pledge to reveal their favourite. Pledge to reveal their favourite. Pledge to reveal their favourite." />
               )}
 
               {hasItems && (

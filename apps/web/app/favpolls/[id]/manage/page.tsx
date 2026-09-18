@@ -49,7 +49,7 @@ export default async function ManageFavpollPage({
       favpoll_charities ( charities ( id, name, logo_url, registered_number, description, created_at, consent_status, consent_contacted_at, registered_email ) ),
       favpoll_polls (
         id,
-        personal_reveal,
+        personal_note,
         topics ( title ),
         pledges ( count ),
         favpoll_poll_favourites ( is_hidden, is_guest_added, favourites ( id, label ) )
@@ -151,7 +151,7 @@ export default async function ManageFavpollPage({
     isPrivate: ev.is_private ?? false,
     context: ev.protagonists?.context ?? null,
     about: (isCause ? ev.description : ev.protagonists?.about) ?? null,
-    reveal: ev.favpoll_polls?.personal_reveal ?? null,
+    reveal: ev.favpoll_polls?.personal_note ?? null,
     photoUrl: (isCause ? ev.photo_url : ev.protagonists?.photo_url) ?? null,
     favourites: (ev.favpoll_polls?.favpoll_poll_favourites ?? [])
       .filter((f) => f.favourites)

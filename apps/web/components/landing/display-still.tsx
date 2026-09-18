@@ -166,7 +166,7 @@ export function DisplayStill({
           id: scene.poll.id,
           // The reveal is the witnessed finale on the real display and types
           // out only at the close; a still is not that moment.
-          personal_reveal: null,
+          personal_note: null,
           topic: { id: topicId, title: scene.poll.topic.title },
           items: ranked.slice(0, RANKS_SHOWN),
         }}

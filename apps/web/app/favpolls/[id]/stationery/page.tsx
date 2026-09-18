@@ -22,7 +22,7 @@ export default async function PackPage({ params }: Props) {
       `id, short_code, subject, category, grouping, cause_label, occasion_type, opening_line, is_private,
        protagonists!favpolls_protagonist_id_fkey ( name ),
        favpoll_polls (
-         personal_reveal,
+         personal_note,
          topics ( title, favourites ( label ) ),
          favpoll_poll_favourites ( favourites ( label ) )
        ),
@@ -58,7 +58,7 @@ export default async function PackPage({ params }: Props) {
     // One content-free bit: the pack's step 3 promises the personal note
     // when one exists (2026-09-17 — the old message-vs-favourite
     // detection retired with the "note" rename).
-    hasNote: !!firstPoll?.personal_reveal,
+    hasNote: !!firstPoll?.personal_note,
     charityNames: (favpoll.favpoll_charities ?? []).map(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (ec: any) => ec.charities.name

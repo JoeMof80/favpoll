@@ -19,7 +19,7 @@ export async function GET(
   // Resolve poll → favpoll to check closed status
   const { data: poll } = await supabase
     .from("favpoll_polls")
-    .select("personal_reveal, topic_id, favpoll_id, topics ( is_finite )")
+    .select("personal_note, topic_id, favpoll_id, topics ( is_finite )")
     .eq("id", pollId)
     .single()
 
@@ -85,7 +85,7 @@ export async function GET(
   ])
 
   return NextResponse.json({
-    personal_reveal: poll.personal_reveal ?? null,
+    personal_note: poll.personal_note ?? null,
     items: overlayStandings(rawItems, standings),
   })
 }

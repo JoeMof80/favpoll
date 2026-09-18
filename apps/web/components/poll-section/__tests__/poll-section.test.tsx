@@ -52,7 +52,7 @@ const BASE_POLL: FavpollPollWithItems = {
   id: "poll-1",
   favpoll_id: "fp-1",
   topic_id: "t1",
-  personal_reveal: null,
+  personal_note: null,
   created_at: "2024-01-01T00:00:00Z",
   topics: {
     id: "t1",
@@ -76,7 +76,7 @@ const BASE_PROPS = {
   isOrganiser: false,
   favpollId: "fp-1",
   entitled: false,
-  personalReveal: null,
+  personalNote: null,
   initialItems: ITEMS,
 }
 
@@ -174,7 +174,7 @@ describe("PollSection — unlock overlay interaction", () => {
         protagonistName="Yusuf"
         isCause={false}
         entitled={true}
-        personalReveal="His was purple."
+        personalNote="His was purple."
         onOpenPledgeDialog={vi.fn()}
       />
     )
@@ -206,7 +206,7 @@ describe("PollSection — decoy region accessibility", () => {
   })
 })
 
-// ─── TypedReveal integration ──────────────────────────────────────────────────
+// ─── TypedNote integration ──────────────────────────────────────────────────
 
 const REVEAL_TEXT =
   "Yusuf said: My favourite colour was blue. I wore it to every occasion that mattered."
@@ -226,7 +226,7 @@ describe("PollSection — reveal on first in-session unlock (pledgeJustConfirmed
       <PollSection
         {...BASE_PROPS}
         entitled={true}
-        personalReveal={REVEAL_TEXT}
+        personalNote={REVEAL_TEXT}
         pledgeJustConfirmed={true}
         protagonistName="Yusuf"
         isCause={false}
@@ -245,7 +245,7 @@ describe("PollSection — reveal on first in-session unlock (pledgeJustConfirmed
       <PollSection
         {...BASE_PROPS}
         entitled={true}
-        personalReveal={REVEAL_TEXT}
+        personalNote={REVEAL_TEXT}
         pledgeJustConfirmed={true}
         protagonistName="Yusuf"
         isCause={false}
@@ -263,7 +263,7 @@ describe("PollSection — reveal on first in-session unlock (pledgeJustConfirmed
       <PollSection
         {...BASE_PROPS}
         entitled={true}
-        personalReveal={REVEAL_TEXT}
+        personalNote={REVEAL_TEXT}
         pledgeJustConfirmed={true}
         protagonistName="Yusuf"
         isCause={false}
@@ -289,14 +289,14 @@ describe("PollSection — reveal for returning pledger (pledgeJustConfirmed=fals
       <PollSection
         {...BASE_PROPS}
         entitled={true}
-        personalReveal={REVEAL_TEXT}
+        personalNote={REVEAL_TEXT}
         pledgeJustConfirmed={false}
         protagonistName="Yusuf"
         isCause={false}
         onOpenPledgeDialog={vi.fn()}
       />
     )
-    // No animated path — PollReveal renders directly
+    // No animated path — PollNote renders directly
     expect(container.querySelector('[aria-hidden="true"]:not(svg)')).toBeNull()
     // Full text is in the document
     expect(screen.getByText(REVEAL_TEXT)).toBeInTheDocument()
@@ -304,12 +304,12 @@ describe("PollSection — reveal for returning pledger (pledgeJustConfirmed=fals
 })
 
 describe("PollSection — gating: real reveal absent when not entitled", () => {
-  it("the real personal_reveal string is not present in the pre-pledge DOM", () => {
+  it("the real personal_note string is not present in the pre-pledge DOM", () => {
     render(
       <PollSection
         {...BASE_PROPS}
         entitled={false}
-        personalReveal={null}
+        personalNote={null}
         protagonistName="Yusuf"
         isCause={false}
         onOpenPledgeDialog={vi.fn()}
@@ -322,11 +322,11 @@ describe("PollSection — gating: real reveal absent when not entitled", () => {
 // ─── No-reveal favpolls + trust line ─────────────────────────────────────────
 
 describe("PollSection — favpolls without a reveal", () => {
-  it("offers the results, not a reveal, when hasReveal is false", () => {
+  it("offers the results, not a reveal, when hasNote is false", () => {
     render(
       <PollSection
         {...BASE_PROPS}
-        hasReveal={false}
+        hasNote={false}
         protagonistName="Yusuf"
         isCause={false}
         onOpenPledgeDialog={vi.fn()}
@@ -340,11 +340,11 @@ describe("PollSection — favpolls without a reveal", () => {
     expect(screen.queryByText(/Pledge to reveal/i)).toBeNull()
   })
 
-  it("renders no decoy reveal quote when hasReveal is false", () => {
+  it("renders no decoy reveal quote when hasNote is false", () => {
     const { container } = render(
       <PollSection
         {...BASE_PROPS}
-        hasReveal={false}
+        hasNote={false}
         protagonistName="Yusuf"
         isCause={false}
         onOpenPledgeDialog={vi.fn()}
@@ -357,7 +357,7 @@ describe("PollSection — favpolls without a reveal", () => {
     render(
       <PollSection
         {...BASE_PROPS}
-        hasReveal={true}
+        hasNote={true}
         protagonistName="Yusuf"
         isCause={false}
         onOpenPledgeDialog={vi.fn()}

@@ -26,7 +26,7 @@ export function useFavpollContent({
   const [pledgeConfirmed, setPledgeConfirmed] = useState(false)
   const [localEntitled, setLocalEntitled] = useState(entitled)
   // undefined = fall back to server value; null/string = guest override
-  const [localReveal, setLocalReveal] = useState<string | null | undefined>(
+  const [localNote, setLocalReveal] = useState<string | null | undefined>(
     undefined
   )
   const [localItems, setLocalItems] = useState<Favourite[] | undefined>(
@@ -48,11 +48,11 @@ export function useFavpollContent({
         // Guest: fetch real reveal + items from gated endpoint
         try {
           const res = await fetch(
-            `/api/polls/${encodeURIComponent(pollWithItems.id)}/reveal?guest_token=${encodeURIComponent(guestToken)}`
+            `/api/polls/${encodeURIComponent(pollWithItems.id)}/note?guest_token=${encodeURIComponent(guestToken)}`
           )
           if (res.ok) {
             const data = await res.json()
-            setLocalReveal(data.personal_reveal ?? null)
+            setLocalReveal(data.personal_note ?? null)
             setLocalItems(data.items ?? [])
           }
         } catch {
@@ -102,10 +102,8 @@ export function useFavpollContent({
   }, [])
 
   // Effective reveal: guest override takes precedence; signed-in gets it from pollWithItems after refresh
-  const effectiveReveal =
-    localReveal !== undefined
-      ? localReveal
-      : (pollWithItems?.personal_reveal ?? null)
+  const effectiveNote =
+    localNote !== undefined ? localNote : (pollWithItems?.personal_note ?? null)
 
   // Effective items: guest override takes precedence; signed-in gets real values after refresh
   const effectiveItems =
@@ -120,7 +118,7 @@ export function useFavpollContent({
     showPledgeCard,
     handleViewChange,
     localEntitled,
-    effectiveReveal,
+    effectiveNote,
     effectiveItems,
   }
 }

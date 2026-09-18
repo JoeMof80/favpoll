@@ -46,5 +46,5 @@ export const Confirmed: Story = {
 }
 
 export const Reveal: Story = {
-  args: { phase: "reveal", barWidths: realWidths },
+  args: { phase: "note", barWidths: realWidths },
 }

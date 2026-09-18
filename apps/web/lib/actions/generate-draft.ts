@@ -238,7 +238,7 @@ export type GenerateDraftInput = {
 
 export type GeneratedDraftResult = {
   about: string
-  reveal: string
+  note: string
   /** Cause favpolls only — suggested cause name when none was set. */
   causeLabel?: string | null
   /** Cause favpolls only — suggested context subline. */
@@ -307,7 +307,9 @@ export async function generateDraft(
     incrementRateLimitCount(userId)
     return {
       about: parsed.about,
-      reveal: parsed.reveal,
+      // Boundary map: the LLM JSON keeps its "reveal" field (the prompt
+      // is a tuned creative instrument); storage and code say note.
+      note: parsed.reveal,
       // Defensive caps match the form schema (causeLabel 60, context 40)
       causeLabel: parsed.causeLabel?.trim().slice(0, 60) || null,
       context: parsed.context?.trim().slice(0, 40) || null,
@@ -329,15 +331,15 @@ export async function generateDraft(
 
   const { data: cached } = await supabase
     .from("generated_drafts")
-    .select("about, reveal, cause_label, context")
+    .select("about, note, cause_label, context")
     .eq("cache_key", cacheKey)
     .neq("status", "rejected")
     .maybeSingle()
 
-  if (cached?.about && cached?.reveal) {
+  if (cached?.about && cached?.note) {
     return {
       about: cached.about,
-      reveal: cached.reveal,
+      note: cached.note,
       causeLabel: cached.cause_label ?? null,
       context: cached.context ?? null,
       fromCache: true,
@@ -406,7 +408,7 @@ export async function generateDraft(
     primary_charity_id: input.primaryCharityId ?? null,
     subject: input.subject,
     about: parsed.about,
-    reveal: parsed.reveal,
+    note: parsed.reveal,
     cause_label: causeLabel,
     context,
     model: modelId,
@@ -416,7 +418,7 @@ export async function generateDraft(
   incrementRateLimitCount(userId)
   return {
     about: parsed.about,
-    reveal: parsed.reveal,
+    note: parsed.reveal,
     causeLabel,
     context,
     fromCache: false,
@@ -452,7 +454,7 @@ export async function safeGenerateDraft(
  */
 export async function getCachedDraftGhosts(
   input: GenerateDraftInput
-): Promise<{ about: string; reveal: string } | null> {
+): Promise<{ about: string; note: string } | null> {
   const { userId } = await auth()
   if (!userId) return null
   const supabase = createAdminClient()
@@ -467,12 +469,12 @@ export async function getCachedDraftGhosts(
   )
   const { data: cached } = await supabase
     .from("generated_drafts")
-    .select("about, reveal")
+    .select("about, note")
     .eq("cache_key", cacheKey)
     .neq("status", "rejected")
     .maybeSingle()
-  if (cached?.about && cached?.reveal) {
-    return { about: cached.about, reveal: cached.reveal }
+  if (cached?.about && cached?.note) {
+    return { about: cached.about, note: cached.note }
   }
 
   // NAME-AGNOSTIC FALLBACK (founder, 2026-09-18): the key's name-hash
@@ -491,19 +493,19 @@ export async function getCachedDraftGhosts(
   const namePrefix = cacheKey.slice(0, cacheKey.lastIndexOf(":") + 1)
   const { data: sibling } = await supabase
     .from("generated_drafts")
-    .select("about, reveal, display_name")
+    .select("about, note, display_name")
     .like("cache_key", `${namePrefix}%`)
     .neq("status", "rejected")
     .not("display_name", "is", null)
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle()
-  if (sibling?.about && sibling?.reveal) {
+  if (sibling?.about && sibling?.note) {
     const from = (sibling.display_name ?? "").trim()
     const to = (input.displayName ?? "").trim()
     const swap = (text: string) =>
       from && to ? text.split(from).join(to) : text
-    return { about: swap(sibling.about), reveal: swap(sibling.reveal) }
+    return { about: swap(sibling.about), note: swap(sibling.note) }
   }
   return null
 }

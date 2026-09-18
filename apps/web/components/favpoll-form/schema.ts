@@ -26,7 +26,7 @@ export const favpollFormSchema = z
       .number()
       .positive("Goal must be greater than zero")
       .optional(),
-    reveal: z.string().max(280, "Must be 280 characters or fewer").optional(),
+    note: z.string().max(280, "Must be 280 characters or fewer").optional(),
     topics: z
       .array(
         z.object({

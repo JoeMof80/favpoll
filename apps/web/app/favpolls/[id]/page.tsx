@@ -281,7 +281,7 @@ export default async function FavpollPage({ params }: Props) {
 
   // Safe to send even when un-entitled: whether a reveal exists, without its
   // content — the lock pill must not promise a reveal on favpolls without one.
-  const hasReveal = !!pollWithItems?.personal_reveal
+  const hasNote = !!pollWithItems?.personal_note
   // The quote/message detectors (isQuoteReveal/isMessageReveal) retired
   // 2026-09-17: "a note" covers every reveal shape, so no copy forks on
   // them any more.
@@ -290,7 +290,7 @@ export default async function FavpollPage({ params }: Props) {
   if (!entitled && pollWithItems) {
     pollWithItems = {
       ...pollWithItems,
-      personal_reveal: null,
+      personal_note: null,
       topics: {
         ...pollWithItems.topics,
         favourites: pollWithItems.topics.favourites.map((f) => ({
@@ -369,7 +369,7 @@ export default async function FavpollPage({ params }: Props) {
           clerkUserId={userId}
           isOrganiser={isOrganiser}
           entitled={entitled}
-          hasReveal={hasReveal}
+          hasNote={hasNote}
           gatedCharityNames={gatedCharityNames}
         />
       </>

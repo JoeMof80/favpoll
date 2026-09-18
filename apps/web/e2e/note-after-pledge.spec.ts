@@ -3,7 +3,7 @@
  *
  * Tests the full guest pledge → reveal flow on the favpoll public page.
  * This is the test that would have caught the PR #120 bug immediately:
- * personal_reveal was null on every seeded favpoll due to a wrong
+ * personal_note was null on every seeded favpoll due to a wrong
  * placeholder lookup key, and this went undetected through unit tests.
  *
  * Test favpoll:
@@ -32,7 +32,7 @@ import { resolve } from "path"
 
 // ── Load fixture state written by global-setup ────────────────────────────────
 let openFavpollId: string
-let revealText: string
+let noteText: string
 
 test.beforeAll(() => {
   try {
@@ -40,7 +40,7 @@ test.beforeAll(() => {
       readFileSync(resolve(process.cwd(), "e2e/.state/fixtures.json"), "utf-8")
     )
     openFavpollId = state.openFavpollId
-    revealText = state.revealText
+    noteText = state.noteText
   } catch {
     // Will surface as a skip in individual tests
   }
@@ -67,9 +67,9 @@ test.describe("reveal after pledge", () => {
 
     // ── 2. Confirm reveal is NOT visible before pledging ─────────────────────
     // PR #127: PollSection now shows a blurred decoy + lock card overlay
-    // pre-pledge instead of simply hiding the reveal. The real PollReveal
+    // pre-pledge instead of simply hiding the reveal. The real PollNote
     // (role="status") is not mounted until entitled=true (server-gated).
-    // Use [aria-live="polite"] to select only the TypedReveal sr-only node —
+    // Use [aria-live="polite"] to select only the TypedNote sr-only node —
     // page loading spinners also carry role="status" and would match the
     // generic getByRole("status") selector.
     await expect(
@@ -262,12 +262,12 @@ test.describe("reveal after pledge", () => {
 
     // ── 8. Confirm the reveal is now visible ──────────────────────────────────
     // PledgeDialog.onPledgeSuccess → FavpollContent.handlePledgeSuccess →
-    // pledgeConfirmed = true → TypedReveal mounts and types the reveal out.
+    // pledgeConfirmed = true → TypedNote mounts and types the reveal out.
     //
     // THIS IS THE ASSERTION THAT WOULD HAVE CAUGHT PR #120's BUG.
-    // personal_reveal was null → TypedReveal never mounts → no blockquote.
+    // personal_note was null → TypedNote never mounts → no blockquote.
     //
-    // TypedReveal animated path: blockquote is aria-hidden (AT gets a sr-only
+    // TypedNote animated path: blockquote is aria-hidden (AT gets a sr-only
     // polite announcement instead). Playwright's toBeVisible() is CSS-based,
     // not ARIA-based, so the visually rendered blockquote still passes.
     const revealBlock = page.locator("blockquote").first()
@@ -279,7 +279,7 @@ test.describe("reveal after pledge", () => {
     // sr-only aria-live announcement carries the same text, and toContainText
     // retries while the typewriter animation finishes.
     await expect(revealBlock).toContainText("Cornflower blue")
-    await expect(revealBlock).toContainText(revealText, { timeout: 10_000 })
+    await expect(revealBlock).toContainText(noteText, { timeout: 10_000 })
 
     // ── 9. Confirm results ranking is visible ─────────────────────────────────
     // After pledging, the poll switches to results view and renders a RankingList

@@ -25,7 +25,7 @@ const makeRawDraft = (overrides: Record<string, unknown> = {}) => ({
   register: "cause",
   subject: "cause",
   about: "Come together and give.",
-  reveal: "They support clean water projects.",
+  note: "They support clean water projects.",
   status: "generated",
   created_at: "2026-01-01T00:00:00Z",
   topics: { title: "Colour" },
@@ -50,7 +50,7 @@ describe("getGeneratedDrafts", () => {
       register: "cause",
       subject: "cause",
       about: "Come together and give.",
-      reveal: "They support clean water projects.",
+      note: "They support clean water projects.",
       status: "generated",
       topic_title: "Colour",
       charity_name: "Shelter",
@@ -129,29 +129,29 @@ describe("updateGeneratedDraft", () => {
       .callsFor("generated_drafts")
       .find((c) => c.method === "update")!;
     expect(updateCall.args[0]).toEqual({ about: "Revised about." });
-    expect(updateCall.args[0]).not.toHaveProperty("reveal");
+    expect(updateCall.args[0]).not.toHaveProperty("note");
   });
 
-  it("updates reveal when only reveal is provided", async () => {
+  it("updates note when only note is provided", async () => {
     mock.queue(null);
 
     const { error } = await updateGeneratedDraft("draft-1", {
-      reveal: "Revised reveal.",
+      note: "Revised note.",
     });
 
     expect(error).toBeNull();
     const updateCall = mock
       .callsFor("generated_drafts")
       .find((c) => c.method === "update")!;
-    expect(updateCall.args[0]).toEqual({ reveal: "Revised reveal." });
+    expect(updateCall.args[0]).toEqual({ note: "Revised note." });
   });
 
-  it("updates both about and reveal when both provided", async () => {
+  it("updates both about and note when both provided", async () => {
     mock.queue(null);
 
     await updateGeneratedDraft("draft-1", {
       about: "New about.",
-      reveal: "New reveal.",
+      note: "New note.",
     });
 
     const updateCall = mock
@@ -159,7 +159,7 @@ describe("updateGeneratedDraft", () => {
       .find((c) => c.method === "update")!;
     expect(updateCall.args[0]).toEqual({
       about: "New about.",
-      reveal: "New reveal.",
+      note: "New note.",
     });
   });
 

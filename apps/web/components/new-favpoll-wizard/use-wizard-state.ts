@@ -60,7 +60,7 @@ export type WizardEditConfig = {
     context: string
     photoUrl: string | null
     about: string
-    reveal: string
+    note: string
     goalAmount: number | undefined
     isListed: boolean
     isPrivate: boolean
@@ -150,7 +150,7 @@ export function useWizardState(
     init?.photoUrl ?? null
   )
   const [about, setAbout] = useState(init?.about ?? "")
-  const [reveal, setReveal] = useState(init?.reveal ?? "")
+  const [note, setNote] = useState(init?.note ?? "")
   const [who, setWho] = useState<WhoValue | "">(
     init ? whoFor(init.subject, init.grouping, init.pronoun) : ""
   )
@@ -184,7 +184,7 @@ export function useWizardState(
   const [generating, setGenerating] = useState(false)
   // CACHE-ONLY ghost prefetch (founder, 2026-09-17): when a cached
   // generated draft exists for the current calibration set, its
-  // about/reveal become the Story step's PLACEHOLDERS — contextual
+  // about/note become the Story step's PLACEHOLDERS — contextual
   // ghosts at zero model cost. Fired as soon as the set is complete
   // (the cache key includes the name, typed on the Info step), so the
   // read lands before Story renders; debounced because the name keys
@@ -192,7 +192,7 @@ export function useWizardState(
   // (empty topicId would collide in the cache key).
   const [cachedGhosts, setCachedGhosts] = useState<{
     about: string
-    reveal: string
+    note: string
   } | null>(null)
   const ghostRequestId = useRef(0)
   const [submitting, setSubmitting] = useState(false)
@@ -324,7 +324,7 @@ export function useWizardState(
     // frame and headers stay equidistant. Order is the header's own: opening line, name,
     // context.
     info: [openingLine.trim(), name.trim(), context.trim()].filter(Boolean),
-    story: [about.trim(), reveal.trim()].filter(Boolean),
+    story: [about.trim(), note.trim()].filter(Boolean),
     details: [
       goalAmount ? `£${goalAmount} goal` : "",
       closesAt
@@ -500,7 +500,7 @@ export function useWizardState(
       })
       if (!result) return
       setAbout(result.about)
-      setReveal(result.reveal)
+      setNote(result.note)
       if (isCause) {
         if (!name.trim() && result.causeLabel) setName(result.causeLabel)
         if (!context.trim() && result.context) setContext(result.context)
@@ -589,7 +589,7 @@ export function useWizardState(
             customTopicItems: isCustomTopic
               ? (selected.customLabels ?? [])
               : [],
-            reveal: reveal || null,
+            note: note || null,
             infiniteItems:
               !isCustomTopic && topicMeta && !topicMeta.is_finite
                 ? {
@@ -633,7 +633,7 @@ export function useWizardState(
                 items: selected.customLabels ?? [],
               }
             : null,
-          reveal: reveal || null,
+          note: note || null,
           infiniteItems:
             !isCustomTopic && topicMeta && !topicMeta.is_finite
               ? {
@@ -710,8 +710,8 @@ export function useWizardState(
     setPhotoUrl,
     about,
     setAbout,
-    reveal,
-    setReveal,
+    note,
+    setNote,
     who,
     handleWho,
     goalAmount,

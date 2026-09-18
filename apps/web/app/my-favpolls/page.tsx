@@ -28,7 +28,7 @@ export default async function MyFavpollsPage() {
       `${ORGANIZER_FAVPOLL_COLUMNS},
       protagonists!favpolls_protagonist_id_fkey ( name ),
       favpoll_charities ( charities ( id, name, logo_url, registered_number, description ) ),
-      favpoll_polls ( id, personal_reveal, topics ( title ), pledges ( count ) ),
+      favpoll_polls ( id, personal_note, topics ( title ), pledges ( count ) ),
       favpoll_pots ( total_deposited, total_allocated )`
     )
     .eq("created_by", userId)

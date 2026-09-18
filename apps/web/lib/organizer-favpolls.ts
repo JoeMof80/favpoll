@@ -51,7 +51,7 @@ export type RawOrganizerRow = {
   }[]
   favpoll_polls: {
     id: string
-    personal_reveal: string | null
+    personal_note: string | null
     topics: { title: string } | null
     pledges: { count: number }[]
   } | null
@@ -83,6 +83,6 @@ export function mapOrganizerFavpoll(ev: RawOrganizerRow): OrganizerFavpoll {
       : null,
     pot: ev.favpoll_pots ?? null,
     pledge_count: ev.favpoll_polls?.pledges?.[0]?.count ?? 0,
-    has_reveal: !!ev.favpoll_polls?.personal_reveal,
+    has_note: !!ev.favpoll_polls?.personal_note,
   }
 }

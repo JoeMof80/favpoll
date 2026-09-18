@@ -14,7 +14,7 @@ import { paletteForSceneKind } from "@/lib/register-palette"
 import { Button } from "@/components/ui/button"
 import { RankingBar } from "@/components/ui/ranking-bar"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-import { PollReveal } from "@/components/favpoll-card/poll-reveal"
+import { PollNote } from "@/components/favpoll-card/poll-note"
 import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
 import {
   getFavpollHeadline,
@@ -145,7 +145,7 @@ export function DemoCard({
   const goal = scene.goal_amount
   const amountNum = Number(scene.pledgeAmount.replace(/[^0-9.]/g, "")) || 0
   const amountStr = String(amountNum)
-  const revealText = scene.poll.personal_reveal
+  const noteText = scene.poll.personal_note
   const results = scene.results.slice(0, RESULTS_SHOWN)
 
   // A scene may honour a person (remembering / celebrating) or no one at all
@@ -163,7 +163,7 @@ export function DemoCard({
     charityLine: charityName,
     // Every demo scene carries a note — the lock card should teach the
     // same step 3 a real note-bearing poll shows (2026-09-17)
-    hasNote: !!revealText,
+    hasNote: !!noteText,
   })
 
   const headline = protagonist
@@ -219,14 +219,14 @@ export function DemoCard({
   // Unlocked = disclosure: the dialog has closed; the reveal types out and the
   // ranking bars climb from zero.
   const unlocked =
-    phase === "clearing" || phase === "results" || phase === "reveal"
+    phase === "clearing" || phase === "results" || phase === "note"
   const locked = !unlocked
 
   // About types on arrival; the reveal types at disclosure. They never overlap.
   const aboutShown = useTyped(aboutText, locked, prefersReducedMotion, 2200)
   const revealActive = phase === "clearing" || phase === "results"
   const revealShown = useTyped(
-    revealText,
+    noteText,
     revealActive,
     prefersReducedMotion,
     1900
@@ -474,8 +474,8 @@ export function DemoCard({
           <div className="space-y-4 [grid-area:1/1]">
             {locked ? (
               <div className="blur-xs" aria-hidden="true">
-                <PollReveal
-                  personalReveal={revealText}
+                <PollNote
+                  personalNote={noteText}
                   protagonistFirstName={firstName ?? undefined}
                 />
               </div>
@@ -483,8 +483,8 @@ export function DemoCard({
               <div className="relative">
                 {/* Reserve final height so typing doesn't push results down */}
                 <div className="invisible" aria-hidden="true">
-                  <PollReveal
-                    personalReveal={revealText}
+                  <PollNote
+                    personalNote={noteText}
                     protagonistFirstName={firstName ?? undefined}
                   />
                 </div>
@@ -493,8 +493,8 @@ export function DemoCard({
                   role="status"
                   aria-live="polite"
                 >
-                  <PollReveal
-                    personalReveal={revealShown || "\u00A0"}
+                  <PollNote
+                    personalNote={revealShown || "\u00A0"}
                     protagonistFirstName={firstName ?? undefined}
                   />
                 </div>

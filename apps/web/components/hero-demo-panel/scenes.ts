@@ -15,7 +15,7 @@ export type Phase =
   | "confirmed" // confirmation shown inside the dialog
   | "clearing" // dialog closes
   | "results" // ranking bars climb, reveal skeleton holds
-  | "reveal" // personal reveal types out last
+  | "note" // personal note types out last
 
 /**
  * Supabase-aligned demo scene.
@@ -78,7 +78,7 @@ export type HeroScene = {
   photo_url?: string | null
   poll: {
     id: string
-    personal_reveal: string
+    personal_note: string
     topic: {
       title: string
       favourites: { id: string; label: string }[]
@@ -120,7 +120,7 @@ export const SCENES: HeroScene[] = [
     },
     poll: {
       id: "demo-poll-0",
-      personal_reveal:
+      personal_note:
         "My favourite colour was purple. I wore it to every occasion that mattered.",
       topic: {
         title: "Colour",
@@ -175,7 +175,7 @@ export const SCENES: HeroScene[] = [
     },
     poll: {
       id: "demo-poll-1",
-      personal_reveal:
+      personal_note:
         "Mint choc chip is the best, of course. What do you mean you don't agree?",
       topic: {
         title: "Ice cream",
@@ -330,7 +330,7 @@ export const SCENES: HeroScene[] = [
       // yet. The hope is not about whether they are GOING — that is booked —
       // it is about whether Chengdu turns out to be the favourite, which is
       // the honest answer to the question actually asked.
-      personal_reveal:
+      personal_note:
         "Ours will hopefully be Chengdu. We're planning to visit the pandas on our honeymoon.",
       topic: {
         title: "Holiday destination",
@@ -500,7 +500,7 @@ export const SCENES: HeroScene[] = [
       // both say "message" rather than "favourite", with no field set. If a
       // future edit gives Marcus a favourite back, that capability goes
       // undemonstrated again — see lib/mechanic-steps.ts.
-      personal_reveal:
+      personal_note:
         "Thank you for your pledge. If we reach the goal, I'll eat the hat as well! (Only kidding)",
       topic: {
         title: "Marathon hat",
@@ -616,7 +616,7 @@ export const SCENES: HeroScene[] = [
       // is named after his favourite treat, and the walkers' pick decides
       // which treat he gets. A cause cannot bet on its own poll (the Marcus
       // lesson); this gives something back without doing so.
-      personal_reveal:
+      personal_note:
         "Our favourite is Biscuit, our therapy dog. Named after his favourite treat, he’s a good boy who can have one after the walk.",
       topic: {
         // BISCUIT (founder, 2026-08-31), and the dog is named after it. A real

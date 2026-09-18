@@ -46,9 +46,11 @@ const CHARITY_DATA = {
     "We protect marine ecosystems and support coastal communities worldwide.",
 }
 
-function mockLLMResponse(about: string, reveal: string) {
+// The LLM JSON keeps its "reveal" field (the prompt is untouched by the
+// personal-note rename) — the boundary maps it to the note column.
+function mockLLMResponse(about: string, note: string) {
   mockMessagesCreate.mockResolvedValueOnce({
-    content: [{ type: "text", text: JSON.stringify({ about, reveal }) }],
+    content: [{ type: "text", text: JSON.stringify({ about, reveal: note }) }],
   })
 }
 
@@ -70,7 +72,7 @@ afterEach(() => {
 describe("revealNamesRealItem", () => {
   const items = ["Red", "Blue", "Monster Munch (pickled onion)"]
 
-  it("returns true when reveal contains an exact item label", () => {
+  it("returns true when note contains an exact item label", () => {
     expect(revealNamesRealItem("Her favourite was always Red.", items)).toBe(
       true
     )
@@ -184,7 +186,7 @@ describe("buildCacheKey", () => {
 
 describe("generateDraft — cache hit", () => {
   it("returns cached result without calling the LLM", async () => {
-    mock.queue({ about: "Cached about.", reveal: "Cached reveal — Red." })
+    mock.queue({ about: "Cached about.", note: "Cached note — Red." })
 
     const result = await generateDraft({
       register: "celebrating_one",
@@ -194,7 +196,7 @@ describe("generateDraft — cache hit", () => {
 
     expect(result).toEqual({
       about: "Cached about.",
-      reveal: "Cached reveal — Red.",
+      note: "Cached note — Red.",
       causeLabel: null,
       context: null,
       fromCache: true,
@@ -226,7 +228,7 @@ describe("generateDraft — cache miss, person", () => {
 
     expect(result.fromCache).toBe(false)
     expect(result.about).toBe("A celebration for someone special.")
-    expect(result.reveal).toBe("Her favourite was always Blue.")
+    expect(result.note).toBe("Her favourite was always Blue.")
     expect(mockMessagesCreate).toHaveBeenCalledTimes(1)
 
     const insertCall = mock
@@ -235,7 +237,7 @@ describe("generateDraft — cache miss, person", () => {
     expect(insertCall?.args[0]).toMatchObject({
       subject: "someone",
       about: "A celebration for someone special.",
-      reveal: "Her favourite was always Blue.",
+      note: "Her favourite was always Blue.",
       status: "generated",
     })
   })
@@ -267,7 +269,7 @@ describe("generateDraft — cache miss, person", () => {
     })
   })
 
-  it("retries when first reveal does not name a real item, uses retry result", async () => {
+  it("retries when first note does not name a real item, uses retry result", async () => {
     mock.queue(null) // cache miss
     mock.queue(TOPIC_DATA)
     mockLLMResponse(
@@ -286,7 +288,7 @@ describe("generateDraft — cache miss, person", () => {
       topicId: "topic-1",
     })
 
-    expect(result.reveal).toBe("She always chose Red without hesitation.")
+    expect(result.note).toBe("She always chose Red without hesitation.")
     expect(mockMessagesCreate).toHaveBeenCalledTimes(2)
   })
 })
@@ -400,7 +402,7 @@ describe("generateDraft — cache miss, cause", () => {
   it("returns cached cause fields on a cache hit", async () => {
     mock.queue({
       about: "Cached about.",
-      reveal: "Cached reveal.",
+      note: "Cached note.",
       cause_label: "Cached Cause",
       context: "Cached context",
     })
@@ -418,7 +420,7 @@ describe("generateDraft — cache miss, cause", () => {
     expect(mockMessagesCreate).not.toHaveBeenCalled()
   })
 
-  it("retries when cause reveal contains fabricated statistics", async () => {
+  it("retries when cause note contains fabricated statistics", async () => {
     mock.queue(null) // cache miss
     mock.queue(TOPIC_DATA)
     mock.queue(CHARITY_DATA)
@@ -439,7 +441,7 @@ describe("generateDraft — cache miss, cause", () => {
       primaryCharityId: "charity-1",
     })
 
-    expect(result.reveal).toBe(
+    expect(result.note).toBe(
       "Their ocean work is as vivid and varied as colour itself."
     )
     expect(mockMessagesCreate).toHaveBeenCalledTimes(2)
@@ -500,7 +502,7 @@ describe("rate limiting", () => {
 
   it("cache hits do not consume quota", async () => {
     for (let i = 0; i < RATE_LIMIT_MAX; i++) {
-      mock.queue({ about: "Cached.", reveal: "Cached — Red." })
+      mock.queue({ about: "Cached.", note: "Cached — Red." })
       await generateDraft({
         register: "celebrating_one",
         subject: "someone",
@@ -629,7 +631,7 @@ describe("safeGenerateDraft", () => {
 
     expect(result).not.toBeNull()
     expect(result?.about).toBe("About.")
-    expect(result?.reveal).toBe("Her favourite was always Blue.")
+    expect(result?.note).toBe("Her favourite was always Blue.")
     expect(result?.fromCache).toBe(false)
   })
 })

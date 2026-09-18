@@ -39,7 +39,7 @@ function EditableField({
   label: string;
   initial: string;
   draftId: string;
-  field: "about" | "reveal";
+  field: "about" | "note";
 }) {
   const [value, setValue] = useState(initial);
   const [isPending, startTransition] = useTransition();
@@ -147,10 +147,10 @@ function DraftRow({ draft }: { draft: GeneratedDraft }) {
                 field="about"
               />
               <EditableField
-                label="Reveal"
-                initial={draft.reveal}
+                label="Note"
+                initial={draft.note}
                 draftId={draft.id}
-                field="reveal"
+                field="note"
               />
               {isGenerated && (
                 <div className="space-y-1.5 border-t border-border pt-3">
