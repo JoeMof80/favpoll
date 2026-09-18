@@ -39,6 +39,30 @@ function inviteMailto(row: ConsentQueueRow): string {
   return `mailto:${encodeURIComponent(row.registered_email ?? "")}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
+// The WELCOME follows Approve (founder, 2026-09-18): the invite stays a
+// single ask, and the promised "details" get an artefact — the three
+// optional enrichments a charity can hand us (suggested topics, impact
+// lines, logo), which otherwise nobody remembers to collect. Drafted in
+// the team's own mail client like the invite; sending stays manual.
+function welcomeMailto(row: ConsentQueueRow): string {
+  const subject = `Welcome to favpoll — ${row.name}`;
+  const body = [
+    "Hello,",
+    "",
+    `Thank you for confirming — ${row.name} can now receive pledges through favpoll, and everything raised is passed on when each favpoll closes.`,
+    "",
+    "Three optional things that make your favpolls work harder — just reply with any of them:",
+    "",
+    "1. Suggested topics — poll topics you'd like us to suggest to organisers raising for you (some charities suit certain favourites: a hospice might pick Comfort food, a rescue might pick Dog breed).",
+    "2. Impact lines — one or two short sentences like \u201c\u00a320 funds an hour of care\u201d, shown to guests as they pick an amount.",
+    "3. Your logo — shown wherever your charity is named.",
+    "",
+    "Thank you,",
+    "The favpoll team",
+  ].join("\n");
+  return `mailto:${encodeURIComponent(row.registered_email ?? "")}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
 function QueueRow({ row }: { row: ConsentQueueRow }) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -47,7 +71,13 @@ function QueueRow({ row }: { row: ConsentQueueRow }) {
     setError(null);
     startTransition(async () => {
       const result = await setCharityConsent(row.id, status);
-      if (result.error) setError(result.error);
+      if (result.error) {
+        setError(result.error);
+      } else if (status === "approved" && row.registered_email) {
+        // Approval removes the row from the queue, so the welcome email
+        // drafts NOW — the one moment the ask can't be forgotten.
+        window.location.href = welcomeMailto(row);
+      }
     });
   }
 
