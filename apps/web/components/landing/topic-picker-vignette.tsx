@@ -444,6 +444,18 @@ export function TopicPickerVignette({
                     </motion.p>
                   )}
                 </AnimatePresence>
+                {/* The add ENTRY ends the grid (2026-09-18) — pressed
+                    state while the scripted guest taps it */}
+                {!guestPicked && (
+                  <Chip
+                    size="lg"
+                    className={`border-dashed bg-background text-primary ${
+                      guestAddPressed ? "scale-[0.96] brightness-95" : ""
+                    }`}
+                  >
+                    + Add your own
+                  </Chip>
+                )}
               </div>
             </motion.div>
           )}
@@ -559,15 +571,6 @@ export function TopicPickerVignette({
                     {guestTyping && <span className="opacity-40">|</span>}
                   </span>
                 </div>
-                {/* The add ENTRY lives in the pinned header — highlighted
-                    while the scripted guest "presses" it */}
-                <span
-                  className={`mt-2 block text-sm text-primary ${
-                    guestAddPressed ? "underline" : ""
-                  }`}
-                >
-                  Can&rsquo;t find yours? Add your own →
-                </span>
               </div>
               <div className="flex min-h-8 flex-wrap gap-2 px-5 pt-4 pb-4">
                 {guestPicked && (
@@ -591,6 +594,18 @@ export function TopicPickerVignette({
                       </motion.span>
                     ))}
                 </AnimatePresence>
+                {/* The add ENTRY ends the grid (2026-09-18) — pressed
+                    state while the scripted guest taps it */}
+                {!guestPicked && (
+                  <Chip
+                    size="lg"
+                    className={`border-dashed bg-background text-primary ${
+                      guestAddPressed ? "scale-[0.96] brightness-95" : ""
+                    }`}
+                  >
+                    + Add your own
+                  </Chip>
+                )}
               </div>
               {/* The real step-1 footer twins — the primary's label carries
                   the selection state */}

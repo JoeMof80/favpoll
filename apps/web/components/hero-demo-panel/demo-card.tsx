@@ -658,7 +658,9 @@ export function DemoCard({
                         search=""
                         isInfinite={false}
                         hasAddItem={false}
+                        canAdd={false}
                         onToggle={() => {}}
+                        onEnterAdd={() => {}}
                       />
                     </div>
                     {/* The real step-1 footer twins: the primary's label

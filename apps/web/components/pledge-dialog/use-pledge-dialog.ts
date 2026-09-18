@@ -117,10 +117,25 @@ export function usePledgeDialog({
 
   async function handleAdd() {
     if (!onAddItem || !addText.trim()) return
+    const label = addText.trim()
+    // DUPLICATE = SELECT, NOT ERROR (founder, 2026-09-18): adding a
+    // favourite that already exists just picks its chip — same intent,
+    // better outcome, no constraint error to read. Mirrors the wizard's
+    // topic duplicate guard.
+    const existing = mergedPoll.topics.favourites.find(
+      (f) => f.label.toLowerCase() === label.toLowerCase()
+    )
+    if (existing) {
+      setSelectedIds((prev) =>
+        prev.includes(existing.id) ? prev : [...prev, existing.id]
+      )
+      setSearch("")
+      exitAddView()
+      return
+    }
     setAddingItem(true)
     setAddError(null)
     try {
-      const label = addText.trim()
       const id = await onAddItem(label)
       if (id) {
         setAddedItems((prev) =>

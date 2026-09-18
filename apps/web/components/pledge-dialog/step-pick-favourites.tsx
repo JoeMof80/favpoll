@@ -20,18 +20,12 @@ type PickerHeaderProps = {
   search: string
   onSearchChange: (v: string) => void
   topicTitle?: string
-  /** Adding is possible — shows the add-entry link under the search */
-  canAdd?: boolean
-  /** Opens the focused add view (seeded with the current search). */
-  onEnterAdd?: () => void
 }
 
 export function PickerHeader({
   search,
   onSearchChange,
   topicTitle,
-  canAdd = false,
-  onEnterAdd,
 }: PickerHeaderProps) {
   const topic = topicTitle?.toLowerCase()
   return (
@@ -61,19 +55,6 @@ export function PickerHeader({
           className="w-full bg-transparent text-lg outline-none placeholder:text-muted-foreground/50"
         />
       </div>
-      {/* The add ENTRY lives in the PINNED header (founder, 2026-09-17
-          — a list-end link sat awkwardly and sank on long topics): an
-          honest link, always visible, right where a failed search
-          leaves the eye. */}
-      {canAdd && onEnterAdd && (
-        <button
-          type="button"
-          onClick={onEnterAdd}
-          className="mt-2 block text-sm text-primary hover:underline"
-        >
-          Can&rsquo;t find yours? Add your own →
-        </button>
-      )}
     </div>
   )
 }
@@ -84,8 +65,12 @@ type PickerPillsProps = {
   search: string
   isInfinite?: boolean
   hasAddItem: boolean
+  /** Adding is possible — the grid ends with the "+ Add your own" pill */
+  canAdd: boolean
   /** A tap TOGGLES the pill — commit happens in the footer. */
   onToggle: (id: string) => void
+  /** Opens the focused add view (seeded with the current search). */
+  onEnterAdd: () => void
 }
 
 export function PickerPills({
@@ -94,7 +79,9 @@ export function PickerPills({
   search,
   isInfinite,
   hasAddItem,
+  canAdd,
   onToggle,
+  onEnterAdd,
 }: PickerPillsProps) {
   const searching = search.toLowerCase().trim().length > 0
 
@@ -124,6 +111,23 @@ export function PickerPills({
             {item.label}
           </Chip>
         ))}
+        {/* The add ENTRY ends the grid (founder, 2026-09-18, after two
+            auditions — header line and list-end link): you only need to
+            add if yours isn't there, and you reach the END to find out.
+            Long topics filter down via search, which floats the pill
+            into view. An honest button — it opens the add view. */}
+        {canAdd && (
+          <Chip
+            size="lg"
+            className="border-dashed bg-background text-primary"
+            onMouseDown={(e) => {
+              e.preventDefault()
+              onEnterAdd()
+            }}
+          >
+            + Add your own
+          </Chip>
+        )}
       </div>
 
       {searching && filteredItems.length === 0 && (
