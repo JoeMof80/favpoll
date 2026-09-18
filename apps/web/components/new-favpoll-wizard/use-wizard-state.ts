@@ -482,6 +482,11 @@ export function useWizardState(
   // One-click generation: by the Story step the wizard already holds
   // register, charity, topic, name, context and who — the full
   // calibration set. No dialog (extended-wizard verdict).
+  // Repeat clicks RE-ROLL (founder, 2026-09-18): the first click may
+  // serve the shared cache, but a second click that repeated the same
+  // draft made the button feel broken — so after one result this form
+  // bypasses the cache (read and write) and generates fresh each time.
+  const hasGeneratedRef = useRef(false)
   async function generateExample() {
     const topic = topics[0]
     if (!topic || generating) return
@@ -497,8 +502,10 @@ export function useWizardState(
         pronoun,
         grouping,
         displayName: name.trim() || null,
+        skipCache: hasGeneratedRef.current,
       })
       if (!result) return
+      hasGeneratedRef.current = true
       setAbout(result.about)
       setNote(result.note)
       if (isCause) {

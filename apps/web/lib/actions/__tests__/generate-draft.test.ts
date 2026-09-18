@@ -206,6 +206,35 @@ describe("generateDraft — cache hit", () => {
 })
 
 // ---------------------------------------------------------------------------
+// generateDraft — skipCache re-roll (repeat Generate clicks)
+// ---------------------------------------------------------------------------
+
+describe("generateDraft — skipCache re-roll", () => {
+  it("bypasses the cache read and never writes", async () => {
+    mock.queue(TOPIC_DATA) // topics fetch — NO cache read queued
+
+    mockLLMResponse(
+      "A fresh example, rolled again.",
+      "Her favourite was always Blue."
+    )
+
+    const result = await generateDraft({
+      register: "celebrating_one",
+      subject: "someone",
+      topicId: "topic-1",
+      skipCache: true,
+    })
+
+    expect(result.fromCache).toBe(false)
+    expect(result.about).toBe("A fresh example, rolled again.")
+    expect(mockMessagesCreate).toHaveBeenCalledTimes(1)
+    // A re-roll is this form's alone: no cache lookup, no cache write
+    const draftCalls = mock.callsFor("generated_drafts")
+    expect(draftCalls).toEqual([])
+  })
+})
+
+// ---------------------------------------------------------------------------
 // generateDraft — cache miss, person (someone)
 // ---------------------------------------------------------------------------
 
