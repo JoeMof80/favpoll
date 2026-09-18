@@ -16,6 +16,7 @@ import { decoyWidth } from "@/lib/decoys"
 import { buildMechanicSteps } from "@/lib/mechanic-steps"
 import { LockCardContent } from "@/components/lock-card-content"
 import { Check, EllipsisVertical, Share2 } from "lucide-react"
+import { toast } from "sonner"
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -154,14 +155,26 @@ export function PollSection({
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onSelect={() => {
-                    if (navigator.share) {
+                    // ShareFavpollButton's convention (founder call,
+                    // 2026-07-29): native sheet only on touch — desktop
+                    // share sheets are patchy, the desktop convention is
+                    // copy-link. The old navigator.share-only item did
+                    // NOTHING on desktop.
+                    const coarse = window.matchMedia(
+                      "(hover: none) and (pointer: coarse)"
+                    ).matches
+                    if (coarse && navigator.share) {
                       navigator
                         .share({
                           title: `Favourite ${poll.topics.title}`,
                           url: window.location.href,
                         })
                         .catch(() => {})
+                      return
                     }
+                    void navigator.clipboard
+                      .writeText(window.location.href)
+                      .then(() => toast("Link copied"))
                   }}
                 >
                   Share

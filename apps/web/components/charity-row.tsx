@@ -53,7 +53,10 @@ export function CharityRow({
       )}
       <div className="min-w-0 flex-1">
         <p className={`truncate ${nameClass} font-medium text-foreground`}>
-          {linkToCharity ? (
+          {/* Only link when the charity PAGE exists — /charities/[id]
+              404s for inactive (register-added, pre-consent) charities
+              (founder, 2026-09-18: "leads nowhere"). */}
+          {linkToCharity && charity.is_active !== false ? (
             <Link
               href={`/charities/${charity.id}`}
               className="hover:text-primary hover:underline"

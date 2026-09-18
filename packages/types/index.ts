@@ -21,6 +21,9 @@ export type Charity = {
   /** The register's public contact (2026-09-08) — outreach + row identity */
   registered_email?: string | null;
   registered_website?: string | null;
+  /** On the public catalogue — /charities/[id] 404s when false
+   *  (register-added charities arrive inactive, pre-consent). */
+  is_active?: boolean;
   /** Admin-curated impact line shown at pledge time; null = none */
   impact_statement?: string | null;
   /** Charity Commission check, written by the admin app; null = never checked */
