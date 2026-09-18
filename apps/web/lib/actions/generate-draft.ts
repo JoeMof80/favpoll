@@ -139,12 +139,17 @@ ${charityLine}`
     // A memorial's tense is the whole register: the opener's "was" is
     // computed above, but the model also wrote "has loved" and "still
     // reaches for it" until told the rule applies to EVERY sentence
-    // (founder-caught, 2026-07-31).
+    // (founder-caught, 2026-07-31). The other branch matters just as
+    // much: without it a living protagonist got past-habitual copy
+    // ("always went on it twice") that read elegiac — and, with the
+    // old "long held" instruction, aged every protagonist up
+    // (founder-caught, 2026-09-18: a child's celebration drafted as an
+    // elderly lady's).
     const tenseRule =
       register === "remembering"
         ? ` The person is being remembered: every sentence about them — in the about AND the reveal detail — must be in the past tense (loved, was, would reach for). Never "has loved", "still does", or any present-tense habit.`
-        : ""
-    instructions = `- "about" (max 2 sentences): open with the PROTAGONIST'S connection to the topic — a favourite ${topicTitle.toLowerCase()}, long held, part of who they are — teased WITHOUT naming or hinting at which option it is (the reveal is the gift).${tenseRule} Then one short clause inviting the READER directly, in second person: pledge to ${charityName ?? "charity"} and pick your OWN favourite (say "you"/"your", never "guests"; never say they are guessing or voting on the protagonist's). Keep the charity to a mention, not a description — this is about the person.${pronounHint}${nameHint}
+        : ` The person is living: their habits are in the present tense ("always goes", "still picks first"), never the past-habitual ("always went") — past tense makes them sound gone. Do not assume their age: no whole-life idioms ("since childhood", "all her life", "long held"). When the charity or occasion suggests who they are (a children's charity, a graduation), let that shape the detail; otherwise write habits that fit any age.`
+    instructions = `- "about" (max 2 sentences): open with the PROTAGONIST'S connection to the topic — a favourite ${topicTitle.toLowerCase()} that is distinctly theirs — teased WITHOUT naming or hinting at which option it is (the reveal is the gift).${tenseRule} Then one short clause inviting the READER directly, in second person: pledge to ${charityName ?? "charity"} and pick your OWN favourite (say "you"/"your", never "guests"; never say they are guessing or voting on the protagonist's). Keep the charity to a mention, not a description — this is about the person.${pronounHint}${nameHint}
 - "reveal" (guests see it only AFTER pledging): start with exactly "${opener}".${entityGuard} Then a plausible option from the list (you MUST use a real option, verbatim), then a full stop, then ONE short sentence with a single concrete detail about the PROTAGONIST'S relationship to that favourite — a habit, a memory, a ritual of theirs.${tenseRule} The detail must be entirely the protagonist's own and must NOT depend on any real-world fact about the favourite: no fixture dates or match traditions, no seasons, tours, episodes, eras, or biography (a claim like "watched them play on Boxing Day" fails if that favourite doesn't play then — avoid the whole category). The options may be famous real people, teams, or works: never state or invent facts about them. No preamble such as "We can't wait to reveal".`
   }
 
@@ -234,6 +239,13 @@ export type GenerateDraftInput = {
   grouping?: FavpollGrouping
   /** Protagonist name or cause label — prompt context only, never cached into copy. */
   displayName?: string | null
+  /**
+   * Re-roll (founder, 2026-09-18): bypass the shared cache read AND
+   * write — repeat clicks of Generate must produce a fresh example, and
+   * the regenerated copy is this form's alone. The cache keeps its one
+   * draft as the first-click accelerator and the ghosts' source.
+   */
+  skipCache?: boolean
 }
 
 export type GeneratedDraftResult = {
@@ -329,20 +341,22 @@ export async function generateDraft(
     input.grouping
   )
 
-  const { data: cached } = await supabase
-    .from("generated_drafts")
-    .select("about, note, cause_label, context")
-    .eq("cache_key", cacheKey)
-    .neq("status", "rejected")
-    .maybeSingle()
+  if (!input.skipCache) {
+    const { data: cached } = await supabase
+      .from("generated_drafts")
+      .select("about, note, cause_label, context")
+      .eq("cache_key", cacheKey)
+      .neq("status", "rejected")
+      .maybeSingle()
 
-  if (cached?.about && cached?.note) {
-    return {
-      about: cached.about,
-      note: cached.note,
-      causeLabel: cached.cause_label ?? null,
-      context: cached.context ?? null,
-      fromCache: true,
+    if (cached?.about && cached?.note) {
+      return {
+        about: cached.about,
+        note: cached.note,
+        causeLabel: cached.cause_label ?? null,
+        context: cached.context ?? null,
+        fromCache: true,
+      }
     }
   }
 
@@ -400,20 +414,24 @@ export async function generateDraft(
   const causeLabel = parsed.causeLabel?.trim().slice(0, 60) || null
   const context = parsed.context?.trim().slice(0, 40) || null
 
-  await supabase.from("generated_drafts").insert({
-    cache_key: cacheKey,
-    display_name: input.displayName ?? null,
-    register: input.register,
-    topic_id: input.topicId,
-    primary_charity_id: input.primaryCharityId ?? null,
-    subject: input.subject,
-    about: parsed.about,
-    note: parsed.reveal,
-    cause_label: causeLabel,
-    context,
-    model: modelId,
-    status: "generated",
-  })
+  // A re-roll never writes: the cache row may already exist (unique
+  // cache_key), and a personal re-roll must not replace the vetted
+  // draft other organisers' ghosts read from.
+  if (!input.skipCache)
+    await supabase.from("generated_drafts").insert({
+      cache_key: cacheKey,
+      display_name: input.displayName ?? null,
+      register: input.register,
+      topic_id: input.topicId,
+      primary_charity_id: input.primaryCharityId ?? null,
+      subject: input.subject,
+      about: parsed.about,
+      note: parsed.reveal,
+      cause_label: causeLabel,
+      context,
+      model: modelId,
+      status: "generated",
+    })
 
   incrementRateLimitCount(userId)
   return {
