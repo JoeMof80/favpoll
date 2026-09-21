@@ -237,6 +237,23 @@ export default async function FavpollPage({ params }: Props) {
         .eq("favpoll_poll_id", rawPoll.id)
         .order("label", { referencedTable: "favourites", ascending: true })
 
+      // CATALOGUE FALLBACK (founder, 2026-09-22): a non-finite catalogue
+      // topic (e.g. "Fairground Ride") with zero pledges has no
+      // favpoll_poll_favourites rows yet — guests add items BY pledging.
+      // Without the fallback the picker is empty and nobody can pledge.
+      // Fall back to the catalogue's own favourites so the first guest
+      // sees the full list.
+      if ((epiData ?? []).length === 0 && rawPoll.topic_id) {
+        const { data: catalogueItems } = await supabase
+          .from("favourites")
+          .select("*")
+          .eq("topic_id", rawPoll.topic_id)
+        return overlayStandings(
+          (catalogueItems ?? []) as Favourite[],
+          standings
+        ).sort((a, b) => a.label.localeCompare(b.label))
+      }
+
       const allItems = overlayStandings(
         ((epiData ?? []) as unknown as EpiRow[]).map((epi) => ({
           ...epi.favourites,
@@ -287,9 +304,15 @@ export default async function FavpollPage({ params }: Props) {
   // 2026-09-17: "a note" covers every reveal shape, so no copy forks on
   // them any more.
 
-  // Hide unpledged items from the standings (founder, 2026-09-21): 57
+  // The FULL item list — needed by the pledge dialog's picker so guests
+  // can pick from all catalogue items, even before anyone has pledged.
+  const fullPollWithItems = pollWithItems
+
+  // Hide unpledged items from the STANDINGS (founder, 2026-09-21): 57
   // cities with 50 at £0 dilutes the story — the pledged items ARE the
   // story. Un-entitled viewers still see the full decoy list (zeroed).
+  // This filtered version goes to PollSection; the full list goes to
+  // PledgeDialog via FavpollContent.
   if (entitled && pollWithItems) {
     pollWithItems = {
       ...pollWithItems,
@@ -395,6 +418,7 @@ export default async function FavpollPage({ params }: Props) {
           favpoll={typedFavpoll}
           appeal={memberAppeal}
           pollWithItems={visiblePoll}
+          pickerPoll={fullPollWithItems}
           pot={pot ?? null}
           userPotAllocation={userPotAllocation}
           totalRaised={totalRaised}
