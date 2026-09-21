@@ -59,7 +59,7 @@ const FAVPOLL_SELECT = `
   photo_url,
   protagonist:protagonists ( name, photo_url, about ),
   charities:favpoll_charities (
-    charity:charities ( id, name, logo_url, registered_number )
+    charity:charities ( id, name, logo_url, registered_number, impact_statement )
   ),
   favpoll_polls (
     id,
