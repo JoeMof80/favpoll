@@ -107,8 +107,8 @@ export function WizardTopicCard({
           {!locked && topic.isCustom && customLabels.length < 2 && (
             <span className="text-xs text-muted-foreground">
               {customLabels.length === 0
-                ? "Add at least two options."
-                : "Add at least one more option."}
+                ? "Add at least two items."
+                : "Add at least one more item."}
             </span>
           )}
         </div>

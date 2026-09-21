@@ -96,8 +96,8 @@ export function TopicItemsDialog({
               }}
               placeholder={
                 isNewTopic
-                  ? `Add ${topicTitle.toLowerCase()} options…`
-                  : `Search or add ${topicTitle.toLowerCase()} options…`
+                  ? `Add ${topicTitle.toLowerCase()} items…`
+                  : `Search or add ${topicTitle.toLowerCase()} items…`
               }
               className="flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground/50"
             />
@@ -161,7 +161,7 @@ export function TopicItemsDialog({
             (trimmed ? filteredExisting : existingItems).length > 0 && (
               <div>
                 <p className="mb-2 text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
-                  Existing options
+                  Existing items
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {(trimmed ? filteredExisting : existingItems).map((item) => (
@@ -179,11 +179,11 @@ export function TopicItemsDialog({
             existingItems.length === 0 &&
             (isNewTopic ? (
               <p className="py-2 text-sm text-muted-foreground">
-                Start typing to add options.
+                Start typing to add items.
               </p>
             ) : (
               <p className="py-2 text-sm text-muted-foreground">
-                No options available for this topic.
+                No items available for this topic.
               </p>
             ))}
         </div>
