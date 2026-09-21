@@ -82,7 +82,7 @@ export default async function LiveDisplayPage({ params }: Props) {
           .from("pledges")
           .select(
             `id, display_name, is_anonymous, clerk_user_id, created_at,
-             total_amount, guest_book_display,
+             total_amount, guest_book_display, message,
              pledge_allocations ( favourites ( label ) )`
           )
           .eq("favpoll_poll_id", pollId)
@@ -143,6 +143,8 @@ export default async function LiveDisplayPage({ params }: Props) {
               .map((a) => a.favourites?.label)
               .filter((l): l is string => typeof l === "string"),
       amount: showAmounts && display === "amount" ? totalAmount : undefined,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      message: ((r as any).message as string) || null,
       created_at: r.created_at,
     }
   })

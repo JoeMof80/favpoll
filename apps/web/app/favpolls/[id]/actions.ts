@@ -85,6 +85,8 @@ type CreatePledgeInput = {
   isAnonymous?: boolean
   /** What appears beside the name: pick (favourites), amount (£), none */
   guestBookDisplay?: "pick" | "amount" | "none"
+  /** Short guest book message (100-char limit enforced client-side) */
+  message?: string | null
   allocations: PledgeAllocationInput[]
   /** The Stripe PaymentIntent that charged this pledge */
   paymentIntentId: string
@@ -118,6 +120,7 @@ export async function createPledge(input: CreatePledgeInput) {
       tip_amount: input.tipAmount ?? 0,
       is_anonymous: input.isAnonymous ?? false,
       guest_book_display: input.guestBookDisplay ?? "pick",
+      message: input.message?.trim().slice(0, 100) || null,
       payment_intent_id: input.paymentIntentId,
     })
     .select("id")
@@ -163,6 +166,8 @@ type CreateGuestPledgeInput = {
   isAnonymous?: boolean
   /** What appears beside the name: pick (favourites), amount (£), none */
   guestBookDisplay?: "pick" | "amount" | "none"
+  /** Short guest book message (100-char limit enforced client-side) */
+  message?: string | null
   allocations: PledgeAllocationInput[]
   /** The Stripe PaymentIntent that charged this pledge */
   paymentIntentId: string
@@ -270,6 +275,7 @@ export async function createGuestPledge(input: CreateGuestPledgeInput) {
       display_name: input.displayName?.trim() || null,
       is_anonymous: input.isAnonymous ?? false,
       guest_book_display: input.guestBookDisplay ?? "pick",
+      message: input.message?.trim().slice(0, 100) || null,
       payment_intent_id: input.paymentIntentId,
     })
     .select("id")

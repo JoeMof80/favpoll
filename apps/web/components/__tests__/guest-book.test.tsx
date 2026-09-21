@@ -83,6 +83,38 @@ describe("GuestBook — initials and pills", () => {
   })
 })
 
+describe("GuestBook — messages", () => {
+  it("renders a message in muted italic below the pills", () => {
+    const entries: WallEntry[] = [
+      {
+        id: "m1",
+        name: "Kate",
+        labels: ["Bath"],
+        message: "Thinking of you",
+        created_at: new Date().toISOString(),
+      },
+    ]
+    render(<GuestBook entries={entries} />)
+    expect(screen.getByText("Thinking of you")).toBeInTheDocument()
+  })
+
+  it("does not render a message line when message is null", () => {
+    const entries: WallEntry[] = [
+      {
+        id: "m2",
+        name: "Tom",
+        labels: ["London"],
+        message: null,
+        created_at: new Date().toISOString(),
+      },
+    ]
+    render(<GuestBook entries={entries} />)
+    expect(screen.getByText("Tom")).toBeInTheDocument()
+    // No italic message line
+    expect(screen.queryByText("Thinking of you")).toBeNull()
+  })
+})
+
 describe("GuestBook — count in eyebrow", () => {
   it("shows the pledge count beside the title", () => {
     render(<GuestBook entries={ENTRIES} />)

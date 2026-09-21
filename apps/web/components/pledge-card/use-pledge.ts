@@ -74,6 +74,9 @@ export function usePledge({
   const [guestBookDisplay, setGuestBookDisplay] = useState<
     "pick" | "amount" | "none"
   >("pick")
+  // Guest book message (founder, 2026-09-21): a short free-text note
+  // shown beside the name in the guest book. 100-char limit.
+  const [pledgeMessage, setPledgeMessage] = useState("")
   // null = untouched: the suggestion tracks the pledge tier. Once the
   // guest taps a chip their choice is never overridden by tier changes.
   const [touchedTip, setTouchedTip] = useState<number | null>(null)
@@ -235,6 +238,7 @@ export function usePledge({
         tipAmount: ownTip,
         isAnonymous,
         guestBookDisplay,
+        message: pledgeMessage || null,
         allocations: computePledgeAllocations(
           selections,
           pollWithItems.topics.favourites,
@@ -254,6 +258,7 @@ export function usePledge({
         displayName: displayName || null,
         isAnonymous,
         guestBookDisplay,
+        message: pledgeMessage || null,
         allocations: computePledgeAllocations(
           selections,
           pollWithItems.topics.favourites,
@@ -445,6 +450,8 @@ export function usePledge({
     setIsAnonymous,
     guestBookDisplay,
     setGuestBookDisplay,
+    pledgeMessage,
+    setPledgeMessage,
     giftAid,
     setGiftAid,
     giftAidFirstName,

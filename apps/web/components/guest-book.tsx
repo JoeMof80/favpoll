@@ -20,6 +20,8 @@ export type WallEntry = {
   /** Donation amount in pounds — shown instead of labels when the guest
    *  chose "amount" and the organiser has show_guest_amounts enabled. */
   amount?: number
+  /** Short message from the pledger ("Thinking of you") */
+  message?: string | null
   created_at: string
 }
 
@@ -149,6 +151,11 @@ function WallRow({ entry }: { entry: WallEntry }) {
             <BackedPills labels={entry.labels} />
           )}
         </div>
+        {entry.message && (
+          <p className="mt-0.5 text-xs text-muted-foreground italic">
+            {entry.message}
+          </p>
+        )}
       </div>
     </div>
   )

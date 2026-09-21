@@ -38,14 +38,12 @@ type Props = {
   onTipChange: (v: number) => void
   /** True while a tip change is re-pricing the PaymentIntent. */
   refreshingIntent?: boolean
-  /** Wall identity (anonymity model, 2026-07-05) */
+  /** Identity — guest fields ride inside Stripe's fieldsSlot */
   isGuest: boolean
   guestEmail: string
   onGuestEmailChange: (v: string) => void
   displayName: string
   onDisplayNameChange: (v: string) => void
-  isAnonymous: boolean
-  onIsAnonymousChange: (v: boolean) => void
   /** Gift Aid declaration (2026-09-15) — the charity claims, favpoll
    *  only captures. Pledge amount only, never the tip. */
   giftAid: boolean
@@ -58,11 +56,6 @@ type Props = {
   onGiftAidHouseChange: (v: string) => void
   giftAidPostcode: string
   onGiftAidPostcodeChange: (v: string) => void
-  /** Organiser has enabled show_guest_amounts */
-  showGuestAmounts?: boolean
-  /** Guest's display choice: pick / amount / none */
-  guestBookDisplay?: "pick" | "amount" | "none"
-  onGuestBookDisplayChange?: (v: "pick" | "amount" | "none") => void
 }
 
 export function StepPay({
@@ -87,8 +80,6 @@ export function StepPay({
   onGuestEmailChange,
   displayName,
   onDisplayNameChange,
-  isAnonymous,
-  onIsAnonymousChange,
   giftAid,
   onGiftAidChange,
   giftAidFirstName,
@@ -99,9 +90,6 @@ export function StepPay({
   onGiftAidHouseChange,
   giftAidPostcode,
   onGiftAidPostcodeChange,
-  showGuestAmounts = false,
-  guestBookDisplay = "pick",
-  onGuestBookDisplayChange,
 }: Props) {
   return (
     <div className="px-5 py-4">
@@ -164,58 +152,8 @@ export function StepPay({
         </div>
       )}
 
-      {/* Identity + guest book display choice (2026-09-21).
-          When the organiser has enabled show_guest_amounts, we show a
-          three-option radio replacing the bare anonymity switch —
-          "My pick", "My donation", or "Neither". When off, signed-in
-          users get the original switch; guests get no switch (blank
-          name = Someone). */}
-      {showGuestAmounts && onGuestBookDisplayChange ? (
-        <fieldset className="mb-4">
-          <legend className="mb-2 text-sm font-medium text-foreground">
-            Show in the guest book
-          </legend>
-          <div className="space-y-2">
-            {(
-              [
-                ["pick", "My pick"],
-                ["amount", "My donation"],
-                ["none", "Neither"],
-              ] as const
-            ).map(([value, label]) => (
-              <label
-                key={value}
-                className="flex items-center gap-2 text-sm text-foreground"
-              >
-                <input
-                  type="radio"
-                  name="guest-book-display"
-                  value={value}
-                  checked={guestBookDisplay === value}
-                  onChange={() => {
-                    onGuestBookDisplayChange(value)
-                    // "Neither" hides the name too — the full-anonymous path
-                    onIsAnonymousChange(value === "none")
-                  }}
-                  className="accent-primary"
-                />
-                {label}
-              </label>
-            ))}
-          </div>
-        </fieldset>
-      ) : isGuest ? null : (
-        <div className="mb-4">
-          <label className="flex items-center gap-2 text-sm text-foreground">
-            <Switch
-              checked={isAnonymous}
-              onCheckedChange={onIsAnonymousChange}
-              aria-label="Hide my name from the guest book"
-            />
-            Hide my name from the guest book
-          </label>
-        </div>
-      )}
+      {/* Identity and guest book fields moved to StepGuestBook (step 3,
+          2026-09-21). The pay step keeps only Gift Aid and Stripe. */}
       {/* Gift Aid (2026-09-15): opt-in, collapsed by default — declining
           adds zero friction. The four fields are HMRC's claim-schedule
           minimum; the statement is HMRC's model declaration, required

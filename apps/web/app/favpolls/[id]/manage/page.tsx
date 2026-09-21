@@ -103,6 +103,7 @@ export default async function ManageFavpollPage({
     created_at: string
     total_amount: number
     guest_book_display: string
+    message: string | null
     pledge_allocations: { favourites: { label: string } | null }[] | null
   }
   const pollId = ev.favpoll_polls?.id ?? null
@@ -112,7 +113,7 @@ export default async function ManageFavpollPage({
       .from("pledges")
       .select(
         `id, display_name, is_anonymous, clerk_user_id, created_at,
-         total_amount, guest_book_display,
+         total_amount, guest_book_display, message,
          pledge_allocations ( favourites ( label ) )`
       )
       .eq("favpoll_poll_id", pollId)
@@ -146,6 +147,7 @@ export default async function ManageFavpollPage({
         .map((a) => a.favourites?.label)
         .filter((l): l is string => typeof l === "string"),
       amount: r.total_amount > 0 ? r.total_amount : undefined,
+      message: r.message || null,
       created_at: r.created_at,
     }))
   }
