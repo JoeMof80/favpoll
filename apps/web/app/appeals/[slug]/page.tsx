@@ -270,7 +270,7 @@ export default async function AppealPage({
           asChild
           size="icon"
           aria-label="Manage appeal"
-          className="fixed right-5 bottom-5 z-30 size-14 rounded-full shadow-lg [&_svg]:size-6"
+          className="fixed right-5 bottom-5 z-30 size-14 rounded-full shadow-lg [&_svg]:!size-7"
         >
           <Link href={`/appeals/${appeal.slug}/manage`}>
             <Settings2 aria-hidden="true" />
