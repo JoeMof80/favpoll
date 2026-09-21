@@ -14,6 +14,10 @@ vi.mock("next/link", () => ({
   }) => <a href={href}>{children}</a>,
 }))
 
+vi.mock("@/app/favpolls/[id]/actions", () => ({
+  addGuestItem: vi.fn(),
+}))
+
 vi.mock("@/components/pledge-dialog", () => ({
   PledgeDialog: ({ onPledgeSuccess }: { onPledgeSuccess: () => void }) => (
     <button onClick={onPledgeSuccess}>Pledge favourites</button>
