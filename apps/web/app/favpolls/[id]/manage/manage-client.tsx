@@ -18,10 +18,7 @@ import {
   Trash2,
 } from "lucide-react"
 import { BrandedQR } from "@/components/branded-qr"
-import {
-  WallOfFavourites,
-  type WallEntry,
-} from "@/components/wall-of-favourites"
+import { GuestBook, type WallEntry } from "@/components/guest-book"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { ToolbarBand } from "@/components/ui/toolbar-band"
 import { SegmentedControl } from "@/components/ui/segmented-control"
@@ -52,6 +49,7 @@ import {
   deleteFavpoll,
   setFavpollVisibility,
   setFavpollGuestItems,
+  setFavpollShowGuestAmounts,
 } from "@/app/favpolls/[id]/actions"
 import {
   type OrganizerFavpoll,
@@ -64,6 +62,7 @@ import {
  * plus every authored thing in full. */
 export type ManageFavpoll = OrganizerFavpoll & {
   isPrivate: boolean
+  show_guest_amounts: boolean
   context: string | null
   about: string | null
   reveal: string | null
@@ -184,6 +183,10 @@ export function ManageClient({
     favpoll.allow_guest_items !== false
   )
   const [guestItemsPending, setGuestItemsPending] = useState(false)
+  const [showGuestAmounts, setShowGuestAmounts] = useState(
+    favpoll.show_guest_amounts === true
+  )
+  const [showGuestAmountsPending, setShowGuestAmountsPending] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
   const [copied, setCopied] = useState<string | null>(null)
@@ -211,6 +214,18 @@ export function ManageClient({
       setVisibilityState(prev)
     } finally {
       setVisibilityPending(false)
+    }
+  }
+
+  async function handleToggleShowGuestAmounts(value: boolean) {
+    setShowGuestAmounts(value)
+    setShowGuestAmountsPending(true)
+    try {
+      await setFavpollShowGuestAmounts(favpoll.id, value)
+    } catch {
+      setShowGuestAmounts(!value)
+    } finally {
+      setShowGuestAmountsPending(false)
     }
   }
 
@@ -767,12 +782,32 @@ export function ManageClient({
                     }
                   />
                 </div>
+                <div className="flex items-center justify-between gap-4">
+                  <div className="min-w-0">
+                    <p className="text-sm text-foreground">Show donations</p>
+                    <p className="text-xs text-muted-foreground">
+                      {showGuestAmounts
+                        ? "Guests can choose to show their donation in the guest book."
+                        : "Only favourite picks appear in the guest book."}
+                    </p>
+                  </div>
+                  <Switch
+                    checked={showGuestAmounts}
+                    onCheckedChange={handleToggleShowGuestAmounts}
+                    disabled={showGuestAmountsPending}
+                    aria-label={
+                      showGuestAmounts
+                        ? "Donations visible in guest book — click to hide"
+                        : "Donations hidden in guest book — click to show"
+                    }
+                  />
+                </div>
               </div>
             </Card>
 
             {/* No wrapper: the wall draws its own card, eyebrow and
                 all (founder, 2026-09-03). */}
-            <WallOfFavourites entries={wallEntries} teaseBacked={false} />
+            <GuestBook entries={wallEntries} teaseBacked={false} />
           </div>
         </div>
       </div>

@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite"
-import { WallOfFavourites } from "./wall-of-favourites"
+import { GuestBook } from "./guest-book"
 
 const now = Date.now()
 const ago = (mins: number) => new Date(now - mins * 60_000).toISOString()
 
 const meta = {
-  title: "Components/WallOfFavourites",
-  component: WallOfFavourites,
+  title: "Components/GuestBook",
+  component: GuestBook,
   parameters: { layout: "centered" },
   decorators: [
     (Story) => (
@@ -15,7 +15,7 @@ const meta = {
       </div>
     ),
   ],
-} satisfies Meta<typeof WallOfFavourites>
+} satisfies Meta<typeof GuestBook>
 
 export default meta
 type Story = StoryObj<typeof meta>

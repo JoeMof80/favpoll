@@ -65,6 +65,7 @@ export type WizardEditConfig = {
     isListed: boolean
     isPrivate: boolean
     allowGuestItems: boolean
+    showGuestAmounts: boolean
   }
 }
 
@@ -169,6 +170,9 @@ export function useWizardState(
   )
   const [allowGuestItems, setAllowGuestItems] = useState(
     init?.allowGuestItems ?? true
+  )
+  const [showGuestAmounts, setShowGuestAmounts] = useState(
+    init?.showGuestAmounts ?? false
   )
   const [visibilityOverride, setVisibilityOverride] =
     useState<WizardVisibility | null>(
@@ -586,6 +590,7 @@ export function useWizardState(
           isPrivate,
           isListed,
           allowGuestItems,
+          showGuestAmounts,
           potAmount: null,
           goalAmount: goalAmount ?? null,
           poll: {
@@ -731,6 +736,8 @@ export function useWizardState(
     setVisibility: (v: WizardVisibility) => setVisibilityOverride(v),
     allowGuestItems,
     setAllowGuestItems,
+    showGuestAmounts,
+    setShowGuestAmounts,
     isCause,
     isEdit,
     appeal: appeal ?? null,

@@ -2,15 +2,12 @@
 
 import { useEffect, useState } from "react"
 import { useReducedMotion } from "framer-motion"
-import {
-  WallOfFavourites,
-  type WallEntry,
-} from "@/components/wall-of-favourites"
+import { GuestBook, type WallEntry } from "@/components/guest-book"
 import { Vignette } from "@/components/landing/vignette"
 
 // The guest book, filling as pledges land.
 //
-// The REAL WallOfFavourites with animate — the rows spring in here exactly as they
+// The REAL GuestBook with animate — the rows spring in here exactly as they
 // do on a favpoll, because it is the same AnimatePresence doing it.
 //
 // One entry is anonymous, on purpose. "Someone" is the anonymity model made
@@ -53,7 +50,7 @@ const ORDER = [...ENTRIES].reverse()
 const STEP_MS = 1500
 const HOLD_MS = 4200
 
-export function WallOfFavouritesVignette() {
+export function GuestBookVignette() {
   const reduced = useReducedMotion()
   const [count, setCount] = useState(reduced ? ORDER.length : 1)
 
@@ -82,7 +79,7 @@ export function WallOfFavouritesVignette() {
         {/* w-full: the flex parent would otherwise shrink the card to its
             content, so it would change width as the longest row arrives. */}
         <div className="w-full">
-          <WallOfFavourites
+          <GuestBook
             entries={[...shown].reverse()}
             animate={!reduced}
             maxEntries={ENTRIES.length}

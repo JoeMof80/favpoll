@@ -82,6 +82,7 @@ export default async function LiveDisplayPage({ params }: Props) {
           .from("pledges")
           .select(
             `id, display_name, is_anonymous, clerk_user_id, created_at,
+             total_amount, guest_book_display,
              pledge_allocations ( favourites ( label ) )`
           )
           .eq("favpoll_poll_id", pollId)
@@ -117,22 +118,34 @@ export default async function LiveDisplayPage({ params }: Props) {
   const wallUserNames = Object.fromEntries(
     (wallUsers ?? []).map((u) => [u.id, u.display_name])
   )
-  const initialWallEntries = (wallRows ?? []).map((r) => ({
-    id: r.id,
-    name: r.is_anonymous
-      ? null
-      : r.clerk_user_id
-        ? (wallUserNames[r.clerk_user_id] ?? null)
-        : (r.display_name ?? null),
-    labels: (
-      (r.pledge_allocations ?? []) as unknown as {
-        favourites: { label: string } | null
-      }[]
-    )
-      .map((a) => a.favourites?.label)
-      .filter((l): l is string => typeof l === "string"),
-    created_at: r.created_at,
-  }))
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const showAmounts = (favpoll as any).show_guest_amounts === true
+  const initialWallEntries = (wallRows ?? []).map((r) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const display: string = (r as any).guest_book_display ?? "pick"
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const totalAmount: number = (r as any).total_amount ?? 0
+    return {
+      id: r.id,
+      name: r.is_anonymous
+        ? null
+        : r.clerk_user_id
+          ? (wallUserNames[r.clerk_user_id] ?? null)
+          : (r.display_name ?? null),
+      labels:
+        display === "amount"
+          ? []
+          : (
+              (r.pledge_allocations ?? []) as unknown as {
+                favourites: { label: string } | null
+              }[]
+            )
+              .map((a) => a.favourites?.label)
+              .filter((l): l is string => typeof l === "string"),
+      amount: showAmounts && display === "amount" ? totalAmount : undefined,
+      created_at: r.created_at,
+    }
+  })
 
   // The display's bars show THIS poll's pledges — they must sum to the
   // telethon total above them (see lib/poll-standings). The interval

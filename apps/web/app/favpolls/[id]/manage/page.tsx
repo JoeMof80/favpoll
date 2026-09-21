@@ -11,7 +11,7 @@ import {
   type RawOrganizerRow,
 } from "@/lib/organizer-favpolls"
 import type { FavpollCategory, FavpollSubject } from "@favpoll/types"
-import type { WallEntry } from "@/components/wall-of-favourites"
+import type { WallEntry } from "@/components/guest-book"
 import { ManageClient, type ManageFavpoll } from "./manage-client"
 
 export const metadata = {
@@ -45,6 +45,7 @@ export default async function ManageFavpollPage({
       description,
       photo_url,
       is_private,
+      show_guest_amounts,
       protagonists!favpolls_protagonist_id_fkey ( name, context, about, photo_url ),
       favpoll_charities ( charities ( id, name, logo_url, registered_number, description, created_at, consent_status, consent_contacted_at, registered_email ) ),
       favpoll_polls (
@@ -90,16 +91,18 @@ export default async function ManageFavpollPage({
 
   const [ev] = await withLiveTotals(supabase, [raw as unknown as RawRow])
 
-  // The guest wall, the guest page's own query (capped at 24, newest
-  // first) — but the organiser is always entitled, so labels always
-  // resolve. Names follow the anonymity model: anonymous → null →
-  // "Someone"; amounts never appear.
+  // The guest book, the guest page's own query (capped at 24, newest
+  // first) — the organiser is always entitled, so labels always resolve.
+  // The manage page shows EVERYTHING: picks AND amounts, regardless of
+  // the guest's display choice (not a public surface).
   type WallRow = {
     id: string
     display_name: string | null
     is_anonymous: boolean | null
     clerk_user_id: string | null
     created_at: string
+    total_amount: number
+    guest_book_display: string
     pledge_allocations: { favourites: { label: string } | null }[] | null
   }
   const pollId = ev.favpoll_polls?.id ?? null
@@ -109,6 +112,7 @@ export default async function ManageFavpollPage({
       .from("pledges")
       .select(
         `id, display_name, is_anonymous, clerk_user_id, created_at,
+         total_amount, guest_book_display,
          pledge_allocations ( favourites ( label ) )`
       )
       .eq("favpoll_poll_id", pollId)
@@ -130,6 +134,7 @@ export default async function ManageFavpollPage({
     const names = Object.fromEntries(
       (wallUsers ?? []).map((u) => [u.id, u.display_name])
     )
+    // Organiser sees everything — picks AND amounts (not a public surface)
     wallEntries = rows.map((r) => ({
       id: r.id,
       name: r.is_anonymous
@@ -140,6 +145,7 @@ export default async function ManageFavpollPage({
       labels: (r.pledge_allocations ?? [])
         .map((a) => a.favourites?.label)
         .filter((l): l is string => typeof l === "string"),
+      amount: r.total_amount > 0 ? r.total_amount : undefined,
       created_at: r.created_at,
     }))
   }
@@ -149,6 +155,8 @@ export default async function ManageFavpollPage({
     ...mapOrganizerFavpoll(ev),
     // ── The record's ledger fields ──
     isPrivate: ev.is_private ?? false,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- new column, TS types lag migration
+    show_guest_amounts: (ev as any).show_guest_amounts === true,
     context: ev.protagonists?.context ?? null,
     about: (isCause ? ev.description : ev.protagonists?.about) ?? null,
     reveal: ev.favpoll_polls?.personal_note ?? null,

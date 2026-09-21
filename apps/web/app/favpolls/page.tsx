@@ -55,6 +55,7 @@ const FAVPOLL_SELECT = `
   total_raised,
   is_exemplar,
   allow_guest_items,
+  show_guest_amounts,
   photo_url,
   protagonist:protagonists ( name, photo_url, about ),
   charities:favpoll_charities (
@@ -102,6 +103,7 @@ type RawFavpoll = {
   total_raised: number
   is_exemplar: boolean
   allow_guest_items: boolean | null
+  show_guest_amounts: boolean | null
   photo_url: string | null
   protagonist: {
     name: string

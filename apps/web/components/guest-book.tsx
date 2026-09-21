@@ -4,8 +4,9 @@ import { useState, useSyncExternalStore } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { Button } from "@/components/ui/button"
-import { Maximize2 } from "lucide-react"
+import { Maximize2, User } from "lucide-react"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
+import { formatPoundsExact } from "@/lib/i18n"
 
 // The guest book: presence, not size. Names (or "Someone") and what they
 // backed — never amounts (anonymity model, decided 2026-07-05). Anonymous
@@ -16,6 +17,9 @@ export type WallEntry = {
   name: string | null
   /** Favourite labels this pledge backed */
   labels: string[]
+  /** Donation amount in pounds — shown instead of labels when the guest
+   *  chose "amount" and the organiser has show_guest_amounts enabled. */
+  amount?: number
   created_at: string
 }
 
@@ -42,9 +46,6 @@ function relativeTime(iso: string): string {
 const emptySubscribe = () => () => {}
 
 function RelativeTime({ iso }: { iso: string }) {
-  // useSyncExternalStore serves the server snapshot through hydration and
-  // re-renders once with the client snapshot — the sanctioned form of the
-  // old setMounted-in-effect hack (react-hooks/set-state-in-effect).
   useSyncExternalStore(
     emptySubscribe,
     () => true,
@@ -60,30 +61,100 @@ function RelativeTime({ iso }: { iso: string }) {
   )
 }
 
-function backedLine(labels: string[]): string {
-  if (labels.length === 0) return "pledged"
-  if (labels.length === 1) return `backed ${labels[0]}`
-  if (labels.length === 2) return `backed ${labels[0]} and ${labels[1]}`
-  return `backed ${labels[0]} and ${labels.length - 1} more`
+// --- Initial circle (redesign, 2026-09-21) ---
+// Deterministic colour from the name so each person gets a consistent dot.
+// Eight soft hues that read well on both light card and projector surfaces.
+const INITIAL_COLOURS = [
+  "bg-blue-100 text-blue-700",
+  "bg-emerald-100 text-emerald-700",
+  "bg-amber-100 text-amber-700",
+  "bg-rose-100 text-rose-700",
+  "bg-violet-100 text-violet-700",
+  "bg-cyan-100 text-cyan-700",
+  "bg-orange-100 text-orange-700",
+  "bg-pink-100 text-pink-700",
+]
+
+function nameColour(name: string | null): string {
+  if (!name) return "bg-muted text-muted-foreground"
+  let hash = 0
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  return INITIAL_COLOURS[Math.abs(hash) % INITIAL_COLOURS.length]
 }
 
-function WallRow({ entry }: { entry: WallEntry }) {
-  return (
-    <>
-      <span className="min-w-0 truncate">
-        <span className="font-medium text-foreground">
-          {entry.name ?? "Someone"}
-        </span>{" "}
-        <span className="text-muted-foreground">
-          {backedLine(entry.labels)}
-        </span>
+function InitialCircle({ name }: { name: string | null }) {
+  if (!name) {
+    return (
+      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-muted">
+        <User className="size-3.5 text-muted-foreground" aria-hidden="true" />
       </span>
-      <RelativeTime iso={entry.created_at} />
-    </>
+    )
+  }
+  const initial = name.charAt(0).toUpperCase()
+  return (
+    <span
+      className={`flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${nameColour(name)}`}
+    >
+      {initial}
+    </span>
   )
 }
 
-export function WallOfFavourites({
+// --- Favourite pills ---
+function BackedPills({ labels }: { labels: string[] }) {
+  if (labels.length === 0) {
+    return <span className="text-xs text-muted-foreground">pledged</span>
+  }
+  return (
+    <span className="flex flex-wrap gap-1">
+      {labels.slice(0, 2).map((label) => (
+        <span
+          key={label}
+          className="inline-flex items-center rounded-full border border-border bg-secondary/50 px-2 py-0.5 text-[11px] leading-tight text-secondary-foreground"
+        >
+          {label}
+        </span>
+      ))}
+      {labels.length > 2 && (
+        <span className="text-[11px] leading-tight text-muted-foreground">
+          +{labels.length - 2} more
+        </span>
+      )}
+    </span>
+  )
+}
+
+// --- Two-line row (redesign, 2026-09-21) ---
+// Line 1: initial circle + name (bold) + time (right-aligned)
+// Line 2: backed favourites as pills, or "pledged" if stripped/none
+function WallRow({ entry }: { entry: WallEntry }) {
+  return (
+    <div className="flex gap-2.5">
+      <InitialCircle name={entry.name} />
+      <div className="min-w-0 flex-1">
+        <div className="flex items-baseline justify-between gap-2">
+          <span className="truncate text-sm font-medium text-foreground">
+            {entry.name ?? "Someone"}
+          </span>
+          <RelativeTime iso={entry.created_at} />
+        </div>
+        <div className="mt-0.5">
+          {entry.amount != null && entry.labels.length === 0 ? (
+            <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] leading-tight font-medium text-emerald-700">
+              {formatPoundsExact(entry.amount)}
+            </span>
+          ) : (
+            <BackedPills labels={entry.labels} />
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export function GuestBook({
   entries,
   teaseBacked = false,
   animate = false,
@@ -110,9 +181,9 @@ export function WallOfFavourites({
    * scan target that walks down the screen during the busiest hour is the one
    * thing this card must not do.
    *
-   * Rows are text-sm (1.25rem of line box) with space-y-1.5 (0.375rem)
-   * between, so the reservation is derived from the same values the list is
-   * laid out with rather than a measured constant that would go stale.
+   * TWO-LINE ROWS (redesign, 2026-09-21): each row is ~2.75rem tall
+   * (size-7 circle = 1.75rem + mt-0.5 pills line + gap-3 between rows).
+   * The reservation uses 2.75rem per row + 0.75rem gap.
    */
   reserveRows?: number
   /** Collapse long walls behind a "See all" dialog (guest page). */
@@ -121,18 +192,30 @@ export function WallOfFavourites({
   const reduced = useReducedMotion()
   const [allOpen, setAllOpen] = useState(false)
   const shown = maxEntries ? entries.slice(0, maxEntries) : entries
+  // Two-line rows: ~2.75rem per row, 0.75rem gap (space-y-3)
   const reserved = reserveRows
     ? {
-        minHeight: `calc(${reserveRows} * 1.25rem + ${Math.max(0, reserveRows - 1)} * 0.375rem)`,
+        minHeight: `calc(${reserveRows} * 2.75rem + ${Math.max(0, reserveRows - 1)} * 0.75rem)`,
       }
     : undefined
   const animated = animate && !reduced
+
+  // Count in the eyebrow (redesign, 2026-09-21): the number grows live,
+  // which is its own social proof — "Guest book · 14 pledges" tells the
+  // room the event is happening before you read any names.
+  const countLabel =
+    entries.length > 0
+      ? ` · ${entries.length} ${entries.length === 1 ? "pledge" : "pledges"}`
+      : ""
 
   return (
     <div className="rounded-lg border border-border bg-card px-5 py-4">
       <div className="flex items-start justify-between gap-2">
         <SectionEyebrow variant="muted" className="font-semibold">
           Guest book
+          {countLabel && (
+            <span className="font-normal opacity-70">{countLabel}</span>
+          )}
         </SectionEyebrow>
         {/* Expand to a dialog (founder, 2026-08-02) — the card itself
             scrolls within a max height below */}
@@ -157,8 +240,8 @@ export function WallOfFavourites({
           <ul
             className={
               expandable
-                ? "mt-2 max-h-72 space-y-1.5 overflow-y-auto pr-1"
-                : "mt-2 space-y-1.5"
+                ? "mt-3 max-h-80 space-y-3 overflow-y-auto pr-1"
+                : "mt-3 space-y-3"
             }
             aria-label="Recent pledges"
             style={reserved}
@@ -168,10 +251,11 @@ export function WallOfFavourites({
                 <motion.li
                   key={entry.id}
                   layout={animated}
-                  initial={animated ? { opacity: 0, y: -8 } : false}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.35, ease: "easeOut" }}
-                  className="flex items-baseline justify-between gap-2 text-sm"
+                  initial={
+                    animated ? { opacity: 0, x: -12, scale: 0.97 } : false
+                  }
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
                 >
                   <WallRow entry={entry} />
                 </motion.li>
@@ -179,7 +263,7 @@ export function WallOfFavourites({
             </AnimatePresence>
           </ul>
           {teaseBacked && (
-            <p className="mt-2.5 text-xs text-muted-foreground">
+            <p className="mt-3 text-xs text-muted-foreground">
               Pledge to see what everyone backed.
             </p>
           )}
@@ -192,12 +276,9 @@ export function WallOfFavourites({
           title="Guest book"
           dialogContentClassName="flex-1 overflow-y-auto px-5 pb-5"
         >
-          <ul className="space-y-2" aria-label="All pledges">
+          <ul className="space-y-3" aria-label="All pledges">
             {entries.map((entry) => (
-              <li
-                key={entry.id}
-                className="flex items-baseline justify-between gap-2 text-sm"
-              >
+              <li key={entry.id}>
                 <WallRow entry={entry} />
               </li>
             ))}

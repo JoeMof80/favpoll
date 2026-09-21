@@ -153,6 +153,23 @@ export function WizardDetailsStep({ w }: { w: WizardState }) {
           />
         </div>
       </WizardField>
+
+      <WizardField
+        label="Show donations"
+        hint={
+          w.showGuestAmounts
+            ? "Guests can choose to show their donation in the guest book."
+            : "Only favourite picks appear in the guest book."
+        }
+      >
+        <div className="flex min-h-11 items-center">
+          <Switch
+            checked={w.showGuestAmounts}
+            onCheckedChange={w.setShowGuestAmounts}
+            aria-label="Allow guests to show donations in the guest book"
+          />
+        </div>
+      </WizardField>
     </div>
   )
 }

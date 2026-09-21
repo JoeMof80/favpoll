@@ -46,6 +46,8 @@ type FavpollListCardFavpoll = {
   /** Organiser setting — absent on feeds that don't select it (the
    *  server action enforces it regardless). */
   allow_guest_items?: boolean | null
+  /** Organiser setting — show donation amounts in the guest book */
+  show_guest_amounts?: boolean | null
   /** Cause favpolls carry their own photo; person favpolls keep it on the protagonist. */
   photo_url?: string | null
   protagonist: {
@@ -529,6 +531,7 @@ export function FavpollListCard({
                     return id
                   }
             }
+            showGuestAmounts={favpoll.show_guest_amounts === true}
             isListed
             open={pledgeOpen}
             onOpenChange={(o) => {

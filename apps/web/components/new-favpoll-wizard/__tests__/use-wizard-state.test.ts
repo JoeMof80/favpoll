@@ -541,6 +541,7 @@ describe("useWizardState — edit mode (Phase 2)", () => {
       isListed: false,
       isPrivate: false,
       allowGuestItems: true,
+      showGuestAmounts: false,
     },
   }
 

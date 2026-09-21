@@ -145,12 +145,13 @@ export default async function FavpollPage({ params }: Props) {
       : Promise.resolve([]),
     // Guest book: names resolve server-side (guest display_name, or
     // users.display_name for signed-in pledgers); anonymous → null →
-    // rendered as "Someone". Amounts never appear on the wall.
+    // rendered as "Someone". Amounts gated by guest_book_display.
     pollId
       ? supabase
           .from("pledges")
           .select(
             `id, display_name, is_anonymous, clerk_user_id, created_at,
+             total_amount, guest_book_display,
              pledge_allocations ( favourites ( label ) )`
           )
           .eq("favpoll_poll_id", pollId)
@@ -305,21 +306,38 @@ export default async function FavpollPage({ params }: Props) {
   // Wall entries: anonymous pledges show no name; un-entitled viewers
   // of open polls must not see which favourites were backed (the same
   // standings gate applied to per-favourite amounts above).
-  const wallEntries = (wallRows ?? []).map((r) => ({
-    id: r.id,
-    name: r.is_anonymous
+  // Guest book display (2026-09-21): 'amount' shows £ instead of picks,
+  // 'none' shows neither. The organiser's show_guest_amounts flag is
+  // checked via the favpoll query; amount rows only render when enabled.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- new column, TS types lag migration
+  const showAmounts = (favpoll as any).show_guest_amounts === true
+  const wallEntries = (wallRows ?? []).map((r) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const display: string = (r as any).guest_book_display ?? "pick"
+    const name = r.is_anonymous
       ? null
       : r.clerk_user_id
         ? (wallUserNames[r.clerk_user_id] ?? null)
-        : (r.display_name ?? null),
-    labels: entitled
-      ? (r.pledge_allocations ?? [])
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- nested join shape
-          .map((a: any) => a.favourites?.label)
-          .filter((l: unknown): l is string => typeof l === "string")
-      : [],
-    created_at: r.created_at,
-  }))
+        : (r.display_name ?? null)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const totalAmount: number = (r as any).total_amount ?? 0
+    return {
+      id: r.id,
+      name,
+      labels:
+        display === "amount" || !entitled
+          ? []
+          : (r.pledge_allocations ?? [])
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any -- nested join shape
+              .map((a: any) => a.favourites?.label)
+              .filter((l: unknown): l is string => typeof l === "string"),
+      amount:
+        showAmounts && display === "amount" && entitled
+          ? totalAmount
+          : undefined,
+      created_at: r.created_at,
+    }
+  })
 
   // Gated on a minimum pledge count so sparse polls don't show sparse charts.
   let rankHistory: ReturnType<typeof deriveRankHistory> | null = null
@@ -371,6 +389,7 @@ export default async function FavpollPage({ params }: Props) {
           entitled={entitled}
           hasNote={hasNote}
           gatedCharityNames={gatedCharityNames}
+          showGuestAmounts={showAmounts}
         />
       </>
     </RegisterScope>

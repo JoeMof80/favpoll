@@ -43,6 +43,7 @@ type CreateFavpollInput = {
   isPrivate: boolean
   isListed: boolean
   allowGuestItems: boolean
+  showGuestAmounts?: boolean
   appealId?: string | null
   potAmount: number | null
   goalAmount?: number | null
@@ -326,6 +327,7 @@ export async function createFavpoll(
       is_private: input.isPrivate,
       is_listed: input.isListed,
       allow_guest_items: input.allowGuestItems,
+      show_guest_amounts: input.showGuestAmounts ?? false,
       appeal_id: appeal?.id ?? null,
       description: input.description,
       goal_amount: input.goalAmount ?? null,
