@@ -79,7 +79,7 @@ export function FavpollSubheader({
           onClick={() =>
             window.dispatchEvent(new CustomEvent("favpoll:pledge"))
           }
-          className="size-14 rounded-full shadow-lg md:hidden [&_svg]:size-6"
+          className="size-14 rounded-full shadow-lg [&_svg]:size-6"
         >
           <Gift aria-hidden="true" />
         </Button>
