@@ -36,6 +36,9 @@ type Props = {
   /** Appeal membership, for the charity card's one-line note. */
   appeal?: { name: string; slug: string } | null
   pollWithItems: FavpollPollWithItems | null
+  /** Full item list for the picker — when the standings filter removes
+   *  unpledged items, the picker still needs the complete catalogue. */
+  pickerPoll?: FavpollPollWithItems | null
   pot: FavpollPot | null
   userPotAllocation: PotAllocation | null
   totalRaised: number
@@ -58,6 +61,7 @@ export function FavpollContent({
   favpoll,
   appeal,
   pollWithItems,
+  pickerPoll,
   pot,
   userPotAllocation,
   totalRaised,
@@ -142,7 +146,7 @@ export function FavpollContent({
         clerkUserId={clerkUserId}
         charityNames={charityNames}
         impactStatements={impactStatements}
-        pollWithItems={pollWithItems}
+        pollWithItems={pickerPoll ?? pollWithItems}
         pot={pot}
         userPotAllocation={userPotAllocation}
         onPledgeSuccess={handlePledgeSuccess}

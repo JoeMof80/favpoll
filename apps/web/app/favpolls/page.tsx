@@ -273,11 +273,17 @@ export default async function FavpollsPage({
     } | null = null
     if (rawPoll) {
       const isFinite = rawPoll.topics?.is_finite ?? false
+      const epiItems = (rawPoll.favpoll_poll_favourites ?? [])
+        .map((epf) => epf.favourites)
+        .filter(Boolean)
+      // Catalogue fallback: non-finite topics with no poll-specific items
+      // fall back to the catalogue's own favourites (same fix as the
+      // detail page — founder, 2026-09-22).
       const favourites = isFinite
         ? (rawPoll.topics?.favourites ?? [])
-        : (rawPoll.favpoll_poll_favourites ?? [])
-            .map((epf) => epf.favourites)
-            .filter(Boolean)
+        : epiItems.length > 0
+          ? epiItems
+          : (rawPoll.topics?.favourites ?? [])
       poll = {
         id: rawPoll.id,
         topic_id: rawPoll.topic_id,
