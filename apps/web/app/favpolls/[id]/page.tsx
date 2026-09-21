@@ -151,7 +151,7 @@ export default async function FavpollPage({ params }: Props) {
           .from("pledges")
           .select(
             `id, display_name, is_anonymous, clerk_user_id, created_at,
-             total_amount, guest_book_display,
+             total_amount, guest_book_display, message,
              pledge_allocations ( favourites ( label ) )`
           )
           .eq("favpoll_poll_id", pollId)
@@ -335,6 +335,8 @@ export default async function FavpollPage({ params }: Props) {
         showAmounts && display === "amount" && entitled
           ? totalAmount
           : undefined,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      message: ((r as any).message as string) || null,
       created_at: r.created_at,
     }
   })

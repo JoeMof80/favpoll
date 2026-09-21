@@ -10,7 +10,7 @@ import type {
   Favourite,
 } from "@favpoll/types"
 
-export type PledgeDialogStep = 1 | 2 | 3
+export type PledgeDialogStep = 1 | 2 | 3 | 4
 
 export type UsePledgeDialogOptions = {
   favpollId: string
@@ -222,10 +222,10 @@ export function usePledgeDialog({
     pledge.toggleFund()
   }
 
-  // Advance to the review once the PaymentIntent exists
+  // Advance to the pay step once the PaymentIntent exists
   useEffect(() => {
-    if (pledge.pledgeClientSecret && step === 2) {
-      setStep(3)
+    if (pledge.pledgeClientSecret && step === 3) {
+      setStep(4)
     }
   }, [pledge.pledgeClientSecret, step])
 
@@ -252,29 +252,35 @@ export function usePledgeDialog({
   }
 
   // --- navigation ---
+  // 1 Pick → 2 Amount → 3 Guest book → 4 Review & pay
   async function handleNext() {
     if (step === 1) {
-      // Commits the toggled selection — empty is the no-favourite gift
-      // ("a gift with no favourite attached", 2026-08-17), carried by
-      // the footer's "Give anyway →" label.
       setStep(2)
       return
     }
     if (step === 2) {
+      // Amount step advances to the guest book step
+      setStep(3)
+      return
+    }
+    if (step === 3) {
+      // Guest book step prices the intent (or confirms fund)
       if (pledge.useSharedFund) {
         await pledge.handleFundConfirm()
         // onPledgeSuccess closes the dialog via the caller
       } else {
-        // Price the intent; the effect above advances to the review
+        // Price the intent; the effect above advances to step 4
         await pledge.handleOwnConfirm()
       }
     }
   }
 
   function handleBack() {
-    if (step === 3) {
+    if (step === 4) {
       pledge.setPledgeClientSecret(null)
       pledge.setSubmitting(false)
+      setStep(3)
+    } else if (step === 3) {
       setStep(2)
     } else if (step === 2) {
       setStep(1)

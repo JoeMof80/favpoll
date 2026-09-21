@@ -16,6 +16,7 @@ import {
 } from "./step-pick-favourites"
 import { StepAmount, StepAmountHeader } from "./step-amount"
 import { StepPay } from "./step-pay"
+import { StepGuestBook } from "./step-guest-book"
 import { PollHeading } from "../poll-heading"
 
 type Props = {
@@ -254,16 +255,40 @@ export function PledgeDialog({
     </div>
   )
 
-  const titleByStep = {
+  // Step 3: guest book — lightweight, always advances with Next
+  const step3GuestBookFooter = (
+    <div className="flex gap-3">
+      <Button
+        type="button"
+        variant="ghost"
+        className="h-11 flex-1 md:text-base"
+        onClick={dialog.handleBack}
+      >
+        Back
+      </Button>
+      <Button
+        type="button"
+        className="h-11 flex-1 text-base"
+        onClick={() => dialog.handleNext()}
+        disabled={dialog.submitting}
+      >
+        {dialog.submitting ? "Processing…" : "Next"}
+      </Button>
+    </div>
+  )
+
+  const titleByStep: Record<number, string> = {
     1: `Pick your favourite ${topicTitle.toLowerCase()}`,
     2: "Your pledge",
-    3: "Review & pay",
+    3: "Guest book",
+    4: "Review & pay",
   }
 
-  const footerByStep = {
+  const footerByStep: Record<number, React.ReactNode> = {
     1: step1Footer,
     2: step2Footer,
-    3: step3Footer,
+    3: step3GuestBookFooter,
+    4: step3Footer,
   }
 
   return (
@@ -280,9 +305,9 @@ export function PledgeDialog({
             ? step1Header
             : dialog.step === 2
               ? step2Header
-              : // Step 3's eyebrow lives INSIDE the scrolling body (the
-                // header slot pins, which is right for search fields and
-                // wrong for a label — founder, 2026-09-16)
+              : // Steps 3 and 4's eyebrows live INSIDE the scrolling body
+                // (the header slot pins, which is right for search fields
+                // and wrong for a label — founder, 2026-09-16)
                 undefined
         }
         hideTitle
@@ -352,12 +377,27 @@ export function PledgeDialog({
           />
         )}
 
-        {dialog.step === 3 && dialog.pledgeClientSecret && (
+        {dialog.step === 3 && (
+          <StepGuestBook
+            isGuest={!clerkUserId}
+            displayName={dialog.displayName}
+            onDisplayNameChange={dialog.setDisplayName}
+            isAnonymous={dialog.isAnonymous}
+            onIsAnonymousChange={dialog.setIsAnonymous}
+            showGuestAmounts={showGuestAmounts}
+            guestBookDisplay={dialog.guestBookDisplay}
+            onGuestBookDisplayChange={dialog.setGuestBookDisplay}
+            pledgeMessage={dialog.pledgeMessage}
+            onPledgeMessageChange={dialog.setPledgeMessage}
+          />
+        )}
+
+        {dialog.step === 4 && dialog.pledgeClientSecret && (
           <p className="px-5 pt-4 text-xs font-medium tracking-widest text-muted-foreground uppercase">
             Review &amp; pay
           </p>
         )}
-        {dialog.step === 3 && dialog.pledgeClientSecret && (
+        {dialog.step === 4 && dialog.pledgeClientSecret && (
           <StepPay
             clientSecret={dialog.pledgeClientSecret}
             chargeAmount={dialog.ownCharge}
@@ -380,11 +420,6 @@ export function PledgeDialog({
             isGuest={!clerkUserId}
             displayName={dialog.displayName}
             onDisplayNameChange={dialog.setDisplayName}
-            isAnonymous={dialog.isAnonymous}
-            onIsAnonymousChange={dialog.setIsAnonymous}
-            showGuestAmounts={showGuestAmounts}
-            guestBookDisplay={dialog.guestBookDisplay}
-            onGuestBookDisplayChange={dialog.setGuestBookDisplay}
             giftAid={dialog.giftAid}
             onGiftAidChange={dialog.setGiftAid}
             giftAidFirstName={dialog.giftAidFirstName}

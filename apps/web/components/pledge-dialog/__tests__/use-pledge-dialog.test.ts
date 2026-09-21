@@ -246,33 +246,38 @@ describe("usePledgeDialog — step navigation", () => {
     expect(result.current.selectedIds).toEqual(["red"])
   })
 
-  it("card path prices the intent at step 2 and advances to the review", async () => {
+  it("card path advances through guest book and prices the intent", async () => {
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
     act(() => result.current.toggleFavourite("blue"))
-    await act(async () => result.current.handleNext())
+    await act(async () => result.current.handleNext()) // → step 2
     act(() => result.current.updatePledgeAmount("10"))
-    await act(async () => result.current.handleNext())
+    await act(async () => result.current.handleNext()) // → step 3 (guest book)
     expect(result.current.step).toBe(3)
+    await act(async () => result.current.handleNext()) // → prices intent → step 4
+    expect(result.current.step).toBe(4)
     expect(mockFetch).toHaveBeenCalledTimes(1)
   })
 
   it("a no-pick pledge takes the same path (picking is optional)", async () => {
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
-    await act(async () => result.current.handleNext())
+    await act(async () => result.current.handleNext()) // → step 2
     act(() => result.current.updatePledgeAmount("10"))
-    await act(async () => result.current.handleNext())
+    await act(async () => result.current.handleNext()) // → step 3
     expect(result.current.step).toBe(3)
+    await act(async () => result.current.handleNext()) // → step 4
+    expect(result.current.step).toBe(4)
   })
 
-  it("handleBack from the review clears clientSecret, returns to step 2", async () => {
+  it("handleBack from the review clears clientSecret, returns to guest book", async () => {
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
     act(() => result.current.toggleFavourite("blue"))
-    await act(async () => result.current.handleNext())
+    await act(async () => result.current.handleNext()) // → step 2
     act(() => result.current.updatePledgeAmount("10"))
-    await act(async () => result.current.handleNext())
-    expect(result.current.step).toBe(3)
+    await act(async () => result.current.handleNext()) // → step 3
+    await act(async () => result.current.handleNext()) // → step 4
+    expect(result.current.step).toBe(4)
     act(() => result.current.handleBack())
-    expect(result.current.step).toBe(2)
+    expect(result.current.step).toBe(3)
     expect(result.current.pledgeClientSecret).toBeNull()
   })
 
@@ -369,7 +374,7 @@ describe("usePledgeDialog — two-part entry (favourites + fund)", () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("usePledgeDialog — shared pot path", () => {
-  it("step stays at 2 (no split, no review) when shared pot pledge succeeds", async () => {
+  it("step stays at 3 (no split, no review) when shared pot pledge succeeds", async () => {
     const pot = makePot(100, 0)
     const onPledgeSuccess = vi.fn()
     const { result } = renderHook(() =>
@@ -381,12 +386,13 @@ describe("usePledgeDialog — shared pot path", () => {
       })
     )
     act(() => result.current.toggleFavourite("red"))
-    await act(async () => result.current.handleNext())
+    await act(async () => result.current.handleNext()) // → step 2
     act(() => result.current.updatePledgeAmount("10"))
     act(() => result.current.toggleFund())
-    await act(async () => result.current.handleNext())
+    await act(async () => result.current.handleNext()) // → step 3 (guest book)
+    await act(async () => result.current.handleNext()) // fund confirm
     expect(mockActions.pledgeFromFund).toHaveBeenCalled()
-    expect(result.current.step).toBe(2)
+    expect(result.current.step).toBe(3)
   })
 })
 
@@ -401,9 +407,10 @@ describe("usePledgeDialog — payment success", () => {
       usePledgeDialog({ ...baseOptions, onPledgeSuccess })
     )
     act(() => result.current.toggleFavourite("red"))
-    await act(async () => result.current.handleNext())
+    await act(async () => result.current.handleNext()) // → step 2
     act(() => result.current.updatePledgeAmount("10"))
-    await act(async () => result.current.handleNext()) // → review
+    await act(async () => result.current.handleNext()) // → step 3
+    await act(async () => result.current.handleNext()) // → step 4 (review)
     await act(async () => result.current.handlePledgePaymentSuccess())
     expect(mockActions.createPledge).toHaveBeenCalled()
     expect(onPledgeSuccess).toHaveBeenCalled()
@@ -419,10 +426,11 @@ describe("usePledgeDialog — review tip", () => {
   it("updateTip re-prices the PaymentIntent with the new tip", async () => {
     const { result } = renderHook(() => usePledgeDialog(baseOptions))
     act(() => result.current.toggleFavourite("red"))
-    await act(async () => result.current.handleNext())
+    await act(async () => result.current.handleNext()) // → step 2
     act(() => result.current.updatePledgeAmount("10"))
-    await act(async () => result.current.handleNext())
-    expect(result.current.step).toBe(3)
+    await act(async () => result.current.handleNext()) // → step 3
+    await act(async () => result.current.handleNext()) // → step 4
+    expect(result.current.step).toBe(4)
     await act(async () => {
       result.current.updateTip(2)
     })
@@ -431,6 +439,6 @@ describe("usePledgeDialog — review tip", () => {
     const body = JSON.parse(mockFetch.mock.calls[1][1].body)
     expect(body.tipAmount).toBe(2)
     // the review holds — only the intent behind it was re-priced
-    expect(result.current.step).toBe(3)
+    expect(result.current.step).toBe(4)
   })
 })
