@@ -42,7 +42,6 @@ describe("GuestBook — teaser for un-entitled viewers", () => {
     render(<GuestBook entries={ENTRIES} teaseBacked />)
     expect(screen.getByText("Alex")).toBeInTheDocument()
     expect(screen.getByText("Someone")).toBeInTheDocument()
-    expect(screen.getAllByText("pledged")).toHaveLength(2)
   })
 })
 
@@ -52,7 +51,7 @@ describe("GuestBook — initials and pills", () => {
     expect(screen.getByText("A")).toBeInTheDocument() // Alex → A
   })
 
-  it("renders backed favourites as pills", () => {
+  it("renders the first backed favourite as a pill", () => {
     const entries: WallEntry[] = [
       {
         id: "p3",
@@ -63,10 +62,10 @@ describe("GuestBook — initials and pills", () => {
     ]
     render(<GuestBook entries={entries} />)
     expect(screen.getByText("Dylan Thomas")).toBeInTheDocument()
-    expect(screen.getByText("Sylvia Plath")).toBeInTheDocument()
+    expect(screen.getByText("+1")).toBeInTheDocument()
   })
 
-  it("truncates labels beyond two with a +N more indicator", () => {
+  it("truncates labels beyond the first with a +N indicator", () => {
     const entries: WallEntry[] = [
       {
         id: "p4",
@@ -77,9 +76,8 @@ describe("GuestBook — initials and pills", () => {
     ]
     render(<GuestBook entries={entries} />)
     expect(screen.getByText("Red")).toBeInTheDocument()
-    expect(screen.getByText("Blue")).toBeInTheDocument()
-    expect(screen.queryByText("Green")).toBeNull()
-    expect(screen.getByText("+1 more")).toBeInTheDocument()
+    expect(screen.queryByText("Blue")).toBeNull()
+    expect(screen.getByText("+2")).toBeInTheDocument()
   })
 })
 

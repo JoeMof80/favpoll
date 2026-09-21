@@ -287,6 +287,21 @@ export default async function FavpollPage({ params }: Props) {
   // 2026-09-17: "a note" covers every reveal shape, so no copy forks on
   // them any more.
 
+  // Hide unpledged items from the standings (founder, 2026-09-21): 57
+  // cities with 50 at £0 dilutes the story — the pledged items ARE the
+  // story. Un-entitled viewers still see the full decoy list (zeroed).
+  if (entitled && pollWithItems) {
+    pollWithItems = {
+      ...pollWithItems,
+      topics: {
+        ...pollWithItems.topics,
+        favourites: pollWithItems.topics.favourites.filter(
+          (f) => f.all_time_count > 0
+        ),
+      },
+    }
+  }
+
   // Gate sensitive data server-side for un-entitled viewers of open polls
   if (!entitled && pollWithItems) {
     pollWithItems = {
