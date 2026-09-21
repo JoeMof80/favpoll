@@ -99,7 +99,7 @@ describe("TopicItemsDialog — canonical topic", () => {
 describe("TopicItemsDialog — new topic", () => {
   it("does not render an existing items section", () => {
     render(<TopicItemsDialog {...BASE_PROPS} existingItems={[]} isNewTopic />)
-    expect(screen.queryByText("Existing options")).not.toBeInTheDocument()
+    expect(screen.queryByText("Existing items")).not.toBeInTheDocument()
   })
 
   it("shows added item with remove button when 1 item added", () => {

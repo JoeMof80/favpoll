@@ -599,7 +599,7 @@ export function NewFavpollWizard({
               className="w-full bg-transparent text-lg outline-none placeholder:text-muted-foreground/50"
             />
             <p className="mt-3 text-sm text-muted-foreground">
-              Your topic is created with this favpoll — you’ll add its options
+              Your topic is created with this favpoll — you’ll add its items
               next. Catalogue topics feed the all-time record; your own stays
               yours.
             </p>

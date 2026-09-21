@@ -89,8 +89,8 @@ export function PickerPills({
     return (
       <p className="py-3 text-center text-sm text-muted-foreground">
         {isInfinite && hasAddItem
-          ? "No options yet — be the first to add one."
-          : "No options available for this topic."}
+          ? "No items yet — be the first to add one."
+          : "No items available for this topic."}
       </p>
     )
   }
@@ -132,7 +132,7 @@ export function PickerPills({
 
       {searching && filteredItems.length === 0 && (
         <p className="py-3 text-center text-sm text-muted-foreground">
-          No options found.
+          No items found.
         </p>
       )}
     </div>
