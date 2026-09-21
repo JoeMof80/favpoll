@@ -1,18 +1,14 @@
 "use client"
 
 import { protagonistShortName } from "@/lib/display"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { RankingList } from "@/components/ranking-list"
-import { RankingBar } from "@/components/ui/ranking-bar"
 import { PollHeading } from "@/components/poll-heading"
 import type { FavpollPollWithItems, Favourite } from "@favpoll/types"
 import { usePollSection } from "./use-poll-section"
 import { EmptyPollAlert } from "./empty-poll-alert"
-import { PollNote } from "../favpoll-card/poll-note"
 import { TypedNote } from "./typed-note"
 import { Button } from "../ui/button"
 import { ShareFavpollButton } from "@/components/share-favpoll-button"
-import { decoyWidth } from "@/lib/decoys"
 import { buildMechanicSteps } from "@/lib/mechanic-steps"
 import { LockCardContent } from "@/components/lock-card-content"
 import { Check, EllipsisVertical, Share2 } from "lucide-react"
@@ -24,6 +20,69 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
+
+// oklch neutrals: 0.87 ≈ zinc-300, 0.92 ≈ zinc-200 — register-safe,
+// used by both skeleton components via inline styles (Tailwind's
+// bg-muted inherits the register palette and turns pink/green/purple).
+const SKEL_LABEL = "oklch(0.87 0 0)"
+const SKEL_BAR = "oklch(0.92 0 0)"
+
+// Skeleton personal note — a left-bordered block of neutral lines matching
+// the real TypedNote's blockquote style. Only rendered when hasNote is true.
+// Uses fixed neutral grey (not bg-muted, which inherits the register palette
+// and turns pink/green/purple — founder, 2026-09-21).
+function NoteSkeleton() {
+  return (
+    <div
+      className="mb-4 py-1 pl-4"
+      style={{ borderLeft: `2px solid ${SKEL_BAR}` }}
+    >
+      <div className="space-y-2">
+        <div
+          className="h-4 w-4/5 rounded"
+          style={{ backgroundColor: SKEL_BAR }}
+        />
+        <div
+          className="h-4 w-3/5 rounded"
+          style={{ backgroundColor: SKEL_BAR }}
+        />
+      </div>
+    </div>
+  )
+}
+
+// Skeleton standings bars — used behind the lock card (pre-pledge) and
+// in the organiser's zero-pledges state. Fixed neutral grey so it reads
+// as a placeholder on every register palette (bg-muted turns pink on
+// celebrations — founder, 2026-09-21).
+const SKELETON_WIDTHS = [1, 0.82, 0.65, 0.48, 0.32, 0.18]
+function StandingsSkeleton({ rows = 3 }: { rows?: number }) {
+  return (
+    <div className="space-y-4 py-2">
+      {SKELETON_WIDTHS.slice(0, rows).map((w, i) => (
+        <div key={i} className="space-y-1.5">
+          <div className="flex justify-between">
+            <div
+              className="h-3.5 w-24 rounded"
+              style={{ backgroundColor: SKEL_LABEL }}
+            />
+            <div
+              className="h-3.5 w-10 rounded"
+              style={{ backgroundColor: SKEL_LABEL }}
+            />
+          </div>
+          <div
+            className="h-1.5 rounded-full"
+            style={{
+              width: `${w * 100}%`,
+              backgroundColor: SKEL_BAR,
+            }}
+          />
+        </div>
+      ))}
+    </div>
+  )
+}
 
 type Props = {
   poll: FavpollPollWithItems
@@ -199,7 +258,7 @@ export function PollSection({
             </div>
           )}
 
-          {hasItems && (
+          {hasItems ? (
             <>
               {/* Old desktop tabs row removed — Amount/Pledges now
                   live in the ... dropdown on the topic heading. */}
@@ -221,63 +280,39 @@ export function PollSection({
                 </div>
               )}
             </>
+          ) : (
+            /* No pledges yet — skeleton with a quiet card on top.
+               Only the organiser sees this (guests see the lock card). */
+            <div className="grid">
+              <div
+                className="pointer-events-none [grid-area:1/1]"
+                aria-hidden="true"
+              >
+                <StandingsSkeleton rows={6} />
+              </div>
+              <div className="pointer-events-none z-10 flex items-start justify-center pt-6 [grid-area:1/1]">
+                <div className="w-full max-w-xs rounded-xl bg-background px-5 py-4 text-center shadow-xl ring-1 ring-border">
+                  <p className="text-sm text-muted-foreground">
+                    Standings appear here as guests pledge.
+                  </p>
+                </div>
+              </div>
+            </div>
           )}
         </>
       ) : (
-        /* Pre-pledge: blurred decoy with the lock-card overlay sharing
-           one grid cell — NOT an absolute overlay: WebKit ignores sticky
-           inside absolutely-positioned ancestors, so the card never
-           actually pinned on Safari (found 2026-08-02). The in-flow grid
-           item stretches to the decoy's height, giving the card's sticky
-           its travel in every engine. */
+        /* Pre-pledge: skeleton bars with the lock-card overlay on top.
+           Replaces the old blurred decoy (founder, 2026-09-21: "I quite
+           like the skeleton — replace the decoy with it"). The grid cell
+           trick stays: WebKit ignores sticky inside absolutely-positioned
+           ancestors, so the card pins correctly as an in-flow sibling. */
         <div className="grid">
-          {/* overflow-hidden on a WRAPPER clips the blur filter's painted
-              bleed (filters draw past the element's box) */}
           <div
-            className="pointer-events-none max-h-80 overflow-hidden [grid-area:1/1]"
+            className="pointer-events-none [grid-area:1/1]"
             aria-hidden="true"
           >
-            <div className="space-y-4 opacity-60 blur-xs select-none">
-              {/* Decoy quote only when a reveal actually exists — a favpoll
-                without one shows no quote post-pledge, so fake none here. */}
-              {hasNote && (
-                <PollNote personalNote="Pledge to reveal their favourite. Pledge to reveal their favourite. Pledge to reveal their favourite." />
-              )}
-
-              {hasItems && (
-                <>
-                  <div className="flex items-center justify-end">
-                    <Tabs value="amount">
-                      <TabsList className="h-7">
-                        <TabsTrigger value="amount" className="px-3 text-xs">
-                          Amount
-                        </TabsTrigger>
-                        <TabsTrigger value="count" className="px-3 text-xs">
-                          Pledges
-                        </TabsTrigger>
-                      </TabsList>
-                    </Tabs>
-                  </div>
-
-                  <div>
-                    <ol aria-label="Rankings" className="space-y-3">
-                      {[...poll.topics.favourites]
-                        .sort((a, b) => a.label.localeCompare(b.label))
-                        .map((item, i) => (
-                          <li key={item.id}>
-                            <RankingBar
-                              label={item.label}
-                              amount="—"
-                              widthPercent={decoyWidth(i)}
-                              barClassName="transition-all duration-700 ease-out"
-                            />
-                          </li>
-                        ))}
-                    </ol>
-                  </div>
-                </>
-              )}
-            </div>
+            {hasNote && <NoteSkeleton />}
+            <StandingsSkeleton rows={6} />
           </div>
 
           {onOpenPledgeDialog && (
@@ -324,9 +359,14 @@ export function PollSection({
         </div>
       )}
 
-      {poll.topics.favourites.every((i) => i.is_hidden ?? false) && (
-        <EmptyPollAlert />
-      )}
+      {/* Only show when there ARE items and they're all hidden (organiser
+          hid every one). An empty array means no pledges yet, not "all
+          hidden" — .every() on [] returns true, which would incorrectly
+          trigger the alert (founder, 2026-09-21). */}
+      {poll.topics.favourites.length > 0 &&
+        poll.topics.favourites.every((i) => i.is_hidden ?? false) && (
+          <EmptyPollAlert />
+        )}
     </section>
   )
 }

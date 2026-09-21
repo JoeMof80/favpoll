@@ -353,8 +353,8 @@ describe("PollSection — favpolls without a reveal", () => {
     expect(container.querySelector("blockquote")).toBeNull()
   })
 
-  it("uses the verb-form decoy placeholder when a reveal exists", () => {
-    render(
+  it("shows a note skeleton when a reveal exists (pre-pledge)", () => {
+    const { container } = render(
       <PollSection
         {...BASE_PROPS}
         hasNote={true}
@@ -363,9 +363,9 @@ describe("PollSection — favpolls without a reveal", () => {
         onOpenPledgeDialog={vi.fn()}
       />
     )
-    expect(
-      screen.getAllByText(/Pledge to reveal their favourite\./).length
-    ).toBeGreaterThanOrEqual(1)
+    // The note skeleton renders a left-bordered placeholder block
+    // (replaces the old blurred decoy text, 2026-09-21)
+    expect(container.querySelector("[style*='border-left']")).not.toBeNull()
   })
 })
 

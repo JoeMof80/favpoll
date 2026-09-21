@@ -40,11 +40,6 @@ function relativeTime(iso: string): string {
   })
 }
 
-// relativeTime is clock-dependent, so server-rendered text can disagree with
-// the client at hydration — by hours on statically prerendered pages (the
-// landing demo bakes Date.now() into its HTML at build). Keep the server's
-// text through hydration, then re-render once mounted so the client's clock
-// takes over.
 const emptySubscribe = () => () => {}
 
 function RelativeTime({ iso }: { iso: string }) {
@@ -63,7 +58,7 @@ function RelativeTime({ iso }: { iso: string }) {
   )
 }
 
-// --- Initial circle (redesign, 2026-09-21) ---
+// --- Initial circle ---
 // Deterministic colour from the name so each person gets a consistent dot.
 // Eight soft hues that read well on both light card and projector surfaces.
 const INITIAL_COLOURS = [
@@ -89,74 +84,69 @@ function nameColour(name: string | null): string {
 function InitialCircle({ name }: { name: string | null }) {
   if (!name) {
     return (
-      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-muted">
-        <User className="size-3.5 text-muted-foreground" aria-hidden="true" />
+      <span className="flex size-8 shrink-0 items-center justify-center rounded bg-muted">
+        <User className="size-4 text-muted-foreground" aria-hidden="true" />
       </span>
     )
   }
   const initial = name.charAt(0).toUpperCase()
   return (
     <span
-      className={`flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${nameColour(name)}`}
+      className={`flex size-8 shrink-0 items-center justify-center rounded text-xs font-medium ${nameColour(name)}`}
     >
       {initial}
     </span>
   )
 }
 
-// --- Favourite pills ---
-function BackedPills({ labels }: { labels: string[] }) {
-  if (labels.length === 0) {
-    return <span className="text-xs text-muted-foreground">pledged</span>
+// --- Detail pill (pick or amount) — sits where the time used to be ---
+function DetailPill({ entry }: { entry: WallEntry }) {
+  if (entry.amount != null && entry.labels.length === 0) {
+    return (
+      <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] leading-tight font-medium text-emerald-700">
+        {formatPoundsExact(entry.amount)}
+      </span>
+    )
   }
+  if (entry.labels.length === 0) return null
+  const label = entry.labels[0]
+  const extra = entry.labels.length - 1
   return (
-    <span className="flex flex-wrap gap-1">
-      {labels.slice(0, 2).map((label) => (
-        <span
-          key={label}
-          className="inline-flex items-center rounded-full border border-border bg-secondary/50 px-2 py-0.5 text-[11px] leading-tight text-secondary-foreground"
-        >
-          {label}
-        </span>
-      ))}
-      {labels.length > 2 && (
-        <span className="text-[11px] leading-tight text-muted-foreground">
-          +{labels.length - 2} more
-        </span>
+    <span className="flex shrink-0 items-center gap-1">
+      <span className="inline-flex items-center rounded-full border border-border bg-secondary/50 px-2 py-0.5 text-[11px] leading-tight text-secondary-foreground">
+        {label}
+      </span>
+      {extra > 0 && (
+        <span className="text-[11px] text-muted-foreground">+{extra}</span>
       )}
     </span>
   )
 }
 
-// --- Two-line row (redesign, 2026-09-21) ---
-// Line 1: initial circle + name (bold) + time (right-aligned)
-// Line 2: backed favourites as pills, or "pledged" if stripped/none
-function WallRow({ entry }: { entry: WallEntry }) {
+// --- Guest book row ---
+// Matches the charity row pattern: flex items-center gap-3, 8×8 rounded
+// initial, name font-medium, detail right-aligned. Message as a blockquote
+// with a left border below.
+function GuestBookRow({ entry }: { entry: WallEntry }) {
   return (
-    <div className="flex gap-2.5">
-      <InitialCircle name={entry.name} />
-      <div className="min-w-0 flex-1">
-        <div className="flex items-baseline justify-between gap-2">
-          <span className="truncate text-sm font-medium text-foreground">
+    <div>
+      <div className="flex items-center gap-3">
+        <InitialCircle name={entry.name} />
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-medium text-foreground">
             {entry.name ?? "Someone"}
-          </span>
-          <RelativeTime iso={entry.created_at} />
-        </div>
-        <div className="mt-0.5">
-          {entry.amount != null && entry.labels.length === 0 ? (
-            <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] leading-tight font-medium text-emerald-700">
-              {formatPoundsExact(entry.amount)}
-            </span>
-          ) : (
-            <BackedPills labels={entry.labels} />
-          )}
-        </div>
-        {entry.message && (
-          <p className="mt-0.5 text-xs text-muted-foreground italic">
-            {entry.message}
           </p>
-        )}
+          <p className="text-xs text-muted-foreground">
+            <RelativeTime iso={entry.created_at} />
+          </p>
+        </div>
+        <DetailPill entry={entry} />
       </div>
+      {entry.message && (
+        <p className="mt-1.5 ml-11 border-l-2 border-border pl-3 text-sm text-muted-foreground italic">
+          {entry.message}
+        </p>
+      )}
     </div>
   )
 }
@@ -168,55 +158,45 @@ export function GuestBook({
   maxEntries,
   reserveRows,
   expandable = false,
+  variant = "card",
 }: {
   entries: WallEntry[]
-  /**
-   * True for un-entitled viewers, whose entries arrive with the backed
-   * favourites stripped — adds a line telling them pledging shows more.
-   */
   teaseBacked?: boolean
-  /** Animate new rows in as they arrive (live wall surfaces). */
   animate?: boolean
-  /** Cap the rows shown (e.g. the live display). */
   maxEntries?: number
   /**
    * Hold space for this many rows, whether or not they have arrived.
-   *
-   * The live display needs it: names land one at a time through an event, and
-   * a card that grows with them moved everything beneath it on every pledge —
-   * including, since 2026-08-21, the QR people are meant to be scanning. A
-   * scan target that walks down the screen during the busiest hour is the one
-   * thing this card must not do.
-   *
-   * TWO-LINE ROWS (redesign, 2026-09-21): each row is ~2.75rem tall
-   * (size-7 circle = 1.75rem + mt-0.5 pills line + gap-3 between rows).
-   * The reservation uses 2.75rem per row + 0.75rem gap.
+   * Rows are ~3.25rem tall with gap-4 between.
    */
   reserveRows?: number
-  /** Collapse long walls behind a "See all" dialog (guest page). */
   expandable?: boolean
+  /** "card" = bordered card (favpoll page, manage); "border" = left
+   *  border only (live display). */
+  variant?: "card" | "border"
 }) {
   const reduced = useReducedMotion()
   const [allOpen, setAllOpen] = useState(false)
   const shown = maxEntries ? entries.slice(0, maxEntries) : entries
-  // Two-line rows: ~2.75rem per row, 0.75rem gap (space-y-3)
   const reserved = reserveRows
     ? {
-        minHeight: `calc(${reserveRows} * 2.75rem + ${Math.max(0, reserveRows - 1)} * 0.75rem)`,
+        minHeight: `calc(${reserveRows} * 3.25rem + ${Math.max(0, reserveRows - 1)} * 1rem)`,
       }
     : undefined
   const animated = animate && !reduced
 
-  // Count in the eyebrow (redesign, 2026-09-21): the number grows live,
-  // which is its own social proof — "Guest book · 14 pledges" tells the
-  // room the event is happening before you read any names.
   const countLabel =
     entries.length > 0
       ? ` · ${entries.length} ${entries.length === 1 ? "pledge" : "pledges"}`
       : ""
 
   return (
-    <div className="rounded-lg border border-border bg-card px-5 py-4">
+    <div
+      className={
+        variant === "border"
+          ? "border-l-2 border-border pl-5"
+          : "rounded-lg border border-border bg-card px-5 py-4"
+      }
+    >
       <div className="flex items-start justify-between gap-2">
         <SectionEyebrow variant="muted" className="font-semibold">
           Guest book
@@ -224,8 +204,6 @@ export function GuestBook({
             <span className="font-normal opacity-70">{countLabel}</span>
           )}
         </SectionEyebrow>
-        {/* Expand to a dialog (founder, 2026-08-02) — the card itself
-            scrolls within a max height below */}
         {expandable && entries.length > 0 && (
           <Button
             type="button"
@@ -247,8 +225,8 @@ export function GuestBook({
           <ul
             className={
               expandable
-                ? "mt-3 max-h-80 space-y-3 overflow-y-auto pr-1"
-                : "mt-3 space-y-3"
+                ? "mt-3 max-h-80 space-y-4 overflow-y-auto pr-1"
+                : "mt-3 space-y-4"
             }
             aria-label="Recent pledges"
             style={reserved}
@@ -264,7 +242,7 @@ export function GuestBook({
                   animate={{ opacity: 1, x: 0, scale: 1 }}
                   transition={{ duration: 0.4, ease: "easeOut" }}
                 >
-                  <WallRow entry={entry} />
+                  <GuestBookRow entry={entry} />
                 </motion.li>
               ))}
             </AnimatePresence>
@@ -283,10 +261,10 @@ export function GuestBook({
           title="Guest book"
           dialogContentClassName="flex-1 overflow-y-auto px-5 pb-5"
         >
-          <ul className="space-y-3" aria-label="All pledges">
+          <ul className="space-y-4" aria-label="All pledges">
             {entries.map((entry) => (
               <li key={entry.id}>
-                <WallRow entry={entry} />
+                <GuestBookRow entry={entry} />
               </li>
             ))}
           </ul>

@@ -152,7 +152,11 @@ export default async function LiveDisplayPage({ params }: Props) {
   // The display's bars show THIS poll's pledges — they must sum to the
   // telethon total above them (see lib/poll-standings). The interval
   // router.refresh() re-runs this overlay, keeping the room live.
-  const items = standings ? overlayStandings(allItems, standings) : allItems
+  // Hide unpledged items from the live display (founder, 2026-09-21):
+  // the room sees only the items people have actually backed.
+  const items = (
+    standings ? overlayStandings(allItems, standings) : allItems
+  ).filter((item) => item.all_time_count > 0)
 
   const displayPoll = rawPoll
     ? {

@@ -679,6 +679,7 @@ export function DisplayScreen({
             <GuestBook
               entries={initialWallEntries}
               animate
+              variant="border"
               maxEntries={12}
               // 12 on a LIVE display, where rows land through the event and
               // the reservation is the whole point. A still does not fill up,

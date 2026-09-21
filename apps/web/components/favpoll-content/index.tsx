@@ -28,7 +28,7 @@ import { useFavpollContent } from "./use-favpoll-content"
 import { MobileCharityFooter } from "./mobile-charity-footer"
 import { StickyIdentityBar } from "./sticky-identity-bar"
 import { PageLayout } from "../page-layout"
-import { Gift, FileText } from "lucide-react"
+import { PiggyBank, FileText } from "lucide-react"
 import { formatPoundsExact } from "@/lib/i18n"
 
 type Props = {
@@ -226,8 +226,8 @@ export function FavpollContent({
         className="mt-3 flex w-full"
         onClick={() => setShowGuestFund(true)}
       >
-        <Gift data-icon="inline-start" aria-hidden="true" />
-        Top up the pot
+        <PiggyBank data-icon="inline-start" aria-hidden="true" />
+        Add to the pot
       </Button>
     </div>
   )
