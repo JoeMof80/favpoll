@@ -25,6 +25,7 @@ import type {
   FavpollSubject,
 } from "@favpoll/types"
 import { decoyWidth } from "@/lib/decoys"
+import { addGuestItem } from "@/app/favpolls/[id]/actions"
 import { paletteForFavpoll } from "@/lib/register-palette"
 import { buildMechanicSteps } from "@/lib/mechanic-steps"
 import { joinCharities } from "@/lib/og/favpoll-og"
@@ -42,6 +43,9 @@ type FavpollListCardFavpoll = {
   closed_at?: string | null
   total_raised: number
   is_exemplar?: boolean
+  /** Organiser setting — absent on feeds that don't select it (the
+   *  server action enforces it regardless). */
+  allow_guest_items?: boolean | null
   /** Cause favpolls carry their own photo; person favpolls keep it on the protagonist. */
   photo_url?: string | null
   protagonist: {
@@ -503,6 +507,28 @@ export function FavpollListCard({
             pot={null}
             userPotAllocation={null}
             onPledgeSuccess={handlePledgeSuccess}
+            // The in-card dialog matches the favpoll page's picker
+            // (founder, 2026-09-18: "the add button shows on the favpoll
+            // page but not the favpolls page") — withheld only when the
+            // topic is finite, the poll is closed, or the organiser turned
+            // guest additions off. Always the GUEST path here: the card
+            // doesn't know created_by, and the server enforces the
+            // setting either way.
+            onAddItem={
+              pollWithItems.topics.is_finite ||
+              isClosed ||
+              favpoll.allow_guest_items === false
+                ? undefined
+                : async (label: string) => {
+                    const id = await addGuestItem(
+                      pollWithItems.id,
+                      pollWithItems.topic_id,
+                      label
+                    )
+                    router.refresh()
+                    return id
+                  }
+            }
             isListed
             open={pledgeOpen}
             onOpenChange={(o) => {

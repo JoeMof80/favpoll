@@ -398,70 +398,29 @@ export function LandingHero({
           <div className="flex flex-wrap items-center gap-x-5 gap-y-3.5">
             {/* The hero's only conversion action under a display headline —
                 poster-scale, not form-scale (founder call, 2026-07-28) */}
-            {/* The caption is GROUPED with the primary, not trailing the row
-                (founder, 2026-08-18: "the free to create label is in the wrong
-                place now"). It was written when the hero had one button and it
-                simply followed it; the second CTA landed between them, so
-                "Free to create" ended up reading as a note about SEEING HOW IT
-                WORKS — which is not a thing anyone creates. Proximity is the
-                whole fix: a tighter gap inside the pair than the row's own
-                gap, so the eye binds it to the button it describes. 8px
-                inside against 20px between: at 10 against 14 the pair did not
-                read as a pair, it read as three things evenly spaced. */}
-            {/* flex-wrap so the pair can BREAK on a narrow phone (2026-08-22).
-                Grouping the caption with its button fixed the referent, but a
-                group that cannot wrap is a single unbreakable 306px unit — and
-                /celebrations has the longest label of the three registers
-                ("Create a celebration favpoll"), so it alone pushed a 320px
-                phone sideways by 10px. Wrapped, the caption drops under the
-                button and stays attached to it, which is all the grouping was
-                ever for. */}
-            <div className="flex flex-wrap items-center gap-2">
-              <Button
-                asChild
-                size="lg"
-                variant="secondary"
-                // WRAPPING, WHICH TAKES FOUR CLASSES, NOT ONE (2026-08-27).
-                // The register labels were 25-28 characters and carrying the
-                // promise makes the longest 42 — a 356px button inside a
-                // 272px content column on a 320px phone. Measured: the page
-                // went sideways on all three registers.
-                //
-                // whitespace-normal alone did nothing, and the reason is worth
-                // recording: Button is `shrink-0`, so a flex item that is
-                // allowed to wrap still never gets narrow enough to. `shrink`
-                // restores flex-shrink:1. And the label is TWO flex items —
-                // the head as an anonymous one, withQuietTail's span as the
-                // other — so without flex-wrap they stay side by side and each
-                // wraps internally into a pair of narrow columns. flex-wrap
-                // drops the quiet tail to its own line instead. h-auto with
-                // min-h-11 lets the button grow for it while keeping the 44px
-                // tap target at every width that still fits one line, which is
-                // 390 up.
-                className="h-auto min-h-11 shrink flex-wrap px-6 py-2 text-base whitespace-normal"
-              >
-                <Link href={ctaHref ?? "/favpolls/new"}>
-                  {withQuietTail(ctaLabel ?? t("landing.cta.primaryFree"))}
-                </Link>
-              </Button>
-              {/* ONLY WHERE THE LABEL DOES NOT CARRY IT — now keyed on the
-                  LABEL rather than on which page it is (founder, 2026-08-27:
-                  "'free to create' should be part of the button like the
-                  homepage").
-                  Home has said "always free" inside its button since
-                  2026-08-18; the register pages kept a caption beside theirs
-                  because appending the promise to a 28-character label makes
-                  42, and 42 characters was judged not a button. It fits: the
-                  tail sets in withQuietTail's smaller, quieter type, and the
-                  row already flex-wraps, so the longest of the three measures
-                  well inside a 390px phone.
-                  A label carrying a quiet tail says it itself, so a caption
-                  beside it would state the same fact twice in one row. Any
-                  future label without one still gets the caption. */}
-              {ctaLabel && !ctaLabel.includes(" — ") && (
-                <p className="text-xs opacity-80">{t("landing.cta.free")}</p>
-              )}
-            </div>
+            <Button
+              asChild
+              size="lg"
+              variant="secondary"
+              // THE FREE PROMISE IS OUT OF THE HERO ENTIRELY (founder,
+              // 2026-09-18, in two steps the same day: the quiet tail
+              // "— always free" left the button — "maybe it just
+              // elongates the button" — then the "Free to create"
+              // caption went too, with its grouping wrapper). The hero
+              // states no fee fact; the page still does — the trust grid
+              // and the close-band tails carry it (landing.cta.primaryFree
+              // and the *.close.cta strings keep "— always free", so
+              // withQuietTail stays for labels that pass one).
+              //
+              // w-full sm:w-auto: on a phone the pair stack as two
+              // full-width rows (founder, 2026-09-18) — wrapping classes
+              // kept for the tail-carrying labels custom pages may pass.
+              className="h-auto min-h-11 w-full shrink flex-wrap px-6 py-2 text-base whitespace-normal sm:w-auto"
+            >
+              <Link href={ctaHref ?? "/favpolls/new"}>
+                {withQuietTail(ctaLabel ?? t("landing.cta.primary"))}
+              </Link>
+            </Button>
             {/* A SECOND PATH, HOME ONLY (founder, 2026-08-17). "Create a
                 favpoll" names an invented noun, so on home it asks a
                 first-time visitor to make a thing nothing has yet defined —
@@ -482,16 +441,15 @@ export function LandingHero({
                 Ghost in BAND ink — a wash and ring of the band's own
                 foreground, the router cards' idiom — so it reads as the
                 quieter of the two without vanishing when the theme flips.
-                NO RING AT ALL (founder, 2026-08-18: "it should have no border
-                or ring"). Tried at 1px, then at a 0.5px hairline, and the
-                founder took it all the way off. It is a deliberate departure
-                from the style guide, which puts a bordered ghost at the
-                secondary tier and reserves the borderless one for quiet
-                actions like cancel — worth knowing before anyone "restores"
-                the border as a fix.
-                It survives without one because two other things carry it: the
-                arrow, which no static line of copy on this band has, and the
-                hover wash, and h-11 keeps both CTAs on one baseline.
+                THE BORDER IS BACK (founder, 2026-09-18: "I'm tempted to make
+                See how it works an outline for visibility") — a KNOWING
+                reversal of his own 2026-08-18 "no border or ring" call
+                (1px and a 0.5px hairline were auditioned then and stripped).
+                What changed: the primary shed its quiet tail the same day,
+                and stacked full-width on mobile a borderless ghost read as a
+                stray text line. This puts the pair back on the style guide's
+                tiers (bordered ghost = secondary).
+                h-11 keeps both CTAs on one baseline.
 
                 PADDING MATCHES THE PRIMARY'S so the two LABELS start at the
                 same x (founder, 2026-08-18: "their text doesn't line up
@@ -516,7 +474,7 @@ export function LandingHero({
                 asChild
                 size="lg"
                 variant="ghost"
-                className="h-11 px-6 text-base text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground has-data-[icon=inline-end]:pr-6"
+                className="h-11 w-full border border-primary-foreground/40 px-6 text-base text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground has-data-[icon=inline-end]:pr-6 sm:w-auto"
               >
                 {/* The arrow says WHERE it goes (founder, 2026-08-17): every
                     other button on this page navigates, and this one scrolls
@@ -880,14 +838,13 @@ export function LandingHero({
           <dl
             className={cn(
               "gap-y-6 border-t border-primary-foreground/20 pt-8",
-              router
-                ? "grid grid-cols-2 gap-x-8 md:grid-cols-3"
-                : "flex flex-wrap gap-x-14"
+              router ? "grid grid-cols-3 gap-x-8" : "flex flex-wrap gap-x-14"
             )}
           >
             <div>
               <dt className="text-xs font-medium tracking-widest uppercase opacity-70">
-                Open favpolls
+                Open <br className="sm:hidden" />
+                favpolls
               </dt>
               <dd className="mt-1 text-3xl font-light tabular-nums">
                 <CountUp
@@ -899,7 +856,8 @@ export function LandingHero({
             {totalLive > 0 && (
               <div>
                 <dt className="text-xs font-medium tracking-widest uppercase opacity-70">
-                  Raised by open favpolls
+                  Raised <br className="sm:hidden" />
+                  so far
                 </dt>
                 <dd className="mt-1 text-3xl font-light tabular-nums">
                   <CountUp
@@ -913,7 +871,8 @@ export function LandingHero({
             )}
             <div>
               <dt className="text-xs font-medium tracking-widest uppercase opacity-70">
-                Reaches charity
+                Reaches <br className="sm:hidden" />
+                charity
               </dt>
               <dd className="mt-1 text-3xl font-light tabular-nums">
                 <CountUp value={100} format={(n) => `${Math.round(n)}%`} />

@@ -102,14 +102,6 @@ describe("t", () => {
     )
   })
 
-  // The hero's caption, and now the only one. The closing CTA's fuller
-  // "Free to create · 100% goes to charity" was retired 2026-08-08 when the
-  // trust grid moved to sit directly above that button and said the same at
-  // more length — the fee had been stated three times on one page.
-  it("returns the hero's short CTA caption", () => {
-    expect(t("landing.cta.free")).toBe("Free to create")
-  })
-
   it("returns the brand subheader", () => {
     expect(t("landing.subheader")).toBe(
       "Expressions of joy, for charitable causes, in the name of those we love."
