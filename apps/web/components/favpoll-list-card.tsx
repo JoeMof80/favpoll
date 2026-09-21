@@ -505,10 +505,14 @@ export function FavpollListCard({
             dataRegister={palette}
             clerkUserId={clerkUserId}
             charityNames={favpoll.charities.map((c) => c.charity.name)}
+            impactStatements={favpoll.charities
+              .map((c) => c.charity.impact_statement)
+              .filter((s): s is string => !!s && s.trim().length > 0)}
             pollWithItems={pollWithItems}
             pot={null}
             userPotAllocation={null}
             onPledgeSuccess={handlePledgeSuccess}
+            suggestTip={favpoll.category !== "memorial"}
             // The in-card dialog matches the favpoll page's picker
             // (founder, 2026-09-18: "the add button shows on the favpoll
             // page but not the favpolls page") — withheld only when the
