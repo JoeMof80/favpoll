@@ -31,6 +31,8 @@ type Props = {
   onAddItem?: (label: string) => Promise<string | void>
   /** false defaults the contribution to None (memorials) */
   suggestTip?: boolean
+  /** Organiser has enabled donation amounts in the guest book */
+  showGuestAmounts?: boolean
   isListed?: boolean
   /** The favpoll's register palette — themes the portalled overlay. */
   dataRegister?: string | null
@@ -50,6 +52,7 @@ export function PledgeDialog({
   onPledgeSuccess,
   onAddItem,
   suggestTip,
+  showGuestAmounts = false,
   dataRegister,
   open: controlledOpen,
   onOpenChange: controlledOnOpenChange,
@@ -379,6 +382,9 @@ export function PledgeDialog({
             onDisplayNameChange={dialog.setDisplayName}
             isAnonymous={dialog.isAnonymous}
             onIsAnonymousChange={dialog.setIsAnonymous}
+            showGuestAmounts={showGuestAmounts}
+            guestBookDisplay={dialog.guestBookDisplay}
+            onGuestBookDisplayChange={dialog.setGuestBookDisplay}
             giftAid={dialog.giftAid}
             onGiftAidChange={dialog.setGiftAid}
             giftAidFirstName={dialog.giftAidFirstName}

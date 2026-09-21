@@ -13,10 +13,7 @@ import {
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { CharityRow } from "@/components/charity-row"
 import { Countdown } from "@/components/countdown"
-import {
-  WallOfFavourites,
-  type WallEntry,
-} from "@/components/wall-of-favourites"
+import { GuestBook, type WallEntry } from "@/components/guest-book"
 import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
 import { DisplayChrome } from "./display-chrome"
 import { FavpollLogo } from "@/components/favpoll-logo"
@@ -679,7 +676,7 @@ export function DisplayScreen({
               the QR beneath, that would have been the scan target walking
               away from people mid-scan. */}
           <div className="flex flex-col gap-8">
-            <WallOfFavourites
+            <GuestBook
               entries={initialWallEntries}
               animate
               maxEntries={12}

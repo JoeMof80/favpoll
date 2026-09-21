@@ -95,6 +95,7 @@ export type FavpollCategory = "celebration" | "memorial" | "fundraiser";
 export type FavpollGrouping = "individual" | "couple" | "group";
 export type FavpollSubject = "someone" | "cause";
 export type Pronoun = "he" | "she" | "they";
+export type GuestBookDisplay = "pick" | "amount" | "none";
 
 export type Favpoll = {
   id: string;
@@ -277,6 +278,7 @@ export type CanvasSubmitData = {
   isPrivate: boolean;
   isListed: boolean;
   allowGuestItems: boolean;
+  showGuestAmounts?: boolean;
   potAmount: number | null;
   /** Optional pledge goal in pounds; null = no goal. */
   goalAmount?: number | null;

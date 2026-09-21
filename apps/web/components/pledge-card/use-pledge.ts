@@ -68,6 +68,12 @@ export function usePledge({
   // see names, which the UI discloses at the point of choice.
   const [displayName, setDisplayName] = useState("")
   const [isAnonymous, setIsAnonymous] = useState(false)
+  // Guest book display choice (founder, 2026-09-21): pick (favourites),
+  // amount (£), or none. Only offered when the organiser enables
+  // show_guest_amounts; otherwise stays 'pick' (today's default).
+  const [guestBookDisplay, setGuestBookDisplay] = useState<
+    "pick" | "amount" | "none"
+  >("pick")
   // null = untouched: the suggestion tracks the pledge tier. Once the
   // guest taps a chip their choice is never overridden by tier changes.
   const [touchedTip, setTouchedTip] = useState<number | null>(null)
@@ -228,6 +234,7 @@ export function usePledge({
         totalAmount: numericPledge,
         tipAmount: ownTip,
         isAnonymous,
+        guestBookDisplay,
         allocations: computePledgeAllocations(
           selections,
           pollWithItems.topics.favourites,
@@ -246,6 +253,7 @@ export function usePledge({
         tipAmount: ownTip,
         displayName: displayName || null,
         isAnonymous,
+        guestBookDisplay,
         allocations: computePledgeAllocations(
           selections,
           pollWithItems.topics.favourites,
@@ -435,6 +443,8 @@ export function usePledge({
     setDisplayName,
     isAnonymous,
     setIsAnonymous,
+    guestBookDisplay,
+    setGuestBookDisplay,
     giftAid,
     setGiftAid,
     giftAidFirstName,

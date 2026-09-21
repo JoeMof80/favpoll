@@ -58,6 +58,11 @@ type Props = {
   onGiftAidHouseChange: (v: string) => void
   giftAidPostcode: string
   onGiftAidPostcodeChange: (v: string) => void
+  /** Organiser has enabled show_guest_amounts */
+  showGuestAmounts?: boolean
+  /** Guest's display choice: pick / amount / none */
+  guestBookDisplay?: "pick" | "amount" | "none"
+  onGuestBookDisplayChange?: (v: "pick" | "amount" | "none") => void
 }
 
 export function StepPay({
@@ -94,6 +99,9 @@ export function StepPay({
   onGiftAidHouseChange,
   giftAidPostcode,
   onGiftAidPostcodeChange,
+  showGuestAmounts = false,
+  guestBookDisplay = "pick",
+  onGuestBookDisplayChange,
 }: Props) {
   return (
     <div className="px-5 py-4">
@@ -156,11 +164,47 @@ export function StepPay({
         </div>
       )}
 
-      {/* Identity, MINIMAL (founder, 2026-09-07: all helper text out —
-          noisy and superfluous). Guests: two bare inputs + the guest-book
-          switch; signed-in: the switch alone. The receipt/withdrawal-link
-          and organiser-visibility explanations retired with the chrome. */}
-      {isGuest ? null : (
+      {/* Identity + guest book display choice (2026-09-21).
+          When the organiser has enabled show_guest_amounts, we show a
+          three-option radio replacing the bare anonymity switch —
+          "My pick", "My donation", or "Neither". When off, signed-in
+          users get the original switch; guests get no switch (blank
+          name = Someone). */}
+      {showGuestAmounts && onGuestBookDisplayChange ? (
+        <fieldset className="mb-4">
+          <legend className="mb-2 text-sm font-medium text-foreground">
+            Show in the guest book
+          </legend>
+          <div className="space-y-2">
+            {(
+              [
+                ["pick", "My pick"],
+                ["amount", "My donation"],
+                ["none", "Neither"],
+              ] as const
+            ).map(([value, label]) => (
+              <label
+                key={value}
+                className="flex items-center gap-2 text-sm text-foreground"
+              >
+                <input
+                  type="radio"
+                  name="guest-book-display"
+                  value={value}
+                  checked={guestBookDisplay === value}
+                  onChange={() => {
+                    onGuestBookDisplayChange(value)
+                    // "Neither" hides the name too — the full-anonymous path
+                    onIsAnonymousChange(value === "none")
+                  }}
+                  className="accent-primary"
+                />
+                {label}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      ) : isGuest ? null : (
         <div className="mb-4">
           <label className="flex items-center gap-2 text-sm text-foreground">
             <Switch

@@ -5,10 +5,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Countdown } from "@/components/countdown"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-import {
-  WallOfFavourites,
-  type WallEntry,
-} from "@/components/wall-of-favourites"
+import { GuestBook, type WallEntry } from "@/components/guest-book"
 import { BumpChart } from "@/components/bump-chart"
 import type { RankHistory } from "@/lib/rank-history"
 import { FavpollHero } from "@/components/favpoll-hero"
@@ -53,6 +50,8 @@ type Props = {
   /** Charities that haven't yet consented to receive pledges (consent-first
    * posture only) — non-empty withholds every pledge entry point. */
   gatedCharityNames?: string[]
+  /** Organiser has enabled show_guest_amounts — thread to pledge dialog */
+  showGuestAmounts?: boolean
 }
 
 export function FavpollContent({
@@ -70,6 +69,7 @@ export function FavpollContent({
   wallEntries,
   rankHistory,
   gatedCharityNames = [],
+  showGuestAmounts = false,
 }: Props) {
   const router = useRouter()
   const [showGuestFund, setShowGuestFund] = useState(false)
@@ -154,6 +154,7 @@ export function FavpollContent({
             ? undefined
             : addItemHandler(pollWithItems)
         }
+        showGuestAmounts={showGuestAmounts}
         isListed={isListed}
         open={pledgeDialogOpen}
         onOpenChange={setPledgeDialogOpen}
@@ -192,7 +193,7 @@ export function FavpollContent({
   )
 
   const guestBook = (
-    <WallOfFavourites
+    <GuestBook
       entries={wallEntries}
       teaseBacked={!localEntitled}
       animate

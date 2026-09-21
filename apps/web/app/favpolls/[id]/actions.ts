@@ -83,6 +83,8 @@ type CreatePledgeInput = {
   tipAmount?: number
   /** Hide the name from the public guest book (organiser still sees it) */
   isAnonymous?: boolean
+  /** What appears beside the name: pick (favourites), amount (£), none */
+  guestBookDisplay?: "pick" | "amount" | "none"
   allocations: PledgeAllocationInput[]
   /** The Stripe PaymentIntent that charged this pledge */
   paymentIntentId: string
@@ -115,6 +117,7 @@ export async function createPledge(input: CreatePledgeInput) {
       fee: 0,
       tip_amount: input.tipAmount ?? 0,
       is_anonymous: input.isAnonymous ?? false,
+      guest_book_display: input.guestBookDisplay ?? "pick",
       payment_intent_id: input.paymentIntentId,
     })
     .select("id")
@@ -158,6 +161,8 @@ type CreateGuestPledgeInput = {
   displayName?: string | null
   /** Hide the name from the public guest book (organiser still sees it) */
   isAnonymous?: boolean
+  /** What appears beside the name: pick (favourites), amount (£), none */
+  guestBookDisplay?: "pick" | "amount" | "none"
   allocations: PledgeAllocationInput[]
   /** The Stripe PaymentIntent that charged this pledge */
   paymentIntentId: string
@@ -264,6 +269,7 @@ export async function createGuestPledge(input: CreateGuestPledgeInput) {
       tip_amount: input.tipAmount ?? 0,
       display_name: input.displayName?.trim() || null,
       is_anonymous: input.isAnonymous ?? false,
+      guest_book_display: input.guestBookDisplay ?? "pick",
       payment_intent_id: input.paymentIntentId,
     })
     .select("id")
@@ -766,6 +772,31 @@ export async function setFavpollGuestItems(
   const { error } = await supabase
     .from("favpolls")
     .update({ allow_guest_items: allowGuestItems })
+    .eq("id", favpollId)
+
+  if (error) throw new Error(error.message)
+}
+
+export async function setFavpollShowGuestAmounts(
+  favpollId: string,
+  showGuestAmounts: boolean
+) {
+  const { userId } = await auth()
+  if (!userId) throw new Error("Not authenticated")
+
+  const supabase = createAdminClient()
+
+  const { data: favpoll } = await supabase
+    .from("favpolls")
+    .select("created_by")
+    .eq("id", favpollId)
+    .single()
+
+  if (!favpoll || favpoll.created_by !== userId) throw new Error("Unauthorized")
+
+  const { error } = await supabase
+    .from("favpolls")
+    .update({ show_guest_amounts: showGuestAmounts })
     .eq("id", favpollId)
 
   if (error) throw new Error(error.message)
