@@ -64,7 +64,7 @@ export function FavpollSubheader({
           size="icon"
           variant="secondary"
           aria-label="Manage favpoll"
-          className="size-14 rounded-full shadow-lg [&_svg]:size-6"
+          className="size-14 rounded-full shadow-lg [&_svg]:!size-7"
         >
           <Link href={`/favpolls/${favpollId}/manage`}>
             <Settings2 aria-hidden="true" />
@@ -79,7 +79,7 @@ export function FavpollSubheader({
           onClick={() =>
             window.dispatchEvent(new CustomEvent("favpoll:pledge"))
           }
-          className="size-14 rounded-full shadow-lg [&_svg]:size-6"
+          className="size-14 rounded-full shadow-lg [&_svg]:!size-7"
         >
           <Gift aria-hidden="true" />
         </Button>
