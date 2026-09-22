@@ -65,6 +65,22 @@ export default async function FavpollPage({ params }: Props) {
     null
 
   const isOrganiser = userId === favpoll.created_by
+
+  // Organiser card — name + avatar from the users table
+  const { data: organiserUser } = favpoll.created_by
+    ? await supabase
+        .from("users")
+        .select("display_name, avatar_url")
+        .eq("id", favpoll.created_by)
+        .maybeSingle()
+    : { data: null }
+  const organiser = organiserUser
+    ? {
+        name: organiserUser.display_name ?? "Organiser",
+        avatarUrl: organiserUser.avatar_url ?? null,
+      }
+    : null
+
   const isClosed =
     !!favpoll.closed_at || new Date(favpoll.closes_at) < new Date()
 
@@ -432,6 +448,7 @@ export default async function FavpollPage({ params }: Props) {
           hasNote={hasNote}
           gatedCharityNames={gatedCharityNames}
           showGuestAmounts={showAmounts}
+          organiser={organiser}
         />
       </>
     </RegisterScope>

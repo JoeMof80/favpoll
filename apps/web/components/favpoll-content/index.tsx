@@ -56,6 +56,8 @@ type Props = {
   gatedCharityNames?: string[]
   /** Organiser has enabled show_guest_amounts — thread to pledge dialog */
   showGuestAmounts?: boolean
+  /** Organiser name + avatar for the rail card */
+  organiser?: { name: string; avatarUrl: string | null } | null
 }
 
 export function FavpollContent({
@@ -75,9 +77,15 @@ export function FavpollContent({
   rankHistory,
   gatedCharityNames = [],
   showGuestAmounts = false,
+  organiser,
 }: Props) {
   const router = useRouter()
   const [pledgeDialogOpen, setPledgeDialogOpen] = useState(false)
+  // The desktop rail expands to an equal split instead of opening a
+  // modal (founder, 2026-09-22): the standings stay on screen, and at
+  // that width the guest book's comments become readable. Mobile has no
+  // columns to swap, so its own GuestBook keeps the dialog.
+  const [guestBookExpanded, setGuestBookExpanded] = useState(false)
 
   // The Pledge FAB (in FavpollSubheader, a sibling) dispatches this
   // event to open the dialog without prop-drilling through the server
@@ -170,8 +178,17 @@ export function FavpollContent({
   // favpolls, no guest book and no pot card. The charity banner is NOT
   // in the stack — the fixed mobile charity footer already carries
   // charity + total + goal, and twice on one screen is noise.
-  const stateCard = isClosed ? (
-    <div className="space-y-1 rounded-lg border border-border bg-card px-5 py-4">
+  //
+  // The two surfaces have DIFFERENT chrome (2026-09-22): the desktop rail
+  // is a divided column, so its rows are flat and the divider does the
+  // separating; the mobile stack keeps the bordered cards. `railChrome`
+  // is applied to the rail copy only.
+  // The rail COLUMN carries the horizontal gutter; rows set rhythm only.
+  const railChrome = "py-5"
+  const cardChrome = "rounded-lg border border-border bg-card px-5 py-4"
+
+  const stateCardInner = isClosed ? (
+    <div className="space-y-1">
       <SectionEyebrow variant="muted" className="font-semibold">
         Poll closed
       </SectionEyebrow>
@@ -190,21 +207,31 @@ export function FavpollContent({
       </Button>
     </div>
   ) : (
-    <div className="rounded-lg border border-border bg-card px-5 py-4">
-      <Countdown closesAt={favpoll.closes_at} />
-    </div>
+    <Countdown closesAt={favpoll.closes_at} />
   )
+
+  const stateCardMobile = <div className={cardChrome}>{stateCardInner}</div>
+  const stateCardRail = <div className={railChrome}>{stateCardInner}</div>
 
   // Guest book: always visible in the rail (fills the space), but
   // entries are withheld pre-pledge — a teaser with skeleton rows
   // replaces the real list. Post-pledge it expands with real entries.
-  const guestBook = (
+  const guestBookProps = {
+    entries: localEntitled ? wallEntries : [],
+    teaseBacked: !localEntitled,
+    animate: true,
+    expandable: localEntitled,
+  }
+  const guestBookMobile = <GuestBook {...guestBookProps} />
+  // flex-1: the rail is a flex column, so the guest book takes the
+  // height the cards above it leave and scrolls its list internally.
+  const guestBookRail = (
     <GuestBook
-      entries={localEntitled ? wallEntries : []}
-      teaseBacked={!localEntitled}
-      animate
-      expandable={localEntitled}
-      className="md:h-[calc(100vh-15rem)]"
+      {...guestBookProps}
+      variant="flat"
+      className="flex-1"
+      expanded={guestBookExpanded}
+      onToggleExpand={() => setGuestBookExpanded((v) => !v)}
     />
   )
 
@@ -268,14 +295,10 @@ export function FavpollContent({
           State first (and the keepsake route back on closed favpolls),
           social proof under the results it animates, then the pot. */}
       <div className="mt-8 space-y-4 md:hidden">
-        {stateCard}
-        {guestBook}
+        {stateCardMobile}
+        {guestBookMobile}
       </div>
 
-      {/* STICKY CHARITY FOOTER (2026-09-22): matches the mobile footer's
-          grammar (charity carousel + total + goal bar). Sticky bottom-0
-          in the left column. Hidden on mobile — MobileCharityFooter
-          handles that surface. */}
       <div className="sticky bottom-0 z-10 mt-8 hidden border-t border-border bg-background py-5 md:block">
         {appeal && (
           <p className="mb-2 truncate border-b border-border pb-2 text-xs text-muted-foreground">
@@ -317,15 +340,47 @@ export function FavpollContent({
     </>
   )
 
+  const organiserCard = organiser && (
+    <div className={`flex items-center gap-3 ${railChrome}`}>
+      {organiser.avatarUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={organiser.avatarUrl}
+          alt={organiser.name}
+          className="size-8 shrink-0 rounded-full object-cover"
+        />
+      ) : (
+        <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary">
+          {organiser.name.charAt(0).toUpperCase()}
+        </div>
+      )}
+      <div className="min-w-0">
+        <p className="truncate text-sm font-medium text-foreground">
+          {organiser.name}
+        </p>
+        <p className="text-xs text-muted-foreground">Organiser</p>
+      </div>
+    </div>
+  )
+
   const right = (
     <>
-      {stateCard}
-      {guestBook}
+      {stateCardRail}
+      {organiserCard}
+      {guestBookRail}
     </>
   )
 
   return (
-    <PageLayout left={left} right={right}>
+    // appShell: the favpoll page is the only surface built for the
+    // two-pane desktop shell — the rail runs to the page bottom and the
+    // charity footer pins inside the left scroller.
+    <PageLayout
+      left={left}
+      right={right}
+      appShell
+      railExpanded={guestBookExpanded}
+    >
       <StickyIdentityBar
         name={
           favpoll.subject === "cause"

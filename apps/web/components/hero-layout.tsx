@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
+import { useScrollRoot } from "@/components/shell-scroller"
 
 type HeroLayoutProps = {
   eyebrowText: React.ReactNode
@@ -39,7 +40,14 @@ export function HeroLayout({
   avatar,
   about,
 }: HeroLayoutProps) {
-  const { scrollY } = useScroll()
+  // THE SCROLL ROOT (2026-09-22): on the favpoll page's desktop app
+  // shell the left COLUMN scrolls, not the document, so window scroll
+  // never fires and every channel below froze at rest (founder: the
+  // hero "doesn't animate as we scroll"). Below md the column is not a
+  // scroller, so scrollY simply stays 0 — which is already what mobile
+  // wants (every transform below is identity when isMobile).
+  const { ref: scrollRef, headerInset } = useScrollRoot()
+  const { scrollY } = useScroll(scrollRef ? { container: scrollRef } : {})
 
   // The var is the SETTLED band bottom, derived from geometry that is
   // scroll-invariant (the name block's offset within the pinned band):
@@ -63,7 +71,9 @@ export function HeroLayout({
         el.getBoundingClientRect().top
       document.documentElement.style.setProperty(
         "--hero-stuck-bottom",
-        `${Math.round(56 + inset + BAND_PB)}px` // 56 = the h-14 header
+        // headerInset = 56 (the h-14 header) when the document scrolls,
+        // 0 inside the shell's scroller, whose box starts below it.
+        `${Math.round(headerInset + inset + BAND_PB)}px`
       )
     }
     set()
@@ -73,7 +83,7 @@ export function HeroLayout({
       ro.disconnect()
       document.documentElement.style.removeProperty("--hero-stuck-bottom")
     }
-  }, [])
+  }, [headerInset])
 
   // THE REDESIGN'S CORE (founder, 2026-09-05): the avatar's endpoints
   // are MEASURED, not stamped. Rest = the full text stack (eyebrow +
@@ -183,7 +193,12 @@ export function HeroLayout({
         // about now lives INSIDE the band as a third collapsing clip
         // (below), so the band hides poll content at its bottom exactly
         // as the original design did.
-        className="bg-background pt-6 pb-4 md:sticky md:top-14 md:z-30 md:pt-16 md:before:absolute md:before:inset-x-0 md:before:-top-14 md:before:h-14 md:before:bg-background"
+        className={`bg-background pt-6 pb-4 md:sticky md:z-30 md:pt-16 md:before:absolute md:before:inset-x-0 md:before:-top-14 md:before:h-14 md:before:bg-background ${
+          // The scrollport already starts below the header in shell mode;
+          // md:top-14 there pins the band 56px too low, which is what was
+          // eating the about line.
+          headerInset === 0 ? "md:top-0" : "md:top-14"
+        }`}
       >
         {/* min-h = the settled avatar size (0.9×80 / 0.635×132): heroes
             WITHOUT an avatar (causes) otherwise settle a few px higher
