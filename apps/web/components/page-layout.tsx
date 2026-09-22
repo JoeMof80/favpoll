@@ -26,7 +26,7 @@ export function PageLayout({
       <main // Mobile bottom padding clears the fixed charity footer by 1.5rem when
         // one is mounted (it publishes --charity-footer-h), and is the old
         // 6rem otherwise.
-        className="mx-auto min-h-[calc(100vh-3.5rem)] max-w-5xl bg-background px-6 pb-[max(6rem,calc(var(--charity-footer-h,0px)+1.5rem))] md:px-16 md:pt-0 md:pb-24 md:drop-shadow-lg"
+        className="mx-auto min-h-[calc(100vh-3.5rem)] max-w-5xl bg-background px-6 pb-[max(6rem,calc(var(--charity-footer-h,0px)+1.5rem))] md:px-16 md:pt-0 md:pb-24 md:drop-shadow-lg md:[clip-path:inset(-1px_-24px_-24px_-24px)]"
       >
         <div className="grid gap-10 md:grid-cols-[1fr_300px]">
           {/* min-w-0: grid items default to min-width auto, so any wide

@@ -8,7 +8,6 @@ import { usePollSection } from "./use-poll-section"
 import { EmptyPollAlert } from "./empty-poll-alert"
 import { TypedNote } from "./typed-note"
 import { Button } from "../ui/button"
-import { ShareFavpollButton } from "@/components/share-favpoll-button"
 import { buildMechanicSteps } from "@/lib/mechanic-steps"
 import { LockCardContent } from "@/components/lock-card-content"
 import { Check, EllipsisVertical, Share2 } from "lucide-react"
@@ -269,16 +268,6 @@ export function PollSection({
                 rankingView={rankingView}
                 isOrganiser={isOrganiser}
               />
-              {/* The JustGiving lesson at the right moment: the pledge just
-                  landed, the reveal played — this is the peak, and sharing
-                  is the 5x lever. Quiet, once, only on the confirmed visit. */}
-              {pledgeJustConfirmed && (
-                <div className="flex justify-center pt-2">
-                  <ShareFavpollButton
-                    shareTitle={`${protagonistName} — favpoll`}
-                  />
-                </div>
-              )}
             </>
           ) : (
             /* No pledges yet — skeleton with a quiet card on top.
