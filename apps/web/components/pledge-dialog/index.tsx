@@ -374,6 +374,7 @@ export function PledgeDialog({
             fundPart={dialog.fundPart}
             onFavShare={dialog.setFavShare}
             onRemoveFavourite={dialog.removeFavourite}
+            fundAvailable={dialog.available}
           />
         )}
 
