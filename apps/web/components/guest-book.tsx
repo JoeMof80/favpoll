@@ -293,36 +293,27 @@ export function GuestBook({
         </div>
         {shown.length === 0 ? (
           <div className="mt-3 space-y-4 px-5" style={reserved}>
-            {teaseBacked ? (
-              <>
-                {/* Skeleton rows — teaser for pre-pledge viewers */}
-                {[0.9, 0.75, 0.6, 0.85, 0.5, 0.7].map((w, i) => (
-                  <div key={i} className="flex gap-3">
-                    <div
-                      className="size-8 shrink-0 rounded"
-                      style={{ backgroundColor: "oklch(0.92 0 0)" }}
-                    />
-                    <div className="min-w-0 flex-1 space-y-1.5">
-                      <div
-                        className="h-3.5 rounded"
-                        style={{
-                          width: `${w * 100}%`,
-                          backgroundColor: "oklch(0.87 0 0)",
-                        }}
-                      />
-                      <div
-                        className="h-3 w-16 rounded"
-                        style={{ backgroundColor: "oklch(0.92 0 0)" }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                Names appear here as people pledge.
-              </p>
-            )}
+            {[0.9, 0.75, 0.6, 0.85, 0.5, 0.7].map((w, i) => (
+              <div key={i} className="flex gap-3">
+                <div
+                  className="size-8 shrink-0 rounded"
+                  style={{ backgroundColor: "oklch(0.92 0 0)" }}
+                />
+                <div className="min-w-0 flex-1 space-y-1.5">
+                  <div
+                    className="h-3.5 rounded"
+                    style={{
+                      width: `${w * 100}%`,
+                      backgroundColor: "oklch(0.87 0 0)",
+                    }}
+                  />
+                  <div
+                    className="h-3 w-16 rounded"
+                    style={{ backgroundColor: "oklch(0.92 0 0)" }}
+                  />
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
           <>
