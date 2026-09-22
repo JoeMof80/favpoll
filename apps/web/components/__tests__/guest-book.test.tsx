@@ -30,11 +30,11 @@ describe("GuestBook — teaser for un-entitled viewers", () => {
     expect(screen.queryByText(/Pledge to see what/)).toBeNull()
   })
 
-  it("shows skeleton teaser on an empty wall with teaseBacked", () => {
-    render(<GuestBook entries={[]} teaseBacked />)
-    expect(
-      screen.getByText("Pledge to see the guest book.")
-    ).toBeInTheDocument()
+  it("shows skeleton teaser rows on an empty wall with teaseBacked", () => {
+    const { container } = render(<GuestBook entries={[]} teaseBacked />)
+    // 6 skeleton rows (initial circle placeholders)
+    const skeletons = container.querySelectorAll("[style*='oklch']")
+    expect(skeletons.length).toBeGreaterThanOrEqual(6)
   })
 
   it("renders stripped entries as plain 'pledged' with name or Someone", () => {
