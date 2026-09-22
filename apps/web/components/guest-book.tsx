@@ -123,7 +123,12 @@ function GuestBookRow({ entry }: { entry: WallEntry }) {
         </div>
         <div className="flex items-baseline justify-between gap-2">
           <p
-            className={["truncate text-xs text-muted-foreground", isSharedPot && "italic"].filter(Boolean).join(" ")}
+            className={[
+              "truncate text-xs text-muted-foreground",
+              isSharedPot && "italic",
+            ]
+              .filter(Boolean)
+              .join(" ")}
           >
             {pick ? (
               <>
@@ -169,7 +174,12 @@ function GuestBookRowFull({ entry }: { entry: WallEntry }) {
           </div>
           <div className="flex items-baseline justify-between gap-2">
             <p
-              className={["truncate text-sm text-muted-foreground", isSharedPot && "italic"].filter(Boolean).join(" ")}
+              className={[
+                "truncate text-sm text-muted-foreground",
+                isSharedPot && "italic",
+              ]
+                .filter(Boolean)
+                .join(" ")}
             >
               {pick ? (
                 <>
