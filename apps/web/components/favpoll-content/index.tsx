@@ -10,7 +10,6 @@ import { BumpChart } from "@/components/bump-chart"
 import type { RankHistory } from "@/lib/rank-history"
 import { FavpollHero } from "@/components/favpoll-hero"
 import { CauseHero } from "@/components/cause-hero"
-import { CharityBanner } from "@/components/charity-banner"
 import { PollSection } from "@/components/poll-section"
 import { PledgeDialog } from "@/components/pledge-dialog"
 import type {
@@ -28,7 +27,10 @@ import { MobileCharityFooter } from "./mobile-charity-footer"
 import { StickyIdentityBar } from "./sticky-identity-bar"
 import { PageLayout } from "../page-layout"
 import { FileText } from "lucide-react"
-import { formatPoundsExact } from "@/lib/i18n"
+import Link from "next/link"
+import { formatPounds, formatPoundsExact } from "@/lib/i18n"
+import { FavpollListCardCharityCarousel } from "@/components/favpoll-list-card/favpoll-list-card-charity-carousel"
+import { GoalProgress } from "@/components/goal-progress"
 
 type Props = {
   favpoll: FavpollWithDetails
@@ -193,12 +195,18 @@ export function FavpollContent({
     </div>
   )
 
-  // Guest book gated on entitlement (founder, 2026-09-22): part of the
-  // reward, like the standings. The live display shows it to everyone
-  // (the room's projector is not an individual guest surface).
-  const guestBook = localEntitled ? (
-    <GuestBook entries={wallEntries} animate expandable />
-  ) : null
+  // Guest book: always visible in the rail (fills the space), but
+  // entries are withheld pre-pledge — a teaser with skeleton rows
+  // replaces the real list. Post-pledge it expands with real entries.
+  const guestBook = (
+    <GuestBook
+      entries={localEntitled ? wallEntries : []}
+      teaseBacked={!localEntitled}
+      animate
+      expandable={localEntitled}
+      className="md:h-[calc(100vh-15rem)]"
+    />
+  )
 
   // Pot card RETIRED (founder, 2026-09-22): the pledge dialog's step 2
   // now shows the pot balance and has the fund toggle — the standalone
@@ -263,23 +271,55 @@ export function FavpollContent({
         {stateCard}
         {guestBook}
       </div>
+
+      {/* STICKY CHARITY FOOTER (2026-09-22): matches the mobile footer's
+          grammar (charity carousel + total + goal bar). Sticky bottom-0
+          in the left column. Hidden on mobile — MobileCharityFooter
+          handles that surface. */}
+      <div className="sticky bottom-0 z-10 mt-8 hidden border-t border-border bg-background py-5 md:block">
+        {appeal && (
+          <p className="mb-2 truncate border-b border-border pb-2 text-xs text-muted-foreground">
+            Part of{" "}
+            <Link
+              href={`/appeals/${appeal.slug}`}
+              className="font-medium text-primary underline-offset-4 hover:underline"
+            >
+              {appeal.name}
+            </Link>
+          </p>
+        )}
+        <FavpollListCardCharityCarousel
+          charities={favpoll.favpoll_charities.map((ec) => ({
+            charity: ec.charities,
+          }))}
+          size="lg"
+          perCharity={
+            favpoll.goal_amount
+              ? totalRaised
+              : totalRaised / Math.max(1, favpoll.favpoll_charities.length)
+          }
+          amountCaption={
+            favpoll.goal_amount
+              ? totalRaised >= favpoll.goal_amount
+                ? `${formatPounds(favpoll.goal_amount)} goal reached`
+                : `of the ${formatPounds(favpoll.goal_amount)} goal`
+              : undefined
+          }
+        />
+        {favpoll.goal_amount ? (
+          <GoalProgress
+            totalRaised={totalRaised}
+            goalAmount={favpoll.goal_amount}
+            className="mt-4 h-1"
+          />
+        ) : null}
+      </div>
     </>
   )
 
   const right = (
     <>
       {stateCard}
-
-      <CharityBanner
-        charities={favpoll.favpoll_charities.map((ec) => ec.charities)}
-        totalRaised={totalRaised}
-        appeal={appeal}
-        goalAmount={favpoll.goal_amount ?? null}
-      />
-
-      {/* Share removed from the rail — it lives in the ... dropdown
-          on the topic heading now (founder, 2026-09-11). */}
-
       {guestBook}
     </>
   )
