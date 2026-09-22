@@ -30,11 +30,10 @@ describe("GuestBook — teaser for un-entitled viewers", () => {
     expect(screen.queryByText(/Pledge to see what/)).toBeNull()
   })
 
-  it("shows no teaser on an empty wall — the empty state explains instead", () => {
+  it("shows skeleton teaser on an empty wall with teaseBacked", () => {
     render(<GuestBook entries={[]} teaseBacked />)
-    expect(screen.queryByText(/Pledge to see what/)).toBeNull()
     expect(
-      screen.getByText("Names appear here as people pledge.")
+      screen.getByText("Pledge to see the guest book.")
     ).toBeInTheDocument()
   })
 
@@ -142,7 +141,6 @@ describe("GuestBook — expandable collapse", () => {
     render(<GuestBook entries={MANY} expandable />)
     expect(screen.getAllByText(/Guest \d+/).length).toBe(12)
     expect(screen.getByRole("list", { name: "Recent pledges" })).toHaveClass(
-      "max-h-80",
       "overflow-y-auto"
     )
     expect(

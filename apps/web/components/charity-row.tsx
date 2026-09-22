@@ -30,9 +30,9 @@ export function CharityRow({
   linkToCharity = false,
   amountCaption,
 }: Props) {
-  const logoClass = size === "lg" ? "h-8 w-8" : "h-6 w-6"
-  const nameClass = size === "lg" ? "text-sm" : "text-sm"
-  const amountClass = size === "lg" ? "text-sm" : "text-sm"
+  const logoClass = size === "lg" ? "h-10 w-10" : "h-6 w-6"
+  const nameClass = size === "lg" ? "text-base" : "text-sm"
+  const amountClass = size === "lg" ? "text-base" : "text-sm"
 
   return (
     <div className="flex items-center gap-3">

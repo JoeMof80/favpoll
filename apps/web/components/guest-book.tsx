@@ -215,6 +215,7 @@ export function GuestBook({
   reserveRows,
   expandable = false,
   variant = "card",
+  className,
 }: {
   entries: WallEntry[]
   teaseBacked?: boolean
@@ -229,6 +230,8 @@ export function GuestBook({
   /** "card" = bordered card (favpoll page, manage); "border" = left
    *  border only (live display). */
   variant?: "card" | "border"
+  /** Extra classes on the card wrapper */
+  className?: string
 }) {
   const reduced = useReducedMotion()
   const [allOpen, setAllOpen] = useState(false)
@@ -266,7 +269,8 @@ export function GuestBook({
           variant === "border"
             ? "border-l-2 border-border pl-5"
             : [
-                "w-full rounded-lg border border-border bg-card py-4 text-left",
+                "flex w-full flex-col justify-start rounded-lg border border-border bg-card py-4 text-left",
+                className,
                 Wrapper === "button" && "transition-colors hover:bg-muted/50",
               ]
                 .filter(Boolean)
@@ -288,18 +292,47 @@ export function GuestBook({
           )}
         </div>
         {shown.length === 0 ? (
-          <p
-            className="mt-2 px-5 text-sm text-muted-foreground"
-            style={reserved}
-          >
-            Names appear here as people pledge.
-          </p>
+          <div className="mt-3 space-y-4 px-5" style={reserved}>
+            {teaseBacked ? (
+              <>
+                {/* Skeleton rows — teaser for pre-pledge viewers */}
+                {[0.9, 0.7, 0.5].map((w, i) => (
+                  <div key={i} className="flex gap-3">
+                    <div
+                      className="size-8 shrink-0 rounded"
+                      style={{ backgroundColor: "oklch(0.92 0 0)" }}
+                    />
+                    <div className="min-w-0 flex-1 space-y-1.5">
+                      <div
+                        className="h-3.5 rounded"
+                        style={{
+                          width: `${w * 100}%`,
+                          backgroundColor: "oklch(0.87 0 0)",
+                        }}
+                      />
+                      <div
+                        className="h-3 w-16 rounded"
+                        style={{ backgroundColor: "oklch(0.92 0 0)" }}
+                      />
+                    </div>
+                  </div>
+                ))}
+                <p className="text-xs text-muted-foreground">
+                  Pledge to see the guest book.
+                </p>
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Names appear here as people pledge.
+              </p>
+            )}
+          </div>
         ) : (
           <>
             <ul
               className={
                 expandable
-                  ? "mt-3 max-h-80 space-y-4 overflow-y-auto px-5"
+                  ? "mt-3 flex-1 space-y-4 overflow-y-auto px-5"
                   : "mt-3 space-y-4 px-5"
               }
               aria-label="Recent pledges"

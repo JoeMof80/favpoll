@@ -38,8 +38,8 @@ export function PageLayout({
             <div
               className={
                 rightSticky
-                  ? "sticky top-14 z-10 hidden space-y-4 self-start bg-background md:block md:pt-16"
-                  : "hidden space-y-4 self-start md:block md:pt-16"
+                  ? "sticky top-14 z-10 hidden max-h-[calc(100vh-3.5rem)] flex-col space-y-4 self-start overflow-y-auto bg-background md:flex md:pt-16"
+                  : "hidden flex-col space-y-4 self-start md:flex md:pt-16"
               }
             >
               {right}

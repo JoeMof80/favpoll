@@ -21,6 +21,8 @@ type Props = {
    * guest page omits this and the banner stays read-only.
    */
   onEditGoal?: () => void
+  /** "card" = bordered card (rail); "flat" = no card wrapper (sticky footer) */
+  variant?: "card" | "flat"
 }
 
 export function CharityBanner({
@@ -29,11 +31,18 @@ export function CharityBanner({
   appeal,
   goalAmount,
   onEditGoal,
+  variant = "card",
 }: Props) {
   const perCharity = charities.length > 0 ? totalRaised / charities.length : 0
 
   return (
-    <div className="rounded-lg border border-border bg-card px-5 py-4">
+    <div
+      className={
+        variant === "card"
+          ? "rounded-lg border border-border bg-card px-5 py-4"
+          : "py-4"
+      }
+    >
       {appeal && (
         <p className="mb-3 truncate border-b border-border pb-3 text-sm text-muted-foreground">
           Part of{" "}
