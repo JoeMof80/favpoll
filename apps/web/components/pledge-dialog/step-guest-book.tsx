@@ -2,7 +2,6 @@
 
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
-import { SegmentedControl } from "@/components/ui/segmented-control"
 
 type Props = {
   isGuest: boolean
@@ -10,21 +9,9 @@ type Props = {
   onDisplayNameChange: (v: string) => void
   isAnonymous: boolean
   onIsAnonymousChange: (v: boolean) => void
-  showGuestAmounts: boolean
-  guestBookDisplay: "pick" | "amount" | "none"
-  onGuestBookDisplayChange: (v: "pick" | "amount" | "none") => void
   pledgeMessage: string
   onPledgeMessageChange: (v: string) => void
 }
-
-const DISPLAY_OPTIONS: {
-  value: "pick" | "amount" | "none"
-  label: string
-}[] = [
-  { value: "pick", label: "My pick" },
-  { value: "amount", label: "My donation" },
-  { value: "none", label: "Neither" },
-]
 
 export function StepGuestBook({
   isGuest,
@@ -32,14 +19,14 @@ export function StepGuestBook({
   onDisplayNameChange,
   isAnonymous,
   onIsAnonymousChange,
-  showGuestAmounts,
-  guestBookDisplay,
-  onGuestBookDisplayChange,
   pledgeMessage,
   onPledgeMessageChange,
 }: Props) {
   return (
     <div className="space-y-4 px-5 py-4">
+      <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
+        Guest book
+      </p>
       {/* Guest name — signed-in users resolve from their account */}
       {isGuest && (
         <div>
@@ -60,25 +47,8 @@ export function StepGuestBook({
         </div>
       )}
 
-      {/* Display choice — segmented control when show_guest_amounts is on,
-          switch otherwise */}
-      {showGuestAmounts ? (
-        <div>
-          <p className="mb-2 text-sm font-medium text-foreground">
-            Show in the guest book
-          </p>
-          <SegmentedControl
-            label="Show in the guest book"
-            options={DISPLAY_OPTIONS}
-            value={guestBookDisplay}
-            onChange={(v) => {
-              onGuestBookDisplayChange(v as "pick" | "amount" | "none")
-              onIsAnonymousChange(v === "none")
-            }}
-            className="w-fit"
-          />
-        </div>
-      ) : isGuest ? null : (
+      {/* Anonymity — signed-in users only (guests leave name blank instead) */}
+      {!isGuest && (
         <div>
           <label className="flex items-center gap-2 text-sm text-foreground">
             <Switch

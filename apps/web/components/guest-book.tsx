@@ -98,67 +98,85 @@ function InitialCircle({ name }: { name: string | null }) {
   )
 }
 
-// --- Detail pill (pick or amount) — sits where the time used to be ---
-function DetailPill({ entry }: { entry: WallEntry }) {
-  if (entry.amount != null && entry.labels.length === 0) {
-    return (
-      <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] leading-tight font-medium text-emerald-700">
-        {formatPoundsExact(entry.amount)}
-      </span>
-    )
-  }
-  if (entry.labels.length === 0) return null
-  const label = entry.labels[0]
-  const extra = entry.labels.length - 1
-  return (
-    <span className="flex shrink-0 items-center gap-1">
-      <span className="inline-flex items-center rounded-full border border-border bg-secondary/50 px-2 py-0.5 text-[11px] leading-tight text-secondary-foreground">
-        {label}
-      </span>
-      {extra > 0 && (
-        <span className="text-[11px] text-muted-foreground">+{extra}</span>
-      )}
-    </span>
-  )
-}
-
 // --- Guest book row ---
-// Matches the charity row pattern: flex items-center gap-3, 8×8 rounded
-// initial, name font-medium, detail right-aligned. Message as a blockquote
-// with a left border below.
-// Compact row for the card — no message (shown only in the dialog).
+// Row layout (founder, 2026-09-22):
+// Line 1: name (left) + time (right)
+// Line 2: pick (left) + amount (right, when present)
+// Neither truncates — each line only has two short items.
 function GuestBookRow({ entry }: { entry: WallEntry }) {
+  const pick = entry.labels.length > 0 ? entry.labels[0] : null
+  const extra = entry.labels.length - 1
+  const amount =
+    entry.amount != null && entry.amount > 0
+      ? formatPoundsExact(entry.amount)
+      : null
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex gap-3">
       <InitialCircle name={entry.name} />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-foreground">
-          {entry.name ?? "Someone"}
-        </p>
-        <p className="text-xs text-muted-foreground">
+        <div className="flex items-baseline justify-between gap-2">
+          <p className="truncate text-sm font-medium text-foreground">
+            {entry.name ?? "Someone"}
+          </p>
           <RelativeTime iso={entry.created_at} />
-        </p>
+        </div>
+        {(pick || amount) && (
+          <div className="flex items-baseline justify-between gap-2">
+            {pick && (
+              <p className="truncate text-xs text-muted-foreground">
+                {pick}
+                {extra > 0 && ` +${extra}`}
+              </p>
+            )}
+            {amount && (
+              <span className="shrink-0 text-xs font-medium text-emerald-600">
+                {amount}
+              </span>
+            )}
+          </div>
+        )}
       </div>
-      <DetailPill entry={entry} />
     </div>
   )
 }
 
-// Full row for the expanded dialog — includes message, larger text.
+// Full row for the expanded dialog — same layout, larger text + message.
 function GuestBookRowFull({ entry }: { entry: WallEntry }) {
+  const pick = entry.labels.length > 0 ? entry.labels[0] : null
+  const extra = entry.labels.length - 1
+  const amount =
+    entry.amount != null && entry.amount > 0
+      ? formatPoundsExact(entry.amount)
+      : null
   return (
     <div>
-      <div className="flex items-center gap-3">
+      <div className="flex gap-3">
         <InitialCircle name={entry.name} />
         <div className="min-w-0 flex-1">
-          <p className="truncate text-base font-medium text-foreground">
-            {entry.name ?? "Someone"}
-          </p>
-          <p className="text-sm text-muted-foreground">
-            <RelativeTime iso={entry.created_at} />
-          </p>
+          <div className="flex items-baseline justify-between gap-2">
+            <p className="truncate text-base font-medium text-foreground">
+              {entry.name ?? "Someone"}
+            </p>
+            <span className="shrink-0 text-sm text-muted-foreground">
+              <RelativeTime iso={entry.created_at} />
+            </span>
+          </div>
+          {(pick || amount) && (
+            <div className="flex items-baseline justify-between gap-2">
+              {pick && (
+                <p className="truncate text-sm text-muted-foreground">
+                  {pick}
+                  {extra > 0 && ` +${extra}`}
+                </p>
+              )}
+              {amount && (
+                <span className="shrink-0 text-sm font-medium text-emerald-600">
+                  {amount}
+                </span>
+              )}
+            </div>
+          )}
         </div>
-        <DetailPill entry={entry} />
       </div>
       {entry.message && (
         <p className="mt-1.5 ml-11 border-l-2 border-border pl-3 text-base text-muted-foreground italic">
@@ -228,14 +246,14 @@ export function GuestBook({
           variant === "border"
             ? "border-l-2 border-border pl-5"
             : [
-                "w-full rounded-lg border border-border bg-card px-5 py-4 text-left",
+                "w-full rounded-lg border border-border bg-card py-4 text-left",
                 Wrapper === "button" && "transition-colors hover:bg-muted/50",
               ]
                 .filter(Boolean)
                 .join(" ")
         }
       >
-        <div className="flex items-start justify-between gap-2">
+        <div className="flex items-start justify-between gap-2 px-5">
           <SectionEyebrow variant="muted" className="font-semibold">
             Guest book
             {countLabel && (
@@ -250,7 +268,10 @@ export function GuestBook({
           )}
         </div>
         {shown.length === 0 ? (
-          <p className="mt-2 text-sm text-muted-foreground" style={reserved}>
+          <p
+            className="mt-2 px-5 text-sm text-muted-foreground"
+            style={reserved}
+          >
             Names appear here as people pledge.
           </p>
         ) : (
@@ -258,8 +279,8 @@ export function GuestBook({
             <ul
               className={
                 expandable
-                  ? "mt-3 max-h-80 space-y-4 overflow-y-auto pr-1"
-                  : "mt-3 space-y-4"
+                  ? "mt-3 max-h-80 space-y-4 overflow-y-auto px-5"
+                  : "mt-3 space-y-4 px-5"
               }
               aria-label="Recent pledges"
               style={reserved}

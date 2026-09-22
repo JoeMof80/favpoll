@@ -384,9 +384,6 @@ export function PledgeDialog({
             onDisplayNameChange={dialog.setDisplayName}
             isAnonymous={dialog.isAnonymous}
             onIsAnonymousChange={dialog.setIsAnonymous}
-            showGuestAmounts={showGuestAmounts}
-            guestBookDisplay={dialog.guestBookDisplay}
-            onGuestBookDisplayChange={dialog.setGuestBookDisplay}
             pledgeMessage={dialog.pledgeMessage}
             onPledgeMessageChange={dialog.setPledgeMessage}
           />

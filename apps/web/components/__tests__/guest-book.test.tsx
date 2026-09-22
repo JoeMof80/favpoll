@@ -51,7 +51,7 @@ describe("GuestBook — initials and pills", () => {
     expect(screen.getByText("A")).toBeInTheDocument() // Alex → A
   })
 
-  it("renders the first backed favourite as a pill", () => {
+  it("renders the first backed favourite on line 2", () => {
     const entries: WallEntry[] = [
       {
         id: "p3",
@@ -61,8 +61,7 @@ describe("GuestBook — initials and pills", () => {
       },
     ]
     render(<GuestBook entries={entries} />)
-    expect(screen.getByText("Dylan Thomas")).toBeInTheDocument()
-    expect(screen.getByText("+1")).toBeInTheDocument()
+    expect(screen.getByText("Dylan Thomas +1")).toBeInTheDocument()
   })
 
   it("truncates labels beyond the first with a +N indicator", () => {
@@ -75,9 +74,7 @@ describe("GuestBook — initials and pills", () => {
       },
     ]
     render(<GuestBook entries={entries} />)
-    expect(screen.getByText("Red")).toBeInTheDocument()
-    expect(screen.queryByText("Blue")).toBeNull()
-    expect(screen.getByText("+2")).toBeInTheDocument()
+    expect(screen.getByText("Red +2")).toBeInTheDocument()
   })
 })
 

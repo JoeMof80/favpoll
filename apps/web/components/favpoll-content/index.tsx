@@ -196,14 +196,12 @@ export function FavpollContent({
     </div>
   )
 
-  const guestBook = (
-    <GuestBook
-      entries={wallEntries}
-      teaseBacked={!localEntitled}
-      animate
-      expandable
-    />
-  )
+  // Guest book gated on entitlement (founder, 2026-09-22): part of the
+  // reward, like the standings. The live display shows it to everyone
+  // (the room's projector is not an individual guest surface).
+  const guestBook = localEntitled ? (
+    <GuestBook entries={wallEntries} animate expandable />
+  ) : null
 
   /* Guest shared pot contribution card — always shown on open favpolls.
      Carries both jobs explicitly: how to USE the fund (pledge step) and
