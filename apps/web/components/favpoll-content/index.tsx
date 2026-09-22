@@ -209,12 +209,11 @@ export function FavpollContent({
      Carries both jobs explicitly: how to USE the fund (pledge step) and
      how to GIVE to it (the button). */
   const potCard = !isClosed && !pledgesGated && pot && (
-    <div className="rounded-lg border border-border bg-background px-5 py-4">
-      {/* ONE sentence of purpose (founder, 2026-09-14: "a lot of
-          repetition") — the empty state's old second line restated
-          the first, and the button restated "shared pot" a third
-          time. The non-empty second line stays: how to USE the pot
-          is the one thing the first line doesn't say. */}
+    <button
+      type="button"
+      onClick={() => setShowGuestFund(true)}
+      className="w-full rounded-lg border border-border bg-background px-5 py-4 text-left transition-colors hover:bg-muted/50"
+    >
       <p className="mt-1 text-sm text-muted-foreground">
         <b>{formatPoundsExact(fundAvailable)}</b> in the shared pot, for any
         guest who needs help to pledge.
@@ -224,16 +223,11 @@ export function FavpollContent({
           To use it, pick &ldquo;Use shared pot&rdquo; when you pledge.
         </p>
       )}
-      <Button
-        type="button"
-        variant="outline"
-        className="mt-3 flex w-full"
-        onClick={() => setShowGuestFund(true)}
-      >
-        <PiggyBank data-icon="inline-start" aria-hidden="true" />
+      <span className="mt-3 flex w-full items-center justify-center gap-2 text-sm font-medium text-foreground">
+        <PiggyBank className="size-4" aria-hidden="true" />
         Add to the pot
-      </Button>
-    </div>
+      </span>
+    </button>
   )
 
   const left = (
