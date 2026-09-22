@@ -296,7 +296,7 @@ export function GuestBook({
             {teaseBacked ? (
               <>
                 {/* Skeleton rows — teaser for pre-pledge viewers */}
-                {[0.9, 0.7, 0.5].map((w, i) => (
+                {[0.9, 0.75, 0.6, 0.85, 0.5, 0.7].map((w, i) => (
                   <div key={i} className="flex gap-3">
                     <div
                       className="size-8 shrink-0 rounded"
@@ -317,9 +317,6 @@ export function GuestBook({
                     </div>
                   </div>
                 ))}
-                <p className="text-xs text-muted-foreground">
-                  Pledge to see the guest book.
-                </p>
               </>
             ) : (
               <p className="text-sm text-muted-foreground">
