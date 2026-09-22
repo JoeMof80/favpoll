@@ -176,6 +176,8 @@ type Props = {
   onFavShare?: (pounds: number) => void
   /** Remove a favourite line without returning to the picker. */
   onRemoveFavourite?: (id: string) => void
+  /** Shared pot balance — shown as context when a fund exists */
+  fundAvailable?: number
 }
 
 /**
@@ -196,6 +198,7 @@ export function StepAmount({
   fundPart = 0,
   onFavShare,
   onRemoveFavourite,
+  fundAvailable,
 }: Props) {
   const numericFav = parseFloat(pledgeAmount)
   const favShare = !isNaN(numericFav) && numericFav > 0 ? numericFav : 0
@@ -270,6 +273,11 @@ export function StepAmount({
           <p className="text-[11px] text-muted-foreground">
             {showSplit &&
               "The shared pot backs guests without a favourite — add to it, or slide to rebalance. "}
+            {!showSplit &&
+              hasFund &&
+              fundAvailable != null &&
+              fundAvailable > 0 &&
+              `${formatPoundsExact(fundAvailable)} in the shared pot — pick "Use shared pot" below to use it. `}
             Processed securely by Stripe — favpoll takes no platform fee.
           </p>
         )}

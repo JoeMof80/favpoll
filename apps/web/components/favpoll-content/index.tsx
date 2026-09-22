@@ -13,7 +13,6 @@ import { CauseHero } from "@/components/cause-hero"
 import { CharityBanner } from "@/components/charity-banner"
 import { PollSection } from "@/components/poll-section"
 import { PledgeDialog } from "@/components/pledge-dialog"
-import { SeedFundModal } from "@/components/favpoll-form/seed-fund-modal"
 import type {
   FavpollWithDetails,
   FavpollPollWithItems,
@@ -28,7 +27,7 @@ import { useFavpollContent } from "./use-favpoll-content"
 import { MobileCharityFooter } from "./mobile-charity-footer"
 import { StickyIdentityBar } from "./sticky-identity-bar"
 import { PageLayout } from "../page-layout"
-import { PiggyBank, FileText } from "lucide-react"
+import { FileText } from "lucide-react"
 import { formatPoundsExact } from "@/lib/i18n"
 
 type Props = {
@@ -76,7 +75,6 @@ export function FavpollContent({
   showGuestAmounts = false,
 }: Props) {
   const router = useRouter()
-  const [showGuestFund, setShowGuestFund] = useState(false)
   const [pledgeDialogOpen, setPledgeDialogOpen] = useState(false)
 
   // The Pledge FAB (in FavpollSubheader, a sibling) dispatches this
@@ -117,7 +115,6 @@ export function FavpollContent({
           gatedCharityNames.length > 1 ? "confirm" : "confirms"
         }.`
       : undefined
-  const fundAvailable = pot ? pot.total_deposited - pot.total_allocated : 0
 
   const closedAt = favpoll.closed_at
     ? new Date(favpoll.closed_at).toLocaleDateString("en-GB", {
@@ -203,30 +200,10 @@ export function FavpollContent({
     <GuestBook entries={wallEntries} animate expandable />
   ) : null
 
-  /* Guest shared pot contribution card — always shown on open favpolls.
-     Carries both jobs explicitly: how to USE the fund (pledge step) and
-     how to GIVE to it (the button). */
-  const potCard = !isClosed && !pledgesGated && pot && (
-    <button
-      type="button"
-      onClick={() => setShowGuestFund(true)}
-      className="w-full rounded-lg border border-border bg-background px-5 py-4 text-left transition-colors hover:bg-muted/50"
-    >
-      <p className="mt-1 text-sm text-muted-foreground">
-        <b>{formatPoundsExact(fundAvailable)}</b> in the shared pot, for any
-        guest who needs help to pledge.
-      </p>
-      {fundAvailable > 0 && (
-        <p className="mt-1 text-xs text-muted-foreground">
-          To use it, pick &ldquo;Use shared pot&rdquo; when you pledge.
-        </p>
-      )}
-      <span className="mt-3 flex w-full items-center justify-center gap-2 text-sm font-medium text-foreground">
-        <PiggyBank className="size-4" aria-hidden="true" />
-        Add to the pot
-      </span>
-    </button>
-  )
+  // Pot card RETIRED (founder, 2026-09-22): the pledge dialog's step 2
+  // now shows the pot balance and has the fund toggle — the standalone
+  // card was a second door to the same room, buried below the fold on
+  // mobile. "Give without picking" on step 1 routes to the shared pot.
 
   const left = (
     <>
@@ -285,7 +262,6 @@ export function FavpollContent({
       <div className="mt-8 space-y-4 md:hidden">
         {stateCard}
         {guestBook}
-        {potCard}
       </div>
     </>
   )
@@ -305,25 +281,11 @@ export function FavpollContent({
           on the topic heading now (founder, 2026-09-11). */}
 
       {guestBook}
-
-      {potCard}
     </>
   )
 
   return (
     <PageLayout left={left} right={right}>
-      {showGuestFund && (
-        <SeedFundModal
-          favpollId={favpoll.id}
-          variant="guest"
-          isListed={isListed}
-          onComplete={() => {
-            setShowGuestFund(false)
-            router.refresh()
-          }}
-          onCancel={() => setShowGuestFund(false)}
-        />
-      )}
       <StickyIdentityBar
         name={
           favpoll.subject === "cause"
