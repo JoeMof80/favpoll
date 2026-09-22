@@ -3,7 +3,6 @@
 import { useState, useSyncExternalStore } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-import { Button } from "@/components/ui/button"
 import { Maximize2, User } from "lucide-react"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { formatPoundsExact } from "@/lib/i18n"
@@ -127,23 +126,42 @@ function DetailPill({ entry }: { entry: WallEntry }) {
 // Matches the charity row pattern: flex items-center gap-3, 8×8 rounded
 // initial, name font-medium, detail right-aligned. Message as a blockquote
 // with a left border below.
+// Compact row for the card — no message (shown only in the dialog).
 function GuestBookRow({ entry }: { entry: WallEntry }) {
+  return (
+    <div className="flex items-center gap-3">
+      <InitialCircle name={entry.name} />
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium text-foreground">
+          {entry.name ?? "Someone"}
+        </p>
+        <p className="text-xs text-muted-foreground">
+          <RelativeTime iso={entry.created_at} />
+        </p>
+      </div>
+      <DetailPill entry={entry} />
+    </div>
+  )
+}
+
+// Full row for the expanded dialog — includes message, larger text.
+function GuestBookRowFull({ entry }: { entry: WallEntry }) {
   return (
     <div>
       <div className="flex items-center gap-3">
         <InitialCircle name={entry.name} />
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium text-foreground">
+          <p className="truncate text-base font-medium text-foreground">
             {entry.name ?? "Someone"}
           </p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             <RelativeTime iso={entry.created_at} />
           </p>
         </div>
         <DetailPill entry={entry} />
       </div>
       {entry.message && (
-        <p className="mt-1.5 ml-11 border-l-2 border-border pl-3 text-sm text-muted-foreground italic">
+        <p className="mt-1.5 ml-11 border-l-2 border-border pl-3 text-base text-muted-foreground italic">
           {entry.message}
         </p>
       )}
@@ -189,71 +207,90 @@ export function GuestBook({
       ? ` · ${entries.length} ${entries.length === 1 ? "pledge" : "pledges"}`
       : ""
 
+  const isCard = variant === "card"
+  // Card variant with entries becomes a single tap target (like the pot
+  // card) — tapping anywhere opens the expand dialog.
+  const Wrapper = isCard && expandable && entries.length > 0 ? "button" : "div"
+  const wrapperProps =
+    Wrapper === "button"
+      ? {
+          type: "button" as const,
+          onClick: () => setAllOpen(true),
+          "aria-label": "Expand guest book",
+        }
+      : {}
+
   return (
-    <div
-      className={
-        variant === "border"
-          ? "border-l-2 border-border pl-5"
-          : "rounded-lg border border-border bg-card px-5 py-4"
-      }
-    >
-      <div className="flex items-start justify-between gap-2">
-        <SectionEyebrow variant="muted" className="font-semibold">
-          Guest book
-          {countLabel && (
-            <span className="font-normal opacity-70">{countLabel}</span>
+    <>
+      <Wrapper
+        {...wrapperProps}
+        className={
+          variant === "border"
+            ? "border-l-2 border-border pl-5"
+            : [
+                "w-full rounded-lg border border-border bg-card px-5 py-4 text-left",
+                Wrapper === "button" && "transition-colors hover:bg-muted/50",
+              ]
+                .filter(Boolean)
+                .join(" ")
+        }
+      >
+        <div className="flex items-start justify-between gap-2">
+          <SectionEyebrow variant="muted" className="font-semibold">
+            Guest book
+            {countLabel && (
+              <span className="font-normal opacity-70">{countLabel}</span>
+            )}
+          </SectionEyebrow>
+          {expandable && entries.length > 0 && (
+            <Maximize2
+              className="size-4 shrink-0 text-muted-foreground"
+              aria-hidden="true"
+            />
           )}
-        </SectionEyebrow>
-        {expandable && entries.length > 0 && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-xs"
-            aria-label="Expand guest book"
-            onClick={() => setAllOpen(true)}
-          >
-            <Maximize2 aria-hidden="true" />
-          </Button>
+        </div>
+        {shown.length === 0 ? (
+          <p className="mt-2 text-sm text-muted-foreground" style={reserved}>
+            Names appear here as people pledge.
+          </p>
+        ) : (
+          <>
+            <ul
+              className={
+                expandable
+                  ? "mt-3 max-h-80 space-y-4 overflow-y-auto pr-1"
+                  : "mt-3 space-y-4"
+              }
+              aria-label="Recent pledges"
+              style={reserved}
+            >
+              <AnimatePresence initial={false}>
+                {shown.map((entry) => (
+                  <motion.li
+                    key={entry.id}
+                    layout={animated}
+                    initial={
+                      animated ? { opacity: 0, x: -12, scale: 0.97 } : false
+                    }
+                    animate={{ opacity: 1, x: 0, scale: 1 }}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
+                  >
+                    <GuestBookRow entry={entry} />
+                  </motion.li>
+                ))}
+              </AnimatePresence>
+            </ul>
+            {teaseBacked && (
+              <p className="mt-3 text-xs text-muted-foreground">
+                Pledge to see what everyone backed.
+              </p>
+            )}
+          </>
         )}
-      </div>
-      {shown.length === 0 ? (
-        <p className="mt-2 text-sm text-muted-foreground" style={reserved}>
-          Names appear here as people pledge.
-        </p>
-      ) : (
-        <>
-          <ul
-            className={
-              expandable
-                ? "mt-3 max-h-80 space-y-4 overflow-y-auto pr-1"
-                : "mt-3 space-y-4"
-            }
-            aria-label="Recent pledges"
-            style={reserved}
-          >
-            <AnimatePresence initial={false}>
-              {shown.map((entry) => (
-                <motion.li
-                  key={entry.id}
-                  layout={animated}
-                  initial={
-                    animated ? { opacity: 0, x: -12, scale: 0.97 } : false
-                  }
-                  animate={{ opacity: 1, x: 0, scale: 1 }}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
-                >
-                  <GuestBookRow entry={entry} />
-                </motion.li>
-              ))}
-            </AnimatePresence>
-          </ul>
-          {teaseBacked && (
-            <p className="mt-3 text-xs text-muted-foreground">
-              Pledge to see what everyone backed.
-            </p>
-          )}
-        </>
-      )}
+      </Wrapper>
+      {/* Portal-rendered overlay lives OUTSIDE the button wrapper —
+        otherwise closing the overlay fires inside the button,
+        which re-opens it immediately. */}
       {expandable && (
         <ResponsiveOverlay
           open={allOpen}
@@ -261,10 +298,10 @@ export function GuestBook({
           title="Guest book"
           dialogContentClassName="flex-1 overflow-y-auto px-5 pb-5"
         >
-          <ul className="space-y-4" aria-label="All pledges">
+          <ul className="space-y-5" aria-label="All pledges">
             {entries.map((entry) => (
               <li key={entry.id}>
-                <GuestBookRow entry={entry} />
+                <GuestBookRowFull entry={entry} />
               </li>
             ))}
           </ul>
@@ -275,6 +312,6 @@ export function GuestBook({
           )}
         </ResponsiveOverlay>
       )}
-    </div>
+    </>
   )
 }

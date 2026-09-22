@@ -82,7 +82,7 @@ describe("GuestBook — initials and pills", () => {
 })
 
 describe("GuestBook — messages", () => {
-  it("renders a message in muted italic below the pills", () => {
+  it("hides messages in the card view (shown only in the expanded dialog)", () => {
     const entries: WallEntry[] = [
       {
         id: "m1",
@@ -93,7 +93,10 @@ describe("GuestBook — messages", () => {
       },
     ]
     render(<GuestBook entries={entries} />)
-    expect(screen.getByText("Thinking of you")).toBeInTheDocument()
+    // Messages hidden in compact card row
+    expect(screen.queryByText("Thinking of you")).toBeNull()
+    // Name still visible
+    expect(screen.getByText("Kate")).toBeInTheDocument()
   })
 
   it("does not render a message line when message is null", () => {
