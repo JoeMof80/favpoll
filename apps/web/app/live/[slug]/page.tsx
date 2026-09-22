@@ -120,9 +120,9 @@ export default async function LiveDisplayPage({ params }: Props) {
   )
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const showAmounts = (favpoll as any).show_guest_amounts === true
+  // Live display: always show everything — picks, amounts (when enabled),
+  // messages. The room's projector is not an individual guest surface.
   const initialWallEntries = (wallRows ?? []).map((r) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const display: string = (r as any).guest_book_display ?? "pick"
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const totalAmount: number = (r as any).total_amount ?? 0
     return {
@@ -132,17 +132,14 @@ export default async function LiveDisplayPage({ params }: Props) {
         : r.clerk_user_id
           ? (wallUserNames[r.clerk_user_id] ?? null)
           : (r.display_name ?? null),
-      labels:
-        display === "amount"
-          ? []
-          : (
-              (r.pledge_allocations ?? []) as unknown as {
-                favourites: { label: string } | null
-              }[]
-            )
-              .map((a) => a.favourites?.label)
-              .filter((l): l is string => typeof l === "string"),
-      amount: showAmounts && display === "amount" ? totalAmount : undefined,
+      labels: (
+        (r.pledge_allocations ?? []) as unknown as {
+          favourites: { label: string } | null
+        }[]
+      )
+        .map((a) => a.favourites?.label)
+        .filter((l): l is string => typeof l === "string"),
+      amount: showAmounts ? totalAmount : undefined,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       message: ((r as any).message as string) || null,
       created_at: r.created_at,

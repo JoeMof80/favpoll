@@ -344,14 +344,14 @@ export default async function FavpollPage({ params }: Props) {
   // Wall entries: anonymous pledges show no name; un-entitled viewers
   // of open polls must not see which favourites were backed (the same
   // standings gate applied to per-favourite amounts above).
-  // Guest book display (2026-09-21): 'amount' shows £ instead of picks,
-  // 'none' shows neither. The organiser's show_guest_amounts flag is
-  // checked via the favpoll query; amount rows only render when enabled.
+  // Simplified (2026-09-22): always show pick AND amount when entitled.
+  // The either-or display choice was over-engineered — the organiser
+  // toggle (show_guest_amounts) is the real gate; forcing the guest to
+  // choose between pick and amount was confusing UX. Pre-pledge guests
+  // see neither (the guest book is gated on entitlement on this page).
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- new column, TS types lag migration
   const showAmounts = (favpoll as any).show_guest_amounts === true
   const wallEntries = (wallRows ?? []).map((r) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const display: string = (r as any).guest_book_display ?? "pick"
     const name = r.is_anonymous
       ? null
       : r.clerk_user_id
@@ -362,17 +362,13 @@ export default async function FavpollPage({ params }: Props) {
     return {
       id: r.id,
       name,
-      labels:
-        display === "amount" || !entitled
-          ? []
-          : (r.pledge_allocations ?? [])
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any -- nested join shape
-              .map((a: any) => a.favourites?.label)
-              .filter((l: unknown): l is string => typeof l === "string"),
-      amount:
-        showAmounts && display === "amount" && entitled
-          ? totalAmount
-          : undefined,
+      labels: entitled
+        ? (r.pledge_allocations ?? [])
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- nested join shape
+            .map((a: any) => a.favourites?.label)
+            .filter((l: unknown): l is string => typeof l === "string")
+        : [],
+      amount: showAmounts && entitled ? totalAmount : undefined,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       message: ((r as any).message as string) || null,
       created_at: r.created_at,
