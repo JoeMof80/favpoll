@@ -95,7 +95,6 @@ export type FavpollCategory = "celebration" | "memorial" | "fundraiser";
 export type FavpollGrouping = "individual" | "couple" | "group";
 export type FavpollSubject = "someone" | "cause";
 export type Pronoun = "he" | "she" | "they";
-export type GuestBookDisplay = "pick" | "amount" | "none";
 
 export type Favpoll = {
   id: string;

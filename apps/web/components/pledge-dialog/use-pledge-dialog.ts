@@ -191,7 +191,11 @@ export function usePledgeDialog({
   // and the slider between them REBALANCES the current sum without
   // changing it. No mapping layer: these are the rail's native parts.
   const numericPledge = parseFloat(pledge.pledgeAmount)
-  const isPledgeValid = !isNaN(numericPledge) && numericPledge > 0
+  // £1 minimum when a favourite is picked — £0.50 for "Tokyo" makes no
+  // sense. Without a pick the pledge goes to the shared pot and any
+  // amount > 0 is valid.
+  const minAmount = 1
+  const isPledgeValid = !isNaN(numericPledge) && numericPledge >= minAmount
   const numericFund = parseFloat(pledge.topUpAmount)
   const fundPart = !isNaN(numericFund) && numericFund > 0 ? numericFund : 0
 

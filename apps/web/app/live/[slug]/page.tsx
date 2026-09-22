@@ -82,7 +82,7 @@ export default async function LiveDisplayPage({ params }: Props) {
           .from("pledges")
           .select(
             `id, display_name, is_anonymous, clerk_user_id, created_at,
-             total_amount, guest_book_display, message,
+             total_amount, guest_book_display, pot_allocation_id, message,
              pledge_allocations ( favourites ( label ) )`
           )
           .eq("favpoll_poll_id", pollId)
@@ -125,6 +125,16 @@ export default async function LiveDisplayPage({ params }: Props) {
   const initialWallEntries = (wallRows ?? []).map((r) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const totalAmount: number = (r as any).total_amount ?? 0
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const display: string = (r as any).guest_book_display ?? "pick"
+    const guestHidAmount = display === "none"
+    const labels = (
+      (r.pledge_allocations ?? []) as unknown as {
+        favourites: { label: string } | null
+      }[]
+    )
+      .map((a) => a.favourites?.label)
+      .filter((l): l is string => typeof l === "string")
     return {
       id: r.id,
       name: r.is_anonymous
@@ -132,14 +142,8 @@ export default async function LiveDisplayPage({ params }: Props) {
         : r.clerk_user_id
           ? (wallUserNames[r.clerk_user_id] ?? null)
           : (r.display_name ?? null),
-      labels: (
-        (r.pledge_allocations ?? []) as unknown as {
-          favourites: { label: string } | null
-        }[]
-      )
-        .map((a) => a.favourites?.label)
-        .filter((l): l is string => typeof l === "string"),
-      amount: showAmounts ? totalAmount : undefined,
+      labels,
+      amount: showAmounts && !guestHidAmount ? totalAmount : undefined,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       message: ((r as any).message as string) || null,
       created_at: r.created_at,
