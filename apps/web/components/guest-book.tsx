@@ -3,7 +3,7 @@
 import { useState, useSyncExternalStore } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-import { Maximize2, User } from "lucide-react"
+import { Maximize2, Minimize2, User } from "lucide-react"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { formatPoundsExact } from "@/lib/i18n"
 
@@ -216,6 +216,8 @@ export function GuestBook({
   expandable = false,
   variant = "card",
   className,
+  expanded = false,
+  onToggleExpand,
 }: {
   entries: WallEntry[]
   teaseBacked?: boolean
@@ -227,11 +229,22 @@ export function GuestBook({
    */
   reserveRows?: number
   expandable?: boolean
-  /** "card" = bordered card (favpoll page, manage); "border" = left
-   *  border only (live display). */
-  variant?: "card" | "border"
+  /** "card" — bordered card (mobile stack, manage page, landing).
+   *  "border" — left rule only (live display).
+   *  "flat" — the card's layout without its chrome: the desktop rail,
+   *  where the column's divider does the separating. */
+  variant?: "card" | "border" | "flat"
   /** Extra classes on the card wrapper */
   className?: string
+  /** Expanded IN PLACE (the desktop rail): rows show messages at the
+   *  dialog's larger size, because the column is wide enough to read
+   *  them. Ignored unless onToggleExpand is supplied. */
+  expanded?: boolean
+  /** Supplied by a surface that expands in place instead of opening the
+   *  dialog — the desktop rail widens its column. When present the
+   *  overlay is never rendered: the rail is desktop-only, and the mobile
+   *  stack has its own instance that keeps the dialog. */
+  onToggleExpand?: () => void
 }) {
   const reduced = useReducedMotion()
   const [allOpen, setAllOpen] = useState(false)
@@ -248,10 +261,23 @@ export function GuestBook({
       ? ` · ${entries.length} ${entries.length === 1 ? "pledge" : "pledges"}`
       : ""
 
-  const isCard = variant === "card"
-  // Card variant with entries becomes a single tap target (like the pot
-  // card) — tapping anywhere opens the expand dialog.
-  const Wrapper = isCard && expandable && entries.length > 0 ? "button" : "div"
+  // "card" and "flat" are both panels — the live display's "border" is
+  // not. A panel that opens the DIALOG is a single tap target (like the
+  // pot card, #915) — tapping anywhere opens it.
+  //
+  // A panel that expands IN PLACE is NOT (founder, 2026-09-22): only its
+  // icon is the control. The rail's guest book scrolls its own list, so
+  // a whole-panel button would toggle the columns every time you clicked
+  // a row to scroll it — and it would swallow text selection besides.
+  const isPanel = variant !== "border"
+  const inPlace = !!onToggleExpand
+  const canExpand = isPanel && expandable && entries.length > 0
+  const Wrapper = canExpand && !inPlace ? "button" : "div"
+  // Card and border keep the gutter on their INNER blocks, never the
+  // wrapper, so the scroll list's scrollbar sits at the panel edge
+  // (#916). "flat" takes its gutter from the rail column instead —
+  // every rail row is padded the same way, so they cannot drift apart.
+  const pad = variant === "flat" ? "" : "px-5"
   const wrapperProps =
     Wrapper === "button"
       ? {
@@ -261,6 +287,25 @@ export function GuestBook({
         }
       : {}
 
+  const ExpandIcon = expanded ? Minimize2 : Maximize2
+  const expandControl = !canExpand ? null : inPlace ? (
+    <button
+      type="button"
+      onClick={onToggleExpand}
+      aria-expanded={expanded}
+      aria-label={expanded ? "Collapse guest book" : "Expand guest book"}
+      // -m-1 p-1: a 24px target without moving the icon off the eyebrow.
+      className="-m-1 shrink-0 rounded p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+    >
+      <ExpandIcon className="size-4" aria-hidden="true" />
+    </button>
+  ) : (
+    <ExpandIcon
+      className="size-4 shrink-0 text-muted-foreground"
+      aria-hidden="true"
+    />
+  )
+
   return (
     <>
       <Wrapper
@@ -269,7 +314,8 @@ export function GuestBook({
           variant === "border"
             ? "border-l-2 border-border pl-5"
             : [
-                "flex w-full flex-col justify-start rounded-lg border border-border bg-card py-4 text-left",
+                "flex min-h-0 w-full flex-col justify-start py-4 text-left",
+                variant === "card" && "rounded-lg border border-border bg-card",
                 className,
                 Wrapper === "button" && "transition-colors hover:bg-muted/50",
               ]
@@ -277,22 +323,17 @@ export function GuestBook({
                 .join(" ")
         }
       >
-        <div className="flex items-start justify-between gap-2 px-5">
+        <div className={`flex items-start justify-between gap-2 ${pad}`}>
           <SectionEyebrow variant="muted" className="font-semibold">
             Guest book
             {countLabel && (
               <span className="font-normal opacity-70">{countLabel}</span>
             )}
           </SectionEyebrow>
-          {expandable && entries.length > 0 && (
-            <Maximize2
-              className="size-4 shrink-0 text-muted-foreground"
-              aria-hidden="true"
-            />
-          )}
+          {expandControl}
         </div>
         {shown.length === 0 ? (
-          <div className="mt-3 space-y-4 px-5" style={reserved}>
+          <div className={`mt-3 space-y-4 ${pad}`} style={reserved}>
             {[0.9, 0.75, 0.6, 0.85, 0.5, 0.7].map((w, i) => (
               <div key={i} className="flex gap-3">
                 <div
@@ -320,8 +361,8 @@ export function GuestBook({
             <ul
               className={
                 expandable
-                  ? "mt-3 flex-1 space-y-4 overflow-y-auto px-5"
-                  : "mt-3 space-y-4 px-5"
+                  ? `mt-3 flex-1 overflow-y-auto ${expanded ? "space-y-5" : "space-y-4"} ${pad}`
+                  : `mt-3 space-y-4 ${pad}`
               }
               aria-label="Recent pledges"
               style={reserved}
@@ -337,13 +378,17 @@ export function GuestBook({
                     animate={{ opacity: 1, x: 0, scale: 1 }}
                     transition={{ duration: 0.4, ease: "easeOut" }}
                   >
-                    <GuestBookRow entry={entry} />
+                    {expanded ? (
+                      <GuestBookRowFull entry={entry} />
+                    ) : (
+                      <GuestBookRow entry={entry} />
+                    )}
                   </motion.li>
                 ))}
               </AnimatePresence>
             </ul>
             {teaseBacked && (
-              <p className="mt-3 text-xs text-muted-foreground">
+              <p className={`mt-3 text-xs text-muted-foreground ${pad}`}>
                 Pledge to see what everyone backed.
               </p>
             )}
@@ -353,7 +398,7 @@ export function GuestBook({
       {/* Portal-rendered overlay lives OUTSIDE the button wrapper —
         otherwise closing the overlay fires inside the button,
         which re-opens it immediately. */}
-      {expandable && (
+      {expandable && !inPlace && (
         <ResponsiveOverlay
           open={allOpen}
           onOpenChange={setAllOpen}

@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest"
 import { render, screen } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
 import { GuestBook, type WallEntry } from "@/components/guest-book"
 
 const ENTRIES: WallEntry[] = [
@@ -156,5 +157,74 @@ describe("GuestBook — expandable collapse", () => {
     expect(
       screen.queryByRole("button", { name: "Expand guest book" })
     ).toBeNull()
+  })
+})
+
+// The desktop rail expands IN PLACE to an equal column split rather than
+// opening a modal (founder, 2026-09-22) — so at that width the comments
+// the compact row hides become readable, and the standings stay on screen.
+describe("GuestBook — in-place expansion (the desktop rail)", () => {
+  const WITH_MESSAGE: WallEntry[] = [
+    {
+      id: "x1",
+      name: "Kate",
+      labels: ["Bath"],
+      message: "Thinking of you",
+      created_at: new Date().toISOString(),
+    },
+  ]
+
+  it("shows messages once expanded in place", () => {
+    render(
+      <GuestBook
+        entries={WITH_MESSAGE}
+        variant="flat"
+        expandable
+        expanded
+        onToggleExpand={() => {}}
+      />
+    )
+    expect(screen.getByText("Thinking of you")).toBeInTheDocument()
+  })
+
+  it("still hides messages while collapsed", () => {
+    render(
+      <GuestBook
+        entries={WITH_MESSAGE}
+        variant="flat"
+        expandable
+        onToggleExpand={() => {}}
+      />
+    )
+    expect(screen.queryByText("Thinking of you")).toBeNull()
+  })
+
+  it("toggles instead of opening the dialog, and reports its state", async () => {
+    const user = userEvent.setup()
+    let expanded = false
+    render(
+      <GuestBook
+        entries={WITH_MESSAGE}
+        variant="flat"
+        expandable
+        onToggleExpand={() => {
+          expanded = true
+        }}
+      />
+    )
+    const button = screen.getByRole("button", { name: "Expand guest book" })
+    expect(button).toHaveAttribute("aria-expanded", "false")
+    await user.click(button)
+    expect(expanded).toBe(true)
+    // The overlay is never rendered for an in-place surface — the rail is
+    // desktop-only and the mobile stack keeps its own dialog instance.
+    expect(screen.queryByRole("dialog")).toBeNull()
+  })
+
+  it("keeps the dialog for surfaces that do not expand in place", async () => {
+    const user = userEvent.setup()
+    render(<GuestBook entries={WITH_MESSAGE} expandable />)
+    await user.click(screen.getByRole("button", { name: "Expand guest book" }))
+    expect(await screen.findByText("Thinking of you")).toBeInTheDocument()
   })
 })
