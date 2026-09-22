@@ -178,13 +178,23 @@ test.describe("wizard → publish flow (cause)", () => {
     await expect(pollSection).toBeVisible({ timeout: 10_000 })
 
     // ── 10. Verify: countdown shows a real value ──────────────────────────────
-    await expect(page.getByText(/closes in/i)).toBeVisible()
-    const countdownText = await page
-      .getByRole("timer")
-      .or(page.locator(".countdown, [aria-live='polite']").first())
-      .textContent()
-      .catch(() => "")
-    expect(countdownText).not.toBe("--")
+    // Scoped to the VISIBLE countdown. It renders TWICE since #900 — once
+    // in the md:hidden mobile stack, once in the desktop rail — so an
+    // unscoped locator trips Playwright's strict mode, and .first() picks
+    // the mobile copy, which is display:none at this viewport.
+    const countdown = page.getByText(/closes in/i).filter({ visible: true })
+    await expect(countdown).toHaveCount(1)
+    await expect(countdown).toBeVisible()
+
+    // A REAL value, not the pre-mount "--" placeholder: only the mounted
+    // countdown publishes the remaining time as an aria-label. The old
+    // check read getByRole("timer"), which matches nothing here, so its
+    // .catch(() => "") made it pass whatever the countdown showed.
+    await expect(
+      page
+        .getByLabel(/\d+ days \d+ hours \d+ minutes remaining/)
+        .filter({ visible: true })
+    ).toBeVisible({ timeout: 10_000 })
 
     // ── 11. Verify: IS listed on /favpolls ───────────────────────────────────
     await page.goto("/favpolls")
