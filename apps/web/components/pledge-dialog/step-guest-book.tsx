@@ -11,6 +11,10 @@ type Props = {
   onIsAnonymousChange: (v: boolean) => void
   pledgeMessage: string
   onPledgeMessageChange: (v: string) => void
+  /** Show the "Show my donation" toggle (card pledges + show_guest_amounts on) */
+  showAmountToggle?: boolean
+  hideAmount?: boolean
+  onHideAmountChange?: (v: boolean) => void
 }
 
 export function StepGuestBook({
@@ -21,6 +25,9 @@ export function StepGuestBook({
   onIsAnonymousChange,
   pledgeMessage,
   onPledgeMessageChange,
+  showAmountToggle = false,
+  hideAmount = false,
+  onHideAmountChange,
 }: Props) {
   return (
     <div className="space-y-4 px-5 py-4">
@@ -47,19 +54,31 @@ export function StepGuestBook({
         </div>
       )}
 
-      {/* Anonymity — signed-in users only (guests leave name blank instead) */}
-      {!isGuest && (
-        <div>
+      {/* Visibility switches — consistent positive framing, both
+          default on. Signed-in users get the name switch; guests
+          control name via the blank-name field above. */}
+      <div className="space-y-3">
+        {!isGuest && (
           <label className="flex items-center gap-2 text-sm text-foreground">
             <Switch
-              checked={isAnonymous}
-              onCheckedChange={onIsAnonymousChange}
-              aria-label="Hide my name from the guest book"
+              checked={!isAnonymous}
+              onCheckedChange={(v) => onIsAnonymousChange(!v)}
+              aria-label="Show my name in the guest book"
             />
-            Hide my name from the guest book
+            Show my name
           </label>
-        </div>
-      )}
+        )}
+        {showAmountToggle && onHideAmountChange && (
+          <label className="flex items-center gap-2 text-sm text-foreground">
+            <Switch
+              checked={!hideAmount}
+              onCheckedChange={(v) => onHideAmountChange(!v)}
+              aria-label="Show my donation in the guest book"
+            />
+            Show my donation
+          </label>
+        )}
+      </div>
 
       {/* Message */}
       <div>

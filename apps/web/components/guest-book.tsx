@@ -106,6 +106,7 @@ function InitialCircle({ name }: { name: string | null }) {
 function GuestBookRow({ entry }: { entry: WallEntry }) {
   const pick = entry.labels.length > 0 ? entry.labels[0] : null
   const extra = entry.labels.length - 1
+  const isSharedPot = !pick
   const amount =
     entry.amount != null && entry.amount > 0
       ? formatPoundsExact(entry.amount)
@@ -120,21 +121,25 @@ function GuestBookRow({ entry }: { entry: WallEntry }) {
           </p>
           <RelativeTime iso={entry.created_at} />
         </div>
-        {(pick || amount) && (
-          <div className="flex items-baseline justify-between gap-2">
-            {pick && (
-              <p className="truncate text-xs text-muted-foreground">
+        <div className="flex items-baseline justify-between gap-2">
+          <p
+            className={["truncate text-xs text-muted-foreground", isSharedPot && "italic"].filter(Boolean).join(" ")}
+          >
+            {pick ? (
+              <>
                 {pick}
                 {extra > 0 && ` +${extra}`}
-              </p>
+              </>
+            ) : (
+              "Shared pot"
             )}
-            {amount && (
-              <span className="shrink-0 text-xs font-medium text-emerald-600">
-                {amount}
-              </span>
-            )}
-          </div>
-        )}
+          </p>
+          {amount && (
+            <span className="shrink-0 text-xs font-medium text-emerald-600">
+              {amount}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   )
@@ -144,6 +149,7 @@ function GuestBookRow({ entry }: { entry: WallEntry }) {
 function GuestBookRowFull({ entry }: { entry: WallEntry }) {
   const pick = entry.labels.length > 0 ? entry.labels[0] : null
   const extra = entry.labels.length - 1
+  const isSharedPot = !pick
   const amount =
     entry.amount != null && entry.amount > 0
       ? formatPoundsExact(entry.amount)
@@ -161,21 +167,25 @@ function GuestBookRowFull({ entry }: { entry: WallEntry }) {
               <RelativeTime iso={entry.created_at} />
             </span>
           </div>
-          {(pick || amount) && (
-            <div className="flex items-baseline justify-between gap-2">
-              {pick && (
-                <p className="truncate text-sm text-muted-foreground">
+          <div className="flex items-baseline justify-between gap-2">
+            <p
+              className={["truncate text-sm text-muted-foreground", isSharedPot && "italic"].filter(Boolean).join(" ")}
+            >
+              {pick ? (
+                <>
                   {pick}
                   {extra > 0 && ` +${extra}`}
-                </p>
+                </>
+              ) : (
+                "Shared pot"
               )}
-              {amount && (
-                <span className="shrink-0 text-sm font-medium text-emerald-600">
-                  {amount}
-                </span>
-              )}
-            </div>
-          )}
+            </p>
+            {amount && (
+              <span className="shrink-0 text-sm font-medium text-emerald-600">
+                {amount}
+              </span>
+            )}
+          </div>
         </div>
       </div>
       {entry.message && (

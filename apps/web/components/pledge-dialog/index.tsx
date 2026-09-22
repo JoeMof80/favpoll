@@ -386,6 +386,9 @@ export function PledgeDialog({
             onIsAnonymousChange={dialog.setIsAnonymous}
             pledgeMessage={dialog.pledgeMessage}
             onPledgeMessageChange={dialog.setPledgeMessage}
+            showAmountToggle={showGuestAmounts && !dialog.useSharedFund}
+            hideAmount={dialog.hideAmount}
+            onHideAmountChange={dialog.setHideAmount}
           />
         )}
 

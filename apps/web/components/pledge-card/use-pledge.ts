@@ -68,15 +68,12 @@ export function usePledge({
   // see names, which the UI discloses at the point of choice.
   const [displayName, setDisplayName] = useState("")
   const [isAnonymous, setIsAnonymous] = useState(false)
-  // Guest book display choice (founder, 2026-09-21): pick (favourites),
-  // amount (£), or none. Only offered when the organiser enables
-  // show_guest_amounts; otherwise stays 'pick' (today's default).
-  const [guestBookDisplay, setGuestBookDisplay] = useState<
-    "pick" | "amount" | "none"
-  >("pick")
   // Guest book message (founder, 2026-09-21): a short free-text note
   // shown beside the name in the guest book. 100-char limit.
   const [pledgeMessage, setPledgeMessage] = useState("")
+  // Guest opt-out: hide donation amount from the guest book.
+  // Only meaningful when show_guest_amounts is on.
+  const [hideAmount, setHideAmount] = useState(false)
   // null = untouched: the suggestion tracks the pledge tier. Once the
   // guest taps a chip their choice is never overridden by tier changes.
   const [touchedTip, setTouchedTip] = useState<number | null>(null)
@@ -119,7 +116,7 @@ export function usePledge({
 
   const numericPledge = parseFloat(pledgeAmount)
   const numericTopUp = parseFloat(topUpAmount)
-  const isPledgeValid = !isNaN(numericPledge) && numericPledge > 0
+  const isPledgeValid = !isNaN(numericPledge) && numericPledge >= 1
   const isTopUpValid = !isNaN(numericTopUp) && numericTopUp > 0
   const fundOverAvailable = isPledgeValid && numericPledge > available
 
@@ -237,8 +234,8 @@ export function usePledge({
         totalAmount: numericPledge,
         tipAmount: ownTip,
         isAnonymous,
-        guestBookDisplay,
         message: pledgeMessage || null,
+        hideAmount,
         allocations: computePledgeAllocations(
           selections,
           pollWithItems.topics.favourites,
@@ -257,8 +254,8 @@ export function usePledge({
         tipAmount: ownTip,
         displayName: displayName || null,
         isAnonymous,
-        guestBookDisplay,
         message: pledgeMessage || null,
+        hideAmount,
         allocations: computePledgeAllocations(
           selections,
           pollWithItems.topics.favourites,
@@ -344,6 +341,7 @@ export function usePledge({
         potId: pot.id,
         totalAmount: numericPledge,
         isAnonymous,
+        message: pledgeMessage || null,
         allocations: computePledgeAllocations(
           pollSelections[pollWithItems.id] ?? [],
           pollWithItems.topics.favourites,
@@ -448,10 +446,10 @@ export function usePledge({
     setDisplayName,
     isAnonymous,
     setIsAnonymous,
-    guestBookDisplay,
-    setGuestBookDisplay,
     pledgeMessage,
     setPledgeMessage,
+    hideAmount,
+    setHideAmount,
     giftAid,
     setGiftAid,
     giftAidFirstName,

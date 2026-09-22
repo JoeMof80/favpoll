@@ -83,10 +83,10 @@ type CreatePledgeInput = {
   tipAmount?: number
   /** Hide the name from the public guest book (organiser still sees it) */
   isAnonymous?: boolean
-  /** What appears beside the name: pick (favourites), amount (£), none */
-  guestBookDisplay?: "pick" | "amount" | "none"
   /** Short guest book message (100-char limit enforced client-side) */
   message?: string | null
+  /** Guest opted out of showing their donation amount */
+  hideAmount?: boolean
   allocations: PledgeAllocationInput[]
   /** The Stripe PaymentIntent that charged this pledge */
   paymentIntentId: string
@@ -119,7 +119,7 @@ export async function createPledge(input: CreatePledgeInput) {
       fee: 0,
       tip_amount: input.tipAmount ?? 0,
       is_anonymous: input.isAnonymous ?? false,
-      guest_book_display: input.guestBookDisplay ?? "pick",
+      guest_book_display: input.hideAmount ? "none" : "pick",
       message: input.message?.trim().slice(0, 100) || null,
       payment_intent_id: input.paymentIntentId,
     })
@@ -164,10 +164,10 @@ type CreateGuestPledgeInput = {
   displayName?: string | null
   /** Hide the name from the public guest book (organiser still sees it) */
   isAnonymous?: boolean
-  /** What appears beside the name: pick (favourites), amount (£), none */
-  guestBookDisplay?: "pick" | "amount" | "none"
   /** Short guest book message (100-char limit enforced client-side) */
   message?: string | null
+  /** Guest opted out of showing their donation amount */
+  hideAmount?: boolean
   allocations: PledgeAllocationInput[]
   /** The Stripe PaymentIntent that charged this pledge */
   paymentIntentId: string
@@ -274,7 +274,7 @@ export async function createGuestPledge(input: CreateGuestPledgeInput) {
       tip_amount: input.tipAmount ?? 0,
       display_name: input.displayName?.trim() || null,
       is_anonymous: input.isAnonymous ?? false,
-      guest_book_display: input.guestBookDisplay ?? "pick",
+      guest_book_display: input.hideAmount ? "none" : "pick",
       message: input.message?.trim().slice(0, 100) || null,
       payment_intent_id: input.paymentIntentId,
     })
@@ -585,6 +585,8 @@ export async function pledgeFromFund(input: {
   potId: string
   totalAmount: number
   isAnonymous?: boolean
+  /** Short guest book message (100-char limit enforced client-side) */
+  message?: string | null
   allocations: PledgeAllocationInput[]
 }) {
   const { userId } = await auth()
@@ -614,6 +616,8 @@ export async function pledgeFromFund(input: {
       total_amount: input.totalAmount,
       fee: 0,
       is_anonymous: input.isAnonymous ?? false,
+      guest_book_display: "none",
+      message: input.message?.trim().slice(0, 100) || null,
     })
     .select("id")
     .single()
