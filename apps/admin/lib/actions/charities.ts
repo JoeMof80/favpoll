@@ -8,6 +8,7 @@ import {
   type RegisterSearchResult,
   type VerificationStatus,
   fetchRegisterContact,
+  fetchRegisterPurpose,
 } from "@/lib/charity-commission";
 
 /** Live search of the Register of Charities for the admin typeahead. */
@@ -103,9 +104,15 @@ export async function createCharity(input: {
   const name = input.name.trim();
   const registeredNumber = input.registered_number?.trim() || null;
 
-  const contact = registeredNumber
-    ? await fetchRegisterContact(registeredNumber)
-    : { email: null, website: null };
+  const [contact, purpose] = registeredNumber
+    ? await Promise.all([
+        fetchRegisterContact(registeredNumber),
+        fetchRegisterPurpose(registeredNumber),
+      ])
+    : [
+        { email: null, website: null },
+        { activities: null, classification: null },
+      ];
 
   const { error } = await supabase.from("charities").insert({
     name,
@@ -114,6 +121,8 @@ export async function createCharity(input: {
     registered_number: registeredNumber,
     registered_email: contact.email,
     registered_website: contact.website,
+    activities: purpose.activities,
+    classification: purpose.classification,
     logo_url: input.logo_url?.trim() || null,
     market: input.market,
     is_active: true,

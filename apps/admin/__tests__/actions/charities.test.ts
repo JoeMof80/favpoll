@@ -8,9 +8,13 @@ const mockVerify = vi.hoisted(() => vi.fn());
 const mockContact = vi.hoisted(() =>
   vi.fn().mockResolvedValue({ email: null, website: null }),
 );
+const mockPurpose = vi.hoisted(() =>
+  vi.fn().mockResolvedValue({ activities: null, classification: null }),
+);
 vi.mock("@/lib/charity-commission", () => ({
   verifyCharityNumber: mockVerify,
   fetchRegisterContact: mockContact,
+  fetchRegisterPurpose: mockPurpose,
 }));
 
 let mock = makeSupabaseMock();
