@@ -8,6 +8,12 @@ Scaffold a complete new topic entry in the **register-keyed placeholder model** 
 
 ## Before writing anything
 
+**Overlap gate — check this first.** `favpoll-topic-rules` forbids shipping
+overlapping altitudes: never run both a topic and a narrower slice of it
+(`Animal` + `Farm animal`, `Bird` + `Bird of prey`). If you cannot state the
+different question in one sentence — as `Sport to play` vs `Sport to watch` does
+— it is one topic, not two. Stop and pick one.
+
 Read the source files to understand current shapes exactly — do not guess:
 
 ```bash
@@ -38,34 +44,20 @@ Add one new entry to the exported object in the **least-populated**
 
 ```ts
 "<Title>": {
-  remembering: {
-    pronouns: "she" | "he" | "they",
-    about: "...",
-    reveal: "...",
-  },
-  celebrating_one: {
-    pronouns: "she" | "he" | "they",
-    about: "...",
-    reveal: "...",
-  },
-  celebrating_many: {
-    pronouns: "they",
-    about: "...",
-    reveal: "...",
-    group: "pair",    // "set" only for team-sport topics — default is always "pair"
-  },
-  cause: {
-    pronouns: "she" | "he" | "they",
-    about: "...",
-    reveal: "...",
-  },
-  neutral: {
-    pronouns: "she" | "he" | "they",
-    about: "...",
-    reveal: "...",
-  },
+  remembering: { about: "...", reveal: "..." },
+  celebrating_one: { about: "...", reveal: "..." },
+  celebrating_many: { about: "...", reveal: "..." },
+  cause: { about: "...", reveal: "..." },
+  neutral: { about: "...", reveal: "..." },
 },
 ```
+
+**Entries carry `about` and `reveal` ONLY.** The batch type is
+`Record<Register, { about: string; reveal: string }>` — there is no `pronouns`
+field and no `group` field. `group` moved to `scripts/celebrating-many-groups.ts`,
+which holds the `"set"` overrides; everything else defaults to `"pair"`.
+
+Gender still matters in the PROSE (see below) — it is simply not a field.
 
 ### 2. Topic row (→ `scripts/seed.ts`)
 
@@ -80,23 +72,34 @@ Insert into the `topics` array in the appropriate finite / infinite section:
 },
 ```
 
-**Canonical categories:** `"Nature"`, `"Music"`, `"Film & TV"`, `"Food & Drink"`,
-`"Places"`, `"Sport"`, `"Literature"`, `"Everyday life"`, `"Childhood"`, `"Time"`
+**Canonical categories (11, as seeded — verify against seed.ts before using):**
+`"Animals"`, `"Books & Arts"`, `"Childhood"`, `"Everyday life"`, `"Film & TV"`,
+`"Food & Drink"`, `"Music"`, `"Nature"`, `"Places"`, `"Sport"`, `"Time"`
 
-### 3. Topic items (→ `scripts/seed.ts`) — finite topics only
+Note `"Animals"` and `"Books & Arts"` are live; there is no `"Literature"`.
 
-Insert into the `topicItems` array:
+### 3. Topic items (→ `scripts/seed.ts`) — every topic
+
+Insert into the `topicItems` object — it is
+`Record<string, string[]>`, a title keyed to a flat array of label strings:
 
 ```ts
-{
-  topicTitle: "<Title>",
-  items: [
-    { label: "...", display_order: 1, markets: ["en-GB"] },
-    { label: "...", display_order: 2, markets: ["en-GB"] },
-    // 8–15 items total; use display_order only for finite topics
-  ],
-},
+"<Title>": [
+  "First item",
+  "Second item",
+  // alphabetical unless a natural order exists
+],
 ```
+
+Ordering is alphabetical by default. For a topic with a natural order (months,
+days, planets), add a separate entry to `topicItemDisplayOrder`:
+
+```ts
+"<Title>": { "First item": 1, "Second item": 2 },
+```
+
+**Infinite topics get items too** — a strong curated starter set that guests
+extend. Items are not finite-only.
 
 ---
 
@@ -104,18 +107,20 @@ Insert into the `topicItems` array:
 
 ### No named protagonists
 
-Personas are written in third person with **no proper names**. The `pronouns` field is a
-**label** describing the fixed prose — it does not re-conjugate text at runtime.
+Personas are written in third person with **no proper names**. Gender lives in the
+prose alone — there is no `pronouns` field to set (see the entry shape above).
 
-| pronouns | prose voice                              |
-| -------- | ---------------------------------------- |
-| `"she"`  | "A woman who…", "She…", "Her…"           |
-| `"he"`   | "A man who…", "He…", "His…"              |
-| `"they"` | "Someone who…", "A couple who…", "They…" |
+| gender in the prose | how it reads                             |
+| ------------------- | ---------------------------------------- |
+| she                 | "A woman who…", "She…", "Her…"           |
+| he                  | "A man who…", "He…", "His…"              |
+| they                | "Someone who…", "A couple who…", "They…" |
 
-**Balance genders within a topic.** `remembering` and `celebrating_one` tend to opposite
-genders (if one is `"she"`, the other is `"he"`). `celebrating_many` always uses `"they"`.
-`cause` and `neutral` may use any, though `"they"` fits most naturally.
+**Balance genders within a topic.** `remembering` and `celebrating_one` take opposite
+genders. `celebrating_many` is always a couple or group ("they"). `cause` and `neutral`
+may use any, though "they" fits most naturally — and `cause` is faceless, so it takes
+the instruction form ("Pick the one you'd… and pledge what it's worth.") with the reveal
+opening "Our pick to start: …".
 
 ---
 
@@ -149,7 +154,7 @@ Rules:
   every New Year's Eve since 1987.") — describe the persona's _relationship_ to the
   item; **never fabricate quotes**.
 - One sentence. One concrete detail. Not a list, not generic praise.
-- `celebrating_many` (`group: "pair"`): write from the couple's shared perspective
+- `celebrating_many`: write from the couple's shared perspective
   ("They argue about it every time; they always end up ordering the same thing.").
 
 ---
@@ -169,28 +174,22 @@ Rules:
 ```ts
 "Cocktail": {
   remembering: {
-    pronouns: "she",
     about: "A woman who spent her working life in hotel bars and still judged any gathering by the quality of its drinks list. She had opinions about glassware, about ice, about the precise ratio of vermouth. She never ordered something she hadn't already decided on the way there.",
     reveal: "Hers was the Negroni. She made herself one every Friday evening for thirty years — the one ritual that belonged entirely to her.",
   },
   celebrating_one: {
-    pronouns: "he",
     about: "A man who treats cocktails as a serious subject. He has the books, holds opinions about dilution, and has been known to send back a poor Martini without apology. He is particular about his order and quietly baffled by people who aren't.",
     reveal: "His is the Old Fashioned. He has ordered one at every new bar he has ever visited, as a kind of baseline test.",
   },
   celebrating_many: {
-    pronouns: "they",
     about: "A couple who have been known to disagree about almost everything on a menu — except this. They have a standing order at their local and it hasn't shifted in years.",
     reveal: "Hers is the Aperol Spritz, and so is his — they both maintain it is strictly a summer drink, and they are correct.",
-    group: "pair",
   },
   cause: {
-    pronouns: "they",
     about: "A group that knows how to gather and how to mark a moment properly. Every event ends with the same round, and everyone arrives already knowing what's coming.",
     reveal: "Our pick to start: the Mojito — it has closed every fundraiser they have ever run.",
   },
   neutral: {
-    pronouns: "she",
     about: "Someone with a clear favourite — consistent, unhurried, and mildly impatient with menus that bury the classics. She hasn't wavered in years and doesn't intend to.",
     reveal: "Hers is the Daiquiri. She has ordered one at every occasion that called for a drink, and a fair number that didn't.",
   },
@@ -221,7 +220,7 @@ Rules:
    pnpm seed
    ```
 
-   The seed is additive and idempotent. It imports all six batch files at startup
+   The seed is additive and idempotent. It imports all EIGHT batch files at startup
    (duplicate title → throws), creates the topic row, runs `applyAllPlaceholders()`
    (writes placeholders to DB by title), and `assertAllTopicsHavePlaceholders()` (verifies
    all 5 register keys are non-empty for every active topic). Fix any assertion errors
@@ -244,8 +243,8 @@ Rules:
 
 - [ ] Exactly 5 register keys in the placeholder entry (`remembering`, `celebrating_one`,
       `celebrating_many`, `cause`, `neutral`)
-- [ ] `celebrating_many` has `group: "pair"` (or `"set"` only for team-sport topics)
-- [ ] `celebrating_many` uses `pronouns: "they"`
+- [ ] `celebrating_many` prose reads as a couple ("A pair who…", "They…"); a GROUP
+      persona means adding the topic to `scripts/celebrating-many-groups.ts` instead
 - [ ] No proper names in any `about` prose
 - [ ] No charity references in any register
 - [ ] Every `reveal` names an item present in the topic's `topic_items`
