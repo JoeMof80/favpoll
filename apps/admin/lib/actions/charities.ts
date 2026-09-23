@@ -1,5 +1,7 @@
 "use server";
 
+import { CAUSE_FAMILIES, type CauseFamily } from "@favpoll/types";
+
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
@@ -293,6 +295,11 @@ export type ConsentQueueRow = {
   registered_email: string | null;
   consent_contacted_at: string | null;
   favpoll_count: number;
+  /** Cause family (references/favpoll-pairing-table §2): the confirmed
+   *  value, the model's suggestion, and the register text it came from. */
+  cause_family: CauseFamily | null;
+  cause_family_suggested: CauseFamily | null;
+  activities: string | null;
 };
 
 /** CONSENT OUTREACH QUEUE — pending charities in use on at least one
@@ -319,7 +326,7 @@ export async function getConsentQueue(): Promise<{
   const { data, error } = await supabase
     .from("charities")
     .select(
-      "id, name, registered_number, registered_email, consent_contacted_at",
+      "id, name, registered_number, registered_email, consent_contacted_at, cause_family, cause_family_suggested, activities",
     )
     .eq("consent_status", "pending")
     .in("id", [...counts.keys()])
@@ -353,6 +360,27 @@ export async function markCharityContacted(
 
   if (error) return { error: error.message };
 
+  revalidatePath("/charities");
+  return { error: null };
+}
+
+/** CAUSE FAMILY — the admin's confirmation (references/favpoll-pairing-table
+ * §2). `cause_family` is the ONLY family the generator reads; the model's
+ * `cause_family_suggested` is shown beside it and never used directly. null
+ * is a valid, honest answer: a grant-maker has no cause of its own. */
+export async function setCauseFamily(
+  id: string,
+  family: CauseFamily | null,
+): Promise<{ error: string | null }> {
+  if (family !== null && !CAUSE_FAMILIES.includes(family)) {
+    return { error: `Unknown cause family: ${family}` };
+  }
+  const supabase = createAdminClient();
+  const { error } = await supabase
+    .from("charities")
+    .update({ cause_family: family })
+    .eq("id", id);
+  if (error) return { error: error.message };
   revalidatePath("/charities");
   return { error: null };
 }

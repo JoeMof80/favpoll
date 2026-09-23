@@ -488,3 +488,38 @@ describe("setCharityConsent", () => {
     expect(error).toBe("update failed");
   });
 });
+
+// The cause family (references/favpoll-pairing-table §2). Confirmed here,
+// read by the generator only once confirmed.
+import { setCauseFamily } from "@/lib/actions/charities";
+
+describe("setCauseFamily", () => {
+  it("writes a confirmed family", async () => {
+    mock.queue(null); // update
+    const { error } = await setCauseFamily("charity-1", "homelessness");
+    expect(error).toBeNull();
+    const update = mock
+      .callsFor("charities")
+      .find((c) => c.method === "update");
+    expect(update?.args[0]).toEqual({ cause_family: "homelessness" });
+  });
+
+  it("clears to null — 'no cause of its own' is a real answer", async () => {
+    mock.queue(null);
+    const { error } = await setCauseFamily("charity-1", null);
+    expect(error).toBeNull();
+    const update = mock
+      .callsFor("charities")
+      .find((c) => c.method === "update");
+    expect(update?.args[0]).toEqual({ cause_family: null });
+  });
+
+  it("rejects a value that is not a family", async () => {
+    const { error } = await setCauseFamily(
+      "charity-1",
+      "puppies" as unknown as "animals",
+    );
+    expect(error).toBe("Unknown cause family: puppies");
+    expect(mock.callsFor("charities")).toHaveLength(0);
+  });
+});

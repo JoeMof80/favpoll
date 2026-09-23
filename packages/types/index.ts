@@ -7,6 +7,40 @@ export type User = {
   updated_at: string;
 };
 
+/** The cause families of references/favpoll-pairing-table §2 (2026-09-24).
+ *  A charity's family is what gives a favpoll its charity→topic and
+ *  occasion↔charity edges. Order = the dropdown order. */
+export const CAUSE_FAMILIES = [
+  "animals",
+  "children",
+  "older_people",
+  "end_of_life",
+  "health_condition",
+  "mental_health",
+  "homelessness",
+  "food_poverty",
+  "environment_heritage",
+  "sea_rescue",
+  "international",
+  "entertainment",
+] as const;
+export type CauseFamily = (typeof CAUSE_FAMILIES)[number];
+
+export const CAUSE_FAMILY_LABELS: Record<CauseFamily, string> = {
+  animals: "Animals",
+  children: "Children",
+  older_people: "Older people",
+  end_of_life: "End of life · dementia",
+  health_condition: "A health condition",
+  mental_health: "Mental health",
+  homelessness: "Homelessness",
+  food_poverty: "Food poverty",
+  environment_heritage: "Environment · heritage",
+  sea_rescue: "Sea · rescue",
+  international: "International",
+  entertainment: "Entertainment-led",
+};
+
 export type Charity = {
   id: string;
   name: string;
@@ -42,6 +76,12 @@ export type Charity = {
    *  Both null for charities without a registered number. */
   activities?: string | null;
   classification?: { what: string[]; who: string[]; how: string[] } | null;
+  /** Admin-CONFIRMED cause family — the only one the generator reads.
+   *  null = no cause of its own (a grant-maker), which is a valid answer. */
+  cause_family?: CauseFamily | null;
+  /** The model's guess from `activities`; shown to the admin, never read
+   *  by the generator. */
+  cause_family_suggested?: CauseFamily | null;
   created_at: string;
 };
 

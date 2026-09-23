@@ -5,8 +5,14 @@ import { Mail } from "lucide-react";
 import type { ConsentQueueRow } from "@/lib/actions/charities";
 import {
   markCharityContacted,
+  setCauseFamily,
   setCharityConsent,
 } from "@/lib/actions/charities";
+import {
+  CAUSE_FAMILIES,
+  CAUSE_FAMILY_LABELS,
+  type CauseFamily,
+} from "@favpoll/types";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 
@@ -63,6 +69,58 @@ function welcomeMailto(row: ConsentQueueRow): string {
   return `mailto:${encodeURIComponent(row.registered_email ?? "")}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
+// The cause family (references/favpoll-pairing-table §2) is confirmed
+// HERE, because this is the one moment an admin already has the charity in
+// front of them. The model's suggestion pre-selects; the register's own
+// `activities` text sits beneath so the admin can judge it. "No cause of
+// its own" is a real choice — grant-makers get it — not a missing value.
+function CauseFamilySelect({ row }: { row: ConsentQueueRow }) {
+  const [isPending, startTransition] = useTransition();
+  const [value, setValue] = useState<CauseFamily | "">(
+    row.cause_family ?? row.cause_family_suggested ?? "",
+  );
+  const confirmed = row.cause_family != null;
+  const suggested = !confirmed && row.cause_family_suggested != null;
+
+  function handleChange(next: CauseFamily | "") {
+    setValue(next);
+    startTransition(async () => {
+      await setCauseFamily(row.id, next === "" ? null : next);
+    });
+  }
+
+  return (
+    <div className="flex w-full flex-col gap-1">
+      <div className="flex items-center gap-2">
+        <label className="text-xs text-muted-foreground">Cause family</label>
+        <select
+          value={value}
+          disabled={isPending}
+          onChange={(e) => handleChange(e.target.value as CauseFamily | "")}
+          className="h-8 rounded-lg border border-border bg-background px-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+        >
+          <option value="">No cause of its own</option>
+          {CAUSE_FAMILIES.map((f) => (
+            <option key={f} value={f}>
+              {CAUSE_FAMILY_LABELS[f]}
+            </option>
+          ))}
+        </select>
+        {suggested && (
+          <StatusBadge tone="info">
+            suggested — confirm by changing or leaving
+          </StatusBadge>
+        )}
+      </div>
+      {row.activities && (
+        <p className="line-clamp-2 text-xs text-muted-foreground">
+          Register: {row.activities}
+        </p>
+      )}
+    </div>
+  );
+}
+
 function QueueRow({ row }: { row: ConsentQueueRow }) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -105,6 +163,8 @@ function QueueRow({ row }: { row: ConsentQueueRow }) {
           {new Date(row.consent_contacted_at).toLocaleDateString("en-GB")}
         </StatusBadge>
       )}
+
+      <CauseFamilySelect row={row} />
 
       <div className="flex items-center gap-2">
         <Button asChild size="sm" variant="outline" disabled={isPending}>

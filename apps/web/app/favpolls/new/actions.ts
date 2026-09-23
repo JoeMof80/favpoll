@@ -7,6 +7,7 @@ import {
   fetchRegisterContact,
   fetchRegisterPurpose,
 } from "@/lib/charity-commission"
+import { suggestCauseFamily } from "@/lib/cause-family"
 import type { Charity } from "@favpoll/types"
 
 type CustomTopic = {
@@ -420,6 +421,12 @@ export async function findOrCreateRegisterCharity(input: {
       registered_website: contact.website,
       activities: purpose.activities,
       classification: purpose.classification,
+      // A SUGGESTION only — the admin confirms it in the outreach queue.
+      cause_family_suggested: await suggestCauseFamily({
+        name,
+        activities: purpose.activities,
+        classification: purpose.classification,
+      }),
     })
     .select("*")
     .single()
