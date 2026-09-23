@@ -485,6 +485,64 @@ guinea pigs) — real, recent, and the motivation demonstrably reads.
 
 ---
 
+# THE PLAN (live — update in place, do not let it evaporate)
+
+| # | Item | State |
+|---|---|---|
+| 1 | Motivation line on the card | **REJECTED** by founder. Replaced by a selection rule: choose exemplars motivated from a source the card already carries (cause or occasion) |
+| 2 | Choose the exemplar set | **DONE** — see below |
+| 3 | Fix prod's existing favpolls | open, unblocked |
+| 4 | Seed the six exemplars to prod | open, needs `ALLOW_FAVPOLL_SEED=1` and founder go |
+| 5 | Link preview (`SITE_DESCRIPTION`) | in progress |
+| 6 | Surface one above the fold | gated behind a motivated favpoll existing |
+| 7 | Real favpolls for new occasions | parked — calendar-bound |
+| 8 | Cold-read test with Gemma | schedulable once any of 3–5 lands |
+
+## What prod actually holds (checked 2026-09-23)
+
+Prod has **zero exemplars**. Its six favpolls are hand-made, and four are already
+cause-motivated:
+
+| Favpoll | Topic | Charity | Motivated? |
+|---|---|---|---|
+| (cause) | Part of a roast dinner | Trussell Trust | yes — food bank |
+| Stanley | Dog breed | Dogs Trust | yes |
+| Mary Jones | Animal | Nature Warriors | yes |
+| Ben's Channel Swim | Comfort food | RNLI | yes — occasion |
+| Mary Jones | Fairground ride | Rescue Kitties | **no** |
+| Joan & Arthur | Seaside town | Alzheimer's Society | **no** |
+
+**The demo shown to Yvette and Gemma was the weakest pairing on the platform** —
+and it is live and listed on the public shelf. The topic was never the problem:
+`Seaside town` + RNLI is instantly motivated. The charity pairing was.
+
+## The exemplar set (item 2)
+
+One per register, each motivated from a source the card already carries:
+
+| Register | Occasion | Topic | Charity | Why it reads |
+|---|---|---|---|---|
+| `remembering` | a life that loved music | `Song` | Alzheimer's Society | cause-aligned — music is the last thing to go |
+| `celebrating_one` | a retirement | `Way to spend Sunday` | any | occasion-aligned — Sundays are his now |
+| `celebrating_many` | a wedding | `Cake` | Shelter | occasion-aligned — wedding cake |
+| `cause` | a channel swim | `Seaside town` | RNLI | cause + occasion — swim, sea rescue, coast |
+
+Seasonal, ready for November: **Christmas party · `Christmas song`** — annual,
+occasion-aligned, feeds the record.
+
+## Caution: motivation is not the whole answer
+
+Motivation answers *why this topic*. Gary asked *why a poll at all* — which is
+the payoff question, not the fit question. The demo choice explains Yvette and
+Gemma (they were shown the weakest example); it does NOT explain Gary, who
+arrived cold via the home page and still did not get it, even though four of the
+six favpolls on the shelf are motivated.
+
+Do not let "the demo was bad" become "the site is fine". Both stages need work:
+motivation sells the pledge, payoff rewards it.
+
+---
+
 ## Sources
 
 - Home page composition — `apps/web/app/page.tsx`
