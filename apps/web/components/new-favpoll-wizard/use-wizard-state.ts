@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { STEPS, STEP_LABELS, type WizardStep } from "@/lib/wizard-copy"
 import { createFavpoll, uploadPersonPhoto } from "@/app/favpolls/new/actions"
+import { toast } from "sonner"
+import { TOAST_ERROR_STYLE } from "@/lib/toast-styles"
 import { updateFavpoll } from "@/app/favpolls/[id]/edit/actions"
 import type { FavpollLocks } from "@/lib/favpoll-locks"
 import {
@@ -510,7 +512,18 @@ export function useWizardState(
         displayName: name.trim() || null,
         skipCache: hasGeneratedRef.current,
       })
-      if (!result) return
+      if ("error" in result) {
+        // Say something true instead of failing silently. The old code
+        // returned here with no toast, so a failed Generate was
+        // indistinguishable from a dead button (founder, 2026-09-23).
+        toast.error(
+          result.error === "rate_limit"
+            ? "That's a lot of examples — try again in a few minutes."
+            : "Couldn't generate an example just now. Try again in a moment.",
+          { style: TOAST_ERROR_STYLE }
+        )
+        return
+      }
       hasGeneratedRef.current = true
       setAbout(result.about)
       setNote(result.note)

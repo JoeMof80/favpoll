@@ -6,6 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import type { FavpollGrouping, Pronoun, Register } from "@favpoll/types"
 import {
   checkRateLimit,
+  RateLimitError,
   incrementRateLimitCount,
   revealNamesRealItem,
   hasFabricatedStats,
@@ -189,7 +190,13 @@ async function callLLMWithCopyCheck(
   prompt: string,
   modelId: string
 ): Promise<DraftFields> {
-  const first = await callLLM(prompt, modelId)
+  // The FIRST call used to be unguarded, so one bad response killed the
+  // whole generation and the organiser saw nothing (founder, 2026-09-23).
+  const first = await callLLM(prompt, modelId).catch(() => null)
+  if (!first) {
+    const rescue = await callLLM(prompt, modelId)
+    return rescue
+  }
   if (!violatesCopyRules(`${first.about} ${first.reveal}`)) return first
   const retry = await callLLM(prompt, modelId).catch(() => null)
   return retry && !violatesCopyRules(`${retry.about} ${retry.reveal}`)
@@ -201,8 +208,18 @@ async function callLLM(prompt: string, modelId: string): Promise<DraftFields> {
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
   const message = await client.messages.create({
     model: modelId,
-    // headroom for models that emit a thinking block before the text
-    max_tokens: 512,
+    // NOT a budget — max_tokens is a CEILING, not a spend, so a high value
+    // costs nothing extra; only generated tokens are billed. 512 was two
+    // orders under the documented ~16000 default for non-streaming calls,
+    // and it broke generation outright: prod runs claude-sonnet-5 (its
+    // LLM_MODEL_ID is unset), where OMITTING `thinking` runs ADAPTIVE
+    // thinking by default. The thinking block alone spent 700–2000 tokens,
+    // the JSON was cut mid-object, the `{…}` match found nothing and the
+    // whole generation threw — the organiser just saw a dead button.
+    // Measured 2026-09-23 against a real favpoll: 0/3 parsed at 512,
+    // 4/5 at 2048, 5/5 at 16000. Dev never saw it — .env.local pins
+    // claude-haiku-4-5, which does no adaptive thinking.
+    max_tokens: 16000,
     messages: [{ role: "user", content: prompt }],
   })
   // The text block is not always content[0] — newer models may lead with
@@ -213,7 +230,12 @@ async function callLLM(prompt: string, modelId: string): Promise<DraftFields> {
   )
   const text = textBlock?.text.trim() ?? ""
   const raw = text.startsWith("{") ? text : (text.match(/\{[\s\S]*\}/) ?? [])[0]
-  if (!raw) throw new Error("LLM returned non-JSON response")
+  if (!raw)
+    throw new Error(
+      message.stop_reason === "max_tokens"
+        ? "LLM response truncated at max_tokens before the JSON closed"
+        : "LLM returned non-JSON response"
+    )
   const parsed = JSON.parse(raw) as DraftFields
   if (!parsed.about || !parsed.reveal)
     throw new Error("LLM response missing about or reveal")
@@ -447,17 +469,32 @@ export async function generateDraft(
 // Safe wrapper — never throws; callers receive null on any failure
 // ---------------------------------------------------------------------------
 
+/** Why a generation failed, so the UI can say something true. */
+export type GenerateDraftFailure = { error: "rate_limit" | "failed" }
+
+/**
+ * Never throws across the server-action boundary — Next replaces thrown
+ * error messages with an opaque digest in production, so the reason has to
+ * travel as a RETURN value or it is lost.
+ *
+ * This used to return plain `null` and the wizard dropped it on the floor:
+ * a failed Generate looked identical to nothing happening, with no toast
+ * and no message (founder hit exactly this, 2026-09-23).
+ */
 export async function safeGenerateDraft(
   input: GenerateDraftInput
-): Promise<GeneratedDraftResult | null> {
+): Promise<GeneratedDraftResult | GenerateDraftFailure> {
   try {
     return await generateDraft(input)
   } catch (err) {
+    const rateLimited =
+      err instanceof RateLimitError ||
+      (err instanceof Error && err.name === "RateLimitError")
     console.error(
       "generateDraft failed, using fallback:",
       err instanceof Error ? err.message : String(err)
     )
-    return null
+    return { error: rateLimited ? "rate_limit" : "failed" }
   }
 }
 

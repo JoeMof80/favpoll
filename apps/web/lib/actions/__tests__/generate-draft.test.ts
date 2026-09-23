@@ -577,10 +577,12 @@ describe("rate limiting", () => {
 // ---------------------------------------------------------------------------
 
 describe("safeGenerateDraft", () => {
-  it("returns null and logs when LLM call throws", async () => {
+  it("reports failed when the LLM call throws on both attempts", async () => {
     mock.queue(null) // cache miss
     mock.queue(TOPIC_DATA) // topics
-    mockMessagesCreate.mockRejectedValueOnce(new Error("API key missing"))
+    // Rejected for BOTH attempts: a single bad response is now retried
+    // once before giving up (2026-09-23), so one rejection is survivable.
+    mockMessagesCreate.mockRejectedValue(new Error("API key missing"))
 
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
 
@@ -590,7 +592,7 @@ describe("safeGenerateDraft", () => {
       topicId: "topic-1",
     })
 
-    expect(result).toBeNull()
+    expect(result).toEqual({ error: "failed" })
     expect(consoleSpy).toHaveBeenCalledWith(
       expect.stringContaining("generateDraft failed, using fallback:"),
       "API key missing"
@@ -609,7 +611,7 @@ describe("safeGenerateDraft", () => {
       topicId: "topic-1",
     })
 
-    expect(result).toBeNull()
+    expect(result).toEqual({ error: "failed" })
     expect(consoleSpy).toHaveBeenCalledWith(
       expect.stringContaining("generateDraft failed, using fallback:"),
       expect.any(String)
@@ -617,7 +619,7 @@ describe("safeGenerateDraft", () => {
     consoleSpy.mockRestore()
   })
 
-  it("returns null when rate limit is exceeded", async () => {
+  it("reports rate_limit when the rate limit is exceeded", async () => {
     for (let i = 0; i < RATE_LIMIT_MAX; i++) {
       mock.queue(null)
       mock.queue(TOPIC_DATA)
@@ -638,7 +640,7 @@ describe("safeGenerateDraft", () => {
       topicId: "topic-1",
     })
 
-    expect(result).toBeNull()
+    expect(result).toEqual({ error: "rate_limit" })
     expect(consoleSpy).toHaveBeenCalledWith(
       expect.stringContaining("generateDraft failed, using fallback:"),
       expect.any(String)
@@ -658,9 +660,10 @@ describe("safeGenerateDraft", () => {
       topicId: "topic-1",
     })
 
-    expect(result).not.toBeNull()
-    expect(result?.about).toBe("About.")
-    expect(result?.note).toBe("Her favourite was always Blue.")
-    expect(result?.fromCache).toBe(false)
+    expect(result).not.toHaveProperty("error")
+    if ("error" in result) throw new Error("expected a draft, got a failure")
+    expect(result.about).toBe("About.")
+    expect(result.note).toBe("Her favourite was always Blue.")
+    expect(result.fromCache).toBe(false)
   })
 })
