@@ -343,6 +343,148 @@ framing question per topic, not a budget.
 
 ---
 
+# Front-loaded vs back-loaded (founder, 2026-09-23)
+
+> "Party themes are good for marketing because the pay-off is front loaded."
+
+This reframes the payoff taxonomy rather than extending it. Sort the payoffs by
+WHEN the guest receives them:
+
+| Payoff | Guest receives it | Visible to a stranger? |
+|---|---|---|
+| Topic fit | **before pledging** | **yes** |
+| Note | after pledging | no |
+| Enactment | later, at the event | no |
+| Standings, guest book, record | after pledging | no |
+
+**Every payoff the site currently has is back-loaded.** A cold visitor cannot see
+any of them, so they meet a mechanism with no visible reason — which is exactly
+what Gary reported, and what Yvette hit until the note rescued it.
+
+## The guinea pigs generalise it beyond themes
+
+> "Yvette's daughter just turned 6 and her gift was guinea pigs. 'Favourite
+> animal' or 'Favourite Pet' could have been a suitable favpoll topic for her
+> party (although the party had no theme this year)."
+
+That party had **no theme**, so what makes `Animal` work there is not decoration.
+It is that every guest already knows she just got guinea pigs. The topic is
+motivated by a *known fact about the protagonist*.
+
+Theme fit was one instance of something wider:
+
+> **A topic is motivated when guests can already see why it was chosen.**
+
+Four sources, all front-loaded, none needing a note or an enactment:
+
+1. **The theme** — dinosaur party → `Dinosaur`
+2. **A known fact about the person** — she just got guinea pigs → `Animal`
+3. **The occasion itself** — Christmas party → `Christmas song`
+4. **The cause** — a dogs' charity → `Dog breed`
+
+And it is precisely what Joan & Arthur lacks: fictional people, and nothing
+anywhere saying why *seaside towns*. Yvette had nothing to hold until the note
+arrived, because there was nothing to hold.
+
+## Two stages, not one
+
+- **Motivation sells the pledge** — front-loaded, pre-pledge, does comprehension
+- **Payoff rewards it** — back-loaded, post-pledge, does satisfaction
+
+Both are needed and they are not interchangeable. The site is currently all
+second stage. That is the diagnosis, compressed.
+
+Caution against overcorrecting: motivation gets a favpoll *understood*, not
+*felt*. A motivated favpoll with no note still leans on the mild back-loaded
+rewards. Front-loading fixes comprehension; it does not replace the gift.
+
+## The selection rule
+
+Every exemplar — demo, landing page, anything sent to a friend — should be one
+where **the motivation is visible before the pledge button**.
+
+Testable: show it cold. If the first question is "why this topic?", the exemplar
+failed, not the product. The guinea-pig favpoll passes instantly; Joan & Arthur
+does not.
+
+## The structural gap this exposes
+
+Checked 2026-09-23: **no favpoll card has anywhere to say why the topic was
+chosen.** `opening_line` is the register eyebrow ("In memory of", "Birthday").
+The shelf card renders eyebrow · name · topic · charities · raised. The
+motivation lives in the `about` text, which the card never shows.
+
+So a perfectly motivated favpoll still looks arbitrary on the shelf, and the
+home page's own inventory of real favpolls cannot demonstrate fit. Any plan to
+put a front-loaded exemplar on the home page has to solve this first — otherwise
+the exemplar arrives stripped of the very thing that makes it work.
+
+---
+
+# Solving it on the home page — where this landed (2026-09-23)
+
+## The card gets no motivation line
+
+Founder: "I don't like the idea of adding the line to FavpollSummaryCard."
+Agreed, and it matters less than first argued. Of the four motivation sources,
+**two are already legible on the card as built**:
+
+| Source | Visible on the card today? |
+|---|---|
+| **The cause** — dogs' charity → `Dog breed` | **Yes** — the charity band sits directly under the topic |
+| **The occasion** — Christmas party → `Christmas song` | **Yes** — the topic says it by itself |
+| The theme — dinosaur party → `Dinosaur` | No |
+| A known fact — guinea pigs → `Animal` | No |
+
+`FAVOURITE DOG BREED` above `Dogs Trust` needs no explanatory line. So the fix is
+not a new field — it is **choosing exemplars from the two sources the existing
+card already carries**. No schema change, no fourth card element.
+
+Note the eyebrow could not have carried it anyway: `favpollEyebrow()` prefers
+`category` ("Birthday"), with `opening_line` only a fallback.
+
+The guinea-pig case stays a page-level story, told in the About. Cards tease;
+pages explain.
+
+## Why exemplars cannot simply be opened
+
+Exemplars (`favpolls.is_exemplar`, seeded by `scripts/seed-exemplars.ts`) are
+**fictional** — Belinda does not exist. Today they are CLOSED, so they cannot
+take money, and the "Example" badge says they are samples. Those two facts are
+what keep the fiction honest.
+
+Give them an open date AND remove the badge, and a fictional person accepts real
+pledges to a real charity, presented as a genuine favpoll. On prod that is live
+Stripe. Keep either guard and the problem goes away.
+
+Founder clarified the objection is to the badge's **style**, not the concept —
+so the guard stays and the styling is a separate, small job.
+
+## The conclusion
+
+**The home page needs REAL favpolls whose topic is cause- or occasion-motivated.**
+The exemplar machinery is the wrong tool for it: exemplars exist to be samples in
+the wizard's "see favpolls like this" door, where the surrounding context already
+frames them.
+
+A real favpoll for a real occasion needs no badge, is genuinely open, takes
+honest pledges, and reaches the home shelf (`OpenRightNow`) by itself.
+
+## PARKED — a strategy for creating real favpolls
+
+Founder, 2026-09-23: "We need a strategy for creating real favpolls, but that
+isn't something we can do right now."
+
+Not a code task. It needs real occasions, real organisers and real guests. When
+it resumes, the selection rule is the one above: the motivation must be visible
+before the pledge button, and on the card that means cause-motivated or
+occasion-motivated topics.
+
+First candidate already identified: Yvette's daughter's birthday (`Animal`,
+guinea pigs) — real, recent, and the motivation demonstrably reads.
+
+---
+
 ## Sources
 
 - Home page composition — `apps/web/app/page.tsx`
