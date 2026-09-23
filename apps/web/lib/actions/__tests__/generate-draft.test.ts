@@ -726,3 +726,69 @@ describe("protagonist naming — entity guard and possessives", () => {
     expect(promptOf()).toContain("James' is")
   })
 })
+
+// A register-added charity arrives with no description. The prompt used to
+// pass the bare name and the model guessed what the charity does — an
+// invented cause on a charity platform (found 2026-09-23: seven such
+// charities on prod). With no purpose data the charity is named, and the
+// prompt says so in terms the model cannot miss.
+describe("charity with no description — the prompt must not invite a guess", () => {
+  const promptOf = () =>
+    mockMessagesCreate.mock.calls[0][0].messages[0].content as string
+
+  it("names the charity and forbids characterising its work", async () => {
+    mock.queue(null) // cache miss
+    mock.queue(TOPIC_DATA) // topics
+    mock.queue({ name: "MAC Bevan Charitable Trust", description: null })
+    mockLLMResponse("About.", "Her favourite was always Blue.")
+    mock.queue(null) // insert
+
+    await generateDraft({
+      register: "celebrating_one",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+    })
+    const prompt = promptOf()
+    expect(prompt).toContain("MAC Bevan Charitable Trust")
+    expect(prompt).toContain(
+      "NOTHING is known here about what this charity does"
+    )
+    expect(prompt).toContain("not even from its name")
+  })
+
+  it("passes the description through unchanged when there is one", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mock.queue(CHARITY_DATA)
+    mockLLMResponse("About.", "Her favourite was always Blue.")
+    mock.queue(null)
+
+    await generateDraft({
+      register: "celebrating_one",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+    })
+    const prompt = promptOf()
+    expect(prompt).toContain("Ocean Trust — We protect marine ecosystems")
+    expect(prompt).not.toContain("NOTHING is known here")
+  })
+
+  it("tells the cause branch the 'raising for' must come from the cause name alone", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mock.queue({ name: "MAC Bevan Charitable Trust", description: null })
+    mockLLMResponse("About.", "Our pick to start: Blue — a warm clause.")
+    mock.queue(null)
+
+    await generateDraft({
+      register: "cause",
+      subject: "cause",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      displayName: "Warm Plates This Winter",
+    })
+    expect(promptOf()).toContain("taken from the cause name above only")
+  })
+})
