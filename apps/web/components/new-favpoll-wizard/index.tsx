@@ -1,5 +1,7 @@
 "use client"
 
+import { lockReason } from "@/lib/favpoll-locks"
+
 import { Info, Search } from "lucide-react"
 
 import { useState, useMemo } from "react"
@@ -260,7 +262,9 @@ export function NewFavpollWizard({
                         lockedReason={
                           w.appeal
                             ? `Locked — part of ${w.appeal.name}.`
-                            : "Locked — guests have already pledged."
+                            : w.locks
+                              ? lockReason(w.locks, "charity")
+                              : "Locked — guests have already pledged."
                         }
                       />
                     ) : (

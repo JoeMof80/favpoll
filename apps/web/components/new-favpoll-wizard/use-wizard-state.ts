@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation"
 import { STEPS, STEP_LABELS, type WizardStep } from "@/lib/wizard-copy"
 import { createFavpoll, uploadPersonPhoto } from "@/app/favpolls/new/actions"
 import { updateFavpoll } from "@/app/favpolls/[id]/edit/actions"
+import type { FavpollLocks } from "@/lib/favpoll-locks"
 import {
   safeGenerateDraft,
   getCachedDraftGhosts,
@@ -45,8 +46,9 @@ export type WizardEditConfig = {
   favpollId: string
   protagonistId: string | null
   existingPollId: string | null
-  /** True once any pledge or shared-fund top-up exists. */
-  locked: boolean
+  /** Per-field locks — see lib/favpoll-locks. The topic frees up when the
+   *  only money is someone else's unspent pot top-up. */
+  locks: FavpollLocks
   initialClosesAt: string | null
   initial: {
     category: FavpollCategory | null
@@ -257,11 +259,11 @@ export function useWizardState(
   // Money has moved: Event, Charity and Topic are read-only (Phase 2
   // locking; the server enforces the same rule in updateFavpoll).
   const stepLocked: Record<WizardStep, boolean> = {
-    event: !!edit?.locked,
+    event: !!edit?.locks.event,
     // The appeal's charity is the appeal's whole meaning — locked from
     // birth (server enforces in create/updateFavpoll).
-    charity: !!edit?.locked || !!appeal,
-    topic: !!edit?.locked,
+    charity: !!edit?.locks.charity || !!appeal,
+    topic: !!edit?.locks.topic,
     info: false,
     story: false,
     details: false,
@@ -742,6 +744,7 @@ export function useWizardState(
     isEdit,
     appeal: appeal ?? null,
     stepLocked,
+    locks: edit?.locks ?? null,
     railSummary,
     railDone,
     generating,

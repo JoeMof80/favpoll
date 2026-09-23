@@ -2,6 +2,7 @@
 
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { favpollLocks, readLockInputs } from "@/lib/favpoll-locks"
 import type { CanvasSubmitData } from "@favpoll/types"
 
 type PollInput = CanvasSubmitData["poll"]
@@ -268,23 +269,16 @@ export async function updateFavpoll(
     .eq("favpoll_id", favpollId)
     .maybeSingle()
 
-  let moneyMoved = false
-  if (currentPollRow) {
-    const { count } = await supabase
-      .from("pledges")
-      .select("id", { count: "exact", head: true })
-      .eq("favpoll_poll_id", currentPollRow.id)
-    moneyMoved = (count ?? 0) > 0
-  }
-  if (!moneyMoved) {
-    const { data: pot } = await supabase
-      .from("favpoll_pots")
-      .select("total_deposited")
-      .eq("favpoll_id", favpollId)
-      .maybeSingle()
-    moneyMoved = (pot?.total_deposited ?? 0) > 0
-  }
-  if (moneyMoved) {
+  const locks = favpollLocks(
+    await readLockInputs(
+      supabase,
+      favpollId,
+      currentPollRow?.id ?? null,
+      favpoll.created_by ?? null
+    )
+  )
+
+  if (locks.charity || locks.topic) {
     const currentCharities = (favpoll.favpoll_charities ?? [])
       .map((c: { charity_id: string }) => c.charity_id)
       .sort()
@@ -293,20 +287,26 @@ export async function updateFavpoll(
     const topicChanged = currentPollRow
       ? currentPollRow.topic_id !== (input.poll.topicId || null)
       : false
-    if (
+    const identityChanged =
       (favpoll.category ?? null) !== (input.category ?? null) ||
       // The who axis is structural too (audit, 2026-09-06): subject
       // flips someone<->cause, grouping rewrites is_plural — both
       // change the identity guests pledged on.
       (favpoll.subject ?? null) !== (input.subject ?? null) ||
-      (favpoll.grouping ?? null) !== (input.grouping ?? null) ||
-      currentCharities !== nextCharities ||
-      topicChanged
-    ) {
+      (favpoll.grouping ?? null) !== (input.grouping ?? null)
+
+    if (locks.topic && topicChanged)
+      throw new Error("The topic is locked once guests have pledged.")
+
+    if (
+      locks.charity &&
+      (identityChanged || currentCharities !== nextCharities)
+    )
       throw new Error(
-        "The event, charity and topic are locked once guests have pledged."
+        locks.topic
+          ? "The event and charity are locked once guests have pledged."
+          : "The event and charity are locked once the shared pot has money in it."
       )
-    }
   }
 
   // Appeal membership guards (concept, 2026-09-05): the charity is the
@@ -334,9 +334,13 @@ export async function updateFavpoll(
   // Shortening is a deal change once money is in (audit, 2026-09-06):
   // guests pledged against the published close. Extensions stay policed
   // by the block below; bringing the date forward is refused outright.
-  if (moneyMoved && new Date(newClosesAt) < currentClosesAt) {
+  // locks.charity, not "any money": someone gave against the published
+  // close only if that someone was not the organiser.
+  if (locks.charity && new Date(newClosesAt) < currentClosesAt) {
     throw new Error(
-      "The close date can't be brought forward once guests have pledged."
+      locks.topic
+        ? "The close date can't be brought forward once guests have pledged."
+        : "The close date can't be brought forward once the shared pot has money in it."
     )
   }
 
