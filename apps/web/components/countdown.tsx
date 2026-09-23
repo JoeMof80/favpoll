@@ -5,22 +5,22 @@ import type { FavpollCardSize } from "@/components/favpoll-card/types"
 
 // Four, matching the live maximum below. Keep this in step with the
 // inline `parts` or the card reflows the moment the countdown mounts.
-// The trailing seconds is the MINOR unit — see `minor` below.
-type Part = { value?: number; label: string; minor?: boolean }
+// The trailing seconds takes half a column — see `columns` below.
+type Part = { value?: number; label: string; half?: boolean }
 
 const PLACEHOLDER_PARTS: readonly Part[] = [
   { label: "days" },
   { label: "hrs" },
   { label: "min" },
-  { label: "sec", minor: true },
+  { label: "sec", half: true },
 ]
 
-// The MINOR unit takes half a column, and its figure steps down to the
-// label's size (founder, 2026-09-23). Both halves matter: a 0.5fr track
-// alone does nothing, because an fr track's minimum is min-content, so
-// the column simply refuses to shrink below the figure it holds.
+// The seconds unit gets HALF A COLUMN (founder, 2026-09-23). Every
+// figure keeps its full size. Note that an fr track's minimum is
+// min-content, so this track will not shrink below the figure it holds:
+// it asks for half and settles for whatever the number needs.
 const columns = (parts: readonly Part[]) =>
-  parts.map((p) => (p.minor ? "0.5fr" : "1fr")).join(" ")
+  parts.map((p) => (p.half ? "0.5fr" : "1fr")).join(" ")
 
 type Props = {
   closesAt?: string
@@ -80,7 +80,7 @@ export function Countdown({
             className="grid items-baseline gap-x-3"
             style={{ gridTemplateColumns: columns(PLACEHOLDER_PARTS) }}
           >
-            {PLACEHOLDER_PARTS.map(({ label, minor }, i) => (
+            {PLACEHOLDER_PARTS.map(({ label }, i) => (
               <span
                 key={label}
                 className={`tabular-nums ${
@@ -88,7 +88,7 @@ export function Countdown({
                 }`}
               >
                 <span
-                  className={`${minor ? inlineLabelClass : inlineValueClass} leading-none font-medium text-muted-foreground`}
+                  className={`${inlineValueClass} leading-none font-medium text-muted-foreground`}
                 >
                   --
                 </span>
@@ -113,8 +113,8 @@ export function Countdown({
         </p>
         <div className="flex items-end justify-between">
           {/* The stacked variant keeps the three-unit rule, so it drops
-              the inline row's trailing minor seconds. */}
-          {PLACEHOLDER_PARTS.filter((part) => !part.minor).map(({ label }) => (
+              the inline row's trailing half-column seconds. */}
+          {PLACEHOLDER_PARTS.filter((part) => !part.half).map(({ label }) => (
             <div key={label} className="text-center">
               <p
                 className={`${valueClass} leading-none font-medium text-muted-foreground tabular-nums`}
@@ -202,17 +202,16 @@ export function Countdown({
 
   if (variant === "inline") {
     // Seconds ride along even while days remain (founder, 2026-09-23,
-    // revising the 2026-09-14 three-unit rule for this card) — as the
-    // MINOR unit, which is what makes a fourth fit where four equal
-    // units wrapped. `parts` itself is untouched, so the stacked variant
+    // revising the 2026-09-14 three-unit rule for this card), taking
+    // half a column. `parts` itself is untouched, so the stacked variant
     // keeps three.
     //
-    // Only this appended copy is minor. Once the days unit drops away
-    // seconds become the last-day drama, so they arrive through `parts`
-    // at full size, exactly as before.
+    // Only this appended copy takes a half column. Once the days unit
+    // drops away seconds become the last-day drama and arrive through
+    // `parts` as a full unit, exactly as before.
     const inlineParts: Part[] =
       days > 0
-        ? [...parts, { value: seconds, label: "sec", minor: true }]
+        ? [...parts, { value: seconds, label: "sec", half: true }]
         : parts
     const inlineValueClass =
       size === "lg" ? "text-3xl" : size === "md" ? "text-2xl" : "text-xl"
@@ -237,7 +236,7 @@ export function Countdown({
           // for a restless accessible name.
           aria-label={`${days} days ${hours} hours ${minutes} minutes remaining`}
         >
-          {inlineParts.map(({ value, label, minor }, i) => (
+          {inlineParts.map(({ value, label }, i) => (
             <span
               key={label}
               className={`tabular-nums ${
@@ -247,7 +246,7 @@ export function Countdown({
               }`}
             >
               <span
-                className={`${minor ? inlineLabelClass : inlineValueClass} leading-none font-medium text-foreground`}
+                className={`${inlineValueClass} leading-none font-medium text-foreground`}
               >
                 {String(value).padStart(2, "0")}
               </span>
