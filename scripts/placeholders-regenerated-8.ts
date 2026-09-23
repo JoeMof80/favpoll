@@ -223,4 +223,236 @@ export const regeneratedPlaceholdersBatch8: Record<
       reveal: "Theirs is a katsu curry. The youngest of the classics.",
     },
   },
+  "Halloween costume": {
+    remembering: {
+      about:
+        "Halloween was the one night she planned for properly, weeks out, and never off a shelf.",
+      reveal:
+        "Hers was the witch. Same hat every year, and it got better every year.",
+    },
+    celebrating_one: {
+      about:
+        "One costume, eleven years running. The children stopped finding it funny some time ago; he did not.",
+      reveal:
+        "His is the skeleton. The suit no longer fits and that has changed nothing.",
+    },
+    celebrating_many: {
+      about:
+        "A couple who commit to a joint costume every year and refuse to explain it to anyone who doesn't get it on sight.",
+      reveal:
+        "Hers is the vampire, his is the werewolf. They have been arguing about who would win since 2014.",
+    },
+    cause: {
+      about:
+        "Pick the costume you come back to and pledge what it's worth.",
+      reveal:
+        "Our pick to start: the ghost — the one everybody has worn at least once.",
+    },
+    neutral: {
+      about:
+        "Everyone has one they fall back on when the invitation says fancy dress and the night is closing in.",
+      reveal:
+        "Theirs is the zombie. Minimal effort, total commitment to the shuffle.",
+    },
+  },
+  Superhero: {
+    remembering: {
+      about:
+        "She read them before the films existed and had firm views about which ones the films got wrong.",
+      reveal: "Hers was Wonder Woman. She had the annuals, and she kept them.",
+    },
+    celebrating_one: {
+      about:
+        "He can date every film in the canon and will tell you which of them are actually about grief.",
+      reveal:
+        "His is Spider-Man. The one who never quite gets his own life sorted out.",
+    },
+    celebrating_many: {
+      about:
+        "A couple divided along a line drawn in childhood and never once crossed.",
+      reveal:
+        "Hers is Batman, his is Superman. Neither has moved an inch in twenty years.",
+    },
+    cause: {
+      about: "Pick the one you'd want turning up and pledge what it's worth.",
+      reveal:
+        "Our pick to start: the Hulk — the least subtle and the most reliable.",
+    },
+    neutral: {
+      about: "Everyone has one they'd want on their side when it came to it.",
+      reveal: "Theirs is Black Panther. Arrived late, settled the argument.",
+    },
+  },
+  Pirate: {
+    remembering: {
+      about:
+        "He read the books aloud doing all the voices, and the voices did not improve with age.",
+      reveal: "His was Long John Silver. The charm was the point, he said.",
+    },
+    celebrating_one: {
+      about:
+        "She has been to every exhibition, knows which ones were real, and is quietly annoyed by the films.",
+      reveal:
+        "Hers is Anne Bonny. Real, and better than any of the invented ones.",
+    },
+    celebrating_many: {
+      about:
+        "A pair who have argued about whether the historical ones count since a wet holiday in Cornwall.",
+      reveal:
+        "Hers is Grace O'Malley, his is Blackbeard. The argument is the tradition now.",
+    },
+    cause: {
+      about: "Pick the one you'd sail with and pledge what it's worth.",
+      reveal:
+        "Our pick to start: Captain Hook — the one everybody met first.",
+    },
+    neutral: {
+      about:
+        "Everyone met one first, usually before they could read, and it tends to stick.",
+      reveal: "Theirs is Jack Sparrow. No defence offered, none required.",
+    },
+  },
+  Planet: {
+    remembering: {
+      about:
+        "She kept a telescope by the back door and knew which nights were worth the cold.",
+      reveal: "Hers was Saturn. Worth the cold every time, she said.",
+    },
+    celebrating_one: {
+      about:
+        "He had the poster on the ceiling and can still recite the order without pausing.",
+      reveal:
+        "His is Mars. He intends to live long enough to see somebody walk on it.",
+    },
+    celebrating_many: {
+      about:
+        "A couple who took a child to a planetarium and came out more excited than the child.",
+      reveal:
+        "Theirs is Jupiter — the storm that has been running for four hundred years.",
+    },
+    cause: {
+      about: "Pick the one you'd visit first and pledge what it's worth.",
+      reveal:
+        "Our pick to start: Earth — still the only one that has ever worked.",
+    },
+    neutral: {
+      about:
+        "Somewhere around the age of seven most people settled this and never revisited it.",
+      reveal: "Theirs is Neptune. Furthest, bluest, least bothered.",
+    },
+  },
+  "Circus act": {
+    remembering: {
+      about:
+        "She went every year it came to the common and could tell you which acts had changed.",
+      reveal:
+        "Hers was the trapeze artist. She watched the hands, never the feet.",
+    },
+    celebrating_one: {
+      about:
+        "He claims not to enjoy it and has never once missed a performance.",
+      reveal:
+        "His is the fire eater. He maintains this is a legitimate career.",
+    },
+    celebrating_many: {
+      about:
+        "A couple who disagree entirely about which part is worth the ticket.",
+      reveal: "Hers is the acrobats, his is the clowns. They sit together anyway.",
+    },
+    cause: {
+      about:
+        "Pick the act you'd wait through the rest for and pledge what it's worth.",
+      reveal:
+        "Our pick to start: the ringmaster — the one holding it all together.",
+    },
+    neutral: {
+      about: "There is always one act people stop talking through.",
+      reveal:
+        "Theirs is the tightrope walker. Nobody breathes; that is the point.",
+    },
+  },
+  "Wild West character": {
+    remembering: {
+      about:
+        "Sunday afternoons were westerns, and he knew which ones were based on anything at all.",
+      reveal:
+        "His was Wyatt Earp. He would tell you the film got the timings wrong.",
+    },
+    celebrating_one: {
+      about:
+        "She can separate the real ones from the invented ones and enjoys doing it out loud.",
+      reveal: "Hers is Annie Oakley. Real, and a better shot than any of them.",
+    },
+    celebrating_many: {
+      about:
+        "A couple who watch the same films every Christmas and still argue about who was in the right.",
+      reveal: "Hers is Calamity Jane, his is Butch Cassidy. Neither concedes.",
+    },
+    cause: {
+      about: "Pick the one you'd ride with and pledge what it's worth.",
+      reveal: "Our pick to start: Billy the Kid — the one the songs kept.",
+    },
+    neutral: {
+      about: "Most people have one from a film they only half remember.",
+      reveal: "Theirs is the Lone Ranger. The mask did most of the work.",
+    },
+  },
+  "Farm animal": {
+    remembering: {
+      about:
+        "She grew up on one and never lost the habit of getting up while it was still dark.",
+      reveal:
+        "Hers was the sheepdog. She said it was the only one doing a proper job.",
+    },
+    celebrating_one: {
+      about:
+        "He talks about keeping a smallholding the way other people talk about holidays.",
+      reveal:
+        "His is the pig. Cleverer than the dog, he insists, and he is not wrong.",
+    },
+    celebrating_many: {
+      about:
+        "A pair who stop the car at every field and have never once been in a hurry.",
+      reveal:
+        "Theirs is the horse — the only one either of them has ever managed to ride.",
+    },
+    cause: {
+      about: "Pick the one you'd keep and pledge what it's worth.",
+      reveal:
+        "Our pick to start: the cow — patient, enormous, entirely unbothered.",
+    },
+    neutral: {
+      about: "Everyone has one they'd choose if the field were theirs.",
+      reveal: "Theirs is the goat. Chaos, and they know it.",
+    },
+  },
+  "Safari animal": {
+    remembering: {
+      about:
+        "He watched every wildlife series ever made and could name the narrator by the second sentence.",
+      reveal:
+        "His was the elephant. He said they remembered things we had forgotten how to.",
+    },
+    celebrating_one: {
+      about:
+        "She saved for the trip for eleven years and talks about the morning light more than the animals.",
+      reveal:
+        "Hers is the giraffe. Ridiculous, she says, and completely serious about it.",
+    },
+    celebrating_many: {
+      about:
+        "A couple who booked it for a significant birthday and came back quieter than they went.",
+      reveal:
+        "Theirs is the lion — heard before seen, which neither had expected.",
+    },
+    cause: {
+      about: "Pick the one you'd cross a continent for and pledge what it's worth.",
+      reveal:
+        "Our pick to start: the zebra — no two the same, which nobody quite believes.",
+    },
+    neutral: {
+      about: "There is usually one from a photograph nobody quite got over.",
+      reveal: "Theirs is the cheetah. Built entirely for one thing.",
+    },
+  },
 }
