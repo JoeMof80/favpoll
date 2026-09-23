@@ -522,7 +522,7 @@ describe("useWizardState — edit mode (Phase 2)", () => {
     favpollId: "f9",
     protagonistId: "p9",
     existingPollId: "poll9",
-    locked: false,
+    locks: { event: false, charity: false, topic: false },
     initialClosesAt: "2026-10-01T22:59:00.000Z",
     initial: {
       category: "memorial" as const,
@@ -589,7 +589,10 @@ describe("useWizardState — edit mode (Phase 2)", () => {
 
   it("locked marks event, charity and topic only", () => {
     const { result } = renderHook(() =>
-      useWizardState(DATA, { ...EDIT, locked: true })
+      useWizardState(DATA, {
+        ...EDIT,
+        locks: { event: true, charity: true, topic: true },
+      })
     )
     expect(result.current.stepLocked.event).toBe(true)
     expect(result.current.stepLocked.charity).toBe(true)

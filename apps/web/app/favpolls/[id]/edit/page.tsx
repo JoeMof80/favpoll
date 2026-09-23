@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { NewFavpollWizard } from "@/components/new-favpoll-wizard"
 import { consentPosture } from "@/lib/charity-consent"
+import { favpollLocks, readLockInputs } from "@/lib/favpoll-locks"
 import type { WizardEditConfig } from "@/components/new-favpoll-wizard/use-wizard-state"
 import { getWizardData } from "@/app/favpolls/new/wizard-data"
 import type {
@@ -42,29 +43,28 @@ export default async function EditFavpollPage({ params }: Props) {
   // Settled favpolls are records — no edit surface (audit, 2026-09-06).
   if (favpoll.closed_at) redirect(`/favpolls/${id}/manage`)
 
-  const [data, { data: rawPoll }, { data: pot }] = await Promise.all([
+  // The pot is read inside readLockInputs now — it needs total_allocated
+  // and the top-up ledger, not just total_deposited.
+  const [data, { data: rawPoll }] = await Promise.all([
     getWizardData(),
     supabase
       .from("favpoll_polls")
       .select("*")
       .eq("favpoll_id", id)
       .maybeSingle(),
-    supabase
-      .from("favpoll_pots")
-      .select("total_deposited")
-      .eq("favpoll_id", id)
-      .maybeSingle(),
   ])
 
-  let pledgeCount = 0
-  if (rawPoll?.id) {
-    const { count } = await supabase
-      .from("pledges")
-      .select("id", { count: "exact", head: true })
-      .eq("favpoll_poll_id", rawPoll.id)
-    pledgeCount = count ?? 0
-  }
-  const locked = pledgeCount > 0 || (pot?.total_deposited ?? 0) > 0
+  // Per-field locks (2026-09-23) — see lib/favpoll-locks. The old rule was
+  // `pledges > 0 || deposited > 0`, which locked everything on any money and
+  // then told the organiser "guests have already pledged" when none had.
+  const locks = favpollLocks(
+    await readLockInputs(
+      supabase,
+      id,
+      rawPoll?.id ?? null,
+      favpoll.created_by ?? null
+    )
+  )
 
   // Register-added charities sit is_active=false until approved (the
   // consent gate's catalogue lever) and getWizardData filters those out —
@@ -134,7 +134,7 @@ export default async function EditFavpollPage({ params }: Props) {
     favpollId: id,
     protagonistId: favpoll.protagonist_id ?? null,
     existingPollId: rawPoll?.id ?? null,
-    locked,
+    locks,
     initialClosesAt: favpoll.closes_at ?? null,
     initial: {
       category,
