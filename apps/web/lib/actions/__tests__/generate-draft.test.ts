@@ -577,10 +577,12 @@ describe("rate limiting", () => {
 // ---------------------------------------------------------------------------
 
 describe("safeGenerateDraft", () => {
-  it("returns null and logs when LLM call throws", async () => {
+  it("reports failed when the LLM call throws on both attempts", async () => {
     mock.queue(null) // cache miss
     mock.queue(TOPIC_DATA) // topics
-    mockMessagesCreate.mockRejectedValueOnce(new Error("API key missing"))
+    // Rejected for BOTH attempts: a single bad response is now retried
+    // once before giving up (2026-09-23), so one rejection is survivable.
+    mockMessagesCreate.mockRejectedValue(new Error("API key missing"))
 
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
 
