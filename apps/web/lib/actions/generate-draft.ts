@@ -6,6 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import type { FavpollGrouping, Pronoun, Register } from "@favpoll/types"
 import {
   checkRateLimit,
+  RateLimitError,
   incrementRateLimitCount,
   revealNamesRealItem,
   hasFabricatedStats,
@@ -447,17 +448,32 @@ export async function generateDraft(
 // Safe wrapper — never throws; callers receive null on any failure
 // ---------------------------------------------------------------------------
 
+/** Why a generation failed, so the UI can say something true. */
+export type GenerateDraftFailure = { error: "rate_limit" | "failed" }
+
+/**
+ * Never throws across the server-action boundary — Next replaces thrown
+ * error messages with an opaque digest in production, so the reason has to
+ * travel as a RETURN value or it is lost.
+ *
+ * This used to return plain `null` and the wizard dropped it on the floor:
+ * a failed Generate looked identical to nothing happening, with no toast
+ * and no message (founder hit exactly this, 2026-09-23).
+ */
 export async function safeGenerateDraft(
   input: GenerateDraftInput
-): Promise<GeneratedDraftResult | null> {
+): Promise<GeneratedDraftResult | GenerateDraftFailure> {
   try {
     return await generateDraft(input)
   } catch (err) {
+    const rateLimited =
+      err instanceof RateLimitError ||
+      (err instanceof Error && err.name === "RateLimitError")
     console.error(
       "generateDraft failed, using fallback:",
       err instanceof Error ? err.message : String(err)
     )
-    return null
+    return { error: rateLimited ? "rate_limit" : "failed" }
   }
 }
 
