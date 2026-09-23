@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import {
   verifyCharityNumber,
   fetchRegisterContact,
+  fetchRegisterPurpose,
 } from "@/lib/charity-commission"
 import type { Charity } from "@favpoll/types"
 
@@ -397,7 +398,12 @@ export async function findOrCreateRegisterCharity(input: {
     throw new Error("That charity isn't currently on the register")
   }
 
-  const contact = await fetchRegisterContact(number)
+  const [contact, purpose] = await Promise.all([
+    fetchRegisterContact(number),
+    // What the charity is FOR — the generator's purpose signal, since a
+    // register-added charity has no description (2026-09-23).
+    fetchRegisterPurpose(number),
+  ])
 
   const { data: created, error } = await supabase
     .from("charities")
@@ -412,6 +418,8 @@ export async function findOrCreateRegisterCharity(input: {
       verified_at: new Date().toISOString(),
       registered_email: contact.email,
       registered_website: contact.website,
+      activities: purpose.activities,
+      classification: purpose.classification,
     })
     .select("*")
     .single()

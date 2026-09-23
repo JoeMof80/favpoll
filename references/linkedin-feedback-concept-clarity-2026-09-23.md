@@ -101,6 +101,91 @@ referent, and the question may stop being asked once it is back.
 
 ---
 
+# Gary, round two — the controlled test (2026-09-23, evening)
+
+The founder explained the mechanic in chat, then gave three examples. The
+sequence is the finding:
+
+| Gary saw | Result |
+|---|---|
+| The home page | "what is the vote poll thing about?" |
+| An explanation of the mechanic | an **allocative** model: church hall, three options, "£100 for the roof and £50 for the boiler" — the pick directs the money |
+| **Three scenarios** | "Got it" |
+
+Explanation failed; examples worked. The reference file's central claim,
+demonstrated on the reader who had already failed twice.
+
+## The allocative misread is the dangerous one
+
+Gary's third wrong category (after gambling and survey) is *participatory
+budgeting* — the pick decides where the money goes. It is the crowdfunding
+model the brand doc explicitly excludes, and it is a **reasonable reading of
+the headline**: "Give what it's worth" — worth to *what*? Pick X, give £100,
+and the plain inference is that £100 funds X.
+
+Not a rewrite proposal (2026-08-06 copy is settled). A flag: that line may be
+manufacturing this specific misread. Cold-read the line alone.
+
+The founder's own correction was six words: **"All the money goes to the
+hospice."** That is the invariant the header lacks.
+
+## The three examples ARE the taxonomy
+
+| Example | Payoff | Motivation |
+|---|---|---|
+| A hospice names a therapy dog | enactment | cause — a triad |
+| Granny's wake, flowers, "I really loved daffodils" | the note | occasion — Flower is a ★ constituent of a wake |
+| Halloween party, horror films, Haemophilia Society | theme | theme, with a blood joke for E3 |
+
+One per payoff, one per register, each legible in a sentence, each naming a
+person or a room. Written in eight minutes. And the sentence that landed it —
+*"fundraising with a bit of interaction"* — is plainer than anything on the
+site.
+
+## On the header
+
+> "It's difficult capturing the essence of all the use cases in the header of
+> the homepage though."
+
+The evidence says stop trying. A header that captures all use cases is the
+one that failed; three scenarios succeeded. The header's job is the **one
+invariant** that kills the allocative misread — whatever you pick, all the
+money goes to the charity — and the register cards carry the scenarios.
+
+---
+
+# Yvette, round two — the example must be relevant to the reader (2026-09-23, evening)
+
+The founder went back to the reader who had called Joan & Arthur "pointless"
+and named the fault himself: *"It was a bad example wasn't it… When I show
+people, I should show them an example that is relevant to them."* Then gave
+her one built for her — *"Annette's birthday party and the topic is favourite
+pet"* (her daughter, the guinea pigs) — and: *"The payoff is front loaded so
+you get the point straight away."* Yvette: "Yes."
+
+Two things this adds:
+
+**1. Relevance is a third selection rule, alongside legibility and
+resonance.** Not just "is the motivation visible?" but "is it visible *to this
+reader*?" A guinea-pig birthday landed with the mother of a six-year-old who
+just got guinea pigs. The same example would do less for Gary.
+
+**2. The audience picks the exemplar set — Yvette's own point.** *"If you're
+going for hospices to start with, the memorial and fundraising examples are
+more relevant."* That is go-to-market, not copy: the exemplars shown to a
+segment should be the ones that segment recognises. The hospice pilot
+(appeals concept, 2026-09-05) wants memorial + fundraising triads, not a
+birthday.
+
+So exemplars are now chosen on three axes — **legible** (edges on the card),
+**resonant** (the story adds the person), **relevant** (to who is looking) —
+and the third is decided per surface *and per segment*.
+
+Also noted: the founder is now explaining the product to cold readers in the
+taxonomy's own words ("the payoff is front loaded"), and it works.
+
+---
+
 # The payoff taxonomy
 
 If the poll is "just an arbitrary way to donate to charity", it has no point.
