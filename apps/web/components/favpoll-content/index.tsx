@@ -347,10 +347,10 @@ export function FavpollContent({
         <img
           src={organiser.avatarUrl}
           alt={organiser.name}
-          className="size-8 shrink-0 rounded-full object-cover"
+          className="size-8 shrink-0 rounded object-cover"
         />
       ) : (
-        <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary">
+        <div className="flex size-8 shrink-0 items-center justify-center rounded bg-primary/10 text-xs font-medium text-primary">
           {organiser.name.charAt(0).toUpperCase()}
         </div>
       )}

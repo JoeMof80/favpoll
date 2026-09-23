@@ -30,17 +30,17 @@ export function AccountMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label="Account menu"
-        className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="rounded outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         {user.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element -- Clerk-hosted avatar, unknown remote host
           <img
             src={user.imageUrl}
             alt=""
-            className="size-8 rounded-full border border-border"
+            className="size-8 rounded border border-border"
           />
         ) : (
-          <span className="flex size-8 items-center justify-center rounded-full bg-secondary text-sm font-medium text-secondary-foreground">
+          <span className="flex size-8 items-center justify-center rounded bg-secondary text-sm font-medium text-secondary-foreground">
             {initial}
           </span>
         )}

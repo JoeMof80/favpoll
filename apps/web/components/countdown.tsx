@@ -3,8 +3,24 @@
 import { useEffect, useState } from "react"
 import type { FavpollCardSize } from "@/components/favpoll-card/types"
 
-// Three, matching the live maximum below — four wrapped at 3-digit days
-const PLACEHOLDER_PARTS = ["days", "hrs", "min"] as const
+// Four, matching the live maximum below. Keep this in step with the
+// inline `parts` or the card reflows the moment the countdown mounts.
+// The trailing seconds takes half a column — see `columns` below.
+type Part = { value?: number; label: string; half?: boolean }
+
+const PLACEHOLDER_PARTS: readonly Part[] = [
+  { label: "days" },
+  { label: "hrs" },
+  { label: "min" },
+  { label: "sec", half: true },
+]
+
+// The seconds unit gets HALF A COLUMN (founder, 2026-09-23). Every
+// figure keeps its full size. Note that an fr track's minimum is
+// min-content, so this track will not shrink below the figure it holds:
+// it asks for half and settles for whatever the number needs.
+const columns = (parts: readonly Part[]) =>
+  parts.map((p) => (p.half ? "0.5fr" : "1fr")).join(" ")
 
 type Props = {
   closesAt?: string
@@ -60,9 +76,17 @@ export function Countdown({
           >
             Poll closes in
           </p>
-          <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-            {PLACEHOLDER_PARTS.map((label) => (
-              <span key={label} className="tabular-nums">
+          <div
+            className="grid items-baseline gap-x-3"
+            style={{ gridTemplateColumns: columns(PLACEHOLDER_PARTS) }}
+          >
+            {PLACEHOLDER_PARTS.map(({ label }, i) => (
+              <span
+                key={label}
+                className={`tabular-nums ${
+                  i === PLACEHOLDER_PARTS.length - 1 ? "text-right" : ""
+                }`}
+              >
                 <span
                   className={`${inlineValueClass} leading-none font-medium text-muted-foreground`}
                 >
@@ -88,7 +112,9 @@ export function Countdown({
           Poll closes in
         </p>
         <div className="flex items-end justify-between">
-          {PLACEHOLDER_PARTS.map((label) => (
+          {/* The stacked variant keeps the three-unit rule, so it drops
+              the inline row's trailing half-column seconds. */}
+          {PLACEHOLDER_PARTS.filter((part) => !part.half).map(({ label }) => (
             <div key={label} className="text-center">
               <p
                 className={`${valueClass} leading-none font-medium text-muted-foreground tabular-nums`}
@@ -175,6 +201,18 @@ export function Countdown({
           ]
 
   if (variant === "inline") {
+    // Seconds ride along even while days remain (founder, 2026-09-23,
+    // revising the 2026-09-14 three-unit rule for this card), taking
+    // half a column. `parts` itself is untouched, so the stacked variant
+    // keeps three.
+    //
+    // Only this appended copy takes a half column. Once the days unit
+    // drops away seconds become the last-day drama and arrive through
+    // `parts` as a full unit, exactly as before.
+    const inlineParts: Part[] =
+      days > 0
+        ? [...parts, { value: seconds, label: "sec", half: true }]
+        : parts
     const inlineValueClass =
       size === "lg" ? "text-3xl" : size === "md" ? "text-2xl" : "text-xl"
     const inlineLabelClass =
@@ -189,11 +227,24 @@ export function Countdown({
           Poll closes in
         </p>
         <div
-          className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1"
+          className="grid items-baseline gap-x-3"
+          style={{
+            gridTemplateColumns: columns(inlineParts),
+          }}
+          // Seconds stay OUT of the label: aria-live is off, so this is
+          // read on demand, and a value that changes every second makes
+          // for a restless accessible name.
           aria-label={`${days} days ${hours} hours ${minutes} minutes remaining`}
         >
-          {parts.map(({ value, label }) => (
-            <span key={label} className="tabular-nums">
+          {inlineParts.map(({ value, label }, i) => (
+            <span
+              key={label}
+              className={`tabular-nums ${
+                // Last column hugs the right edge, so the row still spans
+                // the card the way justify-between used to.
+                i === inlineParts.length - 1 ? "text-right" : ""
+              }`}
+            >
               <span
                 className={`${inlineValueClass} leading-none font-medium text-foreground`}
               >
