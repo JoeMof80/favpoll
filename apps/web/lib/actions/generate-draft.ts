@@ -44,6 +44,11 @@ function firstNames(displayName: string): string {
 }
 
 function possessive(name: string): string {
+  // Already possessive — leave it. firstNames() returns one whenever the
+  // protagonist is named after an event ("Ben's Channel Swim" -> "Ben's"),
+  // and the bare endsWith("s") rule then produced "Ben's'"
+  // (founder-caught, 2026-09-23). The s-rule is still right for "James".
+  if (/['\u2019]s?$/.test(name)) return name
   return name.endsWith("s") ? `${name}'` : `${name}'s`
 }
 
@@ -134,9 +139,17 @@ ${charityLine}`
     const nameHint = namePoss
       ? `\nThe protagonist is called "${displayName}". In the about, use pronouns — EXCEPT the reveal promise, which names them once: end the invitation with a clause like "and ${namePoss} will be revealed" or "and we'll reveal ${namePoss}". The reveal opener below already contains the name — never repeat it beyond these two places.`
       : ""
-    const entityGuard = displayName
-      ? ` EXCEPTION: if "${displayName}" is clearly not an individual person (an appeal, fund, organisation, or event), there is no protagonist — open with "Theirs is" instead and keep the about free of personal pronouns.`
-      : ""
+    // An explicitly chosen he/she is the organiser SAYING there is a
+    // person, and it outranks any guess made from the name's shape. The
+    // guard used to win regardless, so a favpoll named after its event
+    // ("Ben's Channel Swim") got "Theirs is …" with ♂ selected
+    // (founder-caught, 2026-09-23). It still earns its place for
+    // "they"/unset, which is the genuine appeal/fund/organisation case.
+    const namedPerson = pronoun === "he" || pronoun === "she"
+    const entityGuard =
+      displayName && !namedPerson
+        ? ` EXCEPTION: if "${displayName}" is clearly not an individual person (an appeal, fund, organisation, or event), there is no protagonist — open with "Theirs is" instead and keep the about free of personal pronouns.`
+        : ""
     // A memorial's tense is the whole register: the opener's "was" is
     // computed above, but the model also wrote "has loved" and "still
     // reaches for it" until told the rule applies to EVERY sentence

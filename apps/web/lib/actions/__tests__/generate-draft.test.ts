@@ -667,3 +667,62 @@ describe("safeGenerateDraft", () => {
     expect(result.fromCache).toBe(false)
   })
 })
+
+// An organiser who picks ♂/♀ is SAYING there is a person. That outranks any
+// guess made from the name's shape — a favpoll named after its event
+// ("Ben's Channel Swim") was getting "Theirs is …" with ♂ selected, and the
+// already-possessive first word was doubling up to "Ben's'"
+// (founder-caught on prod, 2026-09-23).
+describe("protagonist naming — entity guard and possessives", () => {
+  const input = {
+    register: "cause" as const,
+    subject: "someone" as const,
+    topicId: "topic-1",
+    displayName: "Ben's Channel Swim",
+  }
+  const promptOf = () =>
+    mockMessagesCreate.mock.calls[0][0].messages[0].content as string
+
+  it("stands the entity guard down when a gendered pronoun is chosen", async () => {
+    mock.queue(null) // cache miss
+    mock.queue(TOPIC_DATA) // topics
+    mockLLMResponse("About.", "Ben's is Blue.")
+    mock.queue(null) // insert
+
+    await generateDraft({ ...input, pronoun: "he" })
+    expect(promptOf()).not.toContain("EXCEPTION: if")
+    expect(promptOf()).toContain('Use "he" pronouns')
+  })
+
+  it("keeps the guard for they/unset — the real appeal-or-fund case", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mockLLMResponse("About.", "Theirs is Blue.")
+    mock.queue(null)
+
+    await generateDraft({ ...input, pronoun: "they" })
+    expect(promptOf()).toContain("EXCEPTION: if")
+  })
+
+  it("never doubles an already-possessive name into Ben's'", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mockLLMResponse("About.", "Ben's is Blue.")
+    mock.queue(null)
+
+    await generateDraft({ ...input, pronoun: "he" })
+    const prompt = promptOf()
+    expect(prompt).not.toContain("Ben's'")
+    expect(prompt).toContain("Ben's is")
+  })
+
+  it("still uses the bare apostrophe for a name ending in s", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mockLLMResponse("About.", "James' is Blue.")
+    mock.queue(null)
+
+    await generateDraft({ ...input, displayName: "James Holt", pronoun: "he" })
+    expect(promptOf()).toContain("James' is")
+  })
+})
