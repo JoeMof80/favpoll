@@ -7,7 +7,7 @@
  *
  * Exemplars are written to be outgrown by genuine favpolls; don't over-seed.
  * Each has a vivid About (teases topic domain; never states the favourite),
- * populated pledge data so results render, and personal_reveal set.
+ * populated pledge data so results render, and personal_note set.
  *
  * Run order:  pnpm seed   (reference data)   →   this script (exemplars).
  *
@@ -28,6 +28,7 @@
  * ---------------------------------------------------------------------------
  */
 
+import { randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -62,7 +63,7 @@ if (!isStaging && !allowOverride) {
  *
  * About rule: tease the topic domain, weave in why-of-the-charity if
  * appropriate — but NEVER state the specific favourite. That is reserved for
- * personal_reveal. About → reveal is escalation (domain → specific).
+ * personal_note. About → reveal is escalation (domain → specific).
  */
 const EXEMPLARS = [
   {
@@ -75,7 +76,7 @@ const EXEMPLARS = [
       "A beloved mother, teacher, and friend who spent her life bringing people together. Her home was full of deliberate colour — every room had a story, and the shade she always came back to said more about her than most words could. Marie Curie nurses were with her at the end, and she would have wanted them remembered here.",
     topicTitle: "Colour",
     charityName: "Marie Curie",
-    personal_reveal:
+    personal_note:
       "Cornflower blue. She kept a pot of cornflowers on the windowsill every summer.",
     pledgeAmounts: [20, 15, 10, 10, 5, 5, 5, 3, 3, 2],
     closedDaysAgo: 45,
@@ -90,7 +91,7 @@ const EXEMPLARS = [
       "Sarah is forty and has never met a biscuit she didn't take seriously. She has strong opinions and is not afraid to share them, which is part of why everyone is here. She supports the RNLI because she grew up near the coast and means it.",
     topicTitle: "Biscuit",
     charityName: "RNLI",
-    personal_reveal:
+    personal_note:
       "The Bourbon. She once ate four packets in one sitting, and she has no regrets.",
     pledgeAmounts: [10, 10, 10, 5, 5, 5, 3, 3],
     closedDaysAgo: 20,
@@ -105,7 +106,7 @@ const EXEMPLARS = [
       "After thirty-five years building the engineering team from four people to four hundred, David is finally putting down his laptop. He has a shortlist of places he's never had time to actually go to — and now he does. His charity of choice looks after the hearts of people who worked as hard as he did.",
     topicTitle: "Place",
     charityName: "British Heart Foundation",
-    personal_reveal:
+    personal_note:
       "The Dordogne. He kept a photo of it on his desk for thirty years.",
     pledgeAmounts: [50, 20, 20, 10, 10, 5, 5, 5],
     closedDaysAgo: 30,
@@ -120,7 +121,7 @@ const EXEMPLARS = [
       "Emma and James met at a rainy music festival in 2019 and haven't been apart since. Music runs through everything they do together. They asked for pledges to Shelter in lieu of gifts — because a roof over your head matters, and they wanted to share the good fortune.",
     topicTitle: "Song",
     charityName: "Shelter",
-    personal_reveal:
+    personal_note:
       "Fields of Gold. It played at their first dance and neither of them planned it.",
     pledgeAmounts: [50, 50, 25, 25, 20, 10, 10, 10, 5, 5],
     closedDaysAgo: 14,
@@ -135,7 +136,7 @@ const EXEMPLARS = [
       "Marcus just ran his first marathon — raising over £4,000 for Macmillan along the way. He trained for eight months, mostly in the dark, mostly in the rain. He has thoughts about comfort food that got him through the long runs, and now is the time to share them.",
     topicTitle: "Comfort food",
     charityName: "Macmillan Cancer Support",
-    personal_reveal:
+    personal_note:
       "Shepherd's pie. He made a batch every Sunday from September, and it got him to the start line.",
     pledgeAmounts: [20, 20, 10, 10, 10, 5, 5, 3],
     closedDaysAgo: 10,
@@ -150,7 +151,7 @@ const EXEMPLARS = [
       "This poll raises money for Oxfam in memory of the Hargreaves family, who believed in practical acts of generosity. Pick the film that best captures what they stood for. The one with the most pledges will be screened at the memorial event.",
     topicTitle: "Film",
     charityName: "Oxfam",
-    personal_reveal:
+    personal_note:
       "It's a Wonderful Life. They watched it every Christmas Eve without fail.",
     pledgeAmounts: [30, 20, 15, 15, 10, 5],
     closedDaysAgo: 60,
@@ -287,6 +288,7 @@ async function main() {
   const charityByName = new Map((charities ?? []).map((c) => [c.name, c]));
 
   let created = 0;
+  let totalPledges = 0;
 
   for (const ex of EXEMPLARS) {
     const isCause = ex.register === "cause";
@@ -398,11 +400,20 @@ async function main() {
     });
 
     // 4. Favpoll pot (mandatory — every favpoll must have one)
-    await supabase.from("favpoll_pots").insert({
+    // Columns are created_by / total_deposited / total_allocated — the old
+    // { amount, currency } shape silently inserted NOTHING, so every seeded
+    // exemplar was missing the pot the product treats as mandatory
+    // (verified on staging 2026-09-23: 6 exemplars, 0 pots).
+    const { error: potError } = await supabase.from("favpoll_pots").insert({
       favpoll_id: favpoll.id,
-      amount: 0,
-      currency: "gbp",
+      created_by: SEED_USER_ID,
+      total_deposited: 0,
+      total_allocated: 0,
     });
+    if (potError) {
+      console.error(`  ✗  pot insert failed for ${ex.name}:`, potError.message);
+      continue;
+    }
 
     // 5. Favpoll poll
     const { data: favpollPoll, error: pollError } = await supabase
@@ -410,7 +421,7 @@ async function main() {
       .insert({
         favpoll_id: favpoll.id,
         topic_id: topic.id,
-        personal_reveal: ex.personal_reveal,
+        personal_note: ex.personal_note,
       })
       .select("id")
       .single();
@@ -440,6 +451,7 @@ async function main() {
 
     // 7. Pledge allocations (simulated pledges to show results)
     const pledgeAmounts = ex.pledgeAmounts;
+    let pledgesWritten = 0;
     const itemsForAlloc =
       isFinite && favourites.length > 0 ? favourites : favourites.slice(0, 5); // fallback for infinite
 
@@ -461,35 +473,66 @@ async function main() {
         );
         const item = itemsForAlloc[itemIndex];
 
-        const { data: pledge } = await supabase
+        // The money column is total_amount; `currency` and `status` do not
+        // exist on pledges. The old shape failed on EVERY row and the error
+        // was swallowed by `if (pledge)`, so exemplars claimed a
+        // total_raised with no pledges behind it and rendered no standings
+        // at all — the one thing they exist to show.
+        const { data: pledge, error: pledgeError } = await supabase
           .from("pledges")
           .insert({
             favpoll_poll_id: favpollPoll.id,
-            guest_token: `exemplar-${favpoll.id}-${i}`,
-            amount,
-            currency: "gbp",
-            status: "succeeded",
+            // guest_token is a uuid column — the old `exemplar-<id>-<n>`
+            // string was rejected outright.
+            guest_token: randomUUID(),
+            // pledges_identity_check: clerk_user_id OR guest_email must be
+            // set. .invalid is reserved by RFC 2606 and cannot resolve, so a
+            // fictional pledge can never reach a real inbox. Unique per
+            // pledge — the guest identity model allows one active pledge per
+            // email per poll.
+            guest_email: `exemplar-${i}@example.invalid`,
+            total_amount: amount,
+            is_anonymous: true,
           })
           .select("id")
           .single();
 
-        if (pledge) {
-          await supabase.from("pledge_allocations").insert({
+        if (pledgeError || !pledge) {
+          console.error(
+            `  ✗  pledge insert failed for ${ex.name}:`,
+            pledgeError?.message,
+          );
+          continue;
+        }
+
+        const { error: allocError } = await supabase
+          .from("pledge_allocations")
+          .insert({
             pledge_id: pledge.id,
             favourite_id: item.id,
             amount,
           });
+        if (allocError) {
+          console.error(
+            `  ✗  allocation insert failed for ${ex.name}:`,
+            allocError.message,
+          );
+        } else {
+          pledgesWritten++;
         }
       }
     }
 
     console.log(
-      `  ✓  ${ex.name} (${ex.register} / ${ex.occasionType ?? "—"} / ${ex.topicTitle})`,
+      `  ✓  ${ex.name} (${ex.register} / ${ex.occasionType ?? "—"} / ${ex.topicTitle}) — ${pledgesWritten}/${pledgeAmounts.length} pledges`,
     );
     created++;
+    totalPledges += pledgesWritten;
   }
 
-  console.log(`\n✅  Done — ${created} exemplar(s) created.`);
+  console.log(
+    `\n✅  Done — ${created} exemplar(s) created, ${totalPledges} pledge(s) written.`,
+  );
 }
 
 main().catch((err) => {
