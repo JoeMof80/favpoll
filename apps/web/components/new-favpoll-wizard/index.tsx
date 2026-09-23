@@ -204,14 +204,19 @@ export function NewFavpollWizard({
   }
 
   // Money has moved: the step keeps its summary but takes no changes.
-  const lockedBody = (value: string) => (
+  const lockedBody = (value: string, reason: string) => (
     <div className="space-y-2 text-sm">
       <p className="text-base font-medium">{value || "—"}</p>
-      <p className="text-muted-foreground">
-        Locked — guests have already pledged.
-      </p>
+      <p className="text-muted-foreground">{reason}</p>
     </div>
   )
+
+  // The reason depends on WHY the step locked — a pot top-up by someone
+  // other than the organiser locks event/charity without anyone pledging.
+  const reasonFor = (step: "topic" | "charity") =>
+    w.locks
+      ? lockReason(w.locks, step)
+      : "Locked — guests have already pledged."
 
   return (
     <RegisterScope palette={palette}>
@@ -244,7 +249,7 @@ export function NewFavpollWizard({
                         disabled
                       />
                       <p className="text-sm text-muted-foreground">
-                        Locked — guests have already pledged.
+                        {reasonFor("charity")}
                       </p>
                     </div>
                   ) : (
@@ -262,13 +267,14 @@ export function NewFavpollWizard({
                         lockedReason={
                           w.appeal
                             ? `Locked — part of ${w.appeal.name}.`
-                            : w.locks
-                              ? lockReason(w.locks, "charity")
-                              : "Locked — guests have already pledged."
+                            : reasonFor("charity")
                         }
                       />
                     ) : (
-                      lockedBody(w.railSummary.charity.join(" · "))
+                      lockedBody(
+                        w.railSummary.charity.join(" · "),
+                        reasonFor("charity")
+                      )
                     )
                   ) : w.selectedCharities.length > 0 ? (
                     <WizardCharityCard
@@ -304,10 +310,13 @@ export function NewFavpollWizard({
                         showItemsSection={w.showItemsSection}
                         onEdit={() => {}}
                         onOpenItemsDialog={() => {}}
-                        lockedReason="Locked — guests have already pledged."
+                        lockedReason={reasonFor("topic")}
                       />
                     ) : (
-                      lockedBody(w.railSummary.topic.join(" · "))
+                      lockedBody(
+                        w.railSummary.topic.join(" · "),
+                        reasonFor("topic")
+                      )
                     )
                   ) : w.topics.length > 0 ? (
                     <WizardTopicCard
