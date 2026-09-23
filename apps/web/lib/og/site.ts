@@ -11,8 +11,22 @@ export const OG_SITE = {
 
 export const SITE_TITLE = "favpoll"
 
-// The brand statement — never paraphrased (favpoll-brand skill).
+// The brand statement — never paraphrased (favpoll-brand skill). Rendered
+// ON the brand card and the auth shell, where the soul belongs.
 export const SITE_DESCRIPTION = t("landing.subheader")
+
+// THE LINK PREVIEW'S ONE SENTENCE (2026-09-23) — deliberately NOT the brand
+// statement. The brand doc's own division of labour: the subheader carries
+// the soul, the headline "names the arc in plain language". A stranger
+// meeting favpoll in a feed needs the arc — a cold reader took the brand
+// statement, found charity money, and filed favpoll next to JustGiving
+// without ever working out what the poll was for.
+//
+// Separate from SITE_DESCRIPTION on purpose: that constant is also rendered
+// as artwork on the brand card and on the auth shell, where the headline
+// would duplicate HEADLINE_BEATS. Canonical strings either way — never
+// paraphrase, only choose which one a surface needs.
+export const SITE_META_DESCRIPTION = t("landing.headline")
 
 // The home headline, one beat per line on the brand card — the same split
 // the hero makes (the home invariant: the beats never wrap). Canonical

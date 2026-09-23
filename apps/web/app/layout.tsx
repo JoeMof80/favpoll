@@ -10,7 +10,7 @@ import { Toaster } from "sonner"
 import NextTopLoader from "nextjs-toploader"
 import {
   OG_SITE,
-  SITE_DESCRIPTION,
+  SITE_META_DESCRIPTION,
   SITE_TITLE,
   siteBaseUrl,
 } from "@/lib/og/site"
@@ -33,7 +33,7 @@ import {
 export const metadata: Metadata = {
   metadataBase: siteBaseUrl(),
   title: SITE_TITLE,
-  description: SITE_DESCRIPTION,
+  description: SITE_META_DESCRIPTION,
   openGraph: OG_SITE,
   twitter: { card: "summary_large_image" },
   formatDetection: { telephone: false, address: false, email: false },
