@@ -5407,6 +5407,122 @@ const topics: TopicSeed[] = [
       },
     },
   },
+  {
+    title: "Halloween costume",
+    description: "The one they come back to every October",
+    is_finite: false,
+    categories: ["Time", "Childhood"],
+    placeholders: {
+      celebration: {
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and the costume they come back to every year.",
+        reveal: "Name the favourite and what makes it theirs.",
+      },
+      other: {
+        about:
+          "Tell us who this person is and why you're gathering. A favourite costume is a detail worth including.",
+        reveal: "Pick the favourite and say what makes it theirs.",
+      },
+      default: {
+        about:
+          "Tell us who this is for and what the occasion is. The costume someone defaults to says a fair amount about them.",
+        reveal: "Pick the favourite and say what it means to you.",
+      },
+    },
+  },
+
+  {
+    title: "Superhero",
+    description: "The one they'd want on their side",
+    is_finite: false,
+    categories: ["Childhood", "Film & TV"],
+    placeholders: {
+      celebration: {
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and the one they'd want on their side.",
+        reveal: "Name the favourite and what makes it theirs.",
+      },
+      other: {
+        about:
+          "Tell us who this person is and why you're gathering. A favourite here is a detail worth including.",
+        reveal: "Pick the favourite and say what makes it theirs.",
+      },
+      default: {
+        about:
+          "Tell us who this is for and what the occasion is. The one someone picks says more than they intend.",
+        reveal: "Pick the favourite and say what it means to you.",
+      },
+    },
+  },
+  {
+    title: "Pirate",
+    description: "The one they'd sail with",
+    is_finite: false,
+    categories: ["Childhood", "Books & Arts"],
+    placeholders: {
+      celebration: {
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and the one they'd sail with.",
+        reveal: "Name the favourite and what makes it theirs.",
+      },
+      other: {
+        about:
+          "Tell us who this person is and why you're gathering. A favourite here is a detail worth including.",
+        reveal: "Pick the favourite and say what makes it theirs.",
+      },
+      default: {
+        about:
+          "Tell us who this is for and what the occasion is. Most people met one before they could read.",
+        reveal: "Pick the favourite and say what it means to you.",
+      },
+    },
+  },
+  {
+    title: "Planet",
+    description: "The one they'd visit first",
+    is_finite: true,
+    categories: ["Nature", "Childhood"],
+    placeholders: {
+      celebration: {
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and the one they'd visit first.",
+        reveal: "Name the favourite and what makes it theirs.",
+      },
+      other: {
+        about:
+          "Tell us who this person is and why you're gathering. A favourite here is a detail worth including.",
+        reveal: "Pick the favourite and say what makes it theirs.",
+      },
+      default: {
+        about:
+          "Tell us who this is for and what the occasion is. Everyone settles on one and rarely revisits it.",
+        reveal: "Pick the favourite and say what it means to you.",
+      },
+    },
+  },
+  {
+    title: "Circus act",
+    description: "The one worth the ticket",
+    is_finite: false,
+    categories: ["Childhood"],
+    placeholders: {
+      celebration: {
+        about:
+          "Tell their story — who they are, what makes this celebration worth having, and the act they'd wait through the rest for.",
+        reveal: "Name the favourite and what makes it theirs.",
+      },
+      other: {
+        about:
+          "Tell us who this person is and why you're gathering. A favourite here is a detail worth including.",
+        reveal: "Pick the favourite and say what makes it theirs.",
+      },
+      default: {
+        about:
+          "Tell us who this is for and what the occasion is. There is always one act people stop talking through.",
+        reveal: "Pick the favourite and say what it means to you.",
+      },
+    },
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -5415,6 +5531,18 @@ const topics: TopicSeed[] = [
 
 // display_order for finite topics — null/missing means sort alphabetically
 const topicItemDisplayOrder: Record<string, Record<string, number>> = {
+  // Solar order, not alphabetical — the only order anybody reads planets in.
+  Planet: {
+    Mercury: 1,
+    Venus: 2,
+    Earth: 3,
+    Mars: 4,
+    Jupiter: 5,
+    Saturn: 6,
+    Uranus: 7,
+    Neptune: 8,
+    Pluto: 9,
+  },
   "Day of the week": {
     Monday: 1,
     Tuesday: 2,
@@ -8653,6 +8781,85 @@ const topicItems: Record<string, string[]> = {
     "Unicorn",
     "Werewolf",
     "Yeti",
+  ],
+  Superhero: [
+    "Batgirl",
+    "Batman",
+    "Black Panther",
+    "Black Widow",
+    "Captain America",
+    "Catwoman",
+    "Hulk",
+    "Iron Man",
+    "Spider-Man",
+    "Storm",
+    "Supergirl",
+    "Superman",
+    "The Flash",
+    "Thor",
+    "Wolverine",
+    "Wonder Woman",
+  ],
+  Pirate: [
+    "Anne Bonny",
+    "Blackbeard",
+    "Calico Jack",
+    "Captain Flint",
+    "Captain Hook",
+    "Captain Pugwash",
+    "Grace O'Malley",
+    "Henry Morgan",
+    "Jack Sparrow",
+    "Long John Silver",
+    "Mary Read",
+    "Sir Francis Drake",
+    "William Kidd",
+  ],
+  Planet: [
+    "Mercury",
+    "Venus",
+    "Earth",
+    "Mars",
+    "Jupiter",
+    "Saturn",
+    "Uranus",
+    "Neptune",
+    "Pluto",
+  ],
+  "Circus act": [
+    "Acrobats",
+    "Aerial silks",
+    "Clowns",
+    "Contortionist",
+    "Fire eater",
+    "Human cannonball",
+    "Juggler",
+    "Knife thrower",
+    "Lion tamer",
+    "Magician",
+    "Ringmaster",
+    "Stilt walker",
+    "Strongman",
+    "Tightrope walker",
+    "Trapeze artist",
+  ],
+  "Halloween costume": [
+    "Bat",
+    "Black cat",
+    "Clown",
+    "Devil",
+    "Frankenstein's monster",
+    "Ghost",
+    "Grim Reaper",
+    "Mummy",
+    "Pumpkin",
+    "Scarecrow",
+    "Skeleton",
+    "Spider",
+    "Vampire",
+    "Werewolf",
+    "Witch",
+    "Zombie",
   ],
   "Mountain or peak": [
     "Aconcagua",

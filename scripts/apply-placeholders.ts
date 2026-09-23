@@ -1,7 +1,7 @@
 /**
  * apply-placeholders.ts
  *
- * Reads all 6 regenerated-placeholder batch files, builds a single combined
+ * Reads all 8 regenerated-placeholder batch files, builds a single combined
  * map (asserting no duplicate title across batches), then rewrites the
  * `placeholders: { … }` block for every topic in seed.ts with the five
  * register-keyed entries from that map.
@@ -16,6 +16,8 @@ import { regeneratedPlaceholdersBatch3 } from "./placeholders-regenerated-3"
 import { regeneratedPlaceholdersBatch4 } from "./placeholders-regenerated-4"
 import { regeneratedPlaceholdersBatch5 } from "./placeholders-regenerated-5"
 import { regeneratedPlaceholdersBatch6 } from "./placeholders-regenerated-6"
+import { regeneratedPlaceholdersBatch7 } from "./placeholders-regenerated-7"
+import { regeneratedPlaceholdersBatch8 } from "./placeholders-regenerated-8"
 
 // ---------------------------------------------------------------------------
 // 1. Build combined map — fail loudly on duplicate titles
@@ -31,6 +33,8 @@ const batchNames = [
   "regenerated-4",
   "regenerated-5",
   "regenerated-6",
+  "regenerated-7",
+  "regenerated-8",
 ]
 const batches = [
   regeneratedPlaceholders,
@@ -39,6 +43,8 @@ const batches = [
   regeneratedPlaceholdersBatch4,
   regeneratedPlaceholdersBatch5,
   regeneratedPlaceholdersBatch6,
+  regeneratedPlaceholdersBatch7,
+  regeneratedPlaceholdersBatch8,
 ]
 
 for (let i = 0; i < batches.length; i++) {

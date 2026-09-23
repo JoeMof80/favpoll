@@ -11,8 +11,16 @@ description: >
 # favpoll topic rules
 
 A **topic** is the subject of a favpoll (favourite Colour, Song, Biscuit). Each topic
-carries 16 occasion-specific placeholder pairs plus three generic fallbacks, and a list
-of **items** (the answerable favourites). This skill defines what makes a topic and its
+carries **five register-keyed placeholder pairs** and a list of **items** (the answerable
+favourites).
+
+> **The placeholder model changed.** Sections 6–9 below still describe the retired
+> 16-occasion model (memorial, birthday, wedding…) with its named personas. The live
+> model is FIVE register keys — `remembering`, `celebrating_one`, `celebrating_many`,
+> `cause`, `neutral` — written with **no named personas**, and it lives in
+> `scripts/placeholders-regenerated*.ts`, not in the topic row. Read `/new-topic` and the
+> batch files for the current shape. The item rules (sections 1–5), the five tests, the
+> bounded×volatile matrix and the overlap policy are all UNAFFECTED and remain in force. This skill defines what makes a topic and its
 items good, so the library is broad and consistent enough that organisers and guests
 almost never need to invent their own.
 
@@ -20,9 +28,9 @@ almost never need to invent their own.
 
 The schema has exactly three levels, and nothing lives between or below them:
 
-- **Category** — one of the 10 fixed buckets (Nature, Music, Film & TV, Food & Drink,
-  Places, Sport, Literature, Everyday life, Childhood, Time). New categories are rare and
-  deliberate; a topic is tagged with one or two.
+- **Category** — one of the 11 fixed buckets (Animals, Books & Arts, Childhood,
+  Everyday life, Film & TV, Food & Drink, Music, Nature, Places, Sport, Time). New
+  categories are rare and deliberate; a topic is tagged with one or two.
 - **Topic** — the question (Bird, Song, Colour). Sits one step below its category.
 - **Item** — the answer (Robin, Jerusalem, Purple). Sits one step below its topic, at the
   **basic level**: the word an ordinary person reaches for first when pointing at one.
