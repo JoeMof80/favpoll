@@ -12,17 +12,9 @@ description: >
 
 A **topic** is the subject of a favpoll (favourite Colour, Song, Biscuit). Each topic
 carries **five register-keyed placeholder pairs** and a list of **items** (the answerable
-favourites).
-
-> **The placeholder model changed.** Sections 6–9 below still describe the retired
-> 16-occasion model (memorial, birthday, wedding…) with its named personas. The live
-> model is FIVE register keys — `remembering`, `celebrating_one`, `celebrating_many`,
-> `cause`, `neutral` — written with **no named personas**, and it lives in
-> `scripts/placeholders-regenerated*.ts`, not in the topic row. Read `/new-topic` and the
-> batch files for the current shape. The item rules (sections 1–5), the five tests, the
-> bounded×volatile matrix and the overlap policy are all UNAFFECTED and remain in force. This skill defines what makes a topic and its
-items good, so the library is broad and consistent enough that organisers and guests
-almost never need to invent their own.
+favourites). This skill defines what makes a topic and its items good, so the library is
+broad and consistent enough that organisers and guests almost never need to invent their
+own.
 
 ## 1. The three altitudes (the data model is the rule)
 
@@ -88,59 +80,48 @@ prey" (niche). **Never ship overlapping altitudes** — don't run both "Birds" a
 prey"; pick one, and reserve a narrower variant only for an occasion that specifically
 pulls for it.
 
-## 6. Occasion fit: register, not bans
+## 6. The five registers (what the copy is keyed to)
 
-Any topic can run on any occasion (each ships framing for all of them). Fit is about
-_tone_ and _surfacing_, carried entirely by the placeholder copy. Every occasion has a
-register; the copy must match it.
+Any topic can run on any occasion — fit is about _tone_, carried entirely by the
+placeholder copy. But the copy is **not** written per occasion. Thirty-six occasion types
+collapse into **five registers**, and a topic ships one `about` + `reveal` pair per
+register. The mapping lives in `OCCASION_TO_REGISTER` in `scripts/seed.ts`.
 
-| Register                | Voice                                     | Occasions                                                                                                  |
-| ----------------------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| **Reflective / legacy** | Past tense, tender, eulogy-like           | memorial, tribute                                                                                          |
-| **Celebratory**         | Present tense, warm, toast-like           | birthday, retirement, wedding, engagement, anniversary, leaving, graduation, achievement, award, promotion |
-| **Forward-looking**     | Gentle, hopeful, a beginning              | christening, recovery                                                                                      |
-| **Open (no persona)**   | Second-person invitation to the organiser | celebration, other, default                                                                                |
+| Register           | Voice                                    | Occasions that map to it                                                                      |
+| ------------------ | ---------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `remembering`      | Past tense, tender, eulogy-like          | Memorial, Tribute, Celebration of life, Pet memorial, In memoriam appeal                       |
+| `celebrating_one`  | Present tense, warm, toast-like          | Birthday, Retirement, Graduation, Christening, Recovery, Promotion, Award, New home, …         |
+| `celebrating_many` | Present tense, a couple or a group       | Wedding, Engagement, Anniversary, Renewal of vows, Reunion, Team celebration, Family gathering |
+| `cause`            | **Faceless** — second-person instruction | Fundraiser, Sponsored event, Charity night                                                     |
+| `neutral`          | Present tense, no occasion assumed       | everything else (`default`)                                                                    |
+
+`celebrating_many` defaults to a **pair**. Topics whose group persona should be a team or
+club instead are listed in `scripts/celebrating-many-groups.ts` and tagged `"set"`.
 
 Surfacing follows register: lead the picker with universal topics (Colour, Song, Food,
 Place, Animal) for every occasion; rank reflective-leaning topics (favourite saying, hymn,
 walk) up for memorial/tribute and down for a child's birthday; rank child-centred topics
 (storybook, sweet) up for christening. Down-rank, don't ban.
 
-## 7. The personas (the engine of the copy)
+## 7. Personas: unnamed, and gendered only in the prose
 
-Persona occasions are written as a specific recurring character. Reusing the same persona
-across every topic is intentional — it is the "repetition with variance" that keeps quality
-high: the persona is constant, the topic-specific detail varies.
+The named recurring personas (Belinda, Sarah, David, Marcus…) are **retired** along with
+the 16-occasion model. Register copy carries **no proper names at all** — the persona is a
+sketch in third person, and the occasion is implied by the register.
 
-- **memorial** — Belinda: retired teacher and mother, forty years of pupils and garden, a
-  precise eye; Marie Curie nurses cared for her at home. (she/her, past tense)
-- **tribute** — a mentor, colleague and friend; decades shaping careers; nothing by
-  accident. (he/him, past tense)
-- **birthday** — Sarah: turning 40, decisive, opinionated, hiker, strong tastes. (she/her)
-- **retirement** — David: 35 years building engineering teams, steady, golfer, the Dales.
-  (he/him)
-- **wedding** — Emma & James: met at a rainy festival in 2019, amiably disagree about
-  everything domestic. (they)
-- **engagement** — Callum & Sophie: Lake District walkers; Callum proposed (Arthur's Seat,
-  New Year / the fells above Coniston); Sophie thought it was just a walk. (they)
-- **anniversary** — Mum & Dad: 40 years, three houses, gentle unresolved domestic
-  disagreements. (they)
-- **leaving** — Priya: six years in the studio, deliberate, brought the right thing,
-  cycled in, grew up near the coast in Tamil Nadu. (she/her)
-- **graduation** — Tom: architecture at Manchester, studio all-nighters, scale models,
-  thinks on foot. (he/him)
-- **christening** — Lily: born in March, on a Tuesday, already unimpressed; a family full
-  of opinions. (she/her, infant, forward-looking)
-- **achievement** — Marcus: ran his first marathon, raising for the RNLI **through favpoll
-  itself**, trained eight months on the coastline the RNLI patrols. (he/him)
-- **recovery** — Claire: finished treatment, one year of recovery, daily walks, music got
-  her through. (she/her, gentle/forward-looking)
-- **award** — Amelia: Teacher of the Year, English teacher, her classroom an institution.
-  (she/her)
-- **promotion** — Kwame: three years of excellent work, now Head of Product, grew up in
-  Accra, has a theory about everything. (he/him)
-- **celebration / other / default** — no persona. Second-person copy inviting the
-  organiser to tell their own story and prompting for the favourite.
+| Register           | How it reads                                                  |
+| ------------------ | ------------------------------------------------------------- |
+| `remembering`      | "She kept a telescope by the back door…" — past tense         |
+| `celebrating_one`  | "He had the poster on the ceiling…" — present tense           |
+| `celebrating_many` | "A couple who…", "A pair who…" — shared perspective           |
+| `cause`            | "Pick the one you'd visit first and pledge what it's worth."  |
+| `neutral`          | "Most people settled this aged seven and never revisited it." |
+
+**Balance genders within a topic:** `remembering` and `celebrating_one` take opposite
+genders. `celebrating_many` is a couple or group. `cause` and `neutral` may use any.
+
+**`cause` has a fixed shape.** It is faceless — there is no persona to describe — so the
+`about` is an instruction to the reader and the `reveal` opens "Our pick to start: …".
 
 ## 8. The writing discipline (every placeholder pair)
 
@@ -149,31 +130,55 @@ high: the persona is constant, the topic-specific detail varies.
 2. **About second.** Set up the topic area through the persona **without naming the
    answer** the reveal will give.
 3. **No leak.** Re-read: does the about give away the reveal's answer? If so, rewrite.
-4. **Match the register** (section 6) — past tense for reflective, present for celebratory,
-   gentle for forward-looking, second-person for the open three.
-5. **Variance.** Across a topic's 16 cells, vary sentence shape and openings; don't let the
-   structure become a visible template. (This is where seeded phrase-bank variance helps,
-   on the generic occasions and on repeated closers.)
+4. **Match the register** (section 6) — past tense for `remembering`, present for the
+   celebrating pair, second-person instruction for `cause`.
+5. **Variance.** Across a topic's five registers, vary sentence shape and openings; don't
+   let the structure become a visible template.
+6. **Charity-free.** No register mentions charity — that is the page's job, not the
+   placeholder's.
 
-## 9. TopicSeed shape (current — for reference)
+## 9. Where the copy actually lives
+
+Two places, and they are not the same thing.
+
+**The real copy — batch files.** `scripts/placeholders-regenerated*.ts` (eight of them)
+hold the five register pairs per topic. This is what `seed.ts` writes to the DB, so it is
+the copy guests see. Entries carry `about` and `reveal` only — no `pronouns` field, no
+`group` field.
+
+```ts
+"<Title>": {
+  remembering: { about: "...", reveal: "..." },
+  celebrating_one: { about: "...", reveal: "..." },
+  celebrating_many: { about: "...", reveal: "..." },
+  cause: { about: "...", reveal: "..." },
+  neutral: { about: "...", reveal: "..." },
+},
+```
+
+**The topic row — `scripts/seed.ts`.** Its inline `placeholders` use the three OPEN
+occasion keys (`celebration`, `other`, `default`) and hold generic second-person
+instructions. They are overwritten in the DB by the batch copy and are skipped by the
+linter, so they are effectively scaffolding.
 
 ```ts
 type TopicSeed = {
   title: string;
   description: string; // one short phrase: what this captures about a person
   is_finite: boolean; // closed list (true) vs starter list (false)
-  categories: string[]; // 1–2 of the 10 fixed categories
-  placeholders: {
-    // about + reveal per occasion (NOT framing/quote)
-    [occasion: string]: { about: string; reveal: string };
-  };
+  categories: string[]; // 1–2 of the 11 fixed categories
+  placeholders: RawTopicPlaceholders | TopicPlaceholders;
 };
 ```
 
-Occasion keys (16 + 3 fallbacks): memorial, tribute, birthday, retirement, wedding,
-engagement, anniversary, leaving, graduation, christening, achievement, recovery, award,
-promotion, celebration, other, default. Finite topics also need a `topicItems` entry; an
-optional `topicItemDisplayOrder` controls ordering, else alphabetical.
+**Items.** `topicItems` is `Record<string, string[]>` — a title keyed to a flat array of
+labels. **Every topic ships items**, not only finite ones; infinite topics get a starter
+set that guests extend. Alphabetical unless a natural order exists, in which case add an
+entry to `topicItemDisplayOrder`.
+
+**The guard.** `node scripts/lint-topics.mjs` checks that every reveal names an item in
+that topic's list. It reads the INLINE placeholders in seed.ts, **not** the batch files —
+so batch reveals must be verified by hand, or by seeding and querying the result.
 
 ## 10. Audit checklist (for existing topics)
 
@@ -183,5 +188,7 @@ optional `topicItemDisplayOrder` controls ordering, else alphabetical.
 - `is_finite` correct for the topic's actual closed/open nature.
 - Every reveal's named answer exists in `topicItems`.
 - No about leaks its reveal.
-- Each occasion's copy matches its register and persona.
+- All five registers present, each matching its voice (sections 6–7).
+- `cause` uses the faceless instruction form.
+- No proper names anywhere in the placeholder prose.
 - No two topics ship overlapping altitudes.
