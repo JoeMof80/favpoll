@@ -22,10 +22,18 @@ const mockContact = vi.hoisted(() =>
     website: "www.dogstrust.org.uk",
   })
 )
+// Hoisted: vi.mock factories run before module-level consts exist.
+const mockPurpose = vi.hoisted(() =>
+  vi.fn().mockResolvedValue({
+    activities: "Rescues and rehomes dogs across the UK.",
+    classification: { what: ["Animals"], who: [], how: ["Provides Services"] },
+  })
+)
 
 vi.mock("@/lib/charity-commission", () => ({
   verifyCharityNumber: mockVerify,
   fetchRegisterContact: mockContact,
+  fetchRegisterPurpose: mockPurpose,
 }))
 
 let mock = makeSupabaseMock()
@@ -90,6 +98,13 @@ describe("findOrCreateRegisterCharity", () => {
       verified_name: "DOGS TRUST",
       registered_email: "enquiries@dogstrust.org.uk",
       registered_website: "www.dogstrust.org.uk",
+      // What the charity is FOR, captured at insert (2026-09-23)
+      activities: "Rescues and rehomes dogs across the UK.",
+      classification: {
+        what: ["Animals"],
+        who: [],
+        how: ["Provides Services"],
+      },
     })
   })
 

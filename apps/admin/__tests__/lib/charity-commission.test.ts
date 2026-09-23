@@ -458,3 +458,75 @@ describe("fetchRegisterContact", () => {
     expect(mockFetch).not.toHaveBeenCalled();
   });
 });
+
+// ─── fetchRegisterPurpose ────────────────────────────────────────────────────
+// What the charity is FOR. Two endpoints, both optional, never throws.
+// Shapes verified against the live register on 2026-09-23.
+import { fetchRegisterPurpose } from "@/lib/charity-commission";
+
+function jsonResponse(body: unknown, status = 200) {
+  return { ok: status < 400, status, json: async () => body };
+}
+
+describe("fetchRegisterPurpose", () => {
+  it("normalises who_what_where and reads activities from the overview", async () => {
+    mockFetch.mockImplementation(async (url: string) => {
+      if (url.includes("/allcharitydetails/"))
+        return jsonResponse({
+          charity_name: "RESCUE KITTIES",
+          who_what_where: [
+            { classification_type: "What", classification_desc: "Animals" },
+            {
+              classification_type: "How",
+              classification_desc: "Provides Services",
+            },
+          ],
+        });
+      if (url.includes("/charityoverview/"))
+        return jsonResponse({
+          activities:
+            "  Rescue Kitties is a feral, stray and at-risk cat charity.  ",
+        });
+      return jsonResponse({}, 404);
+    });
+
+    const purpose = await fetchRegisterPurpose("1196284");
+    expect(purpose).toEqual({
+      activities: "Rescue Kitties is a feral, stray and at-risk cat charity.",
+      classification: {
+        what: ["Animals"],
+        who: [],
+        how: ["Provides Services"],
+      },
+    });
+  });
+
+  it("returns nulls, not a throw, when the register is unavailable", async () => {
+    mockFetch.mockRejectedValue(new Error("network"));
+    expect(await fetchRegisterPurpose("1196284")).toEqual({
+      activities: null,
+      classification: null,
+    });
+  });
+
+  it("returns null classification when who_what_where is empty", async () => {
+    mockFetch.mockImplementation(async (url: string) =>
+      url.includes("/allcharitydetails/")
+        ? jsonResponse({ who_what_where: [] })
+        : jsonResponse({ activities: null }),
+    );
+    expect(await fetchRegisterPurpose("515595")).toEqual({
+      activities: null,
+      classification: null,
+    });
+  });
+
+  it("does nothing without a key or a number", async () => {
+    vi.stubEnv("CHARITY_COMMISSION_API_KEY", "");
+    expect(await fetchRegisterPurpose("1196284")).toEqual({
+      activities: null,
+      classification: null,
+    });
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
+});

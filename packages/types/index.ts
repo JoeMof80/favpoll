@@ -36,6 +36,12 @@ export type Charity = {
     | null;
   verified_name?: string | null;
   verified_at?: string | null;
+  /** What the charity is FOR, from the Commission register (2026-09-23).
+   *  `activities` is the charity's own free text — prompt source only,
+   *  never displayed raw. `classification` is who_what_where normalised.
+   *  Both null for charities without a registered number. */
+  activities?: string | null;
+  classification?: { what: string[]; who: string[]; how: string[] } | null;
   created_at: string;
 };
 

@@ -374,3 +374,91 @@ export async function fetchRegisterContact(
     return EMPTY_CONTACT
   }
 }
+
+// ─── Register purpose: what the charity is FOR (2026-09-23) ──────────────────
+//
+// A register-added charity arrives with no description, so the generator had
+// only a name and guessed the cause (#933 stops the guessing; this supplies
+// the data). The register publishes two things:
+//
+//   who_what_where  What / Who / How classification codes, in the
+//                   allcharitydetails payload we already fetch — structured,
+//                   and honest about grant-makers with no cause of their own
+//                   ("General Charitable Purposes").
+//   activities      the charity's own free-text account, on charityoverview.
+//                   Raw (run-together sentences, bulleted lists): a source
+//                   for the prompt, never copy to display.
+//
+// Two calls, both optional, never throws — purpose is strictly additive.
+
+export type RegisterClassification = {
+  what: string[]
+  who: string[]
+  how: string[]
+}
+
+export type RegisterPurpose = {
+  activities: string | null
+  classification: RegisterClassification | null
+}
+
+const EMPTY_PURPOSE: RegisterPurpose = {
+  activities: null,
+  classification: null,
+}
+
+type WhoWhatWhere = {
+  classification_type?: string | null
+  classification_desc?: string | null
+}
+
+function normaliseClassification(
+  rows: WhoWhatWhere[] | null | undefined
+): RegisterClassification | null {
+  if (!Array.isArray(rows) || rows.length === 0) return null
+  const pick = (type: string) =>
+    rows
+      .filter((r) => r.classification_type === type)
+      .map((r) => (r.classification_desc ?? "").trim())
+      .filter(Boolean)
+  const c = { what: pick("What"), who: pick("Who"), how: pick("How") }
+  return c.what.length || c.who.length || c.how.length ? c : null
+}
+
+export async function fetchRegisterPurpose(
+  registeredNumber: string
+): Promise<RegisterPurpose> {
+  const apiKey = process.env.CHARITY_COMMISSION_API_KEY
+  const digits = registeredNumber.replace(/\D/g, "")
+  if (!apiKey || !digits) return EMPTY_PURPOSE
+  const headers = { "Ocp-Apim-Subscription-Key": apiKey }
+
+  const [detailsRes, overviewRes] = await Promise.all([
+    fetch(`${API_BASE}/allcharitydetails/${digits}/0`, {
+      headers,
+      cache: "no-store",
+    }).catch(() => null),
+    fetch(`${API_BASE}/charityoverview/${digits}/0`, {
+      headers,
+      cache: "no-store",
+    }).catch(() => null),
+  ])
+
+  let classification: RegisterClassification | null = null
+  if (detailsRes?.ok) {
+    const details = (await detailsRes.json().catch(() => null)) as {
+      who_what_where?: WhoWhatWhere[] | null
+    } | null
+    classification = normaliseClassification(details?.who_what_where)
+  }
+
+  let activities: string | null = null
+  if (overviewRes?.ok) {
+    const overview = (await overviewRes.json().catch(() => null)) as {
+      activities?: string | null
+    } | null
+    activities = overview?.activities?.trim() || null
+  }
+
+  return { activities, classification }
+}
