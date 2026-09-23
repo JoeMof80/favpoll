@@ -5523,75 +5523,6 @@ const topics: TopicSeed[] = [
       },
     },
   },
-  {
-    title: "Wild West character",
-    description: "The one they'd ride with",
-    is_finite: false,
-    categories: ["Film & TV", "Childhood"],
-    placeholders: {
-      celebration: {
-        about:
-          "Tell their story — who they are, what makes this celebration worth having, and the one they'd ride with.",
-        reveal: "Name the favourite and what makes it theirs.",
-      },
-      other: {
-        about:
-          "Tell us who this person is and why you're gathering. A favourite here is a detail worth including.",
-        reveal: "Pick the favourite and say what makes it theirs.",
-      },
-      default: {
-        about:
-          "Tell us who this is for and what the occasion is. Half-remembered from a film on a wet afternoon.",
-        reveal: "Pick the favourite and say what it means to you.",
-      },
-    },
-  },
-  {
-    title: "Farm animal",
-    description: "The one they'd keep if they could",
-    is_finite: false,
-    categories: ["Animals", "Childhood"],
-    placeholders: {
-      celebration: {
-        about:
-          "Tell their story — who they are, what makes this celebration worth having, and the one they'd keep if they could.",
-        reveal: "Name the favourite and what makes it theirs.",
-      },
-      other: {
-        about:
-          "Tell us who this person is and why you're gathering. A favourite here is a detail worth including.",
-        reveal: "Pick the favourite and say what makes it theirs.",
-      },
-      default: {
-        about:
-          "Tell us who this is for and what the occasion is. The one someone would choose if the field were theirs.",
-        reveal: "Pick the favourite and say what it means to you.",
-      },
-    },
-  },
-  {
-    title: "Safari animal",
-    description: "The one they'd cross a continent to see",
-    is_finite: false,
-    categories: ["Animals", "Childhood"],
-    placeholders: {
-      celebration: {
-        about:
-          "Tell their story — who they are, what makes this celebration worth having, and the one they'd cross a continent to see.",
-        reveal: "Name the favourite and what makes it theirs.",
-      },
-      other: {
-        about:
-          "Tell us who this person is and why you're gathering. A favourite here is a detail worth including.",
-        reveal: "Pick the favourite and say what makes it theirs.",
-      },
-      default: {
-        about:
-          "Tell us who this is for and what the occasion is. Usually traceable to one photograph.",
-        reveal: "Pick the favourite and say what it means to you.",
-      },
-    },
-  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -8911,50 +8842,6 @@ const topicItems: Record<string, string[]> = {
     "Strongman",
     "Tightrope walker",
     "Trapeze artist",
-  ],
-  "Wild West character": [
-    "Annie Oakley",
-    "Billy the Kid",
-    "Buffalo Bill",
-    "Butch Cassidy",
-    "Calamity Jane",
-    "Doc Holliday",
-    "Jesse James",
-    "Sitting Bull",
-    "The Lone Ranger",
-    "The Sundance Kid",
-    "Wild Bill Hickok",
-    "Wyatt Earp",
-  ],
-  "Farm animal": [
-    "Alpaca",
-    "Chicken",
-    "Cow",
-    "Donkey",
-    "Duck",
-    "Goat",
-    "Goose",
-    "Horse",
-    "Pig",
-    "Sheep",
-    "Sheepdog",
-    "Turkey",
-  ],
-  "Safari animal": [
-    "Buffalo",
-    "Cheetah",
-    "Elephant",
-    "Gazelle",
-    "Giraffe",
-    "Hippopotamus",
-    "Hyena",
-    "Leopard",
-    "Lion",
-    "Meerkat",
-    "Rhinoceros",
-    "Warthog",
-    "Wildebeest",
-    "Zebra",
   ],
   "Halloween costume": [
     "Bat",
