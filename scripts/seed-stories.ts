@@ -32,7 +32,8 @@
  *        --judge-model=… (default claude-haiku-4-5) · --dry-run (pick and
  *        print the triples, no model, no writes) · --registers=cause,… (only
  *        these registers) · --refresh (patch the existing cohort: full
- *        canonical items, portraits; copy untouched) · --wipe
+ *        canonical items, portraits; copy untouched) · --regen="Name" (rewrite
+ *        one seeded favpoll's Story in place) · --wipe
  *
  * SAFETY: refuses to run unless the target is staging, or
  * ALLOW_FAVPOLL_SEED=1. Owned by created_by = 'user_seed_story' (no email,
@@ -97,6 +98,9 @@ const WIPE = flag("wipe");
 // --refresh patches the EXISTING cohort in place (full canonical item set,
 // a portrait where photo_url is null) without touching its copy.
 const REFRESH = flag("refresh");
+// --regen="Carys Bright" rewrites ONE seeded favpoll's Story in place: same
+// triple, same name, same items, fresh copy through the judge loop.
+const REGEN = opt("regen", "");
 const DRY_RUN = flag("dry-run");
 const COUNT = parseInt(opt("count", "24"), 10);
 const THREES = parseFloat(opt("threes", "0.4"));
@@ -589,6 +593,46 @@ async function wipe() {
   console.log(`Wiped ${favpollIds.length} favpolls and everything under them.`);
 }
 
+// ── the judge loop ───────────────────────────────────────────────────────
+// Generate, check P1 (and the cause's event) by lookup and realism by the
+// judge, retry up to MAX_ATTEMPTS; the best attempt is returned even when
+// none passes, and the caller decides.
+type Attempt = {
+  story: Awaited<ReturnType<typeof generateStory>>;
+  item: { id: string; label: string } | null;
+  verdict: string;
+  score: number;
+};
+async function judgeLoop(
+  input: StoryInput,
+  items: { id: string; label: string }[],
+  isCause: boolean,
+  occasion: string,
+  label: string,
+): Promise<{ best: Attempt | null; attempts: number }> {
+  let best: Attempt | null = null;
+  let attempts = 0;
+  for (; attempts < MAX_ATTEMPTS; attempts++) {
+    let story;
+    try {
+      story = await generateStory(input, STORY_MODEL);
+    } catch (err) {
+      console.error(
+        `  ✗ ${label}: generate failed — ${err instanceof Error ? err.message : String(err)}`,
+      );
+      continue;
+    }
+    const item = namedItem(story.note, items);
+    const event = isCause ? aboutNamesEvent(story.about, occasion) : true;
+    const verdict = await judgeStory(story, input, story.edges, JUDGE_MODEL);
+    const score = (item && event ? 1 : 0) + (verdict.realistic ? 2 : 0);
+    const v = `P1 ${item ? "✓" : "✗"}${isCause ? ` · event ${event ? "✓" : "✗"}` : ""} · real ${verdict.realistic ? "✓" : "✗"}${verdict.reason ? ` — ${verdict.reason}` : ""}`;
+    if (!best || score > best.score) best = { story, item, verdict: v, score };
+    if (score === 3) break;
+  }
+  return { best, attempts };
+}
+
 // ── seed ─────────────────────────────────────────────────────────────────
 type Manifest = {
   name: string;
@@ -713,33 +757,13 @@ async function seed() {
     // The judge loop: generate, check P1 by lookup and A1/P2 by the
     // judge, retry up to MAX_ATTEMPTS; the best attempt wins if none
     // passes, and the manifest says so.
-    let best: {
-      story: Awaited<ReturnType<typeof generateStory>>;
-      item: { id: string; label: string } | null;
-      verdict: string;
-      score: number;
-    } | null = null;
-    let attempts = 0;
-    for (; attempts < MAX_ATTEMPTS; attempts++) {
-      let story;
-      try {
-        story = await generateStory(input, STORY_MODEL);
-      } catch (err) {
-        console.error(
-          `  ✗ ${who?.name ?? c.charity.name}: generate failed — ${err instanceof Error ? err.message : String(err)}`,
-        );
-        continue;
-      }
-      const item = namedItem(story.note, items);
-      // P1 and the cause's event are lookups; realism is the one judgement.
-      const event = isCause ? aboutNamesEvent(story.about, c.occasion) : true;
-      const verdict = await judgeStory(story, input, story.edges, JUDGE_MODEL);
-      const score = (item && event ? 1 : 0) + (verdict.realistic ? 2 : 0);
-      const label = `P1 ${item ? "✓" : "✗"}${isCause ? ` · event ${event ? "✓" : "✗"}` : ""} · real ${verdict.realistic ? "✓" : "✗"}${verdict.reason ? ` — ${verdict.reason}` : ""}`;
-      if (!best || score > best.score)
-        best = { story, item, verdict: label, score };
-      if (score === 3) break;
-    }
+    const { best, attempts } = await judgeLoop(
+      input,
+      items,
+      isCause,
+      c.occasion,
+      who?.name ?? c.charity.name,
+    );
     if (!best) {
       manifest.push({
         name: who?.name ?? "(cause)",
@@ -1064,7 +1088,120 @@ async function refresh() {
   );
 }
 
-(WIPE ? wipe() : REFRESH ? refresh() : seed()).catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+// ── regen: one seeded favpoll's Story, in place ──────────────────────────
+async function regen(name: string) {
+  const { data: f, error } = await supabase
+    .from("favpolls")
+    .select(
+      "id, subject, category, grouping, occasion_type, cause_label, protagonists(id, name, pronoun), favpoll_polls(id, topics(title, is_finite, favourites(id, label, is_canonical)), favpoll_poll_favourites(favourite_id)), favpoll_charities(charities(name, description, activities, cause_family))",
+    )
+    .eq("created_by", SEED_USER);
+  if (error) throw new Error(error.message);
+  const one = <T>(v: T | T[] | null): T | null =>
+    Array.isArray(v) ? (v[0] ?? null) : v;
+  const want = name.trim().toLowerCase();
+  const x = (f ?? []).find(
+    (r: any) =>
+      (one(r.protagonists) as any)?.name?.toLowerCase() === want ||
+      r.cause_label?.toLowerCase() === want,
+  );
+  if (!x) throw new Error(`No seeded favpoll named "${name}"`);
+  const p = one(x.protagonists as any) as {
+    id: string;
+    name: string;
+    pronoun: Pronoun | null;
+  } | null;
+  const poll = one(x.favpoll_polls as any) as any;
+  const topic = one(poll.topics) as Topic;
+  const ch = one(one(x.favpoll_charities as any)?.charities) as Charity;
+  const isCause = x.subject === "cause";
+  const register: Register = isCause
+    ? "cause"
+    : x.category === "memorial"
+      ? "remembering"
+      : x.grouping === "individual"
+        ? "celebrating_one"
+        : "celebrating_many";
+  const curated = new Set(
+    (poll.favpoll_poll_favourites as { favourite_id: string }[]).map(
+      (r) => r.favourite_id,
+    ),
+  );
+  const items = topic.is_finite
+    ? topic.favourites
+    : topic.favourites.filter((fv) => curated.has(fv.id));
+  const input: StoryInput = {
+    register,
+    subject: isCause ? "cause" : "someone",
+    occasionType: x.occasion_type,
+    topicTitle: topic.title,
+    itemLabels: items.map((i) => i.label),
+    charity: {
+      name: ch.name,
+      description: ch.description,
+      activities: ch.activities,
+      causeFamily: ch.cause_family,
+    },
+    pronoun: p?.pronoun ?? undefined,
+    grouping: x.grouping,
+    displayName: p?.name ?? x.cause_label,
+  };
+  console.log(
+    `Regenerating ${p?.name ?? x.cause_label}: ${x.occasion_type} · ${topic.title} · ${ch.name} (${"★".repeat(storyEdges(input).count) || "no edges"})`,
+  );
+  const { best, attempts } = await judgeLoop(
+    input,
+    items,
+    isCause,
+    x.occasion_type,
+    p?.name ?? x.cause_label,
+  );
+  if (!best || best.score < 3) {
+    console.warn(
+      `  ⚠ gate not met after ${attempts} attempt(s) — ${best?.verdict ?? "no story"}; nothing written`,
+    );
+    return;
+  }
+  const { story, item } = best;
+  if (p)
+    await supabase
+      .from("protagonists")
+      .update({ about: story.about })
+      .eq("id", p.id);
+  else
+    await supabase
+      .from("favpolls")
+      .update({ description: story.about })
+      .eq("id", x.id);
+  await supabase
+    .from("favpoll_polls")
+    .update({ personal_note: story.note })
+    .eq("id", poll.id);
+  // The note's item leads the standings: re-point the first half of the
+  // pledges' allocations to it.
+  if (item) {
+    const { data: pledges } = await supabase
+      .from("pledges")
+      .select("id")
+      .eq("favpoll_poll_id", poll.id)
+      .order("created_at");
+    const lead = (pledges ?? [])
+      .slice(0, Math.ceil((pledges ?? []).length / 2))
+      .map((r) => r.id);
+    if (lead.length)
+      await supabase
+        .from("pledge_allocations")
+        .update({ favourite_id: item.id })
+        .in("pledge_id", lead);
+  }
+  console.log(
+    `  ✓ written (${attempts + 1} attempt${attempts ? "s" : ""})\n  ABOUT: ${story.about}\n  NOTE:  ${story.note}`,
+  );
+}
+
+(WIPE ? wipe() : REFRESH ? refresh() : REGEN ? regen(REGEN) : seed()).catch(
+  (e) => {
+    console.error(e);
+    process.exit(1);
+  },
+);
