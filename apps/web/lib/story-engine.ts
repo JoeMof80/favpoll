@@ -69,6 +69,26 @@ function namePossessive(displayName?: string | null): string | null {
   return possessive(firstNames(displayName))
 }
 
+/** The closing promise of the about, in one of a few founder-approved
+ *  shapes. "X" is the possessive ("Joan's"). Rotated per generation. */
+export const REVEAL_PROMISES = [
+  "and X will be revealed",
+  "to see X",
+  "and we'll reveal X",
+  "and find out X",
+  "then see X",
+] as const
+
+export function pickRevealPromise(
+  possessive: string,
+  index = Math.floor(Math.random() * REVEAL_PROMISES.length)
+): string {
+  return REVEAL_PROMISES[index % REVEAL_PROMISES.length].replace(
+    "X",
+    possessive
+  )
+}
+
 function revealOpener(
   register: Register,
   pronoun?: Pronoun,
@@ -202,8 +222,13 @@ ${edgesBlock(edges, subject)}`
         ? ` Use "${pronoun}" pronouns for the person.`
         : ""
     const namePoss = namePossessive(displayName)
-    const nameHint = namePoss
-      ? `\nThe protagonist is called "${displayName}". In the about, use pronouns — EXCEPT the reveal promise, which names them once: end the invitation with a clause like "and ${namePoss} will be revealed" or "and we'll reveal ${namePoss}". The reveal opener below already contains the name — never repeat it beyond these two places.`
+    // The reveal promise closes every about, so its shape is rotated HERE
+    // rather than left to the model, which always took the first example
+    // ("and Joan's will be revealed" on 24 of 24 seeded Stories; founder,
+    // 2026-09-24: "appears too often"). One form per generation.
+    const promise = namePoss ? pickRevealPromise(namePoss) : null
+    const nameHint = promise
+      ? `\nThe protagonist is called "${displayName}". In the about, use pronouns — EXCEPT the reveal promise, which names them once: end the invitation with exactly this shape: "${promise}". The reveal opener below already contains the name — never repeat it beyond these two places.`
       : ""
     // An explicitly chosen he/she is the organiser SAYING there is a
     // person, and it outranks any guess made from the name's shape. The

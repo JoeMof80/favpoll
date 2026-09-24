@@ -20,6 +20,7 @@ vi.mock("@anthropic-ai/sdk", () => ({
 }))
 
 import { generateDraft, safeGenerateDraft } from "../generate-draft"
+import { REVEAL_PROMISES, pickRevealPromise } from "@/lib/story-engine"
 import {
   buildCacheKey,
   revealNamesRealItem,
@@ -987,5 +988,41 @@ describe("edge-aware generation — the prompt carries the table's edges", () =>
     )
     expect(prompt).not.toContain("Occasion ↔ charity")
     expect(prompt).toContain("with why THIS topic in a clause")
+  })
+})
+
+describe("the reveal promise rotates", () => {
+  it("substitutes the possessive into every form", () => {
+    REVEAL_PROMISES.forEach((form, i) => {
+      const out = pickRevealPromise("Joan's", i)
+      expect(out).toBe(form.replace("X", "Joan's"))
+      expect(out).not.toContain("X")
+    })
+  })
+
+  it("includes the founder's form: pick your own favourite to see X", () => {
+    expect(REVEAL_PROMISES).toContain("to see X")
+  })
+
+  it("the prompt asks for exactly one shape, not a choice", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mock.queue(CHARITY_DATA)
+    mockLLMResponse("About.", "Joan's is Blue. She kept a pot of them.")
+    mock.queue(null)
+    await generateDraft({
+      register: "celebrating_one",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      pronoun: "she",
+      displayName: "Joan Okafor",
+    })
+    const prompt = mockMessagesCreate.mock.calls[0][0].messages[0]
+      .content as string
+    expect(prompt).toContain("end the invitation with exactly this shape")
+    expect(
+      REVEAL_PROMISES.some((f) => prompt.includes(f.replace("X", "Joan's")))
+    ).toBe(true)
   })
 })
