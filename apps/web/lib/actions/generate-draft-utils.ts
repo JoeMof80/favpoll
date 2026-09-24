@@ -79,8 +79,17 @@ export function violatesCopyRules(text: string): boolean {
  * "always" is allowed once per Story.
  */
 export function hasTics(text: string): boolean {
-  if (/anyone who ask/i.test(text)) return true
+  if (/anyone who (ask|look|will listen|cares)/i.test(text)) return true
   return (text.match(/\balways\b/gi) ?? []).length > 1
+}
+
+/**
+ * A couple or group writing in the first person plural must stay "we"
+ * in the note too; the model dropped to "I keep a small model of it on
+ * my desk" twice (founder, 2026-09-24).
+ */
+export function slipsToSingular(text: string): boolean {
+  return /\b(I|I'm|I've|my|me|mine)\b/.test(text)
 }
 
 /**

@@ -12,6 +12,7 @@ import {
   violatesCopyRules,
   inventsCondition,
   hasTics,
+  slipsToSingular,
 } from "./actions/generate-draft-utils"
 
 /**
@@ -235,6 +236,8 @@ export function buildPrompt(opts: {
   /** The about's fixed last sentence, computed by the caller so it can
    *  be enforced on the result. */
   closing?: string
+  /** The favourite, when the caller has chosen it. */
+  pick?: string | null
 }): string {
   const {
     register,
@@ -250,6 +253,7 @@ export function buildPrompt(opts: {
     displayName,
     fiction = false,
     closing: givenClosing,
+    pick,
   } = opts
   const activities = activitiesExcerpt(opts.charityActivities)
   // Purpose data, in order of trust: the curated description, then the
@@ -304,7 +308,7 @@ ${edgesBlock(edges, subject)}`
       : ""
     instructions = `${labelContext}${causeLabelInstruction}- "context" (max 40 characters): one short subline for under the cause name, giving a timeframe or who it helps — like "Winter 2026 appeal" or "For families facing hardship". It must NOT contain the charity's name in any form (the charity is already shown beside it), and must NOT mention pledges, money, or where the money goes — the about owns that. No full stop.
 - "about" (max 2 sentences): first what this favpoll is raising for${hasPurpose ? "" : " (taken from the cause name above only — the charity's own work is unknown and must not be described)"}${occasionType && occasionType !== "Fundraiser" ? `, at what event (say "${occasionType.toLowerCase()}" or its plain equivalent — a guest must know what is happening${EFFORT_OCCASIONS.has(occasionType) ? ", and it is still to come: pledges are gathered in the build-up, so never write it as finished" : ""})` : ""}${edges.count > 0 ? ", with why THIS topic in a clause — say the edge listed above, in your own words" : ""}, then the mechanic in ONE clause — guests pick their favourite ${topicTitle.toLowerCase()} and pledge to ${charityName ?? "the charity"}, where the pick and the pledge are a single action (the pick is made BY pledging). Never present them as separate steps: no "first…", "then…", "tell us…". favpoll takes no platform fee. Do NOT name or hint at any particular option, and do not repeat the context subline's wording.
-- "reveal" (guests see it only AFTER pledging): start with exactly "Our pick to start:" then a real option from the list, then " — " (this separator is the one place an em dash is allowed) and one short, warm clause, plain and unforced, like "They watched it every Christmas Eve without fail". It need not justify the pick; the about carries the reason. No statistics, numbers, percentages, or invented quotes.`
+- "reveal" (guests see it only AFTER pledging): start with exactly "Our pick to start:" then ${pick ? `exactly this option, verbatim: "${pick}"` : "a real option from the list"}, then " — " (this separator is the one place an em dash is allowed) and one short, warm clause, plain and unforced, like "They watched it every Christmas Eve without fail". It need not justify the pick; the about carries the reason. No statistics, numbers, percentages, or invented quotes.`
   } else {
     const opener = revealOpener(register, pronoun, displayName, grouping)
     // Pair/Group are structural (founder bug, 2026-09-06: the generator
@@ -392,7 +396,7 @@ ${edgesBlock(edges, subject)}`
       ? ` The charity's fit with the occasion is given above; you may say it in a few plain words, as the examples do ("Marie Curie nurses were with her at the end"), or leave it to the closing.`
       : ` The charity is named in the closing sentence and nowhere else.`
     instructions = `- "about": write it the way the four examples below are written: two or three sentences, 40 to 65 words in all, about the person and the occasion, in plain words, ending with the closing sentence given here exactly, nothing added after it: "${closing}"${tenseRule}${edgeRule}${truthRule}${babyRule}${effortRule}${realPersonRule}${charityFit}${pronounHint}${nameHint}
-- "reveal" (guests see it only AFTER pledging): start with exactly "${opener}".${entityGuard} Then a plausible option from the list (you MUST use a real option, verbatim), then a full stop, then ONE short sentence with a single detail of the PROTAGONIST'S own relationship to that favourite${first ? " (in the first person)" : ""}: something anyone could have watched them do, and something the about did not already say. The detail involves the favourite ITSELF (what they do with it, where, how often), not a mood, a light or a weather that stands near it. When the favourite is a KIND of thing (a breed, a cuisine, a type of holiday), the detail is about one particular one in their life, never the kind at large.${tenseRule} The detail must be entirely the protagonist's own and must NOT depend on any real-world fact about the favourite: no fixture dates or match traditions, no seasons, tours, episodes, eras, or biography (a claim like "watched them play on Boxing Day" fails if that favourite doesn't play then; avoid the whole category). The options may be famous real people, teams, or works: never state or invent facts about them. No preamble such as "We can't wait to reveal".
+- "reveal" (guests see it only AFTER pledging): start with exactly "${opener}".${entityGuard} Then ${pick ? `exactly this option, verbatim: "${pick}"` : "a plausible option from the list (you MUST use a real option, verbatim)"}, then a full stop, then ONE short sentence with a single detail of the PROTAGONIST'S own relationship to that favourite${first ? " (in the first person)" : ""}: something anyone could have watched them do, and something the about did not already say. The detail involves the favourite ITSELF (what they do with it, where, how often), not a mood, a light or a weather that stands near it. When the favourite is a KIND of thing (a breed, a cuisine, a type of holiday), the detail is about one particular one in their life, never the kind at large.${tenseRule} The detail must be entirely the protagonist's own and must NOT depend on any real-world fact about the favourite: no fixture dates or match traditions, no seasons, tours, episodes, eras, or biography (a claim like "watched them play on Boxing Day" fails if that favourite doesn't play then; avoid the whole category). The options may be famous real people, teams, or works: never state or invent facts about them. No preamble such as "We can't wait to reveal".
 
 ${exemplarsBlock()}`
   }
@@ -521,6 +525,12 @@ export type StoryInput = {
    * somebody via the wizard"). Default false: real.
    */
   fiction?: boolean
+  /**
+   * The favourite, chosen by the caller: the seed picks a random item so
+   * the model stops defaulting to Camber Sands, Sissinghurst and Stand by
+   * Me across cohorts (2026-09-24). The wizard leaves it to the model.
+   */
+  pick?: string | null
 }
 
 export type Story = {
@@ -622,9 +632,19 @@ export async function generateStory(
     displayName: input.displayName ?? null,
     fiction: input.fiction ?? false,
     closing: closing ?? undefined,
+    pick: input.pick ?? null,
   })
 
   let parsed = await callLLMWithCopyCheck(prompt, modelId)
+  // A first-person couple or group keeps "we" in the note.
+  if (
+    firstPerson(input.pronoun) &&
+    (input.grouping === "couple" || input.grouping === "group") &&
+    slipsToSingular(parsed.reveal)
+  ) {
+    const retry = await callLLM(prompt, modelId).catch(() => null)
+    if (retry && !slipsToSingular(retry.reveal)) parsed = retry
+  }
   // Belt and braces for a real person: one retry when the copy names a
   // condition anyway. The charity's own name is exempt (Cancer Research
   // UK, Alzheimer's Society are named on purpose).

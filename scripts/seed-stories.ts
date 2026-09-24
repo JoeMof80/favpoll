@@ -958,6 +958,9 @@ async function seed() {
       grouping: who?.grouping,
       displayName: who?.name ?? null,
       fiction: true,
+      // The seed chooses the favourite: left to the model it defaults to
+      // the same few (Camber Sands, Sissinghurst) cohort after cohort.
+      pick: pick(items).label,
     };
 
     // The judge loop: generate, check P1 by lookup and A1/P2 by the
@@ -1420,6 +1423,7 @@ async function regen(name: string) {
     grouping: x.grouping,
     displayName: p?.name ?? x.cause_label,
     fiction: true,
+    pick: pick(items).label,
   };
   // If the table has moved under the favpoll (a row narrowed), the
   // triple may be below the seed bar: re-pick the topic for the same
@@ -1488,6 +1492,7 @@ async function regen(name: string) {
     items.push(...newItems);
     input.topicTitle = newTopic.title;
     input.itemLabels = newItems.map((i) => i.label);
+    input.pick = pick(newItems).label;
   }
   // A birth favpoll seeded with the BABY on the card becomes the parents'
   // (2026-09-24): a couple is named, the baby moves to the context line.

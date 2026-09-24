@@ -34,6 +34,7 @@ import {
   violatesCopyRules,
   inventsCondition,
   hasTics,
+  slipsToSingular,
   _rateLimitStore,
   RATE_LIMIT_MAX,
   RateLimitError,
@@ -1315,5 +1316,38 @@ describe("hasTics", () => {
       true
     )
     expect(hasTics("He always sits there, by the window.")).toBe(false)
+  })
+})
+
+describe("a caller may choose the favourite; a couple stays plural", () => {
+  it("slipsToSingular catches I and my", () => {
+    expect(
+      slipsToSingular("Ours is Saturn. I point it out whenever I can.")
+    ).toBe(true)
+    expect(
+      slipsToSingular("Ours is Saturn. We point it out whenever we can.")
+    ).toBe(false)
+  })
+
+  it("the prompt names the chosen option verbatim", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mock.queue(CHARITY_DATA)
+    mockLLMResponse("About.", "Joan's is Green. She paints the gate in it.")
+    mock.queue(null)
+    const { generateStory } = await import("@/lib/story-engine")
+    void generateStory
+    await generateDraft({
+      register: "celebrating_one",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      pronoun: "she",
+      displayName: "Joan Okafor",
+    })
+    const prompt = mockMessagesCreate.mock.calls[0][0].messages[0]
+      .content as string
+    // The wizard passes no pick: the model chooses from the list.
+    expect(prompt).toContain("a plausible option from the list")
   })
 })
