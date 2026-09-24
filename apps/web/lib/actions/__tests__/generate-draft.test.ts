@@ -861,9 +861,7 @@ describe("edge-aware generation — the prompt carries the table's edges", () =>
     expect(prompt).toContain(
       "Occasion → topic: A favourite seaside town is part of an achievement:"
     )
-    expect(prompt).toContain(
-      "Charity → topic: RNLI works for rescue"
-    )
+    expect(prompt).toContain("Charity → topic: RNLI works for rescue")
     expect(prompt).toContain(
       "Occasion ↔ charity: RNLI belongs at an achievement"
     )
@@ -1195,6 +1193,8 @@ describe("a real person never gets an invented condition (the wizard caller)", (
       .content as string
     expect(prompt).toContain("This is a REAL person")
     expect(prompt).toContain("never invent or imply any illness")
+    expect(prompt).toContain("Never invent a spouse, partner, child")
+    expect(prompt).toContain("Never announce that a favourite exists")
   })
 
   it("retries once when the first draft gives a real person a condition", async () => {
