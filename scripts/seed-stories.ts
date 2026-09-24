@@ -1347,6 +1347,76 @@ async function regen(name: string) {
     displayName: p?.name ?? x.cause_label,
     fiction: true,
   };
+  // If the table has moved under the favpoll (a row narrowed), the
+  // triple may be below the seed bar: re-pick the topic for the same
+  // occasion and charity, keeping the name, before writing.
+  const bar = isCause
+    ? (e: ReturnType<typeof storyEdges>) => Boolean(e.e1 && e.e2)
+    : (e: ReturnType<typeof storyEdges>) => e.count >= 2;
+  if (!bar(storyEdges(input))) {
+    const { data: allTopics } = await supabase
+      .from("topics")
+      .select("id, title, is_finite, favourites(id, label, is_canonical)")
+      .eq("is_active", true);
+    const options = ((allTopics ?? []) as Topic[])
+      .filter(
+        (t) =>
+          t.favourites.length >= 5 &&
+          !(isCause ? NO_CAUSE_STORY : NO_PERSON_STORY).has(t.title),
+      )
+      .map((t) => ({ t, e: storyEdges({ ...input, topicTitle: t.title }) }))
+      .filter(({ e }) => bar(e));
+    if (options.length === 0)
+      throw new Error(
+        "No topic meets the seed bar for this occasion and charity",
+      );
+    const best = Math.max(...options.map((o) => o.e.count));
+    const { t: newTopic } = pick(options.filter((o) => o.e.count === best));
+    console.log(
+      `  topic ${topic.title} → ${newTopic.title} (the old triple fell below the bar)`,
+    );
+    const newItems = newTopic.is_finite
+      ? newTopic.favourites
+      : newTopic.favourites.filter((f) => f.is_canonical);
+    await supabase
+      .from("favpoll_poll_favourites")
+      .delete()
+      .eq("favpoll_poll_id", poll.id);
+    await supabase
+      .from("favpoll_polls")
+      .update({ topic_id: newTopic.id })
+      .eq("id", poll.id);
+    if (!newTopic.is_finite)
+      await supabase
+        .from("favpoll_poll_favourites")
+        .insert(
+          newItems.map((f) => ({
+            favpoll_poll_id: poll.id,
+            favourite_id: f.id,
+            is_guest_added: false,
+            is_hidden: false,
+            added_by: SEED_USER,
+          })),
+        );
+    // Allocations must point at the new items: spread them, the note's
+    // item re-leads below.
+    const { data: pledges } = await supabase
+      .from("pledges")
+      .select("id")
+      .eq("favpoll_poll_id", poll.id);
+    for (const pl of pledges ?? [])
+      await supabase
+        .from("pledge_allocations")
+        .update({ favourite_id: pick(newItems).id })
+        .eq("pledge_id", pl.id);
+    topic.title = newTopic.title;
+    topic.is_finite = newTopic.is_finite;
+    topic.favourites = newTopic.favourites;
+    items.length = 0;
+    items.push(...newItems);
+    input.topicTitle = newTopic.title;
+    input.itemLabels = newItems.map((i) => i.label);
+  }
   console.log(
     `Regenerating ${p?.name ?? x.cause_label}: ${x.occasion_type} · ${topic.title} · ${ch.name} (${"★".repeat(storyEdges(input).count) || "no edges"})`,
   );

@@ -62,7 +62,10 @@ const MEMORIAL: OccasionRow = {
     t("Garden to visit"),
   ],
   at: "the flowers, the hymns and the readings of the service itself",
-  hop: "what the person loved is what the gathering remembers",
+  // Empty on purpose: everyone knows a memorial remembers what the
+  // person loved, and a written hop was quoted back verbatim ("What he
+  // loved is what we remember today"; founder, 2026-09-24: verbose).
+  hop: "",
 }
 
 const WEDDING: OccasionRow = {
@@ -867,10 +870,15 @@ export function lookupEdges(input: EdgeLookupInput): StoryEdges {
             star: true,
             text: `A favourite ${topic} is part of ${article(occasion)} ${occasion}: ${occ.row.at}.`,
           }
-        : {
-            star: false,
-            text: `${article(occasion) === "an" ? "An" : "A"} ${occasion} suggests a favourite ${topic} only by a step the about must say out loud: ${occ.row.hop}.`,
-          }
+        : occ.row.hop
+          ? {
+              star: false,
+              text: `${article(occasion) === "an" ? "An" : "A"} ${occasion} suggests a favourite ${topic} only by a step the about must say out loud: ${occ.row.hop}.`,
+            }
+          : {
+              star: false,
+              text: `A favourite ${topic} suits ${article(occasion)} ${occasion}; that needs no saying in the about.`,
+            }
     }
   }
 
