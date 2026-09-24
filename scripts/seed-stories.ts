@@ -30,7 +30,8 @@
  *        claude-sonnet-5, what prod runs — quality is the point) ·
  *        --judge-model=… (default claude-haiku-4-5) · --dry-run (pick and
  *        print the triples, no model, no writes) · --registers=cause,… (only
- *        these registers) · --wipe
+ *        these registers) · --refresh (patch the existing cohort: full
+ *        canonical items, portraits; copy untouched) · --wipe
  *
  * SAFETY: refuses to run unless the target is staging, or
  * ALLOW_FAVPOLL_SEED=1. Owned by created_by = 'user_seed_story' (no email,
@@ -39,7 +40,8 @@
  * ---------------------------------------------------------------------------
  */
 
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
+import { deflateSync } from "node:zlib";
 import { writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -90,6 +92,9 @@ const opt = (name: string, dflt: string) => {
   return a ? a.slice(name.length + 3) : dflt;
 };
 const WIPE = flag("wipe");
+// --refresh patches the EXISTING cohort in place (full canonical item set,
+// a portrait where photo_url is null) without touching its copy.
+const REFRESH = flag("refresh");
 const DRY_RUN = flag("dry-run");
 const COUNT = parseInt(opt("count", "24"), 10);
 const THREES = parseFloat(opt("threes", "0.4"));
@@ -253,12 +258,130 @@ function resolveContext(c: OccasionContext, pronoun: Pronoun): string {
   return typeof c === "string" ? c : c[pronoun];
 }
 
+// ── portraits ────────────────────────────────────────────────────────────
+// Every real favpoll has a photo; a seeded one had the initials tile, so
+// the shelf read as a demo (founder, 2026-09-24). Each seeded favpoll gets
+// an abstract portrait in its register colour: a tinted ground and three
+// soft discs placed by a hash of the name. Drawn as a raster here (no
+// image library in scope) and uploaded to the same public bucket real
+// photos use, so photo_url is an ordinary URL for the hero AND the OG
+// image (Satori renders PNG; it would not render an SVG data URI).
+const REGISTER_RGB: Record<string, [number, number, number]> = {
+  remembering: [91, 79, 207], // memorial purple
+  celebrating_one: [192, 57, 123], // celebration magenta
+  celebrating_many: [192, 57, 123],
+  cause: [46, 139, 106], // fundraiser green
+};
+
+function crc32(buf: Uint8Array): number {
+  let c = ~0;
+  for (const b of buf) {
+    c ^= b;
+    for (let k = 0; k < 8; k++) c = (c >>> 1) ^ (0xedb88320 & -(c & 1));
+  }
+  return ~c >>> 0;
+}
+function pngChunk(type: string, data: Uint8Array): Uint8Array {
+  const len = new Uint8Array(4);
+  new DataView(len.buffer).setUint32(0, data.length);
+  const body = new Uint8Array(type.length + data.length);
+  body.set(Buffer.from(type), 0);
+  body.set(data, type.length);
+  const crc = new Uint8Array(4);
+  new DataView(crc.buffer).setUint32(0, crc32(body));
+  return Buffer.concat([len, body, crc]);
+}
+
+/** A 512×512 PNG portrait, deterministic for (name, register). */
+export function makePortrait(name: string, register: string): Uint8Array {
+  const SIZE = 512;
+  const [r0, g0, b0] = REGISTER_RGB[register] ?? REGISTER_RGB.celebrating_one;
+  const h = createHash("sha256").update(`${register}:${name}`).digest();
+  const u = (i: number) => h[i % h.length] / 255;
+  // Ground: the register at a whisper. Discs: three tones of the register,
+  // from deep to pale, each with its own alpha, placed by the hash.
+  const ground = [
+    Math.round(255 - (255 - r0) * 0.1),
+    Math.round(255 - (255 - g0) * 0.1),
+    Math.round(255 - (255 - b0) * 0.1),
+  ];
+  const discs = [0, 1, 2].map((i) => {
+    const t = 0.15 + i * 0.35; // 0.15 deep, 0.5 mid, 0.85 pale
+    return {
+      cx: SIZE * (0.2 + 0.6 * u(i * 3)),
+      cy: SIZE * (0.2 + 0.6 * u(i * 3 + 1)),
+      r: SIZE * (0.22 + 0.2 * u(i * 3 + 2)),
+      rgb: [
+        Math.round(r0 + (255 - r0) * t),
+        Math.round(g0 + (255 - g0) * t),
+        Math.round(b0 + (255 - b0) * t),
+      ],
+      a: 0.85 - i * 0.2,
+    };
+  });
+  const raw = new Uint8Array((SIZE * 3 + 1) * SIZE);
+  for (let y = 0; y < SIZE; y++) {
+    raw[y * (SIZE * 3 + 1)] = 0; // filter: none
+    for (let x = 0; x < SIZE; x++) {
+      let [r, g, b] = ground;
+      for (const d of discs) {
+        const dx = x - d.cx,
+          dy = y - d.cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        // Soft edge over the last 6px so the discs don't alias.
+        const cover = Math.max(0, Math.min(1, (d.r - dist) / 6)) * d.a;
+        if (cover > 0) {
+          r = r + (d.rgb[0] - r) * cover;
+          g = g + (d.rgb[1] - g) * cover;
+          b = b + (d.rgb[2] - b) * cover;
+        }
+      }
+      const o = y * (SIZE * 3 + 1) + 1 + x * 3;
+      raw[o] = r;
+      raw[o + 1] = g;
+      raw[o + 2] = b;
+    }
+  }
+  const ihdr = new Uint8Array(13);
+  const dv = new DataView(ihdr.buffer);
+  dv.setUint32(0, SIZE);
+  dv.setUint32(4, SIZE);
+  ihdr[8] = 8;
+  ihdr[9] = 2; // 8-bit RGB
+  return Buffer.concat([
+    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+    pngChunk("IHDR", ihdr),
+    pngChunk("IDAT", deflateSync(raw)),
+    pngChunk("IEND", new Uint8Array(0)),
+  ]);
+}
+
+async function uploadPortrait(
+  favpollId: string,
+  name: string,
+  register: string,
+): Promise<string | null> {
+  const path = `seed/${favpollId}.png`;
+  const { error } = await supabase.storage
+    .from("protagonists")
+    .upload(path, makePortrait(name, register), {
+      contentType: "image/png",
+      upsert: true,
+    });
+  if (error) {
+    console.error(`  ✗ portrait upload failed for ${name}: ${error.message}`);
+    return null;
+  }
+  return supabase.storage.from("protagonists").getPublicUrl(path).data
+    .publicUrl;
+}
+
 // ── candidates: every triple the table motivates ─────────────────────────
 type Topic = {
   id: string;
   title: string;
   is_finite: boolean;
-  favourites: { id: string; label: string }[];
+  favourites: { id: string; label: string; is_canonical: boolean }[];
 };
 type Charity = {
   id: string;
@@ -468,7 +591,7 @@ async function seed() {
   ] = await Promise.all([
     supabase
       .from("topics")
-      .select("id, title, is_finite, favourites(id, label)")
+      .select("id, title, is_finite, favourites(id, label, is_canonical)")
       .eq("is_active", true),
     supabase
       .from("charities")
@@ -525,15 +648,14 @@ async function seed() {
       ? resolveContext(pick(spec.contexts), who?.pronoun ?? "they")
       : null;
 
-    // Item set follows the item-source rule (lib/poll-items): a finite
-    // topic's items are its closed set; an infinite topic gets a curated
-    // subset, which must include whatever the note ends up naming.
+    // Item set follows the item-source rule (lib/poll-items) AND the
+    // wizard: a finite topic's items are its closed set; an infinite
+    // topic's are its curated rows, which the wizard seeds with EVERY
+    // canonical favourite (the founder's instinct, 2026-09-24: "infinite
+    // lists should be full"). Nothing here trims the list.
     const items = c.topic.is_finite
       ? c.topic.favourites
-      : shuffle(c.topic.favourites).slice(
-          0,
-          Math.min(between(8, 14), c.topic.favourites.length),
-        );
+      : c.topic.favourites.filter((f) => f.is_canonical);
 
     const input: StoryInput = {
       register: c.register,
@@ -633,6 +755,8 @@ async function seed() {
       : now - between(3, 60) * DAY;
     const createdAt = closesAt - between(14, 45) * DAY;
     const favpollId = randomUUID();
+    const portraitName = who?.name ?? story.causeLabel ?? c.charity.name;
+    const photoUrl = await uploadPortrait(favpollId, portraitName, c.register);
 
     let protagonistId: string | null = null;
     if (who) {
@@ -643,6 +767,7 @@ async function seed() {
           about: story.about,
           context,
           pronoun: who.pronoun,
+          photo_url: photoUrl,
           created_by: SEED_USER,
         })
         .select("id")
@@ -673,6 +798,7 @@ async function seed() {
         : null,
       description: isCause ? story.about : null,
       context: isCause ? (story.context ?? context) : null,
+      photo_url: isCause ? photoUrl : null,
       category: isCause
         ? null
         : c.register === "remembering"
@@ -814,7 +940,97 @@ async function seed() {
   console.log("Tear down with: --wipe");
 }
 
-(WIPE ? wipe() : seed()).catch((e) => {
+// ── refresh: patch the existing cohort in place ──────────────────────────
+async function refresh() {
+  console.log("Refreshing the existing story seed…");
+  const { data: f, error } = await supabase
+    .from("favpolls")
+    .select(
+      "id, subject, category, grouping, cause_label, photo_url, protagonists(id, name, photo_url), favpoll_polls(id, topics(id, is_finite, favourites(id, is_canonical)), favpoll_poll_favourites(favourite_id))",
+    )
+    .eq("created_by", SEED_USER);
+  if (error) throw new Error(error.message);
+  const one = <T>(v: T | T[] | null): T | null =>
+    Array.isArray(v) ? (v[0] ?? null) : v;
+  let items = 0,
+    portraits = 0;
+  for (const x of f ?? []) {
+    const p = one(x.protagonists as any) as {
+      id: string;
+      name: string;
+      photo_url: string | null;
+    } | null;
+    const poll = one(x.favpoll_polls as any) as any;
+    const topic = one(poll?.topics) as {
+      id: string;
+      is_finite: boolean;
+      favourites: { id: string; is_canonical: boolean }[];
+    } | null;
+    // Full canonical set for infinite topics — add what the curated subset left out.
+    if (topic && !topic.is_finite) {
+      const have = new Set(
+        (poll.favpoll_poll_favourites as { favourite_id: string }[]).map(
+          (r) => r.favourite_id,
+        ),
+      );
+      const missing = topic.favourites.filter(
+        (fv) => fv.is_canonical && !have.has(fv.id),
+      );
+      if (missing.length) {
+        const { error: e } = await supabase
+          .from("favpoll_poll_favourites")
+          .insert(
+            missing.map((fv) => ({
+              favpoll_poll_id: poll.id,
+              favourite_id: fv.id,
+              is_guest_added: false,
+              is_hidden: false,
+              added_by: SEED_USER,
+            })),
+          );
+        if (e)
+          console.error(
+            `  ✗ items for ${p?.name ?? x.cause_label}: ${e.message}`,
+          );
+        else items += missing.length;
+      }
+    }
+    // A portrait where there is none.
+    const register =
+      x.subject === "cause"
+        ? "cause"
+        : x.category === "memorial"
+          ? "remembering"
+          : x.grouping === "individual"
+            ? "celebrating_one"
+            : "celebrating_many";
+    const name = p?.name ?? x.cause_label ?? x.id;
+    if (p && !p.photo_url) {
+      const url = await uploadPortrait(x.id, name, register);
+      if (url) {
+        await supabase
+          .from("protagonists")
+          .update({ photo_url: url })
+          .eq("id", p.id);
+        portraits++;
+      }
+    } else if (!p && !x.photo_url) {
+      const url = await uploadPortrait(x.id, name, register);
+      if (url) {
+        await supabase
+          .from("favpolls")
+          .update({ photo_url: url })
+          .eq("id", x.id);
+        portraits++;
+      }
+    }
+  }
+  console.log(
+    `Refreshed ${f?.length ?? 0} favpolls: ${items} items added, ${portraits} portraits set.`,
+  );
+}
+
+(WIPE ? wipe() : REFRESH ? refresh() : seed()).catch((e) => {
   console.error(e);
   process.exit(1);
 });
