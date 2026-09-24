@@ -477,6 +477,10 @@ function sample(candidates: Candidate[], n: number): Candidate[] {
   const perTopic = new Map<string, number>();
   const perOccasion = new Map<string, number>();
   const perRegister = new Map<Register, number>();
+  // Births are triads with every children's charity, so the triads-first
+  // pass filled a third of the shelf with them (8 of 24, third cohort).
+  let births = 0;
+  const MAX_BIRTHS = Math.max(1, Math.round(n / 12));
   const cap = (m: Map<string, number>, k: string, max: number) =>
     (m.get(k) ?? 0) < max;
   const bump = (m: Map<string, number>, k: string) =>
@@ -499,12 +503,14 @@ function sample(candidates: Candidate[], n: number): Candidate[] {
         chosen.filter((x) => x.count === 3).length >= wantThrees
       )
         continue;
+      if (BABY_OCCASIONS.has(c.occasion) && births >= MAX_BIRTHS) continue;
       if (!cap(perCharity, c.charity.id, 3)) continue;
       if (!cap(perTopic, c.topic.id, 2)) continue;
       if (!cap(perOccasion, c.occasion, 3)) continue;
       if ((perRegister.get(c.register) ?? 0) >= registerQuota(c.register))
         continue;
       chosen.push(c);
+      if (BABY_OCCASIONS.has(c.occasion)) births++;
       bump(perCharity, c.charity.id);
       bump(perTopic, c.topic.id);
       bump(perOccasion, c.occasion);
@@ -662,7 +668,9 @@ async function seed() {
     const isBirth = BABY_OCCASIONS.has(c.occasion);
     // "Welcome to the world" addresses the baby; the card names the
     // parents, so a birth congratulates them and names the baby beneath.
-    const babyName = isBirth ? pick([...SHE, ...HE]) : null;
+    const babyName = isBirth
+      ? pick([...SHE, ...HE].filter((nm) => !who?.name.includes(nm)))
+      : null;
     const openingLine = isBirth
       ? "Congratulations to"
       : spec
