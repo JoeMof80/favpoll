@@ -1,5 +1,7 @@
 "use server";
 
+import { CAUSE_FAMILIES, type CauseFamily } from "@favpoll/types";
+
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
@@ -36,6 +38,12 @@ export type Charity = {
   is_active: boolean;
   market: string;
   created_at: string;
+  /** Cause family (references/favpoll-pairing-table §2): the confirmed
+   *  value the generator reads, the model's suggestion, and the register
+   *  text it came from. Selected by getCharities. */
+  cause_family?: CauseFamily | null;
+  cause_family_suggested?: CauseFamily | null;
+  activities?: string | null;
 };
 
 /** Charity Commission fields for an insert/update, from a (name, number) pair. */
@@ -70,7 +78,7 @@ export async function getCharities(
   let query = supabase
     .from("charities")
     .select(
-      "id, name, description, logo_url, impact_statement, registered_number, verification_status, verified_name, verified_at, consent_status, consent_contacted_at, consent_decided_at, is_active, market, created_at",
+      "id, name, description, logo_url, impact_statement, registered_number, verification_status, verified_name, verified_at, consent_status, consent_contacted_at, consent_decided_at, is_active, market, created_at, cause_family, cause_family_suggested, activities",
     )
     .order("name", { ascending: true });
 
@@ -84,6 +92,17 @@ export async function getCharities(
   return { data: data as Charity[], error: null };
 }
 
+/** The form sends the family as a string ("" = no cause of its own). */
+function parseCauseFamily(
+  value: string | null | undefined,
+): { ok: true; family: CauseFamily | null } | { ok: false; error: string } {
+  if (value === undefined || value === null || value === "")
+    return { ok: true, family: null };
+  if ((CAUSE_FAMILIES as readonly string[]).includes(value))
+    return { ok: true, family: value as CauseFamily };
+  return { ok: false, error: `Unknown cause family: ${value}` };
+}
+
 export async function createCharity(input: {
   name: string;
   description?: string;
@@ -91,8 +110,11 @@ export async function createCharity(input: {
   registered_number?: string;
   logo_url?: string;
   market: string;
+  cause_family?: string;
 }): Promise<{ error: string | null }> {
   if (!input.name.trim()) return { error: "Name is required." };
+  const family = parseCauseFamily(input.cause_family);
+  if (!family.ok) return { error: family.error };
   if (!VALID_MARKETS.includes(input.market)) {
     return {
       error: `Invalid market. Must be one of: ${VALID_MARKETS.join(", ")}.`,
@@ -123,6 +145,8 @@ export async function createCharity(input: {
     registered_website: contact.website,
     activities: purpose.activities,
     classification: purpose.classification,
+    // Hand-entered by an admin, so this IS the confirmed value.
+    cause_family: family.family,
     logo_url: input.logo_url?.trim() || null,
     market: input.market,
     is_active: true,
@@ -144,6 +168,7 @@ export async function updateCharity(
     registered_number?: string;
     logo_url?: string;
     market?: string;
+    cause_family?: string;
   },
 ): Promise<{ error: string | null }> {
   if (data.name !== undefined && !data.name.trim()) {
@@ -151,6 +176,11 @@ export async function updateCharity(
   }
 
   const updates: Record<string, string | null> = {};
+  if (data.cause_family !== undefined) {
+    const family = parseCauseFamily(data.cause_family);
+    if (!family.ok) return { error: family.error };
+    updates.cause_family = family.family;
+  }
   if (data.name !== undefined) updates.name = data.name.trim();
   if (data.description !== undefined)
     updates.description = data.description.trim() || null;
@@ -293,6 +323,11 @@ export type ConsentQueueRow = {
   registered_email: string | null;
   consent_contacted_at: string | null;
   favpoll_count: number;
+  /** Cause family (references/favpoll-pairing-table §2): the confirmed
+   *  value, the model's suggestion, and the register text it came from. */
+  cause_family: CauseFamily | null;
+  cause_family_suggested: CauseFamily | null;
+  activities: string | null;
 };
 
 /** CONSENT OUTREACH QUEUE — pending charities in use on at least one
@@ -319,7 +354,7 @@ export async function getConsentQueue(): Promise<{
   const { data, error } = await supabase
     .from("charities")
     .select(
-      "id, name, registered_number, registered_email, consent_contacted_at",
+      "id, name, registered_number, registered_email, consent_contacted_at, cause_family, cause_family_suggested, activities",
     )
     .eq("consent_status", "pending")
     .in("id", [...counts.keys()])
@@ -353,6 +388,27 @@ export async function markCharityContacted(
 
   if (error) return { error: error.message };
 
+  revalidatePath("/charities");
+  return { error: null };
+}
+
+/** CAUSE FAMILY — the admin's confirmation (references/favpoll-pairing-table
+ * §2). `cause_family` is the ONLY family the generator reads; the model's
+ * `cause_family_suggested` is shown beside it and never used directly. null
+ * is a valid, honest answer: a grant-maker has no cause of its own. */
+export async function setCauseFamily(
+  id: string,
+  family: CauseFamily | null,
+): Promise<{ error: string | null }> {
+  if (family !== null && !CAUSE_FAMILIES.includes(family)) {
+    return { error: `Unknown cause family: ${family}` };
+  }
+  const supabase = createAdminClient();
+  const { error } = await supabase
+    .from("charities")
+    .update({ cause_family: family })
+    .eq("id", id);
+  if (error) return { error: error.message };
   revalidatePath("/charities");
   return { error: null };
 }

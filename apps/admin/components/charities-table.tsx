@@ -1,5 +1,11 @@
 "use client";
 
+import {
+  CAUSE_FAMILIES,
+  CAUSE_FAMILY_LABELS,
+  type CauseFamily,
+} from "@favpoll/types";
+
 import { useEffect, useState, useTransition } from "react";
 import { ChevronDown, ChevronRight, Search } from "lucide-react";
 import type { Charity } from "@/lib/actions/charities";
@@ -145,6 +151,10 @@ type CharityFormValues = {
   registered_number: string;
   logo_url: string;
   market: string;
+  /** "" = no cause of its own. Saved as CONFIRMED — so it is never
+   *  pre-filled from the model's suggestion; an unrelated edit must not
+   *  silently confirm a guess. */
+  cause_family: string;
 };
 
 // ─── Register typeahead ───────────────────────────────────────────────────────
@@ -237,9 +247,13 @@ function RegisterSearch({
 function CharityFields({
   form,
   set,
+  suggestedFamily,
 }: {
   form: CharityFormValues;
   set: (field: keyof CharityFormValues, value: string) => void;
+  /** The model's guess from the register (edit form only) — shown as a
+   *  hint, never pre-selected. */
+  suggestedFamily?: CauseFamily | null;
 }) {
   return (
     <div className="space-y-3">
@@ -295,6 +309,29 @@ function CharityFields({
             onChange={(v) => set("market", v)}
           />
         </Field>
+        {/* Cause family (references/favpoll-pairing-table §2). This form
+            is the confirm path for charities OUTSIDE the outreach queue —
+            the queue only lists pending charities in use on a favpoll. */}
+        <Field label="Cause family">
+          <select
+            value={form.cause_family}
+            onChange={(e) => set("cause_family", e.target.value)}
+            className="h-8 w-full rounded-lg border border-border bg-background px-3 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+          >
+            <option value="">No cause of its own</option>
+            {CAUSE_FAMILIES.map((f) => (
+              <option key={f} value={f}>
+                {CAUSE_FAMILY_LABELS[f]}
+              </option>
+            ))}
+          </select>
+          {suggestedFamily && !form.cause_family && (
+            <p className="mt-1 text-xs text-muted-foreground">
+              Suggested from the register:{" "}
+              {CAUSE_FAMILY_LABELS[suggestedFamily]} — pick it to confirm.
+            </p>
+          )}
+        </Field>
       </div>
     </div>
   );
@@ -309,6 +346,7 @@ const EMPTY_FORM: CharityFormValues = {
   registered_number: "",
   logo_url: "",
   market: "en-GB",
+  cause_family: "",
 };
 
 export function AddCharityForm() {
@@ -520,6 +558,7 @@ function CharityRow({
     registered_number: charity.registered_number ?? "",
     logo_url: charity.logo_url ?? "",
     market: charity.market,
+    cause_family: charity.cause_family ?? "",
   });
 
   function set(field: keyof CharityFormValues, value: string) {
@@ -624,7 +663,11 @@ function CharityRow({
 
               {editing ? (
                 <div className="space-y-3">
-                  <CharityFields form={form} set={set} />
+                  <CharityFields
+                    form={form}
+                    set={set}
+                    suggestedFamily={charity.cause_family_suggested}
+                  />
                   <div className="flex gap-2">
                     <Button
                       type="button"

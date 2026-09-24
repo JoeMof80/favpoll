@@ -488,3 +488,72 @@ describe("setCharityConsent", () => {
     expect(error).toBe("update failed");
   });
 });
+
+// The cause family (references/favpoll-pairing-table §2). Confirmed here,
+// read by the generator only once confirmed.
+import { setCauseFamily } from "@/lib/actions/charities";
+
+describe("setCauseFamily", () => {
+  it("writes a confirmed family", async () => {
+    mock.queue(null); // update
+    const { error } = await setCauseFamily("charity-1", "homelessness");
+    expect(error).toBeNull();
+    const update = mock
+      .callsFor("charities")
+      .find((c) => c.method === "update");
+    expect(update?.args[0]).toEqual({ cause_family: "homelessness" });
+  });
+
+  it("clears to null — 'no cause of its own' is a real answer", async () => {
+    mock.queue(null);
+    const { error } = await setCauseFamily("charity-1", null);
+    expect(error).toBeNull();
+    const update = mock
+      .callsFor("charities")
+      .find((c) => c.method === "update");
+    expect(update?.args[0]).toEqual({ cause_family: null });
+  });
+
+  it("rejects a value that is not a family", async () => {
+    const { error } = await setCauseFamily(
+      "charity-1",
+      "puppies" as unknown as "animals",
+    );
+    expect(error).toBe("Unknown cause family: puppies");
+    expect(mock.callsFor("charities")).toHaveLength(0);
+  });
+});
+
+// The edit form is the confirm path for charities OUTSIDE the outreach queue
+// (not pending, or not yet on a favpoll) — the queue only lists pending
+// charities in use. Saving the form writes the family as confirmed.
+describe("updateCharity — cause family", () => {
+  it("writes a confirmed family from the form", async () => {
+    mock.queue(null); // update
+    const { error } = await updateCharity("charity-1", {
+      cause_family: "end_of_life",
+    });
+    expect(error).toBeNull();
+    const update = mock
+      .callsFor("charities")
+      .find((c) => c.method === "update");
+    expect(update?.args[0]).toEqual({ cause_family: "end_of_life" });
+  });
+
+  it("treats the empty option as 'no cause of its own'", async () => {
+    mock.queue(null);
+    await updateCharity("charity-1", { cause_family: "" });
+    const update = mock
+      .callsFor("charities")
+      .find((c) => c.method === "update");
+    expect(update?.args[0]).toEqual({ cause_family: null });
+  });
+
+  it("rejects a value that is not a family", async () => {
+    const { error } = await updateCharity("charity-1", {
+      cause_family: "puppies",
+    });
+    expect(error).toBe("Unknown cause family: puppies");
+    expect(mock.callsFor("charities")).toHaveLength(0);
+  });
+});
