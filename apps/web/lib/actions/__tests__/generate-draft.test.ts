@@ -865,13 +865,13 @@ describe("edge-aware generation — the prompt carries the table's edges", () =>
     expect(prompt).toContain(
       "Occasion ↔ charity: RNLI belongs at an achievement"
     )
-    expect(prompt).toContain("All THREE edges link this favpoll")
+    expect(prompt).toContain("never explain a ★ one")
     // The first seed run parroted the edge sentences into copy, and
     // explained ★ edges that read on the card by themselves (founder,
     // 2026-09-24: "it doesn't quite make sense").
     expect(prompt).toContain("must NOT explain or justify it")
     expect(prompt).toContain("em dashes (—) in prose")
-    expect(prompt).toContain("won't say which")
+    expect(prompt).toContain("kept back or withheld")
     expect(prompt).toContain(
       'In its own words on the Charity Commission register: "The RNLI operates lifeboats'
     )
@@ -906,8 +906,8 @@ describe("edge-aware generation — the prompt carries the table's edges", () =>
     expect(prompt).toContain("Occasion → topic: none.")
     expect(prompt).toContain("Charity → topic: none.")
     expect(prompt).toContain("Occasion ↔ charity: none.")
-    expect(prompt).toContain("NO edge links this occasion")
-    expect(prompt).toContain("stated in the about before the invitation")
+    expect(prompt).toContain("No edge links this occasion")
+    expect(prompt).toContain("one plain, believable thing about them")
   })
 
   it("the wizard passes no occasion: the register default pairs with nothing", async () => {
@@ -929,7 +929,7 @@ describe("edge-aware generation — the prompt carries the table's edges", () =>
     expect(prompt).toContain("Occasion → topic: none.")
     // The charity edge survives without an occasion.
     expect(prompt).toContain("Charity → topic: RNLI works for")
-    expect(prompt).toContain("ONE edge links this favpoll")
+    expect(prompt).toContain("The edges above are context")
   })
 
   it("a charity with register words but no description is described only in those terms", async () => {
@@ -1025,7 +1025,9 @@ describe("the reveal promise rotates", () => {
     })
     const prompt = mockMessagesCreate.mock.calls[0][0].messages[0]
       .content as string
-    expect(prompt).toContain("SECOND sentence, exactly this, nothing added")
+    expect(prompt).toContain(
+      "ending with the closing sentence given here exactly"
+    )
     expect(
       REVEAL_PROMISES.some((f) =>
         prompt.includes(
@@ -1106,10 +1108,10 @@ describe("realism rules in the person prompt (founder review, 2026-09-24)", () =
     const prompt = promptOf()
     expect(prompt).toContain("These four are the bar")
     expect(prompt).toContain("Cornflower blue. She kept a pot of cornflowers")
-    expect(prompt).toContain("must be ORDINARY")
+    expect(prompt).toContain("ordinary and believable")
     expect(prompt).toContain("one particular one in their life")
-    expect(prompt).toContain("places and things have no agency")
-    expect(prompt).toContain("something anyone could have WATCHED them do")
+    expect(prompt).toContain("given agency")
+    expect(prompt).toContain("something anyone could have watched them do")
     expect(prompt).not.toContain("The occasion is a birth")
   })
 
@@ -1134,8 +1136,8 @@ describe("realism rules in the person prompt (founder review, 2026-09-24)", () =
     const prompt = promptOf()
     expect(prompt).toContain("The occasion is a birth")
     expect(prompt).toContain("the name above is the BABY'S")
-    expect(prompt).toContain("keep the reason back")
-    expect(prompt).toContain("a newborn has none")
+    expect(prompt).toContain("say only that the parents have chosen")
+    expect(prompt).toContain("no preferences, habits or memories of its own")
   })
 })
 
@@ -1200,7 +1202,6 @@ describe("a real person never gets an invented condition (the wizard caller)", (
     expect(prompt).toContain("never invent or imply any illness")
     expect(prompt).toContain("Never invent a spouse, partner, child")
     expect(prompt).toContain("Never announce that a favourite exists")
-    expect(prompt).toContain("No props or actions added to sound specific")
   })
 
   it("retries once when the first draft gives a real person a condition", async () => {

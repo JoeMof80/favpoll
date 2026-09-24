@@ -67,7 +67,7 @@ function exemplarsBlock(): string {
   const items = EXEMPLAR_STORIES.map(
     (x) => `${x.triple}\n  about: ${x.about}\n  note: ${x.note}`
   ).join("\n")
-  return `These four are the bar. Notice how ordinary the facts are (a pot on a windowsill, a photo on a desk, four packets of biscuits), how plainly they are said, and that nothing in them is invented for effect. They predate the em dash rule; keep their plainness, not their dashes.\n${items}`
+  return `These four are the bar. Notice how ordinary the facts are (a pot on a windowsill, a photo on a desk, four packets of biscuits), how plainly they are said, how much room they take, and that nothing in them is invented for effect. They predate the em dash rule; keep their plainness, not their dashes.\n${items}`
 }
 
 /** A birth: the BABY is the protagonist on the card ("Welcome to the
@@ -259,7 +259,7 @@ export function buildPrompt(opts: {
     : 'Charity: not yet chosen — say "charity" generically.'
 
   const voice = `You write short copy for favpoll, a UK charitable-giving platform used at real life events. Guests pledge money to charity and share favourites; after pledging, the protagonist's own favourite is revealed to them.
-Voice: warm, plain, specific, quietly dignified. Short sentences. British English. Every word earns its place: no "a day out at" for "a garden", no "always" doubled with "every", no clause that restates the one before it. If a sentence works without a phrase, drop the phrase.
+Voice: warm, plain, specific, quietly dignified. Short sentences. British English.
 Never use: "vote", "voting", "choose", "choosing", "choice", "remarkable", "meaningful", "celebrate the life", "make a difference", exclamation marks, em dashes (—) in prose, or any fundraising cliché. Join clauses with a comma, a full stop or "and". The money word is "pledge"; the selection word is "pick".`
 
   const context = `Occasion: ${REGISTER_LABEL[register]}.${occasionType ? ` Occasion type: ${occasionType}.` : ""}
@@ -336,42 +336,30 @@ ${edgesBlock(edges, subject)}`
       register === "remembering"
         ? ` The person is being remembered: every sentence about them — in the about AND the reveal detail — must be in the past tense (loved, was, would reach for). Never "has loved", "still does", or any present-tense habit.`
         : ` The person is living: their habits are in the present tense ("always goes", "still picks first"), never the past-habitual ("always went") — past tense makes them sound gone. Do not assume their age: no whole-life idioms ("since childhood", "all her life", "long held"). When the charity or occasion suggests who they are (a children's charity, a graduation), let that shape the detail; otherwise write habits that fit any age.`
-    // What the about must do, by edge count (pairing table §6). At zero
-    // edges the fact about the person IS the motivation, and it has to be
-    // in the about, read before the pledge, not only in the reveal (the
-    // Yvette case). But the fact must be ORDINARY: the first cohort's
-    // demand for "a specific fact that makes the topic theirs" produced
-    // talismans, quirks and places with agency (founder, 2026-09-24:
-    // "one seaside town has walked every mile of it with her").
+    // What the about must do (pairing table §6), stripped back
+    // 2026-09-24 after a day of patching one example at a time left the
+    // writer squeezed ("never went a week without one"). The exemplars
+    // carry the form; the rules that remain are about truth, not style,
+    // and the seed's judge carries realism.
     const topicLower = topicTitle.toLowerCase()
     const edgeRule =
       edges.count === 0
-        ? ` NO edge links this occasion, this charity and this topic, so the about MUST say one plain, believable thing about the person that makes a favourite ${topicLower} a natural thing to ask them, stated in the about before the invitation, not only in the reveal.`
-        : edges.count === 1
-          ? ` ONE edge links this favpoll (listed above). Let it stand, and say one plain, believable thing about the person that makes a favourite ${topicLower} a natural thing to ask them.`
-          : edges.count === 2
-            ? ` TWO edges link this favpoll (listed above). Let them stand; the about's job is the person.`
-            : ` All THREE edges link this favpoll (listed above). The card already says it; the about's job is the person.`
-    const ordinaryRule = ` The one thing the about says about the person must be ORDINARY: something a relative would actually say (what they do on a Sunday, what they always order, where they sit, who they go with). Never a talisman, a lucky object, a superstition, or a quirk invented for effect. Never a thing they "turn to", that "steadies" them, that "feels most like their own", or a place or object that has "walked with" or "carried" them: places and things have no agency. Never say that the favourite is being kept back, withheld, not yet revealed, or that they "won't say which": simply do not name it. The one promise of a reveal is the closing clause.`
-    // The parents are the protagonists at a birth; the baby has no habits.
+        ? ` No edge links this occasion, this charity and this topic, so the about itself must make a favourite ${topicLower} a natural thing to ask this person, with one plain, believable thing about them.`
+        : ` The edges above are context; the card already carries them. Say a two-hop one in a clause if the about needs it; never explain a ★ one.`
+    const truthRule = ` What you say about the person must be ordinary and believable, the kind of thing a relative would say: never a talisman, a lucky object, a superstition, a quirk invented for effect, or a place or object given agency ("walked every mile with her", "steadies him"). Never announce that a favourite exists ("she had a favourite cat breed"). Never say the favourite is being kept back or withheld: simply do not name or hint at it; the closing sentence is the one promise of a reveal.`
     const babyRule = BABY_OCCASIONS.has(occasionType ?? "")
-      ? ` The occasion is a birth: the name above is the BABY'S, and the parents are writing on the baby's behalf. The favourite is what they have chosen for the baby (the book they read first, the rhyme they sing, the game they will teach), said as the baby's ("Mei's is The Gruffalo"). In the about, say only that the parents have chosen and keep the reason back. The reveal's detail is that reason, one plain fact the about did not give ("it was what her dad called his own grandmother", "her grandmother came over from Naples in 1970"). Never a preference, habit or memory of the baby's own (a newborn has none), never a ritual invented to attach the parents to the pick, and no "still" or "already" in a newborn's household.`
+      ? ` The occasion is a birth: the name above is the BABY'S, and the parents are writing on the baby's behalf. The favourite is what they have chosen for the baby (the book they read first, the rhyme they sing), said as the baby's ("Mei's is The Gruffalo"). In the about say only that the parents have chosen; the reveal's detail is where the choice came from. The baby has no preferences, habits or memories of its own, and no "still" or "already" in a newborn's household.`
       : ""
-    const noInventedPeople = ` Never invent a spouse, partner, child, sibling, parent, friend, job, home or town for them to fill a sentence ("with his wife", "at the office"): stay with what they themselves do. A relative may appear only when the occasion supplies one (a wedding has a couple; a birth has parents).`
+    const noInventedPeople = ` Never invent a spouse, partner, child, sibling, parent, friend, job, home or town for them to fill a sentence: stay with what they themselves do. A relative may appear only when the occasion supplies one (a wedding has a couple; a birth has parents).`
     const realPersonRule = fiction
       ? noInventedPeople
       : noInventedPeople +
-        ` This is a REAL person and the organiser who knows them will read this: never invent or imply any illness, condition, disability, diagnosis, treatment, cause of death or medical history for them, and never infer one from the charity's cause (a hospice, a cancer charity, a sight-loss charity says nothing about this person). The edges above are context about the occasion and the charity, not facts about the person. If no link between the charity and the person is given, do not supply one: name the charity and leave the reason to the organiser.`
-    // The charity's fit with the occasion (E3) may be said in a few
-    // words, as the exemplars do ("Marie Curie nurses were with her at
-    // the end"); otherwise the charity is only named in the closing.
+        ` This is a REAL person and the organiser who knows them will read this: never invent or imply any illness, condition, disability, diagnosis, treatment, cause of death or medical history for them, and never infer one from the charity's cause (a hospice, a cancer charity, a sight-loss charity says nothing about this person). If no link between the charity and the person is given, do not supply one: name the charity and leave the reason to the organiser.`
     const charityFit = edges.e3
-      ? ` The charity's fit with the occasion is given above; you may say it in the first sentence in a few plain words, or leave it to the closing.`
-      : ` The charity is named in the closing sentence only: no clause describing it.`
-    instructions = `- "about": exactly TWO sentences, under 40 words in all.
-  FIRST sentence (under 24 words): one plain thing about the PROTAGONIST that a relative would say without being asked, from the world of ${topicLower} where it comes naturally (the cats she kept; the gardens he walked on Sundays), the way the examples below do. No props or actions added to sound specific (a flask, a border, a lucky object): if a reader would ask "why mention that?", cut it. Never announce that a favourite exists ("she had a favourite cat breed"). Do not name or hint at which option it is (the reveal is the gift). At most one "and".${tenseRule}${edgeRule}${ordinaryRule}${babyRule}${realPersonRule}${charityFit}
-  SECOND sentence, exactly this, nothing added: "${closing}"${pronounHint}${nameHint}
-- "reveal" (guests see it only AFTER pledging): start with exactly "${opener}".${entityGuard} Then a plausible option from the list (you MUST use a real option, verbatim), then a full stop, then ONE short sentence (under 18 words) with a single detail about the PROTAGONIST'S relationship to that favourite. When the favourite is a KIND of thing (a breed, a type of holiday, a cuisine, a flower), the detail is about one particular one in their life ("her own, a grey called Moss, slept on her lap every evening"), never the kind at large ("waiting for one to appear"). The detail must be something anyone could have WATCHED them do: where they sit, what they order, what they say, who they go with, how often. It pays off what the about set up, adding something the about did not say; never restate the about.${tenseRule} Never a talisman, a lucky object, a superstition, a joke, or a quirk invented for effect; never a habit for a baby or a child too young to have one. The detail must be entirely the protagonist's own and must NOT depend on any real-world fact about the favourite: no fixture dates or match traditions, no seasons, tours, episodes, eras, or biography (a claim like "watched them play on Boxing Day" fails if that favourite doesn't play then; avoid the whole category). The options may be famous real people, teams, or works: never state or invent facts about them. No preamble such as "We can't wait to reveal".
+      ? ` The charity's fit with the occasion is given above; you may say it in a few plain words, as the examples do ("Marie Curie nurses were with her at the end"), or leave it to the closing.`
+      : ` The charity is named in the closing sentence and nowhere else.`
+    instructions = `- "about": write it the way the four examples below are written: two or three sentences, 40 to 65 words in all, about the person and the occasion, in plain words, ending with the closing sentence given here exactly, nothing added after it: "${closing}"${tenseRule}${edgeRule}${truthRule}${babyRule}${realPersonRule}${charityFit}${pronounHint}${nameHint}
+- "reveal" (guests see it only AFTER pledging): start with exactly "${opener}".${entityGuard} Then a plausible option from the list (you MUST use a real option, verbatim), then a full stop, then ONE short sentence with a single detail of the PROTAGONIST'S own relationship to that favourite: something anyone could have watched them do, and something the about did not already say. When the favourite is a KIND of thing (a breed, a cuisine, a type of holiday), the detail is about one particular one in their life, never the kind at large.${tenseRule} The detail must be entirely the protagonist's own and must NOT depend on any real-world fact about the favourite: no fixture dates or match traditions, no seasons, tours, episodes, eras, or biography (a claim like "watched them play on Boxing Day" fails if that favourite doesn't play then; avoid the whole category). The options may be famous real people, teams, or works: never state or invent facts about them. No preamble such as "We can't wait to reveal".
 
 ${exemplarsBlock()}`
   }
