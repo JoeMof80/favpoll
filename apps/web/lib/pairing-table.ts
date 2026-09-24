@@ -98,7 +98,7 @@ const ACHIEVEMENT: OccasionRow = {
     t("Sporting moment"),
   ],
   at: "where the effort happened — the sea, the peak, the route",
-  hop: "the training, the fuel and the playlist behind the effort",
+  hop: "what got them through the training",
 }
 
 // The name on the card at a birth is the PARENTS'; the baby cannot have a
@@ -470,6 +470,10 @@ export const FAMILY_ROWS: Record<
   CauseFamily,
   { cause: string; topics: TopicRow[] }
 > = {
+  // The family row is a rehoming charity's: dogs and cats. The wild
+  // topics (Sea creature, Butterfly, Insect) live on the RSPCA and WWF
+  // rows only — a pet memorial for an octopus came out of the wider
+  // row (fifth cohort, 2026-09-24).
   animals: {
     cause: "animals — rescue, welfare and wildlife",
     topics: [
@@ -477,9 +481,6 @@ export const FAMILY_ROWS: Record<
       t("Dog breed"),
       t("Cat breed"),
       t("Bird"),
-      t("Sea creature"),
-      t("Butterfly"),
-      t("Insect"),
       t("Weather for walk"),
       t("Beach"),
     ],
@@ -559,16 +560,13 @@ export const FAMILY_ROWS: Record<
       t("Garden to visit"),
     ],
   },
+  // Rescue is a family (lifeboats, mountain rescue, air ambulance); the
+  // sea topics were the RNLI's own and now live on its row. "Mountain
+  // Rescue works for lifeboats and rescue at sea" failed the judge
+  // (fifth cohort, 2026-09-24).
   sea_rescue: {
-    cause: "lifeboats and rescue at sea",
-    topics: [
-      t("Seaside town", true),
-      t("Beach", true),
-      t("Sea creature"),
-      t("Island"),
-      t("Weather"),
-      t("Way to travel"),
-    ],
+    cause: "rescue — lifeboats, mountain rescue, air ambulance",
+    topics: [t("Weather")],
   },
   // Review note F (not HOLD): risks reading as a holiday — kept as tabled.
   international: {
@@ -593,9 +591,26 @@ export const FAMILY_ROWS: Record<
   },
 }
 
-/** Seeded charities whose table row is sharper than their family's.
- *  Keyed on the seeded name (scripts/seed.ts), matched loosely. */
+/** Charities whose table row is sharper than their family's. Keyed on
+ *  the name as seeded (scripts/seed.ts) or as added from the register
+ *  on staging (REGISTER_ADDED), matched loosely. */
+export const REGISTER_ADDED = ["Mountain Rescue England and Wales"] as const
 export const CHARITY_ROWS: Record<string, TopicRow[]> = {
+  RNLI: [
+    t("Seaside town", true),
+    t("Beach", true),
+    t("Sea creature"),
+    t("Island"),
+    t("Weather"),
+    t("Way to travel"),
+  ],
+  "Mountain Rescue England and Wales": [
+    t("Mountain or peak", true),
+    t("National park", true),
+    t("Landscape"),
+    t("Weather for walk"),
+    t("Weather"),
+  ],
   "Dogs Trust": [
     t("Dog breed", true),
     t("Animal"),
@@ -738,7 +753,7 @@ export const HONOUR_CHARITY_ROWS: HonourCharityRow[] = [
     occasions: ["Achievement", "Sponsored event"],
     family: "sea_rescue",
     star: true,
-    why: "the cause the effort is for — a swim for the lifeboats",
+    why: "the cause the effort is for — a swim for the lifeboats, a climb for mountain rescue",
   },
   {
     occasions: ["Achievement", "Sponsored event"],

@@ -862,7 +862,7 @@ describe("edge-aware generation — the prompt carries the table's edges", () =>
       "Occasion → topic: A favourite seaside town is part of an achievement:"
     )
     expect(prompt).toContain(
-      "Charity → topic: RNLI works for lifeboats and rescue at sea"
+      "Charity → topic: RNLI works for rescue"
     )
     expect(prompt).toContain(
       "Occasion ↔ charity: RNLI belongs at an achievement"

@@ -6,6 +6,7 @@ import {
   FAMILY_ROWS,
   CHARITY_ROWS,
   HONOUR_CHARITY_ROWS,
+  REGISTER_ADDED,
   lookupEdges,
 } from "../pairing-table"
 import { OCCASION_TYPES_BY_REGISTER } from "../registers"
@@ -56,12 +57,10 @@ describe("pairing table — vocabulary drift guards", () => {
     }
   })
 
-  it("every per-charity row names a seeded charity", () => {
+  it("every per-charity row names a seeded or register-added charity", () => {
+    const known = new Set([...SEEDED_CHARITIES, ...REGISTER_ADDED])
     for (const name of Object.keys(CHARITY_ROWS)) {
-      expect(
-        SEEDED_CHARITIES.has(name),
-        `charity "${name}" is not seeded`
-      ).toBe(true)
+      expect(known.has(name), `charity "${name}" is not known`).toBe(true)
     }
   })
 
@@ -116,7 +115,7 @@ describe("lookupEdges — the worked triples from the reference note", () => {
       "A favourite seaside town is part of an achievement: where the effort happened — the sea, the peak, the route."
     )
     expect(edges.e3?.text).toBe(
-      "RNLI belongs at an achievement: the cause the effort is for — a swim for the lifeboats."
+      "RNLI belongs at an achievement: the cause the effort is for — a swim for the lifeboats, a climb for mountain rescue."
     )
   })
 
