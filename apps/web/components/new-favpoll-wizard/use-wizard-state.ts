@@ -99,7 +99,9 @@ function whoFor(
   if (subject === "cause") return "cause"
   if (grouping === "couple") return "couple"
   if (grouping === "group") return "group"
-  return pronoun ?? ""
+  // "i" (the organiser is the protagonist) has no who icon yet — noted
+  // as a product decision, 2026-09-24 — so it reads as unanswered here.
+  return pronoun === "i" ? "" : (pronoun ?? "")
 }
 
 function sortTopicItems(items: Favourite[]): Favourite[] {

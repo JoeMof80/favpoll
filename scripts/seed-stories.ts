@@ -372,6 +372,28 @@ const GROUP_NAMES: Record<string, string[]> = {
   ],
 };
 
+// Where the organiser is usually the protagonist, the Story is written
+// in the first person most of the time (founder, 2026-09-24: "surely
+// quite a lot of them would be in reality").
+const FIRST_PERSON_OCCASIONS = new Set([
+  "Achievement",
+  "Retirement",
+  "New home",
+  "Citizenship",
+  "Coming out",
+  "Divorce party",
+  "Wedding",
+  "Engagement",
+  "Anniversary",
+  "Renewal of vows",
+  "Reunion",
+  "New baby",
+  "Baby shower",
+  "Christening",
+]);
+const firstPersonHere = (occasion: string) =>
+  FIRST_PERSON_OCCASIONS.has(occasion) && chance(0.7);
+
 function protagonist(
   register: Register,
   occasion: string,
@@ -385,7 +407,7 @@ function protagonist(
   if (BABY_OCCASIONS.has(occasion)) {
     return {
       name: `${drawAny()} & ${drawAny()}`,
-      pronoun: "they",
+      pronoun: firstPersonHere(occasion) ? "i" : "they",
       grouping: "couple",
     };
   }
@@ -399,14 +421,14 @@ function protagonist(
     }
     return {
       name: `${drawAny()} & ${drawAny()}`,
-      pronoun: "they",
+      pronoun: firstPersonHere(occasion) ? "i" : "they",
       grouping: "couple",
     };
   }
   const she = chance(0.5);
   return {
     name: `${she ? drawShe() : drawHe()} ${drawLast()}`,
-    pronoun: she ? "she" : "he",
+    pronoun: firstPersonHere(occasion) ? "i" : she ? "she" : "he",
     grouping: "individual",
   };
 }
@@ -421,7 +443,7 @@ function occasionSpec(occasion: string) {
   );
 }
 function resolveContext(c: OccasionContext, pronoun: Pronoun): string {
-  return typeof c === "string" ? c : c[pronoun];
+  return typeof c === "string" ? c : c[pronoun === "i" ? "they" : pronoun];
 }
 
 // ── portraits ────────────────────────────────────────────────────────────

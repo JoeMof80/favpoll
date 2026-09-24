@@ -159,11 +159,19 @@ export function pickRevealPromise(
   possessive: string,
   index = Math.floor(Math.random() * REVEAL_PROMISES.length)
 ): string {
-  return REVEAL_PROMISES[index % REVEAL_PROMISES.length].replace(
-    "X",
-    possessive
-  )
+  // In the first person "we'll reveal mine" reads as two speakers.
+  const forms =
+    possessive === "mine" || possessive === "ours"
+      ? REVEAL_PROMISES.filter((f) => !f.startsWith("and we'll"))
+      : REVEAL_PROMISES
+  return forms[index % forms.length].replace("X", possessive)
 }
+
+/** First person: the organiser is the protagonist. A pair or group says
+ *  "we"; one person says "I". */
+const firstPerson = (pronoun?: Pronoun) => pronoun === "i"
+const ownPossessive = (grouping?: FavpollGrouping) =>
+  grouping === "couple" || grouping === "group" ? "ours" : "mine"
 
 function revealOpener(
   register: Register,
@@ -172,6 +180,8 @@ function revealOpener(
   grouping?: FavpollGrouping
 ): string {
   const tense = register === "remembering" ? "was" : "is"
+  if (firstPerson(pronoun))
+    return `${ownPossessive(grouping) === "ours" ? "Ours" : "Mine"} ${tense}`
   const named = namePossessive(displayName, grouping)
   if (named) return `${named} ${tense}`
   const poss = pronoun === "she" ? "Hers" : pronoun === "he" ? "His" : "Theirs"
@@ -299,12 +309,19 @@ ${edgesBlock(edges, subject)}`
     // Pair/Group are structural (founder bug, 2026-09-06: the generator
     // wrote "him/his" for a pair because plurality never reached it).
     const plural = grouping === "couple" || grouping === "group"
-    const pronounHint = plural
-      ? ` The favpoll honours ${grouping === "couple" ? "a PAIR — two people together" : "a GROUP of people"}: use "they/them/their" and plural agreement in every sentence ("their favourite", "they have loved"), and treat the name as referring to ${grouping === "couple" ? "both of them" : "all of them"}, never one individual.`
-      : pronoun
-        ? ` Use "${pronoun}" pronouns for the person.`
-        : ""
-    const namePoss = namePossessive(displayName, grouping)
+    const first = firstPerson(pronoun)
+    const pronounHint = first
+      ? plural
+        ? ` The organisers ARE the people honoured, ${grouping === "couple" ? "a pair" : "a group"}, writing in the FIRST PERSON PLURAL: "we", "our", "us" in every sentence. Never "they" for themselves; the name on the card is not used in the copy.`
+        : ` The organiser IS the person honoured, writing in the FIRST PERSON: "I", "my", "me" in every sentence, the way a person writes their own page ("I'm retiring in June"). Never "he", "she" or the name: the name is on the card, not in the copy.`
+      : plural
+        ? ` The favpoll honours ${grouping === "couple" ? "a PAIR — two people together" : "a GROUP of people"}: use "they/them/their" and plural agreement in every sentence ("their favourite", "they have loved"), and treat the name as referring to ${grouping === "couple" ? "both of them" : "all of them"}, never one individual.`
+        : pronoun
+          ? ` Use "${pronoun}" pronouns for the person.`
+          : ""
+    const namePoss = first
+      ? ownPossessive(grouping)
+      : namePossessive(displayName, grouping)
     // The reveal promise closes every about, so its shape is rotated HERE
     // rather than left to the model, which always took the first example
     // ("and Joan's will be revealed" on 24 of 24 seeded Stories; founder,
@@ -315,16 +332,18 @@ ${edgesBlock(edges, subject)}`
       (promise
         ? closingSentence(charityName, promise)
         : `Pledge to ${charityName ?? "charity"} and pick your own favourite.`)
-    const nameHint = promise
-      ? `\nThe protagonist is called "${displayName}". In the about's first sentence use pronouns, or the first name once; the closing sentence names them in its possessive. The reveal opener below already contains the name — never repeat it beyond these places.`
-      : ""
+    const nameHint = first
+      ? ""
+      : promise
+        ? `\nThe protagonist is called "${displayName}". In the about's first sentence use pronouns, or the first name once; the closing sentence names them in its possessive. The reveal opener below already contains the name — never repeat it beyond these places.`
+        : ""
     // An explicitly chosen he/she is the organiser SAYING there is a
     // person, and it outranks any guess made from the name's shape. The
     // guard used to win regardless, so a favpoll named after its event
     // ("Ben's Channel Swim") got "Theirs is …" with ♂ selected
     // (founder-caught, 2026-09-23). It still earns its place for
     // "they"/unset, which is the genuine appeal/fund/organisation case.
-    const namedPerson = pronoun === "he" || pronoun === "she"
+    const namedPerson = pronoun === "he" || pronoun === "she" || first
     const entityGuard =
       displayName && !namedPerson
         ? ` EXCEPTION: if "${displayName}" is clearly not an individual person (an appeal, fund, organisation, or event), there is no protagonist — open with "Theirs is" instead and keep the about free of personal pronouns.`
@@ -372,7 +391,7 @@ ${edgesBlock(edges, subject)}`
       ? ` The charity's fit with the occasion is given above; you may say it in a few plain words, as the examples do ("Marie Curie nurses were with her at the end"), or leave it to the closing.`
       : ` The charity is named in the closing sentence and nowhere else.`
     instructions = `- "about": write it the way the four examples below are written: two or three sentences, 40 to 65 words in all, about the person and the occasion, in plain words, ending with the closing sentence given here exactly, nothing added after it: "${closing}"${tenseRule}${edgeRule}${truthRule}${babyRule}${effortRule}${realPersonRule}${charityFit}${pronounHint}${nameHint}
-- "reveal" (guests see it only AFTER pledging): start with exactly "${opener}".${entityGuard} Then a plausible option from the list (you MUST use a real option, verbatim), then a full stop, then ONE short sentence with a single detail of the PROTAGONIST'S own relationship to that favourite: something anyone could have watched them do, and something the about did not already say. When the favourite is a KIND of thing (a breed, a cuisine, a type of holiday), the detail is about one particular one in their life, never the kind at large.${tenseRule} The detail must be entirely the protagonist's own and must NOT depend on any real-world fact about the favourite: no fixture dates or match traditions, no seasons, tours, episodes, eras, or biography (a claim like "watched them play on Boxing Day" fails if that favourite doesn't play then; avoid the whole category). The options may be famous real people, teams, or works: never state or invent facts about them. No preamble such as "We can't wait to reveal".
+- "reveal" (guests see it only AFTER pledging): start with exactly "${opener}".${entityGuard} Then a plausible option from the list (you MUST use a real option, verbatim), then a full stop, then ONE short sentence with a single detail of the PROTAGONIST'S own relationship to that favourite${first ? " (in the first person)" : ""}: something anyone could have watched them do, and something the about did not already say. When the favourite is a KIND of thing (a breed, a cuisine, a type of holiday), the detail is about one particular one in their life, never the kind at large.${tenseRule} The detail must be entirely the protagonist's own and must NOT depend on any real-world fact about the favourite: no fixture dates or match traditions, no seasons, tours, episodes, eras, or biography (a claim like "watched them play on Boxing Day" fails if that favourite doesn't play then; avoid the whole category). The options may be famous real people, teams, or works: never state or invent facts about them. No preamble such as "We can't wait to reveal".
 
 ${exemplarsBlock()}`
   }
@@ -576,7 +595,9 @@ export async function generateStory(
   const edges = storyEdges(input)
   const closingPoss =
     input.subject === "someone"
-      ? namePossessive(input.displayName, input.grouping)
+      ? firstPerson(input.pronoun)
+        ? ownPossessive(input.grouping)
+        : namePossessive(input.displayName, input.grouping)
       : null
   const closing =
     input.subject === "someone"
@@ -641,8 +662,13 @@ export async function generateStory(
   // The model sometimes returns the first sentence alone (Gordon, fifth
   // cohort): the closing is the invitation and the reveal promise, so it
   // is appended when missing rather than left to chance.
+  // Any promise form counts as present: the model may pick a different
+  // one from the rotation, and two closings would be worse than one.
+  const closingPrefix = `Pledge to ${input.charity.name ?? "charity"}, pick your own favourite,`
   const withClosing = (about: string) =>
-    closing && !about.includes(closing.slice(0, -1))
+    closing &&
+    !about.includes(closingPrefix) &&
+    !about.includes(closing.slice(0, -1))
       ? `${endStop(about)} ${closing}`
       : about
   return {
@@ -708,7 +734,12 @@ export async function judgeStory(
   story: Pick<Story, "about" | "note">,
   input: Pick<
     StoryInput,
-    "subject" | "topicTitle" | "occasionType" | "displayName" | "grouping"
+    | "subject"
+    | "topicTitle"
+    | "occasionType"
+    | "displayName"
+    | "grouping"
+    | "pronoun"
   >,
   edges: StoryEdges,
   modelId: string
@@ -716,7 +747,7 @@ export async function judgeStory(
   const isCause = input.subject === "cause"
   const who = isCause
     ? `a cause (${input.displayName ?? "unnamed"})`
-    : `${input.displayName ?? "the person"}, ${input.grouping === "couple" ? "a couple" : input.grouping === "group" ? "a group" : "one person"}`
+    : `${input.displayName ?? "the person"}, ${input.grouping === "couple" ? "a couple" : input.grouping === "group" ? "a group" : "one person"}${firstPerson(input.pronoun) ? ", writing about themselves in the first person (fail it if it slips into the third person)" : ""}`
   const effort = EFFORT_OCCASIONS.has(input.occasionType ?? "")
     ? " The occasion is a sponsored effort still to come: fail it if the effort is written as already done."
     : ""

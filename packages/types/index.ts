@@ -140,7 +140,10 @@ export type Register =
 export type FavpollCategory = "celebration" | "memorial" | "fundraiser";
 export type FavpollGrouping = "individual" | "couple" | "group";
 export type FavpollSubject = "someone" | "cause";
-export type Pronoun = "he" | "she" | "they";
+/** "i" = the organiser IS the protagonist and writes in the first person
+ *  (founder, 2026-09-24: "isn't it just another pronoun?"); a couple or
+ *  group in the first person says "we" through its grouping. */
+export type Pronoun = "he" | "she" | "they" | "i";
 
 export type Favpoll = {
   id: string;

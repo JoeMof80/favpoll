@@ -1256,3 +1256,53 @@ describe("the closing sentence is enforced", () => {
     )
   })
 })
+
+describe("first person: the organiser is the protagonist", () => {
+  const promptOf = () =>
+    mockMessagesCreate.mock.calls[0][0].messages[0].content as string
+
+  it("opens the reveal with Mine and closes with mine", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mock.queue(CHARITY_DATA)
+    mockLLMResponse(
+      "I'm retiring in June. Pledge to Ocean Trust, pick your own favourite, to see mine.",
+      "Mine is Blue. I painted the shed in it last summer."
+    )
+    mock.queue(null)
+    const result = await generateDraft({
+      register: "celebrating_one",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      pronoun: "i",
+      displayName: "Roy Mansfield",
+    })
+    const prompt = promptOf()
+    expect(prompt).toContain('start with exactly "Mine is"')
+    expect(prompt).toContain("writing in the FIRST PERSON")
+    expect(prompt).not.toContain("Roy's")
+    expect(prompt).not.toContain("we'll reveal mine")
+    expect(result.about).toMatch(/mine\.$/)
+  })
+
+  it("a couple in the first person says ours", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mock.queue(CHARITY_DATA)
+    mockLLMResponse("About.", "Ours is Blue. We painted the hall in it.")
+    mock.queue(null)
+    await generateDraft({
+      register: "celebrating_many",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      pronoun: "i",
+      grouping: "couple",
+      displayName: "Emma & James",
+    })
+    const prompt = promptOf()
+    expect(prompt).toContain('start with exactly "Ours is"')
+    expect(prompt).toContain("FIRST PERSON PLURAL")
+  })
+})
