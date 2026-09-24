@@ -33,6 +33,7 @@ import {
   hasFabricatedStats,
   violatesCopyRules,
   inventsCondition,
+  hasTics,
   _rateLimitStore,
   RATE_LIMIT_MAX,
   RateLimitError,
@@ -1304,5 +1305,15 @@ describe("first person: the organiser is the protagonist", () => {
     const prompt = promptOf()
     expect(prompt).toContain('start with exactly "Ours is"')
     expect(prompt).toContain("FIRST PERSON PLURAL")
+  })
+})
+
+describe("hasTics", () => {
+  it("flags 'anyone who asks' and a second 'always'", () => {
+    expect(hasTics("She shows it to anyone who asks.")).toBe(true)
+    expect(hasTics("He always sits there. He always orders the same.")).toBe(
+      true
+    )
+    expect(hasTics("He always sits there, by the window.")).toBe(false)
   })
 })

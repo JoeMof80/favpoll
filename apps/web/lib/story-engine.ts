@@ -11,6 +11,7 @@ import {
   hasFabricatedStats,
   violatesCopyRules,
   inventsCondition,
+  hasTics,
 } from "./actions/generate-draft-utils"
 
 /**
@@ -391,7 +392,7 @@ ${edgesBlock(edges, subject)}`
       ? ` The charity's fit with the occasion is given above; you may say it in a few plain words, as the examples do ("Marie Curie nurses were with her at the end"), or leave it to the closing.`
       : ` The charity is named in the closing sentence and nowhere else.`
     instructions = `- "about": write it the way the four examples below are written: two or three sentences, 40 to 65 words in all, about the person and the occasion, in plain words, ending with the closing sentence given here exactly, nothing added after it: "${closing}"${tenseRule}${edgeRule}${truthRule}${babyRule}${effortRule}${realPersonRule}${charityFit}${pronounHint}${nameHint}
-- "reveal" (guests see it only AFTER pledging): start with exactly "${opener}".${entityGuard} Then a plausible option from the list (you MUST use a real option, verbatim), then a full stop, then ONE short sentence with a single detail of the PROTAGONIST'S own relationship to that favourite${first ? " (in the first person)" : ""}: something anyone could have watched them do, and something the about did not already say. When the favourite is a KIND of thing (a breed, a cuisine, a type of holiday), the detail is about one particular one in their life, never the kind at large.${tenseRule} The detail must be entirely the protagonist's own and must NOT depend on any real-world fact about the favourite: no fixture dates or match traditions, no seasons, tours, episodes, eras, or biography (a claim like "watched them play on Boxing Day" fails if that favourite doesn't play then; avoid the whole category). The options may be famous real people, teams, or works: never state or invent facts about them. No preamble such as "We can't wait to reveal".
+- "reveal" (guests see it only AFTER pledging): start with exactly "${opener}".${entityGuard} Then a plausible option from the list (you MUST use a real option, verbatim), then a full stop, then ONE short sentence with a single detail of the PROTAGONIST'S own relationship to that favourite${first ? " (in the first person)" : ""}: something anyone could have watched them do, and something the about did not already say. The detail involves the favourite ITSELF (what they do with it, where, how often), not a mood, a light or a weather that stands near it. When the favourite is a KIND of thing (a breed, a cuisine, a type of holiday), the detail is about one particular one in their life, never the kind at large.${tenseRule} The detail must be entirely the protagonist's own and must NOT depend on any real-world fact about the favourite: no fixture dates or match traditions, no seasons, tours, episodes, eras, or biography (a claim like "watched them play on Boxing Day" fails if that favourite doesn't play then; avoid the whole category). The options may be famous real people, teams, or works: never state or invent facts about them. No preamble such as "We can't wait to reveal".
 
 ${exemplarsBlock()}`
   }
@@ -439,11 +440,12 @@ export async function callLLMWithCopyCheck(
     const rescue = await callLLM(prompt, modelId)
     return rescue
   }
-  if (!violatesCopyRules(`${first.about} ${first.reveal}`)) return first
+  const bad = (d: DraftFields) =>
+    violatesCopyRules(`${d.about} ${d.reveal}`) ||
+    hasTics(`${d.about} ${d.reveal}`)
+  if (!bad(first)) return first
   const retry = await callLLM(prompt, modelId).catch(() => null)
-  return retry && !violatesCopyRules(`${retry.about} ${retry.reveal}`)
-    ? retry
-    : first
+  return retry && !bad(retry) ? retry : first
 }
 
 export async function callLLM(
@@ -770,6 +772,15 @@ ABOUT (read before pledging):
 
 NOTE (read after pledging):
 """${story.note}"""
+
+Then read it once more as a good EDITOR. Fail it if the writing is contrived, vague, forced or over-intense, or if the note's detail is not about the favourite itself. Examples that FAIL that reading, from the founder's own review:
+- "always notices which way the wind is blowing" (a contrived link to the topic);
+- "it felt like the right place to start something" (vague: start what?);
+- "shows it to anyone who asks" (nobody asks; a tic);
+- "argue kindly" (an oxymoron);
+- "a favourite cuisine has settled somewhere in there" (passive and vague);
+- a person made to seem obsessed with ice cream, or with cat breeds (over-intense);
+- "she takes her tea onto the step when the light turns yellow" as the detail for a favourite kind of weather for a WALK (the detail is not about the walk).
 
 Fail it if ANY of these is true:
 - a baby or a child too young has a favourite, a habit or a memory;

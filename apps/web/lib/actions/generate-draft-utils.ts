@@ -74,6 +74,16 @@ export function violatesCopyRules(text: string): boolean {
 }
 
 /**
+ * The model's tics, caught in code because a rule only moves them along
+ * ("still" became "always" became "anyone who asks"; founder, 2026-09-24).
+ * "always" is allowed once per Story.
+ */
+export function hasTics(text: string): boolean {
+  if (/anyone who ask/i.test(text)) return true
+  return (text.match(/\balways\b/gi) ?? []).length > 1
+}
+
+/**
  * True when copy about a REAL person states or implies a medical
  * condition, a diagnosis, a treatment or a cause of death (founder,
  * 2026-09-24). The charity's own name is stripped first: "Cancer Research
