@@ -55,6 +55,7 @@ import type { CauseFamily, Pronoun } from "@favpoll/types";
 import {
   aboutNamesEvent,
   BABY_OCCASIONS,
+  EFFORT_OCCASIONS,
   generateStory,
   judgeStory,
   storyEdges,
@@ -110,7 +111,12 @@ const RENAME = flag("rename");
 const DRY_RUN = flag("dry-run");
 const COUNT = parseInt(opt("count", "24"), 10);
 const THREES = parseFloat(opt("threes", "0.4"));
-const RNG_SEED = parseInt(opt("seed", "1"), 10);
+// A regen is a fresh draw each time (two regens in a row named both
+// couples "David & Farid" from the same seed, 2026-09-24).
+const RNG_SEED = parseInt(
+  opt("seed", opt("regen", "") ? String(Date.now() % 100000) : "1"),
+  10,
+);
 const STORY_MODEL = opt("model", "claude-sonnet-5");
 // The realism judge runs on the Story model: a smaller judge passed
 // anything concrete (founder, 2026-09-24).
@@ -374,6 +380,15 @@ function protagonist(
   pronoun: Pronoun;
   grouping: "individual" | "couple" | "group";
 } {
+  // A birth honours the PARENTS on behalf of the child (founder,
+  // 2026-09-24): named as a couple, the baby in the context line.
+  if (BABY_OCCASIONS.has(occasion)) {
+    return {
+      name: `${drawAny()} & ${drawAny()}`,
+      pronoun: "they",
+      grouping: "couple",
+    };
+  }
   if (register === "celebrating_many") {
     if (GROUP_NAMES[occasion]) {
       return {
@@ -855,10 +870,37 @@ async function seed() {
     const isCause = c.register === "cause";
     const who = isCause ? null : protagonist(c.register, c.occasion);
     const spec = occasionSpec(c.occasion);
-    const openingLine = spec ? pick(spec.openingLines) : null;
-    const context = spec
-      ? resolveContext(pick(spec.contexts), who?.pronoun ?? "they")
-      : null;
+    // The catalogue's Achievement lines ("Well done", "Take a bow") are
+    // written after the event; a sponsored effort is cheered on before it.
+    const isEffort = EFFORT_OCCASIONS.has(c.occasion) && !isCause;
+    const isBirth = BABY_OCCASIONS.has(c.occasion);
+    const babyName = isBirth ? drawAny() : null;
+    const effortName = pick([
+      "Marathon",
+      "Half marathon",
+      "Channel swim",
+      "Coast to coast",
+      "Three Peaks",
+      "London to Brighton",
+      "10k",
+      "Triathlon",
+    ]);
+    const openingLine = isBirth
+      ? "Congratulations to"
+      : isEffort
+        ? pick(["Cheering on", "Backing", "Good luck to"])
+        : spec
+          ? pick(spec.openingLines)
+          : null;
+    const context = isBirth
+      ? c.occasion === "Baby shower"
+        ? `Baby ${drawLast()} due ${pick(["October", "November", "December"])}`
+        : `Welcoming ${babyName}`
+      : isEffort
+        ? `${effortName} · ${pick(["4th", "12th", "19th", "26th"])} ${pick(["October", "November"])}`
+        : spec
+          ? resolveContext(pick(spec.contexts), who?.pronoun ?? "they")
+          : null;
 
     // Item set follows the item-source rule (lib/poll-items) AND the
     // wizard: a finite topic's items are its closed set; an infinite
@@ -940,7 +982,8 @@ async function seed() {
     }
 
     // ── write ──
-    const open = chance(0.6);
+    // An effort's favpoll closes on the day, so it is always still open.
+    const open = EFFORT_OCCASIONS.has(c.occasion) || chance(0.6);
     const closesAt = open
       ? now + between(7, 40) * DAY
       : now - between(3, 60) * DAY;
@@ -1387,17 +1430,15 @@ async function regen(name: string) {
       .update({ topic_id: newTopic.id })
       .eq("id", poll.id);
     if (!newTopic.is_finite)
-      await supabase
-        .from("favpoll_poll_favourites")
-        .insert(
-          newItems.map((f) => ({
-            favpoll_poll_id: poll.id,
-            favourite_id: f.id,
-            is_guest_added: false,
-            is_hidden: false,
-            added_by: SEED_USER,
-          })),
-        );
+      await supabase.from("favpoll_poll_favourites").insert(
+        newItems.map((f) => ({
+          favpoll_poll_id: poll.id,
+          favourite_id: f.id,
+          is_guest_added: false,
+          is_hidden: false,
+          added_by: SEED_USER,
+        })),
+      );
     // Allocations must point at the new items: spread them, the note's
     // item re-leads below.
     const { data: pledges } = await supabase
@@ -1416,6 +1457,39 @@ async function regen(name: string) {
     items.push(...newItems);
     input.topicTitle = newTopic.title;
     input.itemLabels = newItems.map((i) => i.label);
+  }
+  // A birth favpoll seeded with the BABY on the card becomes the parents'
+  // (2026-09-24): a couple is named, the baby moves to the context line.
+  if (
+    p &&
+    BABY_OCCASIONS.has(x.occasion_type ?? "") &&
+    x.grouping === "individual"
+  ) {
+    const babyFirst = p.name.split(" ")[0];
+    const parents = `${drawAny()} & ${drawAny()}`;
+    await supabase
+      .from("protagonists")
+      .update({
+        name: parents,
+        pronoun: "they",
+        context: `Welcoming ${babyFirst}`,
+      })
+      .eq("id", p.id);
+    await supabase
+      .from("favpolls")
+      .update({
+        grouping: "couple",
+        is_plural: true,
+        opening_line: "Congratulations to",
+      })
+      .eq("id", x.id);
+    console.log(`  ${p.name} → ${parents}, welcoming ${babyFirst}`);
+    p.name = parents;
+    p.pronoun = "they";
+    (x as any).grouping = "couple";
+    input.displayName = parents;
+    input.pronoun = undefined;
+    input.grouping = "couple";
   }
   console.log(
     `Regenerating ${p?.name ?? x.cause_label}: ${x.occasion_type} · ${topic.title} · ${ch.name} (${"★".repeat(storyEdges(input).count) || "no edges"})`,

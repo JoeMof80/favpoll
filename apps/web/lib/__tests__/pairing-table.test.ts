@@ -112,7 +112,7 @@ describe("lookupEdges — the worked triples from the reference note", () => {
     expect(edges.e2?.star).toBe(true)
     expect(edges.e3?.star).toBe(true)
     expect(edges.e1?.text).toBe(
-      "A favourite seaside town is part of an achievement: where the effort happened — the sea, the peak, the route."
+      "A favourite seaside town is part of an achievement: where the effort happens — the sea, the peak, the route."
     )
     expect(edges.e3?.text).toBe(
       "RNLI belongs at an achievement: the cause the effort is for — a swim for the lifeboats, a climb for mountain rescue."

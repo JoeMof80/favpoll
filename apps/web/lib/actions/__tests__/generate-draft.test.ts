@@ -866,6 +866,8 @@ describe("edge-aware generation — the prompt carries the table's edges", () =>
       "Occasion ↔ charity: RNLI belongs at an achievement"
     )
     expect(prompt).toContain("never explain a ★ one")
+    // A sponsored effort is written before the day, never as finished.
+    expect(prompt).toContain("STILL TO COME")
     // The first seed run parroted the edge sentences into copy, and
     // explained ★ edges that read on the card by themselves (founder,
     // 2026-09-24: "it doesn't quite make sense").
@@ -1115,29 +1117,28 @@ describe("realism rules in the person prompt (founder review, 2026-09-24)", () =
     expect(prompt).not.toContain("The occasion is a birth")
   })
 
-  it("at a birth, the baby is the protagonist and the parents write on her behalf", async () => {
+  it("at a birth, the parents are honoured and the favourite is their own", async () => {
     mock.queue(null)
     mock.queue(TOPIC_DATA)
     mock.queue(CHARITY_DATA)
     mockLLMResponse(
       "About.",
-      "Mei's is Blue. Her mum painted the nursery in it before she arrived."
+      "Sarah & Tom's is Blue. They painted their first flat in it."
     )
     mock.queue(null)
     await generateDraft({
-      register: "celebrating_one",
+      register: "celebrating_many",
       subject: "someone",
       topicId: "topic-1",
       primaryCharityId: "charity-1",
-      pronoun: "she",
+      grouping: "couple",
       occasionType: "New baby",
-      displayName: "Mei Doyle",
+      displayName: "Sarah & Tom",
     })
     const prompt = promptOf()
     expect(prompt).toContain("The occasion is a birth")
-    expect(prompt).toContain("the name above is the BABY'S")
-    expect(prompt).toContain("say only that the parents have chosen")
-    expect(prompt).toContain("no preferences, habits or memories of its own")
+    expect(prompt).toContain("The people honoured are the PARENTS")
+    expect(prompt).toContain("The favourite is the parents' OWN")
   })
 })
 

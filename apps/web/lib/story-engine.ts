@@ -80,6 +80,12 @@ export const BABY_OCCASIONS = new Set([
   "Christening",
 ])
 
+/** A sponsored effort is fundraising: the favpoll runs in the build-up
+ *  and closes on the day, so the copy is written BEFORE the effort
+ *  (founder, 2026-09-24: "it doesn't make sense to fundraise after
+ *  finishing a marathon"). */
+export const EFFORT_OCCASIONS = new Set(["Achievement", "Sponsored event"])
+
 const REGISTER_LABEL: Record<Register, string> = {
   remembering: "a memorial — someone being remembered",
   celebrating_one: "a celebration of one person",
@@ -259,7 +265,7 @@ export function buildPrompt(opts: {
     : 'Charity: not yet chosen — say "charity" generically.'
 
   const voice = `You write short copy for favpoll, a UK charitable-giving platform used at real life events. Guests pledge money to charity and share favourites; after pledging, the protagonist's own favourite is revealed to them.
-Voice: warm, plain, specific, quietly dignified. Short sentences. British English.
+Voice: warm, plain, specific, quietly dignified. Short sentences. British English. A comma before "and" only when a new subject follows it ("she cooks, and he washes up"), never between two verbs sharing a subject ("he cooks the dishes he grew up with and has picked up new ones").
 Never use: "vote", "voting", "choose", "choosing", "choice", "remarkable", "meaningful", "celebrate the life", "make a difference", exclamation marks, em dashes (—) in prose, or any fundraising cliché. Join clauses with a comma, a full stop or "and". The money word is "pledge"; the selection word is "pick".`
 
   const context = `Occasion: ${REGISTER_LABEL[register]}.${occasionType ? ` Occasion type: ${occasionType}.` : ""}
@@ -286,7 +292,7 @@ ${edgesBlock(edges, subject)}`
       ? `The organiser calls this cause "${displayName!.trim()}" — write around that name; do not rename it.\n`
       : ""
     instructions = `${labelContext}${causeLabelInstruction}- "context" (max 40 characters): one short subline for under the cause name, giving a timeframe or who it helps — like "Winter 2026 appeal" or "For families facing hardship". It must NOT contain the charity's name in any form (the charity is already shown beside it), and must NOT mention pledges, money, or where the money goes — the about owns that. No full stop.
-- "about" (max 2 sentences): first what this favpoll is raising for${hasPurpose ? "" : " (taken from the cause name above only — the charity's own work is unknown and must not be described)"}${occasionType && occasionType !== "Fundraiser" ? `, at what event (say "${occasionType.toLowerCase()}" or its plain equivalent — a guest must know what is happening)` : ""}${edges.count > 0 ? ", with why THIS topic in a clause — say the edge listed above, in your own words" : ""}, then the mechanic in ONE clause — guests pick their favourite ${topicTitle.toLowerCase()} and pledge to ${charityName ?? "the charity"}, where the pick and the pledge are a single action (the pick is made BY pledging). Never present them as separate steps: no "first…", "then…", "tell us…". favpoll takes no platform fee. Do NOT name or hint at any particular option, and do not repeat the context subline's wording.
+- "about" (max 2 sentences): first what this favpoll is raising for${hasPurpose ? "" : " (taken from the cause name above only — the charity's own work is unknown and must not be described)"}${occasionType && occasionType !== "Fundraiser" ? `, at what event (say "${occasionType.toLowerCase()}" or its plain equivalent — a guest must know what is happening${EFFORT_OCCASIONS.has(occasionType) ? ", and it is still to come: pledges are gathered in the build-up, so never write it as finished" : ""})` : ""}${edges.count > 0 ? ", with why THIS topic in a clause — say the edge listed above, in your own words" : ""}, then the mechanic in ONE clause — guests pick their favourite ${topicTitle.toLowerCase()} and pledge to ${charityName ?? "the charity"}, where the pick and the pledge are a single action (the pick is made BY pledging). Never present them as separate steps: no "first…", "then…", "tell us…". favpoll takes no platform fee. Do NOT name or hint at any particular option, and do not repeat the context subline's wording.
 - "reveal" (guests see it only AFTER pledging): start with exactly "Our pick to start:" then a real option from the list, then " — " (this separator is the one place an em dash is allowed) and one short, warm clause, plain and unforced, like "They watched it every Christmas Eve without fail". It need not justify the pick; the about carries the reason. No statistics, numbers, percentages, or invented quotes.`
   } else {
     const opener = revealOpener(register, pronoun, displayName, grouping)
@@ -335,7 +341,7 @@ ${edgesBlock(edges, subject)}`
     const tenseRule =
       register === "remembering"
         ? ` The person is being remembered: every sentence about them — in the about AND the reveal detail — must be in the past tense (loved, was, would reach for). Never "has loved", "still does", or any present-tense habit.`
-        : ` The person is living: their habits are in the present tense ("always goes", "still picks first"), never the past-habitual ("always went") — past tense makes them sound gone. Do not assume their age: no whole-life idioms ("since childhood", "all her life", "long held"). When the charity or occasion suggests who they are (a children's charity, a graduation), let that shape the detail; otherwise write habits that fit any age.`
+        : ` The person is living: their habits are in the present tense ("always goes", "picks first"), never the past-habitual ("always went") — past tense makes them sound gone. Do not write "still" or "already": both imply a before that the reader has not been told. Do not assume their age: no whole-life idioms ("since childhood", "all her life", "long held"). When the charity or occasion suggests who they are (a children's charity, a graduation), let that shape the detail; otherwise write habits that fit any age.`
     // What the about must do (pairing table §6), stripped back
     // 2026-09-24 after a day of patching one example at a time left the
     // writer squeezed ("never went a week without one"). The exemplars
@@ -346,9 +352,16 @@ ${edgesBlock(edges, subject)}`
       edges.count === 0
         ? ` No edge links this occasion, this charity and this topic, so the about itself must make a favourite ${topicLower} a natural thing to ask this person, with one plain, believable thing about them.`
         : ` The edges above are context; the card already carries them. Say a two-hop one in a clause if the about needs it; never explain a ★ one.`
-    const truthRule = ` What you say about the person must be ordinary and believable, the kind of thing a relative would say: never a talisman, a lucky object, a superstition, a quirk invented for effect, or a place or object given agency ("walked every mile with her", "steadies him"). Never announce that a favourite exists ("she had a favourite cat breed"). Never say the favourite is being kept back or withheld: simply do not name or hint at it; the closing sentence is the one promise of a reveal.`
+    const truthRule = ` What you say about the person must be ordinary and believable, the kind of thing a relative would say: never a talisman, a lucky object, a superstition, a quirk invented for effect, or a place or object given agency ("walked every mile with her", "steadies him"). Never announce that a favourite exists ("she had a favourite cat breed"). Never say the favourite is being kept back or withheld: simply do not name or hint at it; the closing sentence is the one promise of a reveal. Never comment on the favpoll itself ("it felt right for today", "this seemed fitting"): write about the person, not about the page.`
+    // A birth honours the PARENTS on behalf of the child; the favourite
+    // is their own. Nobody picks a favourite for a baby (founder,
+    // 2026-09-24: "Bagpuss is the parent's favourite cartoon, not the
+    // child's").
     const babyRule = BABY_OCCASIONS.has(occasionType ?? "")
-      ? ` The occasion is a birth: the name above is the BABY'S, and the parents are writing on the baby's behalf. The favourite is what they have chosen for the baby (the book they read first, the rhyme they sing), said as the baby's ("Mei's is The Gruffalo"). In the about say only that the parents have chosen; the reveal's detail is where the choice came from. The baby has no preferences, habits or memories of its own, and no "still" or "already" in a newborn's household.`
+      ? ` The occasion is a birth. The people honoured are the PARENTS, named above, on behalf of their child, who is in the card's context line and has no favourite. The favourite is the parents' OWN (the cartoon they love, the book they read as children, the rhyme they sing), the one they will pass on. Never write a favourite, a preference or a habit as the baby's, and never say a favourite was chosen "for" the baby.`
+      : ""
+    const effortRule = EFFORT_OCCASIONS.has(occasionType ?? "")
+      ? ` The occasion is a sponsored effort that is STILL TO COME: this favpoll gathers pledges in the build-up and closes on the day. Write it before the effort ("is swimming the Channel in June", "runs the marathon on Sunday"), never as finished, and say nothing about how it went. Do not name a month or a date: the card carries them.`
       : ""
     const noInventedPeople = ` Never invent a spouse, partner, child, sibling, parent, friend, job, home or town for them to fill a sentence: stay with what they themselves do. A relative may appear only when the occasion supplies one (a wedding has a couple; a birth has parents).`
     const realPersonRule = fiction
@@ -358,7 +371,7 @@ ${edgesBlock(edges, subject)}`
     const charityFit = edges.e3
       ? ` The charity's fit with the occasion is given above; you may say it in a few plain words, as the examples do ("Marie Curie nurses were with her at the end"), or leave it to the closing.`
       : ` The charity is named in the closing sentence and nowhere else.`
-    instructions = `- "about": write it the way the four examples below are written: two or three sentences, 40 to 65 words in all, about the person and the occasion, in plain words, ending with the closing sentence given here exactly, nothing added after it: "${closing}"${tenseRule}${edgeRule}${truthRule}${babyRule}${realPersonRule}${charityFit}${pronounHint}${nameHint}
+    instructions = `- "about": write it the way the four examples below are written: two or three sentences, 40 to 65 words in all, about the person and the occasion, in plain words, ending with the closing sentence given here exactly, nothing added after it: "${closing}"${tenseRule}${edgeRule}${truthRule}${babyRule}${effortRule}${realPersonRule}${charityFit}${pronounHint}${nameHint}
 - "reveal" (guests see it only AFTER pledging): start with exactly "${opener}".${entityGuard} Then a plausible option from the list (you MUST use a real option, verbatim), then a full stop, then ONE short sentence with a single detail of the PROTAGONIST'S own relationship to that favourite: something anyone could have watched them do, and something the about did not already say. When the favourite is a KIND of thing (a breed, a cuisine, a type of holiday), the detail is about one particular one in their life, never the kind at large.${tenseRule} The detail must be entirely the protagonist's own and must NOT depend on any real-world fact about the favourite: no fixture dates or match traditions, no seasons, tours, episodes, eras, or biography (a claim like "watched them play on Boxing Day" fails if that favourite doesn't play then; avoid the whole category). The options may be famous real people, teams, or works: never state or invent facts about them. No preamble such as "We can't wait to reveal".
 
 ${exemplarsBlock()}`
@@ -704,8 +717,11 @@ export async function judgeStory(
   const who = isCause
     ? `a cause (${input.displayName ?? "unnamed"})`
     : `${input.displayName ?? "the person"}, ${input.grouping === "couple" ? "a couple" : input.grouping === "group" ? "a group" : "one person"}`
+  const effort = EFFORT_OCCASIONS.has(input.occasionType ?? "")
+    ? " The occasion is a sponsored effort still to come: fail it if the effort is written as already done."
+    : ""
   const baby = BABY_OCCASIONS.has(input.occasionType ?? "")
-    ? " The occasion is a birth: the name is the BABY'S and the parents write on the baby's behalf. The favourite is what they chose for the baby; fail it if the baby is given a preference, habit or memory of its own."
+    ? " The occasion is a birth: the people honoured are the PARENTS, on behalf of their child; the favourite is the parents' own. Fail it if the baby is given a favourite, a preference or a habit, or if a favourite is said to be chosen for the baby."
     : ""
   const edgeLines = [edges.e1, edges.e2, edges.e3]
     .filter((e): e is Edge => Boolean(e))
@@ -713,7 +729,7 @@ export async function judgeStory(
     .join("\n")
   const prompt = `You are a relative reading a favpoll page at a real event. A favpoll honours someone; guests pledge to charity and pick a favourite; after pledging they see the honoured person's own favourite. You are checking whether the copy reads as something a family member would actually have written about a real person. Answer with JSON only.
 
-Occasion: ${input.occasionType ?? "unknown"}. Honouring: ${who}.${baby}
+Occasion: ${input.occasionType ?? "unknown"}. Honouring: ${who}.${baby}${effort}
 Topic: Favourite ${input.topicTitle}.
 Links the writer was given:
 ${edgeLines || "(none)"}

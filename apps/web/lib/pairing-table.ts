@@ -83,7 +83,7 @@ const WEDDING: OccasionRow = {
     t("Place"),
   ],
   at: "the first dance, the cake and the flowers of the day itself",
-  hop: "the honeymoon, the venue, the reading chosen for the day",
+  hop: "the honeymoon or the venue",
 }
 
 const ACHIEVEMENT: OccasionRow = {
@@ -100,8 +100,8 @@ const ACHIEVEMENT: OccasionRow = {
     t("Weather"),
     t("Sporting moment"),
   ],
-  at: "where the effort happened — the sea, the peak, the route",
-  hop: "what got them through the training",
+  at: "where the effort happens — the sea, the peak, the route",
+  hop: "the training",
 }
 
 // The name on the card at a birth is the PARENTS'; the baby cannot have a
@@ -119,7 +119,7 @@ const NEW_BABY: OccasionRow = {
     t("Season"),
   ],
   at: "the stories, rhymes and names that arrive with a new baby",
-  hop: "a childhood about to begin",
+  hop: "",
 }
 
 const NEW_JOB: OccasionRow = {
@@ -133,7 +133,7 @@ const NEW_JOB: OccasionRow = {
     t("City"),
   ],
   at: "",
-  hop: "the celebratory drink, or the working day they are stepping into",
+  hop: "the celebratory drink",
 }
 
 /** §1 — occasion → topics, keyed on `occasion_type`. Occasions absent
@@ -156,7 +156,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Toy"),
     ],
     at: "the animal being remembered",
-    hop: "the walks and the places that were theirs together",
+    hop: "the walks that were theirs",
   },
 
   // ── celebrating_one ─────────────────────────────────────────────────
@@ -172,7 +172,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Song"),
     ],
     at: "the cake on the table",
-    hop: "the treats and the games of a birthday tea",
+    hop: "a birthday tea",
   },
   "Milestone birthday": {
     topics: [
@@ -185,7 +185,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Toy"),
     ],
     at: "the decade they were born in, and its music",
-    hop: "a big birthday looks back at the years",
+    hop: "a big birthday looks back",
   },
   // Little HAPPENS at a retirement that maps to a topic — every pairing
   // is two hops ("now there's time"); like a memorial, the person
@@ -212,7 +212,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Saying"),
     ],
     at: "",
-    hop: "the leaving drinks, the office habits being left behind, or where they are going next",
+    hop: "the leaving drinks, or where they are going next",
   },
   Graduation: {
     topics: [
@@ -224,7 +224,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Takeaway"),
     ],
     at: "the subject they have just finished studying",
-    hop: "the studying just done, and where they go next",
+    hop: "the studying just done",
   },
   Christening: NEW_BABY,
   "New baby": NEW_BABY,
@@ -233,7 +233,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
   "Bar or bat mitzvah": {
     topics: [t("Song"), t("Film"), t("Book"), t("Sweet"), t("Board game")],
     at: "",
-    hop: "a coming-of-age party",
+    hop: "",
   },
   Recovery: {
     topics: [
@@ -247,7 +247,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Time of day"),
     ],
     at: "",
-    hop: "back on their feet — the walks, the food and the days they can enjoy again",
+    hop: "being back on their feet",
   },
   "New job": NEW_JOB,
   Promotion: NEW_JOB,
@@ -264,7 +264,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Instrument"),
     ],
     at: "",
-    hop: "what the award was given for",
+    hop: "what the award is for",
   },
   "Exam success": {
     topics: [
@@ -290,7 +290,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Smell"),
     ],
     at: "",
-    hop: "settling in — the first dinner, the first Sunday, the place itself",
+    hop: "settling in",
   },
   Citizenship: {
     topics: [
@@ -307,7 +307,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Cuisine"),
     ],
     at: "the small British things a new citizen has taken on",
-    hop: "the country being joined, and the one they came from",
+    hop: "the country being joined",
   },
   // Review note C: kept to what makes no assumption on the person's behalf.
   "Coming out": {
@@ -319,7 +319,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Decade"),
     ],
     at: "",
-    hop: "the music and films that were theirs through it",
+    hop: "",
   },
   "Divorce party": {
     topics: [
@@ -331,7 +331,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Way to spend Sunday"),
     ],
     at: "the drink in hand — it is a party",
-    hop: "the first solo trip, and the Sundays that are now their own",
+    hop: "the first solo trip",
   },
 
   // ── celebrating_many ────────────────────────────────────────────────
@@ -353,7 +353,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Place"),
     ],
     at: "the ring",
-    hop: "the toast, and where it happened",
+    hop: "where it happened",
   },
   Anniversary: {
     topics: [
@@ -368,7 +368,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Dance"),
     ],
     at: "their song, and the year they married",
-    hop: "the years together — the gift, the trips, the table",
+    hop: "the years together",
   },
   Reunion: {
     topics: [
@@ -386,7 +386,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Video game"),
     ],
     at: "the years everyone shared",
-    hop: "what everyone remembers from back then",
+    hop: "what everyone remembers",
   },
   // The live vocabulary has ONE "Team celebration" (the table splits
   // sport from work), so nothing is starred: a sporting moment is not
@@ -406,7 +406,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Sandwich"),
     ],
     at: "",
-    hop: "the win itself, or the team's meal after it",
+    hop: "the win, or the meal after",
   },
   // The Christmas variant folds in unstarred — the topic itself says
   // Christmas; whether the gathering is one is not known here.
@@ -427,7 +427,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Carol"),
     ],
     at: "the table, the names round it and the game after",
-    hop: "what the family does when it is all together",
+    hop: "",
   },
 
   // ── cause ───────────────────────────────────────────────────────────
@@ -446,7 +446,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Dance"),
     ],
     at: "",
-    hop: "the event itself — a bake sale, a do, a casino night or a film night",
+    hop: "the event itself",
   },
   "Sponsored event": ACHIEVEMENT,
   "Charity night": {
