@@ -674,6 +674,11 @@ export type HonourCharityRow = {
   family: CauseFamily
   star: boolean
   why: string
+  /** Seeded charities the row's reason does not fit: the health family
+   *  spans cancer and heart (which take people) and sight loss and
+   *  disability equality (which do not). "RNIB fights the sight loss
+   *  that takes people" was written from this row (2026-09-24). */
+  except?: string[]
 }
 
 const MEMORIAL_OCCASIONS = [
@@ -696,6 +701,7 @@ export const HONOUR_CHARITY_ROWS: HonourCharityRow[] = [
     family: "health_condition",
     star: false,
     why: "a charity that fights the kind of illness that takes people belongs at a memorial",
+    except: ["RNIB", "Scope"],
   },
   {
     occasions: ["Pet memorial"],
@@ -720,6 +726,7 @@ export const HONOUR_CHARITY_ROWS: HonourCharityRow[] = [
     family: "health_condition",
     star: true,
     why: "the condition's own charity, at a recovery",
+    except: ["RNIB", "Scope"],
   },
   {
     occasions: ["Recovery"],
@@ -875,10 +882,12 @@ export function lookupEdges(input: EdgeLookupInput): StoryEdges {
     input.causeFamily
   ) {
     const want = norm(occ.key)
+    const name = norm(input.charityName)
     const row = HONOUR_CHARITY_ROWS.find(
       (r) =>
         r.family === input.causeFamily &&
-        r.occasions.some((o) => norm(o) === want)
+        r.occasions.some((o) => norm(o) === want) &&
+        !(r.except ?? []).some((x) => norm(x) === name)
     )
     if (row) {
       e3 = {

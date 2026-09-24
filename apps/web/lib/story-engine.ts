@@ -483,6 +483,24 @@ export function storyEdges(input: StoryInput): StoryEdges {
  * about 1 in 12 Stories (2026-09-24). Enforcement: a spaced dash joins
  * two clauses, so a comma stands in; an unspaced one is a hyphen's job.
  */
+/** The model wrote "The Okafors's" against a computed "The Okafors'"
+ *  (third cohort, 2026-09-24): a possessive already ending in an
+ *  apostrophe never takes another 's. */
+export function undoubledPossessive(
+  text: string,
+  possessive: string | null
+): string {
+  if (!possessive || !/['\u2019]$/.test(possessive)) return text
+  return text.split(`${possessive}s`).join(possessive)
+}
+
+/** A sentence ends with a stop: "and find out James'" lost its full stop
+ *  after a possessive apostrophe (third cohort, 2026-09-24). */
+export function endStop(text: string): string {
+  const t = text.trimEnd()
+  return /[.!?…"”')]$/.test(t) && !/['\u2019]$/.test(t) ? t : `${t}.`
+}
+
 export function stripEmDashes(text: string, keep: string[] = []): string {
   // An item label may itself carry an em dash ("Stand by Me — Ben E.
   // King"); it is catalogue data and must survive verbatim, or the
@@ -542,13 +560,15 @@ export async function generateStory(
       parsed = retry
   }
 
+  const namePoss = namePossessive(input.displayName, input.grouping)
+  const tidy = (text: string) =>
+    endStop(
+      undoubledPossessive(stripEmDashes(text, input.itemLabels), namePoss)
+    )
   return {
-    about: stripEmDashes(parsed.about, input.itemLabels),
+    about: tidy(parsed.about),
     // The cause reveal's " — " separator is the one em dash allowed.
-    note:
-      input.subject === "cause"
-        ? parsed.reveal
-        : stripEmDashes(parsed.reveal, input.itemLabels),
+    note: input.subject === "cause" ? parsed.reveal : tidy(parsed.reveal),
     // Defensive caps match the form schema (causeLabel 60, context 40)
     causeLabel: parsed.causeLabel?.trim().slice(0, 60) || null,
     context: parsed.context?.trim().slice(0, 40) || null,

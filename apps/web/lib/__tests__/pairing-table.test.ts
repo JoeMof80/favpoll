@@ -251,3 +251,24 @@ describe("lookupEdges — rules", () => {
     expect(edges.count).toBe(3)
   })
 })
+
+describe("lookupEdges — a row's exceptions", () => {
+  it("RNIB does not belong at a memorial for fighting what takes people", () => {
+    const rnib = lookupEdges({
+      register: "remembering",
+      occasionType: "Tribute",
+      topicTitle: "Instrument",
+      charityName: "RNIB",
+      causeFamily: "health_condition",
+    })
+    expect(rnib.e3).toBeNull()
+    const bhf = lookupEdges({
+      register: "remembering",
+      occasionType: "Tribute",
+      topicTitle: "Instrument",
+      charityName: "British Heart Foundation",
+      causeFamily: "health_condition",
+    })
+    expect(bhf.e3).not.toBeNull()
+  })
+})

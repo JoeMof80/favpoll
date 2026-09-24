@@ -24,6 +24,8 @@ import {
   REVEAL_PROMISES,
   pickRevealPromise,
   stripEmDashes,
+  undoubledPossessive,
+  endStop,
 } from "@/lib/story-engine"
 import {
   buildCacheKey,
@@ -1129,5 +1131,22 @@ describe("realism rules in the person prompt (founder review, 2026-09-24)", () =
     expect(prompt).toContain("The occasion is a birth")
     expect(prompt).toContain("the people honoured are the PARENTS")
     expect(prompt).toContain("never give the baby one")
+  })
+})
+
+describe("tidying the model's grammar", () => {
+  it("never lets a plural possessive take a second s", () => {
+    expect(
+      undoubledPossessive("we'll reveal The Okafors's.", "The Okafors'")
+    ).toBe("we'll reveal The Okafors'.")
+    expect(undoubledPossessive("Joan's is Blue.", "Joan's")).toBe(
+      "Joan's is Blue."
+    )
+  })
+
+  it("ends a sentence that lost its stop after a possessive", () => {
+    expect(endStop("and find out James'")).toBe("and find out James'.")
+    expect(endStop("and find out James'.")).toBe("and find out James'.")
+    expect(endStop("Done.")).toBe("Done.")
   })
 })
