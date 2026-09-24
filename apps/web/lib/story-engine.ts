@@ -70,10 +70,10 @@ function exemplarsBlock(): string {
   return `These four are the bar. Notice how ordinary the facts are (a pot on a windowsill, a photo on a desk, four packets of biscuits), how plainly they are said, and that nothing in them is invented for effect. They predate the em dash rule; keep their plainness, not their dashes.\n${items}`
 }
 
-/** Occasions where the name on the card is the parents', and the baby
- *  cannot have a favourite (founder, 2026-09-24: "doesn't make sense for
- *  a new born"). The seed names the parents; the prompt says whose the
- *  favourite is. */
+/** A birth: the BABY is the protagonist on the card ("Welcome to the
+ *  world, Mei") and the parents write on the child's behalf. The
+ *  favourite is what they have chosen for the baby; the baby has no
+ *  preferences or habits of its own (founder, 2026-09-24). */
 export const BABY_OCCASIONS = new Set([
   "New baby",
   "Baby shower",
@@ -272,7 +272,7 @@ ${edgesBlock(edges, subject)}`
       : ""
     instructions = `${labelContext}${causeLabelInstruction}- "context" (max 40 characters): one short subline for under the cause name, giving a timeframe or who it helps — like "Winter 2026 appeal" or "For families facing hardship". It must NOT contain the charity's name in any form (the charity is already shown beside it), and must NOT mention pledges, money, or where the money goes — the about owns that. No full stop.
 - "about" (max 2 sentences): first what this favpoll is raising for${hasPurpose ? "" : " (taken from the cause name above only — the charity's own work is unknown and must not be described)"}${occasionType && occasionType !== "Fundraiser" ? `, at what event (say "${occasionType.toLowerCase()}" or its plain equivalent — a guest must know what is happening)` : ""}${edges.count > 0 ? ", with why THIS topic in a clause — say the edge listed above, in your own words" : ""}, then the mechanic in ONE clause — guests pick their favourite ${topicTitle.toLowerCase()} and pledge to ${charityName ?? "the charity"}, where the pick and the pledge are a single action (the pick is made BY pledging). Never present them as separate steps: no "first…", "then…", "tell us…". favpoll takes no platform fee. Do NOT name or hint at any particular option, and do not repeat the context subline's wording.
-- "reveal" (guests see it only AFTER pledging): start with exactly "Our pick to start:" then a real option from the list, then " — " (this separator is the one place an em dash is allowed) and one short, warm clause saying why THAT pick suits this cause or this event (not a description of the pick itself). No statistics, numbers, percentages, or invented quotes.`
+- "reveal" (guests see it only AFTER pledging): start with exactly "Our pick to start:" then a real option from the list, then " — " (this separator is the one place an em dash is allowed) and one short, warm clause, plain and unforced, like "They watched it every Christmas Eve without fail". It need not justify the pick; the about carries the reason. No statistics, numbers, percentages, or invented quotes.`
   } else {
     const opener = revealOpener(register, pronoun, displayName, grouping)
     // Pair/Group are structural (founder bug, 2026-09-06: the generator
@@ -335,7 +335,7 @@ ${edgesBlock(edges, subject)}`
     const ordinaryRule = ` The one thing the about says about the person must be ORDINARY: something a relative would actually say (what they do on a Sunday, what they always order, where they sit, who they go with). Never a talisman, a lucky object, a superstition, or a quirk invented for effect. Never a thing they "turn to", that "steadies" them, that "feels most like their own", or a place or object that has "walked with" or "carried" them: places and things have no agency. Never say that the favourite is being kept back, withheld, not yet revealed, or that they "won't say which": simply do not name it. The one promise of a reveal is the closing clause.`
     // The parents are the protagonists at a birth; the baby has no habits.
     const babyRule = BABY_OCCASIONS.has(occasionType ?? "")
-      ? ` The occasion is a birth: the people honoured are the PARENTS (the name above is theirs), and the favourite is theirs, the one they will pass on (the book they will read first, the game they will teach). The baby is not yet old enough to have a favourite or a habit: never give the baby one, and never write the parent as a child.`
+      ? ` The occasion is a birth: the name above is the BABY'S, and the parents are writing on the baby's behalf. The favourite is what they have chosen for the baby (the book they read first, the rhyme they sing, the game they will teach), said as the baby's ("Mei's is The Gruffalo"). The detail in the reveal is what the PARENTS do ("her mum has read it to the bump every night since June"), never a preference, habit or memory of the baby's own: a newborn has none.`
       : ""
     const realPersonRule = fiction
       ? ""
@@ -669,7 +669,7 @@ export async function judgeStory(
     ? `a cause (${input.displayName ?? "unnamed"})`
     : `${input.displayName ?? "the person"}, ${input.grouping === "couple" ? "a couple" : input.grouping === "group" ? "a group" : "one person"}`
   const baby = BABY_OCCASIONS.has(input.occasionType ?? "")
-    ? " The occasion is a birth: the name is the parents'; the baby cannot have favourites or habits."
+    ? " The occasion is a birth: the name is the BABY'S and the parents write on the baby's behalf. The favourite is what they chose for the baby; fail it if the baby is given a preference, habit or memory of its own."
     : ""
   const edgeLines = [edges.e1, edges.e2, edges.e3]
     .filter((e): e is Edge => Boolean(e))

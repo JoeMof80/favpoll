@@ -1110,28 +1110,29 @@ describe("realism rules in the person prompt (founder review, 2026-09-24)", () =
     expect(prompt).not.toContain("The occasion is a birth")
   })
 
-  it("at a birth, the parents are the protagonists and the baby has no favourite", async () => {
+  it("at a birth, the baby is the protagonist and the parents write on her behalf", async () => {
     mock.queue(null)
     mock.queue(TOPIC_DATA)
     mock.queue(CHARITY_DATA)
     mockLLMResponse(
       "About.",
-      "Sarah & Tom's is Blue. They painted the nursery in it."
+      "Mei's is Blue. Her mum painted the nursery in it before she arrived."
     )
     mock.queue(null)
     await generateDraft({
-      register: "celebrating_many",
+      register: "celebrating_one",
       subject: "someone",
       topicId: "topic-1",
       primaryCharityId: "charity-1",
-      grouping: "couple",
+      pronoun: "she",
       occasionType: "New baby",
-      displayName: "Sarah & Tom",
+      displayName: "Mei Doyle",
     })
     const prompt = promptOf()
     expect(prompt).toContain("The occasion is a birth")
-    expect(prompt).toContain("the people honoured are the PARENTS")
-    expect(prompt).toContain("never give the baby one")
+    expect(prompt).toContain("the name above is the BABY'S")
+    expect(prompt).toContain("what the PARENTS do")
+    expect(prompt).toContain("a newborn has none")
   })
 })
 

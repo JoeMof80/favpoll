@@ -14,7 +14,9 @@
  *   Seed bar    person favpolls need 2+ edges; cause favpolls need the
  *               charity edge AND a stated event. Ones and zeros are never
  *               seeded.
- *   Triads      the share of 3-edge favpolls is a knob (--threes).
+ *   Triads      --threes is the chance a charity's pick is a triad when it
+ *               has one; charities are drawn in turn, so none repeats until
+ *               every eligible charity has a favpoll.
  *   Fiction     every row carries is_exemplar = true — the flag that keeps
  *               fiction OUT of charity totals and the record (§7).
  *
@@ -372,15 +374,6 @@ function protagonist(
   pronoun: Pronoun;
   grouping: "individual" | "couple" | "group";
 } {
-  // A birth honours the PARENTS: the baby cannot have a favourite. Named
-  // as a couple; the baby goes in the context line.
-  if (BABY_OCCASIONS.has(occasion)) {
-    return {
-      name: `${drawAny()} & ${drawAny()}`,
-      pronoun: "they",
-      grouping: "couple",
-    };
-  }
   if (register === "celebrating_many") {
     if (GROUP_NAMES[occasion]) {
       return {
@@ -562,6 +555,9 @@ type Candidate = {
 // model invented one every time (founder, 2026-09-24). They stay valid for
 // causes and for organisers who choose them.
 const NO_PERSON_STORY = new Set(["Smell", "Sound", "Time of day", "Weather"]);
+// And for a cause the pick has to be able to say something honest about
+// the cause: Weather and Landscape never could (founder, 2026-09-24).
+const NO_CAUSE_STORY = new Set([...NO_PERSON_STORY, "Landscape"]);
 
 function enumerate(topics: Topic[], charities: Charity[]): Candidate[] {
   const out: Candidate[] = [];
@@ -576,6 +572,7 @@ function enumerate(topics: Topic[], charities: Charity[]): Candidate[] {
     for (const occasion of OCCASION_TYPES_BY_REGISTER[register]) {
       for (const topic of topics) {
         if (register !== "cause" && NO_PERSON_STORY.has(topic.title)) continue;
+        if (register === "cause" && NO_CAUSE_STORY.has(topic.title)) continue;
         for (const charity of charities) {
           const edges = storyEdges({
             register,
@@ -621,49 +618,53 @@ const REGISTER_SHARE: Record<Register, number> = {
 };
 
 function sample(candidates: Candidate[], n: number): Candidate[] {
+  // Pick PER CHARITY from a shuffled queue, one triple per charity per
+  // pass, so a charity repeats only once every eligible charity has one
+  // (the cap-of-three version repeated Age UK and the hospices; founder,
+  // 2026-09-24). Within a charity's triples a triad is preferred with
+  // probability THREES; otherwise a two. Topic and occasion caps and the
+  // register mix still spread the shelf.
   const chosen: Candidate[] = [];
-  const perCharity = new Map<string, number>();
   const perTopic = new Map<string, number>();
   const perOccasion = new Map<string, number>();
   const perRegister = new Map<Register, number>();
-  // Births are triads with every children's charity, so the triads-first
-  // pass filled a third of the shelf with them (8 of 24, third cohort).
-  let births = 0;
-  const MAX_BIRTHS = Math.max(1, Math.round(n / 12));
   const cap = (m: Map<string, number>, k: string, max: number) =>
     (m.get(k) ?? 0) < max;
   const bump = (m: Map<string, number>, k: string) =>
     m.set(k, (m.get(k) ?? 0) + 1);
-  const wantThrees = Math.round(n * THREES);
+  let births = 0;
+  const MAX_BIRTHS = Math.max(1, Math.round(n / 12));
   const registerQuota = (r: Register) =>
     REGISTERS.length ? n : Math.ceil(n * REGISTER_SHARE[r]);
-
-  const pool = shuffle(candidates);
-  // Triads first (they are scarcer), then twos, each pass honouring caps.
-  for (const wantCount of [3, 2]) {
-    const target = wantCount === 3 ? wantThrees : n;
-    for (const c of pool) {
-      if (chosen.length >= target) break;
-      const isTriad = c.count === 3;
-      if (wantCount === 3 && !isTriad) continue;
-      if (
-        wantCount === 2 &&
-        isTriad &&
-        chosen.filter((x) => x.count === 3).length >= wantThrees
-      )
-        continue;
-      if (BABY_OCCASIONS.has(c.occasion) && births >= MAX_BIRTHS) continue;
-      if (!cap(perCharity, c.charity.id, 3)) continue;
-      if (!cap(perTopic, c.topic.id, 2)) continue;
-      if (!cap(perOccasion, c.occasion, 3)) continue;
-      if ((perRegister.get(c.register) ?? 0) >= registerQuota(c.register))
-        continue;
-      chosen.push(c);
-      if (BABY_OCCASIONS.has(c.occasion)) births++;
-      bump(perCharity, c.charity.id);
-      bump(perTopic, c.topic.id);
-      bump(perOccasion, c.occasion);
-      perRegister.set(c.register, (perRegister.get(c.register) ?? 0) + 1);
+  const byCharity = new Map<string, Candidate[]>();
+  for (const c of candidates) {
+    const list = byCharity.get(c.charity.id) ?? [];
+    list.push(c);
+    byCharity.set(c.charity.id, list);
+  }
+  const fits = (c: Candidate) =>
+    !(BABY_OCCASIONS.has(c.occasion) && births >= MAX_BIRTHS) &&
+    cap(perTopic, c.topic.id, 2) &&
+    cap(perOccasion, c.occasion, 3) &&
+    (perRegister.get(c.register) ?? 0) < registerQuota(c.register);
+  const take = (c: Candidate) => {
+    chosen.push(c);
+    if (BABY_OCCASIONS.has(c.occasion)) births++;
+    bump(perTopic, c.topic.id);
+    bump(perOccasion, c.occasion);
+    perRegister.set(c.register, (perRegister.get(c.register) ?? 0) + 1);
+  };
+  const charityIds = shuffle([...byCharity.keys()]);
+  for (let pass = 0; chosen.length < n && pass < 8; pass++) {
+    for (const id of charityIds) {
+      if (chosen.length >= n) break;
+      const pool = shuffle(byCharity.get(id) ?? []).filter(fits);
+      if (pool.length === 0) continue;
+      const wantTriad = chance(THREES);
+      const pickFrom = pool.filter((c) =>
+        wantTriad ? c.count === 3 : c.count < 3,
+      );
+      take(pickFrom.length ? pickFrom[0] : pool[0]);
     }
   }
   return chosen;
@@ -854,22 +855,10 @@ async function seed() {
     const isCause = c.register === "cause";
     const who = isCause ? null : protagonist(c.register, c.occasion);
     const spec = occasionSpec(c.occasion);
-    const isBirth = BABY_OCCASIONS.has(c.occasion);
-    // "Welcome to the world" addresses the baby; the card names the
-    // parents, so a birth congratulates them and names the baby beneath.
-    const babyName = isBirth ? drawAny() : null;
-    const openingLine = isBirth
-      ? "Congratulations to"
-      : spec
-        ? pick(spec.openingLines)
-        : null;
-    const context = isBirth
-      ? c.occasion === "Baby shower"
-        ? `Baby ${drawLast()} due ${pick(["September", "October", "November"])}`
-        : `Welcoming ${babyName}`
-      : spec
-        ? resolveContext(pick(spec.contexts), who?.pronoun ?? "they")
-        : null;
+    const openingLine = spec ? pick(spec.openingLines) : null;
+    const context = spec
+      ? resolveContext(pick(spec.contexts), who?.pronoun ?? "they")
+      : null;
 
     // Item set follows the item-source rule (lib/poll-items) AND the
     // wizard: a finite topic's items are its closed set; an infinite
