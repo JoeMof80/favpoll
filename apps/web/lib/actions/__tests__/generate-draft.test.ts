@@ -1131,7 +1131,7 @@ describe("realism rules in the person prompt (founder review, 2026-09-24)", () =
     const prompt = promptOf()
     expect(prompt).toContain("The occasion is a birth")
     expect(prompt).toContain("the name above is the BABY'S")
-    expect(prompt).toContain("what the PARENTS do")
+    expect(prompt).toContain("who chose it and why")
     expect(prompt).toContain("a newborn has none")
   })
 })
