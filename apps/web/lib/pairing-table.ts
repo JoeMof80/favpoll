@@ -101,6 +101,9 @@ const ACHIEVEMENT: OccasionRow = {
   hop: "the training, the fuel and the playlist behind the effort",
 }
 
+// The name on the card at a birth is the PARENTS'; the baby cannot have a
+// favourite. The favourite is theirs, the one they will pass on (founder,
+// 2026-09-24). BABY_OCCASIONS in story-engine.ts carries the rule.
 const NEW_BABY: OccasionRow = {
   topics: [
     t("Children's book", true),

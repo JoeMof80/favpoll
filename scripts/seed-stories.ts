@@ -7,8 +7,9 @@
  * picked FROM the table, so its edges are known before a word of copy
  * exists; the Story engine (apps/web/lib/story-engine.ts — the same
  * generator behind the wizard's Generate) writes the edges in; a judge
- * loop retries until the rubric's two model checks pass (A1: the about
- * adds a fact about the person; P2: the note's detail is theirs).
+ * loop retries until the copy passes one judgement: would a relative
+ * have written this about a real person? (P1, a real item named, is a
+ * lookup.)
  *
  *   Seed bar    person favpolls need 2+ edges; cause favpolls need the
  *               charity edge AND a stated event. Ones and zeros are never
@@ -49,6 +50,7 @@ import { createClient } from "@supabase/supabase-js";
 import type { CauseFamily, Pronoun } from "@favpoll/types";
 import {
   aboutNamesEvent,
+  BABY_OCCASIONS,
   generateStory,
   judgeStory,
   storyEdges,
@@ -100,10 +102,9 @@ const COUNT = parseInt(opt("count", "24"), 10);
 const THREES = parseFloat(opt("threes", "0.4"));
 const RNG_SEED = parseInt(opt("seed", "1"), 10);
 const STORY_MODEL = opt("model", "claude-sonnet-5");
-const JUDGE_MODEL = opt(
-  "judge-model",
-  process.env.LLM_CLASSIFIER_MODEL_ID ?? "claude-haiku-4-5",
-);
+// The realism judge runs on the Story model: a smaller judge passed
+// anything concrete (founder, 2026-09-24).
+const JUDGE_MODEL = opt("judge-model", STORY_MODEL);
 // --registers=cause,remembering narrows the pick (re-running one register
 // after a judge fix without duplicating the rest of a cohort).
 const REGISTERS = opt("registers", "")
@@ -224,6 +225,14 @@ function protagonist(
   pronoun: Pronoun;
   grouping: "individual" | "couple" | "group";
 } {
+  // A birth honours the PARENTS: the baby cannot have a favourite. Named
+  // as a couple; the baby goes in the context line.
+  if (BABY_OCCASIONS.has(occasion)) {
+    const a = chance(0.5) ? pick(SHE) : pick(HE);
+    let b = chance(0.5) ? pick(SHE) : pick(HE);
+    while (b === a) b = pick(HE);
+    return { name: `${a} & ${b}`, pronoun: "they", grouping: "couple" };
+  }
   if (register === "celebrating_many") {
     if (GROUP_NAMES[occasion]) {
       return {
@@ -399,6 +408,12 @@ type Candidate = {
   count: number;
 };
 
+// Fine as polls, hopeless as a person's story: nobody has a believable
+// ritual around a smell, a sound, a time of day or the weather, and the
+// model invented one every time (founder, 2026-09-24). They stay valid for
+// causes and for organisers who choose them.
+const NO_PERSON_STORY = new Set(["Smell", "Sound", "Time of day", "Weather"]);
+
 function enumerate(topics: Topic[], charities: Charity[]): Candidate[] {
   const out: Candidate[] = [];
   const all: Register[] = [
@@ -411,6 +426,7 @@ function enumerate(topics: Topic[], charities: Charity[]): Candidate[] {
   for (const register of registers) {
     for (const occasion of OCCASION_TYPES_BY_REGISTER[register]) {
       for (const topic of topics) {
+        if (register !== "cause" && NO_PERSON_STORY.has(topic.title)) continue;
         for (const charity of charities) {
           const edges = storyEdges({
             register,
@@ -643,10 +659,22 @@ async function seed() {
     const isCause = c.register === "cause";
     const who = isCause ? null : protagonist(c.register, c.occasion);
     const spec = occasionSpec(c.occasion);
-    const openingLine = spec ? pick(spec.openingLines) : null;
-    const context = spec
-      ? resolveContext(pick(spec.contexts), who?.pronoun ?? "they")
-      : null;
+    const isBirth = BABY_OCCASIONS.has(c.occasion);
+    // "Welcome to the world" addresses the baby; the card names the
+    // parents, so a birth congratulates them and names the baby beneath.
+    const babyName = isBirth ? pick([...SHE, ...HE]) : null;
+    const openingLine = isBirth
+      ? "Congratulations to"
+      : spec
+        ? pick(spec.openingLines)
+        : null;
+    const context = isBirth
+      ? c.occasion === "Baby shower"
+        ? `Baby ${pick(LAST)} due ${pick(["September", "October", "November"])}`
+        : `Welcoming ${babyName}`
+      : spec
+        ? resolveContext(pick(spec.contexts), who?.pronoun ?? "they")
+        : null;
 
     // Item set follows the item-source rule (lib/poll-items) AND the
     // wizard: a finite topic's items are its closed set; an infinite
@@ -695,13 +723,11 @@ async function seed() {
         continue;
       }
       const item = namedItem(story.note, items);
-      // The event check is a lookup (cause register only); the judge
-      // answers the two model questions.
+      // P1 and the cause's event are lookups; realism is the one judgement.
       const event = isCause ? aboutNamesEvent(story.about, c.occasion) : true;
       const verdict = await judgeStory(story, input, story.edges, JUDGE_MODEL);
-      const score =
-        (item && event ? 1 : 0) + (verdict.a1 ? 1 : 0) + (verdict.p2 ? 1 : 0);
-      const label = `P1 ${item ? "✓" : "✗"}${isCause ? ` · event ${event ? "✓" : "✗"}` : ""} · A1 ${verdict.a1 ? "✓" : "✗"} · P2 ${verdict.p2 ? "✓" : "✗"}${verdict.reason ? ` — ${verdict.reason}` : ""}`;
+      const score = (item && event ? 1 : 0) + (verdict.realistic ? 2 : 0);
+      const label = `P1 ${item ? "✓" : "✗"}${isCause ? ` · event ${event ? "✓" : "✗"}` : ""} · real ${verdict.realistic ? "✓" : "✗"}${verdict.reason ? ` — ${verdict.reason}` : ""}`;
       if (!best || score > best.score)
         best = { story, item, verdict: label, score };
       if (score === 3) break;

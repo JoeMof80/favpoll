@@ -110,7 +110,7 @@ the About half is actually there.
 | Retirement | Place · Type of holiday · Way to spend Sunday · Garden to visit · Hobby · Way to travel — **all two hops ("now there's time")**. Little *happens* at a retirement that maps to a topic; like a memorial, the **person** motivates it. Lean on E1′ |
 | Leaving do | Beer · Takeaway (the leaving drinks) · Coffee order · Sandwich (office life — two hops) · City (where they're going) · Saying |
 | Graduation | School subject ★ · Book · Author · Type of book · City (where next) · Takeaway |
-| Christening · New baby · Baby shower | Children's book ★ · Nursery rhyme ★ · Name for a grandparent ★ · Fairy tale · Toy · Cartoon · Childhood game · Season |
+| Christening · New baby · Baby shower | Children's book ★ · Nursery rhyme ★ · Name for a grandparent ★ · Fairy tale · Toy · Cartoon · Childhood game · Season — **the protagonists are the parents** (named as a couple, the baby in the context line) and the favourite is theirs, the one they will pass on; a newborn has no favourite (founder, 2026-09-24) |
 | Bar or bat mitzvah | Song · Film · Book · Sweet · Board game — *see review note A* |
 | Recovery | Form of exercise · Weather for walk · Landscape · Comfort food · Song · Way to spend Sunday · Season · Time of day — *two hops ("back on their feet"); the About says it* |
 | New job · Promotion | Cocktail · Beer · Wine · Takeaway (the celebration) · Coffee order · Sandwich · City — *thin; lean on E1′* |

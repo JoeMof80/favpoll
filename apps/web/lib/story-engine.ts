@@ -29,6 +29,56 @@ import {
 // Prompt
 // ---------------------------------------------------------------------------
 
+/**
+ * The founder's own Stories (scripts/seed-exemplars.ts), verbatim: the bar
+ * for plainness and believability. Rules produce compliance; examples
+ * produce voice (founder, 2026-09-24: "many examples just aren't
+ * realistic"). They predate the em dash rule; the prompt says so.
+ */
+const EXEMPLAR_STORIES = [
+  {
+    triple: "Memorial · Colour · Marie Curie",
+    about:
+      "A beloved mother, teacher, and friend who spent her life bringing people together. Her home was full of deliberate colour — every room had a story, and the shade she always came back to said more about her than most words could. Marie Curie nurses were with her at the end, and she would have wanted them remembered here.",
+    note: "Cornflower blue. She kept a pot of cornflowers on the windowsill every summer.",
+  },
+  {
+    triple: "Birthday · Biscuit · RNLI",
+    about:
+      "Sarah is forty and has never met a biscuit she didn't take seriously. She has strong opinions and is not afraid to share them, which is part of why everyone is here. She supports the RNLI because she grew up near the coast and means it.",
+    note: "The Bourbon. She once ate four packets in one sitting, and she has no regrets.",
+  },
+  {
+    triple: "Retirement · Place · British Heart Foundation",
+    about:
+      "After thirty-five years building the engineering team from four people to four hundred, David is finally putting down his laptop. He has a shortlist of places he's never had time to actually go to — and now he does. His charity of choice looks after the hearts of people who worked as hard as he did.",
+    note: "The Dordogne. He kept a photo of it on his desk for thirty years.",
+  },
+  {
+    triple: "Wedding · Song · Shelter",
+    about:
+      "Emma and James met at a rainy music festival in 2019 and haven't been apart since. Music runs through everything they do together. They asked for pledges to Shelter in lieu of gifts — because a roof over your head matters, and they wanted to share the good fortune.",
+    note: "Fields of Gold. It played at their first dance and neither of them planned it.",
+  },
+] as const
+
+function exemplarsBlock(): string {
+  const items = EXEMPLAR_STORIES.map(
+    (x) => `${x.triple}\n  about: ${x.about}\n  note: ${x.note}`
+  ).join("\n")
+  return `These four are the bar. Notice how ordinary the facts are (a pot on a windowsill, a photo on a desk, four packets of biscuits), how plainly they are said, and that nothing in them is invented for effect. They predate the em dash rule; keep their plainness, not their dashes.\n${items}`
+}
+
+/** Occasions where the name on the card is the parents', and the baby
+ *  cannot have a favourite (founder, 2026-09-24: "doesn't make sense for
+ *  a new born"). The seed names the parents; the prompt says whose the
+ *  favourite is. */
+export const BABY_OCCASIONS = new Set([
+  "New baby",
+  "Baby shower",
+  "Christening",
+])
+
 const REGISTER_LABEL: Record<Register, string> = {
   remembering: "a memorial — someone being remembered",
   celebrating_one: "a celebration of one person",
@@ -255,21 +305,30 @@ ${edgesBlock(edges, subject)}`
         ? ` The person is being remembered: every sentence about them — in the about AND the reveal detail — must be in the past tense (loved, was, would reach for). Never "has loved", "still does", or any present-tense habit.`
         : ` The person is living: their habits are in the present tense ("always goes", "still picks first"), never the past-habitual ("always went") — past tense makes them sound gone. Do not assume their age: no whole-life idioms ("since childhood", "all her life", "long held"). When the charity or occasion suggests who they are (a children's charity, a graduation), let that shape the detail; otherwise write habits that fit any age.`
     // What the about must do, by edge count (pairing table §6). At zero
-    // edges the fact about the person IS the motivation — and it has to
-    // be in the about, read before the pledge, not only in the reveal
-    // (the Yvette case: a payoff with nothing in front of it).
+    // edges the fact about the person IS the motivation, and it has to be
+    // in the about, read before the pledge, not only in the reveal (the
+    // Yvette case). But the fact must be ORDINARY: the first cohort's
+    // demand for "a specific fact that makes the topic theirs" produced
+    // talismans, quirks and places with agency (founder, 2026-09-24:
+    // "one seaside town has walked every mile of it with her").
     const topicLower = topicTitle.toLowerCase()
     const edgeRule =
       edges.count === 0
-        ? ` NO edge links this occasion, this charity and this topic, so the about MUST supply the link itself: one plausible, specific fact about the person that makes a favourite ${topicLower} theirs (a habit, a place, a thing they always do), stated in the about before the invitation, not only in the reveal.`
+        ? ` NO edge links this occasion, this charity and this topic, so the about MUST say one plain, believable thing about the person that makes a favourite ${topicLower} a natural thing to ask them, stated in the about before the invitation, not only in the reveal.`
         : edges.count === 1
-          ? ` ONE edge links this favpoll (listed above). Let it stand, and supply the other side yourself: a plausible, specific fact about the person that makes a favourite ${topicLower} theirs.`
+          ? ` ONE edge links this favpoll (listed above). Let it stand, and say one plain, believable thing about the person that makes a favourite ${topicLower} a natural thing to ask them.`
           : edges.count === 2
             ? ` TWO edges link this favpoll (listed above). Let them stand; the about's job is the person.`
             : ` All THREE edges link this favpoll (listed above). The card already says it; the about's job is the person.`
-    const resonanceRule = ` The about must carry at least one fact about the PERSON that the edges do not already hold, and the reveal's detail must pay off what the about set up: the two halves agree. Never say that the favourite is being kept back, withheld, not yet revealed, or that they "won't say which": simply do not name it. The one promise of a reveal is the closing clause.`
-    instructions = `- "about" (max 2 sentences, under 55 words): open with the PROTAGONIST'S connection to the topic — a favourite ${topicLower} that is distinctly theirs — teased WITHOUT naming or hinting at which option it is (the reveal is the gift).${tenseRule}${edgeRule}${resonanceRule} Then one short clause inviting the READER directly, in second person: pledge to ${charityName ?? "charity"} and pick your OWN favourite (say "you"/"your", never "guests"; never say they are guessing or voting on the protagonist's). Keep the charity to a mention${edges.e2 || edges.e3 ? " plus its edge" : ", not a description"} — this is about the person.${pronounHint}${nameHint}
-- "reveal" (guests see it only AFTER pledging): start with exactly "${opener}".${entityGuard} Then a plausible option from the list (you MUST use a real option, verbatim), then a full stop, then ONE short sentence with a single concrete detail about the PROTAGONIST'S relationship to that favourite — a habit, a memory, a ritual of theirs.${tenseRule} The detail must be entirely the protagonist's own and must NOT depend on any real-world fact about the favourite: no fixture dates or match traditions, no seasons, tours, episodes, eras, or biography (a claim like "watched them play on Boxing Day" fails if that favourite doesn't play then — avoid the whole category). The options may be famous real people, teams, or works: never state or invent facts about them. No preamble such as "We can't wait to reveal".`
+    const ordinaryRule = ` The one thing the about says about the person must be ORDINARY: something a relative would actually say (what they do on a Sunday, what they always order, where they sit, who they go with). Never a talisman, a lucky object, a superstition, or a quirk invented for effect. Never a thing they "turn to", that "steadies" them, that "feels most like their own", or a place or object that has "walked with" or "carried" them: places and things have no agency. Never say that the favourite is being kept back, withheld, not yet revealed, or that they "won't say which": simply do not name it. The one promise of a reveal is the closing clause.`
+    // The parents are the protagonists at a birth; the baby has no habits.
+    const babyRule = BABY_OCCASIONS.has(occasionType ?? "")
+      ? ` The occasion is a birth: the people honoured are the PARENTS (the name above is theirs), and the favourite is theirs, the one they will pass on (the book they will read first, the game they will teach). The baby is not yet old enough to have a favourite or a habit: never give the baby one, and never write the parent as a child.`
+      : ""
+    instructions = `- "about" (max 2 sentences, under 55 words): open with the PROTAGONIST'S connection to the topic, a favourite ${topicLower} that is distinctly theirs, without naming or hinting at which option it is (the reveal is the gift).${tenseRule}${edgeRule}${ordinaryRule}${babyRule} Then one short clause inviting the READER directly, in second person: pledge to ${charityName ?? "charity"} and pick your OWN favourite (say "you"/"your", never "guests"; never say they are guessing or voting on the protagonist's). Keep the charity to a mention${edges.e2 || edges.e3 ? " plus its edge" : ", not a description"}: this is about the person.${pronounHint}${nameHint}
+- "reveal" (guests see it only AFTER pledging): start with exactly "${opener}".${entityGuard} Then a plausible option from the list (you MUST use a real option, verbatim), then a full stop, then ONE short sentence with a single detail about the PROTAGONIST'S relationship to that favourite, and the detail must be something anyone could have WATCHED them do: where they sit, what they order, what they say, who they go with, how often. It pays off what the about set up: the two halves agree.${tenseRule} Never a talisman, a lucky object, a superstition, a joke, or a quirk invented for effect; never a habit for a baby or a child too young to have one. The detail must be entirely the protagonist's own and must NOT depend on any real-world fact about the favourite: no fixture dates or match traditions, no seasons, tours, episodes, eras, or biography (a claim like "watched them play on Boxing Day" fails if that favourite doesn't play then; avoid the whole category). The options may be famous real people, teams, or works: never state or invent facts about them. No preamble such as "We can't wait to reveal".
+
+${exemplarsBlock()}`
   }
 
   const responseShape =
@@ -507,67 +566,68 @@ export function aboutNamesEvent(
 }
 
 export type StoryVerdict = {
-  /** A1 — the about adds a fact about the person the edges don't carry. */
-  a1: boolean
-  /** P2 — the note's detail is the person's own relationship to the pick. */
-  p2: boolean
+  /** Would a relative have written this about a real person? */
+  realistic: boolean
   reason: string
 }
 
 /**
- * The rubric's two model judgements (pairing table §4, §4b) — everything
- * else about a Story is a lookup. Used by the seed's judge loop; the
- * wizard runs one pass and lets the organiser re-roll. Never throws:
- * an unreadable verdict is a fail with the reason attached.
+ * The seed's one model judgement. It used to ask "is there a concrete
+ * detail?" (A1/P2) and passed anything concrete, marmalade sandwiches in
+ * coat pockets included: concreteness is not realism (founder,
+ * 2026-09-24). It now asks whether a relative would have written this,
+ * told the occasion and who the protagonist is, and is asked to name
+ * anything a real person would not say or do. Run it on the Story model,
+ * not a smaller one. Never throws: an unreadable verdict is a fail.
  */
 export async function judgeStory(
   story: Pick<Story, "about" | "note">,
-  input: Pick<StoryInput, "subject" | "topicTitle">,
+  input: Pick<
+    StoryInput,
+    "subject" | "topicTitle" | "occasionType" | "displayName" | "grouping"
+  >,
   edges: StoryEdges,
   modelId: string
 ): Promise<StoryVerdict> {
+  const isCause = input.subject === "cause"
+  const who = isCause
+    ? `a cause (${input.displayName ?? "unnamed"})`
+    : `${input.displayName ?? "the person"}, ${input.grouping === "couple" ? "a couple" : input.grouping === "group" ? "a group" : "one person"}`
+  const baby = BABY_OCCASIONS.has(input.occasionType ?? "")
+    ? " The occasion is a birth: the name is the parents'; the baby cannot have favourites or habits."
+    : ""
   const edgeLines = [edges.e1, edges.e2, edges.e3]
     .filter((e): e is Edge => Boolean(e))
     .map((e) => `- ${e.text}`)
     .join("\n")
-  const who = input.subject === "cause" ? "the cause" : "the person"
-  // A cause has no person: its note is "Our pick to start: X — clause",
-  // so P2 asks whether the clause ties THAT pick to the cause or the
-  // event, not whether a person has a ritual (the first seed run failed
-  // every cause on the person wording, 2026-09-24).
-  // A cause's about may not invent facts about the charity beyond its
-  // purpose data (a truthfulness rule), so "a fact the edges don't carry"
-  // is unsatisfiable there. Its resonance is the two things a guest needs
-  // before pledging: what is being raised for, and the event.
-  const a1 =
-    input.subject === "cause"
-      ? `A1 — does the ABOUT say plainly WHAT is being raised for — the charity's purpose, in its own terms (research, support, rescue, care)? Naming the charity alone, or restating the mechanic ("pick and pledge", "no fee"), does not count.`
-      : `A1 — does the ABOUT state at least one specific fact about ${who} that the edges above do NOT already carry? A restated edge ("a swim for the lifeboats") does not count; "he swims the sea pool most mornings" does. Generic sentiment ("she loved life") does not count.`
-  const p2 =
-    input.subject === "cause"
-      ? `P2 — does the NOTE's clause after the dash say something specific about why THAT pick suits this cause or this event? A description of the pick itself ("a rainbow after rain"), or a generic warm sentiment, fails.`
-      : `P2 — does the NOTE carry ONE concrete detail about ${who}'s own relationship to the named favourite — a habit, a memory, a ritual? A fact about the favourite itself, or a vague sentiment, fails.`
-  const prompt = `You are checking two things about a short piece of charity-event copy. Answer with JSON only.
+  const prompt = `You are a relative reading a favpoll page at a real event. A favpoll honours someone; guests pledge to charity and pick a favourite; after pledging they see the honoured person's own favourite. You are checking whether the copy reads as something a family member would actually have written about a real person. Answer with JSON only.
 
+Occasion: ${input.occasionType ?? "unknown"}. Honouring: ${who}.${baby}
 Topic: Favourite ${input.topicTitle}.
-Links the copy was already given (the edges):
+Links the writer was given:
 ${edgeLines || "(none)"}
 
-ABOUT (read by guests before they pledge):
+ABOUT (read before pledging):
 """${story.about}"""
 
-NOTE (read only after pledging):
+NOTE (read after pledging):
 """${story.note}"""
 
-${a1}
-${p2}
+Fail it if ANY of these is true:
+- a baby or a child too young has a favourite, a habit or a memory;
+- a place, an object, a time of day or a smell is given agency ("walked every mile with her", "steadies him", "feels most like his own");
+- a quirk, talisman, superstition or joke invented for effect (a sandwich kept in a coat pocket "just in case");
+- the person is written as the wrong age or the wrong person for the occasion;
+- a sentence that does not make sense, or that no relative would say out loud;
+- ${isCause ? "the about does not say what is being raised for" : "the about and the note contradict each other"}.
+Ordinary is good. Plain is good. A detail like "she kept a pot of cornflowers on the windowsill" passes.
 
-Respond with ONLY: {"a1": true|false, "p2": true|false, "reason": "one short sentence"}`
+Respond with ONLY: {"realistic": true|false, "reason": "one short sentence naming the problem, or 'reads as real'"}`
   try {
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
     const message = await client.messages.create({
       model: modelId,
-      max_tokens: 400,
+      max_tokens: 4000,
       messages: [{ role: "user", content: prompt }],
     })
     const text =
@@ -576,17 +636,15 @@ Respond with ONLY: {"a1": true|false, "p2": true|false, "reason": "one short sen
           c.type === "text"
       )?.text ?? ""
     const raw = (text.match(/\{[\s\S]*\}/) ?? [])[0]
-    if (!raw) return { a1: false, p2: false, reason: "judge returned no JSON" }
+    if (!raw) return { realistic: false, reason: "judge returned no JSON" }
     const parsed = JSON.parse(raw) as Partial<StoryVerdict>
     return {
-      a1: parsed.a1 === true,
-      p2: parsed.p2 === true,
+      realistic: parsed.realistic === true,
       reason: typeof parsed.reason === "string" ? parsed.reason : "",
     }
   } catch (err) {
     return {
-      a1: false,
-      p2: false,
+      realistic: false,
       reason: `judge failed: ${err instanceof Error ? err.message : String(err)}`,
     }
   }
