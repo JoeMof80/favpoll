@@ -3,7 +3,14 @@
 import Anthropic from "@anthropic-ai/sdk"
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
-import type { FavpollGrouping, Pronoun, Register } from "@favpoll/types"
+import { DEFAULT_OCCASION_TYPE } from "@/lib/registers"
+import { lookupEdges, type Edge, type StoryEdges } from "@/lib/pairing-table"
+import type {
+  CauseFamily,
+  FavpollGrouping,
+  Pronoun,
+  Register,
+} from "@favpoll/types"
 import {
   checkRateLimit,
   RateLimitError,
@@ -70,13 +77,45 @@ function revealOpener(
   return `${poss} ${tense}`
 }
 
+/**
+ * The charity's own words from the Commission register — raw text
+ * (run-together sentences, bulleted lists), so it is a prompt SOURCE and
+ * never copy to display. Collapsed and capped so a long entry cannot
+ * crowd the rest of the prompt.
+ */
+function activitiesExcerpt(activities: string | null): string | null {
+  const text = activities?.replace(/\s+/g, " ").trim()
+  if (!text) return null
+  return text.length > 600 ? `${text.slice(0, 600).trimEnd()}…` : text
+}
+
+/**
+ * The edges, as text, for the prompt (pairing table §6). Told which
+ * links exist, the model writes them in; told none exist, it supplies
+ * E1′ — the known fact — instead of inventing a link.
+ */
+function edgesBlock(edges: StoryEdges, subject: "someone" | "cause"): string {
+  const line = (label: string, edge: Edge | null) =>
+    `- ${label}: ${edge ? edge.text : "none."}`
+  const rows = [
+    line("Occasion → topic", edges.e1),
+    line("Charity → topic", edges.e2),
+    ...(subject === "cause" ? [] : [line("Occasion ↔ charity", edges.e3)]),
+  ]
+  return `Why this favpoll hangs together — the EDGES. These are the only links between the occasion, the topic and the charity that you may state; never invent another.
+${rows.join("\n")}`
+}
+
 function buildPrompt(opts: {
   register: Register
   subject: "someone" | "cause"
+  occasionType: string | null
   topicTitle: string
   itemLabels: string[]
   charityName: string | null
   charityDescription: string | null
+  charityActivities: string | null
+  edges: StoryEdges
   pronoun?: Pronoun
   grouping?: FavpollGrouping
   displayName?: string | null
@@ -84,34 +123,49 @@ function buildPrompt(opts: {
   const {
     register,
     subject,
+    occasionType,
     topicTitle,
     itemLabels,
     charityName,
     charityDescription,
+    edges,
     pronoun,
     grouping,
     displayName,
   } = opts
+  const activities = activitiesExcerpt(opts.charityActivities)
+  // Purpose data, in order of trust: the curated description, then the
+  // charity's own register text. Either lets the model say what the
+  // charity does; neither means it must not.
+  const hasPurpose = Boolean(charityDescription || activities)
 
   // A register-added charity arrives with NO description (seven on prod,
   // 2026-09-23). Passing the bare name let the model guess what "MAC Bevan
   // Charitable Trust" does — on a charity platform, an invented cause is a
   // truthfulness failure, not a style one. With no purpose data the charity
-  // is named and nothing more. (The real fix — activities + cause family
-  // stored at approval — is in references/favpoll-pairing-table §2.)
+  // is named and nothing more. Since #934 most register-added charities
+  // carry `activities` — their own words — which the prompt quotes and
+  // bounds ("only in these terms").
+  const ownWords = activities
+    ? ` In its own words on the Charity Commission register: "${activities}".`
+    : ""
   const charityLine = charityName
     ? charityDescription
-      ? `Charity receiving the pledges: ${charityName} — ${charityDescription}.`
-      : `Charity receiving the pledges: ${charityName}. NOTHING is known here about what this charity does. Name it exactly as given and do NOT describe, characterise, or guess at its work, its cause, or who it helps — not even from its name.`
+      ? `Charity receiving the pledges: ${charityName} — ${charityDescription.replace(/\.\s*$/, "")}.${ownWords}`
+      : activities
+        ? `Charity receiving the pledges: ${charityName}.${ownWords} Describe its work only in those terms — nothing beyond them.`
+        : `Charity receiving the pledges: ${charityName}. NOTHING is known here about what this charity does. Name it exactly as given and do NOT describe, characterise, or guess at its work, its cause, or who it helps — not even from its name.`
     : 'Charity: not yet chosen — say "charity" generically.'
 
   const voice = `You write short copy for favpoll, a UK charitable-giving platform used at real life events. Guests pledge money to charity and share favourites; after pledging, the protagonist's own favourite is revealed to them.
 Voice: warm, plain, specific, quietly dignified. Short sentences. British English.
 Never use: "vote", "voting", "choose", "choosing", "choice", "remarkable", "meaningful", "celebrate the life", "make a difference", exclamation marks, or any fundraising cliché. The money word is "pledge"; the selection word is "pick".`
 
-  const context = `Occasion: ${REGISTER_LABEL[register]}.
+  const context = `Occasion: ${REGISTER_LABEL[register]}.${occasionType ? ` Occasion type: ${occasionType}.` : ""}
 Poll topic: Favourite ${topicTitle}. Options include: ${itemLabels.slice(0, 12).join(", ")}.
-${charityLine}`
+${charityLine}
+
+${edgesBlock(edges, subject)}`
 
   let instructions: string
   if (subject === "cause") {
@@ -131,7 +185,7 @@ ${charityLine}`
       ? `The organiser calls this cause "${displayName!.trim()}" — write around that name; do not rename it.\n`
       : ""
     instructions = `${labelContext}${causeLabelInstruction}- "context" (max 40 characters): one short subline for under the cause name, giving a timeframe or who it helps — like "Winter 2026 appeal" or "For families facing hardship". It must NOT contain the charity's name in any form (the charity is already shown beside it), and must NOT mention pledges, money, or where the money goes — the about owns that. No full stop.
-- "about" (max 2 sentences): first what this favpoll is raising for${charityDescription ? "" : " (taken from the cause name above only — the charity's own work is unknown and must not be described)"}, then the mechanic in ONE clause — guests pick their favourite ${topicTitle.toLowerCase()} and pledge to ${charityName ?? "the charity"}, where the pick and the pledge are a single action (the pick is made BY pledging). Never present them as separate steps: no "first…", "then…", "tell us…". favpoll takes no platform fee. Do NOT name or hint at any particular option, and do not repeat the context subline's wording.
+- "about" (max 2 sentences): first what this favpoll is raising for${hasPurpose ? "" : " (taken from the cause name above only — the charity's own work is unknown and must not be described)"}${edges.count > 0 ? ", with why THIS topic in a clause — say the edge listed above, plainly" : ""}, then the mechanic in ONE clause — guests pick their favourite ${topicTitle.toLowerCase()} and pledge to ${charityName ?? "the charity"}, where the pick and the pledge are a single action (the pick is made BY pledging). Never present them as separate steps: no "first…", "then…", "tell us…". favpoll takes no platform fee. Do NOT name or hint at any particular option, and do not repeat the context subline's wording.
 - "reveal" (guests see it only AFTER pledging): start with exactly "Our pick to start:" then a real option from the list, then " — " and one short, warm clause. No statistics, numbers, percentages, or invented quotes.`
   } else {
     const opener = revealOpener(register, pronoun, displayName)
@@ -171,7 +225,21 @@ ${charityLine}`
       register === "remembering"
         ? ` The person is being remembered: every sentence about them — in the about AND the reveal detail — must be in the past tense (loved, was, would reach for). Never "has loved", "still does", or any present-tense habit.`
         : ` The person is living: their habits are in the present tense ("always goes", "still picks first"), never the past-habitual ("always went") — past tense makes them sound gone. Do not assume their age: no whole-life idioms ("since childhood", "all her life", "long held"). When the charity or occasion suggests who they are (a children's charity, a graduation), let that shape the detail; otherwise write habits that fit any age.`
-    instructions = `- "about" (max 2 sentences): open with the PROTAGONIST'S connection to the topic — a favourite ${topicTitle.toLowerCase()} that is distinctly theirs — teased WITHOUT naming or hinting at which option it is (the reveal is the gift).${tenseRule} Then one short clause inviting the READER directly, in second person: pledge to ${charityName ?? "charity"} and pick your OWN favourite (say "you"/"your", never "guests"; never say they are guessing or voting on the protagonist's). Keep the charity to a mention, not a description — this is about the person.${pronounHint}${nameHint}
+    // What the about must do, by edge count (pairing table §6). At zero
+    // edges the fact about the person IS the motivation — and it has to
+    // be in the about, read before the pledge, not only in the reveal
+    // (the Yvette case: a payoff with nothing in front of it).
+    const topicLower = topicTitle.toLowerCase()
+    const edgeRule =
+      edges.count === 0
+        ? ` NO edge links this occasion, this charity and this topic — so the about MUST supply the link itself: one plausible, specific fact about the person that makes a favourite ${topicLower} theirs (a habit, a place, a thing they always do), stated in the about before the invitation, not only in the reveal.`
+        : edges.count === 1
+          ? ` ONE edge links this favpoll (listed above): state it plainly in the about, and supply the other side yourself — a plausible, specific fact about the person that makes a favourite ${topicLower} theirs.`
+          : edges.count === 2
+            ? ` TWO edges link this favpoll (listed above): state both plainly in the about; you may add one known fact about the person to tighten it.`
+            : ` All THREE edges link this favpoll (listed above): state them plainly in the about — the occasion, the topic and the charity in one breath — then invite.`
+    const resonanceRule = ` Whatever the edge count, the about must add at least one fact about the PERSON that the edges do not already carry — an edge restated is legible but nobody's. The reveal's detail must pay off what the about set up: the two halves agree.`
+    instructions = `- "about" (max 2 sentences): open with the PROTAGONIST'S connection to the topic — a favourite ${topicLower} that is distinctly theirs — teased WITHOUT naming or hinting at which option it is (the reveal is the gift).${tenseRule}${edgeRule}${resonanceRule} Then one short clause inviting the READER directly, in second person: pledge to ${charityName ?? "charity"} and pick your OWN favourite (say "you"/"your", never "guests"; never say they are guessing or voting on the protagonist's). Keep the charity to a mention${edges.e2 || edges.e3 ? " plus its edge" : ", not a description"} — this is about the person.${pronounHint}${nameHint}
 - "reveal" (guests see it only AFTER pledging): start with exactly "${opener}".${entityGuard} Then a plausible option from the list (you MUST use a real option, verbatim), then a full stop, then ONE short sentence with a single concrete detail about the PROTAGONIST'S relationship to that favourite — a habit, a memory, a ritual of theirs.${tenseRule} The detail must be entirely the protagonist's own and must NOT depend on any real-world fact about the favourite: no fixture dates or match traditions, no seasons, tours, episodes, eras, or biography (a claim like "watched them play on Boxing Day" fails if that favourite doesn't play then — avoid the whole category). The options may be famous real people, teams, or works: never state or invent facts about them. No preamble such as "We can't wait to reveal".`
   }
 
@@ -267,6 +335,45 @@ async function callLLM(prompt: string, modelId: string): Promise<DraftFields> {
 // Main action
 // ---------------------------------------------------------------------------
 
+type CharityForPrompt = {
+  name: string | null
+  description: string | null
+  activities: string | null
+  /** The admin-CONFIRMED family — never the model's suggestion (#937). */
+  causeFamily: CauseFamily | null
+}
+
+async function fetchCharity(
+  supabase: ReturnType<typeof createAdminClient>,
+  charityId: string | null | undefined
+): Promise<CharityForPrompt> {
+  const none: CharityForPrompt = {
+    name: null,
+    description: null,
+    activities: null,
+    causeFamily: null,
+  }
+  if (!charityId) return none
+  const { data } = await supabase
+    .from("charities")
+    .select("name, description, activities, cause_family")
+    .eq("id", charityId)
+    .single()
+  if (!data) return none
+  return {
+    name: data.name ?? null,
+    description: data.description ?? null,
+    activities: data.activities ?? null,
+    causeFamily: (data.cause_family as CauseFamily | null | undefined) ?? null,
+  }
+}
+
+/** The table key for the occasion: the caller's, else the register's
+ *  default (which pairs with nothing). */
+function resolveOccasionType(input: GenerateDraftInput): string | null {
+  return input.occasionType?.trim() || DEFAULT_OCCASION_TYPE[input.register]
+}
+
 export type GenerateDraftInput = {
   register: Register
   subject: "someone" | "cause"
@@ -282,6 +389,14 @@ export type GenerateDraftInput = {
   grouping?: FavpollGrouping
   /** Protagonist name or cause label — prompt context only, never cached into copy. */
   displayName?: string | null
+  /**
+   * An `occasion_type` string (OCCASION_TYPES_BY_REGISTER) — the key for
+   * the occasion's edges in the pairing table. The seed passes the one it
+   * chose; the wizard has none (its occasion picker retired in #605), so
+   * it falls back to the register's default, which pairs with nothing —
+   * the zero-edge case, where the about must supply a known fact.
+   */
+  occasionType?: string | null
   /**
    * Re-roll (founder, 2026-09-18): bypass the shared cache read AND
    * write — repeat clicks of Generate must produce a fresh example, and
@@ -318,26 +433,26 @@ export async function generateDraft(
     const itemLabels = input.itemLabels ?? []
 
     const supabase = createAdminClient()
-    let charityName: string | null = null
-    let charityDescription: string | null = null
-    if (input.primaryCharityId) {
-      const { data: charity } = await supabase
-        .from("charities")
-        .select("name, description")
-        .eq("id", input.primaryCharityId)
-        .single()
-      charityName = charity?.name ?? null
-      charityDescription = charity?.description ?? null
-    }
+    const charity = await fetchCharity(supabase, input.primaryCharityId)
+    const occasionType = resolveOccasionType(input)
 
     const modelId = process.env.LLM_MODEL_ID ?? "claude-sonnet-5"
     const prompt = buildPrompt({
       register: input.register,
       subject: input.subject,
+      occasionType,
       topicTitle,
       itemLabels,
-      charityName,
-      charityDescription,
+      charityName: charity.name,
+      charityDescription: charity.description,
+      charityActivities: charity.activities,
+      edges: lookupEdges({
+        register: input.register,
+        occasionType,
+        topicTitle,
+        charityName: charity.name,
+        causeFamily: charity.causeFamily,
+      }),
       pronoun: input.subject === "someone" ? input.pronoun : undefined,
       grouping: input.subject === "someone" ? input.grouping : undefined,
       displayName: input.displayName ?? null,
@@ -381,7 +496,8 @@ export async function generateDraft(
     input.primaryCharityId,
     input.pronoun,
     input.displayName,
-    input.grouping
+    input.grouping,
+    resolveOccasionType(input)
   )
 
   if (!input.skipCache) {
@@ -414,26 +530,27 @@ export async function generateDraft(
     (topic as { favourites: { label: string }[] }).favourites ?? []
   ).map((i) => i.label)
 
-  let charityName: string | null = null
-  let charityDescription: string | null = null
-  if (input.primaryCharityId) {
-    const { data: charity } = await supabase
-      .from("charities")
-      .select("name, description")
-      .eq("id", input.primaryCharityId)
-      .single()
-    charityName = charity?.name ?? null
-    charityDescription = charity?.description ?? null
-  }
+  const charity = await fetchCharity(supabase, input.primaryCharityId)
+  const occasionType = resolveOccasionType(input)
+  const topicTitle = topic.title as string
 
   const modelId = process.env.LLM_MODEL_ID ?? "claude-sonnet-5"
   const prompt = buildPrompt({
     register: input.register,
     subject: input.subject,
-    topicTitle: topic.title as string,
+    occasionType,
+    topicTitle,
     itemLabels,
-    charityName,
-    charityDescription,
+    charityName: charity.name,
+    charityDescription: charity.description,
+    charityActivities: charity.activities,
+    edges: lookupEdges({
+      register: input.register,
+      occasionType,
+      topicTitle,
+      charityName: charity.name,
+      causeFamily: charity.causeFamily,
+    }),
     pronoun: input.subject === "someone" ? input.pronoun : undefined,
     grouping: input.subject === "someone" ? input.grouping : undefined,
     displayName: input.displayName ?? null,
@@ -541,7 +658,8 @@ export async function getCachedDraftGhosts(
     input.primaryCharityId,
     input.pronoun,
     input.displayName,
-    input.grouping
+    input.grouping,
+    resolveOccasionType(input)
   )
   const { data: cached } = await supabase
     .from("generated_drafts")
