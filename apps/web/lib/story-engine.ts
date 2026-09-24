@@ -106,7 +106,7 @@ function edgesBlock(edges: StoryEdges, subject: "someone" | "cause"): string {
     line("Charity → topic", edges.e2),
     ...(subject === "cause" ? [] : [line("Occasion ↔ charity", edges.e3)]),
   ]
-  return `Why this favpoll hangs together — the EDGES. These are the only links between the occasion, the topic and the charity that you may state; never invent another. Say them in your own words, as a friend would — never repeat the phrasing below ("sits inside", "belongs at", "the cause the effort is for" are notes to you, not copy).
+  return `Why this favpoll hangs together — the EDGES. These are the only links between the occasion, the topic and the charity that you may state; never invent another. They are notes to you, not copy: never repeat their phrasing ("sits inside", "belongs at", "the cause the effort is for"). A ★ edge already reads on the card (the cake at a birthday, a children's book at a christening), so the about must NOT explain or justify it; a pairing that needs no explanation gets none. Only a two-hop edge (marked "a step the about must say out loud") is said, in one plain clause.
 ${rows.join("\n")}`
 }
 
@@ -163,7 +163,7 @@ export function buildPrompt(opts: {
 
   const voice = `You write short copy for favpoll, a UK charitable-giving platform used at real life events. Guests pledge money to charity and share favourites; after pledging, the protagonist's own favourite is revealed to them.
 Voice: warm, plain, specific, quietly dignified. Short sentences. British English.
-Never use: "vote", "voting", "choose", "choosing", "choice", "remarkable", "meaningful", "celebrate the life", "make a difference", exclamation marks, or any fundraising cliché. The money word is "pledge"; the selection word is "pick".`
+Never use: "vote", "voting", "choose", "choosing", "choice", "remarkable", "meaningful", "celebrate the life", "make a difference", exclamation marks, em dashes (—) in prose, or any fundraising cliché. Join clauses with a comma, a full stop or "and". The money word is "pledge"; the selection word is "pick".`
 
   const context = `Occasion: ${REGISTER_LABEL[register]}.${occasionType ? ` Occasion type: ${occasionType}.` : ""}
 Poll topic: Favourite ${topicTitle}. Options include: ${itemLabels.slice(0, 12).join(", ")}.
@@ -190,7 +190,7 @@ ${edgesBlock(edges, subject)}`
       : ""
     instructions = `${labelContext}${causeLabelInstruction}- "context" (max 40 characters): one short subline for under the cause name, giving a timeframe or who it helps — like "Winter 2026 appeal" or "For families facing hardship". It must NOT contain the charity's name in any form (the charity is already shown beside it), and must NOT mention pledges, money, or where the money goes — the about owns that. No full stop.
 - "about" (max 2 sentences): first what this favpoll is raising for${hasPurpose ? "" : " (taken from the cause name above only — the charity's own work is unknown and must not be described)"}${occasionType && occasionType !== "Fundraiser" ? `, at what event (say "${occasionType.toLowerCase()}" or its plain equivalent — a guest must know what is happening)` : ""}${edges.count > 0 ? ", with why THIS topic in a clause — say the edge listed above, in your own words" : ""}, then the mechanic in ONE clause — guests pick their favourite ${topicTitle.toLowerCase()} and pledge to ${charityName ?? "the charity"}, where the pick and the pledge are a single action (the pick is made BY pledging). Never present them as separate steps: no "first…", "then…", "tell us…". favpoll takes no platform fee. Do NOT name or hint at any particular option, and do not repeat the context subline's wording.
-- "reveal" (guests see it only AFTER pledging): start with exactly "Our pick to start:" then a real option from the list, then " — " and one short, warm clause saying why THAT pick suits this cause or this event (not a description of the pick itself). No statistics, numbers, percentages, or invented quotes.`
+- "reveal" (guests see it only AFTER pledging): start with exactly "Our pick to start:" then a real option from the list, then " — " (this separator is the one place an em dash is allowed) and one short, warm clause saying why THAT pick suits this cause or this event (not a description of the pick itself). No statistics, numbers, percentages, or invented quotes.`
   } else {
     const opener = revealOpener(register, pronoun, displayName)
     // Pair/Group are structural (founder bug, 2026-09-06: the generator
@@ -236,14 +236,14 @@ ${edgesBlock(edges, subject)}`
     const topicLower = topicTitle.toLowerCase()
     const edgeRule =
       edges.count === 0
-        ? ` NO edge links this occasion, this charity and this topic — so the about MUST supply the link itself: one plausible, specific fact about the person that makes a favourite ${topicLower} theirs (a habit, a place, a thing they always do), stated in the about before the invitation, not only in the reveal.`
+        ? ` NO edge links this occasion, this charity and this topic, so the about MUST supply the link itself: one plausible, specific fact about the person that makes a favourite ${topicLower} theirs (a habit, a place, a thing they always do), stated in the about before the invitation, not only in the reveal.`
         : edges.count === 1
-          ? ` ONE edge links this favpoll (listed above): state it plainly in the about, and supply the other side yourself — a plausible, specific fact about the person that makes a favourite ${topicLower} theirs.`
+          ? ` ONE edge links this favpoll (listed above). Let it stand, and supply the other side yourself: a plausible, specific fact about the person that makes a favourite ${topicLower} theirs.`
           : edges.count === 2
-            ? ` TWO edges link this favpoll (listed above): state both plainly in the about; you may add one known fact about the person to tighten it.`
-            : ` All THREE edges link this favpoll (listed above): state them plainly in the about — the occasion, the topic and the charity in one breath — then invite.`
-    const resonanceRule = ` Whatever the edge count, the about must add at least one fact about the PERSON that the edges do not already carry — an edge restated is legible but nobody's. The reveal's detail must pay off what the about set up: the two halves agree.`
-    instructions = `- "about" (max 2 sentences): open with the PROTAGONIST'S connection to the topic — a favourite ${topicLower} that is distinctly theirs — teased WITHOUT naming or hinting at which option it is (the reveal is the gift).${tenseRule}${edgeRule}${resonanceRule} Then one short clause inviting the READER directly, in second person: pledge to ${charityName ?? "charity"} and pick your OWN favourite (say "you"/"your", never "guests"; never say they are guessing or voting on the protagonist's). Keep the charity to a mention${edges.e2 || edges.e3 ? " plus its edge" : ", not a description"} — this is about the person.${pronounHint}${nameHint}
+            ? ` TWO edges link this favpoll (listed above). Let them stand; the about's job is the person.`
+            : ` All THREE edges link this favpoll (listed above). The card already says it; the about's job is the person.`
+    const resonanceRule = ` The about must carry at least one fact about the PERSON that the edges do not already hold, and the reveal's detail must pay off what the about set up: the two halves agree. Never say that the favourite is being kept back, withheld, not yet revealed, or that they "won't say which": simply do not name it. The one promise of a reveal is the closing clause.`
+    instructions = `- "about" (max 2 sentences, under 55 words): open with the PROTAGONIST'S connection to the topic — a favourite ${topicLower} that is distinctly theirs — teased WITHOUT naming or hinting at which option it is (the reveal is the gift).${tenseRule}${edgeRule}${resonanceRule} Then one short clause inviting the READER directly, in second person: pledge to ${charityName ?? "charity"} and pick your OWN favourite (say "you"/"your", never "guests"; never say they are guessing or voting on the protagonist's). Keep the charity to a mention${edges.e2 || edges.e3 ? " plus its edge" : ", not a description"} — this is about the person.${pronounHint}${nameHint}
 - "reveal" (guests see it only AFTER pledging): start with exactly "${opener}".${entityGuard} Then a plausible option from the list (you MUST use a real option, verbatim), then a full stop, then ONE short sentence with a single concrete detail about the PROTAGONIST'S relationship to that favourite — a habit, a memory, a ritual of theirs.${tenseRule} The detail must be entirely the protagonist's own and must NOT depend on any real-world fact about the favourite: no fixture dates or match traditions, no seasons, tours, episodes, eras, or biography (a claim like "watched them play on Boxing Day" fails if that favourite doesn't play then — avoid the whole category). The options may be famous real people, teams, or works: never state or invent facts about them. No preamble such as "We can't wait to reveal".`
   }
 

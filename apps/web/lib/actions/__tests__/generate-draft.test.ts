@@ -860,8 +860,12 @@ describe("edge-aware generation — the prompt carries the table's edges", () =>
       "Occasion ↔ charity: RNLI belongs at an achievement"
     )
     expect(prompt).toContain("All THREE edges link this favpoll")
-    // The first seed run parroted the edge sentences into copy.
-    expect(prompt).toContain("Say them in your own words")
+    // The first seed run parroted the edge sentences into copy, and
+    // explained ★ edges that read on the card by themselves (founder,
+    // 2026-09-24: "it doesn't quite make sense").
+    expect(prompt).toContain("must NOT explain or justify it")
+    expect(prompt).toContain("em dashes (—) in prose")
+    expect(prompt).toContain("won't say which")
     expect(prompt).toContain(
       'In its own words on the Charity Commission register: "The RNLI operates lifeboats'
     )
