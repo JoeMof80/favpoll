@@ -860,6 +860,8 @@ describe("edge-aware generation — the prompt carries the table's edges", () =>
       "Occasion ↔ charity: RNLI belongs at an achievement"
     )
     expect(prompt).toContain("All THREE edges link this favpoll")
+    // The first seed run parroted the edge sentences into copy.
+    expect(prompt).toContain("Say them in your own words")
     expect(prompt).toContain(
       'In its own words on the Charity Commission register: "The RNLI operates lifeboats'
     )

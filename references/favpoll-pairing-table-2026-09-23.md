@@ -14,6 +14,9 @@ charities on prod as of today. Every topic and charity named here exists.
 > `cause_family`) and `lookupEdges()`; `generate-draft.ts` passes the edges
 > and the charity's `activities` into the prompt (§6). Rows D, E and H are
 > deliberately NOT encoded. §3 themes wait for a theme input to exist.
+> The engine is `apps/web/lib/story-engine.ts` (one generator, two callers);
+> `scripts/seed-stories.ts` (`pnpm seed:stories`) picks triples from the table
+> at the seed bar and runs the judge loop (A1, P2) before writing.
 
 ## How it is used
 
