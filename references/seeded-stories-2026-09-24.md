@@ -1,0 +1,277 @@
+# The seeded Stories, seventh cohort, 24 September 2026
+
+Edit the **About** and **Note** paragraphs in place. Leave the headings and the `id` lines alone: they are how the edits get paired back to the originals (kept in `seeded-stories-2026-09-24.original.json`) and to the rows on staging. Voice is `first person` where the organiser is the protagonist.
+
+Stars are the edges the triple has: ★ occasion→topic, ★ charity→topic, ★ occasion↔charity. Cause favpolls have at most two.
+
+## Celebrating one person
+
+### 1. Belinda Quinn · Achievement · Sea creature · RNLI
+`id 0e4132e9-22aa-444b-bbef-135b029e364e` · ★★☆ · third person, she
+
+**About**
+
+Belinda trains at the pool most mornings before work, counting lengths without complaint. She swims for the lifeboats, a stretch of open water she has mapped out on a chart at home. Pledge to RNLI, pick your own favourite, and find out Belinda's.
+
+**Note**
+
+Belinda's is the Dolphin. She keeps a small carved dolphin on her kitchen windowsill and dusts it every Sunday.
+
+### 2. Ivy Nakamura · Achievement · Song · Samaritans
+`id 6157a64a-4b74-4254-b3ae-47c10d66a405` · ★★★ · first person
+
+**About**
+
+I'm taking on this challenge after months of early starts and quiet training runs. Music keeps me going when the miles get long, and it feels right to raise pledges for Samaritans, who are there for anyone who needs to talk. Pledge to Samaritans, pick your own favourite, to see mine.
+
+**Note**
+
+Mine is Dancing Queen — ABBA. I turn it up in the kitchen every Sunday morning.
+
+### 3. Malcolm Baxter · Achievement · Mountain or peak · Scope
+`id b863cb4d-131c-4cd6-bba6-dc08a4f4eb39` · ★★☆ · third person, he
+
+**About**
+
+Malcolm is training for a mountain climb this year, walking the local hills whenever he can. He is doing it for Scope, so disabled people get the same chances as everyone else. Pledge to Scope, pick your own favourite, and Malcolm's will be revealed.
+
+**Note**
+
+Malcolm's is Ben Nevis. He always plans his climbs to reach the summit at sunrise.
+
+### 4. Oliver Thorne · Birthday · Ice cream flavour · Barnardos
+`id 54e2db37-daa3-4810-8256-ab0f8a00ec22` · ★★☆ · third person, he
+
+**About**
+
+Oliver puts on a proper birthday tea every year, with sandwiches cut into triangles and something cold to follow. He hands round the tub himself and always lets the youngest guests go first. Pledge to Barnardos, pick your own favourite, and we'll reveal Oliver's.
+
+**Note**
+
+Oliver's is Rocky road. He picks out the marshmallow pieces first and eats them before touching the rest.
+
+### 5. Philip Clarke · Citizenship · Type of tea · Trussell Trust
+`id 47b78481-a17f-4698-9c74-0eb66a53130e` · ★★☆ · first person
+
+**About**
+
+I became a British citizen this year, and the little rituals have grown on me: queuing patiently, apologising for things that aren't my fault, and putting the kettle on before anything else. I've picked up a taste for tea I never expected. Pledge to Trussell Trust, pick your own favourite, to see mine.
+
+**Note**
+
+Mine is Earl Grey. I keep a tin of it in my desk drawer at work and make a cup every afternoon at three.
+
+### 6. Fiona Coles · Recovery · Weather for walk · Cancer Research UK
+`id 8794d709-1aee-4bee-b3b5-e1f6987a53cc` · ★★☆ · third person, she
+
+**About**
+
+Fiona is back on her feet and glad of it. Her walks are getting longer again, and she takes more notice of the weather now. Cancer Research UK has been part of her story this year. Pledge to Cancer Research UK, pick your own favourite, and find out Fiona's.
+
+**Note**
+
+Fiona's is Bright spring day. She keeps her walking boots by the back door, ready for one to arrive.
+
+### 7. Kate Whitaker · Recovery · Song · Stroke Association
+`id 2cf0db1b-0dd0-4145-8ff3-4bd8991b06d6` · ★★☆ · third person, she
+
+**About**
+
+Kate is back on her feet and walking further each week. She keeps a notebook of small progress and takes the stairs now instead of the lift. Stroke Association helped her through the early days, and she wanted them thanked properly. Pledge to Stroke Association, pick your own favourite, then see Kate's.
+
+**Note**
+
+Kate's is Three Little Birds — Bob Marley. She plays it every morning while she does her exercises.
+
+### 8. Tess Yates · Recovery · Weather for walk · Cats Protection
+`id 428f8ae9-1e8a-41cf-aeff-426f99c76113` · ★★☆ · third person, she
+
+**About**
+
+Tess is back on her feet now, and the short walk to the corner and back has become the best part of her day. She notices the sky before she checks the time and always has an opinion on it. Pledge to Cats Protection, pick your own favourite, and Tess' will be revealed.
+
+**Note**
+
+Tess' is Crisp winter morning. She fills a flask before she leaves and drinks it on the same bench every time.
+
+## Celebrating a couple or group
+
+### 9. Hugo & Kenneth · Anniversary · Cuisine · British Red Cross
+`id 7921084c-9ab8-45b4-9831-5724807e4994` · ★★☆ · third person, they
+
+**About**
+
+Hugo & Kenneth have shared decades of meals, and each year adds another cuisine to the list they keep going back to. They cook together most weekends, taking turns at the stove and sharing the washing up. Pledge to British Red Cross, pick your own favourite, and Hugo & Kenneth's will be revealed.
+
+**Note**
+
+Hugo & Kenneth's is Vietnamese. They make pho together every few weeks, simmering the broth for hours before they serve it.
+
+### 10. Florence & Marion · Engagement · Beach · Blue Cross
+`id bc5f0081-4ded-4a50-9ac0-efb24d942639` · ★★☆ · first person
+
+**About**
+
+We got engaged on a walk along the coast, and that's the beach we talk about most. Most weekends we pack a flask and head for the sand, whatever the weather. Pledge to Blue Cross, pick your own favourite, then see ours.
+
+**Note**
+
+Ours is Camber Sands. I always climb the highest dune before we spread out the picnic blanket.
+
+### 11. Gillian & Eamon · Engagement · Cocktail · Crisis
+`id fb5ac6b1-a9d7-4b8d-adce-695189f9ab48` · ★★☆ · first person
+
+**About**
+
+We got engaged at a small bar near the river, the kind of place that does one good cocktail and no fuss. We're asking for pledges to Crisis instead of gifts, a home for someone else in place of things we don't need. Pledge to Crisis, pick your own favourite, and ours will be revealed.
+
+**Note**
+
+Ours is Espresso martini. We always order two the moment we sit down, no matter the occasion.
+
+### 12. Ravi & Dominic · New baby · Planet · Action for Children
+`id 3abf67e8-483a-4566-bf95-0745deae3a98` · ★★☆ · first person
+
+**About**
+
+We read the same book every evening, the one we know almost by heart. We like to stand at the window and spot what we can see in the sky before bed. Action for Children works with children and young people, and we wanted our pledges to go there. Pledge to Action for Children, pick your own favourite, and ours will be revealed.
+
+**Note**
+
+Ours is Jupiter. I keep a small model of it on my desk, bought years ago at a museum shop.
+
+### 13. Rhys & Kwame · New baby · Dinosaur · Children's Society
+`id d77a97e1-f6ee-4d5a-be7a-d7c179f289f5` · ★★☆ · first person
+
+**About**
+
+We read dinosaur names before bedtime most nights, and one of us always slips in a favourite without meaning to. Children's Society works for young people, so a favourite dinosaur felt like the right thing to ask about. Pledge to Children's Society, pick your own favourite, and ours will be revealed.
+
+**Note**
+
+Ours is Diplodocus. I trace its long neck on the page each time we reach that spread.
+
+### 14. Barry & Alan · Renewal of vows · Island · Centrepoint
+`id ec7a161b-6e93-4b12-89eb-e21c5dd05e51` · ★★☆ · first person
+
+**About**
+
+We renew our vows on the beach where we first honeymooned, back for another summer by the sea. We ask friends and family to pledge to Centrepoint instead of bringing gifts, a home for someone who needs one. Pledge to Centrepoint, pick your own favourite, and find out ours.
+
+**Note**
+
+Ours is Mull. We take the same ferry crossing every year and stand at the rail until the hills disappear.
+
+### 15. Mei & Simon · Wedding · Cake · Shelter
+`id 61a974f7-e4f8-4cdf-9c1d-539f3f88a561` · ★★☆ · third person, they
+
+**About**
+
+They bake together most weekends, arguing gently over icing and portion sizes. Sunday mornings often end with a new recipe cooling on the side. They're asking for pledges to Shelter instead of gifts, so someone else can have a home of their own. Pledge to Shelter, pick your own favourite, and Mei & Simon's will be revealed.
+
+**Note**
+
+Mei & Simon's is Chocolate fudge cake. They always scrape the bowl clean before it goes in the oven.
+
+### 16. Nicola & Jack · Wedding · Beach · National Trust
+`id f5b1b601-061e-4739-afa8-30a3cde89ae0` · ★★☆ · first person
+
+**About**
+
+We spent our engagement arguing over honeymoon routes, and every one somehow ended on a coastline. Between us we've packed a beach bag more times than we can count, and our sandy shoes end up by the door most summers. Pledge to National Trust, pick your own favourite, and find out ours.
+
+**Note**
+
+Ours is Camber Sands. We always walk the same stretch of sand at low tide and never agree on which way to turn.
+
+## Remembering
+
+### 17. Pam Zhang · Memorial · Garden to visit · Diabetes UK
+`id a8a8afd5-5646-4d32-9262-a257acd6f97d` · ★★☆ · third person, she
+
+**About**
+
+Pam loved wandering around gardens, taking her time over every border and vista. She grew her own vegetables at home and enjoyed sharing cuttings with neighbours. Diabetes UK supported her through the illness she lived with. Pledge to Diabetes UK, pick your own favourite, and Pam's will be revealed.
+
+**Note**
+
+Pam's was Chatsworth. She kept a pressed leaf from her first visit there in an old diary.
+
+### 18. Kieran Abara · Remembrance · Saying · Guide Dogs
+`id 9f2d04ad-fb8d-4854-a58e-5f96a4148fea` · ★★☆ · third person, he
+
+**About**
+
+Kieran was known for having a saying to fit almost any moment, delivered with the same steady calm each time. He never made a fuss and always had a word ready to smooth things over. Pledge to Guide Dogs, pick your own favourite, then see Kieran's.
+
+**Note**
+
+Kieran's was Mustn't grumble. He'd say it every time someone asked how he was, then quickly turn the talk to something else.
+
+### 19. Rosa Gibson · Remembrance · Flower · St Richard's Hospice
+`id ed86ba14-c578-4c58-b827-96854c5fddeb` · ★★☆ · third person, she
+
+**About**
+
+Rosa loved her garden and could name every flower in it. She spent her afternoons tending borders that were never quite finished and always found time for a cup of tea with anyone who called round. St Richard's Hospice cared for her in her last weeks. Pledge to St Richard's Hospice, pick your own favourite, then see Rosa's.
+
+**Note**
+
+Rosa's was Forget-me-not. She kept a single stem in a jam jar on her kitchen windowsill every spring.
+
+### 20. Aisha Hartley · Tribute · Flower · Macmillan Cancer Support
+`id f0844140-d494-4679-908f-5fabb4208216` · ★★☆ · third person, she
+
+**About**
+
+Aisha spent weekend afternoons weeding borders and giving cuttings to anyone who admired them. She kept the garden going through every season, rain or shine. Macmillan nurses cared for her at the end, and their kindness stayed with those who loved her. Pledge to Macmillan Cancer Support, pick your own favourite, and we'll reveal Aisha's.
+
+**Note**
+
+Aisha's was Hydrangea. She always cut the first blue bloom of summer and set it in a jam jar on her kitchen table.
+
+### 21. Edith Ahmed · Tribute · Poem · St Gemma's Hospice
+`id ec550565-e5ef-42b0-8e93-cf95d0df8a1e` · ★★☆ · third person, she
+
+**About**
+
+Edith loved words that could be read aloud, and she kept a shelf of poetry by her chair. She read every evening and marked her favourite lines in pencil. St Gemma's Hospice cared for her at the end. Pledge to St Gemma's Hospice, pick your own favourite, and we'll reveal Edith's.
+
+**Note**
+
+Edith's was Desiderata. She copied it out by hand and kept the copy folded in her handbag.
+
+## A cause
+
+### 22. Emergency Medical Relief · Sponsored event · River · Médecins Sans Frontières
+`id 372e8548-17b1-48f1-b768-96f97b474bad` · ★★☆ · cause
+
+**About**
+
+This sponsored event is raising for Médecins Sans Frontières, whose humanitarian work reaches rivers and communities in crisis across the world. Guests pick their favourite river by pledging to the charity, and favpoll takes no platform fee.
+
+**Note**
+
+Our pick to start: Wye — a walk they took every summer as children.
+
+### 23. End Global Poverty · Sponsored event · River · Oxfam
+`id 6c01a36b-1fa2-4cb2-924b-70685b6d4a4b` · ★★☆ · cause
+
+**About**
+
+This sponsored event is raising for Oxfam's work against poverty overseas, and a favourite river follows the routes and waters where that work happens. Guests pick their favourite river by pledging to Oxfam, with no platform fee taken.
+
+**Note**
+
+Our pick to start: Thames — the water people walk beside on ordinary days, without much thought at all
+
+### 24. Men's Mental Health · Sponsored event · Form of exercise · CALM
+`id 3653cba9-9d3a-47a2-890a-7417c22dc7aa` · ★★☆ · cause
+
+**About**
+
+This favpoll is raising for CALM ahead of our sponsored event, where months of training have us thinking about the forms of exercise that keep us going. Guests pick their favourite form of exercise and pledge to CALM, which offers support services, counselling, advice and information to protect men's mental health and help prevent suicide.
+
+**Note**
+
+Our pick to start: Running — the one that clears the head before anything else does
