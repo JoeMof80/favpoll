@@ -1042,3 +1042,55 @@ describe("stripEmDashes", () => {
     expect(stripEmDashes("a forget—me—not")).toBe("a forget-me-not")
   })
 })
+
+describe("realism rules in the person prompt (founder review, 2026-09-24)", () => {
+  const promptOf = () =>
+    mockMessagesCreate.mock.calls[0][0].messages[0].content as string
+
+  it("carries the founder's exemplars and the ordinariness rule", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mock.queue(CHARITY_DATA)
+    mockLLMResponse("About.", "Joan's is Blue. She kept a pot of them.")
+    mock.queue(null)
+    await generateDraft({
+      register: "celebrating_one",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      pronoun: "she",
+      displayName: "Joan Okafor",
+    })
+    const prompt = promptOf()
+    expect(prompt).toContain("These four are the bar")
+    expect(prompt).toContain("Cornflower blue. She kept a pot of cornflowers")
+    expect(prompt).toContain("must be ORDINARY")
+    expect(prompt).toContain("places and things have no agency")
+    expect(prompt).toContain("something anyone could have WATCHED them do")
+    expect(prompt).not.toContain("The occasion is a birth")
+  })
+
+  it("at a birth, the parents are the protagonists and the baby has no favourite", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mock.queue(CHARITY_DATA)
+    mockLLMResponse(
+      "About.",
+      "Sarah & Tom's is Blue. They painted the nursery in it."
+    )
+    mock.queue(null)
+    await generateDraft({
+      register: "celebrating_many",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      grouping: "couple",
+      occasionType: "New baby",
+      displayName: "Sarah & Tom",
+    })
+    const prompt = promptOf()
+    expect(prompt).toContain("The occasion is a birth")
+    expect(prompt).toContain("the people honoured are the PARENTS")
+    expect(prompt).toContain("never give the baby one")
+  })
+})
