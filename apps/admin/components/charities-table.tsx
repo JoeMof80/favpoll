@@ -642,6 +642,23 @@ function CharityRow({
         <TableCell>
           <StatusBadge tone="info">{charity.market}</StatusBadge>
         </TableCell>
+        {/* The confirm affordance has to be VISIBLE from the list — the
+            founder could not find it (2026-09-24). Confirmed = plain text;
+            a waiting suggestion = a badge, so the rows that need a decision
+            announce themselves. */}
+        <TableCell>
+          {charity.cause_family ? (
+            <span className="text-sm">
+              {CAUSE_FAMILY_LABELS[charity.cause_family]}
+            </span>
+          ) : charity.cause_family_suggested ? (
+            <StatusBadge tone="warning">
+              suggested: {CAUSE_FAMILY_LABELS[charity.cause_family_suggested]}
+            </StatusBadge>
+          ) : (
+            <span className="text-sm text-muted-foreground">—</span>
+          )}
+        </TableCell>
         <TableCell className="text-right">
           {charity.is_active ? (
             <StatusBadge tone="success">Active</StatusBadge>
@@ -830,6 +847,7 @@ export function CharitiesTable({
             <TableHead>Verification</TableHead>
             <TableHead>Consent</TableHead>
             <TableHead>Market</TableHead>
+            <TableHead>Cause family</TableHead>
             <TableHead className="text-right">Status</TableHead>
           </TableRow>
         </TableHeader>
