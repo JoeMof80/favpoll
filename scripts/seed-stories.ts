@@ -33,7 +33,8 @@
  *        print the triples, no model, no writes) · --registers=cause,… (only
  *        these registers) · --refresh (patch the existing cohort: full
  *        canonical items, portraits; copy untouched) · --regen="Name" (rewrite
- *        one seeded favpoll's Story in place) · --wipe
+ *        one seeded favpoll's Story in place) · --rename (fresh unrepeated
+ *        names for the cohort, copy kept) · --wipe
  *
  * SAFETY: refuses to run unless the target is staging, or
  * ALLOW_FAVPOLL_SEED=1. Owned by created_by = 'user_seed_story' (no email,
@@ -101,6 +102,9 @@ const REFRESH = flag("refresh");
 // --regen="Carys Bright" rewrites ONE seeded favpoll's Story in place: same
 // triple, same name, same items, fresh copy through the judge loop.
 const REGEN = opt("regen", "");
+// --rename gives every seeded protagonist a fresh, unrepeated name and
+// swaps it into the copy; nothing is regenerated.
+const RENAME = flag("rename");
 const DRY_RUN = flag("dry-run");
 const COUNT = parseInt(opt("count", "24"), 10);
 const THREES = parseFloat(opt("threes", "0.4"));
@@ -162,6 +166,46 @@ const HE = [
   "Patrick",
   "Leon",
   "Sam",
+  "Alan",
+  "Andrew",
+  "Barry",
+  "Callum",
+  "Clive",
+  "Colin",
+  "Dan",
+  "Dev",
+  "Dominic",
+  "Eamon",
+  "Ewan",
+  "Farid",
+  "Gareth",
+  "Gordon",
+  "Graham",
+  "Hamish",
+  "Hugo",
+  "Ian",
+  "Jamal",
+  "Jonah",
+  "Kenneth",
+  "Kieran",
+  "Lewis",
+  "Malcolm",
+  "Matthew",
+  "Nathan",
+  "Neil",
+  "Omar",
+  "Owen",
+  "Paul",
+  "Philip",
+  "Rhys",
+  "Robert",
+  "Rory",
+  "Seb",
+  "Simon",
+  "Tariq",
+  "Terry",
+  "Vikram",
+  "Will",
 ];
 const SHE = [
   "Margaret",
@@ -184,6 +228,46 @@ const SHE = [
   "Carys",
   "Mei",
   "Zara",
+  "Amara",
+  "Anna",
+  "Bea",
+  "Bethan",
+  "Carol",
+  "Claire",
+  "Deborah",
+  "Diane",
+  "Eleanor",
+  "Fatima",
+  "Fiona",
+  "Gemma",
+  "Gillian",
+  "Harriet",
+  "Helen",
+  "Iris",
+  "Jasmine",
+  "Jenny",
+  "Judith",
+  "Kate",
+  "Lauren",
+  "Leila",
+  "Lorna",
+  "Lucy",
+  "Maeve",
+  "Marion",
+  "Naomi",
+  "Nicola",
+  "Pam",
+  "Rachel",
+  "Rosa",
+  "Sally",
+  "Shona",
+  "Sophie",
+  "Susan",
+  "Tess",
+  "Una",
+  "Val",
+  "Wendy",
+  "Yasmin",
 ];
 const LAST = [
   "Mitchell",
@@ -202,7 +286,66 @@ const LAST = [
   "Abara",
   "Quinn",
   "Lister",
+  "Ahmed",
+  "Baxter",
+  "Begum",
+  "Bennett",
+  "Bishop",
+  "Boateng",
+  "Brennan",
+  "Carter",
+  "Chapman",
+  "Choudhury",
+  "Coles",
+  "Dawson",
+  "Devlin",
+  "Ellis",
+  "Ferris",
+  "Gallagher",
+  "Gibson",
+  "Hale",
+  "Hughes",
+  "Iqbal",
+  "Jarvis",
+  "Kaur",
+  "Lambert",
+  "Lowe",
+  "MacLeod",
+  "Marsden",
+  "Mensah",
+  "Morgan",
+  "Nash",
+  "Odell",
+  "Osei",
+  "Parry",
+  "Pearce",
+  "Reid",
+  "Rowe",
+  "Shah",
+  "Singh",
+  "Talbot",
+  "Thorne",
+  "Vance",
+  "Walsh",
+  "Whitaker",
+  "Yates",
+  "Zhang",
 ];
+
+// Draw WITHOUT replacement: the first cohorts drew with it from 20 names
+// and repeated Aisha four times in 24 favpolls (founder, 2026-09-24).
+function drawer(pool: readonly string[]) {
+  let queue: string[] = [];
+  return () => {
+    if (queue.length === 0) queue = shuffle([...pool]);
+    return queue.pop()!;
+  };
+}
+const drawHe = drawer(HE);
+const drawShe = drawer(SHE);
+const drawLast = drawer(LAST);
+const drawAny = () => (chance(0.5) ? drawShe() : drawHe());
+
 const GROUP_NAMES: Record<string, string[]> = {
   Reunion: [
     "The Class of 2006",
@@ -232,10 +375,11 @@ function protagonist(
   // A birth honours the PARENTS: the baby cannot have a favourite. Named
   // as a couple; the baby goes in the context line.
   if (BABY_OCCASIONS.has(occasion)) {
-    const a = chance(0.5) ? pick(SHE) : pick(HE);
-    let b = chance(0.5) ? pick(SHE) : pick(HE);
-    while (b === a) b = pick(HE);
-    return { name: `${a} & ${b}`, pronoun: "they", grouping: "couple" };
+    return {
+      name: `${drawAny()} & ${drawAny()}`,
+      pronoun: "they",
+      grouping: "couple",
+    };
   }
   if (register === "celebrating_many") {
     if (GROUP_NAMES[occasion]) {
@@ -245,14 +389,15 @@ function protagonist(
         grouping: "group",
       };
     }
-    const a = chance(0.5) ? pick(SHE) : pick(HE);
-    let b = chance(0.5) ? pick(SHE) : pick(HE);
-    while (b === a) b = pick(HE);
-    return { name: `${a} & ${b}`, pronoun: "they", grouping: "couple" };
+    return {
+      name: `${drawAny()} & ${drawAny()}`,
+      pronoun: "they",
+      grouping: "couple",
+    };
   }
   const she = chance(0.5);
   return {
-    name: `${she ? pick(SHE) : pick(HE)} ${pick(LAST)}`,
+    name: `${she ? drawShe() : drawHe()} ${drawLast()}`,
     pronoun: she ? "she" : "he",
     grouping: "individual",
   };
@@ -712,9 +857,7 @@ async function seed() {
     const isBirth = BABY_OCCASIONS.has(c.occasion);
     // "Welcome to the world" addresses the baby; the card names the
     // parents, so a birth congratulates them and names the baby beneath.
-    const babyName = isBirth
-      ? pick([...SHE, ...HE].filter((nm) => !who?.name.includes(nm)))
-      : null;
+    const babyName = isBirth ? drawAny() : null;
     const openingLine = isBirth
       ? "Congratulations to"
       : spec
@@ -722,7 +865,7 @@ async function seed() {
         : null;
     const context = isBirth
       ? c.occasion === "Baby shower"
-        ? `Baby ${pick(LAST)} due ${pick(["September", "October", "November"])}`
+        ? `Baby ${drawLast()} due ${pick(["September", "October", "November"])}`
         : `Welcoming ${babyName}`
       : spec
         ? resolveContext(pick(spec.contexts), who?.pronoun ?? "they")
@@ -1089,6 +1232,73 @@ async function refresh() {
   );
 }
 
+// ── rename: fresh names, copy kept ───────────────────────────────────────
+async function rename() {
+  const { data: f, error } = await supabase
+    .from("favpolls")
+    .select(
+      "id, occasion_type, grouping, protagonists(id, name, about, pronoun), favpoll_polls(id, personal_note)",
+    )
+    .eq("created_by", SEED_USER)
+    .eq("subject", "someone");
+  if (error) throw new Error(error.message);
+  const one = <T>(v: T | T[] | null): T | null =>
+    Array.isArray(v) ? (v[0] ?? null) : v;
+  const swap = (text: string, from: string, to: string) => {
+    // The whole name, its "and" form, and its possessives.
+    let out = text.split(from).join(to);
+    if (from.includes(" & "))
+      out = out
+        .split(from.replace(" & ", " and "))
+        .join(to.replace(" & ", " and "));
+    const fromFirst = from.includes(" & ") ? from : from.split(" ")[0];
+    const toFirst = to.includes(" & ") ? to : to.split(" ")[0];
+    out = out.split(fromFirst).join(toFirst);
+    // Re-form the possessive for the new name: "James' was" must become
+    // "Arthur's was", and "Nora's" must become "Carys'".
+    const bare = toFirst.replace(/['\u2019]s?$/, "");
+    const poss = bare.endsWith("s") ? `${bare}'` : `${bare}'s`;
+    return out
+      .split(`${bare}'s`)
+      .join(poss)
+      .split(`${bare}' `)
+      .join(`${poss} `)
+      .split(`${bare}'.`)
+      .join(`${poss}.`);
+  };
+  let n = 0;
+  for (const x of f ?? []) {
+    const p = one(x.protagonists as any) as {
+      id: string;
+      name: string;
+      about: string;
+      pronoun: Pronoun | null;
+    } | null;
+    const poll = one(x.favpoll_polls as any) as {
+      id: string;
+      personal_note: string;
+    } | null;
+    if (!p || !poll || x.grouping === "group") continue;
+    const fresh =
+      x.grouping === "couple"
+        ? `${drawAny()} & ${drawAny()}`
+        : `${p.pronoun === "she" ? drawShe() : drawHe()} ${drawLast()}`;
+    const about = swap(p.about, p.name, fresh);
+    const note = swap(poll.personal_note, p.name, fresh);
+    await supabase
+      .from("protagonists")
+      .update({ name: fresh, about })
+      .eq("id", p.id);
+    await supabase
+      .from("favpoll_polls")
+      .update({ personal_note: note })
+      .eq("id", poll.id);
+    n++;
+    console.log(`  ${p.name.padEnd(22)} → ${fresh}`);
+  }
+  console.log(`Renamed ${n}.`);
+}
+
 // ── regen: one seeded favpoll's Story, in place ──────────────────────────
 async function regen(name: string) {
   const { data: f, error } = await supabase
@@ -1201,9 +1411,16 @@ async function regen(name: string) {
   );
 }
 
-(WIPE ? wipe() : REFRESH ? refresh() : REGEN ? regen(REGEN) : seed()).catch(
-  (e) => {
-    console.error(e);
-    process.exit(1);
-  },
-);
+(WIPE
+  ? wipe()
+  : REFRESH
+    ? refresh()
+    : REGEN
+      ? regen(REGEN)
+      : RENAME
+        ? rename()
+        : seed()
+).catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
