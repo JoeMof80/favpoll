@@ -47,7 +47,7 @@
 
 import { createHash, randomUUID } from "node:crypto";
 import { deflateSync } from "node:zlib";
-import { writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createClient } from "@supabase/supabase-js";
@@ -1376,6 +1376,43 @@ async function rename() {
   console.log(`Renamed ${n}.`);
 }
 
+// The founder edits the cohort in references/seeded-stories-<date>.md; a
+// regen writes its result there too so the file, staging and the review
+// page cannot drift (2026-09-25).
+const EDITABLE_MD = join(
+  __dirname,
+  "..",
+  "references",
+  "seeded-stories-2026-09-24.md",
+);
+function syncEditableMd(
+  id: string,
+  heading: string,
+  about: string,
+  note: string,
+) {
+  if (!existsSync(EDITABLE_MD)) return;
+  const md = readFileSync(EDITABLE_MD, "utf8");
+  const re = new RegExp(
+    "(### \\d+\\. )[^\\n]*(\\n`id " +
+      id +
+      "`[^\\n]*\\n\\n\\*\\*About\\*\\*\\n\\n)([\\s\\S]*?)(\\n\\n\\*\\*Note\\*\\*\\n\\n)([\\s\\S]*?)(?=\\n\\n### |\\n\\n## |$)",
+  );
+  const m = md.match(re);
+  if (!m || m.index === undefined) return;
+  const out =
+    md.slice(0, m.index) +
+    m[1] +
+    heading +
+    m[2] +
+    about +
+    m[4] +
+    note +
+    md.slice(m.index + m[0].length);
+  writeFileSync(EDITABLE_MD, out);
+  console.log(`  ↳ ${EDITABLE_MD.split("/").slice(-2).join("/")} updated`);
+}
+
 // ── regen: one seeded favpoll's Story, in place ──────────────────────────
 async function regen(name: string) {
   const { data: f, error } = await supabase
@@ -1588,6 +1625,12 @@ async function regen(name: string) {
   }
   console.log(
     `  ✓ written (${attempts + 1} attempt${attempts ? "s" : ""})\n  ABOUT: ${story.about}\n  NOTE:  ${story.note}`,
+  );
+  syncEditableMd(
+    x.id,
+    `${p?.name ?? x.cause_label} · ${x.occasion_type} · ${topic.title} · ${ch.name}`,
+    story.about,
+    story.note,
   );
 }
 
