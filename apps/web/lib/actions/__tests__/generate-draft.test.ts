@@ -234,7 +234,7 @@ describe("generateDraft — skipCache re-roll", () => {
     })
 
     expect(result.fromCache).toBe(false)
-    expect(result.about).toBe("A fresh example, rolled again.")
+    expect(result.about).toContain("A fresh example, rolled again.")
     expect(mockMessagesCreate).toHaveBeenCalledTimes(1)
     // A re-roll is this form's alone: no cache lookup, no cache write
     const draftCalls = mock.callsFor("generated_drafts")
@@ -264,7 +264,7 @@ describe("generateDraft — cache miss, person", () => {
     })
 
     expect(result.fromCache).toBe(false)
-    expect(result.about).toBe("A celebration for someone special.")
+    expect(result.about).toContain("A celebration for someone special.")
     expect(result.note).toBe("Her favourite was always Blue.")
     expect(mockMessagesCreate).toHaveBeenCalledTimes(1)
 
@@ -273,7 +273,7 @@ describe("generateDraft — cache miss, person", () => {
       .find((c) => c.method === "insert")
     expect(insertCall?.args[0]).toMatchObject({
       subject: "someone",
-      about: "A celebration for someone special.",
+      about: expect.stringContaining("A celebration for someone special."),
       note: "Her favourite was always Blue.",
       status: "generated",
     })
@@ -671,7 +671,7 @@ describe("safeGenerateDraft", () => {
 
     expect(result).not.toHaveProperty("error")
     if ("error" in result) throw new Error("expected a draft, got a failure")
-    expect(result.about).toBe("About.")
+    expect(result.about).toContain("About.")
     expect(result.note).toBe("Her favourite was always Blue.")
     expect(result.fromCache).toBe(false)
   })
@@ -1025,9 +1025,13 @@ describe("the reveal promise rotates", () => {
     })
     const prompt = mockMessagesCreate.mock.calls[0][0].messages[0]
       .content as string
-    expect(prompt).toContain("end the invitation with exactly this shape")
+    expect(prompt).toContain("SECOND sentence, exactly this, nothing added")
     expect(
-      REVEAL_PROMISES.some((f) => prompt.includes(f.replace("X", "Joan's")))
+      REVEAL_PROMISES.some((f) =>
+        prompt.includes(
+          `Pledge to Ocean Trust, pick your own favourite, ${f.replace("X", "Joan's")}.`
+        )
+      )
     ).toBe(true)
   })
 })
@@ -1103,6 +1107,7 @@ describe("realism rules in the person prompt (founder review, 2026-09-24)", () =
     expect(prompt).toContain("These four are the bar")
     expect(prompt).toContain("Cornflower blue. She kept a pot of cornflowers")
     expect(prompt).toContain("must be ORDINARY")
+    expect(prompt).toContain("one particular one in their life")
     expect(prompt).toContain("places and things have no agency")
     expect(prompt).toContain("something anyone could have WATCHED them do")
     expect(prompt).not.toContain("The occasion is a birth")
@@ -1195,6 +1200,7 @@ describe("a real person never gets an invented condition (the wizard caller)", (
     expect(prompt).toContain("never invent or imply any illness")
     expect(prompt).toContain("Never invent a spouse, partner, child")
     expect(prompt).toContain("Never announce that a favourite exists")
+    expect(prompt).toContain("No props or actions added to sound specific")
   })
 
   it("retries once when the first draft gives a real person a condition", async () => {
@@ -1219,6 +1225,32 @@ describe("a real person never gets an invented condition (the wizard caller)", (
       displayName: "Joan Okafor",
     })
     expect(mockMessagesCreate).toHaveBeenCalledTimes(2)
-    expect(result.about).toBe("Joan loved colour, and her kitchen showed it.")
+    expect(result.about).toContain(
+      "Joan loved colour, and her kitchen showed it."
+    )
+  })
+})
+
+describe("the closing sentence is enforced", () => {
+  it("appends the invitation when the model returns the first sentence alone", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mock.queue(CHARITY_DATA)
+    mockLLMResponse(
+      "Gordon spent most Sundays walking in a garden",
+      "Gordon's is Blue. He always stopped at the same gate."
+    )
+    mock.queue(null)
+    const result = await generateDraft({
+      register: "celebrating_one",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      pronoun: "he",
+      displayName: "Gordon Mitchell",
+    })
+    expect(result.about).toMatch(
+      /^Gordon spent most Sundays walking in a garden\. Pledge to Ocean Trust, pick your own favourite, .*Gordon's.*\.$/
+    )
   })
 })

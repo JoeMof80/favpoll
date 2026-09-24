@@ -138,6 +138,17 @@ export const REVEAL_PROMISES = [
   "then see X",
 ] as const
 
+/** The about's last sentence, whole: the founder's own shape ("Pledge to
+ *  x and pick your own favourite to see x's"), with the charity named
+ *  once and one "and" at most. Handing the model the sentence removes
+ *  the connectives it kept adding (2026-09-24: "too many ands"). */
+export function closingSentence(
+  charityName: string | null,
+  promise: string
+): string {
+  return `Pledge to ${charityName ?? "charity"}, pick your own favourite, ${promise}.`
+}
+
 export function pickRevealPromise(
   possessive: string,
   index = Math.floor(Math.random() * REVEAL_PROMISES.length)
@@ -204,6 +215,9 @@ export function buildPrompt(opts: {
   grouping?: FavpollGrouping
   displayName?: string | null
   fiction?: boolean
+  /** The about's fixed last sentence, computed by the caller so it can
+   *  be enforced on the result. */
+  closing?: string
 }): string {
   const {
     register,
@@ -218,6 +232,7 @@ export function buildPrompt(opts: {
     grouping,
     displayName,
     fiction = false,
+    closing: givenClosing,
   } = opts
   const activities = activitiesExcerpt(opts.charityActivities)
   // Purpose data, in order of trust: the curated description, then the
@@ -289,8 +304,13 @@ ${edgesBlock(edges, subject)}`
     // ("and Joan's will be revealed" on 24 of 24 seeded Stories; founder,
     // 2026-09-24: "appears too often"). One form per generation.
     const promise = namePoss ? pickRevealPromise(namePoss) : null
+    const closing =
+      givenClosing ??
+      (promise
+        ? closingSentence(charityName, promise)
+        : `Pledge to ${charityName ?? "charity"} and pick your own favourite.`)
     const nameHint = promise
-      ? `\nThe protagonist is called "${displayName}". In the about, use pronouns — EXCEPT the reveal promise, which names them once: end the invitation with exactly this shape: "${promise}". The reveal opener below already contains the name — never repeat it beyond these two places.`
+      ? `\nThe protagonist is called "${displayName}". In the about's first sentence use pronouns, or the first name once; the closing sentence names them in its possessive. The reveal opener below already contains the name — never repeat it beyond these places.`
       : ""
     // An explicitly chosen he/she is the organiser SAYING there is a
     // person, and it outranks any guess made from the name's shape. The
@@ -342,8 +362,16 @@ ${edgesBlock(edges, subject)}`
       ? noInventedPeople
       : noInventedPeople +
         ` This is a REAL person and the organiser who knows them will read this: never invent or imply any illness, condition, disability, diagnosis, treatment, cause of death or medical history for them, and never infer one from the charity's cause (a hospice, a cancer charity, a sight-loss charity says nothing about this person). The edges above are context about the occasion and the charity, not facts about the person. If no link between the charity and the person is given, do not supply one: name the charity and leave the reason to the organiser.`
-    instructions = `- "about" (max 2 sentences, under 45 words): open with one ordinary thing about the PROTAGONIST from the world of ${topicLower} (the cats she kept, the gardens he walked, the biscuits she took seriously), the way the examples below do. Never announce that a favourite exists ("she had a favourite cat breed", "he loved a garden"): a person is not defined by having a favourite. Do not name or hint at which option it is (the reveal is the gift). At most one "and" per sentence.${tenseRule}${edgeRule}${ordinaryRule}${babyRule}${realPersonRule} Then one short clause inviting the READER directly, in second person: pledge to ${charityName ?? "charity"} and pick your OWN favourite (say "you"/"your", never "guests"; never say they are guessing or voting on the protagonist's). Keep the charity to a mention${edges.e2 || edges.e3 ? " plus its edge" : ", not a description"}: this is about the person.${pronounHint}${nameHint}
-- "reveal" (guests see it only AFTER pledging): start with exactly "${opener}".${entityGuard} Then a plausible option from the list (you MUST use a real option, verbatim), then a full stop, then ONE short sentence (under 18 words) with a single detail about the PROTAGONIST'S relationship to that favourite, and the detail must be something anyone could have WATCHED them do: where they sit, what they order, what they say, who they go with, how often. It pays off what the about set up, adding something the about did not say; never restate the about.${tenseRule} Never a talisman, a lucky object, a superstition, a joke, or a quirk invented for effect; never a habit for a baby or a child too young to have one. The detail must be entirely the protagonist's own and must NOT depend on any real-world fact about the favourite: no fixture dates or match traditions, no seasons, tours, episodes, eras, or biography (a claim like "watched them play on Boxing Day" fails if that favourite doesn't play then; avoid the whole category). The options may be famous real people, teams, or works: never state or invent facts about them. No preamble such as "We can't wait to reveal".
+    // The charity's fit with the occasion (E3) may be said in a few
+    // words, as the exemplars do ("Marie Curie nurses were with her at
+    // the end"); otherwise the charity is only named in the closing.
+    const charityFit = edges.e3
+      ? ` The charity's fit with the occasion is given above; you may say it in the first sentence in a few plain words, or leave it to the closing.`
+      : ` The charity is named in the closing sentence only: no clause describing it.`
+    instructions = `- "about": exactly TWO sentences, under 40 words in all.
+  FIRST sentence (under 24 words): one plain thing about the PROTAGONIST that a relative would say without being asked, from the world of ${topicLower} where it comes naturally (the cats she kept; the gardens he walked on Sundays), the way the examples below do. No props or actions added to sound specific (a flask, a border, a lucky object): if a reader would ask "why mention that?", cut it. Never announce that a favourite exists ("she had a favourite cat breed"). Do not name or hint at which option it is (the reveal is the gift). At most one "and".${tenseRule}${edgeRule}${ordinaryRule}${babyRule}${realPersonRule}${charityFit}
+  SECOND sentence, exactly this, nothing added: "${closing}"${pronounHint}${nameHint}
+- "reveal" (guests see it only AFTER pledging): start with exactly "${opener}".${entityGuard} Then a plausible option from the list (you MUST use a real option, verbatim), then a full stop, then ONE short sentence (under 18 words) with a single detail about the PROTAGONIST'S relationship to that favourite. When the favourite is a KIND of thing (a breed, a type of holiday, a cuisine, a flower), the detail is about one particular one in their life ("her own, a grey called Moss, slept on her lap every evening"), never the kind at large ("waiting for one to appear"). The detail must be something anyone could have WATCHED them do: where they sit, what they order, what they say, who they go with, how often. It pays off what the about set up, adding something the about did not say; never restate the about.${tenseRule} Never a talisman, a lucky object, a superstition, a joke, or a quirk invented for effect; never a habit for a baby or a child too young to have one. The detail must be entirely the protagonist's own and must NOT depend on any real-world fact about the favourite: no fixture dates or match traditions, no seasons, tours, episodes, eras, or biography (a claim like "watched them play on Boxing Day" fails if that favourite doesn't play then; avoid the whole category). The options may be famous real people, teams, or works: never state or invent facts about them. No preamble such as "We can't wait to reveal".
 
 ${exemplarsBlock()}`
   }
@@ -545,6 +573,16 @@ export async function generateStory(
   modelId: string
 ): Promise<Story> {
   const edges = storyEdges(input)
+  const closingPoss =
+    input.subject === "someone"
+      ? namePossessive(input.displayName, input.grouping)
+      : null
+  const closing =
+    input.subject === "someone"
+      ? closingPoss
+        ? closingSentence(input.charity.name, pickRevealPromise(closingPoss))
+        : `Pledge to ${input.charity.name ?? "charity"} and pick your own favourite.`
+      : null
   const prompt = buildPrompt({
     register: input.register,
     subject: input.subject,
@@ -559,6 +597,7 @@ export async function generateStory(
     grouping: input.subject === "someone" ? input.grouping : undefined,
     displayName: input.displayName ?? null,
     fiction: input.fiction ?? false,
+    closing: closing ?? undefined,
   })
 
   let parsed = await callLLMWithCopyCheck(prompt, modelId)
@@ -598,8 +637,15 @@ export async function generateStory(
     endStop(
       undoubledPossessive(stripEmDashes(text, input.itemLabels), namePoss)
     )
+  // The model sometimes returns the first sentence alone (Gordon, fifth
+  // cohort): the closing is the invitation and the reveal promise, so it
+  // is appended when missing rather than left to chance.
+  const withClosing = (about: string) =>
+    closing && !about.includes(closing.slice(0, -1))
+      ? `${endStop(about)} ${closing}`
+      : about
   return {
-    about: tidy(parsed.about),
+    about: withClosing(tidy(parsed.about)),
     // The cause reveal's " — " separator is the one em dash allowed.
     note: input.subject === "cause" ? parsed.reveal : tidy(parsed.reveal),
     // Defensive caps match the form schema (causeLabel 60, context 40)
