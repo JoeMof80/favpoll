@@ -61,7 +61,10 @@ import {
   storyEdges,
   type StoryInput,
 } from "../apps/web/lib/story-engine";
-import { revealNamesRealItem } from "../apps/web/lib/actions/generate-draft-utils";
+import {
+  revealNamesRealItem,
+  slipsToSingular,
+} from "../apps/web/lib/actions/generate-draft-utils";
 import { OCCASION_TYPES_BY_REGISTER } from "../apps/web/lib/registers";
 import { OCCASIONS, type OccasionContext } from "../apps/web/lib/occasions";
 
@@ -816,9 +819,17 @@ async function judgeLoop(
     }
     const item = namedItem(story.note, items);
     const event = isCause ? aboutNamesEvent(story.about, occasion) : true;
+    // A first-person couple or group keeps "we" in the note: a lookup,
+    // and part of the gate rather than a single retry.
+    const plural = !(
+      input.pronoun === "i" &&
+      (input.grouping === "couple" || input.grouping === "group") &&
+      slipsToSingular(story.note)
+    );
     const verdict = await judgeStory(story, input, story.edges, JUDGE_MODEL);
-    const score = (item && event ? 1 : 0) + (verdict.realistic ? 2 : 0);
-    const v = `P1 ${item ? "✓" : "✗"}${isCause ? ` · event ${event ? "✓" : "✗"}` : ""} · real ${verdict.realistic ? "✓" : "✗"}${verdict.reason ? ` — ${verdict.reason}` : ""}`;
+    const score =
+      (item && event && plural ? 1 : 0) + (verdict.realistic ? 2 : 0);
+    const v = `P1 ${item ? "✓" : "✗"}${isCause ? ` · event ${event ? "✓" : "✗"}` : ""}${plural ? "" : " · we ✗"} · real ${verdict.realistic ? "✓" : "✗"}${verdict.reason ? ` — ${verdict.reason}` : ""}`;
     if (!best || score > best.score) best = { story, item, verdict: v, score };
     if (score === 3) break;
   }
