@@ -411,6 +411,15 @@ export function storyEdges(input: StoryInput): StoryEdges {
 }
 
 /**
+ * The prompt bans em dashes in prose and the model still lands one in
+ * about 1 in 12 Stories (2026-09-24). Enforcement: a spaced dash joins
+ * two clauses, so a comma stands in; an unspaced one is a hyphen's job.
+ */
+export function stripEmDashes(text: string): string {
+  return text.replace(/\s+[—–]\s+/g, ", ").replace(/[—–]/g, "-")
+}
+
+/**
  * Generate a Story for a triple. One model call, one guarded retry on a
  * hard-rule breach, one validator retry (a real item named / no invented
  * statistics). Throws when the model returns nothing usable twice.
@@ -453,8 +462,10 @@ export async function generateStory(
   }
 
   return {
-    about: parsed.about,
-    note: parsed.reveal,
+    about: stripEmDashes(parsed.about),
+    // The cause reveal's " — " separator is the one em dash allowed.
+    note:
+      input.subject === "cause" ? parsed.reveal : stripEmDashes(parsed.reveal),
     // Defensive caps match the form schema (causeLabel 60, context 40)
     causeLabel: parsed.causeLabel?.trim().slice(0, 60) || null,
     context: parsed.context?.trim().slice(0, 40) || null,

@@ -20,7 +20,11 @@ vi.mock("@anthropic-ai/sdk", () => ({
 }))
 
 import { generateDraft, safeGenerateDraft } from "../generate-draft"
-import { REVEAL_PROMISES, pickRevealPromise } from "@/lib/story-engine"
+import {
+  REVEAL_PROMISES,
+  pickRevealPromise,
+  stripEmDashes,
+} from "@/lib/story-engine"
 import {
   buildCacheKey,
   revealNamesRealItem,
@@ -1024,5 +1028,17 @@ describe("the reveal promise rotates", () => {
     expect(
       REVEAL_PROMISES.some((f) => prompt.includes(f.replace("X", "Joan's")))
     ).toBe(true)
+  })
+})
+
+describe("stripEmDashes", () => {
+  it("turns a spaced em dash into a comma and an unspaced one into a hyphen", () => {
+    expect(stripEmDashes("She sang — every morning — to the dog")).toBe(
+      "She sang, every morning, to the dog"
+    )
+    expect(stripEmDashes("Stand by Me — Ben E. King")).toBe(
+      "Stand by Me, Ben E. King"
+    )
+    expect(stripEmDashes("a forget—me—not")).toBe("a forget-me-not")
   })
 })
