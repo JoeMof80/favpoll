@@ -73,6 +73,23 @@ export function violatesCopyRules(text: string): boolean {
   return /\bchoos(?:e|es|ing)\b|\bchoice\b|\bvot(?:e|es|ing)\b/i.test(text)
 }
 
+/**
+ * True when copy about a REAL person states or implies a medical
+ * condition, a diagnosis, a treatment or a cause of death (founder,
+ * 2026-09-24). The charity's own name is stripped first: "Cancer Research
+ * UK" is named on purpose, "her cancer" is not. "Recovery" alone is an
+ * occasion and passes; "recovered from a stroke" does not.
+ */
+export function inventsCondition(
+  text: string,
+  charityName?: string | null
+): boolean {
+  const scrubbed = charityName ? text.split(charityName).join(" ") : text
+  return /\b(diagnos\w*|illness|disease|dementia|alzheimer|cancer|tumou?r|stroke|heart attack|diabet\w*|sight loss|lost (?:his|her|their) sight|blind|deaf|hospice|palliative|terminal|chemo\w*|surgery|operation|disabilit\w*|wheelchair|depression|anxiety|addiction|sober|recover(?:ed|ing) from|passed away from|died of|took (?:him|her|them))\b/i.test(
+    scrubbed
+  )
+}
+
 // ---------------------------------------------------------------------------
 // Cache key
 // ---------------------------------------------------------------------------

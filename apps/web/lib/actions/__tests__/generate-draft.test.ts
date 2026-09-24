@@ -32,6 +32,7 @@ import {
   revealNamesRealItem,
   hasFabricatedStats,
   violatesCopyRules,
+  inventsCondition,
   _rateLimitStore,
   RATE_LIMIT_MAX,
   RateLimitError,
@@ -1148,5 +1149,75 @@ describe("tidying the model's grammar", () => {
     expect(endStop("and find out James'")).toBe("and find out James'.")
     expect(endStop("and find out James'.")).toBe("and find out James'.")
     expect(endStop("Done.")).toBe("Done.")
+  })
+})
+
+describe("a real person never gets an invented condition (the wizard caller)", () => {
+  it("flags conditions, diagnoses and causes of death, but not the charity's name or the Recovery occasion", () => {
+    expect(
+      inventsCondition("Carys loved music long before she lost her sight.")
+    ).toBe(true)
+    expect(
+      inventsCondition(
+        "Marie Curie nurses were with her at the end. She was diagnosed in May."
+      )
+    ).toBe(true)
+    expect(
+      inventsCondition(
+        "Pledge to Cancer Research UK and pick your own.",
+        "Cancer Research UK"
+      )
+    ).toBe(false)
+    expect(
+      inventsCondition("Ben is celebrating his recovery with a swim.")
+    ).toBe(false)
+    expect(inventsCondition("He recovered from a stroke last spring.")).toBe(
+      true
+    )
+  })
+
+  it("the wizard's prompt carries the rule", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mock.queue(CHARITY_DATA)
+    mockLLMResponse("About.", "Joan's is Blue. She kept a pot of them.")
+    mock.queue(null)
+    await generateDraft({
+      register: "remembering",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      pronoun: "she",
+      displayName: "Joan Okafor",
+    })
+    const prompt = mockMessagesCreate.mock.calls[0][0].messages[0]
+      .content as string
+    expect(prompt).toContain("This is a REAL person")
+    expect(prompt).toContain("never invent or imply any illness")
+  })
+
+  it("retries once when the first draft gives a real person a condition", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mock.queue(CHARITY_DATA)
+    mockLLMResponse(
+      "Joan loved colour long before the dementia took her words.",
+      "Joan's was Blue. She kept a pot of them."
+    )
+    mockLLMResponse(
+      "Joan loved colour, and her kitchen showed it.",
+      "Joan's was Blue. She kept a pot of them."
+    )
+    mock.queue(null)
+    const result = await generateDraft({
+      register: "remembering",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      pronoun: "she",
+      displayName: "Joan Okafor",
+    })
+    expect(mockMessagesCreate).toHaveBeenCalledTimes(2)
+    expect(result.about).toBe("Joan loved colour, and her kitchen showed it.")
   })
 })

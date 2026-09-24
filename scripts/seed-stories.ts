@@ -752,6 +752,7 @@ async function seed() {
       pronoun: who?.pronoun,
       grouping: who?.grouping,
       displayName: who?.name ?? null,
+      fiction: true,
     };
 
     // The judge loop: generate, check P1 by lookup and A1/P2 by the
@@ -1145,6 +1146,7 @@ async function regen(name: string) {
     pronoun: p?.pronoun ?? undefined,
     grouping: x.grouping,
     displayName: p?.name ?? x.cause_label,
+    fiction: true,
   };
   console.log(
     `Regenerating ${p?.name ?? x.cause_label}: ${x.occasion_type} · ${topic.title} · ${ch.name} (${"★".repeat(storyEdges(input).count) || "no edges"})`,

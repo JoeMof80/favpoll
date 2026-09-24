@@ -10,6 +10,7 @@ import {
   revealNamesRealItem,
   hasFabricatedStats,
   violatesCopyRules,
+  inventsCondition,
 } from "./actions/generate-draft-utils"
 
 /**
@@ -202,6 +203,7 @@ export function buildPrompt(opts: {
   pronoun?: Pronoun
   grouping?: FavpollGrouping
   displayName?: string | null
+  fiction?: boolean
 }): string {
   const {
     register,
@@ -215,6 +217,7 @@ export function buildPrompt(opts: {
     pronoun,
     grouping,
     displayName,
+    fiction = false,
   } = opts
   const activities = activitiesExcerpt(opts.charityActivities)
   // Purpose data, in order of trust: the curated description, then the
@@ -334,7 +337,10 @@ ${edgesBlock(edges, subject)}`
     const babyRule = BABY_OCCASIONS.has(occasionType ?? "")
       ? ` The occasion is a birth: the people honoured are the PARENTS (the name above is theirs), and the favourite is theirs, the one they will pass on (the book they will read first, the game they will teach). The baby is not yet old enough to have a favourite or a habit: never give the baby one, and never write the parent as a child.`
       : ""
-    instructions = `- "about" (max 2 sentences, under 55 words): open with the PROTAGONIST'S connection to the topic, a favourite ${topicLower} that is distinctly theirs, without naming or hinting at which option it is (the reveal is the gift).${tenseRule}${edgeRule}${ordinaryRule}${babyRule} Then one short clause inviting the READER directly, in second person: pledge to ${charityName ?? "charity"} and pick your OWN favourite (say "you"/"your", never "guests"; never say they are guessing or voting on the protagonist's). Keep the charity to a mention${edges.e2 || edges.e3 ? " plus its edge" : ", not a description"}: this is about the person.${pronounHint}${nameHint}
+    const realPersonRule = fiction
+      ? ""
+      : ` This is a REAL person and the organiser who knows them will read this: never invent or imply any illness, condition, disability, diagnosis, treatment, cause of death or medical history for them, and never infer one from the charity's cause (a hospice, a cancer charity, a sight-loss charity says nothing about this person). The edges above are context about the occasion and the charity, not facts about the person. If no link between the charity and the person is given, do not supply one: name the charity and leave the reason to the organiser.`
+    instructions = `- "about" (max 2 sentences, under 55 words): open with the PROTAGONIST'S connection to the topic, a favourite ${topicLower} that is distinctly theirs, without naming or hinting at which option it is (the reveal is the gift).${tenseRule}${edgeRule}${ordinaryRule}${babyRule}${realPersonRule} Then one short clause inviting the READER directly, in second person: pledge to ${charityName ?? "charity"} and pick your OWN favourite (say "you"/"your", never "guests"; never say they are guessing or voting on the protagonist's). Keep the charity to a mention${edges.e2 || edges.e3 ? " plus its edge" : ", not a description"}: this is about the person.${pronounHint}${nameHint}
 - "reveal" (guests see it only AFTER pledging): start with exactly "${opener}".${entityGuard} Then a plausible option from the list (you MUST use a real option, verbatim), then a full stop, then ONE short sentence with a single detail about the PROTAGONIST'S relationship to that favourite, and the detail must be something anyone could have WATCHED them do: where they sit, what they order, what they say, who they go with, how often. It pays off what the about set up: the two halves agree.${tenseRule} Never a talisman, a lucky object, a superstition, a joke, or a quirk invented for effect; never a habit for a baby or a child too young to have one. The detail must be entirely the protagonist's own and must NOT depend on any real-world fact about the favourite: no fixture dates or match traditions, no seasons, tours, episodes, eras, or biography (a claim like "watched them play on Boxing Day" fails if that favourite doesn't play then; avoid the whole category). The options may be famous real people, teams, or works: never state or invent facts about them. No preamble such as "We can't wait to reveal".
 
 ${exemplarsBlock()}`
@@ -454,6 +460,15 @@ export type StoryInput = {
   pronoun?: Pronoun
   grouping?: FavpollGrouping
   displayName?: string | null
+  /**
+   * The seed writes FICTION about invented people and may give them a
+   * life, an illness included, when the charity calls for it. The wizard
+   * writes about a REAL person for the organiser: it must never invent a
+   * medical condition, a diagnosis or a cause of death (founder,
+   * 2026-09-24: "it would be insane to invent any medical condition for
+   * somebody via the wizard"). Default false: real.
+   */
+  fiction?: boolean
 }
 
 export type Story = {
@@ -541,9 +556,25 @@ export async function generateStory(
     pronoun: input.subject === "someone" ? input.pronoun : undefined,
     grouping: input.subject === "someone" ? input.grouping : undefined,
     displayName: input.displayName ?? null,
+    fiction: input.fiction ?? false,
   })
 
   let parsed = await callLLMWithCopyCheck(prompt, modelId)
+  // Belt and braces for a real person: one retry when the copy names a
+  // condition anyway. The charity's own name is exempt (Cancer Research
+  // UK, Alzheimer's Society are named on purpose).
+  if (
+    !input.fiction &&
+    input.subject === "someone" &&
+    inventsCondition(`${parsed.about} ${parsed.reveal}`, input.charity.name)
+  ) {
+    const retry = await callLLM(prompt, modelId).catch(() => null)
+    if (
+      retry &&
+      !inventsCondition(`${retry.about} ${retry.reveal}`, input.charity.name)
+    )
+      parsed = retry
+  }
 
   // One validator retry. The item-name check needs a canonical list — a
   // custom topic with no labels has nothing to validate against.
