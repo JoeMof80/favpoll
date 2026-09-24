@@ -113,10 +113,18 @@ function possessive(name: string): string {
   return name.endsWith("s") ? `${name}'` : `${name}'s`
 }
 
-/** "Sylvia's" from "Sylvia Cranfield", or null without a usable name. */
-function namePossessive(displayName?: string | null): string | null {
+/** "Sylvia's" from "Sylvia Cranfield", or null without a usable name.
+ *  A GROUP keeps its whole name: "The Hartley family's", never "The's"
+ *  (the first-word rule made "Ward 4, Spring 1994" into "Ward's";
+ *  third cohort, 2026-09-24). */
+function namePossessive(
+  displayName?: string | null,
+  grouping?: FavpollGrouping
+): string | null {
   if (!displayName?.trim()) return null
-  return possessive(firstNames(displayName))
+  return possessive(
+    grouping === "group" ? displayName.trim() : firstNames(displayName)
+  )
 }
 
 /** The closing promise of the about, in one of a few founder-approved
@@ -142,10 +150,11 @@ export function pickRevealPromise(
 function revealOpener(
   register: Register,
   pronoun?: Pronoun,
-  displayName?: string | null
+  displayName?: string | null,
+  grouping?: FavpollGrouping
 ): string {
   const tense = register === "remembering" ? "was" : "is"
-  const named = namePossessive(displayName)
+  const named = namePossessive(displayName, grouping)
   if (named) return `${named} ${tense}`
   const poss = pronoun === "she" ? "Hers" : pronoun === "he" ? "His" : "Theirs"
   return `${poss} ${tense}`
@@ -262,7 +271,7 @@ ${edgesBlock(edges, subject)}`
 - "about" (max 2 sentences): first what this favpoll is raising for${hasPurpose ? "" : " (taken from the cause name above only — the charity's own work is unknown and must not be described)"}${occasionType && occasionType !== "Fundraiser" ? `, at what event (say "${occasionType.toLowerCase()}" or its plain equivalent — a guest must know what is happening)` : ""}${edges.count > 0 ? ", with why THIS topic in a clause — say the edge listed above, in your own words" : ""}, then the mechanic in ONE clause — guests pick their favourite ${topicTitle.toLowerCase()} and pledge to ${charityName ?? "the charity"}, where the pick and the pledge are a single action (the pick is made BY pledging). Never present them as separate steps: no "first…", "then…", "tell us…". favpoll takes no platform fee. Do NOT name or hint at any particular option, and do not repeat the context subline's wording.
 - "reveal" (guests see it only AFTER pledging): start with exactly "Our pick to start:" then a real option from the list, then " — " (this separator is the one place an em dash is allowed) and one short, warm clause saying why THAT pick suits this cause or this event (not a description of the pick itself). No statistics, numbers, percentages, or invented quotes.`
   } else {
-    const opener = revealOpener(register, pronoun, displayName)
+    const opener = revealOpener(register, pronoun, displayName, grouping)
     // Pair/Group are structural (founder bug, 2026-09-06: the generator
     // wrote "him/his" for a pair because plurality never reached it).
     const plural = grouping === "couple" || grouping === "group"
@@ -271,7 +280,7 @@ ${edgesBlock(edges, subject)}`
       : pronoun
         ? ` Use "${pronoun}" pronouns for the person.`
         : ""
-    const namePoss = namePossessive(displayName)
+    const namePoss = namePossessive(displayName, grouping)
     // The reveal promise closes every about, so its shape is rotated HERE
     // rather than left to the model, which always took the first example
     // ("and Joan's will be revealed" on 24 of 24 seeded Stories; founder,
@@ -474,8 +483,21 @@ export function storyEdges(input: StoryInput): StoryEdges {
  * about 1 in 12 Stories (2026-09-24). Enforcement: a spaced dash joins
  * two clauses, so a comma stands in; an unspaced one is a hyphen's job.
  */
-export function stripEmDashes(text: string): string {
-  return text.replace(/\s+[—–]\s+/g, ", ").replace(/[—–]/g, "-")
+export function stripEmDashes(text: string, keep: string[] = []): string {
+  // An item label may itself carry an em dash ("Stand by Me — Ben E.
+  // King"); it is catalogue data and must survive verbatim, or the
+  // real-item check fails on a note that named it (third cohort,
+  // 2026-09-24: two Song Stories skipped for exactly this).
+  const kept = keep.filter((k) => /[—–]/.test(k) && text.includes(k))
+  let out = text
+  kept.forEach((k, i) => {
+    out = out.split(k).join(`\u0000${i}\u0000`)
+  })
+  out = out.replace(/\s+[—–]\s+/g, ", ").replace(/[—–]/g, "-")
+  kept.forEach((k, i) => {
+    out = out.split(`\u0000${i}\u0000`).join(k)
+  })
+  return out
 }
 
 /**
@@ -521,10 +543,12 @@ export async function generateStory(
   }
 
   return {
-    about: stripEmDashes(parsed.about),
+    about: stripEmDashes(parsed.about, input.itemLabels),
     // The cause reveal's " — " separator is the one em dash allowed.
     note:
-      input.subject === "cause" ? parsed.reveal : stripEmDashes(parsed.reveal),
+      input.subject === "cause"
+        ? parsed.reveal
+        : stripEmDashes(parsed.reveal, input.itemLabels),
     // Defensive caps match the form schema (causeLabel 60, context 40)
     causeLabel: parsed.causeLabel?.trim().slice(0, 60) || null,
     context: parsed.context?.trim().slice(0, 40) || null,

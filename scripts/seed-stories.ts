@@ -203,7 +203,7 @@ const GROUP_NAMES: Record<string, string[]> = {
   Reunion: [
     "The Class of 2006",
     "The Lower Sixth, 1998",
-    "Ward 4, Spring 1994",
+    "The Ravenscroft rowing eight",
   ],
   "Family gathering": [
     "The Hartley family",

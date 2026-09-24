@@ -1041,6 +1041,43 @@ describe("stripEmDashes", () => {
     )
     expect(stripEmDashes("a forget—me—not")).toBe("a forget-me-not")
   })
+
+  it("keeps an item label's own em dash verbatim so the real-item check still passes", () => {
+    const labels = ["Stand by Me — Ben E. King", "Dancing Queen — ABBA"]
+    expect(
+      stripEmDashes(
+        "David's was Stand by Me — Ben E. King. He turned it up — every time.",
+        labels
+      )
+    ).toBe(
+      "David's was Stand by Me — Ben E. King. He turned it up, every time."
+    )
+  })
+})
+
+describe("a group's possessive is its whole name", () => {
+  it("opens the reveal with the full group name", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mock.queue(CHARITY_DATA)
+    mockLLMResponse(
+      "About.",
+      "The Hartley family's is Blue. They painted the shed in it."
+    )
+    mock.queue(null)
+    await generateDraft({
+      register: "celebrating_many",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      grouping: "group",
+      displayName: "The Hartley family",
+    })
+    const prompt = mockMessagesCreate.mock.calls[0][0].messages[0]
+      .content as string
+    expect(prompt).toContain('start with exactly "The Hartley family\'s is"')
+    expect(prompt).not.toContain("The's")
+  })
 })
 
 describe("realism rules in the person prompt (founder review, 2026-09-24)", () => {
