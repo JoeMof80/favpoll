@@ -353,6 +353,15 @@ const drawHe = drawer(HE);
 const drawShe = drawer(SHE);
 const drawLast = drawer(LAST);
 const drawAny = () => (chance(0.5) ? drawShe() : drawHe());
+// A couple is one he and one she nine times in ten: drawing both names
+// at random made half the couples same-sex, which is nothing like the
+// population (founder, 2026-09-24: "it doesn't feel representative").
+const drawCouple = () =>
+  chance(0.9)
+    ? chance(0.5)
+      ? `${drawShe()} & ${drawHe()}`
+      : `${drawHe()} & ${drawShe()}`
+    : `${drawAny()} & ${drawAny()}`;
 
 const GROUP_NAMES: Record<string, string[]> = {
   Reunion: [
@@ -406,7 +415,7 @@ function protagonist(
   // 2026-09-24): named as a couple, the baby in the context line.
   if (BABY_OCCASIONS.has(occasion)) {
     return {
-      name: `${drawAny()} & ${drawAny()}`,
+      name: drawCouple(),
       pronoun: firstPersonHere(occasion) ? "i" : "they",
       grouping: "couple",
     };
@@ -420,7 +429,7 @@ function protagonist(
       };
     }
     return {
-      name: `${drawAny()} & ${drawAny()}`,
+      name: drawCouple(),
       pronoun: firstPersonHere(occasion) ? "i" : "they",
       grouping: "couple",
     };
@@ -1335,7 +1344,7 @@ async function rename() {
     if (!p || !poll || x.grouping === "group") continue;
     const fresh =
       x.grouping === "couple"
-        ? `${drawAny()} & ${drawAny()}`
+        ? drawCouple()
         : `${p.pronoun === "she" ? drawShe() : drawHe()} ${drawLast()}`;
     const about = swap(p.about, p.name, fresh);
     const note = swap(poll.personal_note, p.name, fresh);
@@ -1488,7 +1497,7 @@ async function regen(name: string) {
     x.grouping === "individual"
   ) {
     const babyFirst = p.name.split(" ")[0];
-    const parents = `${drawAny()} & ${drawAny()}`;
+    const parents = drawCouple();
     await supabase
       .from("protagonists")
       .update({

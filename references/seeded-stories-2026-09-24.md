@@ -11,77 +11,77 @@ Stars are the edges the triple has: ★ occasion→topic, ★ charity→topic, �
 
 **About**
 
-Belinda trains at the pool most mornings before work, counting lengths without complaint. She swims for the lifeboats, a stretch of open water she has mapped out on a chart at home. Pledge to RNLI, pick your own favourite, and find out Belinda's.
+Belinda trains at the pool most mornings before work, counting lengths as she goes. She is swimming for the lifeboats (as well as running and cycling). Pledge to the RNLI and pick your favourite sea creature to find out Belinda's.
 
 **Note**
 
-Belinda's is the Dolphin. She keeps a small carved dolphin on her kitchen windowsill and dusts it every Sunday.
+Belinda's is the Dolphin. Her bathroom is full of dolphin pictures and ornaments.
 
 ### 2. Ivy Nakamura · Achievement · Song · Samaritans
 `id 6157a64a-4b74-4254-b3ae-47c10d66a405` · ★★★ · first person
 
 **About**
 
-I'm taking on this challenge after months of early starts and quiet training runs. Music keeps me going when the miles get long, and it feels right to raise pledges for Samaritans, who are there for anyone who needs to talk. Pledge to Samaritans, pick your own favourite, to see mine.
+I'm taking on this challenge after months of early starts and quiet training runs. Music keeps me going when the miles get long, so pick your favourite song to see mine. I'm raising money for Samaritans, who are there during difficult times.
 
 **Note**
 
-Mine is Dancing Queen — ABBA. I turn it up in the kitchen every Sunday morning.
+Mine is Dancing Queen — ABBA. I turn up the volume whenever it comes on.
 
 ### 3. Malcolm Baxter · Achievement · Mountain or peak · Scope
 `id b863cb4d-131c-4cd6-bba6-dc08a4f4eb39` · ★★☆ · third person, he
 
 **About**
 
-Malcolm is training for a mountain climb this year, walking the local hills whenever he can. He is doing it for Scope, so disabled people get the same chances as everyone else. Pledge to Scope, pick your own favourite, and Malcolm's will be revealed.
+Malcolm is training for a mountain climb this year, walking the local hills for practice. He is doing it for Scope, to give disabled people the same chances as everyone else. Pledge to Scope, pick your favourite Mountain or peak, and Malcolm's will be revealed.
 
 **Note**
 
-Malcolm's is Ben Nevis. He always plans his climbs to reach the summit at sunrise.
+Malcolm's is Ben Nevis. There's something magical about the highlands.
 
 ### 4. Oliver Thorne · Birthday · Ice cream flavour · Barnardos
 `id 54e2db37-daa3-4810-8256-ab0f8a00ec22` · ★★☆ · third person, he
 
 **About**
 
-Oliver puts on a proper birthday tea every year, with sandwiches cut into triangles and something cold to follow. He hands round the tub himself and always lets the youngest guests go first. Pledge to Barnardos, pick your own favourite, and we'll reveal Oliver's.
+Oliver loves ice cream so much, we're having it instead of cake. It should be fine as long as he blows out the candles before it melts. Pick your favourite flavour, and we'll reveal Oliver's. Every penny raised will go to Barnardos.
 
 **Note**
 
-Oliver's is Rocky road. He picks out the marshmallow pieces first and eats them before touching the rest.
+Oliver's is Rocky road. He eats the marshmallow pieces first.
 
 ### 5. Philip Clarke · Citizenship · Type of tea · Trussell Trust
 `id 47b78481-a17f-4698-9c74-0eb66a53130e` · ★★☆ · first person
 
 **About**
 
-I became a British citizen this year, and the little rituals have grown on me: queuing patiently, apologising for things that aren't my fault, and putting the kettle on before anything else. I've picked up a taste for tea I never expected. Pledge to Trussell Trust, pick your own favourite, to see mine.
+I became a British citizen this year and I'm picking up all the habits: queuing patiently, apologising for no reason and putting the kettle on as soon as I arrive home. I've picked up a taste for tea I never expected. Pledge to Trussell Trust and pick your own favourite, to see mine.
 
 **Note**
 
-Mine is Earl Grey. I keep a tin of it in my desk drawer at work and make a cup every afternoon at three.
+Mine is Earl Grey. I keep a tin of it in my desk drawer at work, ready for every afternoon.
 
 ### 6. Fiona Coles · Recovery · Weather for walk · Cancer Research UK
 `id 8794d709-1aee-4bee-b3b5-e1f6987a53cc` · ★★☆ · third person, she
 
 **About**
 
-Fiona is back on her feet and glad of it. Her walks are getting longer again, and she takes more notice of the weather now. Cancer Research UK has been part of her story this year. Pledge to Cancer Research UK, pick your own favourite, and find out Fiona's.
+Fiona is back on her feet and much better for it. Her walks are getting longer again, and she has grown a new appreciation of the weather. She owes her recovery to Cancer Research UK so please pledge to them by picking your favourite Weather for walking, and find out Fiona's.
 
 **Note**
 
-Fiona's is Bright spring day. She keeps her walking boots by the back door, ready for one to arrive.
+Fiona's is A bright spring day. It's the combination of the cold wind with the warm sun.
 
 ### 7. Kate Whitaker · Recovery · Song · Stroke Association
 `id 2cf0db1b-0dd0-4145-8ff3-4bd8991b06d6` · ★★☆ · third person, she
 
 **About**
 
-Kate is back on her feet and walking further each week. She keeps a notebook of small progress and takes the stairs now instead of the lift. Stroke Association helped her through the early days, and she wanted them thanked properly. Pledge to Stroke Association, pick your own favourite, then see Kate's.
+Kate is back on her feet and walking further each week. Her latest milestone is taking the stairs instead of the lift. Stroke Association helped her through the early days, and she wanted to thank them properly. Pledge to them, pick your favourite song, then see Kate's.
 
 **Note**
 
-Kate's is Three Little Birds — Bob Marley. She plays it every morning while she does her exercises.
+Kate's is Three Little Birds — Bob Marley. It's the highlight of her playlist when she does her exercises.
 
 ### 8. Tess Yates · Recovery · Weather for walk · Cats Protection
 `id 428f8ae9-1e8a-41cf-aeff-426f99c76113` · ★★☆ · third person, she
@@ -101,18 +101,18 @@ Tess' is Crisp winter morning. She fills a flask before she leaves and drinks it
 
 **About**
 
-Hugo & Kenneth have shared decades of meals, and each year adds another cuisine to the list they keep going back to. They cook together most weekends, taking turns at the stove and sharing the washing up. Pledge to British Red Cross, pick your own favourite, and Hugo & Kenneth's will be revealed.
+Hugo & Kenneth have shared decades of meals and enjoy nothing more than adding a new cuisine to their repertoire. They cook together most days, taking turns at the stove and sharing the washing up. Pick your own favourite cuisine, and Hugo & Kenneth's will be revealed, with all proceeds going to British Red Cross.
 
 **Note**
 
-Hugo & Kenneth's is Vietnamese. They make pho together every few weeks, simmering the broth for hours before they serve it.
+Hugo & Kenneth's is Vietnamese. They make pho together, simmering the broth for hours before they serve.
 
 ### 10. Florence & Marion · Engagement · Beach · Blue Cross
 `id bc5f0081-4ded-4a50-9ac0-efb24d942639` · ★★☆ · first person
 
 **About**
 
-We got engaged on a walk along the coast, and that's the beach we talk about most. Most weekends we pack a flask and head for the sand, whatever the weather. Pledge to Blue Cross, pick your own favourite, then see ours.
+We got engaged on a walk along the coast, so that the beach holds a special memory. But we love all beaches really and try to visit one whenever we can. Pledge to Blue Cross and pick your own favourite beach to then see ours.
 
 **Note**
 
@@ -123,11 +123,11 @@ Ours is Camber Sands. I always climb the highest dune before we spread out the p
 
 **About**
 
-We got engaged at a small bar near the river, the kind of place that does one good cocktail and no fuss. We're asking for pledges to Crisis instead of gifts, a home for someone else in place of things we don't need. Pledge to Crisis, pick your own favourite, and ours will be revealed.
+We got engaged at a small bar near the river. An idyllic setting with fantastic cocktails. Pick your favourite cocktail and we'll reveal ours. We're asking for pledges to Crisis instead of gifts, to give somebody else the chance of a happy home.
 
 **Note**
 
-Ours is Espresso martini. We always order two the moment we sit down, no matter the occasion.
+We love Espresso martini. The best way to end the night, whatever the occasion.
 
 ### 12. Ravi & Dominic · New baby · Planet · Action for Children
 `id 3abf67e8-483a-4566-bf95-0745deae3a98` · ★★☆ · first person
