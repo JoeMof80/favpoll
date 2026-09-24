@@ -88,11 +88,11 @@ Kate's is Three Little Birds — Bob Marley. It's the highlight of her playlist 
 
 **About**
 
-Tess is back on her feet now, and the short walk to the corner and back has become the best part of her day. She notices the sky before she checks the time and always has an opinion on it. Pledge to Cats Protection, pick your own favourite, and Tess' will be revealed.
+Tess is back on her feet after a long stretch indoors, and walking has become her way of marking the days. She notices the weather now, the kind that makes a walk worth planning. Pledge to Cats Protection, pick your own favourite, then see Tess'.
 
 **Note**
 
-Tess' is Crisp winter morning. She fills a flask before she leaves and drinks it on the same bench every time.
+Tess' is Bright spring day. She rings the first one each year on her kitchen calendar, before she even puts her boots on.
 
 ## Celebrating a couple or group
 
@@ -134,11 +134,11 @@ We love Espresso martini. The best way to end the night, whatever the occasion.
 
 **About**
 
-We read the same book every evening, the one we know almost by heart. We like to stand at the window and spot what we can see in the sky before bed. Action for Children works with children and young people, and we wanted our pledges to go there. Pledge to Action for Children, pick your own favourite, and ours will be revealed.
+We spend our evenings on new routines: feeds, naps, and a walk when the baby settles. We read the books we loved as children, and one of us hums old tunes until the room quiets. Pledge to Action for Children, pick your own favourite, then see ours.
 
 **Note**
 
-Ours is Jupiter. I keep a small model of it on my desk, bought years ago at a museum shop.
+Ours is Mercury. We watch for it low in the sky before sunrise, checking an app to be sure it's really there.
 
 ### 13. Rhys & Kwame · New baby · Dinosaur · Children's Society
 `id d77a97e1-f6ee-4d5a-be7a-d7c179f289f5` · ★★☆ · first person
@@ -178,11 +178,11 @@ Mei & Simon's is Chocolate fudge cake. They always scrape the bowl clean before 
 
 **About**
 
-We spent our engagement arguing over honeymoon routes, and every one somehow ended on a coastline. Between us we've packed a beach bag more times than we can count, and our sandy shoes end up by the door most summers. Pledge to National Trust, pick your own favourite, and find out ours.
+We're planning our honeymoon along the coast, and mornings on the sand are becoming the best part of the day. One of us swims before breakfast, and the other collects shells for whoever we meet next. Pledge to National Trust, pick your own favourite, and ours will be revealed.
 
 **Note**
 
-Ours is Camber Sands. We always walk the same stretch of sand at low tide and never agree on which way to turn.
+Ours is Weston-super-Mare. We walk to the water's edge every visit and race back before the tide catches us.
 
 ## Remembering
 
