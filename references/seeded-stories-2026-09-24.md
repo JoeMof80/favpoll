@@ -145,11 +145,11 @@ Ours is Mercury. We watch for it low in the sky before sunrise, checking an app 
 
 **About**
 
-We read dinosaur names before bedtime most nights, and one of us always slips in a favourite without meaning to. Children's Society works for young people, so a favourite dinosaur felt like the right thing to ask about. Pledge to Children's Society, pick your own favourite, and ours will be revealed.
+We read dinosaur books to our new arrival most evenings, tracing the shapes across the page. Children's Society works for children and young people, and a favourite dinosaur is often the first one a child picks. Pledge to Children's Society, pick your own favourite, then see ours.
 
 **Note**
 
-Ours is Diplodocus. I trace its long neck on the page each time we reach that spread.
+Ours is Dilophosaurus. One of us draws it in the margin of every notebook we own.
 
 ### 14. Barry & Alan · Renewal of vows · Island · Centrepoint
 `id ec7a161b-6e93-4b12-89eb-e21c5dd05e51` · ★★☆ · first person
