@@ -83,16 +83,16 @@ Kate is back on her feet and walking further each week. Her latest milestone is 
 
 Kate's is Three Little Birds — Bob Marley. It's the highlight of her playlist when she does her exercises.
 
-### 8. Tess Yates · Recovery · Weather for walk · Cats Protection
+### 8. Tess Yates · Recovery · Cat breed · Cats Protection
 `id 428f8ae9-1e8a-41cf-aeff-426f99c76113` · ★★☆ · third person, she
 
 **About**
 
-Tess is back on her feet after a long stretch indoors, and walking has become her way of marking the days. She notices the weather now, the kind that makes a walk worth planning. Pledge to Cats Protection, pick your own favourite, then see Tess'.
+Tess is back out and about after a long time indoors, and long walks have become a way of life. The best thing about walking is the chance to meet cats. Pledge to Cats Protection, pick your own favourite cat breed, then see Tess'.
 
 **Note**
 
-Tess' is Bright spring day. She rings the first one each year on her kitchen calendar, before she even puts her boots on.
+Tess' favourite is Burmese. She made friends with one recently.
 
 ## Celebrating a couple or group
 
