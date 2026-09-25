@@ -243,17 +243,6 @@ Edith's was Desiderata. She copied it out by hand and kept the copy folded in he
 
 ## A cause
 
-### 23. End Global Poverty · Sponsored event · River · Oxfam
-`id 6c01a36b-1fa2-4cb2-924b-70685b6d4a4b` · ★★☆ · cause
-
-**About**
-
-This sponsored event is raising for Oxfam's work against poverty overseas, and a favourite river follows the routes and waters where that work happens. Guests pick their favourite river by pledging to Oxfam, with no platform fee taken.
-
-**Note**
-
-Our pick to start: Thames — the water people walk beside on ordinary days, without much thought at all
-
 ### 24. Men's Mental Health · Sponsored event · Form of exercise · CALM
 `id 3653cba9-9d3a-47a2-890a-7417c22dc7aa` · ★★☆ · cause
 
@@ -275,3 +264,14 @@ A sponsored event is bringing in pledges for work protecting oceans, waves and w
 **Note**
 
 Our pick to start: Copacabana — a favourite from long summer nights by the sea.
+
+### 23. Better Mental Health · Charity night · Song · Mind
+`id d25eeace-6289-43d4-814d-7969a947a5ac` · ★★☆ · cause
+
+**About**
+
+Tonight's charity night raises for Mind, supporting people's mental health. With the band playing, guests pick their favourite song by pledging to Mind, and favpoll takes no platform fee.
+
+**Note**
+
+Our pick to start: Stand by Me — Ben E. King — the song that always gets everyone singing together.
