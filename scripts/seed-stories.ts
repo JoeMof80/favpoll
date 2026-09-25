@@ -691,6 +691,10 @@ function sample(candidates: Candidate[], n: number): Candidate[] {
   // register mix still spread the shelf.
   const chosen: Candidate[] = [];
   const perTopic = new Map<string, number>();
+  // Two of the same occasion AND topic in a cohort come out alike (two
+  // Graduation · Book favpolls both opened "three years of essays";
+  // founder, 2026-09-25), and retrieval makes it worse. One per pair.
+  const perPair = new Map<string, number>();
   const perOccasion = new Map<string, number>();
   const perRegister = new Map<Register, number>();
   const cap = (m: Map<string, number>, k: string, max: number) =>
@@ -712,12 +716,14 @@ function sample(candidates: Candidate[], n: number): Candidate[] {
   const fits = (c: Candidate) =>
     !(BABY_OCCASIONS.has(c.occasion) && births >= MAX_BIRTHS) &&
     cap(perTopic, c.topic.id, 2) &&
+    cap(perPair, `${c.occasion}|${c.topic.id}`, 1) &&
     cap(perOccasion, c.occasion, OCCASIONS_ONLY.length ? 2 : 3) &&
     (perRegister.get(c.register) ?? 0) < registerQuota(c.register);
   const take = (c: Candidate) => {
     chosen.push(c);
     if (BABY_OCCASIONS.has(c.occasion)) births++;
     bump(perTopic, c.topic.id);
+    bump(perPair, `${c.occasion}|${c.topic.id}`);
     bump(perOccasion, c.occasion);
     perRegister.set(c.register, (perRegister.get(c.register) ?? 0) + 1);
   };

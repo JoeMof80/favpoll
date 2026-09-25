@@ -203,6 +203,8 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
     at: "",
     hop: "now there is time — the freedom to finally go",
   },
+  // Saying was here too: "favourite saying" is awkward as a poll
+  // (founder, 2026-09-25, the second time).
   "Leaving do": {
     topics: [
       t("Beer"),
@@ -210,7 +212,6 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Coffee order"),
       t("Sandwich"),
       t("City"),
-      t("Saying"),
     ],
     at: "",
     hop: "the leaving drinks, or where they are going next",
@@ -257,7 +258,6 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
   // "pick from what the award is for". Nothing starred.
   Award: {
     topics: [
-      t("Saying"),
       t("Word"),
       t("Book"),
       t("Poem"),

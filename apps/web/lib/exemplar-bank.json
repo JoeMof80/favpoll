@@ -271,5 +271,57 @@
   "about": "Edith found it soothing to read aloud and she kept a shelf of poetry by her chair to read from every evening. St Gemma's Hospice cared for Edith at the end and the wonderful staff there read poems to her. Please support them by picking your own favourite, and we'll reveal Edith's.",
   "note": "Edith's was Desiderata. She kept a handwritten copy in her handbag that you can see on her memorial table.",
   "edited": true
+ },
+ {
+  "id": "8a435ea1-529d-4df6-9001-65f3abac4195",
+  "triple": "Divorce party · Way to spend Sunday · Samaritans",
+  "register": "celebrating_one",
+  "occasion": "Divorce party",
+  "topic": "Way to spend Sunday",
+  "family": "mental_health",
+  "voice": "first",
+  "grouping": "individual",
+  "about": "Now I have Sundays to myself, I'm rediscovering how to enjoy them and life in general. For a while, life was tough and Samaritans helped me through. Please help me thank them by pledging your favourite way to spend Sunday, and mine will be revealed.",
+  "note": "I like a Car boot sale. I try to get there early for all the bargains and usually return with some vinyl.",
+  "edited": true
+ },
+ {
+  "id": "b99ed24a-4dfc-44d5-8792-03736bdcfe07",
+  "triple": "Divorce party · Song · CALM",
+  "register": "celebrating_one",
+  "occasion": "Divorce party",
+  "topic": "Song",
+  "family": "mental_health",
+  "voice": "first",
+  "grouping": "individual",
+  "about": "I'm marking the start of a new chapter with my first trip alone in years. I'm planning to relive my youth with a weekend away. My roadtrip playlist is ready and I can't wait. Let me know your own favourite song and I'll share mine.",
+  "note": "Mine is Here I Go Again - Whitesnake. It feels more apt than ever.",
+  "edited": true
+ },
+ {
+  "id": "1751bb5d-a60c-4675-9f3d-23f1285956c3",
+  "triple": "Graduation · Book · Mind",
+  "register": "celebrating_one",
+  "occasion": "Graduation",
+  "topic": "Book",
+  "family": "mental_health",
+  "voice": "third",
+  "grouping": "individual",
+  "about": "Gareth has just graduated after three years of essays, seminars and late nights in the library. He's always found reading relaxing and now he has time to read what he wants, maybe his favourite. Tell us your favourite by pledging to Mind.",
+  "note": "Gareth's is Hamnet. He read it during his gap year and swore to reread it as soon as he had a chance.",
+  "edited": true
+ },
+ {
+  "id": "6aa6b8ee-1ff7-496c-aed6-53140f0acc76",
+  "triple": "Milestone birthday · Song · Alzheimer's Society",
+  "register": "celebrating_one",
+  "occasion": "Milestone birthday",
+  "topic": "Song",
+  "family": "end_of_life",
+  "voice": "third",
+  "grouping": "individual",
+  "about": "Florence loves to play the piano. She says music helps her feel younger than her 90 years. Pick your favourite song, and we'll reveal Florence's, in support of Alzheimer's Society.",
+  "note": "Florence's is Let It Be — The Beatles. She still plays it most days.",
+  "edited": true
  }
 ]

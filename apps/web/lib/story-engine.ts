@@ -120,9 +120,15 @@ export const REVEAL_PROMISES = [
  *  the connectives it kept adding (2026-09-24: "too many ands"). */
 export function closingSentence(
   charityName: string | null,
-  promise: string
+  promise: string,
+  topicTitle?: string
 ): string {
-  return `Pledge to ${charityName ?? "charity"}, pick your own favourite, ${promise}.`
+  // "pick your favourite song", not "pick your own favourite": the
+  // founder named the topic in every one of his edits (2026-09-25).
+  const what = topicTitle
+    ? `your favourite ${topicTitle.toLowerCase()}`
+    : "your own favourite"
+  return `Pledge to ${charityName ?? "charity"}, pick ${what}, ${promise}.`
 }
 
 export function pickRevealPromise(
@@ -341,8 +347,8 @@ ${edgesBlock(edges, subject)}`
     const closing =
       givenClosing ??
       (promise
-        ? closingSentence(charityName, promise)
-        : `Pledge to ${charityName ?? "charity"} and pick your own favourite.`)
+        ? closingSentence(charityName, promise, topicTitle)
+        : `Pledge to ${charityName ?? "charity"} and pick your favourite ${topicTitle.toLowerCase()}.`)
     const nameHint = first
       ? ""
       : promise
@@ -624,8 +630,12 @@ export async function generateStory(
   const closing =
     input.subject === "someone"
       ? closingPoss
-        ? closingSentence(input.charity.name, pickRevealPromise(closingPoss))
-        : `Pledge to ${input.charity.name ?? "charity"} and pick your own favourite.`
+        ? closingSentence(
+            input.charity.name,
+            pickRevealPromise(closingPoss),
+            input.topicTitle
+          )
+        : `Pledge to ${input.charity.name ?? "charity"} and pick your favourite ${input.topicTitle.toLowerCase()}.`
       : null
   const prompt = buildPrompt({
     register: input.register,
@@ -699,7 +709,7 @@ export async function generateStory(
   // is appended when missing rather than left to chance.
   // Any promise form counts as present: the model may pick a different
   // one from the rotation, and two closings would be worse than one.
-  const closingPrefix = `Pledge to ${input.charity.name ?? "charity"}, pick your own favourite,`
+  const closingPrefix = `Pledge to ${input.charity.name ?? "charity"}, pick your`
   const withClosing = (about: string) =>
     closing &&
     !about.includes(closingPrefix) &&

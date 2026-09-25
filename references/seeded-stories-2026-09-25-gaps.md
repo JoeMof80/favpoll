@@ -11,33 +11,33 @@ Stars are the edges the triple has: ★ occasion→topic, ★ charity→topic, �
 
 **About**
 
-I'm working out what a Sunday looks like on my own now, starting with a first solo trip out of the house. I fill the hours my own way, and it feels good to have them to myself. Pledge to Samaritans, pick your own favourite, and mine will be revealed.
+Now I have Sundays to myself, I'm rediscovering how to enjoy them and life in general. For a while, life was tough and Samaritans helped me through. Please help me thank them by pledging your favourite way to spend Sunday, and mine will be revealed.
 
 **Note**
 
-Mine is Car boot sale. I get there early most Sundays and always haggle over the vinyl stall.
+I like a Car boot sale. I try to get there early for all the bargains and usually return with some vinyl.
 
 ### 2. Leon Singh · Divorce party · Song · CALM
 `id b99ed24a-4dfc-44d5-8792-03736bdcfe07` · ★★☆ · first person
 
 **About**
 
-I'm marking the end of one chapter with my first trip alone in years, a weekend away just for me. I've packed a playlist for the drive and I'm looking forward to the quiet. Pledge to CALM, pick your own favourite, then see mine.
+I'm marking the start of a new chapter with my first trip alone in years. I'm planning to relive my youth with a weekend away. My roadtrip playlist is ready and I can't wait. Let me know your own favourite song and I'll share mine.
 
 **Note**
 
-Mine is Fields of Gold — Eva Cassidy. I hum it under my breath whenever I'm packing a suitcase.
+Mine is Here I Go Again - Whitesnake. It feels more apt than ever.
 
 ### 3. Gareth Gibson · Graduation · Book · Mind
 `id 1751bb5d-a60c-4675-9f3d-23f1285956c3` · ★★☆ · third person, he
 
 **About**
 
-Gareth has just finished his degree, three years of essays, seminars and late nights in the library. The reading list is finally his own again, and he is filling it with whatever he fancies. Pledge to Mind, pick your own favourite, and find out Gareth's.
+Gareth has just graduated after three years of essays, seminars and late nights in the library. He's always found reading relaxing and now he has time to read what he wants, maybe his favourite. Tell us your favourite by pledging to Mind.
 
 **Note**
 
-Gareth's is Hamnet. He keeps his copy on the desk and rereads the first page whenever he sits down to write.
+Gareth's is Hamnet. He read it during his gap year and swore to reread it as soon as he had a chance.
 
 ### 4. Harriet Marsh · Graduation · Book · YoungMinds
 `id a3f331a7-5778-4287-b712-3f1c495185bb` · ★★☆ · third person, she
@@ -77,11 +77,11 @@ Robert's is Waste not, want not. He keeps every takeaway tub for leftovers, stac
 
 **About**
 
-Florence marks a landmark birthday this year, the kind that turns thoughts back over the years behind her. She keeps the radio on in the kitchen, humming along as she cooks. Pledge to Alzheimer's Society, pick your own favourite, and Florence's will be revealed.
+Florence loves to play the piano. She says music helps her feel younger than her 90 years. Pick your favourite song, and we'll reveal Florence's, in support of Alzheimer's Society.
 
 **Note**
 
-Florence's is Let It Be — The Beatles. She plays it on the piano before bed most evenings.
+Florence's is Let It Be — The Beatles. She still plays it most days.
 
 ### 8. Helen Iqbal · Milestone birthday · Sweet · Great Ormond Street Hospital Charity
 `id 305e6411-7aa7-4151-bd17-0e2cc36e9a72` · ★★☆ · third person, she

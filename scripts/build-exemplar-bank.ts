@@ -71,6 +71,16 @@ for (const f of files) {
     const o = originals.get(m[2]);
     const [, occasion, topic, charity] = m[1].split(" · ");
     if (!o || o.subject === "cause") continue;
+    // Only the founder's words: a row he has not edited is the model's,
+    // and the bank exists to pull away from the model's habits.
+    const originalRow = (
+      JSON.parse(readFileSync(originalsPath, "utf8")) as (Original & {
+        about: string;
+        note: string;
+      })[]
+    ).find((x) => x.id === m[2])!;
+    if (m[3].trim() === originalRow.about && m[4].trim() === originalRow.note)
+      continue;
     const about = m[3].trim();
     const note = m[4].trim();
     const orig = (
