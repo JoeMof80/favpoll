@@ -243,17 +243,6 @@ Edith's was Desiderata. She copied it out by hand and kept the copy folded in he
 
 ## A cause
 
-### 22. Emergency Medical Relief · Sponsored event · River · Médecins Sans Frontières
-`id 372e8548-17b1-48f1-b768-96f97b474bad` · ★★☆ · cause
-
-**About**
-
-This sponsored event is raising for Médecins Sans Frontières, whose humanitarian work reaches rivers and communities in crisis across the world. Guests pick their favourite river by pledging to the charity, and favpoll takes no platform fee.
-
-**Note**
-
-Our pick to start: Wye — a walk they took every summer as children.
-
 ### 23. End Global Poverty · Sponsored event · River · Oxfam
 `id 6c01a36b-1fa2-4cb2-924b-70685b6d4a4b` · ★★☆ · cause
 
@@ -275,3 +264,14 @@ This favpoll is raising for CALM ahead of our sponsored event, where months of t
 **Note**
 
 Our pick to start: Running — the one that clears the head before anything else does
+
+### 22. Cleaner Beaches And Seas · Sponsored event · Beach · Surfers Against Sewage
+`id c521828f-94bb-44d9-8f98-f6858d019a10` · ★★☆ · cause
+
+**About**
+
+A sponsored event is bringing in pledges for work protecting oceans, waves and wildlife. Guests pick their favourite beach by pledging to Surfers Against Sewage.
+
+**Note**
+
+Our pick to start: Copacabana — a favourite from long summer nights by the sea.
