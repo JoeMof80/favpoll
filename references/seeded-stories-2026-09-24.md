@@ -202,11 +202,11 @@ Pam's was Chatsworth. You can see a book of pressed leaves from there on Pam's m
 
 **About**
 
-Kieran was quiet and steady, the kind of man who turned up when he was needed and asked for nothing in return. He believed dogs trained to guide people who were blind or partially sighted did work worth supporting. Pledge to Guide Dogs, pick your own favourite, then see Kieran's.
+Kieran had a heart of gold. He was always there during times of need and expected nothing in return. He grew a fondness for guide dogs through his volunteering. Pledge to Guide Dogs by picking your favourite.
 
 **Note**
 
-Kieran's was Dalmatian. He kept a photograph of the Dalmatian he'd had as a boy tucked in his wallet.
+Kieran loved all the guide dogs he met but especially an Alsatian named Duke.
 
 ### 19. Rosa Gibson · Remembrance · Flower · St Richard's Hospice
 `id ed86ba14-c578-4c58-b827-96854c5fddeb` · ★★☆ · third person, she
