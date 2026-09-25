@@ -99,11 +99,11 @@ Helen's is Casablanca. She recites the closing line every time it plays.
 
 **About**
 
-Leila has just picked up the keys to her first home. Settling in has put a roast dinner on her mind, and Centrepoint helps young people find a home of their own. Pledge to Centrepoint, pick your favourite part of a roast dinner, then see Leila's.
+Leila has just moved into her new home. She's cooking her first roast for friends there. Centrepoint helps young people without a home find one of their own. Pledge to Centrepoint, pick your favourite part of a roast dinner, to see Leila's.
 
 **Note**
 
-Leila's is Green beans. She trims them by hand before they go in the pot, every time.
+Leila's is Apple sauce. She keeps a spare jar in the cupboard, ready for cheese on toast too.
 
 ### 10. Shona Mitchell · New home · Tree · Emmaus UK
 `id b0c6db2c-3257-43d1-9363-c1db996acfbd` · ★★☆ · first person

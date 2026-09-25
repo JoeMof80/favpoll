@@ -37,7 +37,15 @@ import type { CauseFamily, Register } from "@favpoll/types"
  * (the precedent is scripts/backfill-cause-family.ts).
  */
 
-export type TopicRow = { topic: string; star: boolean }
+export type TopicRow = {
+  topic: string
+  star: boolean
+  /** The concrete thing that links this topic to the occasion, when the
+   *  row's general hop is too abstract to write from ("settling in has
+   *  put a roast dinner on her mind"; founder, 2026-09-26). The table's
+   *  own parentheticals, made data. */
+  why?: string
+}
 
 /** A §1 row: what the occasion pairs with, and the two sentences the
  *  edge text is built from — `at` for a starred topic (what happens at
@@ -49,7 +57,8 @@ export type OccasionRow = {
   hop: string
 }
 
-const t = (topic: string, star = false): TopicRow => ({ topic, star })
+const t = (topic: string, star = false, why?: string): TopicRow =>
+  why ? { topic, star, why } : { topic, star }
 
 const MEMORIAL: OccasionRow = {
   topics: [
@@ -193,12 +202,12 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
   // motivates it. Lean on E1′.
   Retirement: {
     topics: [
-      t("Place"),
-      t("Type of holiday"),
-      t("Way to spend Sunday"),
-      t("Garden to visit"),
-      t("Hobby"),
-      t("Way to travel"),
+      t("Place", false, "the freedom to finally go"),
+      t("Type of holiday", false, "the freedom to finally go"),
+      t("Way to spend Sunday", false, "every day a Sunday now"),
+      t("Garden to visit", false, "the days out there is finally time for"),
+      t("Hobby", false, "the hobby there is finally time for"),
+      t("Way to travel", false, "the freedom to finally go"),
     ],
     at: "",
     hop: "now there is time — the freedom to finally go",
@@ -207,11 +216,11 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
   // (founder, 2026-09-25, the second time).
   "Leaving do": {
     topics: [
-      t("Beer"),
-      t("Takeaway"),
-      t("Coffee order"),
-      t("Sandwich"),
-      t("City"),
+      t("Beer", false, "the leaving drinks"),
+      t("Takeaway", false, "the leaving-night takeaway"),
+      t("Coffee order", false, "the office coffee run they are leaving behind"),
+      t("Sandwich", false, "the desk lunches they are leaving behind"),
+      t("City", false, "where they are going next"),
     ],
     at: "",
     hop: "the leaving drinks, or where they are going next",
@@ -219,11 +228,15 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
   Graduation: {
     topics: [
       t("School subject", true),
-      t("Book"),
-      t("Author"),
-      t("Type of book"),
-      t("City"),
-      t("Takeaway"),
+      t("Book", false, "reading for pleasure again after the reading list"),
+      t("Author", false, "reading for pleasure again after the reading list"),
+      t(
+        "Type of book",
+        false,
+        "reading for pleasure again after the reading list"
+      ),
+      t("City", false, "where they go next"),
+      t("Takeaway", false, "the late-night takeaways of the final year"),
     ],
     at: "the subject they have just finished studying",
     hop: "the studying just done",
@@ -280,15 +293,19 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
   },
   "New home": {
     topics: [
-      t("Part of a roast dinner"),
-      t("Board game"),
-      t("Way to spend Sunday"),
-      t("Flower"),
-      t("Tree"),
-      t("Landmark or building"),
-      t("County"),
-      t("City"),
-      t("Smell"),
+      t(
+        "Part of a roast dinner",
+        false,
+        "the first roast cooked for friends in the new place"
+      ),
+      t("Board game", false, "the first games night in the new place"),
+      t("Way to spend Sunday", false, "the first Sunday in the new place"),
+      t("Flower", false, "the garden that comes with the house"),
+      t("Tree", false, "the garden that comes with the house"),
+      t("Landmark or building", false, "the place they have moved to"),
+      t("County", false, "the place they have moved to"),
+      t("City", false, "the place they have moved to"),
+      t("Smell", false, "a house becoming a home"),
     ],
     at: "",
     hop: "settling in",
@@ -873,10 +890,10 @@ export function lookupEdges(input: EdgeLookupInput): StoryEdges {
             star: true,
             text: `A favourite ${topic} is part of ${article(occasion)} ${occasion}: ${occ.row.at}.`,
           }
-        : occ.row.hop
+        : hit.why || occ.row.hop
           ? {
               star: false,
-              text: `${article(occasion) === "an" ? "An" : "A"} ${occasion} suggests a favourite ${topic} only by a step the about must say out loud: ${occ.row.hop}.`,
+              text: `${article(occasion) === "an" ? "An" : "A"} ${occasion} suggests a favourite ${topic} only by a step the about must say out loud: ${hit.why ?? occ.row.hop}.`,
             }
           : {
               star: false,

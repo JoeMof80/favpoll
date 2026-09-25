@@ -144,7 +144,7 @@ describe("lookupEdges — the worked triples from the reference note", () => {
     expect(edges.count).toBe(1)
     expect(edges.e1?.star).toBe(false)
     expect(edges.e1?.text).toContain(
-      "only by a step the about must say out loud: now there is time"
+      "only by a step the about must say out loud: the freedom to finally go"
     )
     expect(edges.e2).toBeNull()
     expect(edges.e3).toBeNull()
