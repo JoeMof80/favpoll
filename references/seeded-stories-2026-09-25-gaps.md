@@ -66,11 +66,11 @@ David's is Pad thai. He orders extra chilli every time and eats it straight from
 
 **About**
 
-Robert is heading off to a new job, and the leaving drinks are lined up for Friday. He always gets the first round in and reads every beer mat on the table before anyone else finishes their pint. Pledge to Comic Relief, pick your favourite beer, then see Robert's.
+Robert is moving on to a new job, and tonight's drinks are his send-off. He's always first to the bar and remembers everyone's usual order without asking. He keeps the round steady until last orders. Pledge to Comic Relief, pick your favourite beer, and find out Robert's.
 
 **Note**
 
-Robert's is St Austell Tribute. He orders it by name before he even sits down, whichever pub he's in.
+Robert's is Madrí. He orders it first whenever he takes a seat at the pub.
 
 ### 7. Florence Ellis · Milestone birthday · Song · Alzheimer's Society
 `id 6aa6b8ee-1ff7-496c-aed6-53140f0acc76` · ★★☆ · third person, she

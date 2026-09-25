@@ -1119,7 +1119,7 @@ describe("realism rules in the person prompt (founder review, 2026-09-24)", () =
     expect(prompt).toContain("ordinary and believable")
     expect(prompt).toContain("one particular one in their life")
     expect(prompt).toContain("given agency")
-    expect(prompt).toContain("something anyone could have watched them do")
+    expect(prompt).toContain("passes the HONOUR test")
     expect(prompt).not.toContain("The occasion is a birth")
   })
 
