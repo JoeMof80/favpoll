@@ -6,6 +6,7 @@ import type {
   Register,
 } from "@favpoll/types"
 import { lookupEdges, type Edge, type StoryEdges } from "./pairing-table"
+import { pickExemplars, type ExemplarQuery } from "./exemplars"
 import {
   revealNamesRealItem,
   hasFabricatedStats,
@@ -32,44 +33,11 @@ import {
 // Prompt
 // ---------------------------------------------------------------------------
 
-/**
- * The founder's own Stories (scripts/seed-exemplars.ts), verbatim: the bar
- * for plainness and believability. Rules produce compliance; examples
- * produce voice (founder, 2026-09-24: "many examples just aren't
- * realistic"). They predate the em dash rule; the prompt says so.
- */
-const EXEMPLAR_STORIES = [
-  {
-    triple: "Memorial · Colour · Marie Curie",
-    about:
-      "A beloved mother, teacher, and friend who spent her life bringing people together. Her home was full of deliberate colour — every room had a story, and the shade she always came back to said more about her than most words could. Marie Curie nurses were with her at the end, and she would have wanted them remembered here.",
-    note: "Cornflower blue. She kept a pot of cornflowers on the windowsill every summer.",
-  },
-  {
-    triple: "Birthday · Biscuit · RNLI",
-    about:
-      "Sarah is forty and has never met a biscuit she didn't take seriously. She has strong opinions and is not afraid to share them, which is part of why everyone is here. She supports the RNLI because she grew up near the coast and means it.",
-    note: "The Bourbon. She once ate four packets in one sitting, and she has no regrets.",
-  },
-  {
-    triple: "Retirement · Place · British Heart Foundation",
-    about:
-      "After thirty-five years building the engineering team from four people to four hundred, David is finally putting down his laptop. He has a shortlist of places he's never had time to actually go to — and now he does. His charity of choice looks after the hearts of people who worked as hard as he did.",
-    note: "The Dordogne. He kept a photo of it on his desk for thirty years.",
-  },
-  {
-    triple: "Wedding · Song · Shelter",
-    about:
-      "Emma and James met at a rainy music festival in 2019 and haven't been apart since. Music runs through everything they do together. They asked for pledges to Shelter in lieu of gifts — because a roof over your head matters, and they wanted to share the good fortune.",
-    note: "Fields of Gold. It played at their first dance and neither of them planned it.",
-  },
-] as const
-
-function exemplarsBlock(): string {
-  const items = EXEMPLAR_STORIES.map(
-    (x) => `${x.triple}\n  about: ${x.about}\n  note: ${x.note}`
-  ).join("\n")
-  return `These four are the bar. Notice how ordinary the facts are (a pot on a windowsill, a photo on a desk, four packets of biscuits), how plainly they are said, how much room they take, and that nothing in them is invented for effect. They predate the em dash rule; keep their plainness, not their dashes.\n${items}`
+function exemplarsBlock(q: ExemplarQuery): string {
+  const items = pickExemplars(q, 4)
+    .map((x) => `${x.triple}\n  about: ${x.about}\n  note: ${x.note}`)
+    .join("\n")
+  return `These are the bar: the founder's own Stories, the closest to this one. Notice how ordinary the facts are, how plainly they are said, how much room they take, and that nothing in them is invented for effect. Some predate the em dash rule; keep their plainness, not their dashes.\n${items}`
 }
 
 /** A birth: the BABY is the protagonist on the card ("Welcome to the
@@ -238,6 +206,8 @@ export function buildPrompt(opts: {
   closing?: string
   /** The favourite, when the caller has chosen it. */
   pick?: string | null
+  /** The charity's confirmed family, for exemplar retrieval. */
+  causeFamily?: CauseFamily | null
 }): string {
   const {
     register,
@@ -254,6 +224,7 @@ export function buildPrompt(opts: {
     fiction = false,
     closing: givenClosing,
     pick,
+    causeFamily = null,
   } = opts
   const activities = activitiesExcerpt(opts.charityActivities)
   // Purpose data, in order of trust: the curated description, then the
@@ -398,7 +369,7 @@ ${edgesBlock(edges, subject)}`
     instructions = `- "about": write it the way the four examples below are written: two or three sentences, 40 to 65 words in all, about the person and the occasion, in plain words, ending with the closing sentence given here exactly, nothing added after it: "${closing}"${tenseRule}${edgeRule}${truthRule}${babyRule}${effortRule}${realPersonRule}${charityFit}${pronounHint}${nameHint}
 - "reveal" (guests see it only AFTER pledging): start with exactly "${opener}".${entityGuard} Then ${pick ? `exactly this option, verbatim: "${pick}"` : "a plausible option from the list (you MUST use a real option, verbatim)"}, then a full stop, then ONE short sentence with a single detail of the PROTAGONIST'S own relationship to that favourite${first ? " (in the first person)" : ""}: something anyone could have watched them do, and something the about did not already say. The detail involves the favourite ITSELF (what they do with it, where, how often), not a mood, a light or a weather that stands near it. When the favourite is a KIND of thing (a breed, a cuisine, a type of holiday), the detail is about one particular one in their life, never the kind at large.${tenseRule} The detail must be entirely the protagonist's own and must NOT depend on any real-world fact about the favourite: no fixture dates or match traditions, no seasons, tours, episodes, eras, or biography (a claim like "watched them play on Boxing Day" fails if that favourite doesn't play then; avoid the whole category). The options may be famous real people, teams, or works: never state or invent facts about them. No preamble such as "We can't wait to reveal".
 
-${exemplarsBlock()}`
+${exemplarsBlock({ register, occasionType, topicTitle, causeFamily, pronoun, grouping })}`
   }
 
   const responseShape =
@@ -633,6 +604,7 @@ export async function generateStory(
     fiction: input.fiction ?? false,
     closing: closing ?? undefined,
     pick: input.pick ?? null,
+    causeFamily: input.charity.causeFamily,
   })
 
   let parsed = await callLLMWithCopyCheck(prompt, modelId)

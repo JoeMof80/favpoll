@@ -1111,8 +1111,10 @@ describe("realism rules in the person prompt (founder review, 2026-09-24)", () =
       displayName: "Joan Okafor",
     })
     const prompt = promptOf()
-    expect(prompt).toContain("These four are the bar")
-    expect(prompt).toContain("Cornflower blue. She kept a pot of cornflowers")
+    expect(prompt).toContain("These are the bar")
+    // Four retrieved exemplars, each with an about and a note.
+    expect(prompt.match(/\n  about: /g)?.length).toBe(4)
+    expect(prompt.match(/\n  note: /g)?.length).toBe(4)
     expect(prompt).toContain("ordinary and believable")
     expect(prompt).toContain("one particular one in their life")
     expect(prompt).toContain("given agency")
