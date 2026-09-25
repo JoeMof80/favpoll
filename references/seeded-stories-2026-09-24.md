@@ -11,7 +11,7 @@ Stars are the edges the triple has: ★ occasion→topic, ★ charity→topic, �
 
 **About**
 
-Belinda trains at the pool most mornings before work, counting lengths as she goes. She is swimming for the lifeboats (as well as running and cycling). Pledge to the RNLI and pick your favourite sea creature to find out Belinda's.
+Belinda trains at the pool most mornings before work, counting lengths as she goes. She is swimming (and cycling and running) for the lifeboats. Pledge to the RNLI and pick your favourite sea creature to find out Belinda's.
 
 **Note**
 
@@ -22,7 +22,7 @@ Belinda's is the Dolphin. Her bathroom is full of dolphin pictures and ornaments
 
 **About**
 
-I'm taking on this challenge after months of early starts and quiet training runs. Music keeps me going when the miles get long, so pick your favourite song to see mine. I'm raising money for Samaritans, who are there during difficult times.
+I'm taking on this challenge after months of early starts and quiet training runs. Music keeps me going when the miles get long, so pick your favourite song and I'll tell you mine. I'm raising money for Samaritans, who are always there during difficult times.
 
 **Note**
 
@@ -55,18 +55,18 @@ Oliver's is Rocky road. He eats the marshmallow pieces first.
 
 **About**
 
-I became a British citizen this year and I'm picking up all the habits: queuing patiently, apologising for no reason and putting the kettle on as soon as I arrive home. I've picked up a taste for tea I never expected. Pledge to Trussell Trust and pick your own favourite, to see mine.
+I became a British citizen this year and I'm picking up all the habits: queuing patiently, apologising for no reason and putting the kettle on as soon as I arrive home. Share my new taste for tea by picking your favourite and you'll see mine. All donations go to Trussell Trust.
 
 **Note**
 
-Mine is Earl Grey. I keep a tin of it in my desk drawer at work, ready for every afternoon.
+Mine is Earl Grey. I keep a tin of it in my desk drawer at work, ready for each afternoon.
 
 ### 6. Fiona Coles · Recovery · Weather for walk · Cancer Research UK
 `id 8794d709-1aee-4bee-b3b5-e1f6987a53cc` · ★★☆ · third person, she
 
 **About**
 
-Fiona is back on her feet and much better for it. Her walks are getting longer again, and she has grown a new appreciation of the weather. She owes her recovery to Cancer Research UK so please pledge to them by picking your favourite Weather for walking, and find out Fiona's.
+Fiona is back on her feet and feeling much better for it. Her walks are getting longer and she has grown a new appreciation for all weather. She owes her recovery to Cancer Research UK so please pledge to them by picking your favourite Weather for walking, and find out Fiona's.
 
 **Note**
 
@@ -81,7 +81,7 @@ Kate is back on her feet and walking further each week. Her latest milestone is 
 
 **Note**
 
-Kate's is Three Little Birds — Bob Marley. It's the highlight of her playlist when she does her exercises.
+Kate's is Three Little Birds by Bob Marley. It's the highlight of her playlist when she does her exercises.
 
 ### 8. Tess Yates · Recovery · Cat breed · Cats Protection
 `id 428f8ae9-1e8a-41cf-aeff-426f99c76113` · ★★☆ · third person, she
@@ -101,7 +101,7 @@ Tess' favourite is Burmese. She made friends with one recently.
 
 **About**
 
-Hugo & Kenneth have shared decades of meals and enjoy nothing more than adding a new cuisine to their repertoire. They cook together most days, taking turns at the stove and sharing the washing up. Pick your own favourite cuisine, and Hugo & Kenneth's will be revealed, with all proceeds going to British Red Cross.
+Hugo & Kenneth have shared decades of meals. They enjoy nothing more than adding a new cuisine to their repertoire and they cook together most days. Pick your own favourite cuisine, and theirs will be revealed, with all proceeds going to British Red Cross.
 
 **Note**
 
@@ -112,11 +112,11 @@ Hugo & Kenneth's is Vietnamese. They make pho together, simmering the broth for 
 
 **About**
 
-We got engaged on a walk along the coast, so that the beach holds a special memory. But we love all beaches really and try to visit one whenever we can. Pledge to Blue Cross and pick your own favourite beach to then see ours.
+We got engaged on a walk along the coast, so that that particular beach holds a special memory. But we love all beaches really and spend as much time on the sand as possible. Pledge to Blue Cross and pick your own favourite beach to see ours.
 
 **Note**
 
-Ours is Camber Sands. I always climb the highest dune before we spread out the picnic blanket.
+Ours is Camber Sands. We like to stay until the tide comes in.
 
 ### 11. Gillian & Eamon · Engagement · Cocktail · Crisis
 `id fb5ac6b1-a9d7-4b8d-adce-695189f9ab48` · ★★☆ · first person
@@ -134,11 +134,11 @@ We love Espresso martini. The best way to end the night, whatever the occasion.
 
 **About**
 
-Baby Jacob shares his nursery with our telescope so we can stargaze while we watch him. We wonder which planet will be his favourite. We know our favourite and we'll reveal it after you've picked yours. All proceeds to Action for Children.
+Baby Jacob shares his nursery with our telescope so we can stargaze while we watch him. We wonder which planet he'll like best. We know our favourite and we'll reveal it after you've picked yours. All proceeds to Action for Children.
 
 **Note**
 
-Ours is Mercury. We watch for it low in the sky before sunrise, checking an app to be sure it's really there.
+Ours is Saturn. The last time we saw the rings, the excitement almost woke Jacob.
 
 ### 13. Rhys & Kwame · New baby · Dinosaur · Children's Society
 `id d77a97e1-f6ee-4d5a-be7a-d7c179f289f5` · ★★☆ · first person
@@ -160,7 +160,7 @@ We renew our vows on the beach where we first honeymooned, back for another summ
 
 **Note**
 
-Ours is Mull. We take the same ferry crossing every year and stand at the rail until the hills disappear.
+We relive our Menorca honeymoon every year. The same hotel and the same week in June, if we can.
 
 ### 15. Mei & Simon · Wedding · Cake · Shelter
 `id 61a974f7-e4f8-4cdf-9c1d-539f3f88a561` · ★★☆ · third person, they
@@ -178,11 +178,11 @@ Mei & Simon's is Chocolate fudge cake. They always ask the baker for extra ganac
 
 **About**
 
-We're planning our honeymoon along the coast, and mornings on the sand are becoming the best part of the day. One of us swims before breakfast, and the other collects shells for whoever we meet next. Pledge to National Trust, pick your own favourite, and ours will be revealed.
+We're planning our honeymoon along the coast and looking forward to the mornings on the beach. Nothing beats swimming in the sea before breakfast. Pledge to National Trust by picking your own favourite beach, and we'll share our honeymoon destination.
 
 **Note**
 
-Ours is Weston-super-Mare. We walk to the water's edge every visit and race back before the tide catches us.
+Ours is Weston-super-Mare. The sea is freezing but we don't mind.
 
 ## Remembering
 
@@ -191,18 +191,18 @@ Ours is Weston-super-Mare. We walk to the water's edge every visit and race back
 
 **About**
 
-Pam loved wandering around gardens, taking her time over every border and vista. She grew her own vegetables at home and enjoyed sharing cuttings with neighbours. Diabetes UK supported her through the illness she lived with. Pledge to Diabetes UK, pick your own favourite, and Pam's will be revealed.
+Pam loved wandering around gardens. She grew her own vegetables at home too and enjoyed sharing them with neighbours. Diabetes UK supported her through the illness and she's asked for donations to them. Pick your favourite garden to visit, and Pam's will be revealed.
 
 **Note**
 
-Pam's was Chatsworth. She kept a pressed leaf from her first visit there in an old diary.
+Pam's was Chatsworth. You can see a book of pressed leaves from there on Pam's memorial table at the wake.
 
 ### 18. Kieran Abara · Remembrance · Saying · Guide Dogs
 `id 9f2d04ad-fb8d-4854-a58e-5f96a4148fea` · ★★☆ · third person, he
 
 **About**
 
-Kieran was known for having a saying to fit almost any moment, delivered with the same steady calm each time. He never made a fuss and always had a word ready to smooth things over. Pledge to Guide Dogs, pick your own favourite, then see Kieran's.
+Kieran was known for his catchphrase, which his former students affectionately repeated whenever they saw him. He never made a fuss and always had a word ready to smooth things over. Pledge to Guide Dogs, pick your own favourite, then see Kieran's.
 
 **Note**
 
@@ -213,11 +213,11 @@ Kieran's was Mustn't grumble. He'd say it every time someone asked how he was, t
 
 **About**
 
-Rosa loved her garden and could name every flower in it. She spent her afternoons tending borders that were never quite finished and always found time for a cup of tea with anyone who called round. St Richard's Hospice cared for her in her last weeks. Pledge to St Richard's Hospice, pick your own favourite, then see Rosa's.
+Rosa loved flowers and anyone who called round for tea would notice there was always a fresh bouquet on her kitchen table. St Richard's Hospice cared for her in her last weeks and made her extra comfortable by honouring her custom. Please thank St Richard's Hospice by picking your favourite flower and we'll reveal Rosa's.
 
 **Note**
 
-Rosa's was Forget-me-not. She kept a single stem in a jam jar on her kitchen windowsill every spring.
+Rosa's was Forget-me-not. She marked every spring by placing a single stem in a jam jar on her window sill.
 
 ### 20. Aisha Hartley · Tribute · Flower · Macmillan Cancer Support
 `id f0844140-d494-4679-908f-5fabb4208216` · ★★☆ · third person, she
@@ -235,11 +235,11 @@ Aisha's was Hydrangea. She always cut the first blue bloom of summer and set it 
 
 **About**
 
-Edith loved words that could be read aloud, and she kept a shelf of poetry by her chair. She read every evening and marked her favourite lines in pencil. St Gemma's Hospice cared for her at the end. Pledge to St Gemma's Hospice, pick your own favourite, and we'll reveal Edith's.
+Edith found it soothing to read aloud and she kept a shelf of poetry by her chair to read from every evening. St Gemma's Hospice cared for Edith at the end and the wonderful staff there read poems to her. Please support them by picking your own favourite, and we'll reveal Edith's.
 
 **Note**
 
-Edith's was Desiderata. She copied it out by hand and kept the copy folded in her handbag.
+Edith's was Desiderata. She kept a handwritten copy in her handbag that you can see on her memorial table.
 
 ## A cause
 
