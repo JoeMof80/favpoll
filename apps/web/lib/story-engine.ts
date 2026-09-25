@@ -215,7 +215,7 @@ function edgesBlock(edges: StoryEdges, subject: "someone" | "cause"): string {
     line("Charity → topic", edges.e2),
     ...(subject === "cause" ? [] : [line("Occasion ↔ charity", edges.e3)]),
   ]
-  return `Why this favpoll hangs together — the EDGES. These are the only links between the occasion, the topic and the charity that you may state; never invent another. They are notes to you, not copy: never repeat their phrasing ("sits inside", "belongs at", "the cause the effort is for"). A ★ edge already reads on the card (the cake at a birthday, a children's book at a christening), so the about must NOT explain or justify it; a pairing that needs no explanation gets none. Only a two-hop edge (marked "a step the about must say out loud") is said, in one plain clause.
+  return `Why this favpoll hangs together — the EDGES. These are the only links between the occasion, the topic and the charity that you may state; never invent another. They are notes to you, not copy: never repeat their phrasing ("sits inside", "belongs at", "the cause the effort is for"). A ★ edge already reads on the card (the cake at a birthday, a children's book at a christening), so the about must NOT explain or justify it; it may, and usually should, use the thing itself as part of the story. Only a two-hop edge (marked "a step the about must say out loud") is said, in one plain clause.
 ${rows.join("\n")}`
 }
 
@@ -375,7 +375,7 @@ ${edgesBlock(edges, subject)}`
     const edgeRule =
       edges.count === 0
         ? ` No edge links this occasion, this charity and this topic, so the about itself must make a favourite ${topicLower} a natural thing to ask this person, with one plain, believable thing about them.`
-        : ` The edges above are context; the card already carries them. Say a two-hop one in a clause if the about needs it; never explain a ★ one.`
+        : ` The edges above are context; the card already carries them. A ★ edge means the thing itself is part of the occasion, so USE it in the story (the wedding cake they have been tasting, the first dance, the flowers at the service) but never explain why it fits ("a favourite cake belongs at a wedding" is a justification; "they have tasted eleven cakes since March" is a story). Say a two-hop one in a clause if the about needs it.`
     const truthRule = ` What you say about the person must be ordinary and believable, the kind of thing a relative would say: never a talisman, a lucky object, a superstition, a quirk invented for effect, or a place or object given agency ("walked every mile with her", "steadies him"). Never announce that a favourite exists ("she had a favourite cat breed"). Never say the favourite is being kept back or withheld: simply do not name or hint at it; the closing sentence is the one promise of a reveal. Never comment on the favpoll itself ("it felt right for today", "this seemed fitting"): write about the person, not about the page.`
     // A birth honours the PARENTS on behalf of the child; the favourite
     // is their own. Nobody picks a favourite for a baby (founder,

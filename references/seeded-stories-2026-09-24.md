@@ -167,11 +167,11 @@ Ours is Mull. We take the same ferry crossing every year and stand at the rail u
 
 **About**
 
-They bake together most weekends, arguing gently over icing and portion sizes. Sunday mornings often end with a new recipe cooling on the side. They're asking for pledges to Shelter instead of gifts, so someone else can have a home of their own. Pledge to Shelter, pick your own favourite, and Mei & Simon's will be revealed.
+Mei & Simon have tried more cakes than they can count this year, from bakery samples to friends' kitchens, before picking today's. They asked for pledges to Shelter instead of wedding gifts, a home for someone else in place of another present. Pledge to Shelter, pick your own favourite, and find out Mei & Simon's.
 
 **Note**
 
-Mei & Simon's is Chocolate fudge cake. They always scrape the bowl clean before it goes in the oven.
+Mei & Simon's is Chocolate fudge cake. They always ask the baker for extra ganache between the layers.
 
 ### 16. Nicola & Jack · Wedding · Beach · National Trust
 `id f5b1b601-061e-4739-afa8-30a3cde89ae0` · ★★☆ · first person

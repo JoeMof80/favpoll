@@ -867,7 +867,7 @@ describe("edge-aware generation — the prompt carries the table's edges", () =>
     expect(prompt).toContain(
       "Occasion ↔ charity: RNLI belongs at an achievement"
     )
-    expect(prompt).toContain("never explain a ★ one")
+    expect(prompt).toContain("USE it in the story")
     // A sponsored effort is written before the day, never as finished.
     expect(prompt).toContain("STILL TO COME")
     // The first seed run parroted the edge sentences into copy, and
