@@ -111,6 +111,8 @@ const REGEN = opt("regen", "");
 // --rename gives every seeded protagonist a fresh, unrepeated name and
 // swaps it into the copy; nothing is regenerated.
 const RENAME = flag("rename");
+// --topic="Dog breed" with --regen moves the poll to that topic first.
+const REGEN_TOPIC = opt("topic", "");
 const DRY_RUN = flag("dry-run");
 const COUNT = parseInt(opt("count", "24"), 10);
 const THREES = parseFloat(opt("threes", "0.4"));
@@ -1479,7 +1481,7 @@ async function regen(name: string) {
   const bar = isCause
     ? (e: ReturnType<typeof storyEdges>) => Boolean(e.e1 && e.e2)
     : (e: ReturnType<typeof storyEdges>) => e.count >= 2;
-  if (!bar(storyEdges(input))) {
+  if (REGEN_TOPIC || !bar(storyEdges(input))) {
     const { data: allTopics } = await supabase
       .from("topics")
       .select("id, title, is_finite, favourites(id, label, is_canonical)")
@@ -1492,12 +1494,19 @@ async function regen(name: string) {
       )
       .map((t) => ({ t, e: storyEdges({ ...input, topicTitle: t.title }) }))
       .filter(({ e }) => bar(e));
-    if (options.length === 0)
+    if (options.length === 0 && !REGEN_TOPIC)
       throw new Error(
         "No topic meets the seed bar for this occasion and charity",
       );
+    const wanted = REGEN_TOPIC
+      ? ((allTopics ?? []) as Topic[]).find(
+          (t) => t.title.toLowerCase() === REGEN_TOPIC.toLowerCase(),
+        )
+      : null;
+    if (REGEN_TOPIC && !wanted) throw new Error(`No topic "${REGEN_TOPIC}"`);
     const best = Math.max(...options.map((o) => o.e.count));
-    const { t: newTopic } = pick(options.filter((o) => o.e.count === best));
+    const newTopic =
+      wanted ?? pick(options.filter((o) => o.e.count === best)).t;
     console.log(
       `  topic ${topic.title} → ${newTopic.title} (the old triple fell below the bar)`,
     );

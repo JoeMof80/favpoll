@@ -57,7 +57,8 @@ const MEMORIAL: OccasionRow = {
     t("Hymn", true),
     t("Poem", true),
     t("Song"),
-    t("Saying"),
+    // Saying was here: a person can be known for one, but guests at a
+    // wake have no favourite saying to pick (founder, 2026-09-25).
     t("Season"),
     t("Garden to visit"),
   ],
@@ -593,7 +594,10 @@ export const FAMILY_ROWS: Record<
 /** Charities whose table row is sharper than their family's. Keyed on
  *  the name as seeded (scripts/seed.ts) or as added from the register
  *  on staging (REGISTER_ADDED), matched loosely. */
-export const REGISTER_ADDED = ["Mountain Rescue England and Wales"] as const
+export const REGISTER_ADDED = [
+  "Mountain Rescue England and Wales",
+  "Guide Dogs",
+] as const
 export const CHARITY_ROWS: Record<string, TopicRow[]> = {
   RNLI: [
     t("Seaside town", true),
@@ -603,6 +607,9 @@ export const CHARITY_ROWS: Record<string, TopicRow[]> = {
     t("Weather"),
     t("Way to travel"),
   ],
+  // Guide Dogs breeds and trains its own dogs: the one health charity
+  // whose topic is an animal.
+  "Guide Dogs": [t("Dog breed", true), t("Animal"), t("Weather for walk")],
   "Mountain Rescue England and Wales": [
     t("Mountain or peak", true),
     t("National park", true),
@@ -715,7 +722,7 @@ export const HONOUR_CHARITY_ROWS: HonourCharityRow[] = [
     family: "health_condition",
     star: false,
     why: "a charity that fights the kind of illness that takes people belongs at a memorial",
-    except: ["RNIB", "Scope"],
+    except: ["RNIB", "Scope", "Guide Dogs"],
   },
   {
     occasions: ["Pet memorial"],
@@ -740,7 +747,7 @@ export const HONOUR_CHARITY_ROWS: HonourCharityRow[] = [
     family: "health_condition",
     star: true,
     why: "the condition's own charity, at a recovery",
-    except: ["RNIB", "Scope"],
+    except: ["RNIB", "Scope", "Guide Dogs"],
   },
   {
     occasions: ["Recovery"],
