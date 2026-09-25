@@ -224,11 +224,11 @@ Rosa's was Forget-me-not. She marked every spring by placing a single stem in a 
 
 **About**
 
-Aisha spent weekend afternoons weeding borders and giving cuttings to anyone who admired them. She kept the garden going through every season, rain or shine. Macmillan nurses cared for her at the end, and their kindness stayed with those who loved her. Pledge to Macmillan Cancer Support, pick your own favourite, and we'll reveal Aisha's.
+Aisha spent weekend afternoons weeding borders and giving cuttings to anyone who visited. She kept the garden going through every season, rain or shine. Macmillan nurses cared for her at the end, and their kindness meant the world to Aisha's loved ones. Pledge to Macmillan Cancer Support, pick your favourite flowers, and we'll reveal Aisha's.
 
 **Note**
 
-Aisha's was Hydrangea. She always cut the first blue bloom of summer and set it in a jam jar on her kitchen table.
+Aisha loved a Tulip. She grew a row of them every spring, pride of place, on her balcony.
 
 ### 21. Edith Ahmed · Tribute · Poem · St Gemma's Hospice
 `id ec550565-e5ef-42b0-8e93-cf95d0df8a1e` · ★★☆ · third person, she
