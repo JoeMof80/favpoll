@@ -197,16 +197,16 @@ Pam loved wandering around gardens. She grew her own vegetables at home too and 
 
 Pam's was Chatsworth. You can see a book of pressed leaves from there on Pam's memorial table at the wake.
 
-### 18. Kieran Abara · Remembrance · Saying · Guide Dogs
+### 18. Kieran Abara · Remembrance · Dog breed · Guide Dogs
 `id 9f2d04ad-fb8d-4854-a58e-5f96a4148fea` · ★★☆ · third person, he
 
 **About**
 
-Kieran was known for his catchphrase, which his former students affectionately repeated whenever they saw him. He never made a fuss and always had a word ready to smooth things over. Pledge to Guide Dogs, pick your own favourite, then see Kieran's.
+Kieran was quiet and steady, the kind of man who turned up when he was needed and asked for nothing in return. He believed dogs trained to guide people who were blind or partially sighted did work worth supporting. Pledge to Guide Dogs, pick your own favourite, then see Kieran's.
 
 **Note**
 
-Kieran's was Mustn't grumble. He'd say it every time someone asked how he was, then quickly turn the talk to something else.
+Kieran's was Dalmatian. He kept a photograph of the Dalmatian he'd had as a boy tucked in his wallet.
 
 ### 19. Rosa Gibson · Remembrance · Flower · St Richard's Hospice
 `id ed86ba14-c578-4c58-b827-96854c5fddeb` · ★★☆ · third person, she
