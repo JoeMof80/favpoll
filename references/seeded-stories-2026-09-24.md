@@ -248,30 +248,30 @@ Edith's was Desiderata. She kept a handwritten copy in her handbag that you can 
 
 **About**
 
-This favpoll is raising for CALM ahead of our sponsored event, where months of training have us thinking about the forms of exercise that keep us going. Guests pick their favourite form of exercise and pledge to CALM, which offers support services, counselling, advice and information to protect men's mental health and help prevent suicide.
+This favpoll gathers pledges for men's mental health ahead of a sponsored training event. Guests pick their favourite form of exercise by pledging to CALM, and favpoll takes no platform fee.
 
 **Note**
 
-Our pick to start: Running — the one that clears the head before anything else does
+Our pick to start: Golf — a slow walk with friends that could take up half a Sunday.
 
 ### 22. Cleaner Beaches And Seas · Sponsored event · Beach · Surfers Against Sewage
 `id c521828f-94bb-44d9-8f98-f6858d019a10` · ★★☆ · cause
 
 **About**
 
-A sponsored event is bringing in pledges for work protecting oceans, waves and wildlife. Guests pick their favourite beach by pledging to Surfers Against Sewage.
+This sponsored walk is raising for cleaner beaches and seas, with all pledges going to Surfers Against Sewage, a charity that inspires, unites and empowers communities to protect oceans, beaches, waves and wildlife. Guests pick their favourite beach simply by pledging, and favpoll takes no platform fee.
 
 **Note**
 
-Our pick to start: Copacabana — a favourite from long summer nights by the sea.
+Our pick to start: Tenby — sandcastles that lasted from breakfast to teatime.
 
 ### 23. Better Mental Health · Charity night · Song · Mind
 `id d25eeace-6289-43d4-814d-7969a947a5ac` · ★★☆ · cause
 
 **About**
 
-Tonight's charity night raises for Mind, supporting people's mental health. With the band playing, guests pick their favourite song by pledging to Mind, and favpoll takes no platform fee.
+This charity night raises for Better Mental Health, with songs as tonight's entertainment. Guests pick their favourite song and pledge to Mind, one and the same act, with no fee taken by favpoll.
 
 **Note**
 
-Our pick to start: Stand by Me — Ben E. King — the song that always gets everyone singing together.
+Our pick to start: Don't Look Back in Anger — Oasis — sung loudest at the end of every night.
