@@ -134,7 +134,7 @@ We love Espresso martini. The best way to end the night, whatever the occasion.
 
 **About**
 
-We spend our evenings on new routines: feeds, naps, and a walk when the baby settles. We read the books we loved as children, and one of us hums old tunes until the room quiets. Pledge to Action for Children, pick your own favourite, then see ours.
+Baby Jacob shares his nursery with our telescope so we can stargaze while we watch him. We wonder which planet will be his favourite. We know our favourite and we'll reveal it after you've picked yours. All proceeds to Action for Children.
 
 **Note**
 
