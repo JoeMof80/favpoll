@@ -6464,6 +6464,7 @@ const topicItems: Record<string, string[]> = {
     "Perfect — Ed Sheeran",
     "Somewhere Only We Know — Keane",
     "Stand by Me — Ben E. King",
+    "Here I Go Again — Whitesnake",
     "Supermarket Flowers — Ed Sheeran",
     "The Winner Takes It All — ABBA",
     "Three Little Birds — Bob Marley",

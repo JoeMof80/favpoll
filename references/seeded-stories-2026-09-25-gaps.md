@@ -39,38 +39,38 @@ Gareth has just graduated after three years of essays, seminars and late nights 
 
 Gareth's is Hamnet. He read it during his gap year and swore to reread it as soon as he had a chance.
 
-### 4. Harriet Marsh · Graduation · Book · YoungMinds
-`id a3f331a7-5778-4287-b712-3f1c495185bb` · ★★☆ · third person, she
+### 4. Harriet Marsh · Graduation · City · YoungMinds
+`id a3f331a7-5778-4287-b712-3f1c495185bb` · ★☆☆ · third person, she
 
 **About**
 
-Harriet has just finished her degree, three years of essays and exams behind her. She reads for pleasure again, one novel a week from the library, no set list. Pledge to YoungMinds, pick your own favourite, and find out Harriet's.
+Harriet has just finished three years of study, with more essays and exams than she can count. She always looks up flights and city guides between deadlines, and now she has time to plan a trip somewhere new. Pledge to YoungMinds, pick your favourite city, and we'll reveal Harriet's.
 
 **Note**
 
-Harriet's is Great Expectations. She rereads it every summer, dog-earing the same pages each time.
+Harriet's is Rio de Janeiro. She keeps a photograph of Copacabana beach pinned above her desk and glances at it each morning.
 
-### 5. David Hartley · Leaving do · Saying · Independent Age
-`id f14805a7-a410-4ac6-a8b3-1905e61de97f` · ★★☆ · third person, he
+### 5. David Hartley · Leaving do · Takeaway · Independent Age
+`id f14805a7-a410-4ac6-a8b3-1905e61de97f` · ★☆☆ · third person, he
 
 **About**
 
-David is leaving after years of turning meetings into stories worth repeating. His leaving drinks tonight are full of the sayings he's leaned on for years, ready for wherever he heads next. Pledge to Independent Age, pick your own favourite, and we'll reveal David's.
+David is off after years here, and the leaving drinks tonight mark it. He picks the takeaway menu before anyone else gets a look in and orders enough to feed the whole team. Pledge to Independent Age, pick your favourite takeaway, and David's will be revealed.
 
 **Note**
 
-David's is Worse things happen at sea. He says it whenever the printer jams, then carries on with the day.
+David's is Pad thai. He orders extra chilli every time and eats it straight from the box.
 
-### 6. Robert Sørensen · Leaving do · Saying · Comic Relief
-`id aab2f33d-8810-49ea-baca-6c3aa4516941` · ★★☆ · third person, he
+### 6. Robert Sørensen · Leaving do · Beer · Comic Relief
+`id aab2f33d-8810-49ea-baca-6c3aa4516941` · ★☆☆ · third person, he
 
 **About**
 
-Robert always has a saying ready, and tonight's leaving drinks will need a good few. He keeps them short and keeps them coming right up to the door. Pledge to Comic Relief, pick your own favourite, and find out Robert's.
+Robert is heading off to a new job, and the leaving drinks are lined up for Friday. He always gets the first round in and reads every beer mat on the table before anyone else finishes their pint. Pledge to Comic Relief, pick your favourite beer, then see Robert's.
 
 **Note**
 
-Robert's is Waste not, want not. He keeps every takeaway tub for leftovers, stacked in a cupboard by the door.
+Robert's is St Austell Tribute. He orders it by name before he even sits down, whichever pub he's in.
 
 ### 7. Florence Ellis · Milestone birthday · Song · Alzheimer's Society
 `id 6aa6b8ee-1ff7-496c-aed6-53140f0acc76` · ★★☆ · third person, she
@@ -83,38 +83,38 @@ Florence loves to play the piano. She says music helps her feel younger than her
 
 Florence's is Let It Be — The Beatles. She still plays it most days.
 
-### 8. Helen Iqbal · Milestone birthday · Sweet · Great Ormond Street Hospital Charity
-`id 305e6411-7aa7-4151-bd17-0e2cc36e9a72` · ★★☆ · third person, she
+### 8. Helen Iqbal · Milestone birthday · Film · Great Ormond Street Hospital Charity
+`id 305e6411-7aa7-4151-bd17-0e2cc36e9a72` · ★☆☆ · third person, she
 
 **About**
 
-Helen's turning a big birthday, and today has her looking back at old favourites. She keeps a bowl of sweets on the table for anyone who visits. Pledge to Great Ormond Street Hospital Charity, pick your own favourite, and Helen's will be revealed.
+Helen turns a big birthday this year and enjoys looking back before looking forward. She keeps a box of cinema tickets from every trip she takes. Pledge to Great Ormond Street Hospital Charity, pick your favourite film, and find out Helen's.
 
 **Note**
 
-Helen's is Rhubarb and custard. She unwraps one slowly before she starts the crossword each morning.
+Helen's is Casablanca. She recites the closing line every time it plays.
 
-### 9. Leila Patel · New home · County · Centrepoint
+### 9. Leila Patel · New home · Part of a roast dinner · Centrepoint
 `id fc1a33bd-f649-423c-9620-562bb49a1f0f` · ★★☆ · third person, she
 
 **About**
 
-Leila has just picked up the keys to her new home. She's unpacking boxes and working out where she belongs now that she's settling in. Centrepoint gives young people the home she's just found for herself. Pledge to Centrepoint, pick your own favourite, to see Leila's.
+Leila has just picked up the keys to her first home. Settling in has put a roast dinner on her mind, and Centrepoint helps young people find a home of their own. Pledge to Centrepoint, pick your favourite part of a roast dinner, then see Leila's.
 
 **Note**
 
-Leila's is Greater London. She takes the same walk along the South Bank every time she visits.
+Leila's is Green beans. She trims them by hand before they go in the pot, every time.
 
 ### 10. Shona Mitchell · New home · Tree · Emmaus UK
 `id b0c6db2c-3257-43d1-9363-c1db996acfbd` · ★★☆ · first person
 
 **About**
 
-I've just picked up the keys to my new home and I'm working out where everything goes. I look at the garden and think about what trees might fit, now I'm settling in, and my pledge goes to Emmaus UK, who offer people a home when they've nowhere else to turn. Pledge to Emmaus UK, pick your own favourite, and mine will be revealed.
+I've just moved in and I'm finding my way round the neighbourhood, learning which bin day is which and where the nearest shop is. Settling in has made me think of how much a home means, so I'm pledging to Emmaus UK, who work to ease poverty and hardship across the country. Pledge to Emmaus UK, pick your favourite tree, to see mine.
 
 **Note**
 
-Mine is Aspen. I planted one by the back step of my new home and check on it every morning.
+Mine is Sweet chestnut. I planted one in my new garden and check on it every morning.
 
 ### 11. Barry Zhang · Retirement · Garden to visit · Surfers Against Sewage
 `id ad342d61-08a6-4504-8e1a-855dfffcbfe9` · ★★☆ · first person
