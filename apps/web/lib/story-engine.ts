@@ -171,6 +171,32 @@ function activitiesExcerpt(activities: string | null): string | null {
 }
 
 /**
+ * Where a charity works, as a clause the model may use and may not
+ * exceed: a local charity is placed, a national one is never called
+ * local (the relevance axis, 2026-09-25).
+ */
+export function describeAreas(
+  areas: { area: string; type: string }[] | null
+): string | null {
+  if (!areas || areas.length === 0) return null
+  const national = areas.some((a) =>
+    /throughout england and wales|throughout|united kingdom/i.test(a.area)
+  )
+  const countries = areas
+    .filter((a) => /country/i.test(a.type))
+    .map((a) => a.area)
+  const local = areas
+    .filter((a) => /local authority/i.test(a.type))
+    .map((a) => a.area)
+  if (local.length > 0 && !national)
+    return `It works locally, in ${local.slice(0, 5).join(", ")}${local.length > 5 ? " and nearby" : ""}: you may place it there, and must not call it national.`
+  if (national || countries.length > 3)
+    return `It works nationally${countries.length > 3 ? " and overseas" : ""}: never call it local or "your local" anything.`
+  if (countries.length > 0) return `It works in ${countries.join(", ")}.`
+  return null
+}
+
+/**
  * The edges, as text, for the prompt (pairing table §6). Told which
  * links exist, the model writes them in; told none exist, it supplies
  * E1′ — the known fact — instead of inventing a link.
@@ -196,6 +222,8 @@ export function buildPrompt(opts: {
   charityName: string | null
   charityDescription: string | null
   charityActivities: string | null
+  charityObjects?: string | null
+  charityAreas?: { area: string; type: string }[] | null
   edges: StoryEdges
   pronoun?: Pronoun
   grouping?: FavpollGrouping
@@ -227,10 +255,12 @@ export function buildPrompt(opts: {
     causeFamily = null,
   } = opts
   const activities = activitiesExcerpt(opts.charityActivities)
+  const objects = activitiesExcerpt(opts.charityObjects ?? null)
+  const worksIn = describeAreas(opts.charityAreas ?? null)
   // Purpose data, in order of trust: the curated description, then the
   // charity's own register text. Either lets the model say what the
   // charity does; neither means it must not.
-  const hasPurpose = Boolean(charityDescription || activities)
+  const hasPurpose = Boolean(charityDescription || activities || objects)
 
   // A register-added charity arrives with NO description (seven on prod,
   // 2026-09-23). Passing the bare name let the model guess what "MAC Bevan
@@ -239,13 +269,18 @@ export function buildPrompt(opts: {
   // is named and nothing more. Since #934 most register-added charities
   // carry `activities` — their own words — which the prompt quotes and
   // bounds ("only in these terms").
-  const ownWords = activities
-    ? ` In its own words on the Charity Commission register: "${activities}".`
-    : ""
+  const ownWords =
+    (activities
+      ? ` In its own words on the Charity Commission register: "${activities}".`
+      : "") +
+    (objects
+      ? ` Its charitable objects, from its governing document: "${objects}".`
+      : "") +
+    (worksIn ? ` ${worksIn}` : "")
   const charityLine = charityName
     ? charityDescription
       ? `Charity receiving the pledges: ${charityName} — ${charityDescription.replace(/\.\s*$/, "")}.${ownWords}`
-      : activities
+      : activities || objects
         ? `Charity receiving the pledges: ${charityName}.${ownWords} Describe its work only in those terms — nothing beyond them.`
         : `Charity receiving the pledges: ${charityName}. NOTHING is known here about what this charity does. Name it exactly as given and do NOT describe, characterise, or guess at its work, its cause, or who it helps — not even from its name.`
     : 'Charity: not yet chosen — say "charity" generically.'
@@ -474,6 +509,10 @@ export type StoryCharity = {
   activities: string | null
   /** The admin-CONFIRMED family — never the model's suggestion (#937). */
   causeFamily: CauseFamily | null
+  /** The charitable objects (2026-09-25): a second purpose source. */
+  objects?: string | null
+  /** Where it works: local authorities or countries. */
+  areas?: { area: string; type: string }[] | null
 }
 
 export type StoryInput = {
@@ -597,6 +636,8 @@ export async function generateStory(
     charityName: input.charity.name,
     charityDescription: input.charity.description,
     charityActivities: input.charity.activities,
+    charityObjects: input.charity.objects ?? null,
+    charityAreas: input.charity.areas ?? null,
     edges,
     pronoun: input.subject === "someone" ? input.pronoun : undefined,
     grouping: input.subject === "someone" ? input.grouping : undefined,

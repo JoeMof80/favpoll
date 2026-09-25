@@ -76,6 +76,15 @@ export type Charity = {
    *  Both null for charities without a registered number. */
   activities?: string | null;
   classification?: { what: string[]; who: string[]; how: string[] } | null;
+  /** The charitable objects from the governing document (2026-09-25):
+   *  the legal purpose in the charity's own words. Prompt source only. */
+  objects?: string | null;
+  /** Where it works, from the register: local authorities or countries.
+   *  Local vs national is the relevance axis. */
+  areas?: { area: string; type: string }[] | null;
+  /** The register's own flag: grant-making is the main activity, so no
+   *  cause family of its own. */
+  grant_making?: boolean | null;
   /** Admin-CONFIRMED cause family — the only one the generator reads.
    *  null = no cause of its own (a grant-maker), which is a valid answer. */
   cause_family?: CauseFamily | null;

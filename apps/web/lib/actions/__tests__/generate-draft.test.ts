@@ -26,6 +26,7 @@ import {
   stripEmDashes,
   undoubledPossessive,
   endStop,
+  describeAreas,
 } from "@/lib/story-engine"
 import {
   buildCacheKey,
@@ -1352,5 +1353,53 @@ describe("a caller may choose the favourite; a couple stays plural", () => {
       .content as string
     // The wizard passes no pick: the model chooses from the list.
     expect(prompt).toContain("a plausible option from the list")
+  })
+})
+
+describe("the register's objects and areas reach the prompt", () => {
+  it("places a local charity and never calls a national one local", () => {
+    expect(
+      describeAreas([
+        { area: "Bromley", type: "Local Authority" },
+        { area: "Croydon", type: "Local Authority" },
+      ])
+    ).toContain("It works locally, in Bromley, Croydon")
+    expect(
+      describeAreas([
+        { area: "Throughout England And Wales", type: "Region" },
+        { area: "Scotland", type: "Country" },
+      ])
+    ).toContain("never call it local")
+    expect(describeAreas(null)).toBeNull()
+  })
+
+  it("quotes the objects when there is no description", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mock.queue({
+      name: "St Christopher's Hospice",
+      description: null,
+      activities: null,
+      cause_family: "end_of_life",
+      objects:
+        "To promote the relief of suffering by the provision of hospice care.",
+      areas: [{ area: "Bromley", type: "Local Authority" }],
+    })
+    mockLLMResponse("About.", "Her favourite was always Blue.")
+    mock.queue(null)
+    await generateDraft({
+      register: "remembering",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      pronoun: "she",
+    })
+    const prompt = mockMessagesCreate.mock.calls[0][0].messages[0]
+      .content as string
+    expect(prompt).toContain(
+      "Its charitable objects, from its governing document"
+    )
+    expect(prompt).toContain("It works locally, in Bromley")
+    expect(prompt).not.toContain("NOTHING is known here")
   })
 })

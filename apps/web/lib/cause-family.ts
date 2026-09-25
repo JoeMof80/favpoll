@@ -36,6 +36,10 @@ export type CauseFamilyInput = {
   name: string
   activities: string | null
   classification: { what: string[]; who: string[]; how: string[] } | null
+  /** The charitable objects — a second source when activities is thin. */
+  objects?: string | null
+  /** The register's own grant-making flag: true means no family. */
+  grantMaking?: boolean | null
 }
 
 function buildPrompt(input: CauseFamilyInput): string {
@@ -48,6 +52,7 @@ function buildPrompt(input: CauseFamilyInput): string {
 
 Charity: ${input.name}
 Its own description of its activities: ${input.activities ?? "(none on the register)"}
+Its charitable objects: ${input.objects ? input.objects.slice(0, 700) : "(none on the register)"}
 Register classification — What: ${what}
 Register classification — Who: ${who}
 
@@ -67,8 +72,10 @@ export async function suggestCauseFamily(
   input: CauseFamilyInput
 ): Promise<CauseFamily | null> {
   if (!process.env.ANTHROPIC_API_KEY) return null
+  // The register says so itself: a grant-maker has no cause of its own.
+  if (input.grantMaking === true) return null
   // Nothing to classify from — never guess from a name alone.
-  if (!input.activities && !input.classification) return null
+  if (!input.activities && !input.classification && !input.objects) return null
 
   try {
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })

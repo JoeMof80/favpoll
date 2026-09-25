@@ -37,7 +37,7 @@ async function fetchCharity(
   if (!charityId) return none
   const { data } = await supabase
     .from("charities")
-    .select("name, description, activities, cause_family")
+    .select("name, description, activities, cause_family, objects, areas")
     .eq("id", charityId)
     .single()
   if (!data) return none
@@ -46,6 +46,10 @@ async function fetchCharity(
     description: data.description ?? null,
     activities: data.activities ?? null,
     causeFamily: (data.cause_family as CauseFamily | null | undefined) ?? null,
+    objects: (data.objects as string | null | undefined) ?? null,
+    areas:
+      (data.areas as { area: string; type: string }[] | null | undefined) ??
+      null,
   }
 }
 
