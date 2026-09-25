@@ -571,16 +571,12 @@ export const FAMILY_ROWS: Record<
     cause: "rescue — lifeboats, mountain rescue, air ambulance",
     topics: [t("Weather")],
   },
-  // Review note F (not HOLD): risks reading as a holiday — kept as tabled.
+  // Review note F came true: "humanitarian work reaches rivers" was
+  // the model stretching to River (founder, 2026-09-25: "very tenuous
+  // and contrived"). Country and Cuisine stay; the rest go.
   international: {
     cause: "overseas aid and humanitarian relief",
-    topics: [
-      t("Country", true),
-      t("Cuisine"),
-      t("Way to travel"),
-      t("Weather"),
-      t("River"),
-    ],
+    topics: [t("Country", true), t("Cuisine")],
   },
   entertainment: {
     cause: "fundraising through comedy and entertainment",

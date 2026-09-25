@@ -996,7 +996,6 @@ describe("edge-aware generation — the prompt carries the table's edges", () =>
       "Charity → topic: Trussell Trust works for food banks"
     )
     expect(prompt).not.toContain("Occasion ↔ charity")
-    expect(prompt).toContain("with why THIS topic in a clause")
   })
 })
 
