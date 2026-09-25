@@ -33,7 +33,8 @@
  *        claude-sonnet-5, what prod runs — quality is the point) ·
  *        --judge-model=… (default claude-haiku-4-5) · --dry-run (pick and
  *        print the triples, no model, no writes) · --registers=cause,… (only
- *        these registers) · --refresh (patch the existing cohort: full
+ *        these registers) · --occasions=Retirement,… (only these occasion
+ *        types) · --refresh (patch the existing cohort: full
  *        canonical items, portraits; copy untouched) · --regen="Name" (rewrite
  *        one seeded favpoll's Story in place) · --rename (fresh unrepeated
  *        names for the cohort, copy kept) · --wipe
@@ -132,6 +133,12 @@ const REGISTERS = opt("registers", "")
   .split(",")
   .map((r) => r.trim())
   .filter(Boolean) as Register[];
+// --occasions="Retirement,Pet memorial" narrows the pick to those occasion
+// types (a gap-targeted cohort for the exemplar bank, 2026-09-25).
+const OCCASIONS_ONLY = opt("occasions", "")
+  .split(",")
+  .map((o) => o.trim().toLowerCase())
+  .filter(Boolean);
 const MAX_ATTEMPTS = 3;
 
 // ── deterministic rng ────────────────────────────────────────────────────
@@ -623,6 +630,11 @@ function enumerate(topics: Topic[], charities: Charity[]): Candidate[] {
   const registers = REGISTERS.length ? REGISTERS : all;
   for (const register of registers) {
     for (const occasion of OCCASION_TYPES_BY_REGISTER[register]) {
+      if (
+        OCCASIONS_ONLY.length &&
+        !OCCASIONS_ONLY.includes(occasion.toLowerCase())
+      )
+        continue;
       for (const topic of topics) {
         if (register !== "cause" && NO_PERSON_STORY.has(topic.title)) continue;
         if (register === "cause" && NO_CAUSE_STORY.has(topic.title)) continue;
@@ -688,7 +700,9 @@ function sample(candidates: Candidate[], n: number): Candidate[] {
   let births = 0;
   const MAX_BIRTHS = Math.max(1, Math.round(n / 12));
   const registerQuota = (r: Register) =>
-    REGISTERS.length ? n : Math.ceil(n * REGISTER_SHARE[r]);
+    REGISTERS.length || OCCASIONS_ONLY.length
+      ? n
+      : Math.ceil(n * REGISTER_SHARE[r]);
   const byCharity = new Map<string, Candidate[]>();
   for (const c of candidates) {
     const list = byCharity.get(c.charity.id) ?? [];
@@ -698,7 +712,7 @@ function sample(candidates: Candidate[], n: number): Candidate[] {
   const fits = (c: Candidate) =>
     !(BABY_OCCASIONS.has(c.occasion) && births >= MAX_BIRTHS) &&
     cap(perTopic, c.topic.id, 2) &&
-    cap(perOccasion, c.occasion, 3) &&
+    cap(perOccasion, c.occasion, OCCASIONS_ONLY.length ? 2 : 3) &&
     (perRegister.get(c.register) ?? 0) < registerQuota(c.register);
   const take = (c: Candidate) => {
     chosen.push(c);
@@ -707,6 +721,31 @@ function sample(candidates: Candidate[], n: number): Candidate[] {
     bump(perOccasion, c.occasion);
     perRegister.set(c.register, (perRegister.get(c.register) ?? 0) + 1);
   };
+  // A gap-targeted run walks the OCCASIONS in turn, so every one asked
+  // for gets its share before any repeats; each pick still prefers a
+  // charity not yet used.
+  if (OCCASIONS_ONLY.length) {
+    const usedCharity = new Set<string>();
+    for (let pass = 0; chosen.length < n && pass < 8; pass++) {
+      for (const occ of OCCASIONS_ONLY) {
+        if (chosen.length >= n) break;
+        const pool = shuffle(
+          candidates.filter((c) => c.occasion.toLowerCase() === occ && fits(c)),
+        );
+        const fresh = pool.filter((c) => !usedCharity.has(c.charity.id));
+        const from = fresh.length ? fresh : pool;
+        if (!from.length) continue;
+        const wantTriad = chance(THREES);
+        const pickFrom = from.filter((c) =>
+          wantTriad ? c.count === 3 : c.count < 3,
+        );
+        const c = pickFrom.length ? pickFrom[0] : from[0];
+        take(c);
+        usedCharity.add(c.charity.id);
+      }
+    }
+    return chosen;
+  }
   const charityIds = shuffle([...byCharity.keys()]);
   for (let pass = 0; chosen.length < n && pass < 8; pass++) {
     for (const id of charityIds) {
