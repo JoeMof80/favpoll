@@ -11,13 +11,14 @@
  *   pnpm tsx --env-file=.env.local ../../scripts/export-seeded-stories.ts \
  *     --label=2026-09-25-gaps --since=2026-09-25T12:00:00Z
  *
- * --since selects rows created after that instant (a cohort); omit it to
- * export everything owned by the story seed. Existing files are
+ * --manifest=<path> selects exactly one seed run's rows (preferred);
+ * --since is a rough cut on created_at, which the seed back-dates; omit
+ * both to export everything owned by the story seed. Existing files are
  * overwritten, so export a cohort once, before the founder edits it.
  * ---------------------------------------------------------------------------
  */
 import { createClient } from "@supabase/supabase-js";
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { lookupEdges } from "../apps/web/lib/pairing-table";
 
@@ -32,6 +33,9 @@ const opt = (name: string, dflt: string) => {
 };
 const LABEL = opt("label", new Date().toISOString().slice(0, 10));
 const SINCE = opt("since", "");
+// --manifest=<seed-stories run manifest> selects exactly that run's rows.
+// (created_at is back-dated by the seed, so --since is only a rough cut.)
+const MANIFEST = opt("manifest", "");
 const REFS = join(__dirname, "..", "references");
 const one = <T>(v: T | T[] | null): T | null =>
   Array.isArray(v) ? (v[0] ?? null) : v;
@@ -45,6 +49,16 @@ async function main() {
     .eq("created_by", "user_seed_story")
     .order("created_at");
   if (SINCE) q = q.gte("created_at", SINCE);
+  if (MANIFEST) {
+    const ids = (
+      JSON.parse(readFileSync(MANIFEST, "utf8")) as {
+        favpollId: string | null;
+      }[]
+    )
+      .map((m) => m.favpollId)
+      .filter((id): id is string => Boolean(id));
+    q = q.in("id", ids);
+  }
   const { data, error } = await q;
   if (error) throw new Error(error.message);
   const rows = (data ?? []).map((x: any) => {
