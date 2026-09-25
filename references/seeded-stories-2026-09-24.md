@@ -156,7 +156,7 @@ Ours is Dilophosaurus. One of us draws it in the margin of every notebook we own
 
 **About**
 
-We renew our vows on the beach where we first honeymooned, back for another summer by the sea. We ask friends and family to pledge to Centrepoint instead of bringing gifts, a home for someone who needs one. Pledge to Centrepoint, pick your own favourite, and find out ours.
+We renew our vows on the beach where we first honeymooned, back for another summer by the sea. We ask friends and family to pledge to Centrepoint instead of bringing gifts, to help find a home for someone in need. We're on our favourite island but we'd love to know yours.
 
 **Note**
 
