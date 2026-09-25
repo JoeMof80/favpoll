@@ -145,11 +145,11 @@ Ours is Saturn. The last time we saw the rings, the excitement almost woke Jacob
 
 **About**
 
-We read dinosaur books to our new arrival most evenings, tracing the shapes across the page. Children's Society works for children and young people, and a favourite dinosaur is often the first one a child picks. Pledge to Children's Society, pick your own favourite, then see ours.
+Theo has dinosaurs on his walls and plushy dinosaurs in his cot. He even has a dinosaur mobile and we’ve noticed him reaching for one in particular. Tell us your favourite and we’ll tell you his, with all proceeds going to Children’s Society.
 
 **Note**
 
-Ours is Dilophosaurus. One of us draws it in the margin of every notebook we own.
+Theo’s favourite seems to be Diplodocus.
 
 ### 14. Barry & Alan · Renewal of vows · Island · Centrepoint
 `id ec7a161b-6e93-4b12-89eb-e21c5dd05e51` · ★★☆ · first person
@@ -163,15 +163,15 @@ We renew our vows on the beach where we first honeymooned, back for another summ
 We relive our Menorca honeymoon every year. The same hotel and the same week in June, if we can.
 
 ### 15. Mei & Simon · Wedding · Cake · Shelter
-`id 61a974f7-e4f8-4cdf-9c1d-539f3f88a561` · ★★☆ · third person, they
+`id 61a974f7-e4f8-4cdf-9c1d-539f3f88a561` · ★★☆ · first person
 
 **About**
 
-Mei & Simon have tried more cakes than they can count this year, from bakery samples to friends' kitchens, before picking today's. They asked for pledges to Shelter instead of wedding gifts, a home for someone else in place of another present. Pledge to Shelter, pick your own favourite, and find out Mei & Simon's.
+We can’t decide on a wedding cake, so we’re asking for your help. Pick your favourite by the 12th November and we’ll cut the winner on the big day. Please pledge to Shelter instead of gifts, to find a home for somebody in need.
 
 **Note**
 
-Mei & Simon's is Chocolate fudge cake. They always ask the baker for extra ganache between the layers.
+Mei likes Lemon drizzle and Simon prefers chocolate. But we’re not fussy.
 
 ### 16. Nicola & Jack · Wedding · Beach · National Trust
 `id f5b1b601-061e-4739-afa8-30a3cde89ae0` · ★★☆ · first person
