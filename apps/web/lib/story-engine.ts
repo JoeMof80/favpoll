@@ -215,7 +215,7 @@ function edgesBlock(edges: StoryEdges, subject: "someone" | "cause"): string {
     line("Charity → topic", edges.e2),
     ...(subject === "cause" ? [] : [line("Occasion ↔ charity", edges.e3)]),
   ]
-  return `Why this favpoll hangs together — the EDGES. These are the only links between the occasion, the topic and the charity that you may state; never invent another. They are notes to you, not copy: never repeat their phrasing ("sits inside", "belongs at", "the cause the effort is for"). A ★ edge already reads on the card (the cake at a birthday, a children's book at a christening), so the about must NOT explain or justify it; it may, and usually should, use the thing itself as part of the story. Only a two-hop edge (marked "a step the about must say out loud") is said, in one plain clause.
+  return `Why this favpoll hangs together — the EDGES. These are the only links between the occasion, the topic and the charity that you may state; never invent another. An edge marked "none" does not exist: an organiser may pair any charity with any topic, and when the charity has no link to the topic you say NOTHING that connects them (no "whose work reaches rivers", no "a favourite river follows the waters where that work happens"). The favourite is simply what guests are asked; the charity is simply where the money goes. They are notes to you, not copy: never repeat their phrasing ("sits inside", "belongs at", "the cause the effort is for"). A ★ edge already reads on the card (the cake at a birthday, a children's book at a christening), so the about must NOT explain or justify it; it may, and usually should, use the thing itself as part of the story. Only a two-hop edge (marked "a step the about must say out loud") is said, in one plain clause.
 ${rows.join("\n")}`
 }
 
@@ -808,6 +808,7 @@ Fail it if ANY of these is true:
 - a quirk, talisman, superstition or joke invented for effect (a sandwich kept in a coat pocket "just in case");
 - the person is written as the wrong age or the wrong person for the occasion;
 - a sentence that does not make sense, or that no relative would say out loud;
+- a link between the charity and the topic that the edges above do not give ("humanitarian work reaches rivers", "a favourite river follows the routes where that work happens"): when no such edge is listed, any connection drawn is invented;
 - ${isCause ? "the about does not say what is being raised for" : "the about and the note contradict each other"}.
 Ordinary is good. Plain is good. A detail like "she kept a pot of cornflowers on the windowsill" passes.
 

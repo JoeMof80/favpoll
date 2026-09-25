@@ -911,6 +911,8 @@ describe("edge-aware generation — the prompt carries the table's edges", () =>
     expect(prompt).toContain("Charity → topic: none.")
     expect(prompt).toContain("Occasion ↔ charity: none.")
     expect(prompt).toContain("No edge links this occasion")
+    // An organiser may pair Oxfam with River; the writer builds no bridge.
+    expect(prompt).toContain('An edge marked "none" does not exist')
     expect(prompt).toContain("one plain, believable thing about them")
   })
 
