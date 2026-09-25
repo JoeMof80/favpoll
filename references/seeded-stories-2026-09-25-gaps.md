@@ -55,11 +55,11 @@ Harriet's is Rio de Janeiro. She keeps a photograph of Copacabana beach pinned a
 
 **About**
 
-David is off after years here, and the leaving drinks tonight mark it. He picks the takeaway menu before anyone else gets a look in and orders enough to feed the whole team. Pledge to Independent Age, pick your favourite takeaway, and David's will be revealed.
+David leaves on Friday after eleven years, and his leaving drinks end the way every office night should: with a takeaway ordered to the desks. Pick your favourite takeaway before we order and whatever wins is what arrives. Pledges go to Independent Age, David's choice.
 
 **Note**
 
-David's is Pad thai. He orders extra chilli every time and eats it straight from the box.
+David's is Pad thai. He says he doesn't mind what wins, as long as it comes with extra chilli.
 
 ### 6. Robert Sørensen · Leaving do · Beer · Comic Relief
 `id aab2f33d-8810-49ea-baca-6c3aa4516941` · ★☆☆ · third person, he
