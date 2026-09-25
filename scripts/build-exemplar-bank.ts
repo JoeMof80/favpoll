@@ -60,26 +60,32 @@ for (const f of files) {
       o,
     ]),
   );
+  // The heading is the truth for occasion · topic · charity: the founder
+  // moves topics (Tess to Cat breed, Kieran to Dog breed) and the
+  // original snapshot does not follow.
   const re =
-    /### \d+\. [^\n]*\n`id ([0-9a-f-]+)`[^\n]*\n\n\*\*About\*\*\n\n([\s\S]*?)\n\n\*\*Note\*\*\n\n([\s\S]*?)(?=\n\n### |\n\n## |$)/g;
+    /### \d+\. ([^\n]*)\n`id ([0-9a-f-]+)`[^\n]*\n\n\*\*About\*\*\n\n([\s\S]*?)\n\n\*\*Note\*\*\n\n([\s\S]*?)(?=\n\n### |\n\n## |$)/g;
+  const familyOf = new Map<string, string | null>();
+  for (const o of originals.values()) familyOf.set(o.charity, o.family);
   for (const m of md.matchAll(re)) {
-    const o = originals.get(m[1]);
+    const o = originals.get(m[2]);
+    const [, occasion, topic, charity] = m[1].split(" · ");
     if (!o || o.subject === "cause") continue;
-    const about = m[2].trim();
-    const note = m[3].trim();
+    const about = m[3].trim();
+    const note = m[4].trim();
     const orig = (
       JSON.parse(readFileSync(originalsPath, "utf8")) as (Original & {
         about: string;
         note: string;
       })[]
-    ).find((x) => x.id === m[1])!;
+    ).find((x) => x.id === m[2])!;
     bank.push({
       id: o.id,
-      triple: `${o.occasion} · ${o.topic} · ${o.charity}`,
+      triple: `${occasion} · ${topic} · ${charity}`,
       register: o.register,
-      occasion: o.occasion,
-      topic: o.topic,
-      family: o.family,
+      occasion,
+      topic,
+      family: familyOf.get(charity) ?? o.family,
       voice: o.pronoun === "i" ? "first" : "third",
       grouping: o.grouping,
       about,
