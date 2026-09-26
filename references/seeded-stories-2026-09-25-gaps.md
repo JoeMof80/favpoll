@@ -156,11 +156,11 @@ Ours is Pictionary. We keep a battered whiteboard for it, propped against the fi
 
 **About**
 
-Our table is never quiet for long, with second helpings passed down before first ones are finished. We cook enough for everyone here and a bit more besides. Trussell Trust fills tables that would otherwise stay empty. Pledge to Trussell Trust, pick your favourite comfort food, then see ours.
+We fill the table every time we get together, plates passed round until someone asks for more. Between us we cook everything from a Sunday roast to a pot of stew that simmers all afternoon. Pledge to Trussell Trust, pick your favourite comfort food, then see ours.
 
 **Note**
 
-Ours is Beans on toast. We always put a thick layer of butter under the beans and eat the crusts last.
+Ours is Jollof rice. We always make an extra batch so nobody goes back for seconds and finds the pot empty.
 
 ### 15. The Lower Sixth, 1998 · Reunion · Sweet · Children's Society
 `id e7b3c585-1fe2-403c-947a-3450c08de388` · ★★☆ · third person, they

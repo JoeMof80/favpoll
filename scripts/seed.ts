@@ -5905,6 +5905,7 @@ const topicItems: Record<string, string[]> = {
     "Bacon sandwich",
     "Bangers and mash",
     "Beans on toast",
+    "Jollof rice",
     "Bubble and squeak",
     "Cauliflower cheese",
     "Cheese on toast",
