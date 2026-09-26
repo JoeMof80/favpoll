@@ -392,8 +392,8 @@
   "pronoun": "they",
   "grouping": "group",
   "context": "20 years since we last met",
-  "about": "They left school in 1998 and gather most years to swap old stories. Sweets are what everyone remembers, passed round at the back of the classroom and never quite enough to go round. Pledge to Children's Society, pick your own favourite, then see The Lower Sixth, 1998's.",
-  "note": "The Lower Sixth, 1998's is Bonbons. They pass the bag round at every reunion until it's empty.",
+  "about": "We've not been in one room together for years, and the first thing that comes out is a bag of sweets we all remember from school days. We pass it round and argue over whose is the favourite. Pledge to Children's Society, pick your favourite sweet, then see ours.",
+  "note": "Ours is Humbugs. We keep a tin in the glovebox for whoever ends up driving us all home tonight.",
   "edges": {
    "e1": {
     "star": false,
@@ -419,8 +419,8 @@
   "pronoun": "they",
   "grouping": "group",
   "context": "20 years since we last met",
-  "about": "They trained together as students and row together whenever they can get a boat out. This reunion brings them back to the towpath they share. Pledge to Age UK, pick your own favourite, and The Ravenscroft rowing eight's will be revealed.",
-  "note": "The Ravenscroft rowing eight's is 1950s. They dress in fifties style for their reunion dinner and dance until last orders.",
+  "about": "We're back together for the first time in years, catching up over old photos and older jokes. Between us we've lived through more decades than we can count, and days like today remind us how many people spend theirs without a crowd around them. Pledge to Age UK, pick your favourite decade, and ours will be revealed.",
+  "note": "Ours is 2010s. We keep a photo from the first reunion we had that decade pinned in our group chat.",
   "edges": {
    "e1": {
     "star": true,

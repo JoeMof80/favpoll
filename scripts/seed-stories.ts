@@ -1503,6 +1503,29 @@ function syncEditableMd(
     md.slice(m.index + m[0].length);
   writeFileSync(file, out);
   console.log(`  ↳ ${file.split("/").slice(-2).join("/")} updated`);
+  // The originals follow, so a regeneration is not mistaken for one of
+  // the founder's edits by the exemplar-bank builder.
+  const originalsPath = file.replace(/\.md$/, ".original.json");
+  if (existsSync(originalsPath)) {
+    const originals = JSON.parse(readFileSync(originalsPath, "utf8")) as {
+      id: string;
+      about: string;
+      note: string;
+      occasion?: string;
+      topic?: string;
+      charity?: string;
+    }[];
+    const o = originals.find((r) => r.id === id);
+    if (o) {
+      o.about = about;
+      o.note = note;
+      const [occ, top, cha] = heading.split(" · ").slice(1);
+      if (occ) o.occasion = occ;
+      if (top) o.topic = top;
+      if (cha) o.charity = cha;
+      writeFileSync(originalsPath, JSON.stringify(originals, null, 1));
+    }
+  }
 }
 
 // ── regen: one seeded favpoll's Story, in place ──────────────────────────
