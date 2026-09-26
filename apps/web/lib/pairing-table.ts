@@ -614,6 +614,7 @@ export const FAMILY_ROWS: Record<
 export const REGISTER_ADDED = [
   "Mountain Rescue England and Wales",
   "Guide Dogs",
+  "Royal Horticultural Society",
 ] as const
 export const CHARITY_ROWS: Record<string, TopicRow[]> = {
   RNLI: [
@@ -623,6 +624,16 @@ export const CHARITY_ROWS: Record<string, TopicRow[]> = {
     t("Island"),
     t("Weather"),
     t("Way to travel"),
+  ],
+  // The RHS is gardens: the first charity added because a seeded
+  // favpoll deserved an apter one (Barry's retirement; founder,
+  // 2026-09-26).
+  "Royal Horticultural Society": [
+    t("Garden to visit", true),
+    t("Flower", true),
+    t("Tree"),
+    t("Vegetable"),
+    t("Fruit"),
   ],
   // Guide Dogs breeds and trains its own dogs: the one health charity
   // whose topic is an animal.

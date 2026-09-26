@@ -116,12 +116,12 @@ I've just moved in and I'm finding my way round the neighbourhood. Settling in h
 
 Mine is Sweet chestnut. I planted one in my new garden on the first day.
 
-### 11. Barry Zhang · Retirement · Garden to visit · Surfers Against Sewage
+### 11. Barry Zhang · Retirement · Garden to visit · Royal Horticultural Society
 `id ad342d61-08a6-4504-8e1a-855dfffcbfe9` · ★★☆ · first person
 
 **About**
 
-I'm retiring this month and I finally have the time to go further than the weekend. I'm planning long days out with a flask and good boots, no clock to watch. Pledge to Surfers Against Sewage, pick your own favourite, and mine will be revealed.
+I'm retiring this month and will finally have the time to explore. I'm planning long days out with a flask and book, without a clock to watch. Pledge to the Royal Horticultural Society, pick your own favourite, and mine will be revealed.
 
 **Note**
 
