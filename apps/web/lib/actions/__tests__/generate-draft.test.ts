@@ -1146,6 +1146,31 @@ describe("realism rules in the person prompt (founder review, 2026-09-24)", () =
     expect(prompt).toContain("The people honoured are the PARENTS")
     expect(prompt).toContain("The favourite is the parents' OWN")
   })
+
+  it("at a pet memorial, the animal is on the card and its owner writes about it", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mock.queue(CHARITY_DATA)
+    mockLLMResponse(
+      "About.",
+      "Misty's was Blue. She carried the same blue ball to the door every morning."
+    )
+    mock.queue(null)
+    await generateDraft({
+      register: "remembering",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      grouping: "individual",
+      occasionType: "Pet memorial",
+      displayName: "Misty",
+      pronoun: "she",
+    })
+    const prompt = promptOf()
+    expect(prompt).toContain("The one being remembered is an ANIMAL")
+    expect(prompt).toContain("The favourite is the animal's OWN")
+    expect(prompt).toContain("never make the favourite yours")
+  })
 })
 
 describe("tidying the model's grammar", () => {

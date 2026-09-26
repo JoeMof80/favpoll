@@ -57,6 +57,7 @@ import {
   aboutNamesEvent,
   BABY_OCCASIONS,
   EFFORT_OCCASIONS,
+  PET_OCCASIONS,
   generateStory,
   judgeStory,
   storyEdges,
@@ -367,6 +368,46 @@ function drawer(pool: readonly string[]) {
 const drawHe = drawer(HE);
 const drawShe = drawer(SHE);
 const drawLast = drawer(LAST);
+// A pet memorial puts the ANIMAL on the card (founder, 2026-09-26): a
+// first name only, no surname, and the pronoun the owner would use.
+const PET_SHE = [
+  "Misty",
+  "Poppy",
+  "Bella",
+  "Nell",
+  "Tilly",
+  "Luna",
+  "Willow",
+  "Bonnie",
+  "Sadie",
+  "Hattie",
+  "Mabel",
+  "Peggy",
+  "Dotty",
+  "Rosie",
+  "Maisie",
+];
+const PET_HE = [
+  "Bramble",
+  "Alfie",
+  "Dexter",
+  "Rufus",
+  "Otis",
+  "Pip",
+  "Biscuit",
+  "Jasper",
+  "Monty",
+  "Archie",
+  "Ted",
+  "Winston",
+  "Fergus",
+  "Barney",
+  "Bruno",
+];
+const PET_NAMES = [...PET_SHE, ...PET_HE];
+const drawPet = drawer(PET_NAMES);
+const petPronoun = (name: string): Pronoun =>
+  PET_SHE.includes(name) ? "she" : "he";
 const drawAny = () => (chance(0.5) ? drawShe() : drawHe());
 // A couple is one he and one she nine times in ten: drawing both names
 // at random made half the couples same-sex, which is nothing like the
@@ -449,6 +490,11 @@ function protagonist(
       pronoun: firstPersonHere(occasion) ? "i" : "they",
       grouping: "couple",
     };
+  }
+  // A pet memorial remembers the ANIMAL; the owner writes about it.
+  if (PET_OCCASIONS.has(occasion)) {
+    const name = drawPet();
+    return { name, pronoun: petPronoun(name), grouping: "individual" };
   }
   if (register === "celebrating_many") {
     if (GROUP_NAMES[occasion]) {
@@ -1448,7 +1494,9 @@ async function rename() {
     const fresh =
       x.grouping === "couple"
         ? drawCouple()
-        : `${p.pronoun === "she" ? drawShe() : drawHe()} ${drawLast()}`;
+        : PET_OCCASIONS.has(x.occasion_type ?? "")
+          ? drawPet()
+          : `${p.pronoun === "she" ? drawShe() : drawHe()} ${drawLast()}`;
     const about = swap(p.about, p.name, fresh);
     const note = swap(poll.personal_note, p.name, fresh);
     await supabase
@@ -1474,6 +1522,7 @@ function syncEditableMd(
   heading: string,
   about: string,
   note: string,
+  idLine?: string,
 ) {
   // Whichever Stories file holds this id (one file per cohort).
   if (!existsSync(REFS_DIR)) return;
@@ -1488,7 +1537,7 @@ function syncEditableMd(
   const re = new RegExp(
     "(### \\d+\\. )[^\\n]*(\\n`id " +
       id +
-      "`[^\\n]*\\n\\n\\*\\*About\\*\\*\\n\\n)([\\s\\S]*?)(\\n\\n\\*\\*Note\\*\\*\\n\\n)([\\s\\S]*?)(?=\\n\\n### |\\n\\n## |$)",
+      "`)([^\\n]*)(\\n\\n\\*\\*About\\*\\*\\n\\n)([\\s\\S]*?)(\\n\\n\\*\\*Note\\*\\*\\n\\n)([\\s\\S]*?)(?=\\n\\n### |\\n\\n## |$)",
   );
   const m = md.match(re);
   if (!m || m.index === undefined) return;
@@ -1497,8 +1546,10 @@ function syncEditableMd(
     m[1] +
     heading +
     m[2] +
-    about +
+    (idLine ?? m[3]) +
     m[4] +
+    about +
+    m[6] +
     note +
     md.slice(m.index + m[0].length);
   writeFileSync(file, out);
@@ -1509,6 +1560,8 @@ function syncEditableMd(
   if (existsSync(originalsPath)) {
     const originals = JSON.parse(readFileSync(originalsPath, "utf8")) as {
       id: string;
+      name?: string;
+      pronoun?: string | null;
       about: string;
       note: string;
       occasion?: string;
@@ -1519,10 +1572,17 @@ function syncEditableMd(
     if (o) {
       o.about = about;
       o.note = note;
-      const [occ, top, cha] = heading.split(" · ").slice(1);
+      const [name, occ, top, cha] = heading.split(" · ");
+      if (name) o.name = name;
       if (occ) o.occasion = occ;
       if (top) o.topic = top;
       if (cha) o.charity = cha;
+      // The voice on the id line is the pronoun: a pet rename or a group
+      // moving to "we" must reach the originals too.
+      const voice = idLine?.split(" · ").pop()?.trim();
+      if (voice === "first person") o.pronoun = "i";
+      else if (voice?.startsWith("third person, "))
+        o.pronoun = voice.slice("third person, ".length);
       writeFileSync(originalsPath, JSON.stringify(originals, null, 1));
     }
   }
@@ -1707,6 +1767,32 @@ async function regen(name: string) {
     input.pronoun = undefined;
     input.grouping = "couple";
   }
+  // A pet memorial seeded with the OWNER on the card becomes the animal's
+  // (2026-09-26): a pet name and its pronoun; the owner is the writer.
+  if (
+    p &&
+    PET_OCCASIONS.has(x.occasion_type ?? "") &&
+    !PET_NAMES.includes(p.name)
+  ) {
+    const petName = drawPet();
+    const pronoun = petPronoun(petName);
+    await supabase
+      .from("protagonists")
+      .update({ name: petName, pronoun })
+      .eq("id", p.id);
+    console.log(`  ${p.name} → ${petName} (the animal is on the card)`);
+    p.name = petName;
+    p.pronoun = pronoun;
+    input.displayName = petName;
+    input.pronoun = pronoun;
+  }
+  // A group's favpoll is written by one of its own: "we" (2026-09-26).
+  if (p && x.grouping === "group" && p.pronoun !== "i") {
+    await supabase.from("protagonists").update({ pronoun: "i" }).eq("id", p.id);
+    console.log(`  ${p.name}: ${p.pronoun} → we`);
+    p.pronoun = "i";
+    input.pronoun = "i";
+  }
   console.log(
     `Regenerating ${p?.name ?? x.cause_label}: ${x.occasion_type} · ${topic.title} · ${ch.name} (${"★".repeat(storyEdges(input).count) || "no edges"})`,
   );
@@ -1758,11 +1844,19 @@ async function regen(name: string) {
   console.log(
     `  ✓ written (${attempts + 1} attempt${attempts ? "s" : ""})\n  ABOUT: ${story.about}\n  NOTE:  ${story.note}`,
   );
+  const edgeCount = storyEdges(input).count;
+  const voice =
+    p?.pronoun === "i"
+      ? "first person"
+      : isCause
+        ? "cause"
+        : `third person, ${p?.pronoun ?? x.grouping}`;
   syncEditableMd(
     x.id,
     `${p?.name ?? x.cause_label} · ${x.occasion_type} · ${topic.title} · ${ch.name}`,
     story.about,
     story.note,
+    ` · ${"★".repeat(edgeCount)}${"☆".repeat(3 - edgeCount)} · ${voice}`,
   );
 }
 

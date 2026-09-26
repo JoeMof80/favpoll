@@ -163,69 +163,69 @@ We fill the table every time we get together, in a frenzy of full plates that ar
 Ours is Jollof rice. We always make an extra batch so the boys can have seconds.
 
 ### 15. The Lower Sixth, 1998 · Reunion · Sweet · Children's Society
-`id e7b3c585-1fe2-403c-947a-3450c08de388` · ★★☆ · third person, they
+`id e7b3c585-1fe2-403c-947a-3450c08de388` · ★★☆ · first person
 
 **About**
 
-We've not been in one room together for years, and the first thing that comes out is a bag of sweets we all remember from school days. We pass it round and argue over whose is the favourite. Pledge to Children's Society, pick your favourite sweet, then see ours.
+We haven't all been in one room for years. Someone always brings a bag of sweets to pass round, and it takes us straight back to school corridors and pocket money. Pledge to Children's Society, pick your favourite sweet, to see ours.
 
 **Note**
 
-Ours is Humbugs. We keep a tin in the glovebox for whoever ends up driving us all home tonight.
+Ours is Black Jacks. We keep a paper bag of them in the glovebox for the drive here.
 
 ### 16. The Ravenscroft rowing eight · Reunion · Decade · Age UK
-`id b9eacdaf-8224-4cc6-ba98-4deeaa88d7f0` · ★★★ · third person, they
+`id b9eacdaf-8224-4cc6-ba98-4deeaa88d7f0` · ★★★ · first person
 
 **About**
 
-We're back together for the first time in years, catching up over old photos and older jokes. Between us we've lived through more decades than we can count, and days like today remind us how many people spend theirs without a crowd around them. Pledge to Age UK, pick your favourite decade, and ours will be revealed.
+We've swapped stories since we last stood together, from school days to now. Someone always drags out the old photographs before the night is done. Age UK works for people who don't have a room full of friends like this one. Pledge to Age UK, pick your favourite decade, to see ours.
 
 **Note**
 
-Ours is 2010s. We keep a photo from the first reunion we had that decade pinned in our group chat.
+Ours is 2000s. We keep the burned mix CDs we made for each other that year in a shoebox on top of the wardrobe.
 
 ## Remembering
 
-### 17. Fatima Choudhury · Celebration of life · Poem · Diabetes UK
+### 17. Fatima Choudhury · Celebration of life · Hymn · Diabetes UK
 `id 0b3213be-075d-4a9e-ad2b-6fedd27f2ff0` · ★★☆ · third person, she
 
 **About**
 
-Fatima loved poems and could recite them from memory. She kept anthologies by her bed and would read from them most evenings. Diabetes UK supported her through the illness. Pledge to Diabetes UK, pick your own favourite, and Fatima's will be revealed.
+Fatima sang in her church choir for years and knew every hymn by heart. She looked forward to the carol service each December and always brought round mince pies after. Diabetes UK cared for her through her illness. Pledge to Diabetes UK, pick your favourite hymn, and we'll reveal Fatima's.
 
 **Note**
 
-Fatima's was The Road Not Taken. She copied out the closing lines and kept them pinned above her desk.
+Fatima's was When I Survey the Wondrous Cross. She used to hum it while doing the ironing on Sunday afternoons.
 
-### 18. Kenneth Parry · Celebration of life · Poem · Stroke Association
+### 18. Kenneth Parry · Celebration of life · Season · Stroke Association
 `id d6f85631-3e8d-47d9-955d-e34aaf9ebfd4` · ★★☆ · third person, he
 
 **About**
 
-Kenneth read poetry most evenings and kept a stack of books by his armchair. Stroke Association supported him after his stroke, and he wanted the pledges to go there. Pledge to Stroke Association, pick your own favourite, and find out Kenneth's.
+Kenneth Parry loved being outdoors, whatever the weather. He kept logs stacked by the back door for the colder months and always knew when the first frost was near. Stroke Association was there for him after his stroke, and he wanted them remembered today. Pledge to Stroke Association, pick your favourite season, to see Kenneth's.
 
 **Note**
 
-Kenneth's was Do Not Stand at My Grave and Weep. He kept a typed copy in his desk drawer and read it aloud each New Year's Day.
+Kenneth's was Summer. He spent every August bank holiday fishing at the same spot by the river.
 
-### 19. Judith Abara · Pet memorial · Beach · WWF
-`id 22814e73-f626-4586-afcf-3c34e27bfddf` · ★★☆ · third person, she
+### 19. Winston · Pet memorial · Beach · WWF
+`id 22814e73-f626-4586-afcf-3c34e27bfddf` · ★★☆ · third person, he
 
 **About**
 
-Judith's dog loved the sea and pulled her onto the beach every morning, whatever the weather. Long walks along the shore filled most of their days together. She loved watching him race into the waves and shake off afterwards. Pledge to WWF, pick your own favourite, then see Judith's.
+Winston pulled me down to the sea on every walk we took, whatever the weather. He'd wait at the door with his lead the moment I reached for my coat. Pledge to WWF, pick your favourite beach, and Winston's will be revealed.
 
 **Note**
 
-Judith's was Weston-super-Mare. She spent every August bank holiday there, walking the flat sands with a flask of tea in hand.
+Winston's was Saunton Sands. He would bound straight into the shallows every time we visited, tail going nineteen to the dozen.
 
-### 20. Tom Jarvis · Pet memorial · Weather for walk · Dogs Trust
-`id 445f1c94-5c5c-445c-9d70-e9525a28bed2` · ★★★ · third person, he
+### 20. Tilly · Pet memorial · Weather for walk · Dogs Trust
+`id 445f1c94-5c5c-445c-9d70-e9525a28bed2` · ★★★ · third person, she
 
 **About**
 
-Tom took his dog for a walk every day, whatever the weather. He knew every field and lane near his home, and he never missed a walk even when it poured. Pledge to Dogs Trust, pick your own favourite, to see Tom's.
+Tilly pulled me out of the door whatever the sky was doing. She waited by the lead for our walk at the same time every day, rain or shine. Pledge to Dogs Trust, pick your favourite weather for walk, and Tilly's will be revealed.
 
 **Note**
 
-Tom's was Misty and still. He would set off at first light, walking the same stretch of towpath while the mist lay low over the water.
+Tilly's was Golden hour. She would stop on the same ridge every evening to watch the light change before trotting on.

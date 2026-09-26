@@ -56,6 +56,13 @@ export const BABY_OCCASIONS = new Set([
  *  finishing a marathon"). */
 export const EFFORT_OCCASIONS = new Set(["Achievement", "Sponsored event"])
 
+/** A pet memorial is the mirror of a birth: the ANIMAL is the protagonist
+ *  on the card ("Remembering Misty") and the person who had them writes
+ *  about them, as "I". The favourite is the animal's own (its beach, its
+ *  weather, its toy), or a plain fact about what it was (its breed)
+ *  (founder, 2026-09-26: "isn't the pet the protagonist?"). */
+export const PET_OCCASIONS = new Set(["Pet memorial"])
+
 const REGISTER_LABEL: Record<Register, string> = {
   remembering: "a memorial — someone being remembered",
   celebrating_one: "a celebration of one person",
@@ -399,7 +406,10 @@ ${edgesBlock(edges, subject)}`
     const effortRule = EFFORT_OCCASIONS.has(occasionType ?? "")
       ? ` The occasion is a sponsored effort that is STILL TO COME: this favpoll gathers pledges in the build-up and closes on the day. Write it before the effort ("is swimming the Channel in June", "runs the marathon on Sunday"), never as finished, and say nothing about how it went. Do not name a month or a date: the card carries them.`
       : ""
-    const noInventedPeople = ` Never invent a spouse, partner, child, sibling, parent, friend, job, home or town for them to fill a sentence: stay with what they themselves do. A relative may appear only when the occasion supplies one (a wedding has a couple; a birth has parents).`
+    const petRule = PET_OCCASIONS.has(occasionType ?? "")
+      ? ` The one being remembered is an ANIMAL, named above, and the writer is the person who had them: write about the animal with its pronoun, and about yourself as "I" where the animal's life needs you in it (the walks, the beach, the fetching), never by name. The favourite is the animal's OWN, seen in what it did (the beach it pulled you onto, the weather it would still go out in, the toy it carried to the door), or, for a breed or a kind of animal, a plain fact about what it was. Never give the animal opinions, words, memories or a human inner life, and never make the favourite yours.`
+      : ""
+    const noInventedPeople = ` Never invent a spouse, partner, child, sibling, parent, friend, job, home or town for them to fill a sentence: stay with what they themselves do. A relative may appear only when the occasion supplies one (a wedding has a couple; a birth has parents; a pet memorial has the person who had them).`
     const realPersonRule = fiction
       ? noInventedPeople
       : noInventedPeople +
@@ -407,7 +417,7 @@ ${edgesBlock(edges, subject)}`
     const charityFit = edges.e3
       ? ` The charity's fit with the occasion is given above; you may say it in a few plain words, as the examples do ("Marie Curie nurses were with her at the end"), or leave it to the closing.`
       : ` The charity is named in the closing sentence and nowhere else.`
-    instructions = `- "about": write it the way the four examples below are written: two or three sentences, 40 to 65 words in all, about the person and the occasion, in plain words, ending with the closing sentence given here exactly, nothing added after it: "${closing}"${tenseRule}${edgeRule}${truthRule}${babyRule}${effortRule}${realPersonRule}${charityFit}${pronounHint}${nameHint}
+    instructions = `- "about": write it the way the four examples below are written: two or three sentences, 40 to 65 words in all, about the person and the occasion, in plain words, ending with the closing sentence given here exactly, nothing added after it: "${closing}"${tenseRule}${edgeRule}${truthRule}${babyRule}${effortRule}${petRule}${realPersonRule}${charityFit}${pronounHint}${nameHint}
 - "reveal" (guests see it only AFTER pledging): start with exactly "${opener}".${entityGuard} Then ${pick ? `exactly this option, verbatim: "${pick}"` : "a plausible option from the list (you MUST use a real option, verbatim)"}, then a full stop, then ONE short sentence with a single detail of the PROTAGONIST'S own relationship to that favourite${first ? " (in the first person)" : ""}: a plain fact will do ("her bathroom is full of dolphin pictures", "he read it during his gap year"); it need not be a habit or an action, and it must pass the honour test above. Something the about did not already say. The detail involves the favourite ITSELF (what they do with it, where, how often), not a mood, a light or a weather that stands near it. When the favourite is a KIND of thing (a breed, a cuisine, a type of holiday), the detail is about one particular one in their life, never the kind at large.${tenseRule} The detail must be entirely the protagonist's own and must NOT depend on any real-world fact about the favourite: no fixture dates or match traditions, no seasons, tours, episodes, eras, or biography (a claim like "watched them play on Boxing Day" fails if that favourite doesn't play then; avoid the whole category). The options may be famous real people, teams, or works: never state or invent facts about them. No preamble such as "We can't wait to reveal".
 
 ${exemplarsBlock({ register, occasionType, topicTitle, causeFamily, pronoun, grouping })}`
@@ -799,13 +809,16 @@ export async function judgeStory(
   const baby = BABY_OCCASIONS.has(input.occasionType ?? "")
     ? " The occasion is a birth: the people honoured are the PARENTS, on behalf of their child; the favourite is the parents' own. Fail it if the baby is given a favourite, a preference or a habit, or if a favourite is said to be chosen for the baby."
     : ""
+  const pet = PET_OCCASIONS.has(input.occasionType ?? "")
+    ? " The one remembered is an ANIMAL and the writer is the person who had them. The favourite is the animal's own, shown in what it did, or a plain fact about what it was. Fail it if the favourite reads as the owner's, if the animal is given opinions, words or a human inner life, or if the owner is named."
+    : ""
   const edgeLines = [edges.e1, edges.e2, edges.e3]
     .filter((e): e is Edge => Boolean(e))
     .map((e) => `- ${e.text}`)
     .join("\n")
   const prompt = `You are a relative reading a favpoll page at a real event. A favpoll honours someone; guests pledge to charity and pick a favourite; after pledging they see the honoured person's own favourite. You are checking whether the copy reads as something a family member would actually have written about a real person. Answer with JSON only.
 
-Occasion: ${input.occasionType ?? "unknown"}. Honouring: ${who}.${baby}${effort}
+Occasion: ${input.occasionType ?? "unknown"}. Honouring: ${who}.${baby}${pet}${effort}
 Topic: Favourite ${input.topicTitle}.
 Links the writer was given:
 ${edgeLines || "(none)"}

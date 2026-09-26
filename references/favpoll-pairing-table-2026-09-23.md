@@ -17,6 +17,14 @@ charities on prod as of today. Every topic and charity named here exists.
 > The engine is `apps/web/lib/story-engine.ts` (one generator, two callers);
 > `scripts/seed-stories.ts` (`pnpm seed:stories`) picks triples from the table
 > at the seed bar and runs the judge loop (A1, P2) before writing.
+>
+> **Who is on the card (2026-09-26).** Two occasions put someone other than
+> the writer on the card. A birth honours the PARENTS on behalf of the child
+> and the favourite is theirs (`BABY_OCCASIONS`). A pet memorial is the mirror:
+> the ANIMAL is remembered ("Remembering Misty"), the owner writes about it,
+> and the favourite is the animal's own or a plain fact about what it was
+> (`PET_OCCASIONS`). The seed names pets from their own pool; the judge fails
+> a pet's favourite that reads as the owner's.
 
 ## How it is used
 

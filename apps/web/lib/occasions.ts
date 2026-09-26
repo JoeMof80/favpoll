@@ -133,7 +133,10 @@ export const OCCASIONS: OccasionSpec[] = [
     label: "Pet memorial",
     register: "remembering",
     openingLines: ["Remembering", "In memory of"],
-    contexts: ["Fourteen good years", "The best boy"],
+    contexts: [
+      "Fourteen good years",
+      { he: "The best boy", she: "The best girl", they: "The best of them" },
+    ],
   },
 
   // ── Celebrating one person ───────────────────────────────────────────
