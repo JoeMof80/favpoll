@@ -44,33 +44,33 @@ Gareth's is Hamnet. He read it during his gap year and swore to reread it as soo
 
 **About**
 
-Harriet has just finished three years of study, with more essays and exams than she can count. She always looks up flights and city guides between deadlines, and now she has time to plan a trip somewhere new. Pledge to YoungMinds, pick your favourite city, and we'll reveal Harriet's.
+Harriet has just finished three years of study, with more essays and exams than she can count. She's been dreaming of travelling and now she can. Pledge to YoungMinds, pick your favourite city, and we'll reveal Harriet's.
 
 **Note**
 
-Harriet's is Rio de Janeiro. She keeps a photograph of Copacabana beach pinned above her desk and glances at it each morning.
+Harriet's is Rio de Janeiro. She's going back there on her tour of South America.
 
 ### 5. David Hartley · Leaving do · Takeaway · Independent Age
 `id f14805a7-a410-4ac6-a8b3-1905e61de97f` · ★☆☆ · third person, he
 
 **About**
 
-David leaves on Friday after eleven years, and his leaving drinks end the way every office night should: with a takeaway ordered to the desks. Pick your favourite takeaway before we order and whatever wins is what arrives. Pledges go to Independent Age, David's choice.
+David leaves on Friday after eleven years, so we're staying late for office drinks and a takeaway. Pick your favourite takeaway and we'll order whichever one is winning on the night. Pledges go to Independent Age, David's choice.
 
 **Note**
 
-David's is Pad thai. He says he doesn't mind what wins, as long as it comes with extra chilli.
+David's is Pad thai. He orders extra chilli every time and eats it straight from the box.
 
 ### 6. Robert Sørensen · Leaving do · Beer · Comic Relief
 `id aab2f33d-8810-49ea-baca-6c3aa4516941` · ★☆☆ · third person, he
 
 **About**
 
-Robert is moving on to a new job, and tonight's drinks are his send-off. He's always first to the bar and remembers everyone's usual order without asking. He keeps the round steady until last orders. Pledge to Comic Relief, pick your favourite beer, and find out Robert's.
+Robert is moving on to a new job and tonight's drinks are his send-off. He's always first to the bar and remembers everyone's order by heart. He's also a good laugh so pledge your favourite beer to Comic Relief and find out Robert's.
 
 **Note**
 
-Robert's is Madrí. He orders it first whenever he takes a seat at the pub.
+Robert's is whichever beer he last drank on holiday. Currently Estrella.
 
 ### 7. Florence Ellis · Milestone birthday · Song · Alzheimer's Society
 `id 6aa6b8ee-1ff7-496c-aed6-53140f0acc76` · ★★☆ · third person, she
@@ -88,22 +88,22 @@ Florence's is Let It Be — The Beatles. She still plays it most days.
 
 **About**
 
-Helen turns a big birthday this year and enjoys looking back before looking forward. She keeps a box of cinema tickets from every trip she takes. Pledge to Great Ormond Street Hospital Charity, pick your favourite film, and find out Helen's.
+Helen turns 90 this year and enjoys reflecting on a life well lived. She has a box of cinema tickets that she's been collecting since the 60s. Pledge to Great Ormond Street Hospital and pick your favourite film to find out Helen's.
 
 **Note**
 
-Helen's is Casablanca. She recites the closing line every time it plays.
+Helen's is Casablanca. She knows the script off by heart.
 
 ### 9. Leila Patel · New home · Part of a roast dinner · Centrepoint
 `id fc1a33bd-f649-423c-9620-562bb49a1f0f` · ★★☆ · third person, she
 
 **About**
 
-Leila has just moved into her new home. She's cooking her first roast for friends there. Centrepoint helps young people without a home find one of their own. Pledge to Centrepoint, pick your favourite part of a roast dinner, to see Leila's.
+Leila has just moved into her new home. She's cooking her first roast for friends there, as a housewarming. She's asking guests to pledge to Centrepoint to help young people find homes of their own. So pick your favourite part of a roast dinner, and see Leila's.
 
 **Note**
 
-Leila's is Apple sauce. She keeps a spare jar in the cupboard, ready for cheese on toast too.
+Leila loves Apple sauce - not only with a roast dinner.
 
 ### 10. Shona Mitchell · New home · Tree · Emmaus UK
 `id b0c6db2c-3257-43d1-9363-c1db996acfbd` · ★★☆ · first person
@@ -121,7 +121,7 @@ Mine is Sweet chestnut. I planted one in my new garden on the first day.
 
 **About**
 
-I'm retiring this month and will finally have the time to explore. I'm planning long days out with a flask and book, without a clock to watch. Pledge to the Royal Horticultural Society, pick your own favourite, and mine will be revealed.
+I'm retiring this month and will finally have the time to explore. I'm planning long days out with a flask and book, without a clock to watch. Pledge to The Royal Horticultural Society, pick your own favourite, and mine will be revealed.
 
 **Note**
 
@@ -132,11 +132,11 @@ Mine is Crathes Castle. I always find the same bench near the roses and sit ther
 
 **About**
 
-I'm retiring this month, and my diary finally empties. There's time now for the hobby I've been saving for slower mornings. Independent Age offers advice, company and campaigning support to older people across the country. Pledge to Independent Age, pick your favourite hobby, then see mine.
+I'm retiring this month, and my diary will finally be empty. That will give me more time for my hobby. I'm fortunate that I don't need support but Independent Age is there for retirees who do. Pledge to them and pick your favourite hobby, then see mine.
 
 **Note**
 
-Mine is Family history. I keep a folder of birth certificates and photographs, adding a new find every few months.
+Mine is Family history. I have a folder full of findings that should get bigger.
 
 ## Celebrating a couple or group
 
@@ -145,22 +145,22 @@ Mine is Family history. I keep a folder of birth certificates and photographs, a
 
 **About**
 
-Every family gathering ends with the table cleared and a board game brought out. Someone deals, someone keeps score, and the youngest always insists on going first. We are a full house tonight, and Re-engage is there for the people who are not. Pledge to Re-engage, pick your favourite board game, and find out ours.
+Every family gathering ends with a board game and the youngest always goes first. We are lucky to have a full house but others aren't so lucky. Re-engage is there for them so let's all pledge to that cause. Pick your favourite Board game and whichever wins, we'll play tonight.
 
 **Note**
 
-Ours is Pictionary. We keep a battered whiteboard for it, propped against the fireplace every family visit.
+Last time we played scrabble and Nana won again, of course.
 
 ### 14. The Okafors · Family gathering · Comfort food · Trussell Trust
 `id a334422d-65ea-437b-97f9-f8264ec5ce0a` · ★★☆ · third person, they
 
 **About**
 
-We fill the table every time we get together, plates passed round until someone asks for more. Between us we cook everything from a Sunday roast to a pot of stew that simmers all afternoon. Pledge to Trussell Trust, pick your favourite comfort food, then see ours.
+We fill the table every time we get together, in a frenzy of full plates that are soon emptied. We cook a variety of dishes and everybody contributes. We're raising for Trussell Trust to help feed others. Pledge your favourite comfort food in order to see ours.
 
 **Note**
 
-Ours is Jollof rice. We always make an extra batch so nobody goes back for seconds and finds the pot empty.
+Ours is Jollof rice. We always make an extra batch so the boys can have seconds.
 
 ### 15. The Lower Sixth, 1998 · Reunion · Sweet · Children's Society
 `id e7b3c585-1fe2-403c-947a-3450c08de388` · ★★☆ · third person, they
