@@ -191,11 +191,11 @@ Hopefully we won't run out of stilton like last time.
 
 **About**
 
-Margaret sang in the church choir her whole life. She looked forward to the carol service each December and always brought round mince pies after. Marie Curie nurses were with her at the end. Pledge to Marie Curie, pick your favourite hymn, and we'll reveal Margaret's.
+Margaret Ellis played the organ at her local church for thirty years. She loved a full congregation and a hymn everyone knew by heart. Marie Curie nurses cared for her at the end. Pledge to Marie Curie, pick your favourite hymn, and find out Margaret's.
 
 **Note**
 
-Margaret's was When I Survey the Wondrous Cross. She used to hum it while doing the ironing on Sunday afternoons.
+Margaret's was When I Survey the Wondrous Cross. She kept a handwritten copy of the words tucked inside her hymn book.
 
 ### 18. Kenneth Parry · Celebration of life · Season · Stroke Association
 `id d6f85631-3e8d-47d9-955d-e34aaf9ebfd4` · ★★☆ · third person, he
