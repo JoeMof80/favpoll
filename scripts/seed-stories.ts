@@ -422,7 +422,7 @@ const drawCouple = () =>
 const GROUP_NAMES: Record<string, string[]> = {
   Reunion: [
     "The Class of 2006",
-    "The Lower Sixth, 1998",
+    "Hillcrest School, Class of '98",
     "The Ravenscroft rowing eight",
     "The Tuesday night five-a-side",
     "St Bede's, 1987 intake",

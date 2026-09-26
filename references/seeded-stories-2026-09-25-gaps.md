@@ -162,7 +162,7 @@ We fill the table every time we get together, in a frenzy of full plates that ar
 
 Ours is Jollof rice. We always make an extra batch so the boys can have seconds.
 
-### 15. The Lower Sixth, 1998 · Reunion · Sweet · Children's Society
+### 15. Hillcrest School, Class of '98 · Reunion · Sweet · Children's Society
 `id e7b3c585-1fe2-403c-947a-3450c08de388` · ★★☆ · first person
 
 **About**
