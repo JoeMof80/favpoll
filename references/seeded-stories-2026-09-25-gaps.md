@@ -186,16 +186,16 @@ Hopefully we won't run out of stilton like last time.
 
 ## Remembering
 
-### 17. Margaret Ellis · Celebration of life · Hymn · Marie Curie
+### 17. Maureen Ellis · Celebration of life · Hymn · Marie Curie
 `id 0b3213be-075d-4a9e-ad2b-6fedd27f2ff0` · ★★☆ · third person, she
 
 **About**
 
-Margaret Ellis played the organ at her local church for thirty years. She loved a full congregation and a hymn everyone knew by heart. Marie Curie nurses cared for her at the end. Pledge to Marie Curie, pick your favourite hymn, and find out Margaret's.
+Maureen played the organ at her local church for thirty years. She loved to hear a full congregation sing along to her hymns. Marie Curie nurses cared for her at the end and we were touched by their kindness. Please pledge to them, pick your favourite hymn, and we'll share Maureen's.
 
 **Note**
 
-Margaret's was When I Survey the Wondrous Cross. She saved it for the last hymn on a full Sunday, and the organ was never louder.
+Maureen's was Amazing Grace. It was the hymn she loved most to sign off an inspiring service.
 
 ### 18. Kenneth Parry · Celebration of life · Season · Stroke Association
 `id d6f85631-3e8d-47d9-955d-e34aaf9ebfd4` · ★★☆ · third person, he
