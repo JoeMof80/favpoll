@@ -6,6 +6,7 @@ import {
   FAMILY_ROWS,
   CHARITY_ROWS,
   HONOUR_CHARITY_ROWS,
+  REGISTER_ADDED,
   lookupEdges,
 } from "../pairing-table"
 import { OCCASION_TYPES_BY_REGISTER } from "../registers"
@@ -56,12 +57,10 @@ describe("pairing table — vocabulary drift guards", () => {
     }
   })
 
-  it("every per-charity row names a seeded charity", () => {
+  it("every per-charity row names a seeded or register-added charity", () => {
+    const known = new Set([...SEEDED_CHARITIES, ...REGISTER_ADDED])
     for (const name of Object.keys(CHARITY_ROWS)) {
-      expect(
-        SEEDED_CHARITIES.has(name),
-        `charity "${name}" is not seeded`
-      ).toBe(true)
+      expect(known.has(name), `charity "${name}" is not known`).toBe(true)
     }
   })
 
@@ -113,10 +112,10 @@ describe("lookupEdges — the worked triples from the reference note", () => {
     expect(edges.e2?.star).toBe(true)
     expect(edges.e3?.star).toBe(true)
     expect(edges.e1?.text).toBe(
-      "A favourite seaside town is part of an achievement: where the effort happened — the sea, the peak, the route."
+      "A favourite seaside town is part of an achievement: where the effort happens — the sea, the peak, the route."
     )
     expect(edges.e3?.text).toBe(
-      "RNLI belongs at an achievement: the cause the effort is for — a swim for the lifeboats."
+      "RNLI belongs at an achievement: the cause the effort is for — a swim for the lifeboats, a climb for mountain rescue."
     )
   })
 
@@ -145,7 +144,7 @@ describe("lookupEdges — the worked triples from the reference note", () => {
     expect(edges.count).toBe(1)
     expect(edges.e1?.star).toBe(false)
     expect(edges.e1?.text).toContain(
-      "only by a step the about must say out loud: now there is time"
+      "only by a step the about must say out loud: the freedom to finally go"
     )
     expect(edges.e2).toBeNull()
     expect(edges.e3).toBeNull()
@@ -249,5 +248,26 @@ describe("lookupEdges — rules", () => {
       causeFamily: "older_people",
     })
     expect(edges.count).toBe(3)
+  })
+})
+
+describe("lookupEdges — a row's exceptions", () => {
+  it("RNIB does not belong at a memorial for fighting what takes people", () => {
+    const rnib = lookupEdges({
+      register: "remembering",
+      occasionType: "Tribute",
+      topicTitle: "Instrument",
+      charityName: "RNIB",
+      causeFamily: "health_condition",
+    })
+    expect(rnib.e3).toBeNull()
+    const bhf = lookupEdges({
+      register: "remembering",
+      occasionType: "Tribute",
+      topicTitle: "Instrument",
+      charityName: "British Heart Foundation",
+      causeFamily: "health_condition",
+    })
+    expect(bhf.e3).not.toBeNull()
   })
 })

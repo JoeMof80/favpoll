@@ -1,0 +1,725 @@
+[
+ {
+  "id": "0e4132e9-22aa-444b-bbef-135b029e364e",
+  "subject": "someone",
+  "occasion": "Achievement",
+  "opening": "Good luck to",
+  "name": "Belinda Quinn",
+  "context": "Triathlon · 26th November",
+  "pronoun": "she",
+  "grouping": "individual",
+  "about": "Belinda trains at the pool most mornings before work, counting lengths without complaint. She swims for the lifeboats, a stretch of open water she has mapped out on a chart at home. Pledge to RNLI, pick your own favourite, and find out Belinda's.",
+  "note": "Belinda's is the Dolphin. She keeps a small carved dolphin on her kitchen windowsill and dusts it every Sunday.",
+  "topic": "Sea creature",
+  "items": 31,
+  "charity": "RNLI",
+  "family": "sea_rescue",
+  "open": true,
+  "register": "celebrating_one",
+  "edges": {
+   "e1": null,
+   "e2": {
+    "star": false,
+    "text": "RNLI works for rescue — lifeboats, mountain rescue, air ambulance: a favourite sea creature sits inside that cause."
+   },
+   "e3": {
+    "star": true,
+    "text": "RNLI belongs at an achievement: the cause the effort is for — a swim for the lifeboats, a climb for mountain rescue."
+   },
+   "count": 2
+  }
+ },
+ {
+  "id": "6157a64a-4b74-4254-b3ae-47c10d66a405",
+  "subject": "someone",
+  "occasion": "Achievement",
+  "opening": "Backing",
+  "name": "Ivy Nakamura",
+  "context": "Channel swim · 12th November",
+  "pronoun": "i",
+  "grouping": "individual",
+  "about": "I'm taking on this challenge after months of early starts and quiet training runs. Music keeps me going when the miles get long, and it feels right to raise pledges for Samaritans, who are there for anyone who needs to talk. Pledge to Samaritans, pick your own favourite, to see mine.",
+  "note": "Mine is Dancing Queen — ABBA. I turn it up in the kitchen every Sunday morning.",
+  "topic": "Song",
+  "items": 35,
+  "charity": "Samaritans",
+  "family": "mental_health",
+  "open": true,
+  "register": "celebrating_one",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "An achievement suggests a favourite song only by a step the about must say out loud: the training."
+   },
+   "e2": {
+    "star": false,
+    "text": "Samaritans works for mental health: a favourite song sits inside that cause."
+   },
+   "e3": {
+    "star": false,
+    "text": "Samaritans belongs at an achievement: the cause the effort is for."
+   },
+   "count": 3
+  }
+ },
+ {
+  "id": "b863cb4d-131c-4cd6-bba6-dc08a4f4eb39",
+  "subject": "someone",
+  "occasion": "Achievement",
+  "opening": "Cheering on",
+  "name": "Malcolm Baxter",
+  "context": "10k · 19th October",
+  "pronoun": "he",
+  "grouping": "individual",
+  "about": "Malcolm is training for a mountain climb this year, walking the local hills whenever he can. He is doing it for Scope, so disabled people get the same chances as everyone else. Pledge to Scope, pick your own favourite, and Malcolm's will be revealed.",
+  "note": "Malcolm's is Ben Nevis. He always plans his climbs to reach the summit at sunrise.",
+  "topic": "Mountain or peak",
+  "items": 26,
+  "charity": "Scope",
+  "family": "health_condition",
+  "open": true,
+  "register": "celebrating_one",
+  "edges": {
+   "e1": {
+    "star": true,
+    "text": "A favourite mountain or peak is part of an achievement: where the effort happens — the sea, the peak, the route."
+   },
+   "e2": null,
+   "e3": {
+    "star": true,
+    "text": "Scope belongs at an achievement: the cause the effort is for."
+   },
+   "count": 2
+  }
+ },
+ {
+  "id": "54e2db37-daa3-4810-8256-ab0f8a00ec22",
+  "subject": "someone",
+  "occasion": "Birthday",
+  "opening": "Many happy returns",
+  "name": "Oliver Thorne",
+  "context": "Another lap of the sun",
+  "pronoun": "he",
+  "grouping": "individual",
+  "about": "Oliver puts on a proper birthday tea every year, with sandwiches cut into triangles and something cold to follow. He hands round the tub himself and always lets the youngest guests go first. Pledge to Barnardos, pick your own favourite, and we'll reveal Oliver's.",
+  "note": "Oliver's is Rocky road. He picks out the marshmallow pieces first and eats them before touching the rest.",
+  "topic": "Ice cream flavour",
+  "items": 27,
+  "charity": "Barnardos",
+  "family": "children",
+  "open": false,
+  "register": "celebrating_one",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "A birthday suggests a favourite ice cream flavour only by a step the about must say out loud: a birthday tea."
+   },
+   "e2": {
+    "star": false,
+    "text": "Barnardos works for children and young people: a favourite ice cream flavour sits inside that cause."
+   },
+   "e3": null,
+   "count": 2
+  }
+ },
+ {
+  "id": "47b78481-a17f-4698-9c74-0eb66a53130e",
+  "subject": "someone",
+  "occasion": "Citizenship",
+  "opening": "Congratulations to",
+  "name": "Philip Clarke",
+  "context": "Citizen since July 2026",
+  "pronoun": "i",
+  "grouping": "individual",
+  "about": "I became a British citizen this year, and the little rituals have grown on me: queuing patiently, apologising for things that aren't my fault, and putting the kettle on before anything else. I've picked up a taste for tea I never expected. Pledge to Trussell Trust, pick your own favourite, to see mine.",
+  "note": "Mine is Earl Grey. I keep a tin of it in my desk drawer at work and make a cup every afternoon at three.",
+  "topic": "Type of tea",
+  "items": 21,
+  "charity": "Trussell Trust",
+  "family": "food_poverty",
+  "open": false,
+  "register": "celebrating_one",
+  "edges": {
+   "e1": {
+    "star": true,
+    "text": "A favourite type of tea is part of a citizenship: the small British things a new citizen has taken on."
+   },
+   "e2": {
+    "star": false,
+    "text": "Trussell Trust works for food banks and food poverty: a favourite type of tea sits inside that cause."
+   },
+   "e3": null,
+   "count": 2
+  }
+ },
+ {
+  "id": "8794d709-1aee-4bee-b3b5-e1f6987a53cc",
+  "subject": "someone",
+  "occasion": "Recovery",
+  "opening": "Celebrating",
+  "name": "Fiona Coles",
+  "context": "One year on 15th June",
+  "pronoun": "she",
+  "grouping": "individual",
+  "about": "Fiona is back on her feet and glad of it. Her walks are getting longer again, and she takes more notice of the weather now. Cancer Research UK has been part of her story this year. Pledge to Cancer Research UK, pick your own favourite, and find out Fiona's.",
+  "note": "Fiona's is Bright spring day. She keeps her walking boots by the back door, ready for one to arrive.",
+  "topic": "Weather for walking",
+  "items": 8,
+  "charity": "Cancer Research UK",
+  "family": "health_condition",
+  "open": true,
+  "register": "celebrating_one",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "A recovery suggests a favourite weather for walking only by a step the about must say out loud: being back on their feet."
+   },
+   "e2": null,
+   "e3": {
+    "star": true,
+    "text": "Cancer Research UK belongs at a recovery: the condition's own charity, at a recovery."
+   },
+   "count": 2
+  }
+ },
+ {
+  "id": "2cf0db1b-0dd0-4145-8ff3-4bd8991b06d6",
+  "subject": "someone",
+  "occasion": "Recovery",
+  "opening": "Welcome back",
+  "name": "Kate Whitaker",
+  "context": "Back on form",
+  "pronoun": "she",
+  "grouping": "individual",
+  "about": "Kate is back on her feet and walking further each week. She keeps a notebook of small progress and takes the stairs now instead of the lift. Stroke Association helped her through the early days, and she wanted them thanked properly. Pledge to Stroke Association, pick your own favourite, then see Kate's.",
+  "note": "Kate's is Three Little Birds — Bob Marley. She plays it every morning while she does her exercises.",
+  "topic": "Song",
+  "items": 35,
+  "charity": "Stroke Association",
+  "family": "health_condition",
+  "open": true,
+  "register": "celebrating_one",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "A recovery suggests a favourite song only by a step the about must say out loud: being back on their feet."
+   },
+   "e2": null,
+   "e3": {
+    "star": true,
+    "text": "Stroke Association belongs at a recovery: the condition's own charity, at a recovery."
+   },
+   "count": 2
+  }
+ },
+ {
+  "id": "428f8ae9-1e8a-41cf-aeff-426f99c76113",
+  "subject": "someone",
+  "occasion": "Recovery",
+  "opening": "Welcome back",
+  "name": "Tess Yates",
+  "context": "All clear · June 2026",
+  "pronoun": "she",
+  "grouping": "individual",
+  "about": "Tess is back on her feet now, and the short walk to the corner and back has become the best part of her day. She notices the sky before she checks the time and always has an opinion on it. Pledge to Cats Protection, pick your own favourite, and Tess' will be revealed.",
+  "note": "Tess' is Crisp winter morning. She fills a flask before she leaves and drinks it on the same bench every time.",
+  "topic": "Weather for walking",
+  "items": 8,
+  "charity": "Cats Protection",
+  "family": "animals",
+  "open": true,
+  "register": "celebrating_one",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "A recovery suggests a favourite weather for walking only by a step the about must say out loud: being back on their feet."
+   },
+   "e2": {
+    "star": false,
+    "text": "Cats Protection works for animals — rescue, welfare and wildlife: a favourite weather for walking sits inside that cause."
+   },
+   "e3": null,
+   "count": 2
+  }
+ },
+ {
+  "id": "7921084c-9ab8-45b4-9831-5724807e4994",
+  "subject": "someone",
+  "occasion": "Anniversary",
+  "opening": "Celebrating",
+  "name": "Hugo & Kenneth",
+  "context": "Together since 2005 · 20 years",
+  "pronoun": "they",
+  "grouping": "couple",
+  "about": "Hugo & Kenneth have shared decades of meals, and each year adds another cuisine to the list they keep going back to. They cook together most weekends, taking turns at the stove and sharing the washing up. Pledge to British Red Cross, pick your own favourite, and Hugo & Kenneth's will be revealed.",
+  "note": "Hugo & Kenneth's is Vietnamese. They make pho together every few weeks, simmering the broth for hours before they serve it.",
+  "topic": "Cuisine",
+  "items": 30,
+  "charity": "British Red Cross",
+  "family": "international",
+  "open": true,
+  "register": "celebrating_many",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "An anniversary suggests a favourite cuisine only by a step the about must say out loud: the years together."
+   },
+   "e2": {
+    "star": false,
+    "text": "British Red Cross works for overseas aid and humanitarian relief: a favourite cuisine sits inside that cause."
+   },
+   "e3": null,
+   "count": 2
+  }
+ },
+ {
+  "id": "bc5f0081-4ded-4a50-9ac0-efb24d942639",
+  "subject": "someone",
+  "occasion": "Engagement",
+  "opening": "Celebrating the engagement of",
+  "name": "Florence & Marion",
+  "context": "Engaged 14th February 2026",
+  "pronoun": "i",
+  "grouping": "couple",
+  "about": "We got engaged on a walk along the coast, and that's the beach we talk about most. Most weekends we pack a flask and head for the sand, whatever the weather. Pledge to Blue Cross, pick your own favourite, then see ours.",
+  "note": "Ours is Camber Sands. I always climb the highest dune before we spread out the picnic blanket.",
+  "topic": "Beach",
+  "items": 26,
+  "charity": "Blue Cross",
+  "family": "animals",
+  "open": true,
+  "register": "celebrating_many",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "An engagement suggests a favourite beach only by a step the about must say out loud: where it happened."
+   },
+   "e2": {
+    "star": false,
+    "text": "Blue Cross works for animals — rescue, welfare and wildlife: a favourite beach sits inside that cause."
+   },
+   "e3": null,
+   "count": 2
+  }
+ },
+ {
+  "id": "fb5ac6b1-a9d7-4b8d-adce-695189f9ab48",
+  "subject": "someone",
+  "occasion": "Engagement",
+  "opening": "Congratulations to",
+  "name": "Gillian & Eamon",
+  "context": "Engaged 14th February 2026",
+  "pronoun": "i",
+  "grouping": "couple",
+  "about": "We got engaged at a small bar near the river, the kind of place that does one good cocktail and no fuss. We're asking for pledges to Crisis instead of gifts, a home for someone else in place of things we don't need. Pledge to Crisis, pick your own favourite, and ours will be revealed.",
+  "note": "Ours is Espresso martini. We always order two the moment we sit down, no matter the occasion.",
+  "topic": "Cocktail",
+  "items": 33,
+  "charity": "Crisis",
+  "family": "homelessness",
+  "open": false,
+  "register": "celebrating_many",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "An engagement suggests a favourite cocktail only by a step the about must say out loud: where it happened."
+   },
+   "e2": null,
+   "e3": {
+    "star": true,
+    "text": "Crisis belongs at an engagement: a home for someone else, given in lieu of gifts."
+   },
+   "count": 2
+  }
+ },
+ {
+  "id": "3abf67e8-483a-4566-bf95-0745deae3a98",
+  "subject": "someone",
+  "occasion": "New baby",
+  "opening": "Congratulations to",
+  "name": "Ravi & Dominic",
+  "context": "Welcoming Vikram",
+  "pronoun": "i",
+  "grouping": "couple",
+  "about": "We read the same book every evening, the one we know almost by heart. We like to stand at the window and spot what we can see in the sky before bed. Action for Children works with children and young people, and we wanted our pledges to go there. Pledge to Action for Children, pick your own favourite, and ours will be revealed.",
+  "note": "Ours is Jupiter. I keep a small model of it on my desk, bought years ago at a museum shop.",
+  "topic": "Planet",
+  "items": 9,
+  "charity": "Action for Children",
+  "family": "children",
+  "open": true,
+  "register": "celebrating_many",
+  "edges": {
+   "e1": null,
+   "e2": {
+    "star": false,
+    "text": "Action for Children works for children and young people: a favourite planet sits inside that cause."
+   },
+   "e3": {
+    "star": true,
+    "text": "Action for Children belongs at a new baby: a children's charity at the start of a life."
+   },
+   "count": 2
+  }
+ },
+ {
+  "id": "d77a97e1-f6ee-4d5a-be7a-d7c179f289f5",
+  "subject": "someone",
+  "occasion": "New baby",
+  "opening": "Congratulations to",
+  "name": "Rhys & Kwame",
+  "context": "Welcoming Iris",
+  "pronoun": "i",
+  "grouping": "couple",
+  "about": "We read dinosaur names before bedtime most nights, and one of us always slips in a favourite without meaning to. Children's Society works for young people, so a favourite dinosaur felt like the right thing to ask about. Pledge to Children's Society, pick your own favourite, and ours will be revealed.",
+  "note": "Ours is Diplodocus. I trace its long neck on the page each time we reach that spread.",
+  "topic": "Dinosaur",
+  "items": 21,
+  "charity": "Children's Society",
+  "family": "children",
+  "open": true,
+  "register": "celebrating_many",
+  "edges": {
+   "e1": null,
+   "e2": {
+    "star": false,
+    "text": "Children's Society works for children and young people: a favourite dinosaur sits inside that cause."
+   },
+   "e3": {
+    "star": true,
+    "text": "Children's Society belongs at a new baby: a children's charity at the start of a life."
+   },
+   "count": 2
+  }
+ },
+ {
+  "id": "ec7a161b-6e93-4b12-89eb-e21c5dd05e51",
+  "subject": "someone",
+  "occasion": "Renewal of vows",
+  "opening": "Congratulations to",
+  "name": "Barry & Alan",
+  "context": "Vows renewed · June 2026",
+  "pronoun": "i",
+  "grouping": "couple",
+  "about": "We renew our vows on the beach where we first honeymooned, back for another summer by the sea. We ask friends and family to pledge to Centrepoint instead of bringing gifts, a home for someone who needs one. Pledge to Centrepoint, pick your own favourite, and find out ours.",
+  "note": "Ours is Mull. We take the same ferry crossing every year and stand at the rail until the hills disappear.",
+  "topic": "Island",
+  "items": 48,
+  "charity": "Centrepoint",
+  "family": "homelessness",
+  "open": true,
+  "register": "celebrating_many",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "A renewal of vows suggests a favourite island only by a step the about must say out loud: the honeymoon or the venue."
+   },
+   "e2": null,
+   "e3": {
+    "star": true,
+    "text": "Centrepoint belongs at a renewal of vows: a home for someone else, given in lieu of gifts."
+   },
+   "count": 2
+  }
+ },
+ {
+  "id": "61a974f7-e4f8-4cdf-9c1d-539f3f88a561",
+  "subject": "someone",
+  "occasion": "Wedding",
+  "opening": "Congratulations to",
+  "name": "Mei & Simon",
+  "context": "Married 20th June 2026",
+  "pronoun": "they",
+  "grouping": "couple",
+  "about": "They bake together most weekends, arguing gently over icing and portion sizes. Sunday mornings often end with a new recipe cooling on the side. They're asking for pledges to Shelter instead of gifts, so someone else can have a home of their own. Pledge to Shelter, pick your own favourite, and Mei & Simon's will be revealed.",
+  "note": "Mei & Simon's is Chocolate fudge cake. They always scrape the bowl clean before it goes in the oven.",
+  "topic": "Cake",
+  "items": 29,
+  "charity": "Shelter",
+  "family": "homelessness",
+  "open": true,
+  "register": "celebrating_many",
+  "edges": {
+   "e1": {
+    "star": true,
+    "text": "A favourite cake is part of a wedding: the first dance, the cake and the flowers of the day itself."
+   },
+   "e2": null,
+   "e3": {
+    "star": true,
+    "text": "Shelter belongs at a wedding: a home for someone else, given in lieu of gifts."
+   },
+   "count": 2
+  }
+ },
+ {
+  "id": "f5b1b601-061e-4739-afa8-30a3cde89ae0",
+  "subject": "someone",
+  "occasion": "Wedding",
+  "opening": "Celebrating the wedding of",
+  "name": "Nicola & Jack",
+  "context": "Married 20th June 2026",
+  "pronoun": "i",
+  "grouping": "couple",
+  "about": "We spent our engagement arguing over honeymoon routes, and every one somehow ended on a coastline. Between us we've packed a beach bag more times than we can count, and our sandy shoes end up by the door most summers. Pledge to National Trust, pick your own favourite, and find out ours.",
+  "note": "Ours is Camber Sands. We always walk the same stretch of sand at low tide and never agree on which way to turn.",
+  "topic": "Beach",
+  "items": 26,
+  "charity": "National Trust",
+  "family": "environment_heritage",
+  "open": false,
+  "register": "celebrating_many",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "A wedding suggests a favourite beach only by a step the about must say out loud: the honeymoon or the venue."
+   },
+   "e2": {
+    "star": false,
+    "text": "National Trust works for the natural environment and heritage places: a favourite beach sits inside that cause."
+   },
+   "e3": null,
+   "count": 2
+  }
+ },
+ {
+  "id": "a8a8afd5-5646-4d32-9262-a257acd6f97d",
+  "subject": "someone",
+  "occasion": "Memorial",
+  "opening": "In memory of",
+  "name": "Pam Zhang",
+  "context": "1940 – 2024",
+  "pronoun": "she",
+  "grouping": "individual",
+  "about": "Pam loved wandering around gardens, taking her time over every border and vista. She grew her own vegetables at home and enjoyed sharing cuttings with neighbours. Diabetes UK supported her through the illness she lived with. Pledge to Diabetes UK, pick your own favourite, and Pam's will be revealed.",
+  "note": "Pam's was Chatsworth. She kept a pressed leaf from her first visit there in an old diary.",
+  "topic": "Garden to visit",
+  "items": 21,
+  "charity": "Diabetes UK",
+  "family": "health_condition",
+  "open": false,
+  "register": "remembering",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "A favourite garden to visit suits a memorial; that needs no saying in the about."
+   },
+   "e2": null,
+   "e3": {
+    "star": false,
+    "text": "Diabetes UK belongs at a memorial: a charity that fights the kind of illness that takes people belongs at a memorial."
+   },
+   "count": 2
+  }
+ },
+ {
+  "id": "9f2d04ad-fb8d-4854-a58e-5f96a4148fea",
+  "subject": "someone",
+  "occasion": "Remembrance",
+  "opening": "In memory of",
+  "name": "Kieran Abara",
+  "context": "Ten years on",
+  "pronoun": "he",
+  "grouping": "individual",
+  "about": "Kieran was known for having a saying to fit almost any moment, delivered with the same steady calm each time. He never made a fuss and always had a word ready to smooth things over. Pledge to Guide Dogs, pick your own favourite, then see Kieran's.",
+  "note": "Kieran's was Mustn't grumble. He'd say it every time someone asked how he was, then quickly turn the talk to something else.",
+  "topic": "Saying",
+  "items": 20,
+  "charity": "Guide Dogs",
+  "family": "health_condition",
+  "open": true,
+  "register": "remembering",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "A favourite saying suits a remembrance; that needs no saying in the about."
+   },
+   "e2": null,
+   "e3": {
+    "star": false,
+    "text": "Guide Dogs belongs at a remembrance: a charity that fights the kind of illness that takes people belongs at a memorial."
+   },
+   "count": 2
+  }
+ },
+ {
+  "id": "ed86ba14-c578-4c58-b827-96854c5fddeb",
+  "subject": "someone",
+  "occasion": "Remembrance",
+  "opening": "Remembering",
+  "name": "Rosa Gibson",
+  "context": "Not forgotten",
+  "pronoun": "she",
+  "grouping": "individual",
+  "about": "Rosa loved her garden and could name every flower in it. She spent her afternoons tending borders that were never quite finished and always found time for a cup of tea with anyone who called round. St Richard's Hospice cared for her in her last weeks. Pledge to St Richard's Hospice, pick your own favourite, then see Rosa's.",
+  "note": "Rosa's was Forget-me-not. She kept a single stem in a jam jar on her kitchen windowsill every spring.",
+  "topic": "Flower",
+  "items": 52,
+  "charity": "St Richard's Hospice",
+  "family": "end_of_life",
+  "open": false,
+  "register": "remembering",
+  "edges": {
+   "e1": {
+    "star": true,
+    "text": "A favourite flower is part of a remembrance: the flowers, the hymns and the readings of the service itself."
+   },
+   "e2": null,
+   "e3": {
+    "star": true,
+    "text": "St Richard's Hospice belongs at a remembrance: a charity that cares for people at the end of life belongs at a memorial — whoever cared for them."
+   },
+   "count": 2
+  }
+ },
+ {
+  "id": "f0844140-d494-4679-908f-5fabb4208216",
+  "subject": "someone",
+  "occasion": "Tribute",
+  "opening": "A tribute to",
+  "name": "Aisha Hartley",
+  "context": "Born 1962",
+  "pronoun": "she",
+  "grouping": "individual",
+  "about": "Aisha spent weekend afternoons weeding borders and giving cuttings to anyone who admired them. She kept the garden going through every season, rain or shine. Macmillan nurses cared for her at the end, and their kindness stayed with those who loved her. Pledge to Macmillan Cancer Support, pick your own favourite, and we'll reveal Aisha's.",
+  "note": "Aisha's was Hydrangea. She always cut the first blue bloom of summer and set it in a jam jar on her kitchen table.",
+  "topic": "Flower",
+  "items": 52,
+  "charity": "Macmillan Cancer Support",
+  "family": "end_of_life",
+  "open": true,
+  "register": "remembering",
+  "edges": {
+   "e1": {
+    "star": true,
+    "text": "A favourite flower is part of a tribute: the flowers, the hymns and the readings of the service itself."
+   },
+   "e2": null,
+   "e3": {
+    "star": true,
+    "text": "Macmillan Cancer Support belongs at a tribute: a charity that cares for people at the end of life belongs at a memorial — whoever cared for them."
+   },
+   "count": 2
+  }
+ },
+ {
+  "id": "ec550565-e5ef-42b0-8e93-cf95d0df8a1e",
+  "subject": "someone",
+  "occasion": "Tribute",
+  "opening": "A tribute to",
+  "name": "Edith Ahmed",
+  "context": "Born 1962",
+  "pronoun": "she",
+  "grouping": "individual",
+  "about": "Edith loved words that could be read aloud, and she kept a shelf of poetry by her chair. She read every evening and marked her favourite lines in pencil. St Gemma's Hospice cared for her at the end. Pledge to St Gemma's Hospice, pick your own favourite, and we'll reveal Edith's.",
+  "note": "Edith's was Desiderata. She copied it out by hand and kept the copy folded in her handbag.",
+  "topic": "Poem",
+  "items": 32,
+  "charity": "St Gemma's Hospice",
+  "family": "end_of_life",
+  "open": true,
+  "register": "remembering",
+  "edges": {
+   "e1": {
+    "star": true,
+    "text": "A favourite poem is part of a tribute: the flowers, the hymns and the readings of the service itself."
+   },
+   "e2": null,
+   "e3": {
+    "star": true,
+    "text": "St Gemma's Hospice belongs at a tribute: a charity that cares for people at the end of life belongs at a memorial — whoever cared for them."
+   },
+   "count": 2
+  }
+ },
+ {
+  "id": "372e8548-17b1-48f1-b768-96f97b474bad",
+  "subject": "cause",
+  "occasion": "Sponsored event",
+  "opening": null,
+  "name": "Emergency Medical Relief",
+  "context": "For people in crisis zones worldwide",
+  "pronoun": null,
+  "grouping": "individual",
+  "about": "This sponsored event is raising for Médecins Sans Frontières, whose humanitarian work reaches rivers and communities in crisis across the world. Guests pick their favourite river by pledging to the charity, and favpoll takes no platform fee.",
+  "note": "Our pick to start: Wye — a walk they took every summer as children.",
+  "topic": "River",
+  "items": 27,
+  "charity": "Médecins Sans Frontières",
+  "family": "international",
+  "open": true,
+  "register": "cause",
+  "edges": {
+   "e1": {
+    "star": true,
+    "text": "A favourite river is part of a sponsored event: where the effort happens — the sea, the peak, the route."
+   },
+   "e2": {
+    "star": false,
+    "text": "Médecins Sans Frontières works for overseas aid and humanitarian relief: a favourite river sits inside that cause."
+   },
+   "e3": null,
+   "count": 2
+  }
+ },
+ {
+  "id": "6c01a36b-1fa2-4cb2-924b-70685b6d4a4b",
+  "subject": "cause",
+  "occasion": "Sponsored event",
+  "opening": null,
+  "name": "End Global Poverty",
+  "context": "For communities facing hardship worldwid",
+  "pronoun": null,
+  "grouping": "individual",
+  "about": "This sponsored event is raising for Oxfam's work against poverty overseas, and a favourite river follows the routes and waters where that work happens. Guests pick their favourite river by pledging to Oxfam, with no platform fee taken.",
+  "note": "Our pick to start: Thames — the water people walk beside on ordinary days, without much thought at all",
+  "topic": "River",
+  "items": 27,
+  "charity": "Oxfam",
+  "family": "international",
+  "open": true,
+  "register": "cause",
+  "edges": {
+   "e1": {
+    "star": true,
+    "text": "A favourite river is part of a sponsored event: where the effort happens — the sea, the peak, the route."
+   },
+   "e2": {
+    "star": false,
+    "text": "Oxfam works for overseas aid and humanitarian relief: a favourite river sits inside that cause."
+   },
+   "e3": null,
+   "count": 2
+  }
+ },
+ {
+  "id": "3653cba9-9d3a-47a2-890a-7417c22dc7aa",
+  "subject": "cause",
+  "occasion": "Sponsored event",
+  "opening": null,
+  "name": "Men's Mental Health",
+  "context": "Ahead of this year's sponsored event",
+  "pronoun": null,
+  "grouping": "individual",
+  "about": "This favpoll is raising for CALM ahead of our sponsored event, where months of training have us thinking about the forms of exercise that keep us going. Guests pick their favourite form of exercise and pledge to CALM, which offers support services, counselling, advice and information to protect men's mental health and help prevent suicide.",
+  "note": "Our pick to start: Running — the one that clears the head before anything else does",
+  "topic": "Form of exercise",
+  "items": 27,
+  "charity": "CALM",
+  "family": "mental_health",
+  "open": true,
+  "register": "cause",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "A sponsored event suggests a favourite form of exercise only by a step the about must say out loud: the training."
+   },
+   "e2": {
+    "star": false,
+    "text": "CALM works for mental health: a favourite form of exercise sits inside that cause."
+   },
+   "e3": null,
+   "count": 2
+  }
+ }
+]

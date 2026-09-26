@@ -1750,7 +1750,7 @@ const topics: TopicSeed[] = [
     },
   },
   {
-    title: "Weather for walk",
+    title: "Weather for walking",
     description: "The sky that made them pull on their boots",
     is_finite: false,
     categories: ["Nature", "Everyday life"],
@@ -5905,6 +5905,7 @@ const topicItems: Record<string, string[]> = {
     "Bacon sandwich",
     "Bangers and mash",
     "Beans on toast",
+    "Jollof rice",
     "Bubble and squeak",
     "Cauliflower cheese",
     "Cheese on toast",
@@ -6464,6 +6465,7 @@ const topicItems: Record<string, string[]> = {
     "Perfect — Ed Sheeran",
     "Somewhere Only We Know — Keane",
     "Stand by Me — Ben E. King",
+    "Here I Go Again — Whitesnake",
     "Supermarket Flowers — Ed Sheeran",
     "The Winner Takes It All — ABBA",
     "Three Little Birds — Bob Marley",
@@ -6732,7 +6734,7 @@ const topicItems: Record<string, string[]> = {
     "Thunderstorm",
     "Warm rain",
   ],
-  "Weather for walk": [
+  "Weather for walking": [
     "After rain",
     "Autumn drizzle",
     "Blustery and wild",

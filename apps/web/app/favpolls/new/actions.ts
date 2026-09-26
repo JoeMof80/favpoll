@@ -421,11 +421,16 @@ export async function findOrCreateRegisterCharity(input: {
       registered_website: contact.website,
       activities: purpose.activities,
       classification: purpose.classification,
+      objects: purpose.objects,
+      areas: purpose.areas,
+      grant_making: purpose.grantMaking,
       // A SUGGESTION only — the admin confirms it in the outreach queue.
       cause_family_suggested: await suggestCauseFamily({
         name,
         activities: purpose.activities,
         classification: purpose.classification,
+        objects: purpose.objects,
+        grantMaking: purpose.grantMaking,
       }),
     })
     .select("*")

@@ -1,0 +1,551 @@
+[
+ {
+  "id": "8a435ea1-529d-4df6-9001-65f3abac4195",
+  "name": "Lauren Walsh",
+  "subject": "someone",
+  "register": "celebrating_one",
+  "occasion": "Divorce party",
+  "topic": "Way to spend Sunday",
+  "charity": "Samaritans",
+  "family": "mental_health",
+  "pronoun": "i",
+  "grouping": "individual",
+  "context": "Signed, sealed, single",
+  "about": "I'm working out what a Sunday looks like on my own now, starting with a first solo trip out of the house. I fill the hours my own way, and it feels good to have them to myself. Pledge to Samaritans, pick your own favourite, and mine will be revealed.",
+  "note": "Mine is Car boot sale. I get there early most Sundays and always haggle over the vinyl stall.",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "A divorce party suggests a favourite way to spend sunday only by a step the about must say out loud: the first solo trip."
+   },
+   "e2": {
+    "star": false,
+    "text": "Samaritans works for mental health: a favourite way to spend sunday sits inside that cause."
+   },
+   "e3": null,
+   "count": 2
+  }
+ },
+ {
+  "id": "b99ed24a-4dfc-44d5-8792-03736bdcfe07",
+  "name": "Leon Singh",
+  "subject": "someone",
+  "register": "celebrating_one",
+  "occasion": "Divorce party",
+  "topic": "Song",
+  "charity": "CALM",
+  "family": "mental_health",
+  "pronoun": "i",
+  "grouping": "individual",
+  "context": "Signed, sealed, single",
+  "about": "I'm marking the end of one chapter with my first trip alone in years, a weekend away just for me. I've packed a playlist for the drive and I'm looking forward to the quiet. Pledge to CALM, pick your own favourite, then see mine.",
+  "note": "Mine is Fields of Gold — Eva Cassidy. I hum it under my breath whenever I'm packing a suitcase.",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "A divorce party suggests a favourite song only by a step the about must say out loud: the first solo trip."
+   },
+   "e2": {
+    "star": false,
+    "text": "CALM works for mental health: a favourite song sits inside that cause."
+   },
+   "e3": null,
+   "count": 2
+  }
+ },
+ {
+  "id": "1751bb5d-a60c-4675-9f3d-23f1285956c3",
+  "name": "Gareth Gibson",
+  "subject": "someone",
+  "register": "celebrating_one",
+  "occasion": "Graduation",
+  "topic": "Book",
+  "charity": "Mind",
+  "family": "mental_health",
+  "pronoun": "he",
+  "grouping": "individual",
+  "context": "First in the family",
+  "about": "Gareth has just finished his degree, three years of essays, seminars and late nights in the library. The reading list is finally his own again, and he is filling it with whatever he fancies. Pledge to Mind, pick your own favourite, and find out Gareth's.",
+  "note": "Gareth's is Hamnet. He keeps his copy on the desk and rereads the first page whenever he sits down to write.",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "A graduation suggests a favourite book only by a step the about must say out loud: the studying just done."
+   },
+   "e2": {
+    "star": false,
+    "text": "Mind works for mental health: a favourite book sits inside that cause."
+   },
+   "e3": null,
+   "count": 2
+  }
+ },
+ {
+  "id": "a3f331a7-5778-4287-b712-3f1c495185bb",
+  "name": "Harriet Marsh",
+  "subject": "someone",
+  "register": "celebrating_one",
+  "occasion": "Graduation",
+  "topic": "Book",
+  "charity": "YoungMinds",
+  "family": "mental_health",
+  "pronoun": "she",
+  "grouping": "individual",
+  "context": "First in the family",
+  "about": "Harriet has just finished her degree, three years of essays and exams behind her. She reads for pleasure again, one novel a week from the library, no set list. Pledge to YoungMinds, pick your own favourite, and find out Harriet's.",
+  "note": "Harriet's is Great Expectations. She rereads it every summer, dog-earing the same pages each time.",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "A graduation suggests a favourite book only by a step the about must say out loud: the studying just done."
+   },
+   "e2": {
+    "star": false,
+    "text": "YoungMinds works for mental health: a favourite book sits inside that cause."
+   },
+   "e3": null,
+   "count": 2
+  }
+ },
+ {
+  "id": "f14805a7-a410-4ac6-a8b3-1905e61de97f",
+  "name": "David Hartley",
+  "subject": "someone",
+  "register": "celebrating_one",
+  "occasion": "Leaving do",
+  "topic": "Saying",
+  "charity": "Independent Age",
+  "family": "older_people",
+  "pronoun": "he",
+  "grouping": "individual",
+  "context": "Joined March 2019",
+  "about": "David is leaving after years of turning meetings into stories worth repeating. His leaving drinks tonight are full of the sayings he's leaned on for years, ready for wherever he heads next. Pledge to Independent Age, pick your own favourite, and we'll reveal David's.",
+  "note": "David's is Worse things happen at sea. He says it whenever the printer jams, then carries on with the day.",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "A leaving do suggests a favourite saying only by a step the about must say out loud: the leaving drinks, or where they are going next."
+   },
+   "e2": {
+    "star": false,
+    "text": "Independent Age works for older people: a favourite saying sits inside that cause."
+   },
+   "e3": null,
+   "count": 2
+  }
+ },
+ {
+  "id": "aab2f33d-8810-49ea-baca-6c3aa4516941",
+  "name": "Robert Sørensen",
+  "subject": "someone",
+  "register": "celebrating_one",
+  "occasion": "Leaving do",
+  "topic": "Saying",
+  "charity": "Comic Relief",
+  "family": "entertainment",
+  "pronoun": "he",
+  "grouping": "individual",
+  "context": "Joined March 2019",
+  "about": "Robert always has a saying ready, and tonight's leaving drinks will need a good few. He keeps them short and keeps them coming right up to the door. Pledge to Comic Relief, pick your own favourite, and find out Robert's.",
+  "note": "Robert's is Waste not, want not. He keeps every takeaway tub for leftovers, stacked in a cupboard by the door.",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "A leaving do suggests a favourite saying only by a step the about must say out loud: the leaving drinks, or where they are going next."
+   },
+   "e2": {
+    "star": false,
+    "text": "Comic Relief works for fundraising through comedy and entertainment: a favourite saying sits inside that cause."
+   },
+   "e3": null,
+   "count": 2
+  }
+ },
+ {
+  "id": "6aa6b8ee-1ff7-496c-aed6-53140f0acc76",
+  "name": "Florence Ellis",
+  "subject": "someone",
+  "register": "celebrating_one",
+  "occasion": "Milestone birthday",
+  "topic": "Song",
+  "charity": "Alzheimer's Society",
+  "family": "end_of_life",
+  "pronoun": "she",
+  "grouping": "individual",
+  "context": "90 years young",
+  "about": "Florence marks a landmark birthday this year, the kind that turns thoughts back over the years behind her. She keeps the radio on in the kitchen, humming along as she cooks. Pledge to Alzheimer's Society, pick your own favourite, and Florence's will be revealed.",
+  "note": "Florence's is Let It Be — The Beatles. She plays it on the piano before bed most evenings.",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "A milestone birthday suggests a favourite song only by a step the about must say out loud: a big birthday looks back."
+   },
+   "e2": {
+    "star": true,
+    "text": "Alzheimer's Society works for end-of-life care and dementia: a favourite song is at the heart of what they do."
+   },
+   "e3": null,
+   "count": 2
+  }
+ },
+ {
+  "id": "305e6411-7aa7-4151-bd17-0e2cc36e9a72",
+  "name": "Helen Iqbal",
+  "subject": "someone",
+  "register": "celebrating_one",
+  "occasion": "Milestone birthday",
+  "topic": "Sweet",
+  "charity": "Great Ormond Street Hospital Charity",
+  "family": "children",
+  "pronoun": "she",
+  "grouping": "individual",
+  "context": "90 years young",
+  "about": "Helen's turning a big birthday, and today has her looking back at old favourites. She keeps a bowl of sweets on the table for anyone who visits. Pledge to Great Ormond Street Hospital Charity, pick your own favourite, and Helen's will be revealed.",
+  "note": "Helen's is Rhubarb and custard. She unwraps one slowly before she starts the crossword each morning.",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "A milestone birthday suggests a favourite sweet only by a step the about must say out loud: a big birthday looks back."
+   },
+   "e2": {
+    "star": false,
+    "text": "Great Ormond Street Hospital Charity works for children and young people: a favourite sweet sits inside that cause."
+   },
+   "e3": null,
+   "count": 2
+  }
+ },
+ {
+  "id": "fc1a33bd-f649-423c-9620-562bb49a1f0f",
+  "name": "Leila Patel",
+  "subject": "someone",
+  "register": "celebrating_one",
+  "occasion": "New home",
+  "topic": "County",
+  "charity": "Centrepoint",
+  "family": "homelessness",
+  "pronoun": "she",
+  "grouping": "individual",
+  "context": "Keys picked up 1st August",
+  "about": "Leila has just picked up the keys to her new home. She's unpacking boxes and working out where she belongs now that she's settling in. Centrepoint gives young people the home she's just found for herself. Pledge to Centrepoint, pick your own favourite, to see Leila's.",
+  "note": "Leila's is Greater London. She takes the same walk along the South Bank every time she visits.",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "A new home suggests a favourite county only by a step the about must say out loud: settling in."
+   },
+   "e2": null,
+   "e3": {
+    "star": true,
+    "text": "Centrepoint belongs at a new home: the mirror of one's own good fortune: a home."
+   },
+   "count": 2
+  }
+ },
+ {
+  "id": "b0c6db2c-3257-43d1-9363-c1db996acfbd",
+  "name": "Shona Mitchell",
+  "subject": "someone",
+  "register": "celebrating_one",
+  "occasion": "New home",
+  "topic": "Tree",
+  "charity": "Emmaus UK",
+  "family": "homelessness",
+  "pronoun": "i",
+  "grouping": "individual",
+  "context": "Keys picked up 1st August",
+  "about": "I've just picked up the keys to my new home and I'm working out where everything goes. I look at the garden and think about what trees might fit, now I'm settling in, and my pledge goes to Emmaus UK, who offer people a home when they've nowhere else to turn. Pledge to Emmaus UK, pick your own favourite, and mine will be revealed.",
+  "note": "Mine is Aspen. I planted one by the back step of my new home and check on it every morning.",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "A new home suggests a favourite tree only by a step the about must say out loud: settling in."
+   },
+   "e2": null,
+   "e3": {
+    "star": true,
+    "text": "Emmaus UK belongs at a new home: the mirror of one's own good fortune: a home."
+   },
+   "count": 2
+  }
+ },
+ {
+  "id": "ad342d61-08a6-4504-8e1a-855dfffcbfe9",
+  "name": "Barry Zhang",
+  "subject": "someone",
+  "register": "celebrating_one",
+  "occasion": "Retirement",
+  "topic": "Garden to visit",
+  "charity": "Surfers Against Sewage",
+  "family": "environment_heritage",
+  "pronoun": "i",
+  "grouping": "individual",
+  "context": "Joined 1989 · Retiring 2026",
+  "about": "I'm retiring this month and I finally have the time to go further than the weekend. I'm planning long days out with a flask and good boots, no clock to watch. Pledge to Surfers Against Sewage, pick your own favourite, and mine will be revealed.",
+  "note": "Mine is Crathes Castle. I always find the same bench near the roses and sit there before walking on.",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "A retirement suggests a favourite garden to visit only by a step the about must say out loud: now there is time — the freedom to finally go."
+   },
+   "e2": {
+    "star": false,
+    "text": "Surfers Against Sewage works for the natural environment and heritage places: a favourite garden to visit sits inside that cause."
+   },
+   "e3": null,
+   "count": 2
+  }
+ },
+ {
+  "id": "c1f7ea47-be63-4ce4-b5b5-351c8b4f8a22",
+  "name": "Rosa Mensah",
+  "subject": "someone",
+  "register": "celebrating_one",
+  "occasion": "Retirement",
+  "topic": "Way to spend Sunday",
+  "charity": "Independent Age",
+  "family": "older_people",
+  "pronoun": "i",
+  "grouping": "individual",
+  "context": "37 years of service",
+  "about": "I'm retiring this month, and my Sundays are finally my own to spend as I like. I mean to make good use of them, whatever that turns out to mean. Pledge to Independent Age, pick your own favourite, and find out mine.",
+  "note": "Mine is Pub lunch. I always order the same starter before I even look at the menu.",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "A retirement suggests a favourite way to spend sunday only by a step the about must say out loud: now there is time — the freedom to finally go."
+   },
+   "e2": {
+    "star": false,
+    "text": "Independent Age works for older people: a favourite way to spend sunday sits inside that cause."
+   },
+   "e3": {
+    "star": true,
+    "text": "Independent Age belongs at a retirement: a long life, honoured through a charity for older people."
+   },
+   "count": 3
+  }
+ },
+ {
+  "id": "7c96f43f-2855-487c-b224-1bf0cf116436",
+  "name": "The Hartley family",
+  "subject": "someone",
+  "register": "celebrating_many",
+  "occasion": "Family gathering",
+  "topic": "Board game",
+  "charity": "Re-engage",
+  "family": "older_people",
+  "pronoun": "they",
+  "grouping": "group",
+  "context": "Four generations, one table",
+  "about": "They fill every family gathering with the same ritual: chairs pulled in, the board out, and someone keeping score. The last piece goes back in the box while the table is cleared for pudding. A full house like this is what Re-engage gives to those who spend most days on their own. Pledge to Re-engage, pick your own favourite, to see The Hartley family's.",
+  "note": "The Hartley family's is Catan. They spread the board across the kitchen table and argue over every trade until someone gives in.",
+  "edges": {
+   "e1": {
+    "star": true,
+    "text": "A favourite board game is part of a family gathering: the table, the names round it and the game after."
+   },
+   "e2": null,
+   "e3": {
+    "star": false,
+    "text": "Re-engage belongs at a family gathering: a full house, and a charity for those who are on their own."
+   },
+   "count": 2
+  }
+ },
+ {
+  "id": "a334422d-65ea-437b-97f9-f8264ec5ce0a",
+  "name": "The Okafors",
+  "subject": "someone",
+  "register": "celebrating_many",
+  "occasion": "Family gathering",
+  "topic": "Comfort food",
+  "charity": "Trussell Trust",
+  "family": "food_poverty",
+  "pronoun": "they",
+  "grouping": "group",
+  "context": "Four generations, one table",
+  "about": "They gather every few weeks, filling the table until it can barely hold another dish. Someone always brings a pot from the stove straight to the table, and the kitchen never really empties. Pledge to Trussell Trust, pick your own favourite, and The Okafors' will be revealed.",
+  "note": "The Okafors' is Chips. They queue at the chip shop on the corner every Friday night, sharing one large portion between them.",
+  "edges": {
+   "e1": null,
+   "e2": {
+    "star": true,
+    "text": "Trussell Trust works for food banks and food poverty: a favourite comfort food is at the heart of what they do."
+   },
+   "e3": {
+    "star": false,
+    "text": "Trussell Trust belongs at a family gathering: a full table, and a charity that fills other people's."
+   },
+   "count": 2
+  }
+ },
+ {
+  "id": "e7b3c585-1fe2-403c-947a-3450c08de388",
+  "name": "Hillcrest School, Class of '98",
+  "subject": "someone",
+  "register": "celebrating_many",
+  "occasion": "Reunion",
+  "topic": "Song",
+  "charity": "Children's Society",
+  "family": "children",
+  "pronoun": "i",
+  "grouping": "group",
+  "context": "20 years since we last met",
+  "about": "We're back together for the first time in years, and the years fall away fast. We remember who sang loudest and who needed the words on a napkin. Tonight the room fills up again, and the songs carry us back. Pledge to Children's Society, pick your favourite song, and the top ten are the playlist for the night.",
+  "note": "Dancing Queen — ABBA got the whole room up in one go, from the back rows to the bar, and no one wanted to sit down.",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "A reunion suggests a favourite sweet only by a step the about must say out loud: what everyone remembers."
+   },
+   "e2": {
+    "star": false,
+    "text": "Children's Society works for children and young people: a favourite sweet sits inside that cause."
+   },
+   "e3": null,
+   "count": 2
+  }
+ },
+ {
+  "id": "b9eacdaf-8224-4cc6-ba98-4deeaa88d7f0",
+  "name": "The Ravenscroft rowing eight",
+  "subject": "someone",
+  "register": "celebrating_many",
+  "occasion": "Reunion",
+  "topic": "Cheese",
+  "charity": "Age UK",
+  "family": "older_people",
+  "pronoun": "i",
+  "grouping": "group",
+  "context": "20 years since we last met",
+  "about": "We're back under one roof for the first time in years, plates loaded, and the table full. Age UK works for those who spend evenings like this alone. Pledge to Age UK, pick your favourite cheese, and the winners go on the board.",
+  "note": "Stilton was what someone unwrapped first at our last reunion, and by the end of the night the whole board had gathered round it.",
+  "edges": {
+   "e1": {
+    "star": true,
+    "text": "A favourite decade is part of a reunion: the years everyone shared."
+   },
+   "e2": {
+    "star": false,
+    "text": "Age UK works for older people: a favourite decade sits inside that cause."
+   },
+   "e3": {
+    "star": false,
+    "text": "Age UK belongs at a reunion: a full house, and a charity for those who are on their own."
+   },
+   "count": 3
+  }
+ },
+ {
+  "id": "0b3213be-075d-4a9e-ad2b-6fedd27f2ff0",
+  "name": "Fatima Choudhury",
+  "subject": "someone",
+  "register": "remembering",
+  "occasion": "Celebration of life",
+  "topic": "Hymn",
+  "charity": "Diabetes UK",
+  "family": "health_condition",
+  "pronoun": "she",
+  "grouping": "individual",
+  "context": "A life in full",
+  "about": "Fatima sang in her church choir for years and knew every hymn by heart. She looked forward to the carol service each December and always brought round mince pies after. Diabetes UK cared for her through her illness. Pledge to Diabetes UK, pick your favourite hymn, and we'll reveal Fatima's.",
+  "note": "Fatima's was When I Survey the Wondrous Cross. She used to hum it while doing the ironing on Sunday afternoons.",
+  "edges": {
+   "e1": {
+    "star": true,
+    "text": "A favourite poem is part of a celebration of life: the flowers, the hymns and the readings of the service itself."
+   },
+   "e2": null,
+   "e3": {
+    "star": false,
+    "text": "Diabetes UK belongs at a celebration of life: a charity that fights the kind of illness that takes people belongs at a memorial."
+   },
+   "count": 2
+  }
+ },
+ {
+  "id": "d6f85631-3e8d-47d9-955d-e34aaf9ebfd4",
+  "name": "Kenneth Parry",
+  "subject": "someone",
+  "register": "remembering",
+  "occasion": "Celebration of life",
+  "topic": "Season",
+  "charity": "Stroke Association",
+  "family": "health_condition",
+  "pronoun": "he",
+  "grouping": "individual",
+  "context": "A life in full",
+  "about": "Kenneth Parry loved being outdoors, whatever the weather. He kept logs stacked by the back door for the colder months and always knew when the first frost was near. Stroke Association was there for him after his stroke, and he wanted them remembered today. Pledge to Stroke Association, pick your favourite season, to see Kenneth's.",
+  "note": "Kenneth's was Summer. He spent every August bank holiday fishing at the same spot by the river.",
+  "edges": {
+   "e1": {
+    "star": true,
+    "text": "A favourite poem is part of a celebration of life: the flowers, the hymns and the readings of the service itself."
+   },
+   "e2": null,
+   "e3": {
+    "star": false,
+    "text": "Stroke Association belongs at a celebration of life: a charity that fights the kind of illness that takes people belongs at a memorial."
+   },
+   "count": 2
+  }
+ },
+ {
+  "id": "22814e73-f626-4586-afcf-3c34e27bfddf",
+  "name": "Winston",
+  "subject": "someone",
+  "register": "remembering",
+  "occasion": "Pet memorial",
+  "topic": "Beach",
+  "charity": "WWF",
+  "family": "animals",
+  "pronoun": "he",
+  "grouping": "individual",
+  "context": "Fourteen good years",
+  "about": "Winston pulled me down to the sea on every walk we took, whatever the weather. He'd wait at the door with his lead the moment I reached for my coat. Pledge to WWF, pick your favourite beach, and Winston's will be revealed.",
+  "note": "Winston's was Saunton Sands. He would bound straight into the shallows every time we visited, tail going nineteen to the dozen.",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "A pet memorial suggests a favourite beach only by a step the about must say out loud: the walks that were theirs."
+   },
+   "e2": null,
+   "e3": {
+    "star": true,
+    "text": "WWF belongs at a pet memorial: an animal charity, for an animal being remembered."
+   },
+   "count": 2
+  }
+ },
+ {
+  "id": "445f1c94-5c5c-445c-9d70-e9525a28bed2",
+  "name": "Tilly",
+  "subject": "someone",
+  "register": "remembering",
+  "occasion": "Pet memorial",
+  "topic": "Weather for walking",
+  "charity": "Dogs Trust",
+  "family": "animals",
+  "pronoun": "she",
+  "grouping": "individual",
+  "context": "The best boy",
+  "about": "Tilly pulled me out of the door whatever the sky was doing. She waited by the lead for our walk at the same time every day, rain or shine. Pledge to Dogs Trust, pick your favourite weather for walking, and Tilly's will be revealed.",
+  "note": "Tilly's was Golden hour. She would stop on the same ridge every evening to watch the light change before trotting on.",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "A pet memorial suggests a favourite weather for walking only by a step the about must say out loud: the walks that were theirs."
+   },
+   "e2": {
+    "star": false,
+    "text": "Dogs Trust works for animals — rescue, welfare and wildlife: a favourite weather for walking sits inside that cause."
+   },
+   "e3": {
+    "star": true,
+    "text": "Dogs Trust belongs at a pet memorial: an animal charity, for an animal being remembered."
+   },
+   "count": 3
+  }
+ }
+]

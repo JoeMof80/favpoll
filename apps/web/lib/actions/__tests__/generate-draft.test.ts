@@ -21,10 +21,21 @@ vi.mock("@anthropic-ai/sdk", () => ({
 
 import { generateDraft, safeGenerateDraft } from "../generate-draft"
 import {
+  REVEAL_PROMISES,
+  pickRevealPromise,
+  stripEmDashes,
+  undoubledPossessive,
+  endStop,
+  describeAreas,
+} from "@/lib/story-engine"
+import {
   buildCacheKey,
   revealNamesRealItem,
   hasFabricatedStats,
   violatesCopyRules,
+  inventsCondition,
+  hasTics,
+  slipsToSingular,
   _rateLimitStore,
   RATE_LIMIT_MAX,
   RateLimitError,
@@ -226,7 +237,7 @@ describe("generateDraft — skipCache re-roll", () => {
     })
 
     expect(result.fromCache).toBe(false)
-    expect(result.about).toBe("A fresh example, rolled again.")
+    expect(result.about).toContain("A fresh example, rolled again.")
     expect(mockMessagesCreate).toHaveBeenCalledTimes(1)
     // A re-roll is this form's alone: no cache lookup, no cache write
     const draftCalls = mock.callsFor("generated_drafts")
@@ -256,7 +267,7 @@ describe("generateDraft — cache miss, person", () => {
     })
 
     expect(result.fromCache).toBe(false)
-    expect(result.about).toBe("A celebration for someone special.")
+    expect(result.about).toContain("A celebration for someone special.")
     expect(result.note).toBe("Her favourite was always Blue.")
     expect(mockMessagesCreate).toHaveBeenCalledTimes(1)
 
@@ -265,7 +276,7 @@ describe("generateDraft — cache miss, person", () => {
       .find((c) => c.method === "insert")
     expect(insertCall?.args[0]).toMatchObject({
       subject: "someone",
-      about: "A celebration for someone special.",
+      about: expect.stringContaining("A celebration for someone special."),
       note: "Her favourite was always Blue.",
       status: "generated",
     })
@@ -663,7 +674,7 @@ describe("safeGenerateDraft", () => {
 
     expect(result).not.toHaveProperty("error")
     if ("error" in result) throw new Error("expected a draft, got a failure")
-    expect(result.about).toBe("About.")
+    expect(result.about).toContain("About.")
     expect(result.note).toBe("Her favourite was always Blue.")
     expect(result.fromCache).toBe(false)
   })
@@ -853,13 +864,19 @@ describe("edge-aware generation — the prompt carries the table's edges", () =>
     expect(prompt).toContain(
       "Occasion → topic: A favourite seaside town is part of an achievement:"
     )
-    expect(prompt).toContain(
-      "Charity → topic: RNLI works for lifeboats and rescue at sea"
-    )
+    expect(prompt).toContain("Charity → topic: RNLI works for rescue")
     expect(prompt).toContain(
       "Occasion ↔ charity: RNLI belongs at an achievement"
     )
-    expect(prompt).toContain("All THREE edges link this favpoll")
+    expect(prompt).toContain("USE it in the story")
+    // A sponsored effort is written before the day, never as finished.
+    expect(prompt).toContain("STILL TO COME")
+    // The first seed run parroted the edge sentences into copy, and
+    // explained ★ edges that read on the card by themselves (founder,
+    // 2026-09-24: "it doesn't quite make sense").
+    expect(prompt).toContain("must NOT explain or justify it")
+    expect(prompt).toContain("em dashes (—) in prose")
+    expect(prompt).toContain("kept back or withheld")
     expect(prompt).toContain(
       'In its own words on the Charity Commission register: "The RNLI operates lifeboats'
     )
@@ -894,8 +911,10 @@ describe("edge-aware generation — the prompt carries the table's edges", () =>
     expect(prompt).toContain("Occasion → topic: none.")
     expect(prompt).toContain("Charity → topic: none.")
     expect(prompt).toContain("Occasion ↔ charity: none.")
-    expect(prompt).toContain("NO edge links this occasion")
-    expect(prompt).toContain("stated in the about before the invitation")
+    expect(prompt).toContain("No edge links this occasion")
+    // An organiser may pair Oxfam with River; the writer builds no bridge.
+    expect(prompt).toContain('An edge marked "none" does not exist')
+    expect(prompt).toContain("one plain, believable thing about them")
   })
 
   it("the wizard passes no occasion: the register default pairs with nothing", async () => {
@@ -917,7 +936,7 @@ describe("edge-aware generation — the prompt carries the table's edges", () =>
     expect(prompt).toContain("Occasion → topic: none.")
     // The charity edge survives without an occasion.
     expect(prompt).toContain("Charity → topic: RNLI works for")
-    expect(prompt).toContain("ONE edge links this favpoll")
+    expect(prompt).toContain("The edges above are context")
   })
 
   it("a charity with register words but no description is described only in those terms", async () => {
@@ -980,6 +999,466 @@ describe("edge-aware generation — the prompt carries the table's edges", () =>
       "Charity → topic: Trussell Trust works for food banks"
     )
     expect(prompt).not.toContain("Occasion ↔ charity")
-    expect(prompt).toContain("with why THIS topic in a clause")
+  })
+})
+
+describe("the reveal promise rotates", () => {
+  it("substitutes the possessive into every form", () => {
+    REVEAL_PROMISES.forEach((form, i) => {
+      const out = pickRevealPromise("Joan's", i)
+      expect(out).toBe(form.replace("X", "Joan's"))
+      expect(out).not.toContain("X")
+    })
+  })
+
+  it("includes the founder's form: pick your own favourite to see X", () => {
+    expect(REVEAL_PROMISES).toContain("to see X")
+  })
+
+  it("the prompt asks for exactly one shape, not a choice", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mock.queue(CHARITY_DATA)
+    mockLLMResponse("About.", "Joan's is Blue. She kept a pot of them.")
+    mock.queue(null)
+    await generateDraft({
+      register: "celebrating_one",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      pronoun: "she",
+      displayName: "Joan Okafor",
+    })
+    const prompt = mockMessagesCreate.mock.calls[0][0].messages[0]
+      .content as string
+    expect(prompt).toContain(
+      "ending with the closing sentence given here exactly"
+    )
+    expect(
+      REVEAL_PROMISES.some((f) =>
+        prompt.includes(
+          `Pledge to Ocean Trust, pick your favourite colour, ${f.replace("X", "Joan's")}.`
+        )
+      )
+    ).toBe(true)
+  })
+})
+
+describe("stripEmDashes", () => {
+  it("turns a spaced em dash into a comma and an unspaced one into a hyphen", () => {
+    expect(stripEmDashes("She sang — every morning — to the dog")).toBe(
+      "She sang, every morning, to the dog"
+    )
+    expect(stripEmDashes("Stand by Me — Ben E. King")).toBe(
+      "Stand by Me, Ben E. King"
+    )
+    expect(stripEmDashes("a forget—me—not")).toBe("a forget-me-not")
+  })
+
+  it("keeps an item label's own em dash verbatim so the real-item check still passes", () => {
+    const labels = ["Stand by Me — Ben E. King", "Dancing Queen — ABBA"]
+    expect(
+      stripEmDashes(
+        "David's was Stand by Me — Ben E. King. He turned it up — every time.",
+        labels
+      )
+    ).toBe(
+      "David's was Stand by Me — Ben E. King. He turned it up, every time."
+    )
+  })
+})
+
+describe("a group's possessive is its whole name", () => {
+  it("opens the reveal with the full group name", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mock.queue(CHARITY_DATA)
+    mockLLMResponse(
+      "About.",
+      "The Hartley family's is Blue. They painted the shed in it."
+    )
+    mock.queue(null)
+    await generateDraft({
+      register: "celebrating_many",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      grouping: "group",
+      displayName: "The Hartley family",
+    })
+    const prompt = mockMessagesCreate.mock.calls[0][0].messages[0]
+      .content as string
+    expect(prompt).toContain('start with exactly "The Hartley family\'s is"')
+    expect(prompt).not.toContain("The's")
+  })
+})
+
+describe("realism rules in the person prompt (founder review, 2026-09-24)", () => {
+  const promptOf = () =>
+    mockMessagesCreate.mock.calls[0][0].messages[0].content as string
+
+  it("carries the founder's exemplars and the ordinariness rule", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mock.queue(CHARITY_DATA)
+    mockLLMResponse("About.", "Joan's is Blue. She kept a pot of them.")
+    mock.queue(null)
+    await generateDraft({
+      register: "celebrating_one",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      pronoun: "she",
+      displayName: "Joan Okafor",
+    })
+    const prompt = promptOf()
+    expect(prompt).toContain("These are the bar")
+    // Four retrieved exemplars, each with an about and a note.
+    expect(prompt.match(/\n  about: /g)?.length).toBe(4)
+    expect(prompt.match(/\n  note: /g)?.length).toBe(4)
+    expect(prompt).toContain("ordinary and believable")
+    expect(prompt).toContain("one particular one in their life")
+    expect(prompt).toContain("given agency")
+    expect(prompt).toContain("passes the HONOUR test")
+    expect(prompt).not.toContain("The occasion is a birth")
+  })
+
+  it("at a birth, the parents are honoured and the favourite is their own", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mock.queue(CHARITY_DATA)
+    mockLLMResponse(
+      "About.",
+      "Sarah & Tom's is Blue. They painted their first flat in it."
+    )
+    mock.queue(null)
+    await generateDraft({
+      register: "celebrating_many",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      grouping: "couple",
+      occasionType: "New baby",
+      displayName: "Sarah & Tom",
+    })
+    const prompt = promptOf()
+    expect(prompt).toContain("The occasion is a birth")
+    expect(prompt).toContain("The people honoured are the PARENTS")
+    expect(prompt).toContain("The favourite is the parents' OWN")
+  })
+
+  it("an enacted topic promises the outcome, not a reveal", async () => {
+    mock.queue(null)
+    mock.queue({ ...TOPIC_DATA, title: "Song" })
+    mock.queue(CHARITY_DATA)
+    mockLLMResponse(
+      "About.",
+      "Last time Wonderwall — Oasis closed the night and nobody would leave."
+    )
+    mock.queue(null)
+    await generateDraft({
+      register: "celebrating_many",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      grouping: "group",
+      occasionType: "Reunion",
+      displayName: "The Ravenscroft rowing eight",
+      pronoun: "i",
+    })
+    const prompt = promptOf()
+    expect(prompt).toContain(
+      "pick your favourite song, and the top ten are the playlist for the night."
+    )
+    expect(prompt).toContain("The guests' picks are ENACTED on the night")
+    expect(prompt).toContain("no opener and no reveal")
+    expect(hasTics("Someone always brings a speaker.")).toBe(true)
+    expect(prompt).not.toContain('start with exactly "Ours is"')
+  })
+
+  it("at a pet memorial, the animal is on the card and its owner writes about it", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mock.queue(CHARITY_DATA)
+    mockLLMResponse(
+      "About.",
+      "Misty's was Blue. She carried the same blue ball to the door every morning."
+    )
+    mock.queue(null)
+    await generateDraft({
+      register: "remembering",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      grouping: "individual",
+      occasionType: "Pet memorial",
+      displayName: "Misty",
+      pronoun: "she",
+    })
+    const prompt = promptOf()
+    expect(prompt).toContain("The one being remembered is an ANIMAL")
+    expect(prompt).toContain("The favourite is the animal's OWN")
+    expect(prompt).toContain("never make the favourite yours")
+  })
+})
+
+describe("tidying the model's grammar", () => {
+  it("never lets a plural possessive take a second s", () => {
+    expect(
+      undoubledPossessive("we'll reveal The Okafors's.", "The Okafors'")
+    ).toBe("we'll reveal The Okafors'.")
+    expect(undoubledPossessive("Joan's is Blue.", "Joan's")).toBe(
+      "Joan's is Blue."
+    )
+  })
+
+  it("ends a sentence that lost its stop after a possessive", () => {
+    expect(endStop("and find out James'")).toBe("and find out James'.")
+    expect(endStop("and find out James'.")).toBe("and find out James'.")
+    expect(endStop("Done.")).toBe("Done.")
+  })
+})
+
+describe("a real person never gets an invented condition (the wizard caller)", () => {
+  it("flags conditions, diagnoses and causes of death, but not the charity's name or the Recovery occasion", () => {
+    expect(
+      inventsCondition("Carys loved music long before she lost her sight.")
+    ).toBe(true)
+    expect(
+      inventsCondition(
+        "Marie Curie nurses were with her at the end. She was diagnosed in May."
+      )
+    ).toBe(true)
+    expect(
+      inventsCondition(
+        "Pledge to Cancer Research UK and pick your own.",
+        "Cancer Research UK"
+      )
+    ).toBe(false)
+    expect(
+      inventsCondition("Ben is celebrating his recovery with a swim.")
+    ).toBe(false)
+    expect(inventsCondition("He recovered from a stroke last spring.")).toBe(
+      true
+    )
+  })
+
+  it("the wizard's prompt carries the rule", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mock.queue(CHARITY_DATA)
+    mockLLMResponse("About.", "Joan's is Blue. She kept a pot of them.")
+    mock.queue(null)
+    await generateDraft({
+      register: "remembering",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      pronoun: "she",
+      displayName: "Joan Okafor",
+    })
+    const prompt = mockMessagesCreate.mock.calls[0][0].messages[0]
+      .content as string
+    expect(prompt).toContain("This is a REAL person")
+    expect(prompt).toContain("never invent or imply any illness")
+    expect(prompt).toContain("Never invent a spouse, partner, child")
+    expect(prompt).toContain("Never announce that a favourite exists")
+  })
+
+  it("retries once when the first draft gives a real person a condition", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mock.queue(CHARITY_DATA)
+    mockLLMResponse(
+      "Joan loved colour long before the dementia took her words.",
+      "Joan's was Blue. She kept a pot of them."
+    )
+    mockLLMResponse(
+      "Joan loved colour, and her kitchen showed it.",
+      "Joan's was Blue. She kept a pot of them."
+    )
+    mock.queue(null)
+    const result = await generateDraft({
+      register: "remembering",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      pronoun: "she",
+      displayName: "Joan Okafor",
+    })
+    expect(mockMessagesCreate).toHaveBeenCalledTimes(2)
+    expect(result.about).toContain(
+      "Joan loved colour, and her kitchen showed it."
+    )
+  })
+})
+
+describe("the closing sentence is enforced", () => {
+  it("appends the invitation when the model returns the first sentence alone", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mock.queue(CHARITY_DATA)
+    mockLLMResponse(
+      "Gordon spent most Sundays walking in a garden",
+      "Gordon's is Blue. He always stopped at the same gate."
+    )
+    mock.queue(null)
+    const result = await generateDraft({
+      register: "celebrating_one",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      pronoun: "he",
+      displayName: "Gordon Mitchell",
+    })
+    expect(result.about).toMatch(
+      /^Gordon spent most Sundays walking in a garden\. Pledge to Ocean Trust, pick your favourite colour, .*Gordon's.*\.$/
+    )
+  })
+})
+
+describe("first person: the organiser is the protagonist", () => {
+  const promptOf = () =>
+    mockMessagesCreate.mock.calls[0][0].messages[0].content as string
+
+  it("opens the reveal with Mine and closes with mine", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mock.queue(CHARITY_DATA)
+    mockLLMResponse(
+      "I'm retiring in June. Pledge to Ocean Trust, pick your favourite colour, to see mine.",
+      "Mine is Blue. I painted the shed in it last summer."
+    )
+    mock.queue(null)
+    const result = await generateDraft({
+      register: "celebrating_one",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      pronoun: "i",
+      displayName: "Roy Mansfield",
+    })
+    const prompt = promptOf()
+    expect(prompt).toContain('start with exactly "Mine is"')
+    expect(prompt).toContain("writing in the FIRST PERSON")
+    expect(prompt).not.toContain("Roy's")
+    expect(prompt).not.toContain("we'll reveal mine")
+    expect(result.about).toMatch(/mine\.$/)
+  })
+
+  it("a couple in the first person says ours", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mock.queue(CHARITY_DATA)
+    mockLLMResponse("About.", "Ours is Blue. We painted the hall in it.")
+    mock.queue(null)
+    await generateDraft({
+      register: "celebrating_many",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      pronoun: "i",
+      grouping: "couple",
+      displayName: "Emma & James",
+    })
+    const prompt = promptOf()
+    expect(prompt).toContain('start with exactly "Ours is"')
+    expect(prompt).toContain("FIRST PERSON PLURAL")
+  })
+})
+
+describe("hasTics", () => {
+  it("flags 'anyone who asks' and a second 'always'", () => {
+    expect(hasTics("She shows it to anyone who asks.")).toBe(true)
+    expect(hasTics("He always sits there. He always orders the same.")).toBe(
+      true
+    )
+    expect(hasTics("He always sits there, by the window.")).toBe(false)
+  })
+})
+
+describe("a caller may choose the favourite; a couple stays plural", () => {
+  it("slipsToSingular catches I and my", () => {
+    expect(
+      slipsToSingular("Ours is Saturn. I point it out whenever I can.")
+    ).toBe(true)
+    expect(
+      slipsToSingular("Ours is Saturn. We point it out whenever we can.")
+    ).toBe(false)
+    expect(
+      slipsToSingular(
+        "Ours is Nineties indie and dance. My ticket stubs sit in a shoebox."
+      )
+    ).toBe(true)
+  })
+
+  it("the prompt names the chosen option verbatim", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mock.queue(CHARITY_DATA)
+    mockLLMResponse("About.", "Joan's is Green. She paints the gate in it.")
+    mock.queue(null)
+    const { generateStory } = await import("@/lib/story-engine")
+    void generateStory
+    await generateDraft({
+      register: "celebrating_one",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      pronoun: "she",
+      displayName: "Joan Okafor",
+    })
+    const prompt = mockMessagesCreate.mock.calls[0][0].messages[0]
+      .content as string
+    // The wizard passes no pick: the model chooses from the list.
+    expect(prompt).toContain("a plausible option from the list")
+  })
+})
+
+describe("the register's objects and areas reach the prompt", () => {
+  it("places a local charity and never calls a national one local", () => {
+    expect(
+      describeAreas([
+        { area: "Bromley", type: "Local Authority" },
+        { area: "Croydon", type: "Local Authority" },
+      ])
+    ).toContain("It works locally, in Bromley, Croydon")
+    expect(
+      describeAreas([
+        { area: "Throughout England And Wales", type: "Region" },
+        { area: "Scotland", type: "Country" },
+      ])
+    ).toContain("never call it local")
+    expect(describeAreas(null)).toBeNull()
+  })
+
+  it("quotes the objects when there is no description", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mock.queue({
+      name: "St Christopher's Hospice",
+      description: null,
+      activities: null,
+      cause_family: "end_of_life",
+      objects:
+        "To promote the relief of suffering by the provision of hospice care.",
+      areas: [{ area: "Bromley", type: "Local Authority" }],
+    })
+    mockLLMResponse("About.", "Her favourite was always Blue.")
+    mock.queue(null)
+    await generateDraft({
+      register: "remembering",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      pronoun: "she",
+    })
+    const prompt = mockMessagesCreate.mock.calls[0][0].messages[0]
+      .content as string
+    expect(prompt).toContain(
+      "Its charitable objects, from its governing document"
+    )
+    expect(prompt).toContain("It works locally, in Bromley")
+    expect(prompt).not.toContain("NOTHING is known here")
   })
 })

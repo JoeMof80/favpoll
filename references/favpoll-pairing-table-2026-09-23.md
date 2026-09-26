@@ -14,6 +14,17 @@ charities on prod as of today. Every topic and charity named here exists.
 > `cause_family`) and `lookupEdges()`; `generate-draft.ts` passes the edges
 > and the charity's `activities` into the prompt (§6). Rows D, E and H are
 > deliberately NOT encoded. §3 themes wait for a theme input to exist.
+> The engine is `apps/web/lib/story-engine.ts` (one generator, two callers);
+> `scripts/seed-stories.ts` (`pnpm seed:stories`) picks triples from the table
+> at the seed bar and runs the judge loop (A1, P2) before writing.
+>
+> **Who is on the card (2026-09-26).** Two occasions put someone other than
+> the writer on the card. A birth honours the PARENTS on behalf of the child
+> and the favourite is theirs (`BABY_OCCASIONS`). A pet memorial is the mirror:
+> the ANIMAL is remembered ("Remembering Misty"), the owner writes about it,
+> and the favourite is the animal's own or a plain fact about what it was
+> (`PET_OCCASIONS`). The seed names pets from their own pool; the judge fails
+> a pet's favourite that reads as the owner's.
 
 ## How it is used
 
@@ -91,7 +102,7 @@ the About half is actually there.
 | Occasion | Topics |
 |---|---|
 | Memorial · Celebration of life · Tribute | Flower ★ · Hymn ★ · Poem ★ · Song · Saying · Season · Garden to visit |
-| Pet memorial | Dog breed ★ · Cat breed ★ · Animal ★ · Weather for walk · Beach · Toy |
+| Pet memorial | Dog breed ★ · Cat breed ★ · Animal ★ · Weather for walking · Beach · Toy |
 | In memoriam appeal | as Memorial, plus the charity's row in §2 |
 
 > Memorials are the natural home of **known-fact** motivation (Belinda loved
@@ -107,9 +118,9 @@ the About half is actually there.
 | Retirement | Place · Type of holiday · Way to spend Sunday · Garden to visit · Hobby · Way to travel — **all two hops ("now there's time")**. Little *happens* at a retirement that maps to a topic; like a memorial, the **person** motivates it. Lean on E1′ |
 | Leaving do | Beer · Takeaway (the leaving drinks) · Coffee order · Sandwich (office life — two hops) · City (where they're going) · Saying |
 | Graduation | School subject ★ · Book · Author · Type of book · City (where next) · Takeaway |
-| Christening · New baby · Baby shower | Children's book ★ · Nursery rhyme ★ · Name for a grandparent ★ · Fairy tale · Toy · Cartoon · Childhood game · Season |
+| Christening · New baby · Baby shower | Children's book ★ · Nursery rhyme ★ · Name for a grandparent ★ · Fairy tale · Toy · Cartoon · Childhood game · Season — **the protagonists are the parents** (named as a couple, the baby in the context line) and the favourite is theirs, the one they will pass on; a newborn has no favourite (founder, 2026-09-24) |
 | Bar or bat mitzvah | Song · Film · Book · Sweet · Board game — *see review note A* |
-| Recovery | Form of exercise · Weather for walk · Landscape · Comfort food · Song · Way to spend Sunday · Season · Time of day — *two hops ("back on their feet"); the About says it* |
+| Recovery | Form of exercise · Weather for walking · Landscape · Comfort food · Song · Way to spend Sunday · Season · Time of day — *two hops ("back on their feet"); the About says it* |
 | New job · Promotion | Cocktail · Beer · Wine · Takeaway (the celebration) · Coffee order · Sandwich · City — *thin; lean on E1′* |
 | Achievement (sporting) | **where it happened** ★ — Seaside town (a swim) · National park · Landscape · Beach · Mountain or peak · River · Comfort food · Song (the training playlist — two hops) · Form of exercise · Weather · Sporting moment |
 | Award | Saying · Word · Book · Poem · School subject · Instrument — *depends on the award; see note B* |
@@ -128,7 +139,7 @@ the About half is actually there.
 | Engagement | Gemstone ★ (the ring) · Song · Cocktail · Wine · Type of holiday · Island · Beach · Flower · Place (where it happened) |
 | Anniversary | Song ★ (their song) · Decade ★ (the year they married) · Music era · Film · Gemstone (the year's gift) · Cuisine · Wine · Type of holiday · Dance |
 | Renewal of vows | as Wedding, plus Decade |
-| Reunion | Decade ★ · Music era ★ · Song · School subject · Childhood game · Sweet · Crisps · TV theme tune · Sitcom · Cartoon · Toy · Video game |
+| Reunion | Song ★ (enacted: the top ten are the playlist) · Cheese ★ (enacted: the board) · Crisps ★ (enacted: the bar) · Sweet ★ (enacted: bowls on the tables, a tuck shop in passing) · Decade ★ · Music era ★ · School subject · TV theme tune · Sitcom · Cartoon · Video game |
 | Team celebration (sport) | Sporting moment ★ · Sport to play · Sport to watch · Football team · Rugby team · Cricket team · Beer · Takeaway |
 | Team celebration (work) | Takeaway · Beer (the team meal) · Biscuit · Coffee order · Sandwich — *office life is two hops* |
 | Family gathering | Part of a roast dinner ★ · Name for a grandparent ★ · Board game ★ · Card game · Pudding · Pie · Way to spend Sunday · Nursery rhyme · Childhood game |
@@ -231,10 +242,10 @@ Inactive charities omitted. Grouped where the cause is the same.
 
 | Charity | Topics |
 |---|---|
-| Dogs Trust | Dog breed ★★ · Animal · Weather for walk · Beach |
+| Dogs Trust | Dog breed ★★ · Animal · Weather for walking · Beach |
 | RSPCA | Animal ★ · Dog breed · Cat breed · Bird · Butterfly · Insect |
 | WWF | Animal ★ · Sea creature · Bird · Butterfly · Tree · Landscape · Island · National park · River · Mountain or peak · Planet |
-| National Trust | Castle ★ · Garden to visit ★ · Landmark or building · National park · Tree · Landscape · Beach · Weather for walk · Season · Famous painting |
+| National Trust | Castle ★ · Garden to visit ★ · Landmark or building · National park · Tree · Landscape · Beach · Weather for walking · Season · Famous painting |
 | RNLI | Seaside town ★ · Beach ★ · Sea creature · Island · Weather · Way to travel |
 | Trussell Trust | Part of a roast dinner ★ · Comfort food ★ · Meal of the day · Breakfast cereal · Sandwich · Pie · Type of tea |
 | Shelter · Crisis · St Mungo's | Comfort food ★ · Way to spend Sunday · Meal of the day · Smell (of home) · Sound · Season — *the topics of "home"; see note D* |
@@ -242,9 +253,9 @@ Inactive charities omitted. Grouped where the cause is the same.
 | Comic Relief | Comedian ★ · Sitcom ★ · TV programme · Saying · Song |
 | Alzheimer's Society | Song ★ (music is the last thing to go) · Music era · Decade · Smell · Saying · TV theme tune · Hymn · Childhood game · Sweet |
 | Age UK | Decade · Music era · Way to spend Sunday · Type of tea · Biscuit · Radio station · Saying · Dance · Sitcom |
-| Mind · Samaritans | Song · Way to spend Sunday · Weather for walk · Landscape · Form of exercise · Book · Hobby · Sound · Time of day — *the quiet, restorative topics* |
-| British Heart Foundation | Form of exercise ★ · Sport to play · Weather for walk · Landscape · National park · Vegetable · Fruit |
-| Stroke Association | Form of exercise · Song · Weather for walk · Word — *see note E* |
+| Mind · Samaritans | Song · Way to spend Sunday · Weather for walking · Landscape · Form of exercise · Book · Hobby · Sound · Time of day — *the quiet, restorative topics* |
+| British Heart Foundation | Form of exercise ★ · Sport to play · Weather for walking · Landscape · National park · Vegetable · Fruit |
+| Stroke Association | Form of exercise · Song · Weather for walking · Word — *see note E* |
 | Diabetes UK | Fruit · Vegetable · Form of exercise · Breakfast cereal — *see note E* |
 | RNIB | Sound ★ · Smell ★ · Radio station ★ · Instrument · Song · Weather — *the non-visual senses* |
 | Scope | Song · Film · Way to spend Sunday · Sport to watch — *neutral by design; see note E* |

@@ -37,7 +37,20 @@ import type { CauseFamily, Register } from "@favpoll/types"
  * (the precedent is scripts/backfill-cause-family.ts).
  */
 
-export type TopicRow = { topic: string; star: boolean }
+export type TopicRow = {
+  topic: string
+  star: boolean
+  /** The concrete thing that links this topic to the occasion, when the
+   *  row's general hop is too abstract to write from ("settling in has
+   *  put a roast dinner on her mind"; founder, 2026-09-26). The table's
+   *  own parentheticals, made data. */
+  why?: string
+  /** ENACTED: the guests' picks decide something on the night, so the
+   *  favpoll needs no favourite of the group's own. The outcome, as the
+   *  closing sentence will promise it ("the top ten are the playlist for
+   *  the night"; founder, 2026-09-26: a reunion's Song IS the playlist). */
+  enacted?: string
+}
 
 /** A §1 row: what the occasion pairs with, and the two sentences the
  *  edge text is built from — `at` for a starred topic (what happens at
@@ -49,7 +62,14 @@ export type OccasionRow = {
   hop: string
 }
 
-const t = (topic: string, star = false): TopicRow => ({ topic, star })
+/** An enacted topic: starred, and the outcome is the promise. */
+const enact = (topic: string, outcome: string): TopicRow => ({
+  topic,
+  star: true,
+  enacted: outcome,
+})
+const t = (topic: string, star = false, why?: string): TopicRow =>
+  why ? { topic, star, why } : { topic, star }
 
 const MEMORIAL: OccasionRow = {
   topics: [
@@ -57,12 +77,16 @@ const MEMORIAL: OccasionRow = {
     t("Hymn", true),
     t("Poem", true),
     t("Song"),
-    t("Saying"),
+    // Saying was here: a person can be known for one, but guests at a
+    // wake have no favourite saying to pick (founder, 2026-09-25).
     t("Season"),
     t("Garden to visit"),
   ],
   at: "the flowers, the hymns and the readings of the service itself",
-  hop: "what the person loved is what the gathering remembers",
+  // Empty on purpose: everyone knows a memorial remembers what the
+  // person loved, and a written hop was quoted back verbatim ("What he
+  // loved is what we remember today"; founder, 2026-09-24: verbose).
+  hop: "",
 }
 
 const WEDDING: OccasionRow = {
@@ -80,7 +104,7 @@ const WEDDING: OccasionRow = {
     t("Place"),
   ],
   at: "the first dance, the cake and the flowers of the day itself",
-  hop: "the honeymoon, the venue, the reading chosen for the day",
+  hop: "the honeymoon or the venue",
 }
 
 const ACHIEVEMENT: OccasionRow = {
@@ -97,10 +121,13 @@ const ACHIEVEMENT: OccasionRow = {
     t("Weather"),
     t("Sporting moment"),
   ],
-  at: "where the effort happened — the sea, the peak, the route",
-  hop: "the training, the fuel and the playlist behind the effort",
+  at: "where the effort happens — the sea, the peak, the route",
+  hop: "the training",
 }
 
+// The name on the card at a birth is the PARENTS'; the baby cannot have a
+// favourite. The favourite is theirs, the one they will pass on (founder,
+// 2026-09-24). BABY_OCCASIONS in story-engine.ts carries the rule.
 const NEW_BABY: OccasionRow = {
   topics: [
     t("Children's book", true),
@@ -113,7 +140,7 @@ const NEW_BABY: OccasionRow = {
     t("Season"),
   ],
   at: "the stories, rhymes and names that arrive with a new baby",
-  hop: "a childhood about to begin",
+  hop: "",
 }
 
 const NEW_JOB: OccasionRow = {
@@ -127,7 +154,7 @@ const NEW_JOB: OccasionRow = {
     t("City"),
   ],
   at: "",
-  hop: "the celebratory drink, or the working day they are stepping into",
+  hop: "the celebratory drink",
 }
 
 /** §1 — occasion → topics, keyed on `occasion_type`. Occasions absent
@@ -145,12 +172,12 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Dog breed", true),
       t("Cat breed", true),
       t("Animal", true),
-      t("Weather for walk"),
+      t("Weather for walking"),
       t("Beach"),
       t("Toy"),
     ],
     at: "the animal being remembered",
-    hop: "the walks and the places that were theirs together",
+    hop: "the walks that were theirs",
   },
 
   // ── celebrating_one ─────────────────────────────────────────────────
@@ -166,7 +193,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Song"),
     ],
     at: "the cake on the table",
-    hop: "the treats and the games of a birthday tea",
+    hop: "a birthday tea",
   },
   "Milestone birthday": {
     topics: [
@@ -179,46 +206,51 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Toy"),
     ],
     at: "the decade they were born in, and its music",
-    hop: "a big birthday looks back at the years",
+    hop: "a big birthday looks back",
   },
   // Little HAPPENS at a retirement that maps to a topic — every pairing
   // is two hops ("now there's time"); like a memorial, the person
   // motivates it. Lean on E1′.
   Retirement: {
     topics: [
-      t("Place"),
-      t("Type of holiday"),
-      t("Way to spend Sunday"),
-      t("Garden to visit"),
-      t("Hobby"),
-      t("Way to travel"),
+      t("Place", false, "the freedom to finally go"),
+      t("Type of holiday", false, "the freedom to finally go"),
+      t("Way to spend Sunday", false, "every day a Sunday now"),
+      t("Garden to visit", false, "the days out there is finally time for"),
+      t("Hobby", false, "the hobby there is finally time for"),
+      t("Way to travel", false, "the freedom to finally go"),
     ],
     at: "",
     hop: "now there is time — the freedom to finally go",
   },
+  // Saying was here too: "favourite saying" is awkward as a poll
+  // (founder, 2026-09-25, the second time).
   "Leaving do": {
     topics: [
-      t("Beer"),
-      t("Takeaway"),
-      t("Coffee order"),
-      t("Sandwich"),
-      t("City"),
-      t("Saying"),
+      t("Beer", false, "the leaving drinks"),
+      t("Takeaway", false, "the leaving-night takeaway"),
+      t("Coffee order", false, "the office coffee run they are leaving behind"),
+      t("Sandwich", false, "the desk lunches they are leaving behind"),
+      t("City", false, "where they are going next"),
     ],
     at: "",
-    hop: "the leaving drinks, the office habits being left behind, or where they are going next",
+    hop: "the leaving drinks, or where they are going next",
   },
   Graduation: {
     topics: [
       t("School subject", true),
-      t("Book"),
-      t("Author"),
-      t("Type of book"),
-      t("City"),
-      t("Takeaway"),
+      t("Book", false, "reading for pleasure again after the reading list"),
+      t("Author", false, "reading for pleasure again after the reading list"),
+      t(
+        "Type of book",
+        false,
+        "reading for pleasure again after the reading list"
+      ),
+      t("City", false, "where they go next"),
+      t("Takeaway", false, "the late-night takeaways of the final year"),
     ],
     at: "the subject they have just finished studying",
-    hop: "the studying just done, and where they go next",
+    hop: "the studying just done",
   },
   Christening: NEW_BABY,
   "New baby": NEW_BABY,
@@ -227,12 +259,12 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
   "Bar or bat mitzvah": {
     topics: [t("Song"), t("Film"), t("Book"), t("Sweet"), t("Board game")],
     at: "",
-    hop: "a coming-of-age party",
+    hop: "",
   },
   Recovery: {
     topics: [
       t("Form of exercise"),
-      t("Weather for walk"),
+      t("Weather for walking"),
       t("Landscape"),
       t("Comfort food"),
       t("Song"),
@@ -241,7 +273,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Time of day"),
     ],
     at: "",
-    hop: "back on their feet — the walks, the food and the days they can enjoy again",
+    hop: "being back on their feet",
   },
   "New job": NEW_JOB,
   Promotion: NEW_JOB,
@@ -250,7 +282,6 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
   // "pick from what the award is for". Nothing starred.
   Award: {
     topics: [
-      t("Saying"),
       t("Word"),
       t("Book"),
       t("Poem"),
@@ -258,7 +289,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Instrument"),
     ],
     at: "",
-    hop: "what the award was given for",
+    hop: "what the award is for",
   },
   "Exam success": {
     topics: [
@@ -273,18 +304,22 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
   },
   "New home": {
     topics: [
-      t("Part of a roast dinner"),
-      t("Board game"),
-      t("Way to spend Sunday"),
-      t("Flower"),
-      t("Tree"),
-      t("Landmark or building"),
-      t("County"),
-      t("City"),
-      t("Smell"),
+      t(
+        "Part of a roast dinner",
+        false,
+        "the first roast cooked for friends in the new place"
+      ),
+      t("Board game", false, "the first games night in the new place"),
+      t("Way to spend Sunday", false, "the first Sunday in the new place"),
+      t("Flower", false, "the garden that comes with the house"),
+      t("Tree", false, "the garden that comes with the house"),
+      t("Landmark or building", false, "the place they have moved to"),
+      t("County", false, "the place they have moved to"),
+      t("City", false, "the place they have moved to"),
+      t("Smell", false, "a house becoming a home"),
     ],
     at: "",
-    hop: "settling in — the first dinner, the first Sunday, the place itself",
+    hop: "settling in",
   },
   Citizenship: {
     topics: [
@@ -301,7 +336,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Cuisine"),
     ],
     at: "the small British things a new citizen has taken on",
-    hop: "the country being joined, and the one they came from",
+    hop: "the country being joined",
   },
   // Review note C: kept to what makes no assumption on the person's behalf.
   "Coming out": {
@@ -313,7 +348,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Decade"),
     ],
     at: "",
-    hop: "the music and films that were theirs through it",
+    hop: "",
   },
   "Divorce party": {
     topics: [
@@ -325,7 +360,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Way to spend Sunday"),
     ],
     at: "the drink in hand — it is a party",
-    hop: "the first solo trip, and the Sundays that are now their own",
+    hop: "the first solo trip",
   },
 
   // ── celebrating_many ────────────────────────────────────────────────
@@ -347,7 +382,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Place"),
     ],
     at: "the ring",
-    hop: "the toast, and where it happened",
+    hop: "where it happened",
   },
   Anniversary: {
     topics: [
@@ -362,25 +397,31 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Dance"),
     ],
     at: "their song, and the year they married",
-    hop: "the years together — the gift, the trips, the table",
+    hop: "the years together",
   },
+  // A reunion is of people who were teenagers or adults together, so the
+  // small-child nostalgia (toys, playground games) is off the row: "by
+  // the time kids leave school, sweets aren't very important" (founder,
+  // 2026-09-26). A crowd has no favourite of its own, so the topics that
+  // work best are ENACTED: the picks become the playlist, the board, the
+  // bowls on the tables. Sweet survives only that way, as a tuck-shop
+  // bowl in passing.
   Reunion: {
     topics: [
+      enact("Song", "the top ten are the playlist for the night"),
+      enact("Cheese", "the winners go on the board"),
+      enact("Crisps", "the winners go on the bar"),
+      enact("Sweet", "the winners fill the bowls on the tables"),
       t("Decade", true),
       t("Music era", true),
-      t("Song"),
       t("School subject"),
-      t("Childhood game"),
-      t("Sweet"),
-      t("Crisps"),
       t("TV theme tune"),
       t("Sitcom"),
       t("Cartoon"),
-      t("Toy"),
       t("Video game"),
     ],
     at: "the years everyone shared",
-    hop: "what everyone remembers from back then",
+    hop: "what everyone remembers",
   },
   // The live vocabulary has ONE "Team celebration" (the table splits
   // sport from work), so nothing is starred: a sporting moment is not
@@ -400,7 +441,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Sandwich"),
     ],
     at: "",
-    hop: "the win itself, or the team's meal after it",
+    hop: "the win, or the meal after",
   },
   // The Christmas variant folds in unstarred — the topic itself says
   // Christmas; whether the gathering is one is not known here.
@@ -421,7 +462,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Carol"),
     ],
     at: "the table, the names round it and the game after",
-    hop: "what the family does when it is all together",
+    hop: "",
   },
 
   // ── cause ───────────────────────────────────────────────────────────
@@ -440,7 +481,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Dance"),
     ],
     at: "",
-    hop: "the event itself — a bake sale, a do, a casino night or a film night",
+    hop: "the event itself",
   },
   "Sponsored event": ACHIEVEMENT,
   "Charity night": {
@@ -467,6 +508,10 @@ export const FAMILY_ROWS: Record<
   CauseFamily,
   { cause: string; topics: TopicRow[] }
 > = {
+  // The family row is a rehoming charity's: dogs and cats. The wild
+  // topics (Sea creature, Butterfly, Insect) live on the RSPCA and WWF
+  // rows only — a pet memorial for an octopus came out of the wider
+  // row (fifth cohort, 2026-09-24).
   animals: {
     cause: "animals — rescue, welfare and wildlife",
     topics: [
@@ -474,10 +519,7 @@ export const FAMILY_ROWS: Record<
       t("Dog breed"),
       t("Cat breed"),
       t("Bird"),
-      t("Sea creature"),
-      t("Butterfly"),
-      t("Insect"),
-      t("Weather for walk"),
+      t("Weather for walking"),
       t("Beach"),
     ],
   },
@@ -522,7 +564,7 @@ export const FAMILY_ROWS: Record<
     topics: [
       t("Song"),
       t("Way to spend Sunday"),
-      t("Weather for walk"),
+      t("Weather for walking"),
       t("Landscape"),
       t("Form of exercise"),
       t("Book"),
@@ -556,27 +598,20 @@ export const FAMILY_ROWS: Record<
       t("Garden to visit"),
     ],
   },
+  // Rescue is a family (lifeboats, mountain rescue, air ambulance); the
+  // sea topics were the RNLI's own and now live on its row. "Mountain
+  // Rescue works for lifeboats and rescue at sea" failed the judge
+  // (fifth cohort, 2026-09-24).
   sea_rescue: {
-    cause: "lifeboats and rescue at sea",
-    topics: [
-      t("Seaside town", true),
-      t("Beach", true),
-      t("Sea creature"),
-      t("Island"),
-      t("Weather"),
-      t("Way to travel"),
-    ],
+    cause: "rescue — lifeboats, mountain rescue, air ambulance",
+    topics: [t("Weather")],
   },
-  // Review note F (not HOLD): risks reading as a holiday — kept as tabled.
+  // Review note F came true: "humanitarian work reaches rivers" was
+  // the model stretching to River (founder, 2026-09-25: "very tenuous
+  // and contrived"). Country and Cuisine stay; the rest go.
   international: {
     cause: "overseas aid and humanitarian relief",
-    topics: [
-      t("Country", true),
-      t("Cuisine"),
-      t("Way to travel"),
-      t("Weather"),
-      t("River"),
-    ],
+    topics: [t("Country", true), t("Cuisine")],
   },
   entertainment: {
     cause: "fundraising through comedy and entertainment",
@@ -590,13 +625,47 @@ export const FAMILY_ROWS: Record<
   },
 }
 
-/** Seeded charities whose table row is sharper than their family's.
- *  Keyed on the seeded name (scripts/seed.ts), matched loosely. */
+/** Charities whose table row is sharper than their family's. Keyed on
+ *  the name as seeded (scripts/seed.ts) or as added from the register
+ *  on staging (REGISTER_ADDED), matched loosely. */
+export const REGISTER_ADDED = [
+  "Mountain Rescue England and Wales",
+  "Guide Dogs",
+  "Royal Horticultural Society",
+] as const
 export const CHARITY_ROWS: Record<string, TopicRow[]> = {
+  RNLI: [
+    t("Seaside town", true),
+    t("Beach", true),
+    t("Sea creature"),
+    t("Island"),
+    t("Weather"),
+    t("Way to travel"),
+  ],
+  // The RHS is gardens: the first charity added because a seeded
+  // favpoll deserved an apter one (Barry's retirement; founder,
+  // 2026-09-26).
+  "Royal Horticultural Society": [
+    t("Garden to visit", true),
+    t("Flower", true),
+    t("Tree"),
+    t("Vegetable"),
+    t("Fruit"),
+  ],
+  // Guide Dogs breeds and trains its own dogs: the one health charity
+  // whose topic is an animal.
+  "Guide Dogs": [t("Dog breed", true), t("Animal"), t("Weather for walking")],
+  "Mountain Rescue England and Wales": [
+    t("Mountain or peak", true),
+    t("National park", true),
+    t("Landscape"),
+    t("Weather for walking"),
+    t("Weather"),
+  ],
   "Dogs Trust": [
     t("Dog breed", true),
     t("Animal"),
-    t("Weather for walk"),
+    t("Weather for walking"),
     t("Beach"),
   ],
   RSPCA: [
@@ -628,7 +697,7 @@ export const CHARITY_ROWS: Record<string, TopicRow[]> = {
     t("Tree"),
     t("Landscape"),
     t("Beach"),
-    t("Weather for walk"),
+    t("Weather for walking"),
     t("Season"),
     t("Famous painting"),
   ],
@@ -647,7 +716,7 @@ export const CHARITY_ROWS: Record<string, TopicRow[]> = {
   "British Heart Foundation": [
     t("Form of exercise", true),
     t("Sport to play"),
-    t("Weather for walk"),
+    t("Weather for walking"),
     t("Landscape"),
     t("National park"),
     t("Vegetable"),
@@ -671,6 +740,11 @@ export type HonourCharityRow = {
   family: CauseFamily
   star: boolean
   why: string
+  /** Seeded charities the row's reason does not fit: the health family
+   *  spans cancer and heart (which take people) and sight loss and
+   *  disability equality (which do not). "RNIB fights the sight loss
+   *  that takes people" was written from this row (2026-09-24). */
+  except?: string[]
 }
 
 const MEMORIAL_OCCASIONS = [
@@ -693,6 +767,7 @@ export const HONOUR_CHARITY_ROWS: HonourCharityRow[] = [
     family: "health_condition",
     star: false,
     why: "a charity that fights the kind of illness that takes people belongs at a memorial",
+    except: ["RNIB", "Scope", "Guide Dogs"],
   },
   {
     occasions: ["Pet memorial"],
@@ -717,6 +792,7 @@ export const HONOUR_CHARITY_ROWS: HonourCharityRow[] = [
     family: "health_condition",
     star: true,
     why: "the condition's own charity, at a recovery",
+    except: ["RNIB", "Scope", "Guide Dogs"],
   },
   {
     occasions: ["Recovery"],
@@ -728,7 +804,7 @@ export const HONOUR_CHARITY_ROWS: HonourCharityRow[] = [
     occasions: ["Achievement", "Sponsored event"],
     family: "sea_rescue",
     star: true,
-    why: "the cause the effort is for — a swim for the lifeboats",
+    why: "the cause the effort is for — a swim for the lifeboats, a climb for mountain rescue",
   },
   {
     occasions: ["Achievement", "Sponsored event"],
@@ -772,7 +848,12 @@ export const HONOUR_CHARITY_ROWS: HonourCharityRow[] = [
 // Lookup
 // ---------------------------------------------------------------------------
 
-export type Edge = { text: string; star: boolean }
+export type Edge = {
+  text: string
+  star: boolean
+  /** The outcome on the night, when the guests' picks are enacted. */
+  enacted?: string
+}
 
 export type StoryEdges = {
   /** occasion → topic (§1) */
@@ -837,15 +918,26 @@ export function lookupEdges(input: EdgeLookupInput): StoryEdges {
     const hit = findTopic(occ.row.topics, input.topicTitle)
     if (hit) {
       const occasion = occ.key.toLowerCase()
-      e1 = hit.star
+      e1 = hit.enacted
         ? {
             star: true,
-            text: `A favourite ${topic} is part of ${article(occasion)} ${occasion}: ${occ.row.at}.`,
+            enacted: hit.enacted,
+            text: `The guests' picks are enacted at ${article(occasion)} ${occasion}: ${hit.enacted}. The group needs no favourite of its own.`,
           }
-        : {
-            star: false,
-            text: `${article(occasion) === "an" ? "An" : "A"} ${occasion} suggests a favourite ${topic} only by a step the about must say out loud: ${occ.row.hop}.`,
-          }
+        : hit.star
+          ? {
+              star: true,
+              text: `A favourite ${topic} is part of ${article(occasion)} ${occasion}: ${occ.row.at}.`,
+            }
+          : hit.why || occ.row.hop
+            ? {
+                star: false,
+                text: `${article(occasion) === "an" ? "An" : "A"} ${occasion} suggests a favourite ${topic} only by a step the about must say out loud: ${hit.why ?? occ.row.hop}.`,
+              }
+            : {
+                star: false,
+                text: `A favourite ${topic} suits ${article(occasion)} ${occasion}; that needs no saying in the about.`,
+              }
     }
   }
 
@@ -872,10 +964,12 @@ export function lookupEdges(input: EdgeLookupInput): StoryEdges {
     input.causeFamily
   ) {
     const want = norm(occ.key)
+    const name = norm(input.charityName)
     const row = HONOUR_CHARITY_ROWS.find(
       (r) =>
         r.family === input.causeFamily &&
-        r.occasions.some((o) => norm(o) === want)
+        r.occasions.some((o) => norm(o) === want) &&
+        !(r.except ?? []).some((x) => norm(x) === name)
     )
     if (row) {
       e3 = {
