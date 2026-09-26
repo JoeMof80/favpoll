@@ -162,27 +162,27 @@ We fill the table every time we get together, in a frenzy of full plates that ar
 
 Ours is Jollof rice. We always make an extra batch so the boys can have seconds.
 
-### 15. Hillcrest School, Class of '98 · Reunion · Music era · Children's Society
+### 15. Hillcrest School, Class of '98 · Reunion · Song · Children's Society
 `id e7b3c585-1fe2-403c-947a-3450c08de388` · ★☆☆ · first person
 
 **About**
 
-We come back together every few years, and the same songs get us up before the starters arrive. Someone always brings a speaker loaded with tracks from the years we shared. Pledge to Children's Society, pick your favourite music era, and find out ours.
+We're back together for the first time in years, and the years fall away fast. We remember who sang loudest and who needed the words on a napkin. Tonight the room fills up again, and the songs carry us back. Pledge to Children's Society, pick your favourite song, and the top ten are the playlist for the night.
 
 **Note**
 
-Ours is Nineties indie and dance. We keep a mixtape from those years in the glovebox and play it on the drive home.
+Dancing Queen — ABBA got the whole room up in one go, from the back rows to the bar, and no one wanted to sit down.
 
-### 16. The Ravenscroft rowing eight · Reunion · Decade · Age UK
-`id b9eacdaf-8224-4cc6-ba98-4deeaa88d7f0` · ★★★ · first person
+### 16. The Ravenscroft rowing eight · Reunion · Cheese · Age UK
+`id b9eacdaf-8224-4cc6-ba98-4deeaa88d7f0` · ★★☆ · first person
 
 **About**
 
-We've swapped stories since we last stood together, from school days to now. Someone always drags out the old photographs before the night is done. Age UK works for people who don't have a room full of friends like this one. Pledge to Age UK, pick your favourite decade, to see ours.
+We're back under one roof for the first time in years, plates loaded, and the table full. Age UK works for those who spend evenings like this alone. Pledge to Age UK, pick your favourite cheese, and the winners go on the board.
 
 **Note**
 
-Ours is 2000s. We keep the burned mix CDs we made for each other that year in a shoebox on top of the wardrobe.
+Stilton was what someone unwrapped first at our last reunion, and by the end of the night the whole board had gathered round it.
 
 ## Remembering
 

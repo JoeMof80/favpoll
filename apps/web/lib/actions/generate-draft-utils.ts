@@ -80,6 +80,8 @@ export function violatesCopyRules(text: string): boolean {
  */
 export function hasTics(text: string): boolean {
   if (/anyone who (ask|look|will listen|cares)/i.test(text)) return true
+  // Every regenerated reunion opened a sentence with it (2026-09-26).
+  if (/\bsomeone always\b/i.test(text)) return true
   return (text.match(/\balways\b/gi) ?? []).length > 1
 }
 

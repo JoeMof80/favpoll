@@ -45,6 +45,11 @@ export type TopicRow = {
    *  put a roast dinner on her mind"; founder, 2026-09-26). The table's
    *  own parentheticals, made data. */
   why?: string
+  /** ENACTED: the guests' picks decide something on the night, so the
+   *  favpoll needs no favourite of the group's own. The outcome, as the
+   *  closing sentence will promise it ("the top ten are the playlist for
+   *  the night"; founder, 2026-09-26: a reunion's Song IS the playlist). */
+  enacted?: string
 }
 
 /** A §1 row: what the occasion pairs with, and the two sentences the
@@ -57,6 +62,12 @@ export type OccasionRow = {
   hop: string
 }
 
+/** An enacted topic: starred, and the outcome is the promise. */
+const enact = (topic: string, outcome: string): TopicRow => ({
+  topic,
+  star: true,
+  enacted: outcome,
+})
 const t = (topic: string, star = false, why?: string): TopicRow =>
   why ? { topic, star, why } : { topic, star }
 
@@ -389,16 +400,21 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
     hop: "the years together",
   },
   // A reunion is of people who were teenagers or adults together, so the
-  // small-child nostalgia (sweets, toys, playground games) is off the row:
-  // "by the time kids leave school, sweets aren't very important"
-  // (founder, 2026-09-26).
+  // small-child nostalgia (toys, playground games) is off the row: "by
+  // the time kids leave school, sweets aren't very important" (founder,
+  // 2026-09-26). A crowd has no favourite of its own, so the topics that
+  // work best are ENACTED: the picks become the playlist, the board, the
+  // bowls on the tables. Sweet survives only that way, as a tuck-shop
+  // bowl in passing.
   Reunion: {
     topics: [
+      enact("Song", "the top ten are the playlist for the night"),
+      enact("Cheese", "the winners go on the board"),
+      enact("Crisps", "the winners go on the bar"),
+      enact("Sweet", "the winners fill the bowls on the tables"),
       t("Decade", true),
       t("Music era", true),
-      t("Song"),
       t("School subject"),
-      t("Crisps"),
       t("TV theme tune"),
       t("Sitcom"),
       t("Cartoon"),
@@ -832,7 +848,12 @@ export const HONOUR_CHARITY_ROWS: HonourCharityRow[] = [
 // Lookup
 // ---------------------------------------------------------------------------
 
-export type Edge = { text: string; star: boolean }
+export type Edge = {
+  text: string
+  star: boolean
+  /** The outcome on the night, when the guests' picks are enacted. */
+  enacted?: string
+}
 
 export type StoryEdges = {
   /** occasion → topic (§1) */
@@ -897,20 +918,26 @@ export function lookupEdges(input: EdgeLookupInput): StoryEdges {
     const hit = findTopic(occ.row.topics, input.topicTitle)
     if (hit) {
       const occasion = occ.key.toLowerCase()
-      e1 = hit.star
+      e1 = hit.enacted
         ? {
             star: true,
-            text: `A favourite ${topic} is part of ${article(occasion)} ${occasion}: ${occ.row.at}.`,
+            enacted: hit.enacted,
+            text: `The guests' picks are enacted at ${article(occasion)} ${occasion}: ${hit.enacted}. The group needs no favourite of its own.`,
           }
-        : hit.why || occ.row.hop
+        : hit.star
           ? {
-              star: false,
-              text: `${article(occasion) === "an" ? "An" : "A"} ${occasion} suggests a favourite ${topic} only by a step the about must say out loud: ${hit.why ?? occ.row.hop}.`,
+              star: true,
+              text: `A favourite ${topic} is part of ${article(occasion)} ${occasion}: ${occ.row.at}.`,
             }
-          : {
-              star: false,
-              text: `A favourite ${topic} suits ${article(occasion)} ${occasion}; that needs no saying in the about.`,
-            }
+          : hit.why || occ.row.hop
+            ? {
+                star: false,
+                text: `${article(occasion) === "an" ? "An" : "A"} ${occasion} suggests a favourite ${topic} only by a step the about must say out loud: ${hit.why ?? occ.row.hop}.`,
+              }
+            : {
+                star: false,
+                text: `A favourite ${topic} suits ${article(occasion)} ${occasion}; that needs no saying in the about.`,
+              }
     }
   }
 

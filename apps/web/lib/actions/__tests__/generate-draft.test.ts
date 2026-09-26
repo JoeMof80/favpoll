@@ -1147,6 +1147,35 @@ describe("realism rules in the person prompt (founder review, 2026-09-24)", () =
     expect(prompt).toContain("The favourite is the parents' OWN")
   })
 
+  it("an enacted topic promises the outcome, not a reveal", async () => {
+    mock.queue(null)
+    mock.queue({ ...TOPIC_DATA, title: "Song" })
+    mock.queue(CHARITY_DATA)
+    mockLLMResponse(
+      "About.",
+      "Last time Wonderwall — Oasis closed the night and nobody would leave."
+    )
+    mock.queue(null)
+    await generateDraft({
+      register: "celebrating_many",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      grouping: "group",
+      occasionType: "Reunion",
+      displayName: "The Ravenscroft rowing eight",
+      pronoun: "i",
+    })
+    const prompt = promptOf()
+    expect(prompt).toContain(
+      "pick your favourite song, and the top ten are the playlist for the night."
+    )
+    expect(prompt).toContain("The guests' picks are ENACTED on the night")
+    expect(prompt).toContain("no opener and no reveal")
+    expect(hasTics("Someone always brings a speaker.")).toBe(true)
+    expect(prompt).not.toContain('start with exactly "Ours is"')
+  })
+
   it("at a pet memorial, the animal is on the card and its owner writes about it", async () => {
     mock.queue(null)
     mock.queue(TOPIC_DATA)

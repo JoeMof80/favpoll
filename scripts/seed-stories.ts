@@ -65,6 +65,7 @@ import {
 } from "../apps/web/lib/story-engine";
 import {
   revealNamesRealItem,
+  hasTics,
   slipsToSingular,
 } from "../apps/web/lib/actions/generate-draft-utils";
 import { OCCASION_TYPES_BY_REGISTER } from "../apps/web/lib/registers";
@@ -419,6 +420,29 @@ const drawCouple = () =>
       : `${drawHe()} & ${drawShe()}`
     : `${drawAny()} & ${drawAny()}`;
 
+// An enacted reunion topic implies a kind of evening, and the group must
+// fit it: a cheeseboard is a sit-down dinner at home, crisps are the pub,
+// sweets in bowls are a hall (founder, 2026-09-26: "who would be
+// reuniting who enjoy cheese?"). Unlisted groups and topics fit anywhere.
+type Setting = "home" | "pub" | "hall";
+const GROUP_SETTING: Record<string, Setting> = {
+  "The Class of 2006": "hall",
+  "Hillcrest School, Class of '98": "hall",
+  "The Ravenscroft rowing eight": "home",
+  "The Tuesday night five-a-side": "pub",
+  "St Bede's, 1987 intake": "hall",
+  "The Marlow Street mothers' group": "home",
+  "Ward 12 nurses, 1994": "pub",
+  "The Hollowell Youth Orchestra": "hall",
+};
+const ENACTED_SETTING: Record<string, Setting> = {
+  Cheese: "home",
+  Takeaway: "home",
+  Crisps: "pub",
+  Beer: "pub",
+  Cocktail: "pub",
+  Sweet: "hall",
+};
 const GROUP_NAMES: Record<string, string[]> = {
   Reunion: [
     "The Class of 2006",
@@ -477,6 +501,7 @@ const firstPersonHere = (occasion: string) =>
 function protagonist(
   register: Register,
   occasion: string,
+  topic?: string,
 ): {
   name: string;
   pronoun: Pronoun;
@@ -500,8 +525,14 @@ function protagonist(
     if (GROUP_NAMES[occasion]) {
       // A group's favpoll is organised by one of its own: "we", always
       // (founder, 2026-09-26: "the pronoun should be We").
+      const setting = topic ? ENACTED_SETTING[topic] : undefined;
+      const fitting = setting
+        ? GROUP_NAMES[occasion].filter(
+            (n) => !GROUP_SETTING[n] || GROUP_SETTING[n] === setting,
+          )
+        : GROUP_NAMES[occasion];
       return {
-        name: pick(GROUP_NAMES[occasion]),
+        name: pick(fitting.length ? fitting : GROUP_NAMES[occasion]),
         pronoun: "i",
         grouping: "group",
       };
@@ -941,10 +972,13 @@ async function judgeLoop(
       (input.grouping === "couple" || input.grouping === "group") &&
       slipsToSingular(story.note)
     );
+    // The model's tics are part of the gate too: the engine's single
+    // retry let "someone always" through on every reunion (2026-09-26).
+    const clean = !hasTics(`${story.about} ${story.note}`);
     const verdict = await judgeStory(story, input, story.edges, JUDGE_MODEL);
     const score =
-      (item && event && plural ? 1 : 0) + (verdict.realistic ? 2 : 0);
-    const v = `P1 ${item ? "✓" : "✗"}${isCause ? ` · event ${event ? "✓" : "✗"}` : ""}${plural ? "" : " · we ✗"} · real ${verdict.realistic ? "✓" : "✗"}${verdict.reason ? ` — ${verdict.reason}` : ""}`;
+      (item && event && plural && clean ? 1 : 0) + (verdict.realistic ? 2 : 0);
+    const v = `P1 ${item ? "✓" : "✗"}${isCause ? ` · event ${event ? "✓" : "✗"}` : ""}${plural ? "" : " · we ✗"}${clean ? "" : " · tic ✗"} · real ${verdict.realistic ? "✓" : "✗"}${verdict.reason ? ` — ${verdict.reason}` : ""}`;
     if (!best || score > best.score) best = { story, item, verdict: v, score };
     if (score === 3) break;
   }
@@ -1043,7 +1077,9 @@ async function seed() {
 
   for (const c of chosen) {
     const isCause = c.register === "cause";
-    const who = isCause ? null : protagonist(c.register, c.occasion);
+    const who = isCause
+      ? null
+      : protagonist(c.register, c.occasion, c.topic.title);
     const spec = occasionSpec(c.occasion);
     // The catalogue's Achievement lines ("Well done", "Take a bow") are
     // written after the event; a sponsored effort is cheered on before it.

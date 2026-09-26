@@ -350,7 +350,13 @@ ${edgesBlock(edges, subject)}`
     // rather than left to the model, which always took the first example
     // ("and Joan's will be revealed" on 24 of 24 seeded Stories; founder,
     // 2026-09-24: "appears too often"). One form per generation.
-    const promise = namePoss ? pickRevealPromise(namePoss) : null
+    // An enacted row promises the outcome, not a reveal: "and the top
+    // ten are the playlist for the night" (founder, 2026-09-26).
+    const promise = edges.e1?.enacted
+      ? `and ${edges.e1.enacted}`
+      : namePoss
+        ? pickRevealPromise(namePoss)
+        : null
     const closing =
       givenClosing ??
       (promise
@@ -406,6 +412,9 @@ ${edgesBlock(edges, subject)}`
     const effortRule = EFFORT_OCCASIONS.has(occasionType ?? "")
       ? ` The occasion is a sponsored effort that is STILL TO COME: this favpoll gathers pledges in the build-up and closes on the day. Write it before the effort ("is swimming the Channel in June", "runs the marathon on Sunday"), never as finished, and say nothing about how it went. Do not name a month or a date: the card carries them.`
       : ""
+    const enactedRule = edges.e1?.enacted
+      ? ` The guests' picks are ENACTED on the night: ${edges.e1.enacted}. That is the whole reason for the topic, so the about is about the group getting back together, and what the evening will run on; it may say the outcome once in plain words before the closing sentence, or leave it to the closing. Never claim a favourite for the whole group ("we all love", "our favourite has always been"): a crowd has none.`
+      : ""
     const petRule = PET_OCCASIONS.has(occasionType ?? "")
       ? ` The one being remembered is an ANIMAL, named above, and the writer is the person who had them: write about the animal with its pronoun, and about yourself as "I" where the animal's life needs you in it (the walks, the beach, the fetching), never by name. The favourite is the animal's OWN, seen in what it did (the beach it pulled you onto, the weather it would still go out in, the toy it carried to the door), or, for a breed or a kind of animal, a plain fact about what it was. Never give the animal opinions, words, memories or a human inner life, and never make the favourite yours.`
       : ""
@@ -417,8 +426,8 @@ ${edgesBlock(edges, subject)}`
     const charityFit = edges.e3
       ? ` The charity's fit with the occasion is given above; you may say it in a few plain words, as the examples do ("Marie Curie nurses were with her at the end"), or leave it to the closing.`
       : ` The charity is named in the closing sentence and nowhere else.`
-    instructions = `- "about": write it the way the four examples below are written: two or three sentences, 40 to 65 words in all, about the person and the occasion, in plain words, ending with the closing sentence given here exactly, nothing added after it: "${closing}"${tenseRule}${edgeRule}${truthRule}${babyRule}${effortRule}${petRule}${realPersonRule}${charityFit}${pronounHint}${nameHint}
-- "reveal" (guests see it only AFTER pledging): start with exactly "${opener}".${entityGuard} Then ${pick ? `exactly this option, verbatim: "${pick}"` : "a plausible option from the list (you MUST use a real option, verbatim)"}, then a full stop, then ONE short sentence with a single detail of the PROTAGONIST'S own relationship to that favourite${first ? " (in the first person)" : ""}: a plain fact will do ("her bathroom is full of dolphin pictures", "he read it during his gap year"); it need not be a habit or an action, and it must pass the honour test above. Something the about did not already say. The detail involves the favourite ITSELF (what they do with it, where, how often), not a mood, a light or a weather that stands near it. When the favourite is a KIND of thing (a breed, a cuisine, a type of holiday), the detail is about one particular one in their life, never the kind at large.${tenseRule} The detail must be entirely the protagonist's own and must NOT depend on any real-world fact about the favourite: no fixture dates or match traditions, no seasons, tours, episodes, eras, or biography (a claim like "watched them play on Boxing Day" fails if that favourite doesn't play then; avoid the whole category). The options may be famous real people, teams, or works: never state or invent facts about them. No preamble such as "We can't wait to reveal".
+    instructions = `- "about": write it the way the four examples below are written: two or three sentences, 40 to 65 words in all, about the person and the occasion, in plain words, ending with the closing sentence given here exactly, nothing added after it: "${closing}"${tenseRule}${edgeRule}${truthRule}${babyRule}${effortRule}${petRule}${enactedRule}${realPersonRule}${charityFit}${pronounHint}${nameHint}
+- "reveal" (guests see it only AFTER pledging): ${edges.e1?.enacted ? `no opener and no reveal, because the picks are enacted: ONE sentence, a memory the group shares of ${pick ? `exactly this option, named verbatim: "${pick}"` : "one real option from the list, named verbatim"}, a plain remembered moment with the option in it (who reached for it, what it started, how the evening went), never a claim that the group prefers it, and never opening with "Last time". Nothing else.` : `start with exactly "${opener}".`}${entityGuard} ${edges.e1?.enacted ? "Otherwise ignore the rest of this rule:" : `Then ${pick ? `exactly this option, verbatim: "${pick}"` : "a plausible option from the list (you MUST use a real option, verbatim)"}, then a full stop, then`} ONE short sentence with a single detail of the PROTAGONIST'S own relationship to that favourite${first ? " (in the first person)" : ""}: a plain fact will do ("her bathroom is full of dolphin pictures", "he read it during his gap year"); it need not be a habit or an action, and it must pass the honour test above. Something the about did not already say. The detail involves the favourite ITSELF (what they do with it, where, how often), not a mood, a light or a weather that stands near it. When the favourite is a KIND of thing (a breed, a cuisine, a type of holiday), the detail is about one particular one in their life, never the kind at large.${tenseRule} The detail must be entirely the protagonist's own and must NOT depend on any real-world fact about the favourite: no fixture dates or match traditions, no seasons, tours, episodes, eras, or biography (a claim like "watched them play on Boxing Day" fails if that favourite doesn't play then; avoid the whole category). The options may be famous real people, teams, or works: never state or invent facts about them. No preamble such as "We can't wait to reveal".
 
 ${exemplarsBlock({ register, occasionType, topicTitle, causeFamily, pronoun, grouping })}`
   }
@@ -639,13 +648,19 @@ export async function generateStory(
       : null
   const closing =
     input.subject === "someone"
-      ? closingPoss
+      ? edges.e1?.enacted
         ? closingSentence(
             input.charity.name,
-            pickRevealPromise(closingPoss),
+            `and ${edges.e1.enacted}`,
             input.topicTitle
           )
-        : `Pledge to ${input.charity.name ?? "charity"} and pick your favourite ${input.topicTitle.toLowerCase()}.`
+        : closingPoss
+          ? closingSentence(
+              input.charity.name,
+              pickRevealPromise(closingPoss),
+              input.topicTitle
+            )
+          : `Pledge to ${input.charity.name ?? "charity"} and pick your favourite ${input.topicTitle.toLowerCase()}.`
       : null
   const prompt = buildPrompt({
     register: input.register,
@@ -809,6 +824,9 @@ export async function judgeStory(
   const baby = BABY_OCCASIONS.has(input.occasionType ?? "")
     ? " The occasion is a birth: the people honoured are the PARENTS, on behalf of their child; the favourite is the parents' own. Fail it if the baby is given a favourite, a preference or a habit, or if a favourite is said to be chosen for the baby."
     : ""
+  const enacted = edges.e1?.enacted
+    ? ` The guests' picks are enacted on the night (${edges.e1.enacted}), so the group has no favourite of its own: fail it if the copy claims one for the whole group, or if the note reveals a group favourite instead of one shared memory of the named option.`
+    : ""
   const pet = PET_OCCASIONS.has(input.occasionType ?? "")
     ? " The one remembered is an ANIMAL and the writer is the person who had them. The favourite is the animal's own, shown in what it did, or a plain fact about what it was. Fail it if the favourite reads as the owner's, if the animal is given opinions, words or a human inner life, or if the owner is named."
     : ""
@@ -818,7 +836,7 @@ export async function judgeStory(
     .join("\n")
   const prompt = `You are a relative reading a favpoll page at a real event. A favpoll honours someone; guests pledge to charity and pick a favourite; after pledging they see the honoured person's own favourite. You are checking whether the copy reads as something a family member would actually have written about a real person. Answer with JSON only.
 
-Occasion: ${input.occasionType ?? "unknown"}. Honouring: ${who}.${baby}${pet}${effort}
+Occasion: ${input.occasionType ?? "unknown"}. Honouring: ${who}.${baby}${pet}${effort}${enacted}
 Topic: Favourite ${input.topicTitle}.
 Links the writer was given:
 ${edgeLines || "(none)"}

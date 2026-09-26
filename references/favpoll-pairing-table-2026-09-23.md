@@ -139,7 +139,7 @@ the About half is actually there.
 | Engagement | Gemstone ★ (the ring) · Song · Cocktail · Wine · Type of holiday · Island · Beach · Flower · Place (where it happened) |
 | Anniversary | Song ★ (their song) · Decade ★ (the year they married) · Music era · Film · Gemstone (the year's gift) · Cuisine · Wine · Type of holiday · Dance |
 | Renewal of vows | as Wedding, plus Decade |
-| Reunion | Decade ★ · Music era ★ · Song · School subject · Crisps · TV theme tune · Sitcom · Cartoon · Video game |
+| Reunion | Song ★ (enacted: the top ten are the playlist) · Cheese ★ (enacted: the board) · Crisps ★ (enacted: the bar) · Sweet ★ (enacted: bowls on the tables, a tuck shop in passing) · Decade ★ · Music era ★ · School subject · TV theme tune · Sitcom · Cartoon · Video game |
 | Team celebration (sport) | Sporting moment ★ · Sport to play · Sport to watch · Football team · Rugby team · Cricket team · Beer · Takeaway |
 | Team celebration (work) | Takeaway · Beer (the team meal) · Biscuit · Coffee order · Sandwich — *office life is two hops* |
 | Family gathering | Part of a roast dinner ★ · Name for a grandparent ★ · Board game ★ · Card game · Pudding · Pie · Way to spend Sunday · Nursery rhyme · Childhood game |
