@@ -132,11 +132,11 @@ Mine is Crathes Castle. I always find the same bench near the roses and sit ther
 
 **About**
 
-After forty years of early starts, I'm finally hanging up my lanyard. I'm looking forward to having time for a hobby I've been putting off. Independent Age helps older people live independent, fulfilling lives. Pledge to Independent Age, pick your favourite hobby, and find out mine.
+I'm retiring this month, and my diary finally empties. There's time now for the hobby I've been saving for slower mornings. Independent Age offers advice, company and campaigning support to older people across the country. Pledge to Independent Age, pick your favourite hobby, then see mine.
 
 **Note**
 
-Mine is Book club. I host it in my kitchen once a month, and everyone brings a dish to match the book.
+Mine is Family history. I keep a folder of birth certificates and photographs, adding a new find every few months.
 
 ## Celebrating a couple or group
 

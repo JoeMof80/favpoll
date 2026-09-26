@@ -833,7 +833,7 @@ Fail it if ANY of these is true:
 - the person is written as the wrong age or the wrong person for the occasion;
 - a sentence that does not make sense, or that no relative would say out loud;
 - a link between the charity and the topic that the edges above do not give ("humanitarian work reaches rivers", "a favourite river follows the routes where that work happens"): when no such edge is listed, any connection drawn is invented;
-- ${isCause ? "the about does not say what is being raised for" : "the about and the note contradict each other"}.
+- ${isCause ? "the about does not say what is being raised for" : "the about and the note contradict each other, in fact OR in premise (an about that says she finally has time for a hobby she has been putting off, and a note that reveals a book club she already hosts once a month)"}.
 Ordinary is good. Plain is good. A detail like "she kept a pot of cornflowers on the windowsill" passes.
 
 Respond with ONLY: {"realistic": true|false, "reason": "one short sentence naming the problem, or 'reads as real'"}`

@@ -114,6 +114,9 @@ const REGEN = opt("regen", "");
 const RENAME = flag("rename");
 // --topic="Dog breed" with --regen moves the poll to that topic first.
 const REGEN_TOPIC = opt("topic", "");
+// --pick="Painting" with --regen names the favourite the Story is written
+// around (else a random item).
+const REGEN_PICK = opt("pick", "");
 const DRY_RUN = flag("dry-run");
 const COUNT = parseInt(opt("count", "24"), 10);
 const THREES = parseFloat(opt("threes", "0.4"));
@@ -1562,7 +1565,11 @@ async function regen(name: string) {
     grouping: x.grouping,
     displayName: p?.name ?? x.cause_label,
     fiction: true,
-    pick: pick(items).label,
+    pick:
+      (REGEN_PICK &&
+        items.find((i) => i.label.toLowerCase() === REGEN_PICK.toLowerCase())
+          ?.label) ||
+      pick(items).label,
   };
   // If the table has moved under the favpoll (a row narrowed), the
   // triple may be below the seed bar: re-pick the topic for the same
@@ -1638,7 +1645,11 @@ async function regen(name: string) {
     items.push(...newItems);
     input.topicTitle = newTopic.title;
     input.itemLabels = newItems.map((i) => i.label);
-    input.pick = pick(newItems).label;
+    input.pick =
+      (REGEN_PICK &&
+        newItems.find((i) => i.label.toLowerCase() === REGEN_PICK.toLowerCase())
+          ?.label) ||
+      pick(newItems).label;
   }
   // A birth favpoll seeded with the BABY on the card becomes the parents'
   // (2026-09-24): a couple is named, the baby moves to the context line.
