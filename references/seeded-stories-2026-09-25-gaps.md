@@ -186,12 +186,12 @@ Hopefully we won't run out of stilton like last time.
 
 ## Remembering
 
-### 17. Margaret Ellis · Celebration of life · Hymn · Diabetes UK
+### 17. Margaret Ellis · Celebration of life · Hymn · Marie Curie
 `id 0b3213be-075d-4a9e-ad2b-6fedd27f2ff0` · ★★☆ · third person, she
 
 **About**
 
-Margaret sang in the church choir her whole life. She looked forward to the carol service each December and always brought round mince pies after. Diabetes UK cared for her through her illness. Pledge to Diabetes UK, pick your favourite hymn, and we'll reveal Margaret's.
+Margaret sang in the church choir her whole life. She looked forward to the carol service each December and always brought round mince pies after. Marie Curie nurses were with her at the end. Pledge to Marie Curie, pick your favourite hymn, and we'll reveal Margaret's.
 
 **Note**
 
