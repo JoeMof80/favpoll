@@ -145,44 +145,44 @@ Mine is Book club. I host it in my kitchen once a month, and everyone brings a d
 
 **About**
 
-They fill every family gathering with the same ritual: chairs pulled in, the board out, and someone keeping score. The last piece goes back in the box while the table is cleared for pudding. A full house like this is what Re-engage gives to those who spend most days on their own. Pledge to Re-engage, pick your own favourite, to see The Hartley family's.
+Every family gathering ends with the table cleared and a board game brought out. Someone deals, someone keeps score, and the youngest always insists on going first. We are a full house tonight, and Re-engage is there for the people who are not. Pledge to Re-engage, pick your favourite board game, and find out ours.
 
 **Note**
 
-The Hartley family's is Catan. They spread the board across the kitchen table and argue over every trade until someone gives in.
+Ours is Pictionary. We keep a battered whiteboard for it, propped against the fireplace every family visit.
 
 ### 14. The Okafors · Family gathering · Comfort food · Trussell Trust
 `id a334422d-65ea-437b-97f9-f8264ec5ce0a` · ★★☆ · third person, they
 
 **About**
 
-They gather every few weeks, filling the table until it can barely hold another dish. Someone always brings a pot from the stove straight to the table, and the kitchen never really empties. Pledge to Trussell Trust, pick your own favourite, and The Okafors' will be revealed.
+Our table is never quiet for long, with second helpings passed down before first ones are finished. We cook enough for everyone here and a bit more besides. Trussell Trust fills tables that would otherwise stay empty. Pledge to Trussell Trust, pick your favourite comfort food, then see ours.
 
 **Note**
 
-The Okafors' is Chips. They queue at the chip shop on the corner every Friday night, sharing one large portion between them.
+Ours is Beans on toast. We always put a thick layer of butter under the beans and eat the crusts last.
 
 ### 15. The Lower Sixth, 1998 · Reunion · Sweet · Children's Society
 `id e7b3c585-1fe2-403c-947a-3450c08de388` · ★★☆ · third person, they
 
 **About**
 
-They left school in 1998 and gather most years to swap old stories. Sweets are what everyone remembers, passed round at the back of the classroom and never quite enough to go round. Pledge to Children's Society, pick your own favourite, then see The Lower Sixth, 1998's.
+We've not been in one room together for years, and the first thing that comes out is a bag of sweets we all remember from school days. We pass it round and argue over whose is the favourite. Pledge to Children's Society, pick your favourite sweet, then see ours.
 
 **Note**
 
-The Lower Sixth, 1998's is Bonbons. They pass the bag round at every reunion until it's empty.
+Ours is Humbugs. We keep a tin in the glovebox for whoever ends up driving us all home tonight.
 
 ### 16. The Ravenscroft rowing eight · Reunion · Decade · Age UK
 `id b9eacdaf-8224-4cc6-ba98-4deeaa88d7f0` · ★★★ · third person, they
 
 **About**
 
-They trained together as students and row together whenever they can get a boat out. This reunion brings them back to the towpath they share. Pledge to Age UK, pick your own favourite, and The Ravenscroft rowing eight's will be revealed.
+We're back together for the first time in years, catching up over old photos and older jokes. Between us we've lived through more decades than we can count, and days like today remind us how many people spend theirs without a crowd around them. Pledge to Age UK, pick your favourite decade, and ours will be revealed.
 
 **Note**
 
-The Ravenscroft rowing eight's is 1950s. They dress in fifties style for their reunion dinner and dance until last orders.
+Ours is 2010s. We keep a photo from the first reunion we had that decade pinned in our group chat.
 
 ## Remembering
 
