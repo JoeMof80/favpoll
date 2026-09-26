@@ -1750,7 +1750,7 @@ const topics: TopicSeed[] = [
     },
   },
   {
-    title: "Weather for walk",
+    title: "Weather for walking",
     description: "The sky that made them pull on their boots",
     is_finite: false,
     categories: ["Nature", "Everyday life"],
@@ -6734,7 +6734,7 @@ const topicItems: Record<string, string[]> = {
     "Thunderstorm",
     "Warm rain",
   ],
-  "Weather for walk": [
+  "Weather for walking": [
     "After rain",
     "Autumn drizzle",
     "Blustery and wild",

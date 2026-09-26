@@ -66,10 +66,10 @@
  },
  {
   "id": "8794d709-1aee-4bee-b3b5-e1f6987a53cc",
-  "triple": "Recovery · Weather for walk · Cancer Research UK",
+  "triple": "Recovery · Weather for walking · Cancer Research UK",
   "register": "celebrating_one",
   "occasion": "Recovery",
-  "topic": "Weather for walk",
+  "topic": "Weather for walking",
   "family": "health_condition",
   "voice": "third",
   "grouping": "individual",

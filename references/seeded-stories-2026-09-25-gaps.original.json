@@ -524,22 +524,22 @@
   "subject": "someone",
   "register": "remembering",
   "occasion": "Pet memorial",
-  "topic": "Weather for walk",
+  "topic": "Weather for walking",
   "charity": "Dogs Trust",
   "family": "animals",
   "pronoun": "she",
   "grouping": "individual",
   "context": "The best boy",
-  "about": "Tilly pulled me out of the door whatever the sky was doing. She waited by the lead for our walk at the same time every day, rain or shine. Pledge to Dogs Trust, pick your favourite weather for walk, and Tilly's will be revealed.",
+  "about": "Tilly pulled me out of the door whatever the sky was doing. She waited by the lead for our walk at the same time every day, rain or shine. Pledge to Dogs Trust, pick your favourite weather for walking, and Tilly's will be revealed.",
   "note": "Tilly's was Golden hour. She would stop on the same ridge every evening to watch the light change before trotting on.",
   "edges": {
    "e1": {
     "star": false,
-    "text": "A pet memorial suggests a favourite weather for walk only by a step the about must say out loud: the walks that were theirs."
+    "text": "A pet memorial suggests a favourite weather for walking only by a step the about must say out loud: the walks that were theirs."
    },
    "e2": {
     "star": false,
-    "text": "Dogs Trust works for animals — rescue, welfare and wildlife: a favourite weather for walk sits inside that cause."
+    "text": "Dogs Trust works for animals — rescue, welfare and wildlife: a favourite weather for walking sits inside that cause."
    },
    "e3": {
     "star": true,

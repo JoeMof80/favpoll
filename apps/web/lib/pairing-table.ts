@@ -161,7 +161,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Dog breed", true),
       t("Cat breed", true),
       t("Animal", true),
-      t("Weather for walk"),
+      t("Weather for walking"),
       t("Beach"),
       t("Toy"),
     ],
@@ -253,7 +253,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
   Recovery: {
     topics: [
       t("Form of exercise"),
-      t("Weather for walk"),
+      t("Weather for walking"),
       t("Landscape"),
       t("Comfort food"),
       t("Song"),
@@ -503,7 +503,7 @@ export const FAMILY_ROWS: Record<
       t("Dog breed"),
       t("Cat breed"),
       t("Bird"),
-      t("Weather for walk"),
+      t("Weather for walking"),
       t("Beach"),
     ],
   },
@@ -548,7 +548,7 @@ export const FAMILY_ROWS: Record<
     topics: [
       t("Song"),
       t("Way to spend Sunday"),
-      t("Weather for walk"),
+      t("Weather for walking"),
       t("Landscape"),
       t("Form of exercise"),
       t("Book"),
@@ -638,18 +638,18 @@ export const CHARITY_ROWS: Record<string, TopicRow[]> = {
   ],
   // Guide Dogs breeds and trains its own dogs: the one health charity
   // whose topic is an animal.
-  "Guide Dogs": [t("Dog breed", true), t("Animal"), t("Weather for walk")],
+  "Guide Dogs": [t("Dog breed", true), t("Animal"), t("Weather for walking")],
   "Mountain Rescue England and Wales": [
     t("Mountain or peak", true),
     t("National park", true),
     t("Landscape"),
-    t("Weather for walk"),
+    t("Weather for walking"),
     t("Weather"),
   ],
   "Dogs Trust": [
     t("Dog breed", true),
     t("Animal"),
-    t("Weather for walk"),
+    t("Weather for walking"),
     t("Beach"),
   ],
   RSPCA: [
@@ -681,7 +681,7 @@ export const CHARITY_ROWS: Record<string, TopicRow[]> = {
     t("Tree"),
     t("Landscape"),
     t("Beach"),
-    t("Weather for walk"),
+    t("Weather for walking"),
     t("Season"),
     t("Famous painting"),
   ],
@@ -700,7 +700,7 @@ export const CHARITY_ROWS: Record<string, TopicRow[]> = {
   "British Heart Foundation": [
     t("Form of exercise", true),
     t("Sport to play"),
-    t("Weather for walk"),
+    t("Weather for walking"),
     t("Landscape"),
     t("National park"),
     t("Vegetable"),

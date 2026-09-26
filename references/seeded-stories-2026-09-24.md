@@ -61,7 +61,7 @@ I became a British citizen this year and I'm picking up all the habits: queuing 
 
 Mine is Earl Grey. I keep a tin of it in my desk drawer at work, ready for each afternoon.
 
-### 6. Fiona Coles · Recovery · Weather for walk · Cancer Research UK
+### 6. Fiona Coles · Recovery · Weather for walking · Cancer Research UK
 `id 8794d709-1aee-4bee-b3b5-e1f6987a53cc` · ★★☆ · third person, she
 
 **About**

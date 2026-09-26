@@ -219,12 +219,12 @@ Winston pulled me down to the sea on every walk we took, whatever the weather. H
 
 Winston's was Saunton Sands. He would bound straight into the shallows every time we visited, tail going nineteen to the dozen.
 
-### 20. Tilly · Pet memorial · Weather for walk · Dogs Trust
+### 20. Tilly · Pet memorial · Weather for walking · Dogs Trust
 `id 445f1c94-5c5c-445c-9d70-e9525a28bed2` · ★★★ · third person, she
 
 **About**
 
-Tilly pulled me out of the door whatever the sky was doing. She waited by the lead for our walk at the same time every day, rain or shine. Pledge to Dogs Trust, pick your favourite weather for walk, and Tilly's will be revealed.
+Tilly pulled me out of the door whatever the sky was doing. She waited by the lead for our walk at the same time every day, rain or shine. Pledge to Dogs Trust, pick your favourite weather for walking, and Tilly's will be revealed.
 
 **Note**
 

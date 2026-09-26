@@ -102,7 +102,7 @@ the About half is actually there.
 | Occasion | Topics |
 |---|---|
 | Memorial · Celebration of life · Tribute | Flower ★ · Hymn ★ · Poem ★ · Song · Saying · Season · Garden to visit |
-| Pet memorial | Dog breed ★ · Cat breed ★ · Animal ★ · Weather for walk · Beach · Toy |
+| Pet memorial | Dog breed ★ · Cat breed ★ · Animal ★ · Weather for walking · Beach · Toy |
 | In memoriam appeal | as Memorial, plus the charity's row in §2 |
 
 > Memorials are the natural home of **known-fact** motivation (Belinda loved
@@ -120,7 +120,7 @@ the About half is actually there.
 | Graduation | School subject ★ · Book · Author · Type of book · City (where next) · Takeaway |
 | Christening · New baby · Baby shower | Children's book ★ · Nursery rhyme ★ · Name for a grandparent ★ · Fairy tale · Toy · Cartoon · Childhood game · Season — **the protagonists are the parents** (named as a couple, the baby in the context line) and the favourite is theirs, the one they will pass on; a newborn has no favourite (founder, 2026-09-24) |
 | Bar or bat mitzvah | Song · Film · Book · Sweet · Board game — *see review note A* |
-| Recovery | Form of exercise · Weather for walk · Landscape · Comfort food · Song · Way to spend Sunday · Season · Time of day — *two hops ("back on their feet"); the About says it* |
+| Recovery | Form of exercise · Weather for walking · Landscape · Comfort food · Song · Way to spend Sunday · Season · Time of day — *two hops ("back on their feet"); the About says it* |
 | New job · Promotion | Cocktail · Beer · Wine · Takeaway (the celebration) · Coffee order · Sandwich · City — *thin; lean on E1′* |
 | Achievement (sporting) | **where it happened** ★ — Seaside town (a swim) · National park · Landscape · Beach · Mountain or peak · River · Comfort food · Song (the training playlist — two hops) · Form of exercise · Weather · Sporting moment |
 | Award | Saying · Word · Book · Poem · School subject · Instrument — *depends on the award; see note B* |
@@ -242,10 +242,10 @@ Inactive charities omitted. Grouped where the cause is the same.
 
 | Charity | Topics |
 |---|---|
-| Dogs Trust | Dog breed ★★ · Animal · Weather for walk · Beach |
+| Dogs Trust | Dog breed ★★ · Animal · Weather for walking · Beach |
 | RSPCA | Animal ★ · Dog breed · Cat breed · Bird · Butterfly · Insect |
 | WWF | Animal ★ · Sea creature · Bird · Butterfly · Tree · Landscape · Island · National park · River · Mountain or peak · Planet |
-| National Trust | Castle ★ · Garden to visit ★ · Landmark or building · National park · Tree · Landscape · Beach · Weather for walk · Season · Famous painting |
+| National Trust | Castle ★ · Garden to visit ★ · Landmark or building · National park · Tree · Landscape · Beach · Weather for walking · Season · Famous painting |
 | RNLI | Seaside town ★ · Beach ★ · Sea creature · Island · Weather · Way to travel |
 | Trussell Trust | Part of a roast dinner ★ · Comfort food ★ · Meal of the day · Breakfast cereal · Sandwich · Pie · Type of tea |
 | Shelter · Crisis · St Mungo's | Comfort food ★ · Way to spend Sunday · Meal of the day · Smell (of home) · Sound · Season — *the topics of "home"; see note D* |
@@ -253,9 +253,9 @@ Inactive charities omitted. Grouped where the cause is the same.
 | Comic Relief | Comedian ★ · Sitcom ★ · TV programme · Saying · Song |
 | Alzheimer's Society | Song ★ (music is the last thing to go) · Music era · Decade · Smell · Saying · TV theme tune · Hymn · Childhood game · Sweet |
 | Age UK | Decade · Music era · Way to spend Sunday · Type of tea · Biscuit · Radio station · Saying · Dance · Sitcom |
-| Mind · Samaritans | Song · Way to spend Sunday · Weather for walk · Landscape · Form of exercise · Book · Hobby · Sound · Time of day — *the quiet, restorative topics* |
-| British Heart Foundation | Form of exercise ★ · Sport to play · Weather for walk · Landscape · National park · Vegetable · Fruit |
-| Stroke Association | Form of exercise · Song · Weather for walk · Word — *see note E* |
+| Mind · Samaritans | Song · Way to spend Sunday · Weather for walking · Landscape · Form of exercise · Book · Hobby · Sound · Time of day — *the quiet, restorative topics* |
+| British Heart Foundation | Form of exercise ★ · Sport to play · Weather for walking · Landscape · National park · Vegetable · Fruit |
+| Stroke Association | Form of exercise · Song · Weather for walking · Word — *see note E* |
 | Diabetes UK | Fruit · Vegetable · Form of exercise · Breakfast cereal — *see note E* |
 | RNIB | Sound ★ · Smell ★ · Radio station ★ · Instrument · Song · Weather — *the non-visual senses* |
 | Scope | Song · Film · Way to spend Sunday · Sport to watch — *neutral by design; see note E* |

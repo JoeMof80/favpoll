@@ -623,7 +623,7 @@ export const regeneratedPlaceholdersBatch2: Record<string, Record<Register, Ph>>
     },
   },
 
-  "Weather for walk": {
+  "Weather for walking": {
     remembering: {
       about: "She walked every morning without exception, in every kind of weather — but her children knew which one was hers.",
       reveal: "Hers was the crisp winter morning. Cold air, clear sky, the garden white.",

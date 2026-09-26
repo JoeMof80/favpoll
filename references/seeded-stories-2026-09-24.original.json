@@ -163,7 +163,7 @@
   "grouping": "individual",
   "about": "Fiona is back on her feet and glad of it. Her walks are getting longer again, and she takes more notice of the weather now. Cancer Research UK has been part of her story this year. Pledge to Cancer Research UK, pick your own favourite, and find out Fiona's.",
   "note": "Fiona's is Bright spring day. She keeps her walking boots by the back door, ready for one to arrive.",
-  "topic": "Weather for walk",
+  "topic": "Weather for walking",
   "items": 8,
   "charity": "Cancer Research UK",
   "family": "health_condition",
@@ -172,7 +172,7 @@
   "edges": {
    "e1": {
     "star": false,
-    "text": "A recovery suggests a favourite weather for walk only by a step the about must say out loud: being back on their feet."
+    "text": "A recovery suggests a favourite weather for walking only by a step the about must say out loud: being back on their feet."
    },
    "e2": null,
    "e3": {
@@ -223,7 +223,7 @@
   "grouping": "individual",
   "about": "Tess is back on her feet now, and the short walk to the corner and back has become the best part of her day. She notices the sky before she checks the time and always has an opinion on it. Pledge to Cats Protection, pick your own favourite, and Tess' will be revealed.",
   "note": "Tess' is Crisp winter morning. She fills a flask before she leaves and drinks it on the same bench every time.",
-  "topic": "Weather for walk",
+  "topic": "Weather for walking",
   "items": 8,
   "charity": "Cats Protection",
   "family": "animals",
@@ -232,11 +232,11 @@
   "edges": {
    "e1": {
     "star": false,
-    "text": "A recovery suggests a favourite weather for walk only by a step the about must say out loud: being back on their feet."
+    "text": "A recovery suggests a favourite weather for walking only by a step the about must say out loud: being back on their feet."
    },
    "e2": {
     "star": false,
-    "text": "Cats Protection works for animals — rescue, welfare and wildlife: a favourite weather for walk sits inside that cause."
+    "text": "Cats Protection works for animals — rescue, welfare and wildlife: a favourite weather for walking sits inside that cause."
    },
    "e3": null,
    "count": 2
