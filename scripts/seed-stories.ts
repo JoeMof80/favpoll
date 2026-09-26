@@ -380,16 +380,31 @@ const GROUP_NAMES: Record<string, string[]> = {
     "The Class of 2006",
     "The Lower Sixth, 1998",
     "The Ravenscroft rowing eight",
+    "The Tuesday night five-a-side",
+    "St Bede's, 1987 intake",
+    "The Marlow Street mothers' group",
+    "Ward 12 nurses, 1994",
+    "The Hollowell Youth Orchestra",
   ],
   "Family gathering": [
     "The Hartley family",
     "The Okafors",
     "Four generations of Marshes",
+    "The Devlins",
+    "The Whitaker cousins",
+    "The Begum family",
+    "The MacLeods",
+    "The Yates clan",
   ],
   "Team celebration": [
     "Ashby Rovers",
     "The Tuesday Quiz Team",
     "Northgate Netball",
+    "Marlow Cricket Club firsts",
+    "The Leyland bell-ringers",
+    "Castle Street Runners",
+    "The Vale Ladies' hockey team",
+    "Riverside Bowls Club",
   ],
 };
 
@@ -434,9 +449,11 @@ function protagonist(
   }
   if (register === "celebrating_many") {
     if (GROUP_NAMES[occasion]) {
+      // A group's favpoll is organised by one of its own: "we", always
+      // (founder, 2026-09-26: "the pronoun should be We").
       return {
         name: pick(GROUP_NAMES[occasion]),
-        pronoun: "they",
+        pronoun: "i",
         grouping: "group",
       };
     }
