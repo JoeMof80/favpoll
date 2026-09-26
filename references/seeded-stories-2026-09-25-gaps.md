@@ -110,11 +110,11 @@ Leila's is Apple sauce. She keeps a spare jar in the cupboard, ready for cheese 
 
 **About**
 
-I've just moved in and I'm finding my way round the neighbourhood, learning which bin day is which and where the nearest shop is. Settling in has made me think of how much a home means, so I'm pledging to Emmaus UK, who work to ease poverty and hardship across the country. Pledge to Emmaus UK, pick your favourite tree, to see mine.
+I've just moved in and I'm finding my way round the neighbourhood. Settling in has made me think of how much a home means, so I'm pledging to Emmaus UK, who work to ease poverty and hardship across the country. Pledge to Emmaus UK and pick your favourite tree, to see mine.
 
 **Note**
 
-Mine is Sweet chestnut. I planted one in my new garden and check on it every morning.
+Mine is Sweet chestnut. I planted one in my new garden on the first day.
 
 ### 11. Barry Zhang · Retirement · Garden to visit · Surfers Against Sewage
 `id ad342d61-08a6-4504-8e1a-855dfffcbfe9` · ★★☆ · first person
