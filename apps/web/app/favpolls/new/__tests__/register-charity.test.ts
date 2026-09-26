@@ -80,6 +80,7 @@ describe("findOrCreateRegisterCharity", () => {
 
   it("creates consent-pending and OFF the catalogue, with verification", async () => {
     mock.queue(null) // no existing row
+    mock.queue([]) // the catalogue, for the perfect-topic suggestion
     mock.queue({ id: "c-new", name: "Dogs Trust" }) // the insert's select
     const c = await findOrCreateRegisterCharity({
       registeredNumber: "227523",

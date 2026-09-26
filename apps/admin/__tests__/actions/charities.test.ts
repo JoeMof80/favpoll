@@ -491,7 +491,21 @@ describe("setCharityConsent", () => {
 
 // The cause family (references/favpoll-pairing-table §2). Confirmed here,
 // read by the generator only once confirmed.
-import { setCauseFamily } from "@/lib/actions/charities";
+import { setCauseFamily, setPerfectTopic } from "@/lib/actions/charities";
+
+describe("setPerfectTopic", () => {
+  it("writes the confirmed topic, and null when none fits", async () => {
+    mock.queue(null);
+    const { error } = await setPerfectTopic("charity-1", "topic-9");
+    expect(error).toBeNull();
+    const update = mock
+      .callsFor("charities")
+      .find((c) => c.method === "update");
+    expect(update?.args[0]).toEqual({ perfect_topic_id: "topic-9" });
+    mock.queue(null);
+    expect((await setPerfectTopic("charity-1", null)).error).toBeNull();
+  });
+});
 
 describe("setCauseFamily", () => {
   it("writes a confirmed family", async () => {

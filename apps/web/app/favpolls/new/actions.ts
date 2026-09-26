@@ -8,6 +8,10 @@ import {
   fetchRegisterPurpose,
 } from "@/lib/charity-commission"
 import { suggestCauseFamily } from "@/lib/cause-family"
+import {
+  catalogueForSuggestion,
+  suggestPerfectTopic,
+} from "@/lib/perfect-topic"
 import type { Charity } from "@favpoll/types"
 
 type CustomTopic = {
@@ -399,12 +403,33 @@ export async function findOrCreateRegisterCharity(input: {
     throw new Error("That charity isn't currently on the register")
   }
 
-  const [contact, purpose] = await Promise.all([
+  const [contact, purpose, { data: catalogue }] = await Promise.all([
     fetchRegisterContact(number),
     // What the charity is FOR — the generator's purpose signal, since a
     // register-added charity has no description (2026-09-23).
     fetchRegisterPurpose(number),
+    supabase
+      .from("topics")
+      .select("id, title, is_finite, favourites(label, is_canonical)")
+      .eq("is_active", true),
   ])
+  // Both SUGGESTIONS only — the admin confirms them in the outreach queue.
+  const causeFamilySuggested = await suggestCauseFamily({
+    name,
+    activities: purpose.activities,
+    classification: purpose.classification,
+    objects: purpose.objects,
+    grantMaking: purpose.grantMaking,
+  })
+  const perfectTopic = await suggestPerfectTopic({
+    name,
+    activities: purpose.activities,
+    objects: purpose.objects,
+    causeFamily: causeFamilySuggested,
+    grantMaking: purpose.grantMaking,
+    areas: purpose.areas,
+    topics: catalogueForSuggestion(catalogue ?? []),
+  })
 
   const { data: created, error } = await supabase
     .from("charities")
@@ -424,14 +449,9 @@ export async function findOrCreateRegisterCharity(input: {
       objects: purpose.objects,
       areas: purpose.areas,
       grant_making: purpose.grantMaking,
-      // A SUGGESTION only — the admin confirms it in the outreach queue.
-      cause_family_suggested: await suggestCauseFamily({
-        name,
-        activities: purpose.activities,
-        classification: purpose.classification,
-        objects: purpose.objects,
-        grantMaking: purpose.grantMaking,
-      }),
+      cause_family_suggested: causeFamilySuggested,
+      perfect_topic_suggested_id: perfectTopic?.topicId ?? null,
+      perfect_topic_reason: perfectTopic?.reason ?? null,
     })
     .select("*")
     .single()

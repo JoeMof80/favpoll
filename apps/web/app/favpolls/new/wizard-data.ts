@@ -41,13 +41,19 @@ export async function getWizardData(): Promise<{
   }))
 
   const suggestedTopicIds: Record<string, string[]> = {}
+  // The charity's own confirmed PERFECT TOPIC leads its suggestions
+  // (2026-09-26); the admin's hand-picked list follows.
+  for (const c of (charities ?? []) as Charity[]) {
+    if (c.perfect_topic_id) suggestedTopicIds[c.id] = [c.perfect_topic_id]
+  }
   for (const row of charityTopicsRows ?? []) {
     const { charity_id, topic_id } = row as {
       charity_id: string
       topic_id: string
     }
     if (!suggestedTopicIds[charity_id]) suggestedTopicIds[charity_id] = []
-    suggestedTopicIds[charity_id].push(topic_id)
+    if (!suggestedTopicIds[charity_id].includes(topic_id))
+      suggestedTopicIds[charity_id].push(topic_id)
   }
 
   return {

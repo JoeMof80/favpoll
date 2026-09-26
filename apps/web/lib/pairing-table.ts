@@ -875,6 +875,9 @@ export type EdgeLookupInput = {
   charityName: string | null
   /** The admin-CONFIRMED family only — never the model's suggestion. */
   causeFamily: CauseFamily | null
+  /** The charity's own confirmed PERFECT TOPIC (2026-09-26), when it has
+   *  one: beats every table row for the charity→topic edge. */
+  charityTopic?: { title: string; reason: string | null } | null
 }
 
 const norm = (s: string) => s.trim().toLowerCase().replace(/[‘’]/g, "'")
@@ -941,9 +944,19 @@ export function lookupEdges(input: EdgeLookupInput): StoryEdges {
     }
   }
 
-  // E2 — charity → topic (the charity's own row beats its family's)
+  // E2 — charity → topic. The charity's own confirmed topic beats its
+  // row, and its row beats its family's.
   let e2: Edge | null = null
-  if (input.charityName && input.causeFamily) {
+  if (
+    input.charityName &&
+    input.charityTopic &&
+    norm(input.charityTopic.title) === norm(input.topicTitle)
+  ) {
+    e2 = {
+      star: true,
+      text: `A favourite ${topic} is ${input.charityName}'s own topic${input.charityTopic.reason ? `: ${input.charityTopic.reason.replace(/\.$/, "")}` : ""}.`,
+    }
+  } else if (input.charityName && input.causeFamily) {
     const family = FAMILY_ROWS[input.causeFamily]
     const rows = charityRow(input.charityName) ?? family.topics
     const hit = findTopic(rows, input.topicTitle)

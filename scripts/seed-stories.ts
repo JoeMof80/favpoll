@@ -697,7 +697,20 @@ type Charity = {
   cause_family: CauseFamily | null;
   objects?: string | null;
   areas?: { area: string; type: string }[] | null;
+  perfect_topic_reason?: string | null;
+  perfect_topic?: { title: string } | { title: string }[] | null;
 };
+/** The charity's confirmed perfect topic, in the engine's shape. */
+function perfectTopicOf(
+  c: Pick<Charity, "perfect_topic" | "perfect_topic_reason">,
+): { title: string; reason: string | null } | null {
+  const t = Array.isArray(c.perfect_topic)
+    ? c.perfect_topic[0]
+    : c.perfect_topic;
+  return t?.title
+    ? { title: t.title, reason: c.perfect_topic_reason ?? null }
+    : null;
+}
 
 type Candidate = {
   register: Register;
@@ -1022,7 +1035,9 @@ async function seed() {
       .eq("is_active", true),
     supabase
       .from("charities")
-      .select("id, name, description, activities, cause_family, objects, areas")
+      .select(
+        "id, name, description, activities, cause_family, objects, areas, perfect_topic_reason, perfect_topic:topics!charities_perfect_topic_id_fkey(title)",
+      )
       .eq("is_active", true)
       .not("cause_family", "is", null),
   ]);
@@ -1143,6 +1158,7 @@ async function seed() {
         activities: c.charity.activities,
         causeFamily: c.charity.cause_family,
         objects: c.charity.objects ?? null,
+        perfectTopic: perfectTopicOf(c.charity),
         areas: c.charity.areas ?? null,
       },
       pronoun: who?.pronoun,
@@ -1638,7 +1654,7 @@ async function regen(name: string) {
   const { data: f, error } = await supabase
     .from("favpolls")
     .select(
-      "id, subject, category, grouping, occasion_type, cause_label, protagonists(id, name, pronoun), favpoll_polls(id, topics(title, is_finite, favourites(id, label, is_canonical)), favpoll_poll_favourites(favourite_id)), favpoll_charities(charities(name, description, activities, cause_family, objects, areas))",
+      "id, subject, category, grouping, occasion_type, cause_label, protagonists(id, name, pronoun), favpoll_polls(id, topics(title, is_finite, favourites(id, label, is_canonical)), favpoll_poll_favourites(favourite_id)), favpoll_charities(charities(name, description, activities, cause_family, objects, areas, perfect_topic_reason, perfect_topic:topics!charities_perfect_topic_id_fkey(title)))",
     )
     .eq("created_by", SEED_USER);
   if (error) throw new Error(error.message);
@@ -1687,6 +1703,7 @@ async function regen(name: string) {
       activities: ch.activities,
       causeFamily: ch.cause_family,
       objects: ch.objects ?? null,
+      perfectTopic: perfectTopicOf(ch),
       areas: ch.areas ?? null,
     },
     pronoun: p?.pronoun ?? undefined,

@@ -545,6 +545,8 @@ export type StoryCharity = {
   objects?: string | null
   /** Where it works: local authorities or countries. */
   areas?: { area: string; type: string }[] | null
+  /** The admin-CONFIRMED perfect topic (2026-09-26), if any. */
+  perfectTopic?: { title: string; reason: string | null } | null
 }
 
 export type StoryInput = {
@@ -594,6 +596,7 @@ export function storyEdges(input: StoryInput): StoryEdges {
     topicTitle: input.topicTitle,
     charityName: input.charity.name,
     causeFamily: input.charity.causeFamily,
+    charityTopic: input.charity.perfectTopic ?? null,
   })
 }
 

@@ -119,6 +119,29 @@ describe("lookupEdges — the worked triples from the reference note", () => {
     )
   })
 
+  it("a charity's own confirmed topic is a starred charity→topic edge, ahead of its family", () => {
+    const edges = lookupEdges({
+      register: "celebrating_one",
+      occasionType: "Birthday",
+      topicTitle: "River",
+      charityName: "River Action",
+      causeFamily: "environment_heritage",
+      charityTopic: { title: "River", reason: "Your work is rivers." },
+    })
+    expect(edges.e2?.star).toBe(true)
+    expect(edges.e2?.text).toBe(
+      "A favourite river is River Action's own topic: Your work is rivers."
+    )
+    const without = lookupEdges({
+      register: "celebrating_one",
+      occasionType: "Birthday",
+      topicTitle: "River",
+      charityName: "River Action",
+      causeFamily: "environment_heritage",
+    })
+    expect(without.e2?.star ?? false).toBe(false)
+  })
+
   it("Emma & James · Song · Shelter is two edges (wedding→song, wedding↔a home)", () => {
     const edges = lookupEdges({
       register: "celebrating_many",
