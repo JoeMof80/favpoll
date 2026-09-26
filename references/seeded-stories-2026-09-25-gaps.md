@@ -195,7 +195,7 @@ Margaret Ellis played the organ at her local church for thirty years. She loved 
 
 **Note**
 
-Margaret's was When I Survey the Wondrous Cross. She kept a handwritten copy of the words tucked inside her hymn book.
+Margaret's was When I Survey the Wondrous Cross. She saved it for the last hymn on a full Sunday, and the organ was never louder.
 
 ### 18. Kenneth Parry · Celebration of life · Season · Stroke Association
 `id d6f85631-3e8d-47d9-955d-e34aaf9ebfd4` · ★★☆ · third person, he
