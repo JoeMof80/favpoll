@@ -928,7 +928,25 @@ async function seed() {
       "Need active topics and charities with a confirmed cause family — run pnpm seed and confirm families first.",
     );
 
-  const candidates = enumerate(topics, charities);
+  // Topics already used by seeded favpolls on staging count against the
+  // per-topic cap, so a third "Way to spend Sunday" cannot appear across
+  // cohorts (founder, 2026-09-26: "don't we have an example very similar
+  // to this?").
+  const { data: usedRows } = await supabase
+    .from("favpolls")
+    .select("favpoll_polls(topic_id)")
+    .eq("created_by", SEED_USER);
+  const usedTopics = new Map<string, number>();
+  for (const r of usedRows ?? []) {
+    const poll = Array.isArray((r as any).favpoll_polls)
+      ? (r as any).favpoll_polls[0]
+      : (r as any).favpoll_polls;
+    if (poll?.topic_id)
+      usedTopics.set(poll.topic_id, (usedTopics.get(poll.topic_id) ?? 0) + 1);
+  }
+  const candidates = enumerate(topics, charities).filter(
+    (c) => (usedTopics.get(c.topic.id) ?? 0) < 2,
+  );
   const triads = candidates.filter((c) => c.count === 3).length;
   console.log(
     `Table: ${candidates.length} motivated triples from ${topics.length} topics × ${charities.length} charities (${triads} triads).`,

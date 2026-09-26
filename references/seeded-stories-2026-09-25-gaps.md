@@ -127,16 +127,16 @@ I'm retiring this month and will finally have the time to explore. I'm planning 
 
 Mine is Crathes Castle. I always find the same bench near the roses and sit there before walking on.
 
-### 12. Rosa Mensah · Retirement · Way to spend Sunday · Independent Age
+### 12. Rosa Mensah · Retirement · Hobby · Independent Age
 `id c1f7ea47-be63-4ce4-b5b5-351c8b4f8a22` · ★★★ · first person
 
 **About**
 
-I'm retiring this month, and my Sundays are finally my own to spend as I like. I mean to make good use of them, whatever that turns out to mean. Pledge to Independent Age, pick your own favourite, and find out mine.
+After forty years of early starts, I'm finally hanging up my lanyard. I'm looking forward to having time for a hobby I've been putting off. Independent Age helps older people live independent, fulfilling lives. Pledge to Independent Age, pick your favourite hobby, and find out mine.
 
 **Note**
 
-Mine is Pub lunch. I always order the same starter before I even look at the menu.
+Mine is Book club. I host it in my kitchen once a month, and everyone brings a dish to match the book.
 
 ## Celebrating a couple or group
 

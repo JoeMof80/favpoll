@@ -37,7 +37,7 @@ function exemplarsBlock(q: ExemplarQuery): string {
   const items = pickExemplars(q, 4)
     .map((x) => `${x.triple}\n  about: ${x.about}\n  note: ${x.note}`)
     .join("\n")
-  return `These are the bar: the founder's own Stories, the closest to this one. Notice how ordinary the facts are, how plainly they are said, how much room they take, and that nothing in them is invented for effect. Some predate the em dash rule; keep their plainness, not their dashes.\n${items}`
+  return `These are the bar: the founder's own Stories, the closest to this one. Notice how ordinary the facts are, how plainly they are said, how much room they take, and that nothing in them is invented for effect. They are the standard, not a template: never reuse their phrasing, their opening move or their detail (a Story next to "Now I have Sundays to myself" must not open with Sundays being one's own). Some predate the em dash rule; keep their plainness, not their dashes.\n${items}`
 }
 
 /** A birth: the BABY is the protagonist on the card ("Welcome to the
