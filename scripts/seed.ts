@@ -6472,6 +6472,7 @@ const topicItems: Record<string, string[]> = {
     "Time to Say Goodbye — Andrea Bocelli",
     "Tiny Dancer — Elton John",
     "Unchained Melody — The Righteous Brothers",
+    "Under the Bridge — All Saints",
     "Waterloo Sunset — The Kinks",
     "What a Wonderful World — Louis Armstrong",
     "White Christmas — Bing Crosby",

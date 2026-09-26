@@ -156,76 +156,76 @@ Last time we played scrabble and Nana won again, of course.
 
 **About**
 
-We fill the table every time we get together, in a frenzy of full plates that are soon emptied. We cook a variety of dishes and everybody contributes. We're raising for Trussell Trust to help feed others. Pledge your favourite comfort food in order to see ours.
+We fill the table every time we get together, with full plates that soon become empty. We cook a variety of dishes and everybody contributes. We're raising for Trussell Trust to help feed others. Pledge your favourite comfort food in order to see ours.
 
 **Note**
 
 Ours is Jollof rice. We always make an extra batch so the boys can have seconds.
 
-### 15. Hillcrest School, Class of '98 · Reunion · Song · Children's Society
+### 15. Hillcrest School, Class of '98 · Reunion · Song · SHINE
 `id e7b3c585-1fe2-403c-947a-3450c08de388` · ★☆☆ · first person
 
 **About**
 
-We haven't all been in one room for years, and the last time someone grabbed a guitar the night ran late. This time we've got a full band lined up and a night ahead of us. Pledge to Children's Society, pick your favourite song, and the top ten are the playlist for the night.
+We're getting back together for the first time in years but it won't feel like it. Please pledge to SHINE - who help educate disadvantaged kids across the north - by picking your favourite song. The picked songs will be the playlist for the evening.
 
 **Note**
 
-Someone reaches for Wonderwall — Oasis near the end of the night, and the whole room ends up singing along, arms around each other.
+Under The Bridge — All Saints was number one the week of our leaving do. That should bring back some memories.
 
-### 16. The Ravenscroft rowing eight · Reunion · Cheese · Age UK
+### 16. The Ravenscroft rowing eight · Reunion · Cheese · FareShare
 `id b9eacdaf-8224-4cc6-ba98-4deeaa88d7f0` · ★★☆ · first person
 
 **About**
 
-We're back under one roof for the first time in years, plates loaded, and the table full. Age UK works for those who spend evenings like this alone. Pledge to Age UK, pick your favourite cheese, and the winners go on the board.
+We're back together for the first time in years, united by our shared love of rowing and cheese (although the rowing days are over). Not everybody is lucky enough to have cheese so lets support FareShare who fight hunger. Pick your favourite cheese and all the picks will be on the board after dinner.
 
 **Note**
 
-Stilton was what someone unwrapped first at our last reunion, and by the end of the night the whole board had gathered round it.
+Hopefully we won't run out of stilton like last time.
 
 ## Remembering
 
-### 17. Fatima Choudhury · Celebration of life · Hymn · Diabetes UK
+### 17. Margaret Ellis · Celebration of life · Hymn · Diabetes UK
 `id 0b3213be-075d-4a9e-ad2b-6fedd27f2ff0` · ★★☆ · third person, she
 
 **About**
 
-Fatima sang in her church choir for years and knew every hymn by heart. She looked forward to the carol service each December and always brought round mince pies after. Diabetes UK cared for her through her illness. Pledge to Diabetes UK, pick your favourite hymn, and we'll reveal Fatima's.
+Margaret sang in the church choir her whole life. She looked forward to the carol service each December and always brought round mince pies after. Diabetes UK cared for her through her illness. Pledge to Diabetes UK, pick your favourite hymn, and we'll reveal Margaret's.
 
 **Note**
 
-Fatima's was When I Survey the Wondrous Cross. She used to hum it while doing the ironing on Sunday afternoons.
+Margaret's was When I Survey the Wondrous Cross. She used to hum it while doing the ironing on Sunday afternoons.
 
 ### 18. Kenneth Parry · Celebration of life · Season · Stroke Association
 `id d6f85631-3e8d-47d9-955d-e34aaf9ebfd4` · ★★☆ · third person, he
 
 **About**
 
-Kenneth Parry loved being outdoors, whatever the weather. He kept logs stacked by the back door for the colder months and always knew when the first frost was near. Stroke Association was there for him after his stroke, and he wanted them remembered today. Pledge to Stroke Association, pick your favourite season, to see Kenneth's.
+Kenneth loved the outdoors all year round but he did have a favourite season. Stroke Association supported him after his stroke, and he requested we return the favour today. So pledge to Stroke Association, pick your favourite season, and you'll see Kenneth's.
 
 **Note**
 
-Kenneth's was Summer. He spent every August bank holiday fishing at the same spot by the river.
+Kenneth loved river fishing in the Summer most of all.
 
 ### 19. Winston · Pet memorial · Beach · WWF
 `id 22814e73-f626-4586-afcf-3c34e27bfddf` · ★★☆ · third person, he
 
 **About**
 
-Winston pulled me down to the sea on every walk we took, whatever the weather. He'd wait at the door with his lead the moment I reached for my coat. Pledge to WWF, pick your favourite beach, and Winston's will be revealed.
+Winston loved beach holidays more than anything. He couldn't wait for the car door to open and dash onto the sand. He loved all beaches but please tell us your favourite and donate to the WWF.
 
 **Note**
 
-Winston's was Saunton Sands. He would bound straight into the shallows every time we visited, tail going nineteen to the dozen.
+Our best memories of Winston were at Saunton Sands when he was still a puppy. He almost wagged his tail off.
 
 ### 20. Tilly · Pet memorial · Weather for walking · Dogs Trust
 `id 445f1c94-5c5c-445c-9d70-e9525a28bed2` · ★★★ · third person, she
 
 **About**
 
-Tilly pulled me out of the door whatever the sky was doing. She waited by the lead for our walk at the same time every day, rain or shine. Pledge to Dogs Trust, pick your favourite weather for walking, and Tilly's will be revealed.
+Tilly would pull me out of the door whatever the weather. She waited next to the door for walkies at the same time every day, rain or shine. Pick your favourite weather for walking to reveal Tilly's, in support of the Dogs Trust.
 
 **Note**
 
-Tilly's was Golden hour. She would stop on the same ridge every evening to watch the light change before trotting on.
+Tilly loved Golden hour. We both did.
