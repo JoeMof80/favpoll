@@ -802,7 +802,7 @@ export async function judgeStory(
   const isCause = input.subject === "cause"
   const who = isCause
     ? `a cause (${input.displayName ?? "unnamed"})`
-    : `${input.displayName ?? "the person"}, ${input.grouping === "couple" ? "a couple" : input.grouping === "group" ? "a group" : "one person"}${firstPerson(input.pronoun) ? ", writing about themselves in the first person (fail it if it slips into the third person)" : ""}`
+    : `${input.displayName ?? "the person"}, ${input.grouping === "couple" ? "a couple" : input.grouping === "group" ? "a group" : "one person"}${firstPerson(input.pronoun) ? `, writing about themselves in the first person (fail it if it slips into the third person${input.grouping === "couple" || input.grouping === "group" ? ', or if "we" becomes "I" or "my" anywhere' : ""})` : ""}`
   const effort = EFFORT_OCCASIONS.has(input.occasionType ?? "")
     ? " The occasion is a sponsored effort still to come: fail it if the effort is written as already done."
     : ""

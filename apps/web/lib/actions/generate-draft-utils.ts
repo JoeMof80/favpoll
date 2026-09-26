@@ -89,7 +89,9 @@ export function hasTics(text: string): boolean {
  * my desk" twice (founder, 2026-09-24).
  */
 export function slipsToSingular(text: string): boolean {
-  return /\b(I|I'm|I've|my|me|mine)\b/.test(text)
+  // Sentence-initial too: "My ticket stubs sit in a shoebox" slipped past
+  // a case-sensitive match (2026-09-26).
+  return /\b(I|I'm|I've|[Mm]y|[Mm]e|[Mm]ine)\b/.test(text)
 }
 
 /**

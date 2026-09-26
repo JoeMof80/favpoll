@@ -386,14 +386,14 @@
   "subject": "someone",
   "register": "celebrating_many",
   "occasion": "Reunion",
-  "topic": "Sweet",
+  "topic": "Music era",
   "charity": "Children's Society",
   "family": "children",
   "pronoun": "i",
   "grouping": "group",
   "context": "20 years since we last met",
-  "about": "We haven't all been in one room for years. Someone always brings a bag of sweets to pass round, and it takes us straight back to school corridors and pocket money. Pledge to Children's Society, pick your favourite sweet, to see ours.",
-  "note": "Ours is Black Jacks. We keep a paper bag of them in the glovebox for the drive here.",
+  "about": "We come back together every few years, and the same songs get us up before the starters arrive. Someone always brings a speaker loaded with tracks from the years we shared. Pledge to Children's Society, pick your favourite music era, and find out ours.",
+  "note": "Ours is Nineties indie and dance. We keep a mixtape from those years in the glovebox and play it on the drive home.",
   "edges": {
    "e1": {
     "star": false,

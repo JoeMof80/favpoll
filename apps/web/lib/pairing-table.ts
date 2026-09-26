@@ -388,19 +388,20 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
     at: "their song, and the year they married",
     hop: "the years together",
   },
+  // A reunion is of people who were teenagers or adults together, so the
+  // small-child nostalgia (sweets, toys, playground games) is off the row:
+  // "by the time kids leave school, sweets aren't very important"
+  // (founder, 2026-09-26).
   Reunion: {
     topics: [
       t("Decade", true),
       t("Music era", true),
       t("Song"),
       t("School subject"),
-      t("Childhood game"),
-      t("Sweet"),
       t("Crisps"),
       t("TV theme tune"),
       t("Sitcom"),
       t("Cartoon"),
-      t("Toy"),
       t("Video game"),
     ],
     at: "the years everyone shared",

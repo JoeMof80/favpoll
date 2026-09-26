@@ -162,16 +162,16 @@ We fill the table every time we get together, in a frenzy of full plates that ar
 
 Ours is Jollof rice. We always make an extra batch so the boys can have seconds.
 
-### 15. Hillcrest School, Class of '98 · Reunion · Sweet · Children's Society
-`id e7b3c585-1fe2-403c-947a-3450c08de388` · ★★☆ · first person
+### 15. Hillcrest School, Class of '98 · Reunion · Music era · Children's Society
+`id e7b3c585-1fe2-403c-947a-3450c08de388` · ★☆☆ · first person
 
 **About**
 
-We haven't all been in one room for years. Someone always brings a bag of sweets to pass round, and it takes us straight back to school corridors and pocket money. Pledge to Children's Society, pick your favourite sweet, to see ours.
+We come back together every few years, and the same songs get us up before the starters arrive. Someone always brings a speaker loaded with tracks from the years we shared. Pledge to Children's Society, pick your favourite music era, and find out ours.
 
 **Note**
 
-Ours is Black Jacks. We keep a paper bag of them in the glovebox for the drive here.
+Ours is Nineties indie and dance. We keep a mixtape from those years in the glovebox and play it on the drive home.
 
 ### 16. The Ravenscroft rowing eight · Reunion · Decade · Age UK
 `id b9eacdaf-8224-4cc6-ba98-4deeaa88d7f0` · ★★★ · first person

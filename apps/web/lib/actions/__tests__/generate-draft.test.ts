@@ -1356,6 +1356,11 @@ describe("a caller may choose the favourite; a couple stays plural", () => {
     expect(
       slipsToSingular("Ours is Saturn. We point it out whenever we can.")
     ).toBe(false)
+    expect(
+      slipsToSingular(
+        "Ours is Nineties indie and dance. My ticket stubs sit in a shoebox."
+      )
+    ).toBe(true)
   })
 
   it("the prompt names the chosen option verbatim", async () => {
