@@ -1171,7 +1171,7 @@ describe("realism rules in the person prompt (founder review, 2026-09-24)", () =
       "pick your favourite song, and the top ten are the playlist for the night."
     )
     expect(prompt).toContain("The guests' picks are ENACTED on the night")
-    expect(prompt).toContain("no opener and no reveal")
+    expect(prompt).toContain("there is no opener and no reveal")
     expect(hasTics("Someone always brings a speaker.")).toBe(true)
     expect(prompt).not.toContain('start with exactly "Ours is"')
   })

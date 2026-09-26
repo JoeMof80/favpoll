@@ -167,11 +167,11 @@ Ours is Jollof rice. We always make an extra batch so the boys can have seconds.
 
 **About**
 
-We're back together for the first time in years, and the years fall away fast. We remember who sang loudest and who needed the words on a napkin. Tonight the room fills up again, and the songs carry us back. Pledge to Children's Society, pick your favourite song, and the top ten are the playlist for the night.
+We haven't all been in one room for years, and the last time someone grabbed a guitar the night ran late. This time we've got a full band lined up and a night ahead of us. Pledge to Children's Society, pick your favourite song, and the top ten are the playlist for the night.
 
 **Note**
 
-Dancing Queen — ABBA got the whole room up in one go, from the back rows to the bar, and no one wanted to sit down.
+Someone reaches for Wonderwall — Oasis near the end of the night, and the whole room ends up singing along, arms around each other.
 
 ### 16. The Ravenscroft rowing eight · Reunion · Cheese · Age UK
 `id b9eacdaf-8224-4cc6-ba98-4deeaa88d7f0` · ★★☆ · first person

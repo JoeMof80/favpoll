@@ -963,7 +963,16 @@ async function judgeLoop(
       );
       continue;
     }
-    const item = namedItem(story.note, items);
+    // When the favourite was chosen up front the note must name THAT one:
+    // a note naming some other real item passed P1 and hid a disobeyed
+    // pick (2026-09-26: asked for Wonderwall, got Dancing Queen).
+    if (process.env.SEED_DEBUG)
+      console.log(
+        `  [debug] pick=${input.pick ?? "(none)"}\n  [debug] about=${story.about}\n  [debug] note=${story.note}`,
+      );
+    const named = namedItem(story.note, items);
+    const item =
+      input.pick && named && named.label !== input.pick ? null : named;
     const event = isCause ? aboutNamesEvent(story.about, occasion) : true;
     // A first-person couple or group keeps "we" in the note: a lookup,
     // and part of the gate rather than a single retry.
@@ -1696,7 +1705,10 @@ async function regen(name: string) {
   const bar = isCause
     ? (e: ReturnType<typeof storyEdges>) => Boolean(e.e1 && e.e2)
     : (e: ReturnType<typeof storyEdges>) => e.count >= 2;
-  if (REGEN_TOPIC || !bar(storyEdges(input))) {
+  // Re-pick only when the triple has NO edge left: a row deliberately
+  // left at one edge (Song at a reunion, by the founder's choice) was
+  // being moved on every regen without --topic (2026-09-26).
+  if (REGEN_TOPIC || storyEdges(input).count === 0) {
     const { data: allTopics } = await supabase
       .from("topics")
       .select("id, title, is_finite, favourites(id, label, is_canonical)")

@@ -37,7 +37,7 @@ function exemplarsBlock(q: ExemplarQuery): string {
   const items = pickExemplars(q, 4)
     .map((x) => `${x.triple}\n  about: ${x.about}\n  note: ${x.note}`)
     .join("\n")
-  return `These are the bar: the founder's own Stories, the closest to this one. Notice how ordinary the facts are, how plainly they are said, how much room they take, and that nothing in them is invented for effect. They are the standard, not a template: never reuse their phrasing, their opening move or their detail (a Story next to "Now I have Sundays to myself" must not open with Sundays being one's own). Some predate the em dash rule; keep their plainness, not their dashes.\n${items}`
+  return `These are the bar: the founder's own Stories, the closest to this one. Notice how ordinary the facts are, how plainly they are said, how much room they take, and that nothing in them is invented for effect. They are the standard, not a template: never reuse their phrasing, their opening move or their detail (a Story next to "Now I have Sundays to myself" must not open with Sundays being one's own), and never their favourite: the option each names is that person's, and this Story's option is given in the rules below. Some predate the em dash rule; keep their plainness, not their dashes.\n${items}`
 }
 
 /** A birth: the BABY is the protagonist on the card ("Welcome to the
@@ -426,10 +426,15 @@ ${edgesBlock(edges, subject)}`
     const charityFit = edges.e3
       ? ` The charity's fit with the occasion is given above; you may say it in a few plain words, as the examples do ("Marie Curie nurses were with her at the end"), or leave it to the closing.`
       : ` The charity is named in the closing sentence and nowhere else.`
+    // An enacted row's note is a shared memory of the option, not a
+    // reveal; said on its own, because the long reveal rule and the
+    // examples after it drowned the pick (2026-09-26: asked for
+    // Wonderwall, got the exemplar's Dancing Queen three times).
+    const enactedReveal = `- "reveal" (guests see it only AFTER pledging): the picks are enacted, so there is no opener and no reveal. Write ONE sentence: a plain moment the group remembers with ${pick ? `"${pick}"` : "one real option from the list, named verbatim,"} in it (who reached for it, what it started, how the evening went). Never a claim that the group prefers it, never "Last time", nothing else.`
     instructions = `- "about": write it the way the four examples below are written: two or three sentences, 40 to 65 words in all, about the person and the occasion, in plain words, ending with the closing sentence given here exactly, nothing added after it: "${closing}"${tenseRule}${edgeRule}${truthRule}${babyRule}${effortRule}${petRule}${enactedRule}${realPersonRule}${charityFit}${pronounHint}${nameHint}
-- "reveal" (guests see it only AFTER pledging): ${edges.e1?.enacted ? `no opener and no reveal, because the picks are enacted: ONE sentence, a memory the group shares of ${pick ? `exactly this option, named verbatim: "${pick}"` : "one real option from the list, named verbatim"}, a plain remembered moment with the option in it (who reached for it, what it started, how the evening went), never a claim that the group prefers it, and never opening with "Last time". Nothing else.` : `start with exactly "${opener}".`}${entityGuard} ${edges.e1?.enacted ? "Otherwise ignore the rest of this rule:" : `Then ${pick ? `exactly this option, verbatim: "${pick}"` : "a plausible option from the list (you MUST use a real option, verbatim)"}, then a full stop, then`} ONE short sentence with a single detail of the PROTAGONIST'S own relationship to that favourite${first ? " (in the first person)" : ""}: a plain fact will do ("her bathroom is full of dolphin pictures", "he read it during his gap year"); it need not be a habit or an action, and it must pass the honour test above. Something the about did not already say. The detail involves the favourite ITSELF (what they do with it, where, how often), not a mood, a light or a weather that stands near it. When the favourite is a KIND of thing (a breed, a cuisine, a type of holiday), the detail is about one particular one in their life, never the kind at large.${tenseRule} The detail must be entirely the protagonist's own and must NOT depend on any real-world fact about the favourite: no fixture dates or match traditions, no seasons, tours, episodes, eras, or biography (a claim like "watched them play on Boxing Day" fails if that favourite doesn't play then; avoid the whole category). The options may be famous real people, teams, or works: never state or invent facts about them. No preamble such as "We can't wait to reveal".
+${edges.e1?.enacted ? enactedReveal : `- "reveal" (guests see it only AFTER pledging): start with exactly "${opener}".${entityGuard} Then ${pick ? `exactly this option, verbatim: "${pick}"` : "a plausible option from the list (you MUST use a real option, verbatim)"}, then a full stop, then ONE short sentence with a single detail of the PROTAGONIST'S own relationship to that favourite${first ? " (in the first person)" : ""}: a plain fact will do ("her bathroom is full of dolphin pictures", "he read it during his gap year"); it need not be a habit or an action, and it must pass the honour test above. Something the about did not already say. The detail involves the favourite ITSELF (what they do with it, where, how often), not a mood, a light or a weather that stands near it. When the favourite is a KIND of thing (a breed, a cuisine, a type of holiday), the detail is about one particular one in their life, never the kind at large.${tenseRule} The detail must be entirely the protagonist's own and must NOT depend on any real-world fact about the favourite: no fixture dates or match traditions, no seasons, tours, episodes, eras, or biography (a claim like "watched them play on Boxing Day" fails if that favourite doesn't play then; avoid the whole category). The options may be famous real people, teams, or works: never state or invent facts about them. No preamble such as "We can't wait to reveal".`}
 
-${exemplarsBlock({ register, occasionType, topicTitle, causeFamily, pronoun, grouping })}`
+${exemplarsBlock({ register, occasionType, topicTitle, causeFamily, pronoun, grouping })}${pick ? `\n\nThe favourite for THIS Story is "${pick}" and no other. The favourites in the examples belong to the people in them.` : ""}`
   }
 
   const responseShape =
@@ -470,6 +475,8 @@ export async function callLLMWithCopyCheck(
 ): Promise<DraftFields> {
   // The FIRST call used to be unguarded, so one bad response killed the
   // whole generation and the organiser saw nothing (founder, 2026-09-23).
+  if (process.env.SEED_DEBUG)
+    console.log(`[debug] PROMPT\n${prompt}\n[debug] END PROMPT`)
   const first = await callLLM(prompt, modelId).catch(() => null)
   if (!first) {
     const rescue = await callLLM(prompt, modelId)
@@ -861,7 +868,7 @@ Fail it if ANY of these is true:
 - a baby or a child too young has a favourite, a habit or a memory;
 - a place, an object, a time of day or a smell is given agency ("walked every mile with her", "steadies him", "feels most like his own");
 - a quirk, talisman, superstition or joke invented for effect (a sandwich kept in a coat pocket "just in case");
-- the person is written as the wrong age or the wrong person for the occasion;
+- the person is written as the wrong age or the wrong person for the occasion, or the favourite is from the wrong era for them (a group named for a year were teenagers then: a "Class of '98" reunion's song is not Dancing Queen, and a rowing crew's favourite decade is one they lived through);
 - a sentence that does not make sense, or that no relative would say out loud;
 - a link between the charity and the topic that the edges above do not give ("humanitarian work reaches rivers", "a favourite river follows the routes where that work happens"): when no such edge is listed, any connection drawn is invented;
 - ${isCause ? "the about does not say what is being raised for" : "the about and the note contradict each other, in fact OR in premise (an about that says she finally has time for a hobby she has been putting off, and a note that reveals a book club she already hosts once a month)"}.
