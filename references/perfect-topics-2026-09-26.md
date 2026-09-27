@@ -96,3 +96,33 @@ The same 58, asked the other way round: not which existing topic fits, but which
 | Shelter | **Room in a home** (closed) | Kitchen, Living room, Bedroom, Garden, Bathroom, Attic, Dining room, Study, Hallway, Conservatory, Garage, Basement | — | sibling test: living room and lounge may feel like the same item to some guests |
 
 My read: **Cat name** (and its twin, Dog name) is the one real find, and it is a rescue's topic rather than a breeder's. **Room in a home** for Shelter fails the honour rule: it puts the guest's mind on housing. **Flag**, **Scientist** and **Charity shop find** are reaches. **Way to unwind** and **Market** overlap Hobby and Cuisine.
+
+## The register pilot: animals and environment, income over £500k (27 September)
+
+From the Commission's bulk extracts: 171,909 registered charities; the pilot slice (classified Animals or Environment/conservation/heritage, income ≥ £500k) is 2,115, of which 2,030 have a contact email. Each was labelled with the concrete thing at the centre of its work (cheap model), then grouped by kind and given a topic per group (Sonnet). 755 of the 2,115 have nothing a supporter would have a favourite of (funders, universities, housing associations). The rest by kind: animals 259, heritage building 186, community 169, wildlife 166, museum 110, landscape 102, education 69, water 54, faith building 48, other 45, transport heritage 44, gardens 42, arts 36, housing 15, sport 15.
+
+**The run stopped at the API's credit limit after the animals kind.** The other kinds (heritage buildings, wildlife, museums, landscape, water, transport heritage, gardens, faith buildings, arts) are queued and resume from where they stopped once credit is topped up.
+
+### Animals: 151 charities placed
+
+| Topic | Charities | Existing? | Items (new topics) | Doubt |
+|---|---|---|---|---|
+| Animal | 74 | yes |  | The topic may feel too generic to be the 'perfect' fit for a specific charity, since it covers every species rather than what that charity actually handles. |
+| Dog breed | 20 | yes |  | Grouping greyhound rescue, assistance dogs and research together may blur three distinct causes into one favourite. |
+| Pet | 15 | **new** | Dog, Cat, Rabbit, Guinea pig, Hamster, Budgie, Goldfish, Tortoise, Ferret, Parrot, Gerbil, Chinchilla | Could be seen as too close to renaming the existing 'Animal' topic rather than a genuinely new one. |
+| Farm animal | 12 | **new** | Cow, Pig, Sheep, Goat, Chicken, Duck, Horse, Donkey, Turkey, Goose, Rabbit, Llama | Some items (e.g. Horse, Rabbit) could be seen as overlapping with other animal topics, risking the 'not a kind of another' rule. |
+| Horse breed | 7 | **new** | Shetland Pony, Clydesdale, Shire Horse, Thoroughbred, Arabian, Appaloosa, Palomino, Mustang, Welsh Pony, Highland Pony, Connemara Pony, Dartmoor Pony | Naming specific horse breeds may require more expertise than the 'ordinary guest' rule intends. |
+| Cat breed | 4 | yes |  | rescued and feral cats are usually not pedigree, so 'breed' may feel slightly off |
+| Zoo animal | 4 | **new** | Lion, Elephant, Giraffe, Tiger, Penguin, Gorilla, Rhino, Zebra, Meerkat, Panda, Orangutan, Crocodile | Could feel close to the existing Animal topic if not clearly framed around exotic or conserved species. |
+| Zoo Animal | 3 | **new** | Lion, Elephant, Giraffe, Tiger, Zebra, Meerkat, Penguin, Gorilla, Rhino, Hippo, Panda, Flamingo | could be seen as too close to the existing generic 'Animal' topic |
+| Farm Animal | 3 | **new** | Cow, Pig, Sheep, Horse, Chicken, Duck, Goat, Turkey, Goose, Llama, Alpaca, Rabbit | risk of overlapping with the generic 'Animal' catalogue topic |
+| Wild Animal | 3 | **new** | Fox, Hedgehog, Badger, Deer, Squirrel, Otter, Owl, Bat, Swan, Robin, Rabbit, Hare | could blur into the existing 'Bird' or 'Animal' topics depending on items chosen |
+| Cattle breed | 2 | **new** | Aberdeen Angus, Hereford, Charolais, Limousin, Highland, Jersey, Holstein Friesian, Simmental, Belted Galloway, Longhorn, Dexter, Shorthorn | Many guests outside farming circles may struggle to name several cattle breeds unaided. |
+| Parrot | 1 | **new** | Macaw, African Grey, Cockatoo, Budgerigar, Lovebird, Amazon Parrot, Conure, Eclectus, Cockatiel, Ringneck Parakeet, Kea, Lorikeet | items are a species within a species, which risks breaking the 'basic level' rule |
+| Insect | 1 | yes |  | The charity's focus is really just bees, so 'Insect' is broader than what they actually protect. |
+| Bird | 1 | yes |  | The charity is specifically about owls and their habitat, so 'Bird' generalises beyond that single species. |
+| Sea creature | 1 | yes |  | This is about farming welfare conditions rather than admiration of sea creatures, so the connection may feel indirect. |
+
+My read. **Pet** (15 charities: dog-and-cat rescues) and **Farm animal** (15 across two spellings: city farms, farm animal sanctuaries) are the two real additions, and both pass the name-it test easily. **Horse breed** (7) is borderline on name-it, though Shetland pony, Shire horse and Thoroughbred are common knowledge; a horse sanctuary's supporters would manage. **Zoo animal** (7) is a good topic for zoos and wildlife parks, and honestly one guests would enjoy anywhere. **Wild animal** (3) overlaps Animal too much. **Cattle breed** and **Parrot** fail the name-it test for ordinary guests. The 74 on plain Animal are the general rescues, where Animal is honest but not perfect; Pet would serve most of them better.
+
+The outreach shape this implies: one topic serves a cluster, and the cluster is the mailing list. Pet alone gives 15 rescues with £500k+ income a ready-made favpoll before we have written to any of them.
