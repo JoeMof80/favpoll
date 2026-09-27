@@ -1,4 +1,19 @@
-# Mining the Charity Commission register for perfect topics
+# The Charity Commission register: the mirror, and mining it for perfect topics
+
+## The mirror (`load-register.ts`, migration 20260927150000)
+
+Every charity on the register, in our own database (`register_charities`),
+refreshed from the Commission's bulk extract — knowledge, not a
+relationship: a row there is never a consenting charity; the `charities`
+table stays the account. Run from `apps/web`:
+
+    pnpm exec tsx --env-file=.env.local ../../scripts/register/load-register.ts --download
+    …same command again to refresh (it upserts); --dry-run to count only.
+
+Streams the four half-gigabyte extracts rather than parsing them whole;
+main charities only, Registered and Removed both kept.
+
+## Mining it for perfect topics (the pilot)
 
 The pilot pipeline behind `references/perfect-topics-2026-09-26.md` (the
 register section). Founder's intent, 2026-09-27: use every charity on the
