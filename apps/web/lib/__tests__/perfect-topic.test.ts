@@ -47,22 +47,22 @@ describe("suggestPerfectTopic", () => {
     mockCreate.mockReset()
   })
 
-  it("a lens keeps only labels that are on the topic's list, and never the whole list", async () => {
+  it("a subset keeps only labels that are on the topic's list, and never the whole list", async () => {
     answer({
       existing: "Animal",
       existing_reason: "Your animals are the point.",
-      lens_items: ["Cow", "Pig", "Sheep", "Goat", "Donkey", "Unicorn"],
+      subset_items: ["Cow", "Pig", "Sheep", "Goat", "Donkey", "Unicorn"],
     })
     const s = await suggestPerfectTopic(INPUT)
     expect(s?.topicId).toBe("animal")
     expect(s?.items).toEqual(["Cow", "Pig", "Sheep", "Goat", "Donkey"])
   })
 
-  it("fewer than three lens items means the whole list", async () => {
+  it("fewer than three subset items means the whole list", async () => {
     answer({
       existing: "Animal",
       existing_reason: "Yours.",
-      lens_items: ["Cow", "Pig"],
+      subset_items: ["Cow", "Pig"],
     })
     expect((await suggestPerfectTopic(INPUT))?.items).toEqual([])
   })

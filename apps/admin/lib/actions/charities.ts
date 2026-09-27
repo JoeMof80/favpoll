@@ -351,7 +351,7 @@ export type ConsentQueueRow = {
   perfect_topic_suggested_id: string | null;
   perfect_topic_reason: string | null;
   perfect_topic_title: string | null;
-  /** The lens: the charity's own subset of the topic's items. */
+  /** The subset: the charity's own corner of the topic's items, by label. */
   perfect_topic_items: string[] | null;
   /** The fundraising events read from its website (2026-09-27). */
   signature_events: SignatureEvent[] | null;
