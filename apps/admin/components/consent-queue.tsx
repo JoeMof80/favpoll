@@ -122,9 +122,18 @@ function CauseFamilySelect({ row }: { row: ConsentQueueRow }) {
           ))}
         </select>
         {suggested && (
-          <StatusBadge tone="info">
-            suggested — confirm by changing or leaving
-          </StatusBadge>
+          <>
+            <StatusBadge tone="info">suggested</StatusBadge>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              disabled={isPending || value === ""}
+              onClick={() => handleChange(value)}
+            >
+              Confirm
+            </Button>
+          </>
         )}
       </div>
       {row.activities && (
@@ -179,9 +188,21 @@ function PerfectTopicSelect({
           ))}
         </select>
         {suggested && (
-          <StatusBadge tone="info">
-            suggested — confirm by changing or leaving
-          </StatusBadge>
+          <>
+            <StatusBadge tone="info">suggested</StatusBadge>
+            {/* Leaving the select as it stands wrote nothing (founder,
+                2026-09-27: seven suggestions "confirmed" that never
+                landed) — confirming is an explicit press. */}
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              disabled={isPending || value === ""}
+              onClick={() => handleChange(value)}
+            >
+              Confirm
+            </Button>
+          </>
         )}
       </div>
       {row.perfect_topic_reason && (
