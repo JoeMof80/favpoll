@@ -1143,18 +1143,18 @@ async function seed() {
     // topic's are its curated rows, which the wizard seeds with EVERY
     // canonical favourite (the founder's instinct, 2026-09-24: "infinite
     // lists should be full"). Nothing here trims the list.
-    // The charity's LENS narrows an open topic to its own corner of the
+    // The charity's SUBSET narrows an open topic to its own corner of the
     // shelf (a city farm's animals; favpoll-topic-rules §1).
-    const lens = perfectTopicOf(c.charity);
-    const lensLabels =
-      lens && lens.title === c.topic.title && c.charity.perfect_topic_items
+    const subset = perfectTopicOf(c.charity);
+    const subsetLabels =
+      subset && subset.title === c.topic.title && c.charity.perfect_topic_items
         ? new Set(c.charity.perfect_topic_items.map((l) => l.toLowerCase()))
         : null;
     const items = c.topic.is_finite
       ? c.topic.favourites
-      : lensLabels
+      : subsetLabels
         ? c.topic.favourites.filter((f) =>
-            lensLabels.has(f.label.toLowerCase()),
+            subsetLabels.has(f.label.toLowerCase()),
           )
         : c.topic.favourites.filter((f) => f.is_canonical);
 

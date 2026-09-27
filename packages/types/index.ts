@@ -97,8 +97,13 @@ export type Charity = {
   perfect_topic_id?: string | null;
   perfect_topic_suggested_id?: string | null;
   perfect_topic_reason?: string | null;
-  /** A lens: the charity's own subset of the topic's items, by label. */
+  /** The morning's per-charity item list (favpoll-topic-rules §1, first
+   *  step); retires once `perfect_subset_id` carries the subset. */
   perfect_topic_items?: string[] | null;
+  /** A SUBSET of the perfect topic's items, when the cause pulls for
+   *  a narrower list (a city farm's Farm animal). Must belong to
+   *  perfect_topic_id (a trigger enforces it). */
+  perfect_subset_id?: string | null;
   /** The fundraising events the charity already holds, read from its own
    *  website (2026-09-27): a suggestion for outreach. */
   signature_events?: SignatureEvent[] | null;
@@ -122,6 +127,21 @@ export type Topic = {
   is_finite: boolean;
   is_active: boolean;
   created_by: string | null;
+  created_at: string;
+};
+
+/** A SUBSET (favpoll-topic-rules §1): a named subset of ONE topic's
+ *  items, for a cause or an occasion that pulls for it — Farm animal on
+ *  Animal. Its own object, shared by whoever points at it; admin-made;
+ *  no items, copy or rules of its own. Members live in
+ *  `topic_subset_items`, a join to the parent's favourites. */
+export type TopicSubset = {
+  id: string;
+  topic_id: string;
+  /** Topic grammar: singular, basic level, reads after "Favourite". */
+  title: string;
+  /** Delisted from the picker; never deleted (favpolls point at it). */
+  is_active: boolean;
   created_at: string;
 };
 
@@ -211,7 +231,11 @@ export type Favpoll = {
 export type FavpollPoll = {
   id: string;
   favpoll_id: string;
+  /** The parent topic, always — standings and the record read this. */
   topic_id: string;
+  /** The subset beside it, when one was picked: the card says its name,
+   *  the list is its items (favpoll-topic-rules §1). */
+  subset_id?: string | null;
   personal_note: string | null;
   created_at: string;
 };
