@@ -1,6 +1,10 @@
 "use server";
 
-import { CAUSE_FAMILIES, type CauseFamily } from "@favpoll/types";
+import {
+  CAUSE_FAMILIES,
+  type CauseFamily,
+  type SignatureEvent,
+} from "@favpoll/types";
 
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -346,6 +350,9 @@ export type ConsentQueueRow = {
   perfect_topic_title: string | null;
   /** The lens: the charity's own subset of the topic's items. */
   perfect_topic_items: string[] | null;
+  /** The fundraising events read from its website (2026-09-27). */
+  signature_events: SignatureEvent[] | null;
+  registered_website: string | null;
 };
 
 /** CONSENT OUTREACH QUEUE — pending charities in use on at least one
@@ -372,7 +379,7 @@ export async function getConsentQueue(): Promise<{
   const { data, error } = await supabase
     .from("charities")
     .select(
-      "id, name, registered_number, registered_email, consent_contacted_at, cause_family, cause_family_suggested, activities, perfect_topic_id, perfect_topic_suggested_id, perfect_topic_reason, perfect_topic_items, perfect_topic:topics!charities_perfect_topic_id_fkey(title)",
+      "id, name, registered_number, registered_email, consent_contacted_at, cause_family, cause_family_suggested, activities, perfect_topic_id, perfect_topic_suggested_id, perfect_topic_reason, perfect_topic_items, signature_events, registered_website, perfect_topic:topics!charities_perfect_topic_id_fkey(title)",
     )
     .eq("consent_status", "pending")
     .in("id", [...counts.keys()])

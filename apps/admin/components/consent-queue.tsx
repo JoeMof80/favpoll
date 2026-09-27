@@ -54,11 +54,20 @@ function inviteMailto(row: ConsentQueueRow): string {
 // the team's own mail client like the invite; sending stays manual.
 function welcomeMailto(row: ConsentQueueRow): string {
   const subject = `Welcome to favpoll — ${row.name}`;
+  // The charity's own signature event, when its site showed one, is the
+  // strongest hook: it names the occasion as well as the favourite.
+  const event = row.signature_events?.find((e) => e.topic) ?? null;
   const body = [
     "Hello,",
     "",
     `Thank you for confirming — ${row.name} can now receive pledges through favpoll, and everything raised is passed on when each favpoll closes.`,
     "",
+    ...(event
+      ? [
+          `We noticed your ${event.name}${event.when ? ` (${event.when})` : ""}: a favpoll on favourite ${event.topic!.toLowerCase()} would suit it, and we can set one up for you to share.`,
+          "",
+        ]
+      : []),
     "Three optional things that make your favpolls work harder — just reply with any of them:",
     "",
     // The charity's own topic, when an admin has confirmed one: offered,
@@ -183,6 +192,17 @@ function PerfectTopicSelect({
       {row.perfect_topic_items && row.perfect_topic_items.length > 0 && (
         <p className="line-clamp-2 text-xs text-muted-foreground">
           Their list: {row.perfect_topic_items.join(", ")}
+        </p>
+      )}
+      {row.signature_events && row.signature_events.length > 0 && (
+        <p className="line-clamp-3 text-xs text-muted-foreground">
+          Their events:{" "}
+          {row.signature_events
+            .map(
+              (e) =>
+                `${e.name}${e.when ? ` (${e.when})` : ""}${e.topic ? ` → ${e.topic}` : ""}`,
+            )
+            .join(" · ")}
         </p>
       )}
     </div>

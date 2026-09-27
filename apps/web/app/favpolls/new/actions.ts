@@ -12,6 +12,8 @@ import {
   catalogueForSuggestion,
   suggestPerfectTopic,
 } from "@/lib/perfect-topic"
+import { suggestSignatureEvents } from "@/lib/charity-events"
+import { OCCASION_TYPES_BY_REGISTER } from "@/lib/registers"
 import type { Charity } from "@favpoll/types"
 
 type CustomTopic = {
@@ -430,6 +432,17 @@ export async function findOrCreateRegisterCharity(input: {
     areas: purpose.areas,
     topics: catalogueForSuggestion(catalogue ?? []),
   })
+  // The fundraising events it already holds, from its own site
+  // (2026-09-27): read here, at insert, never at Generate.
+  const signatureEvents = await suggestSignatureEvents({
+    name,
+    website: contact.website,
+    activities: purpose.activities,
+    occasionTypes: [
+      ...new Set(Object.values(OCCASION_TYPES_BY_REGISTER).flat()),
+    ],
+    topicTitles: (catalogue ?? []).map((t) => t.title),
+  })
 
   const { data: created, error } = await supabase
     .from("charities")
@@ -455,6 +468,8 @@ export async function findOrCreateRegisterCharity(input: {
       perfect_topic_items: perfectTopic?.items.length
         ? perfectTopic.items
         : null,
+      signature_events: signatureEvents.length ? signatureEvents : null,
+      website_read_at: contact.website ? new Date().toISOString() : null,
     })
     .select("*")
     .single()
