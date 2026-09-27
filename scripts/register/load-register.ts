@@ -219,6 +219,12 @@ async function main() {
   console.log(
     `${DRY ? "would write" : "wrote"} ${written} of ${kept} main charities (${seen} rows in the extract, dated ${extractDate.value})`,
   );
+  if (!DRY) {
+    // The narrow search copy (migration 20260927170000) follows the table.
+    const { error } = await supabase.rpc("refresh_register_search");
+    if (error) throw new Error(`refresh_register_search: ${error.message}`);
+    console.log("refreshed register_search_rows");
+  }
 }
 
 main().catch((e) => {

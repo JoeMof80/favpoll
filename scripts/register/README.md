@@ -10,6 +10,9 @@ table stays the account. Run from `apps/web`:
     pnpm exec tsx --env-file=.env.local ../../scripts/register/load-register.ts --download
     …same command again to refresh (it upserts); --dry-run to count only.
 
+Search runs over `register_search_rows`, a narrow materialised copy of the
+registered rows (migration 20260927170000); the loader refreshes it last.
+
 Streams the four half-gigabyte extracts rather than parsing them whole;
 main charities only, Registered and Removed both kept.
 
