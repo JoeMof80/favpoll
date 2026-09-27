@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit",
     "seed": "tsx --env-file=.env.local ../../scripts/seed.ts",
     "seed:scale": "tsx --env-file=.env.local ../../scripts/seed-scale.ts",
+    "seed:stories": "tsx --env-file=.env.local ../../scripts/seed-stories.ts",
     "test": "vitest",
     "test:run": "vitest run",
     "tokens": "node scripts/generate-register-tokens.mjs",

@@ -133,7 +133,13 @@ export async function createCharity(input: {
       ])
     : [
         { email: null, website: null },
-        { activities: null, classification: null },
+        {
+          activities: null,
+          classification: null,
+          objects: null,
+          areas: null,
+          grantMaking: null,
+        },
       ];
 
   const { error } = await supabase.from("charities").insert({
@@ -145,6 +151,9 @@ export async function createCharity(input: {
     registered_website: contact.website,
     activities: purpose.activities,
     classification: purpose.classification,
+    objects: purpose.objects,
+    areas: purpose.areas,
+    grant_making: purpose.grantMaking,
     // Hand-entered by an admin, so this IS the confirmed value.
     cause_family: family.family,
     logo_url: input.logo_url?.trim() || null,

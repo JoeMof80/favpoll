@@ -396,14 +396,25 @@ export type RegisterClassification = {
   how: string[];
 };
 
+export type RegisterArea = { area: string; type: string };
+
 export type RegisterPurpose = {
   activities: string | null;
   classification: RegisterClassification | null;
+  /** charitygoverningdocument.charitable_objects — the legal purpose. */
+  objects: string | null;
+  /** charityareaofoperation — local authorities or countries. */
+  areas: RegisterArea[] | null;
+  /** charityoverview.grant_making_main_activity. */
+  grantMaking: boolean | null;
 };
 
 const EMPTY_PURPOSE: RegisterPurpose = {
   activities: null,
   classification: null,
+  objects: null,
+  areas: null,
+  grantMaking: null,
 };
 
 type WhoWhatWhere = {
@@ -432,15 +443,16 @@ export async function fetchRegisterPurpose(
   if (!apiKey || !digits) return EMPTY_PURPOSE;
   const headers = { "Ocp-Apim-Subscription-Key": apiKey };
 
-  const [detailsRes, overviewRes] = await Promise.all([
-    fetch(`${API_BASE}/allcharitydetails/${digits}/0`, {
+  const get = (op: string) =>
+    fetch(`${API_BASE}/${op}/${digits}/0`, {
       headers,
       cache: "no-store",
-    }).catch(() => null),
-    fetch(`${API_BASE}/charityoverview/${digits}/0`, {
-      headers,
-      cache: "no-store",
-    }).catch(() => null),
+    }).catch(() => null);
+  const [detailsRes, overviewRes, govRes, areaRes] = await Promise.all([
+    get("allcharitydetails"),
+    get("charityoverview"),
+    get("charitygoverningdocument"),
+    get("charityareaofoperation"),
   ]);
 
   let classification: RegisterClassification | null = null;
@@ -452,12 +464,45 @@ export async function fetchRegisterPurpose(
   }
 
   let activities: string | null = null;
+  let grantMaking: boolean | null = null;
   if (overviewRes?.ok) {
     const overview = (await overviewRes.json().catch(() => null)) as {
       activities?: string | null;
+      grant_making_main_activity?: boolean | null;
     } | null;
     activities = overview?.activities?.trim() || null;
+    grantMaking =
+      typeof overview?.grant_making_main_activity === "boolean"
+        ? overview.grant_making_main_activity
+        : null;
   }
 
-  return { activities, classification };
+  let objects: string | null = null;
+  if (govRes?.ok) {
+    const gov = (await govRes.json().catch(() => null)) as {
+      charitable_objects?: string | null;
+    } | null;
+    objects = gov?.charitable_objects?.replace(/\s+/g, " ").trim() || null;
+  }
+
+  let areas: RegisterArea[] | null = null;
+  if (areaRes?.ok) {
+    const rows = (await areaRes.json().catch(() => null)) as
+      | {
+          area_of_operation?: string | null;
+          geographic_area_type?: string | null;
+        }[]
+      | null;
+    if (Array.isArray(rows) && rows.length > 0) {
+      areas = rows
+        .map((r) => ({
+          area: (r.area_of_operation ?? "").trim(),
+          type: (r.geographic_area_type ?? "").trim(),
+        }))
+        .filter((r) => r.area);
+      if (areas.length === 0) areas = null;
+    }
+  }
+
+  return { activities, classification, objects, areas, grantMaking };
 }

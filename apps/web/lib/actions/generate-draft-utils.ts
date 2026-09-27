@@ -73,6 +73,46 @@ export function violatesCopyRules(text: string): boolean {
   return /\bchoos(?:e|es|ing)\b|\bchoice\b|\bvot(?:e|es|ing)\b/i.test(text)
 }
 
+/**
+ * The model's tics, caught in code because a rule only moves them along
+ * ("still" became "always" became "anyone who asks"; founder, 2026-09-24).
+ * "always" is allowed once per Story.
+ */
+export function hasTics(text: string): boolean {
+  if (/anyone who (ask|look|will listen|cares)/i.test(text)) return true
+  // Every regenerated reunion opened a sentence with it (2026-09-26).
+  if (/\bsomeone always\b/i.test(text)) return true
+  return (text.match(/\balways\b/gi) ?? []).length > 1
+}
+
+/**
+ * A couple or group writing in the first person plural must stay "we"
+ * in the note too; the model dropped to "I keep a small model of it on
+ * my desk" twice (founder, 2026-09-24).
+ */
+export function slipsToSingular(text: string): boolean {
+  // Sentence-initial too: "My ticket stubs sit in a shoebox" slipped past
+  // a case-sensitive match (2026-09-26).
+  return /\b(I|I'm|I've|[Mm]y|[Mm]e|[Mm]ine)\b/.test(text)
+}
+
+/**
+ * True when copy about a REAL person states or implies a medical
+ * condition, a diagnosis, a treatment or a cause of death (founder,
+ * 2026-09-24). The charity's own name is stripped first: "Cancer Research
+ * UK" is named on purpose, "her cancer" is not. "Recovery" alone is an
+ * occasion and passes; "recovered from a stroke" does not.
+ */
+export function inventsCondition(
+  text: string,
+  charityName?: string | null
+): boolean {
+  const scrubbed = charityName ? text.split(charityName).join(" ") : text
+  return /\b(diagnos\w*|illness|disease|dementia|alzheimer|cancer|tumou?r|stroke|heart attack|diabet\w*|sight loss|lost (?:his|her|their) sight|blind|deaf|hospice|palliative|terminal|chemo\w*|surgery|operation|disabilit\w*|wheelchair|depression|anxiety|addiction|sober|recover(?:ed|ing) from|passed away from|died of|took (?:him|her|them))\b/i.test(
+    scrubbed
+  )
+}
+
 // ---------------------------------------------------------------------------
 // Cache key
 // ---------------------------------------------------------------------------

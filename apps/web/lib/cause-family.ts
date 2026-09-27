@@ -36,6 +36,10 @@ export type CauseFamilyInput = {
   name: string
   activities: string | null
   classification: { what: string[]; who: string[]; how: string[] } | null
+  /** The charitable objects — a second source when activities is thin. */
+  objects?: string | null
+  /** The register's own grant-making flag: true means no family. */
+  grantMaking?: boolean | null
 }
 
 function buildPrompt(input: CauseFamilyInput): string {
@@ -48,6 +52,8 @@ function buildPrompt(input: CauseFamilyInput): string {
 
 Charity: ${input.name}
 Its own description of its activities: ${input.activities ?? "(none on the register)"}
+Its charitable objects: ${input.objects ? input.objects.slice(0, 700) : "(none on the register)"}
+Register flag — grant-making is its main activity: ${input.grantMaking === true ? "yes (it funds others; if the grants serve ONE cause, such as cancer research, that cause is its family; if they range across many causes, answer none)" : input.grantMaking === false ? "no" : "unknown"}
 Register classification — What: ${what}
 Register classification — Who: ${who}
 
@@ -56,7 +62,7 @@ ${families}
 
 Rules:
 - Answer with the family id alone, or the word none. No other text.
-- A grant-maker, community foundation, or trust whose activities are giving money to other organisations across several causes has no cause family of its own: answer none.
+- A community foundation or trust whose grants range across several causes has no cause family of its own: answer none. A funder of one cause (a cancer research charity) has that cause as its family.
 - If the activities text is missing and the classification is only generic ("General Charitable Purposes", "Education/training", "Other Charitable Purposes"), answer none — do not guess from the name.
 - Prefer the family a guest at a fundraiser would name. A hospice is end_of_life even if it also does research; a dementia charity is end_of_life; a cancer research charity is health_condition.`
 }
@@ -67,8 +73,11 @@ export async function suggestCauseFamily(
   input: CauseFamilyInput
 ): Promise<CauseFamily | null> {
   if (!process.env.ANTHROPIC_API_KEY) return null
-  // Nothing to classify from — never guess from a name alone.
-  if (!input.activities && !input.classification) return null
+  // Nothing to classify from — never guess from a name alone. (The
+  // register's grant-making flag is NOT a guard: Cancer Research UK,
+  // BHF and Save the Children all carry it, because they fund others.
+  // It goes to the model as a fact, 2026-09-25.)
+  if (!input.activities && !input.classification && !input.objects) return null
 
   try {
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })

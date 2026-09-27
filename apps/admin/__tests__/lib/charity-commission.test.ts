@@ -486,7 +486,23 @@ describe("fetchRegisterPurpose", () => {
         return jsonResponse({
           activities:
             "  Rescue Kitties is a feral, stray and at-risk cat charity.  ",
+          grant_making_main_activity: false,
         });
+      if (url.includes("/charitygoverningdocument/"))
+        return jsonResponse({
+          charitable_objects: "TO RELIEVE THE SUFFERING OF\n  CATS  IN NEED",
+        });
+      if (url.includes("/charityareaofoperation/"))
+        return jsonResponse([
+          {
+            area_of_operation: "Manchester",
+            geographic_area_type: "Local Authority",
+          },
+          {
+            area_of_operation: "Salford",
+            geographic_area_type: "Local Authority",
+          },
+        ]);
       return jsonResponse({}, 404);
     });
 
@@ -498,6 +514,12 @@ describe("fetchRegisterPurpose", () => {
         who: [],
         how: ["Provides Services"],
       },
+      objects: "TO RELIEVE THE SUFFERING OF CATS IN NEED",
+      areas: [
+        { area: "Manchester", type: "Local Authority" },
+        { area: "Salford", type: "Local Authority" },
+      ],
+      grantMaking: false,
     });
   });
 
@@ -506,6 +528,9 @@ describe("fetchRegisterPurpose", () => {
     expect(await fetchRegisterPurpose("1196284")).toEqual({
       activities: null,
       classification: null,
+      objects: null,
+      areas: null,
+      grantMaking: null,
     });
   });
 
@@ -518,6 +543,9 @@ describe("fetchRegisterPurpose", () => {
     expect(await fetchRegisterPurpose("515595")).toEqual({
       activities: null,
       classification: null,
+      objects: null,
+      areas: null,
+      grantMaking: null,
     });
   });
 
@@ -526,6 +554,9 @@ describe("fetchRegisterPurpose", () => {
     expect(await fetchRegisterPurpose("1196284")).toEqual({
       activities: null,
       classification: null,
+      objects: null,
+      areas: null,
+      grantMaking: null,
     });
     expect(mockFetch).not.toHaveBeenCalled();
   });
