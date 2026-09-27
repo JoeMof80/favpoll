@@ -30,16 +30,58 @@ The schema has exactly three levels, and nothing lives between or below them:
 There is no altitude beneath item. There is one thing **beside** a topic, which is not an
 altitude:
 
-- **Lens** — a named subset of ONE topic's items, for a cause or an occasion that pulls
-  for it (founder, 2026-09-27). `Farm animal` is a lens on Animal (Cow, Pig, Sheep, Goat,
-  Chicken, Donkey…); `Cathedral` is a lens on Landmark or building. A lens has a parent, a
-  name for the card, and an item subset. It has **no items of its own and no placeholder
-  copy of its own**; its results roll up into the parent's record. The Charity Commission
-  register kept proposing lenses as topics (Pet, Farm animal, Zoo animal, Safari animal,
-  Big cat), which is how the word arrived: the cause needs its corner of the shelf, not a
-  new shelf. First step (built): a charity's perfect topic carries an optional item
-  list. Second step (not yet): a lens gets its own name on the card and sits under its
-  parent in the picker. This is what resolves "too specific vs too general":
+- **Subset** — a named subset of ONE topic's items, for a cause or an occasion that pulls
+  for it (founder, 2026-09-27; first called a lens, renamed the same evening: "it's a
+  subset of a topic, right?"). `Farm animal` is a subset of Animal (Cow, Pig, Sheep,
+  Goat, Chicken, Donkey…); `Cathedral` is a subset of Landmark or building. The Charity
+  Commission register kept proposing subsets as topics (Pet, Farm animal, Zoo animal,
+  Safari animal, Big cat), which is how the idea arrived: the cause needs its corner of
+  the shelf, not a new shelf. The founder's rulings (2026-09-27, evening):
+
+  1. **Its own object.** A subset is a row of its own — parent topic, name, item subset —
+     shared by everyone who points at it. Two city farms share one Farm animal. It is
+     shelf vocabulary; the charity that prompted it is not special (a charity's perfect
+     topic may simply be a subset instead of a topic).
+  2. **Admin-made, picker-visible.** Admins create subsets: from a scan of the catalogue
+     up front, from the suggester's proposals, or by promoting an organiser's homemade
+     topic. Organisers never create one, but any organiser can pick one.
+  3. **Flat in the picker, with a marker.** A subset is a row in the same list as its
+     parent, under the same search and category filters, marked "of Animal". Browsing
+     shows the parent then its subsets; searching "farm" finds Farm animal. No nesting.
+  4. **Its name everywhere but the record.** Hero, card, share text, live display, guest
+     book all say "Favourite farm animal". The parent shows in one place, the record,
+     where the picks roll up into Animal's numbers. The favpoll stores the parent as its
+     topic and the subset as a pointer beside it.
+  5. **Inherits the parent's openness.** A subset narrows only the STARTERS. On a finite
+     parent the list is closed to the subset's items; on an open parent guests may still
+     add their own (Alpaca on Farm animal rolls into Animal). A subset has **no items of
+     its own, no placeholder copy of its own, and no rules of its own**.
+  6. **Stored as a join, referenced as parent-plus-pointer.** `topic_subsets` (parent,
+     title, slug) and `topic_subset_items` → the parent's favourites rows, so a subset can
+     never name an item the parent lacks. Favpolls, charities (perfect topic) and pairing-
+     table occasion rows keep the parent as the topic and add a nullable subset pointer
+     that must belong to that topic; a check enforces it.
+  7. **What qualifies: the topic test, one altitude sideways.** A phrase an ordinary
+     person puts after "favourite" without thinking (farm animal, pet, big cat, garden
+     bird, Sunday roast) — never a textbook grouping or a cut by letter or decade. At
+     least six items ALREADY on the parent's list, at most sixteen. Subsets of one parent
+     may overlap (Pet and Farm animal both hold Goat) but one may not contain another
+     whole. Names follow topic grammar: singular, basic level, reads after "Favourite".
+  8. **Promotion creates, never re-homes.** When an admin turns a homemade topic into a
+     subset, the favpoll that made it keeps its homemade topic and items (a live favpoll's
+     meaning is never changed after the fact); the homemade row is delisted from the
+     picker so the next organiser finds the subset. Promotion to a canonical TOPIC is
+     different and in place: the homemade row is itself curated, so its favpoll rides
+     along.
+
+  Build order (2026-09-27): schema + these rules → the scan and its admin approval → the
+  picker row, creation narrowing starters (finite parents too), the name on every surface,
+  the Story engine given the name → charities (perfect subset pointer; the suggester
+  matches to existing subsets; the per-charity `perfect_topic_items` list retires) →
+  occasions and the seed → promotion. Stop after the picker step and look at it on the
+  phone. Until the schema lands, the first step still stands: a charity's perfect topic
+  carries an optional item list (`perfect_topic_items`). This is what resolves "too
+  specific vs too general":
 
 - In **Bird**, `Falcon` is a correct item. `Peregrine falcon` is **too specific** — it is
   a _kind of_ falcon, and only an enthusiast names it. It has nowhere to live, by design.
@@ -89,9 +131,9 @@ it's infinite.
 Pick the scoping where "people who'd have a favourite here" is densest. "Garden birds"
 (robin, blackbird, blue tit, wren) beats both "Birds" (sprawls to ostriches) and "Birds of
 prey" (niche). **Never ship overlapping altitudes** — don't run both "Birds" and "Birds of
-prey"; pick one. A narrower slice that a cause or an occasion pulls for is a **lens** on
+prey"; pick one. A narrower slice that a cause or an occasion pulls for is a **subset** of
 the topic (section 1), never a second topic. The test: if every item of the proposed topic
-already sits in an existing topic's list, it is a lens.
+already sits in an existing topic's list, it is a subset.
 
 ## 6. The five registers (what the copy is keyed to)
 
@@ -204,4 +246,4 @@ so batch reveals must be verified by hand, or by seeding and querying the result
 - All five registers present, each matching its voice (sections 6–7).
 - `cause` uses the faceless instruction form.
 - No proper names anywhere in the placeholder prose.
-- No two topics ship overlapping altitudes; a slice of an existing topic is a lens.
+- No two topics ship overlapping altitudes; a slice of an existing topic is a subset.
