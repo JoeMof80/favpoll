@@ -13,6 +13,12 @@
  *     --dir=<path>          where the extracts live (default: ./register-extract)
  *     --dry-run             parse and count, write nothing
  *     --registered-only     skip Removed charities
+ *     --skip=<n>            resume: skip the first n main charities (the
+ *                           count a failed run last printed as written)
+ *
+ * A batch that hits the statement timeout (the GIN indexes flush their
+ * pending lists mid-load on production) is halved and retried, down to
+ * single rows, so one slow flush never ends the run.
  *
  * The extracts are half a gigabyte each, so they are streamed, never
  * JSON.parsed whole: three passes build lookups (classification, areas,
@@ -37,6 +43,7 @@ const DIR = resolve(opt("dir", "register-extract"));
 const DRY = flag("dry-run");
 const REGISTERED_ONLY = flag("registered-only");
 const BATCH = 500;
+const SKIP = parseInt(opt("skip", "0"), 10) || 0;
 
 const FILES = [
   "charity",
@@ -161,14 +168,25 @@ async function main() {
   let seen = 0;
   let kept = 0;
   let written = 0;
+  const upsert = async (rows: Row[]): Promise<void> => {
+    const { error } = await supabase
+      .from("register_charities")
+      .upsert(rows, { onConflict: "registered_number" });
+    if (!error) return;
+    // 57014: statement timeout. Halve and retry; a single row that still
+    // times out is a real fault.
+    if (error.code === "57014" && rows.length > 1) {
+      const mid = Math.ceil(rows.length / 2);
+      await new Promise((r) => setTimeout(r, 1000));
+      await upsert(rows.slice(0, mid));
+      await upsert(rows.slice(mid));
+      return;
+    }
+    throw new Error(`upsert: ${error.message}`);
+  };
   const flush = async () => {
     if (batch.length === 0) return;
-    if (!DRY) {
-      const { error } = await supabase
-        .from("register_charities")
-        .upsert(batch, { onConflict: "registered_number" });
-      if (error) throw new Error(`upsert: ${error.message}`);
-    }
+    if (!DRY) await upsert(batch);
     written += batch.length;
     batch = [];
     if (written % 10000 < BATCH) console.log(`  … ${written} written`);
@@ -186,6 +204,7 @@ async function main() {
       .filter(Boolean)
       .join(", ");
     kept++;
+    if (kept <= SKIP) return; // already written by the run being resumed
     batch.push({
       registered_number: r.registered_charity_number,
       organisation_number: on,
