@@ -139,7 +139,7 @@ export function CharityStep({
       } finally {
         if (!cancelled) setRegisterLoading(false)
       }
-    }, 300)
+    }, 200) // the mirror answers fast enough to earn a shorter wait (2026-09-27)
     return () => {
       cancelled = true
       clearTimeout(id)

@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
-import { searchRegisterMirrorFirst } from "@/lib/register-mirror"
+import {
+  searchApiAsMirror,
+  searchMirrorWithPlaceRetry,
+} from "@/lib/register-mirror"
 import { isRateLimited, RATE_LIMIT_MESSAGE } from "@/lib/rate-limit"
 
 // The wizard's any-charity typeahead, over the REGISTER MIRROR
@@ -13,12 +16,6 @@ export async function GET(req: Request) {
   const { userId } = await auth()
   if (!userId) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
-  }
-  const limited = await isRateLimited("register-search", userId, [
-    { name: "1m", max: 20, windowSeconds: 60 },
-  ])
-  if (limited) {
-    return NextResponse.json({ error: RATE_LIMIT_MESSAGE }, { status: 429 })
   }
   const url = new URL(req.url)
   const q = url.searchParams.get("q") ?? ""
@@ -33,6 +30,21 @@ export async function GET(req: Request) {
     Math.max(Number.isFinite(limitRaw) ? limitRaw : 20, 20),
     200
   )
-  const { results, total } = await searchRegisterMirrorFirst(q, limit)
+  // The rate-limit check and the mirror search are both one round trip
+  // to the database, so they go together (2026-09-27: the function sat
+  // an ocean from the database and every sequential hop showed). A
+  // limited request still pays for one cheap mirror query and nothing
+  // more — the Commission's API is only asked for a request being served.
+  const [limited, mirror] = await Promise.all([
+    isRateLimited("register-search", userId, [
+      { name: "1m", max: 20, windowSeconds: 60 },
+    ]),
+    searchMirrorWithPlaceRetry(q, limit),
+  ])
+  if (limited) {
+    return NextResponse.json({ error: RATE_LIMIT_MESSAGE }, { status: 429 })
+  }
+  const { results, total } =
+    mirror.results.length > 0 ? mirror : await searchApiAsMirror(q, limit)
   return NextResponse.json({ results, total })
 }
