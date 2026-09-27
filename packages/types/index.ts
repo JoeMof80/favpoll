@@ -142,6 +142,15 @@ export type TopicSubset = {
   title: string;
   /** Delisted from the picker; never deleted (favpolls point at it). */
   is_active: boolean;
+  /** Proposed by the scan or the suggester, approved or rejected by an
+   *  admin. Only approved subsets reach the picker. */
+  status: "proposed" | "approved" | "rejected";
+  /** Where it came from: the catalogue scan, the charity suggester, a
+   *  promoted homemade topic, or an admin by hand. */
+  source: "scan" | "suggester" | "homemade" | "admin";
+  /** One sentence for the admin: why this cut is one people ask for. */
+  reason: string | null;
+  reviewed_at: string | null;
   created_at: string;
 };
 

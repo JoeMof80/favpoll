@@ -10,6 +10,7 @@ import {
   CalendarDays,
   Users,
   Sparkles,
+  Layers,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +20,7 @@ const NAV_ITEMS = [
   { href: "/contributions", label: "Contributions", icon: Gift },
   { href: "/charities", label: "Charities", icon: Heart },
   { href: "/generated-drafts", label: "Generated Drafts", icon: Sparkles },
+  { href: "/subsets", label: "Subsets", icon: Layers },
   { href: "/favpolls", label: "Favpolls", icon: CalendarDays },
   { href: "/access", label: "Access", icon: Users },
 ];
