@@ -99,30 +99,44 @@ My read: **Cat name** (and its twin, Dog name) is the one real find, and it is a
 
 ## The register pilot: animals and environment, income over £500k (27 September)
 
-From the Commission's bulk extracts: 171,909 registered charities; the pilot slice (classified Animals or Environment/conservation/heritage, income ≥ £500k) is 2,115, of which 2,030 have a contact email. Each was labelled with the concrete thing at the centre of its work (cheap model), then grouped by kind and given a topic per group (Sonnet). 755 of the 2,115 have nothing a supporter would have a favourite of (funders, universities, housing associations). The rest by kind: animals 259, heritage building 186, community 169, wildlife 166, museum 110, landscape 102, education 69, water 54, faith building 48, other 45, transport heritage 44, gardens 42, arts 36, housing 15, sport 15.
+From the Commission's bulk extracts: 171,909 registered charities. The pilot slice (classified Animals or Environment/conservation/heritage, income ≥ £500k) is 2,115 charities, 2,030 with a contact email. Each was labelled with the concrete thing at the centre of its work (cheap model), grouped by kind, and given a topic per group (Sonnet, 54 chunks). 755 of the 2,115 have nothing a supporter would have a favourite of (funders, universities, housing associations); of the rest, 214 more came back as none from the proposal step.
 
-**The run stopped at the API's credit limit after the animals kind.** The other kinds (heritage buildings, wildlife, museums, landscape, water, transport heritage, gardens, faith buildings, arts) are queued and resume from where they stopped once credit is topped up.
+**972 charities placed: 646 on an existing topic, 326 on a proposed new one.** The pipeline is in `scripts/register/`.
 
-### Animals: 151 charities placed
+### Existing topics the register reaches for
 
-| Topic | Charities | Existing? | Items (new topics) | Doubt |
+Animal 132, Garden to visit 91, Landmark or building 63, Tree 53, River 40, Hobby 27, Landscape 27, Dog breed 20, Sea creature 16, Hymn 14, Play 13, Castle 12, Comfort food 11, National park 11, Bird 9. The rest are singles and pairs. Garden to visit and Landmark or building are doing a lot of work for heritage charities that a sharper topic would serve better (see Cathedral and Stately home below).
+
+### New topics the register proposes, curated
+
+The model proposed 71 titles. Merged where it split one idea several ways, and judged against the topic rules:
+
+| Topic | Charities | Items (as proposed) | Notes | Verdict |
 |---|---|---|---|---|
-| Animal | 74 | yes |  | The topic may feel too generic to be the 'perfect' fit for a specific charity, since it covers every species rather than what that charity actually handles. |
-| Dog breed | 20 | yes |  | Grouping greyhound rescue, assistance dogs and research together may blur three distinct causes into one favourite. |
-| Pet | 15 | **new** | Dog, Cat, Rabbit, Guinea pig, Hamster, Budgie, Goldfish, Tortoise, Ferret, Parrot, Gerbil, Chinchilla | Could be seen as too close to renaming the existing 'Animal' topic rather than a genuinely new one. |
-| Farm animal | 12 | **new** | Cow, Pig, Sheep, Goat, Chicken, Duck, Horse, Donkey, Turkey, Goose, Rabbit, Llama | Some items (e.g. Horse, Rabbit) could be seen as overlapping with other animal topics, risking the 'not a kind of another' rule. |
-| Horse breed | 7 | **new** | Shetland Pony, Clydesdale, Shire Horse, Thoroughbred, Arabian, Appaloosa, Palomino, Mustang, Welsh Pony, Highland Pony, Connemara Pony, Dartmoor Pony | Naming specific horse breeds may require more expertise than the 'ordinary guest' rule intends. |
-| Cat breed | 4 | yes |  | rescued and feral cats are usually not pedigree, so 'breed' may feel slightly off |
-| Zoo animal | 4 | **new** | Lion, Elephant, Giraffe, Tiger, Penguin, Gorilla, Rhino, Zebra, Meerkat, Panda, Orangutan, Crocodile | Could feel close to the existing Animal topic if not clearly framed around exotic or conserved species. |
-| Zoo Animal | 3 | **new** | Lion, Elephant, Giraffe, Tiger, Zebra, Meerkat, Penguin, Gorilla, Rhino, Hippo, Panda, Flamingo | could be seen as too close to the existing generic 'Animal' topic |
-| Farm Animal | 3 | **new** | Cow, Pig, Sheep, Horse, Chicken, Duck, Goat, Turkey, Goose, Llama, Alpaca, Rabbit | risk of overlapping with the generic 'Animal' catalogue topic |
-| Wild Animal | 3 | **new** | Fox, Hedgehog, Badger, Deer, Squirrel, Otter, Owl, Bat, Swan, Robin, Rabbit, Hare | could blur into the existing 'Bird' or 'Animal' topics depending on items chosen |
-| Cattle breed | 2 | **new** | Aberdeen Angus, Hereford, Charolais, Limousin, Highland, Jersey, Holstein Friesian, Simmental, Belted Galloway, Longhorn, Dexter, Shorthorn | Many guests outside farming circles may struggle to name several cattle breeds unaided. |
-| Parrot | 1 | **new** | Macaw, African Grey, Cockatoo, Budgerigar, Lovebird, Amazon Parrot, Conure, Eclectus, Cockatiel, Ringneck Parakeet, Kea, Lorikeet | items are a species within a species, which risks breaking the 'basic level' rule |
-| Insect | 1 | yes |  | The charity's focus is really just bees, so 'Insect' is broader than what they actually protect. |
-| Bird | 1 | yes |  | The charity is specifically about owls and their habitat, so 'Bird' generalises beyond that single species. |
-| Sea creature | 1 | yes |  | This is about farming welfare conditions rather than admiration of sea creatures, so the connection may feel indirect. |
+| **Farm animal** | 102 | Cow, Sheep, Pig, Goat, Chicken, Duck, Horse, Donkey, Rabbit, Turkey, Goose, Alpaca | Closed. City farms, farm-animal sanctuaries, rare-breed centres. Passes every test. | add |
+| **Zoo animal** | 35 | Lion, Elephant, Giraffe, Rhino, Zebra, Cheetah, Leopard, Hippo, Buffalo, Gorilla, Chimpanzee, Wildebeest | Closed. Zoos, safari and wildlife parks, and the conservation charities that work overseas. The model split it six ways (safari, rainforest, big cat, primate); one topic covers them all. | add |
+| **Pet** | 15 | Dog, Cat, Rabbit, Guinea pig, Hamster, Budgie, Goldfish, Tortoise, Ferret, Parrot, Gerbil, Chinchilla | Closed. Dog-and-cat rescues that take everything: Pet asks what Animal cannot. Sits beside Dog breed and Cat breed without overlapping them (a kind of animal kept at home, not a breed). | add |
+| **Canal** | 11 | Grand Union Canal, Kennet and Avon Canal, Leeds and Liverpool Canal, Oxford Canal, Regent's Canal, Trent and Mersey Canal, Llangollen Canal, Caledonian Canal, Bridgewater Canal, Monmouthshire and Brecon Canal, Chesterfield Canal, Wey and Arun Canal | Open. Canal and river trusts, waterway societies. A near-perfect example of the idea: nobody would guess it, and every canal charity would recognise it. | add |
+| **Cathedral** | 23 | Canterbury, York Minster, St Paul's, Wells, Ely, Winchester, Salisbury, Durham, Lincoln, Gloucester, Exeter, Norwich | Open. Cathedral friends, church conservation, abbey trusts. The model offered Church, Cathedral and Abbey; Cathedral is the one ordinary guests name freely, and an abbey can sit in the list. Church as a topic drifts towards worship; leave it. | add |
+| **Stately home** | 8 | Chatsworth House, Longleat House, Woburn Abbey, Hardwick Hall, Knole House, Petworth House, Houghton Hall, Harewood House, Sudbury Hall, Kedleston Hall, Castle Howard, Hatfield House | Open. Historic-house trusts. Castle exists already and Landmark or building is broader; a stately home is its own day out. | add |
+| **Steam railway** | 30 | Flying Scotsman, Mallard, Thomas the Tank Engine, Rocket, City of Truro, Evening Star, Tornado, Duchess of Hamilton, Sir Nigel Gresley, Blue Peter, Oliver Cromwell, Scots Guardsman | Open. Heritage railways are a large cluster (29). The model proposed Locomotive, with Flying Scotsman and Mallard, which fails the name-it test for most guests; the railway itself (Ffestiniog, Severn Valley, Bluebell) is what people have a favourite of. Retitle and re-item before it ships. | add, retitled |
+| **Park** | 25 | Hyde Park, Central Park, Regent's Park, Richmond Park, Battersea Park, Golden Gate Park, Stanley Park, Bushy Park, Greenwich Park, Prospect Park, Retiro Park, Ueno Park | Open. Friends-of-park groups and commons trusts. Items must be British (the model reached for Central Park and Golden Gate). | add, re-item |
+| **Piece of furniture** | 24 | Sofa, Armchair, Dining table, Coffee table, Bed, Wardrobe, Bookcase, Chest of drawers, Sideboard, Desk, Rocking chair, Footstool | Closed. Furniture-reuse charities (the Emmaus shape). Passes the tests, but is it honouring? A favourite armchair is a warm thing; it works. | maybe |
+| **Ship** | 13 | Titanic, HMS Victory, Mayflower, Cutty Sark, Mary Rose, Golden Hind, Endeavour, Bounty, Ark Royal, Queen Mary, Beagle, Santa Maria | Open. Maritime museums and ship trusts. Titanic, Victory, Cutty Sark: nameable. Boat (canoe, kayak) is a different, weaker topic. | maybe |
+| **Horse breed** | 9 | Shetland Pony, Clydesdale, Shire Horse, Thoroughbred, Arabian, Appaloosa, Palomino, Mustang, Welsh Pony, Highland Pony, Connemara Pony, Dartmoor Pony | Closed. Horse sanctuaries and riding charities. Borderline name-it; Shetland pony, Shire horse and Thoroughbred carry it. | maybe |
+| **Badge** | 6 | Camping, Cooking, First Aid, Swimming, Archery, Cycling, Photography, Art, Nature, Astronomy, Map Reading, Fire Lighting | Closed. Scouts and Guides. A lovely surprise, but it belongs to one movement and needs their vocabulary checked. | maybe |
+| **Art form** | 7 | Painting, Sculpture, Dance, Theatre, Music, Photography, Literature, Architecture, Ceramics, Textile art, Printmaking, Opera | Closed. Arts centres. Overlaps Hobby and Dance; weak. | no |
+| **Fish** | 4 | Salmon, Trout, Cod, Haddock, Mackerel, Herring, Tuna, Pike, Carp, Eel, Bass, Sole | Angling trusts and rivers. Sea creature exists; Fish as food exists in Sandwich and Cuisine. Skip. | no |
+| **Faith buildings (Gurdwara, Temple, Mosque, Synagogue)** | 11 |  | The model proposed a topic per faith. A favourite place of worship is not a party topic; leave these as none. | no |
 
-My read. **Pet** (15 charities: dog-and-cat rescues) and **Farm animal** (15 across two spellings: city farms, farm animal sanctuaries) are the two real additions, and both pass the name-it test easily. **Horse breed** (7) is borderline on name-it, though Shetland pony, Shire horse and Thoroughbred are common knowledge; a horse sanctuary's supporters would manage. **Zoo animal** (7) is a good topic for zoos and wildlife parks, and honestly one guests would enjoy anywhere. **Wild animal** (3) overlaps Animal too much. **Cattle breed** and **Parrot** fail the name-it test for ordinary guests. The 74 on plain Animal are the general rescues, where Animal is honest but not perfect; Pet would serve most of them better.
+Singles worth a second look when the next slice runs: Lake (Windermere, Loch Ness), Wildflower, Lighthouse, Hill, Harbour, Village. Each came from one charity here but would come from many across the whole register.
 
-The outreach shape this implies: one topic serves a cluster, and the cluster is the mailing list. Pet alone gives 15 rescues with £500k+ income a ready-made favpoll before we have written to any of them.
+### What the outreach list looks like
+
+A topic is a cluster, and the cluster is the mailing list. With the eight 'add' topics created, the pilot slice alone gives ready-made favpolls for roughly 200 charities before any are written to, on top of the 700-odd already served by existing topics. Members with income, email and the register number are in the pipeline's `pilot-topics.json`.
+
+### Next
+
+1. Take the eight through the new-topic flow (`/new-topic`), with Steam railway and Park re-itemed first.
+2. Run the next slice: every kind, income ≥ £100k (about 43,000 charities; the label step is the only per-charity cost).
+3. The counsel question on unsolicited email to unincorporated charities, before any approach at scale.
