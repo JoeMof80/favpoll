@@ -171,7 +171,8 @@ export async function suggestSignatureEvents(
       )?.text ?? ""
     const raw = (text.match(/\{[\s\S]*\}/) ?? [])[0]
     if (!raw) return []
-    const parsed = JSON.parse(raw) as {
+    // a trailing comma cost one charity its events on the first run
+    const parsed = JSON.parse(raw.replace(/,\s*([}\]])/g, "$1")) as {
       events?: {
         name?: string
         kind?: string
