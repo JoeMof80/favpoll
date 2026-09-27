@@ -241,8 +241,18 @@ async function main() {
   if (!DRY) {
     // The narrow search copy (migration 20260927170000) follows the table.
     const { error } = await supabase.rpc("refresh_register_search");
-    if (error) throw new Error(`refresh_register_search: ${error.message}`);
-    console.log("refreshed register_search_rows");
+    if (error?.code === "57014") {
+      // A full refresh outruns the API's statement timeout (production,
+      // 2026-09-27). The rows are in; the view is the one step left.
+      console.log(
+        "the search view refresh timed out — run this in the SQL editor:\n" +
+          "  REFRESH MATERIALIZED VIEW register_search_rows;",
+      );
+    } else if (error) {
+      throw new Error(`refresh_register_search: ${error.message}`);
+    } else {
+      console.log("refreshed register_search_rows");
+    }
   }
 }
 
