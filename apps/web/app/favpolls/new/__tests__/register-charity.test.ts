@@ -30,10 +30,12 @@ const mockPurpose = vi.hoisted(() =>
   })
 )
 
-vi.mock("@/lib/charity-commission", () => ({
-  verifyCharityNumber: mockVerify,
-  fetchRegisterContact: mockContact,
-  fetchRegisterPurpose: mockPurpose,
+// The action reads the register mirror (2026-09-27); the mirror has its
+// own tests, so here it is the API's shape, mocked.
+vi.mock("@/lib/register-mirror", () => ({
+  verifyOnMirror: mockVerify,
+  contactFromMirror: mockContact,
+  purposeFromMirror: mockPurpose,
 }))
 
 let mock = makeSupabaseMock()

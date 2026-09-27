@@ -9,19 +9,22 @@ import {
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
-  searchRegister,
-  verifyCharityNumber,
   type RegisterSearchResult,
   type VerificationStatus,
-  fetchRegisterContact,
-  fetchRegisterPurpose,
 } from "@/lib/charity-commission";
+import {
+  contactFromMirror,
+  purposeFromMirror,
+  searchRegisterMirrorFirst,
+  verifyOnMirror,
+} from "@/lib/register-mirror";
 
 /** Live search of the Register of Charities for the admin typeahead. */
 export async function searchCharityRegister(
   query: string,
 ): Promise<RegisterSearchResult[]> {
-  return searchRegister(query);
+  // The register mirror first (2026-09-27), the API for what it lacks.
+  return (await searchRegisterMirrorFirst(query)).results;
 }
 
 const VALID_MARKETS = ["en-GB"];
@@ -66,7 +69,7 @@ async function verificationFields(
       verified_at: null,
     };
   }
-  const result = await verifyCharityNumber(registeredNumber, name);
+  const result = await verifyOnMirror(registeredNumber, name);
   return {
     verification_status: result.status,
     verified_name: result.registeredName,
@@ -132,8 +135,8 @@ export async function createCharity(input: {
 
   const [contact, purpose] = registeredNumber
     ? await Promise.all([
-        fetchRegisterContact(registeredNumber),
-        fetchRegisterPurpose(registeredNumber),
+        contactFromMirror(registeredNumber),
+        purposeFromMirror(registeredNumber),
       ])
     : [
         { email: null, website: null },

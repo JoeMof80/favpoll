@@ -3,10 +3,10 @@
 import { auth, currentUser } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import {
-  verifyCharityNumber,
-  fetchRegisterContact,
-  fetchRegisterPurpose,
-} from "@/lib/charity-commission"
+  verifyOnMirror,
+  contactFromMirror,
+  purposeFromMirror,
+} from "@/lib/register-mirror"
 import { suggestCauseFamily } from "@/lib/cause-family"
 import {
   catalogueForSuggestion,
@@ -400,16 +400,16 @@ export async function findOrCreateRegisterCharity(input: {
     .maybeSingle()
   if (existing) return existing as Charity
 
-  const check = await verifyCharityNumber(number, name)
+  const check = await verifyOnMirror(number, name)
   if (check.status === "removed" || check.status === "not_found") {
     throw new Error("That charity isn't currently on the register")
   }
 
   const [contact, purpose, { data: catalogue }] = await Promise.all([
-    fetchRegisterContact(number),
+    contactFromMirror(number),
     // What the charity is FOR — the generator's purpose signal, since a
     // register-added charity has no description (2026-09-23).
-    fetchRegisterPurpose(number),
+    purposeFromMirror(number),
     supabase
       .from("topics")
       .select("id, title, is_finite, favourites(label, is_canonical)")
