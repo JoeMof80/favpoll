@@ -74,6 +74,10 @@ function Avatar({ name, logoUrl }: { name: string; logoUrl?: string | null }) {
   )
 }
 
+// count_register stops counting here (migration 20260927170000): a total
+// at the cap is a floor, shown with a plus.
+const REGISTER_COUNT_CAP = 1000
+
 export function CharityStep({
   charities,
   value,
@@ -342,15 +346,17 @@ export function CharityStep({
                     className="h-auto w-full justify-center rounded-none px-5 py-3 text-sm font-normal text-muted-foreground hover:bg-secondary/40"
                     onClick={() => setRegisterLimit((l) => l + 20)}
                   >
-                    {registerTotal - registerResults.length} more
+                    {registerTotal - registerResults.length}
+                    {registerTotal >= REGISTER_COUNT_CAP ? "+" : ""} more
                   </Button>
                 ) : (
                   /* The server returned fewer rows than the window asked —
                      its clamp is reached (founder hit this stuck at "35
                      more"). A wider tap can't help; narrowing can. */
                   <p className="px-5 py-3 text-center text-sm text-muted-foreground">
-                    {registerTotal - registerResults.length} more — keep typing
-                    to narrow
+                    {registerTotal - registerResults.length}
+                    {registerTotal >= REGISTER_COUNT_CAP ? "+" : ""} more — keep
+                    typing to narrow
                   </p>
                 )}
               </div>

@@ -3,8 +3,10 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { makeSupabaseMock } from "@/tests/mocks/supabase-admin";
 
 const mockVerify = vi.hoisted(() => vi.fn());
-vi.mock("@/lib/charity-commission", () => ({
-  verifyCharityNumber: mockVerify,
+// The cron verifies on the register mirror (2026-09-27), which has its
+// own tests; here the mock stands in for it.
+vi.mock("@/lib/register-mirror", () => ({
+  verifyOnMirror: mockVerify,
 }));
 
 let mock = makeSupabaseMock();

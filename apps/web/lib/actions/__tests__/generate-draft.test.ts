@@ -1147,6 +1147,33 @@ describe("realism rules in the person prompt (founder review, 2026-09-24)", () =
     expect(prompt).toContain("The favourite is the parents' OWN")
   })
 
+  it("the charity's confirmed perfect topic reaches the prompt as its own edge", async () => {
+    mock.queue(null)
+    mock.queue({ ...TOPIC_DATA, title: "River" })
+    mock.queue({
+      ...CHARITY_DATA,
+      name: "River Action",
+      cause_family: "environment_heritage",
+      perfect_topic_reason: "Rivers are what you protect.",
+      perfect_topic: { title: "River" },
+    })
+    mockLLMResponse("About.", "Sam's is the Wye. He swims it every August.")
+    mock.queue(null)
+    await generateDraft({
+      register: "celebrating_one",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      grouping: "individual",
+      occasionType: "Birthday",
+      displayName: "Sam",
+      pronoun: "he",
+    })
+    expect(promptOf()).toContain(
+      "A favourite river is River Action's own topic: Rivers are what you protect."
+    )
+  })
+
   it("an enacted topic promises the outcome, not a reveal", async () => {
     mock.queue(null)
     mock.queue({ ...TOPIC_DATA, title: "Song" })

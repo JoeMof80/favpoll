@@ -59,7 +59,7 @@ export default async function CharitiesPage({ searchParams }: Props) {
 
       {error && <p className="text-sm text-destructive">{error}</p>}
 
-      <ConsentQueue rows={queue ?? []} />
+      <ConsentQueue rows={queue ?? []} topics={topics ?? []} />
 
       <CharitiesTable charities={charities ?? []} allTopics={topics ?? []} />
     </div>

@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { verifyCharityNumber } from "@/lib/charity-commission";
+import { verifyOnMirror } from "@/lib/register-mirror";
 
 const REVERIFY_AFTER_DAYS = 30;
 const BATCH_SIZE = 25;
@@ -35,7 +35,7 @@ export async function GET(request: Request) {
   const errors: string[] = [];
 
   for (const charity of charities ?? []) {
-    const result = await verifyCharityNumber(
+    const result = await verifyOnMirror(
       charity.registered_number as string,
       charity.name as string,
     );

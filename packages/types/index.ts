@@ -24,6 +24,15 @@ export const CAUSE_FAMILIES = [
   "international",
   "entertainment",
 ] as const;
+export type SignatureEvent = {
+  name: string;
+  kind: string;
+  when: string | null;
+  occasionType: string | null;
+  topic: string | null;
+  sourceUrl: string;
+};
+
 export type CauseFamily = (typeof CAUSE_FAMILIES)[number];
 
 export const CAUSE_FAMILY_LABELS: Record<CauseFamily, string> = {
@@ -82,6 +91,18 @@ export type Charity = {
   /** Where it works, from the register: local authorities or countries.
    *  Local vs national is the relevance axis. */
   areas?: { area: string; type: string }[] | null;
+  /** The charity's PERFECT TOPIC (2026-09-26): the admin-confirmed one the
+   *  generator and the wizard read, the model's suggestion beside it, and
+   *  one sentence saying why (or why none). */
+  perfect_topic_id?: string | null;
+  perfect_topic_suggested_id?: string | null;
+  perfect_topic_reason?: string | null;
+  /** A lens: the charity's own subset of the topic's items, by label. */
+  perfect_topic_items?: string[] | null;
+  /** The fundraising events the charity already holds, read from its own
+   *  website (2026-09-27): a suggestion for outreach. */
+  signature_events?: SignatureEvent[] | null;
+  website_read_at?: string | null;
   /** The register's own flag: grant-making is the main activity, so no
    *  cause family of its own. */
   grant_making?: boolean | null;

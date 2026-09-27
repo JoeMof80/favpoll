@@ -1,23 +1,30 @@
 "use server";
 
-import { CAUSE_FAMILIES, type CauseFamily } from "@favpoll/types";
+import {
+  CAUSE_FAMILIES,
+  type CauseFamily,
+  type SignatureEvent,
+} from "@favpoll/types";
 
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
-  searchRegister,
-  verifyCharityNumber,
   type RegisterSearchResult,
   type VerificationStatus,
-  fetchRegisterContact,
-  fetchRegisterPurpose,
 } from "@/lib/charity-commission";
+import {
+  contactFromMirror,
+  purposeFromMirror,
+  searchRegisterMirrorFirst,
+  verifyOnMirror,
+} from "@/lib/register-mirror";
 
 /** Live search of the Register of Charities for the admin typeahead. */
 export async function searchCharityRegister(
   query: string,
 ): Promise<RegisterSearchResult[]> {
-  return searchRegister(query);
+  // The register mirror first (2026-09-27), the API for what it lacks.
+  return (await searchRegisterMirrorFirst(query)).results;
 }
 
 const VALID_MARKETS = ["en-GB"];
@@ -62,7 +69,7 @@ async function verificationFields(
       verified_at: null,
     };
   }
-  const result = await verifyCharityNumber(registeredNumber, name);
+  const result = await verifyOnMirror(registeredNumber, name);
   return {
     verification_status: result.status,
     verified_name: result.registeredName,
@@ -128,8 +135,8 @@ export async function createCharity(input: {
 
   const [contact, purpose] = registeredNumber
     ? await Promise.all([
-        fetchRegisterContact(registeredNumber),
-        fetchRegisterPurpose(registeredNumber),
+        contactFromMirror(registeredNumber),
+        purposeFromMirror(registeredNumber),
       ])
     : [
         { email: null, website: null },
@@ -337,6 +344,18 @@ export type ConsentQueueRow = {
   cause_family: CauseFamily | null;
   cause_family_suggested: CauseFamily | null;
   activities: string | null;
+  /** The PERFECT TOPIC (2026-09-26): confirmed id, the model's suggestion,
+   *  one sentence why (or why none), and the confirmed topic's title for
+   *  the welcome email. */
+  perfect_topic_id: string | null;
+  perfect_topic_suggested_id: string | null;
+  perfect_topic_reason: string | null;
+  perfect_topic_title: string | null;
+  /** The lens: the charity's own subset of the topic's items. */
+  perfect_topic_items: string[] | null;
+  /** The fundraising events read from its website (2026-09-27). */
+  signature_events: SignatureEvent[] | null;
+  registered_website: string | null;
 };
 
 /** CONSENT OUTREACH QUEUE — pending charities in use on at least one
@@ -363,7 +382,7 @@ export async function getConsentQueue(): Promise<{
   const { data, error } = await supabase
     .from("charities")
     .select(
-      "id, name, registered_number, registered_email, consent_contacted_at, cause_family, cause_family_suggested, activities",
+      "id, name, registered_number, registered_email, consent_contacted_at, cause_family, cause_family_suggested, activities, perfect_topic_id, perfect_topic_suggested_id, perfect_topic_reason, perfect_topic_items, signature_events, registered_website, perfect_topic:topics!charities_perfect_topic_id_fkey(title)",
     )
     .eq("consent_status", "pending")
     .in("id", [...counts.keys()])
@@ -371,10 +390,20 @@ export async function getConsentQueue(): Promise<{
   if (error) return { data: null, error: error.message };
 
   const rows = (data ?? [])
-    .map((c) => ({
-      ...(c as Omit<ConsentQueueRow, "favpoll_count">),
-      favpoll_count: counts.get((c as { id: string }).id) ?? 0,
-    }))
+    .map((c) => {
+      const { perfect_topic, ...rest } = c as Omit<
+        ConsentQueueRow,
+        "favpoll_count" | "perfect_topic_title"
+      > & { perfect_topic?: { title: string } | { title: string }[] | null };
+      const pt = Array.isArray(perfect_topic)
+        ? perfect_topic[0]
+        : perfect_topic;
+      return {
+        ...rest,
+        perfect_topic_title: pt?.title ?? null,
+        favpoll_count: counts.get(rest.id) ?? 0,
+      };
+    })
     .sort(
       (a, b) =>
         Number(!!a.consent_contacted_at) - Number(!!b.consent_contacted_at),
@@ -416,6 +445,23 @@ export async function setCauseFamily(
   const { error } = await supabase
     .from("charities")
     .update({ cause_family: family })
+    .eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/charities");
+  return { error: null };
+}
+
+/** PERFECT TOPIC — the admin's confirmation (lib/perfect-topic.ts). Only
+ * `perfect_topic_id` reaches the generator and the wizard; the model's
+ * suggestion sits beside it. null is a real answer: no topic honestly fits. */
+export async function setPerfectTopic(
+  id: string,
+  topicId: string | null,
+): Promise<{ error: string | null }> {
+  const supabase = createAdminClient();
+  const { error } = await supabase
+    .from("charities")
+    .update({ perfect_topic_id: topicId })
     .eq("id", id);
   if (error) return { error: error.message };
   revalidatePath("/charities");

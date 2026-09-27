@@ -3,9 +3,11 @@
 import { useState, useTransition } from "react";
 import { Mail } from "lucide-react";
 import type { ConsentQueueRow } from "@/lib/actions/charities";
+import type { AdminTopic } from "@/lib/actions/topics";
 import {
   markCharityContacted,
   setCauseFamily,
+  setPerfectTopic,
   setCharityConsent,
 } from "@/lib/actions/charities";
 import {
@@ -52,14 +54,27 @@ function inviteMailto(row: ConsentQueueRow): string {
 // the team's own mail client like the invite; sending stays manual.
 function welcomeMailto(row: ConsentQueueRow): string {
   const subject = `Welcome to favpoll — ${row.name}`;
+  // The charity's own signature event, when its site showed one, is the
+  // strongest hook: it names the occasion as well as the favourite.
+  const event = row.signature_events?.find((e) => e.topic) ?? null;
   const body = [
     "Hello,",
     "",
     `Thank you for confirming — ${row.name} can now receive pledges through favpoll, and everything raised is passed on when each favpoll closes.`,
     "",
+    ...(event
+      ? [
+          `We noticed your ${event.name}${event.when ? ` (${event.when})` : ""}: a favpoll on favourite ${event.topic!.toLowerCase()} would suit it, and we can set one up for you to share.`,
+          "",
+        ]
+      : []),
     "Three optional things that make your favpolls work harder — just reply with any of them:",
     "",
-    "1. Suggested topics — poll topics you'd like us to suggest to organisers raising for you (some charities suit certain favourites: a hospice might pick Comfort food, a rescue might pick Dog breed).",
+    // The charity's own topic, when an admin has confirmed one: offered,
+    // with the reason, and theirs to overrule (founder, 2026-09-25).
+    row.perfect_topic_title
+      ? `1. Your topic — we've set up Favourite ${row.perfect_topic_title.toLowerCase()} as the topic we suggest to organisers raising for you${row.perfect_topic_reason ? `: ${row.perfect_topic_reason.replace(/\.$/, "")}` : ""}.${row.perfect_topic_items?.length ? ` The list is yours: ${row.perfect_topic_items.join(", ")}.` : ""} Reply if you'd rather another, or add more.`
+      : "1. Suggested topics — poll topics you'd like us to suggest to organisers raising for you (some charities suit certain favourites: a hospice might pick Comfort food, a rescue might pick Dog breed).",
     "2. Impact lines — one or two short sentences like \u201c\u00a320 funds an hour of care\u201d, shown to guests as they pick an amount.",
     "3. Your logo — shown wherever your charity is named.",
     "",
@@ -121,7 +136,86 @@ function CauseFamilySelect({ row }: { row: ConsentQueueRow }) {
   );
 }
 
-function QueueRow({ row }: { row: ConsentQueueRow }) {
+// The PERFECT TOPIC is confirmed here too, beside the family: the model's
+// suggestion pre-selects and its one-sentence reason sits beneath, so the
+// admin judges it with the register text in view. "No topic of its own"
+// is a real answer (a hospice, a grant-maker).
+function PerfectTopicSelect({
+  row,
+  topics,
+}: {
+  row: ConsentQueueRow;
+  topics: AdminTopic[];
+}) {
+  const [isPending, startTransition] = useTransition();
+  const [value, setValue] = useState<string>(
+    row.perfect_topic_id ?? row.perfect_topic_suggested_id ?? "",
+  );
+  const confirmed = row.perfect_topic_id != null;
+  const suggested = !confirmed && row.perfect_topic_suggested_id != null;
+
+  function handleChange(next: string) {
+    setValue(next);
+    startTransition(async () => {
+      await setPerfectTopic(row.id, next === "" ? null : next);
+    });
+  }
+
+  return (
+    <div className="flex w-full flex-col gap-1">
+      <div className="flex items-center gap-2">
+        <label className="text-xs text-muted-foreground">Their topic</label>
+        <select
+          value={value}
+          disabled={isPending}
+          onChange={(e) => handleChange(e.target.value)}
+          className="h-8 rounded-lg border border-border bg-background px-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+        >
+          <option value="">No topic of its own</option>
+          {topics.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.title}
+            </option>
+          ))}
+        </select>
+        {suggested && (
+          <StatusBadge tone="info">
+            suggested — confirm by changing or leaving
+          </StatusBadge>
+        )}
+      </div>
+      {row.perfect_topic_reason && (
+        <p className="line-clamp-2 text-xs text-muted-foreground">
+          {row.perfect_topic_reason}
+        </p>
+      )}
+      {row.perfect_topic_items && row.perfect_topic_items.length > 0 && (
+        <p className="line-clamp-2 text-xs text-muted-foreground">
+          Their list: {row.perfect_topic_items.join(", ")}
+        </p>
+      )}
+      {row.signature_events && row.signature_events.length > 0 && (
+        <p className="line-clamp-3 text-xs text-muted-foreground">
+          Their events:{" "}
+          {row.signature_events
+            .map(
+              (e) =>
+                `${e.name}${e.when ? ` (${e.when})` : ""}${e.topic ? ` → ${e.topic}` : ""}`,
+            )
+            .join(" · ")}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function QueueRow({
+  row,
+  topics,
+}: {
+  row: ConsentQueueRow;
+  topics: AdminTopic[];
+}) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -165,6 +259,7 @@ function QueueRow({ row }: { row: ConsentQueueRow }) {
       )}
 
       <CauseFamilySelect row={row} />
+      <PerfectTopicSelect row={row} topics={topics} />
 
       <div className="flex items-center gap-2">
         <Button asChild size="sm" variant="outline" disabled={isPending}>
@@ -200,7 +295,13 @@ function QueueRow({ row }: { row: ConsentQueueRow }) {
   );
 }
 
-export function ConsentQueue({ rows }: { rows: ConsentQueueRow[] }) {
+export function ConsentQueue({
+  rows,
+  topics = [],
+}: {
+  rows: ConsentQueueRow[];
+  topics?: AdminTopic[];
+}) {
   // No section at all when nothing is waiting — the queue only exists
   // when there is work.
   if (rows.length === 0) return null;
@@ -215,7 +316,7 @@ export function ConsentQueue({ rows }: { rows: ConsentQueueRow[] }) {
       </h2>
       <div className="divide-y divide-border rounded-lg border border-border">
         {rows.map((row) => (
-          <QueueRow key={row.id} row={row} />
+          <QueueRow key={row.id} row={row} topics={topics} />
         ))}
       </div>
     </section>

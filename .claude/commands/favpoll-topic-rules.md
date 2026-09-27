@@ -27,7 +27,19 @@ The schema has exactly three levels, and nothing lives between or below them:
 - **Item** — the answer (Robin, Jerusalem, Purple). Sits one step below its topic, at the
   **basic level**: the word an ordinary person reaches for first when pointing at one.
 
-There is no altitude beneath item. This is what resolves "too specific vs too general":
+There is no altitude beneath item. There is one thing **beside** a topic, which is not an
+altitude:
+
+- **Lens** — a named subset of ONE topic's items, for a cause or an occasion that pulls
+  for it (founder, 2026-09-27). `Farm animal` is a lens on Animal (Cow, Pig, Sheep, Goat,
+  Chicken, Donkey…); `Cathedral` is a lens on Landmark or building. A lens has a parent, a
+  name for the card, and an item subset. It has **no items of its own and no placeholder
+  copy of its own**; its results roll up into the parent's record. The Charity Commission
+  register kept proposing lenses as topics (Pet, Farm animal, Zoo animal, Safari animal,
+  Big cat), which is how the word arrived: the cause needs its corner of the shelf, not a
+  new shelf. First step (built): a charity's perfect topic carries an optional item
+  list. Second step (not yet): a lens gets its own name on the card and sits under its
+  parent in the picker. This is what resolves "too specific vs too general":
 
 - In **Bird**, `Falcon` is a correct item. `Peregrine falcon` is **too specific** — it is
   a _kind of_ falcon, and only an enthusiast names it. It has nowhere to live, by design.
@@ -77,8 +89,9 @@ it's infinite.
 Pick the scoping where "people who'd have a favourite here" is densest. "Garden birds"
 (robin, blackbird, blue tit, wren) beats both "Birds" (sprawls to ostriches) and "Birds of
 prey" (niche). **Never ship overlapping altitudes** — don't run both "Birds" and "Birds of
-prey"; pick one, and reserve a narrower variant only for an occasion that specifically
-pulls for it.
+prey"; pick one. A narrower slice that a cause or an occasion pulls for is a **lens** on
+the topic (section 1), never a second topic. The test: if every item of the proposed topic
+already sits in an existing topic's list, it is a lens.
 
 ## 6. The five registers (what the copy is keyed to)
 
@@ -191,4 +204,4 @@ so batch reveals must be verified by hand, or by seeding and querying the result
 - All five registers present, each matching its voice (sections 6–7).
 - `cause` uses the faceless instruction form.
 - No proper names anywhere in the placeholder prose.
-- No two topics ship overlapping altitudes.
+- No two topics ship overlapping altitudes; a slice of an existing topic is a lens.

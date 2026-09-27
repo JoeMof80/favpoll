@@ -312,6 +312,21 @@ export function useWizardState(
     .map((id) => data.topics.find((t) => t.id === id))
     .filter((t): t is TopicWithMeta => !!t)
 
+  // The charity's LENS (favpoll-topic-rules §1): when the organiser picks
+  // the charity's own topic, the list is the charity's corner of it (a
+  // city farm's animals), not the whole shelf.
+  const lensLabels: string[] | null =
+    primaryCharity &&
+    topics[0] &&
+    !topics[0].isCustom &&
+    primaryCharity.perfect_topic_id === topics[0].topicId &&
+    primaryCharity.perfect_topic_items?.length
+      ? primaryCharity.perfect_topic_items
+      : null
+  const lensSet = lensLabels
+    ? new Set(lensLabels.map((l) => l.toLowerCase()))
+    : null
+
   // THE RAIL'S PURPOSE (founder, 2026-09-02): the favpoll at a glance —
   // a series of lists tracking everything entered, one line per answer,
   // pre-clipped to the rail's reserved slots. See the doctrine comment
@@ -507,7 +522,9 @@ export function useWizardState(
         subject,
         topicId: topic.isCustom ? "" : topic.topicId,
         topicTitle: topic.isCustom ? topic.title : undefined,
-        itemLabels: topic.isCustom ? (topic.customLabels ?? []) : undefined,
+        itemLabels: topic.isCustom
+          ? (topic.customLabels ?? [])
+          : (lensLabels ?? undefined),
         primaryCharityId: primaryCharity?.id ?? null,
         pronoun,
         grouping,
@@ -667,7 +684,11 @@ export function useWizardState(
             !isCustomTopic && topicMeta && !topicMeta.is_finite
               ? {
                   canonicalItemIds: topicMeta.favourites
-                    .filter((i) => i.is_canonical)
+                    .filter((i) =>
+                      lensSet
+                        ? lensSet.has(i.label.toLowerCase())
+                        : i.is_canonical
+                    )
                     .map((i) => i.id),
                   customLabels: selected.customLabels ?? [],
                 }

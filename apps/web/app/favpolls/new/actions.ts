@@ -3,11 +3,17 @@
 import { auth, currentUser } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import {
-  verifyCharityNumber,
-  fetchRegisterContact,
-  fetchRegisterPurpose,
-} from "@/lib/charity-commission"
+  verifyOnMirror,
+  contactFromMirror,
+  purposeFromMirror,
+} from "@/lib/register-mirror"
 import { suggestCauseFamily } from "@/lib/cause-family"
+import {
+  catalogueForSuggestion,
+  suggestPerfectTopic,
+} from "@/lib/perfect-topic"
+import { suggestSignatureEvents } from "@/lib/charity-events"
+import { OCCASION_TYPES_BY_REGISTER } from "@/lib/registers"
 import type { Charity } from "@favpoll/types"
 
 type CustomTopic = {
@@ -394,17 +400,49 @@ export async function findOrCreateRegisterCharity(input: {
     .maybeSingle()
   if (existing) return existing as Charity
 
-  const check = await verifyCharityNumber(number, name)
+  const check = await verifyOnMirror(number, name)
   if (check.status === "removed" || check.status === "not_found") {
     throw new Error("That charity isn't currently on the register")
   }
 
-  const [contact, purpose] = await Promise.all([
-    fetchRegisterContact(number),
+  const [contact, purpose, { data: catalogue }] = await Promise.all([
+    contactFromMirror(number),
     // What the charity is FOR — the generator's purpose signal, since a
     // register-added charity has no description (2026-09-23).
-    fetchRegisterPurpose(number),
+    purposeFromMirror(number),
+    supabase
+      .from("topics")
+      .select("id, title, is_finite, favourites(label, is_canonical)")
+      .eq("is_active", true),
   ])
+  // Both SUGGESTIONS only — the admin confirms them in the outreach queue.
+  const causeFamilySuggested = await suggestCauseFamily({
+    name,
+    activities: purpose.activities,
+    classification: purpose.classification,
+    objects: purpose.objects,
+    grantMaking: purpose.grantMaking,
+  })
+  const perfectTopic = await suggestPerfectTopic({
+    name,
+    activities: purpose.activities,
+    objects: purpose.objects,
+    causeFamily: causeFamilySuggested,
+    grantMaking: purpose.grantMaking,
+    areas: purpose.areas,
+    topics: catalogueForSuggestion(catalogue ?? []),
+  })
+  // The fundraising events it already holds, from its own site
+  // (2026-09-27): read here, at insert, never at Generate.
+  const signatureEvents = await suggestSignatureEvents({
+    name,
+    website: contact.website,
+    activities: purpose.activities,
+    occasionTypes: [
+      ...new Set(Object.values(OCCASION_TYPES_BY_REGISTER).flat()),
+    ],
+    topicTitles: (catalogue ?? []).map((t) => t.title),
+  })
 
   const { data: created, error } = await supabase
     .from("charities")
@@ -424,14 +462,14 @@ export async function findOrCreateRegisterCharity(input: {
       objects: purpose.objects,
       areas: purpose.areas,
       grant_making: purpose.grantMaking,
-      // A SUGGESTION only — the admin confirms it in the outreach queue.
-      cause_family_suggested: await suggestCauseFamily({
-        name,
-        activities: purpose.activities,
-        classification: purpose.classification,
-        objects: purpose.objects,
-        grantMaking: purpose.grantMaking,
-      }),
+      cause_family_suggested: causeFamilySuggested,
+      perfect_topic_suggested_id: perfectTopic?.topicId ?? null,
+      perfect_topic_reason: perfectTopic?.reason ?? null,
+      perfect_topic_items: perfectTopic?.items.length
+        ? perfectTopic.items
+        : null,
+      signature_events: signatureEvents.length ? signatureEvents : null,
+      website_read_at: contact.website ? new Date().toISOString() : null,
     })
     .select("*")
     .single()

@@ -30,10 +30,12 @@ const mockPurpose = vi.hoisted(() =>
   })
 )
 
-vi.mock("@/lib/charity-commission", () => ({
-  verifyCharityNumber: mockVerify,
-  fetchRegisterContact: mockContact,
-  fetchRegisterPurpose: mockPurpose,
+// The action reads the register mirror (2026-09-27); the mirror has its
+// own tests, so here it is the API's shape, mocked.
+vi.mock("@/lib/register-mirror", () => ({
+  verifyOnMirror: mockVerify,
+  contactFromMirror: mockContact,
+  purposeFromMirror: mockPurpose,
 }))
 
 let mock = makeSupabaseMock()
@@ -80,6 +82,7 @@ describe("findOrCreateRegisterCharity", () => {
 
   it("creates consent-pending and OFF the catalogue, with verification", async () => {
     mock.queue(null) // no existing row
+    mock.queue([]) // the catalogue, for the perfect-topic suggestion
     mock.queue({ id: "c-new", name: "Dogs Trust" }) // the insert's select
     const c = await findOrCreateRegisterCharity({
       registeredNumber: "227523",

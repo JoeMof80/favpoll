@@ -37,7 +37,9 @@ async function fetchCharity(
   if (!charityId) return none
   const { data } = await supabase
     .from("charities")
-    .select("name, description, activities, cause_family, objects, areas")
+    .select(
+      "name, description, activities, cause_family, objects, areas, perfect_topic_reason, perfect_topic:topics!charities_perfect_topic_id_fkey(title)"
+    )
     .eq("id", charityId)
     .single()
   if (!data) return none
@@ -50,6 +52,20 @@ async function fetchCharity(
     areas:
       (data.areas as { area: string; type: string }[] | null | undefined) ??
       null,
+    perfectTopic: (() => {
+      const t = data.perfect_topic as
+        | { title: string }
+        | { title: string }[]
+        | null
+        | undefined
+      const one = Array.isArray(t) ? t[0] : t
+      return one?.title
+        ? {
+            title: one.title,
+            reason: (data.perfect_topic_reason as string | null) ?? null,
+          }
+        : null
+    })(),
   }
 }
 
