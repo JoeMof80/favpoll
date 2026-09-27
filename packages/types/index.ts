@@ -88,6 +88,8 @@ export type Charity = {
   perfect_topic_id?: string | null;
   perfect_topic_suggested_id?: string | null;
   perfect_topic_reason?: string | null;
+  /** A lens: the charity's own subset of the topic's items, by label. */
+  perfect_topic_items?: string[] | null;
   /** The register's own flag: grant-making is the main activity, so no
    *  cause family of its own. */
   grant_making?: boolean | null;

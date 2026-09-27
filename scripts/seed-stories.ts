@@ -698,6 +698,7 @@ type Charity = {
   objects?: string | null;
   areas?: { area: string; type: string }[] | null;
   perfect_topic_reason?: string | null;
+  perfect_topic_items?: string[] | null;
   perfect_topic?: { title: string } | { title: string }[] | null;
 };
 /** The charity's confirmed perfect topic, in the engine's shape. */
@@ -1036,7 +1037,7 @@ async function seed() {
     supabase
       .from("charities")
       .select(
-        "id, name, description, activities, cause_family, objects, areas, perfect_topic_reason, perfect_topic:topics!charities_perfect_topic_id_fkey(title)",
+        "id, name, description, activities, cause_family, objects, areas, perfect_topic_reason, perfect_topic_items, perfect_topic:topics!charities_perfect_topic_id_fkey(title)",
       )
       .eq("is_active", true)
       .not("cause_family", "is", null),
@@ -1142,9 +1143,20 @@ async function seed() {
     // topic's are its curated rows, which the wizard seeds with EVERY
     // canonical favourite (the founder's instinct, 2026-09-24: "infinite
     // lists should be full"). Nothing here trims the list.
+    // The charity's LENS narrows an open topic to its own corner of the
+    // shelf (a city farm's animals; favpoll-topic-rules §1).
+    const lens = perfectTopicOf(c.charity);
+    const lensLabels =
+      lens && lens.title === c.topic.title && c.charity.perfect_topic_items
+        ? new Set(c.charity.perfect_topic_items.map((l) => l.toLowerCase()))
+        : null;
     const items = c.topic.is_finite
       ? c.topic.favourites
-      : c.topic.favourites.filter((f) => f.is_canonical);
+      : lensLabels
+        ? c.topic.favourites.filter((f) =>
+            lensLabels.has(f.label.toLowerCase()),
+          )
+        : c.topic.favourites.filter((f) => f.is_canonical);
 
     const input: StoryInput = {
       register: c.register,

@@ -8,4 +8,8 @@ ALTER TABLE charities
   ADD COLUMN IF NOT EXISTS perfect_topic_id uuid REFERENCES topics(id) ON DELETE SET NULL,
   ADD COLUMN IF NOT EXISTS perfect_topic_suggested_id uuid REFERENCES topics(id) ON DELETE SET NULL,
   -- one plain sentence, for the welcome email and the wizard's label
-  ADD COLUMN IF NOT EXISTS perfect_topic_reason text;
+  ADD COLUMN IF NOT EXISTS perfect_topic_reason text,
+  -- A LENS (favpoll-topic-rules §1): the charity's own corner of the topic's
+  -- shelf — item labels from the topic's list (a city farm's twelve animals).
+  -- Empty means the whole list.
+  ADD COLUMN IF NOT EXISTS perfect_topic_items text[];

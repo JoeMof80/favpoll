@@ -452,6 +452,9 @@ export async function findOrCreateRegisterCharity(input: {
       cause_family_suggested: causeFamilySuggested,
       perfect_topic_suggested_id: perfectTopic?.topicId ?? null,
       perfect_topic_reason: perfectTopic?.reason ?? null,
+      perfect_topic_items: perfectTopic?.items.length
+        ? perfectTopic.items
+        : null,
     })
     .select("*")
     .single()

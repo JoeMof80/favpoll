@@ -12,7 +12,10 @@ Scaffold a complete new topic entry in the **register-keyed placeholder model** 
 overlapping altitudes: never run both a topic and a narrower slice of it
 (`Animal` + `Farm animal`, `Bird` + `Bird of prey`). If you cannot state the
 different question in one sentence — as `Sport to play` vs `Sport to watch` does
-— it is one topic, not two. Stop and pick one.
+— it is one topic, not two. Stop and pick one. If every item of the proposed
+topic already sits in an existing topic's list, it is a **lens** on that topic
+(favpoll-topic-rules §1), not a topic: give the charity or occasion the subset,
+not a new shelf.
 
 Read the source files to understand current shapes exactly — do not guess:
 

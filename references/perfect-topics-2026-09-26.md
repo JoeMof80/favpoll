@@ -107,6 +107,12 @@ From the Commission's bulk extracts: 171,909 registered charities. The pilot sli
 
 Animal 132, Garden to visit 91, Landmark or building 63, Tree 53, River 40, Hobby 27, Landscape 27, Dog breed 20, Sea creature 16, Hymn 14, Play 13, Castle 12, Comfort food 11, National park 11, Bird 9. The rest are singles and pairs. Garden to visit and Landmark or building are doing a lot of work for heritage charities that a sharper topic would serve better (see Cathedral and Stately home below).
 
+### The founder's ruling (27 September): slices are lenses, not topics
+
+Pet, Farm animal and Zoo animal are subsets of Animal, whose list already holds Dog, Cat, Hamster, Sheep, Pig, Goat, Giraffe and Zebra. The topic rules forbid overlapping altitudes, and for good reason: the picker, the items, the record and the placeholder cost all belong to the shelf, not the cause. So a narrower slice that a cause pulls for is a **lens**: a named subset of one topic's items, with no items or copy of its own, rolling up into the parent's record (favpoll-topic-rules §1). First step, built on this branch: a charity's perfect topic carries an optional item list (`perfect_topic_items`), suggested with the topic, shown in the outreach queue, offered in the welcome email ("the list is yours: …"), applied by the wizard when the charity's own topic is picked, and used by the seed. Second step, not yet: a lens with its own name on the card, under its parent in the picker.
+
+Under that ruling the shortlist below reads: Canal, Steam railway and Park are new topics; Cathedral and Stately home are admitted on the Castle precedent or kept as lenses on Landmark or building, the founder's call; Pet, Farm animal, Zoo animal and the safari, rainforest, big cat and primate splits are lenses on Animal; Horse breed stands as a topic beside Dog breed.
+
 ### New topics the register proposes, curated
 
 The model proposed 71 titles. Merged where it split one idea several ways, and judged against the topic rules:

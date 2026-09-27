@@ -68,13 +68,16 @@ async function main() {
       .update({
         perfect_topic_suggested_id: s.topicId,
         perfect_topic_reason: s.reason,
+        perfect_topic_items: s.items.length ? s.items : null,
       })
       .eq("id", c.id);
     if (uErr) console.error(`  ✗ ${c.name}: ${uErr.message}`);
     else {
       n++;
       const title = catalogue.find((t) => t.id === s.topicId)?.title;
-      console.log(`  ✓ ${c.name}: ${title ?? "none"} — ${s.reason}`);
+      console.log(
+        `  ✓ ${c.name}: ${title ?? "none"}${s.items.length ? ` [${s.items.join(", ")}]` : ""} — ${s.reason}`,
+      );
     }
   }
   console.log(`${n} suggested`);
