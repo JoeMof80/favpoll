@@ -186,9 +186,10 @@ export async function searchMirror(
   };
 }
 
-/** The picker's search: the mirror first, with the place-aware retry
- *  ("st lukes winsford"), then the API for anything the mirror lacks. */
-export async function searchRegisterMirrorFirst(
+/** The mirror with the place-aware retry ("st lukes winsford"), and
+ *  nothing else: the route runs this alongside its rate-limit check and
+ *  goes to the API only for a request it has decided to serve. */
+export async function searchMirrorWithPlaceRetry(
   q: string,
   cap = 20,
 ): Promise<{ results: MirrorSearchResult[]; total: number }> {
@@ -202,9 +203,28 @@ export async function searchRegisterMirrorFirst(
     const hit = await searchMirror(base, cap, place);
     if (hit.results.length > 0) return hit;
   }
+  return { results: [], total: 0 };
+}
+
+/** The Commission's API in the mirror's shape — for what the mirror lacks. */
+export async function searchApiAsMirror(
+  q: string,
+  cap = 20,
+): Promise<{ results: MirrorSearchResult[]; total: number }> {
   const api = await searchRegisterRanked(q, cap);
   return {
     total: api.total,
     results: api.results.map((r) => ({ ...r, place: null, website: null })),
   };
+}
+
+/** The picker's search: the mirror first, with the place-aware retry,
+ *  then the API for anything the mirror lacks. */
+export async function searchRegisterMirrorFirst(
+  q: string,
+  cap = 20,
+): Promise<{ results: MirrorSearchResult[]; total: number }> {
+  const mirror = await searchMirrorWithPlaceRetry(q, cap);
+  if (mirror.results.length > 0) return mirror;
+  return searchApiAsMirror(q, cap);
 }
