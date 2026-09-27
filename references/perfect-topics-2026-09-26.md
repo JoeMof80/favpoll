@@ -80,3 +80,19 @@ Where the pairing table already has a row for the charity (`CHARITY_ROWS`), it i
 1. Migration `20260926120000_charity_perfect_topic.sql` on staging, then `scripts/backfill-perfect-topic.ts` writes these as SUGGESTIONS.
 2. The founder confirms or clears each in the admin outreach queue ("Their topic", beside the cause family).
 3. A confirmed topic leads the wizard's suggestions for that charity, counts as a starred edge for the generator and the seed, and is offered in the welcome email with its reason.
+
+## Topics the causes inspire (second pass, 27 September)
+
+The same 58, asked the other way round: not which existing topic fits, but which NEW topic the cause would inspire, with items, and whether it beats the nearest existing one. For 50 of the 58 the model returned nothing new: the big national charities already have a home in the catalogue (Dog breed, Beach, Bird, Song). The new topics will come from the long tail of the register, where hundreds of small charities share a thing we have no topic for (canals, cathedrals, steam railways, allotments). That is the pilot now running on the animals and environment slice.
+
+| Charity | Proposed topic | Items | Nearest existing | Doubt |
+|---|---|---|---|---|
+| CALM | **Way to unwind** (open) | Bath, Walk, Music, Reading, Nap, Cup of tea, Gardening, Cooking, Swimming, Gaming, Yoga, Football, Fishing, Painting, Time with mates, Watching TV | Hobby | sibling test - risk of overlapping with Hobby or Form of exercise for some items |
+| Cancer Research UK | **Scientist** (closed) | Einstein, Marie Curie, Darwin, Newton, Tesla, Isaac Newton, Rosalind Franklin, Galileo, Stephen Hawking, Alexander Fleming, Ada Lovelace, Louis Pasteur, Charles Darwin, Jane Goodall, Nikola Tesla | Author | name-it test: some guests may only know a handful of famous scientists |
+| Cats Protection | **Cat name** (open) | Whiskers, Tom, Felix, Ginger, Smokey, Milo, Oscar, Bella, Luna, Simba, Tiger, Shadow, Jasper, Molly, Charlie | Cat breed | name-it test: some guests may find it harder to name several without thinking of their own cat specifically |
+| Emmaus UK | **Charity shop find** (open) | Book, Vinyl record, Mug, Vase, Lamp, Picture frame, Board game, Teapot, Coat, Handbag, Ornament, Chair, Puzzle, Cushion | Item of clothing | sibling test: 'ornament' and 'picture frame' might blur into a broader 'bric-a-brac' category for some guests |
+| Médecins Sans Frontières | **Flag** (closed) | Union Jack, Stars and Stripes, Tricolour, Union of India flag, Canadian Maple Leaf, Japanese Rising Sun, Brazilian flag, South African flag, Swiss cross flag, Australian flag, German flag, Italian flag, Spanish flag, Norwegian flag, Jamaican flag, Kenyan flag | Country | basic-level test: some flags may be less universally nameable than others |
+| Oxfam | **Market** (open) | Farmers market, Christmas market, Flea market, Night market, Fish market, Spice market, Street market, Food market, Craft market, Antique market, Cattle market, Book market | — | sibling test: some market types could be seen as flavours of the same basic idea |
+| Shelter | **Room in a home** (closed) | Kitchen, Living room, Bedroom, Garden, Bathroom, Attic, Dining room, Study, Hallway, Conservatory, Garage, Basement | — | sibling test: living room and lounge may feel like the same item to some guests |
+
+My read: **Cat name** (and its twin, Dog name) is the one real find, and it is a rescue's topic rather than a breeder's. **Room in a home** for Shelter fails the honour rule: it puts the guest's mind on housing. **Flag**, **Scientist** and **Charity shop find** are reaches. **Way to unwind** and **Market** overlap Hobby and Cuisine.
