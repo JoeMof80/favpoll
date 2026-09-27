@@ -147,7 +147,7 @@ describe("buildCacheKey", () => {
       "charity-1"
     )
     expect(key).toBe(
-      "v5:celebrating_one:topic-1:charity-1:someone:none:individual:none"
+      "v6:celebrating_one:topic-1:charity-1:someone:none:individual:none:none"
     )
   })
 
@@ -160,23 +160,23 @@ describe("buildCacheKey", () => {
       "he"
     )
     expect(key).toBe(
-      "v5:celebrating_one:topic-1:none:someone:he:individual:none"
+      "v6:celebrating_one:topic-1:none:someone:he:individual:none:none"
     )
   })
 
   it("uses charity id when subject is cause", () => {
     const key = buildCacheKey("cause", "topic-1", "cause", "charity-1")
-    expect(key).toBe("v5:cause:topic-1:charity-1:cause:none:none:none")
+    expect(key).toBe("v6:cause:topic-1:charity-1:cause:none:none:none:none")
   })
 
   it("falls back to 'none' when cause has no charity", () => {
     const key = buildCacheKey("cause", "topic-1", "cause", null)
-    expect(key).toBe("v5:cause:topic-1:none:cause:none:none:none")
+    expect(key).toBe("v6:cause:topic-1:none:cause:none:none:none:none")
   })
 
   it("ignores pronoun for cause favpolls", () => {
     const key = buildCacheKey("cause", "topic-1", "cause", "charity-1", "she")
-    expect(key).toBe("v5:cause:topic-1:charity-1:cause:none:none:none")
+    expect(key).toBe("v6:cause:topic-1:charity-1:cause:none:none:none:none")
   })
 })
 
@@ -294,7 +294,8 @@ describe("generateDraft — cache miss, person", () => {
       .find((c) => c.method === "insert")
     expect(insertCall?.args[0]).toMatchObject({
       subject: "someone",
-      cache_key: "v5:cause:topic-1:charity-1:someone:none:individual:none",
+      cache_key:
+        "v6:cause:topic-1:charity-1:someone:none:individual:fundraiser:none",
     })
   })
 
@@ -351,7 +352,7 @@ describe("generateDraft — cache miss, cause", () => {
     expect(insertCall?.args[0]).toMatchObject({
       primary_charity_id: "charity-1",
       subject: "cause",
-      cache_key: "v5:cause:topic-1:charity-1:cause:none:none:none",
+      cache_key: "v6:cause:topic-1:charity-1:cause:none:none:fundraiser:none",
     })
   })
 
@@ -790,5 +791,195 @@ describe("charity with no description — the prompt must not invite a guess", (
       displayName: "Warm Plates This Winter",
     })
     expect(promptOf()).toContain("taken from the cause name above only")
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Edge-aware prompt — the pairing table's edges, as text (2026-09-24)
+// ---------------------------------------------------------------------------
+
+describe("buildCacheKey — occasion segment (v6)", () => {
+  it("slugs the occasion type in before the name, so sibling prefixes still match", () => {
+    const key = buildCacheKey(
+      "celebrating_one",
+      "topic-1",
+      "someone",
+      "charity-1",
+      "he",
+      "Roy Mansfield",
+      "individual",
+      "Milestone birthday"
+    )
+    expect(key).toMatch(
+      /^v6:celebrating_one:topic-1:charity-1:someone:he:individual:milestone-birthday:[0-9a-z]+$/
+    )
+  })
+})
+
+describe("edge-aware generation — the prompt carries the table's edges", () => {
+  const promptOf = () =>
+    mockMessagesCreate.mock.calls[0][0].messages[0].content as string
+
+  const SEASIDE = {
+    title: "Seaside town",
+    favourites: [{ label: "Whitby" }, { label: "St Ives" }],
+  }
+  const RNLI = {
+    name: "RNLI",
+    description: "Saving lives at sea.",
+    activities:
+      "The RNLI operates lifeboats around the coast of the UK and Ireland.",
+    cause_family: "sea_rescue",
+  }
+
+  it("states all three edges for a triad and asks for them in one breath", async () => {
+    mock.queue(null)
+    mock.queue(SEASIDE)
+    mock.queue(RNLI)
+    mockLLMResponse("About.", "Ben's is Whitby. He swims there most mornings.")
+    mock.queue(null)
+
+    await generateDraft({
+      register: "celebrating_one",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      occasionType: "Achievement",
+      pronoun: "he",
+      displayName: "Ben's Channel Swim",
+    })
+    const prompt = promptOf()
+    expect(prompt).toContain("Occasion type: Achievement.")
+    expect(prompt).toContain(
+      "Occasion → topic: A favourite seaside town is part of an achievement:"
+    )
+    expect(prompt).toContain(
+      "Charity → topic: RNLI works for lifeboats and rescue at sea"
+    )
+    expect(prompt).toContain(
+      "Occasion ↔ charity: RNLI belongs at an achievement"
+    )
+    expect(prompt).toContain("All THREE edges link this favpoll")
+    expect(prompt).toContain(
+      'In its own words on the Charity Commission register: "The RNLI operates lifeboats'
+    )
+    expect(prompt).not.toContain("NO edge links")
+  })
+
+  it("at zero edges the about MUST supply the known fact itself", async () => {
+    mock.queue(null)
+    mock.queue(SEASIDE)
+    mock.queue({
+      name: "Alzheimer's Society",
+      description: "Dementia support.",
+      activities: null,
+      cause_family: "end_of_life",
+    })
+    mockLLMResponse(
+      "About.",
+      "Joan & Arthur's is Whitby. They went every year."
+    )
+    mock.queue(null)
+
+    await generateDraft({
+      register: "celebrating_many",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      occasionType: "Anniversary",
+      grouping: "couple",
+      displayName: "Joan & Arthur",
+    })
+    const prompt = promptOf()
+    expect(prompt).toContain("Occasion → topic: none.")
+    expect(prompt).toContain("Charity → topic: none.")
+    expect(prompt).toContain("Occasion ↔ charity: none.")
+    expect(prompt).toContain("NO edge links this occasion")
+    expect(prompt).toContain("stated in the about before the invitation")
+  })
+
+  it("the wizard passes no occasion: the register default pairs with nothing", async () => {
+    mock.queue(null)
+    mock.queue(SEASIDE)
+    mock.queue(RNLI)
+    mockLLMResponse("About.", "His is Whitby. He swims there.")
+    mock.queue(null)
+
+    await generateDraft({
+      register: "celebrating_one",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      pronoun: "he",
+    })
+    const prompt = promptOf()
+    expect(prompt).toContain("Occasion type: Celebration.")
+    expect(prompt).toContain("Occasion → topic: none.")
+    // The charity edge survives without an occasion.
+    expect(prompt).toContain("Charity → topic: RNLI works for")
+    expect(prompt).toContain("ONE edge links this favpoll")
+  })
+
+  it("a charity with register words but no description is described only in those terms", async () => {
+    mock.queue(null)
+    mock.queue(TOPIC_DATA)
+    mock.queue({
+      name: "Rescue Kitties",
+      description: null,
+      activities:
+        "A feral, stray and at-risk cat charity in Greater Manchester.",
+      cause_family: null,
+    })
+    mockLLMResponse("About.", "Her favourite was always Blue.")
+    mock.queue(null)
+
+    await generateDraft({
+      register: "celebrating_one",
+      subject: "someone",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+    })
+    const prompt = promptOf()
+    expect(prompt).toContain(
+      'Rescue Kitties. In its own words on the Charity Commission register: "A feral, stray'
+    )
+    expect(prompt).toContain("only in those terms")
+    expect(prompt).not.toContain("NOTHING is known here")
+    // No confirmed family: no charity edge, whatever the words say.
+    expect(prompt).toContain("Charity → topic: none.")
+  })
+
+  it("a cause favpoll gets the event edge and the charity edge, never an Honour edge", async () => {
+    mock.queue(null)
+    mock.queue({ title: "Pie", favourites: [{ label: "Steak and ale" }] })
+    mock.queue({
+      name: "Trussell Trust",
+      description: "Food banks.",
+      activities: null,
+      cause_family: "food_poverty",
+    })
+    mockLLMResponse(
+      "About.",
+      "Our pick to start: Steak and ale — a warm clause."
+    )
+    mock.queue(null)
+
+    await generateDraft({
+      register: "cause",
+      subject: "cause",
+      topicId: "topic-1",
+      primaryCharityId: "charity-1",
+      occasionType: "Fundraiser",
+      displayName: "Bake for the Bank",
+    })
+    const prompt = promptOf()
+    expect(prompt).toContain(
+      "Occasion → topic: A fundraiser suggests a favourite pie"
+    )
+    expect(prompt).toContain(
+      "Charity → topic: Trussell Trust works for food banks"
+    )
+    expect(prompt).not.toContain("Occasion ↔ charity")
+    expect(prompt).toContain("with why THIS topic in a clause")
   })
 })

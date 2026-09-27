@@ -9,6 +9,12 @@ charities on prod as of today. Every topic and charity named here exists.
 
 ---
 
+> **Encoded 2026-09-24** — `apps/web/lib/pairing-table.ts` holds §1, §2, §2b
+> as data (keyed on `occasion_type`, catalogue titles and the confirmed
+> `cause_family`) and `lookupEdges()`; `generate-draft.ts` passes the edges
+> and the charity's `activities` into the prompt (§6). Rows D, E and H are
+> deliberately NOT encoded. §3 themes wait for a theme input to exist.
+
 ## How it is used
 
 A favpoll is **motivated** when a guest can see why this topic, before pledging.
