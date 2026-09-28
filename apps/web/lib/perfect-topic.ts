@@ -21,13 +21,24 @@ export type PerfectTopicInput = {
   causeFamily: CauseFamily | null
   grantMaking: boolean | null
   areas?: { area: string; type: string }[] | null
-  /** The live catalogue: every active topic with a few of its items. */
-  topics: { id: string; title: string; isFinite: boolean; items: string[] }[]
+  /** The live catalogue: every active topic with a few of its items and
+   *  its approved SUBSETS (favpoll-topic-rules §1), which the model may
+   *  name instead of inventing a list. */
+  topics: {
+    id: string
+    title: string
+    isFinite: boolean
+    items: string[]
+    subsets?: { id: string; title: string; items: string[] }[]
+  }[]
 }
 
 export type PerfectTopicSuggestion = {
   /** The matching catalogue topic, or null when none fits. */
   topicId: string | null
+  /** An existing approved SUBSET of that topic, when the cause pulls for
+   *  one (a city farm → Farm animal). Confirmed beside the topic. */
+  subsetId: string | null
   /** A SUBSET (favpoll-topic-rules §1): the charity's own subset of the
    *  topic's items, by label, when the cause pulls for a narrower list
    *  (a city farm's animals). Empty means the whole list. In step 4 the
@@ -42,7 +53,11 @@ function buildPrompt(input: PerfectTopicInput): string {
   const catalogue = input.topics
     .map(
       (t) =>
-        `${t.title} (${t.isFinite ? "closed" : "open"}: ${t.items.slice(0, 12).join(", ")}${t.items.length > 12 ? ", …" : ""})`
+        `${t.title} (${t.isFinite ? "closed" : "open"}: ${t.items.slice(0, 12).join(", ")}${t.items.length > 12 ? ", …" : ""})${
+          t.subsets?.length
+            ? ` — subsets: ${t.subsets.map((s) => s.title).join(", ")}`
+            : ""
+        }`
     )
     .join("\n")
   const areas = (input.areas ?? [])
@@ -62,12 +77,12 @@ Grant-maker as main activity: ${input.grantMaking ? "yes" : "no"}
 The favpoll catalogue (topic, then a few of its items):
 ${catalogue}
 
-When the cause pulls for a NARROWER list than the topic's (a city farm wants Cow, Pig, Sheep and Goat from Animal, not Lion and Panda; a woodland charity wants native trees), keep the existing topic and name the SUBSET: the items from that topic's list the charity would want to pick from, verbatim from the list, 6 to 16 of them, and only when the narrowing is the charity's own (an air ambulance flies one helicopter: no subset of military aircraft). A narrower slice is never a new topic.
+When the cause pulls for a NARROWER list than the topic's (a city farm wants Cow, Pig, Sheep and Goat from Animal, not Lion and Panda; a woodland charity wants native trees), prefer one of the topic's listed SUBSETS by name when it is the charity's corner (a city farm → Farm animal); only when none of them fits, name the SUBSET's items: the items from that topic's list the charity would want to pick from, verbatim from the list, 6 to 16 of them, and only when the narrowing is the charity's own (an air ambulance flies one helicopter: no subset of military aircraft). A narrower slice is never a new topic.
 
 Rules for a NEW topic, if nothing in the catalogue fits: ordinary people must have a favourite of it and be able to name several without expertise; its items sit at the basic level (Falcon, not Peregrine falcon; not "bird of prey"); different guests would pick different ones. Prefer an existing topic whenever it honestly fits; propose a new one only when the cause is specific and the catalogue has no home for it, and never when its items already sit in an existing topic's list.
 
 Answer with JSON only:
-{"existing": "<catalogue topic title exactly, or null>", "existing_reason": "<one plain sentence addressed to the charity, for the welcome email: why this topic is theirs>", "subset_items": ["<items from that topic's list, only when a narrower list fits the cause; else []>"], "new_topic": "<a new topic title or null>", "new_items": ["<8 to 12 basic-level items>"] or null, "new_reason": "<why the catalogue has no home for it, or null>", "none_reason": "<if no perfect topic exists, one sentence why; else null>"}`
+{"existing": "<catalogue topic title exactly, or null>", "existing_reason": "<one plain sentence addressed to the charity, for the welcome email: why this topic is theirs>", "subset": "<one of that topic's listed subsets, exactly, when the cause pulls for it; else null>", "subset_items": ["<items from that topic's list, only when a narrower list fits the cause; else []>"], "new_topic": "<a new topic title or null>", "new_items": ["<8 to 12 basic-level items>"] or null, "new_reason": "<why the catalogue has no home for it, or null>", "none_reason": "<if no perfect topic exists, one sentence why; else null>"}`
 }
 
 /** The model's suggestion. Never throws; null when nothing can be said. */
@@ -95,6 +110,7 @@ export async function suggestPerfectTopic(
     const parsed = JSON.parse(raw) as {
       existing?: string | null
       existing_reason?: string | null
+      subset?: string | null
       subset_items?: string[] | null
       new_topic?: string | null
       new_items?: string[] | null
@@ -113,13 +129,23 @@ export async function suggestPerfectTopic(
       ? input.topics.find((t) => norm(t.title) === norm(parsed.existing!))
       : undefined
     if (match) {
-      // The subset keeps only labels that are really on the topic's list.
+      // An existing approved subset, named exactly, beats an invented list.
+      const subset = parsed.subset
+        ? (match.subsets ?? []).find(
+            (s) => norm(s.title) === norm(parsed.subset!)
+          )
+        : undefined
+      // Otherwise the list keeps only labels really on the topic's list —
+      // a hint for the admin to propose a subset, never written as one.
       const onList = new Map(match.items.map((l) => [norm(l), l]))
-      const items = (parsed.subset_items ?? [])
-        .map((l) => onList.get(norm(String(l))))
-        .filter((l): l is string => Boolean(l))
+      const items = subset
+        ? []
+        : (parsed.subset_items ?? [])
+            .map((l) => onList.get(norm(String(l))))
+            .filter((l): l is string => Boolean(l))
       return {
         topicId: match.id,
+        subsetId: subset?.id ?? null,
         items:
           items.length >= 3 && items.length < match.items.length ? items : [],
         reason:
@@ -131,12 +157,14 @@ export async function suggestPerfectTopic(
       const items = (parsed.new_items ?? []).slice(0, 12).join(", ")
       return {
         topicId: null,
+        subsetId: null,
         items: [],
         reason: `Proposed new topic "${parsed.new_topic}"${items ? ` (${items})` : ""}: ${plain(parsed.new_reason) || "nothing in the catalogue fits"}. Needs the topic-rules audit before it exists.`,
       }
     }
     return {
       topicId: null,
+      subsetId: null,
       items: [],
       reason:
         plain(parsed.none_reason) || "No favourite honestly fits this cause.",
@@ -158,6 +186,18 @@ export function catalogueForSuggestion(
     title: string
     is_finite: boolean
     favourites?: { label: string; is_canonical?: boolean }[] | null
+    /** Embedded `topic_subsets(...)`; only approved, listed ones count. */
+    topic_subsets?:
+      | {
+          id: string
+          title: string
+          status?: string
+          is_active?: boolean
+          topic_subset_items?:
+            | { favourites: { label: string } | { label: string }[] | null }[]
+            | null
+        }[]
+      | null
   }[]
 ): PerfectTopicInput["topics"] {
   return topics.map((t) => ({
@@ -167,5 +207,16 @@ export function catalogueForSuggestion(
     // The whole list, so a subset can name any item on it; the prompt
     // shows the first few.
     items: (t.favourites ?? []).map((f) => f.label),
+    subsets: (t.topic_subsets ?? [])
+      .filter((s) => (s.status ?? "approved") === "approved" && s.is_active !== false)
+      .map((s) => ({
+        id: s.id,
+        title: s.title,
+        items: (s.topic_subset_items ?? [])
+          .map((i) =>
+            Array.isArray(i.favourites) ? i.favourites[0]?.label : i.favourites?.label
+          )
+          .filter((l): l is string => Boolean(l)),
+      })),
   }))
 }

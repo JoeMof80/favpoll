@@ -77,7 +77,12 @@ export async function getWizardData(): Promise<{
   // The charity's own confirmed PERFECT TOPIC leads its suggestions
   // (2026-09-26); the admin's hand-picked list follows.
   for (const c of (charities ?? []) as Charity[]) {
-    if (c.perfect_topic_id) suggestedTopicIds[c.id] = [c.perfect_topic_id]
+    if (!c.perfect_topic_id) continue
+    // A perfect SUBSET leads (its picker entry, id = the subset's), the
+    // whole topic behind it (favpoll-topic-rules §1, step 4).
+    suggestedTopicIds[c.id] = c.perfect_subset_id
+      ? [c.perfect_subset_id, c.perfect_topic_id]
+      : [c.perfect_topic_id]
   }
   for (const row of charityTopicsRows ?? []) {
     const { charity_id, topic_id } = row as {
