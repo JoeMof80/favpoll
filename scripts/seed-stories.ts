@@ -698,19 +698,46 @@ type Charity = {
   objects?: string | null;
   areas?: { area: string; type: string }[] | null;
   perfect_topic_reason?: string | null;
-  perfect_topic_items?: string[] | null;
   perfect_topic?: { title: string } | { title: string }[] | null;
+  /** The confirmed SUBSET of the perfect topic (favpoll-topic-rules §1),
+   *  with its members: the seed's poll carries it and lists them. */
+  perfect_subset?: PerfectSubset | PerfectSubset[] | null;
 };
-/** The charity's confirmed perfect topic, in the engine's shape. */
+type PerfectSubset = {
+  id: string;
+  title: string;
+  topic_subset_items: { favourite_id: string }[] | null;
+};
+const oneOf = <T>(v: T | T[] | null | undefined): T | null =>
+  Array.isArray(v) ? (v[0] ?? null) : (v ?? null);
+/** The charity's confirmed perfect topic (and subset), in the engine's
+ *  shape. */
 function perfectTopicOf(
-  c: Pick<Charity, "perfect_topic" | "perfect_topic_reason">,
-): { title: string; reason: string | null } | null {
-  const t = Array.isArray(c.perfect_topic)
-    ? c.perfect_topic[0]
-    : c.perfect_topic;
+  c: Pick<Charity, "perfect_topic" | "perfect_topic_reason" | "perfect_subset">,
+): { title: string; subsetTitle: string | null; reason: string | null } | null {
+  const t = oneOf(c.perfect_topic);
   return t?.title
-    ? { title: t.title, reason: c.perfect_topic_reason ?? null }
+    ? {
+        title: t.title,
+        subsetTitle: oneOf(c.perfect_subset)?.title ?? null,
+        reason: c.perfect_topic_reason ?? null,
+      }
     : null;
+}
+/** The charity's subset, when the seed's topic is its perfect topic. */
+function subsetFor(
+  c: Charity,
+  topic: Topic,
+): { id: string; title: string; memberIds: Set<string> } | null {
+  const sub = oneOf(c.perfect_subset);
+  if (!sub || oneOf(c.perfect_topic)?.title !== topic.title) return null;
+  return {
+    id: sub.id,
+    title: sub.title,
+    memberIds: new Set(
+      (sub.topic_subset_items ?? []).map((i) => i.favourite_id),
+    ),
+  };
 }
 
 type Candidate = {
@@ -1037,7 +1064,7 @@ async function seed() {
     supabase
       .from("charities")
       .select(
-        "id, name, description, activities, cause_family, objects, areas, perfect_topic_reason, perfect_topic_items, perfect_topic:topics!charities_perfect_topic_id_fkey(title)",
+        "id, name, description, activities, cause_family, objects, areas, perfect_topic_reason, perfect_topic:topics!charities_perfect_topic_id_fkey(title), perfect_subset:topic_subsets!charities_perfect_subset_id_fkey(id, title, topic_subset_items(favourite_id))",
       )
       .eq("is_active", true)
       .not("cause_family", "is", null),
@@ -1143,26 +1170,23 @@ async function seed() {
     // topic's are its curated rows, which the wizard seeds with EVERY
     // canonical favourite (the founder's instinct, 2026-09-24: "infinite
     // lists should be full"). Nothing here trims the list.
-    // The charity's SUBSET narrows an open topic to its own corner of the
-    // shelf (a city farm's animals; favpoll-topic-rules §1).
-    const subset = perfectTopicOf(c.charity);
-    const subsetLabels =
-      subset && subset.title === c.topic.title && c.charity.perfect_topic_items
-        ? new Set(c.charity.perfect_topic_items.map((l) => l.toLowerCase()))
-        : null;
-    const items = c.topic.is_finite
-      ? c.topic.favourites
-      : subsetLabels
-        ? c.topic.favourites.filter((f) =>
-            subsetLabels.has(f.label.toLowerCase()),
-          )
+    // The charity's SUBSET (favpoll-topic-rules §1): when the seed's topic
+    // is the charity's perfect topic and it has a subset, the poll carries
+    // the subset and lists its members, whatever the parent's openness.
+    const subset = subsetFor(c.charity, c.topic);
+    const items = subset
+      ? c.topic.favourites.filter((f) => subset.memberIds.has(f.id))
+      : c.topic.is_finite
+        ? c.topic.favourites
         : c.topic.favourites.filter((f) => f.is_canonical);
 
     const input: StoryInput = {
       register: c.register,
       subject: isCause ? "cause" : "someone",
       occasionType: c.occasion,
-      topicTitle: c.topic.title,
+      // The subset's name on the card, the parent behind it for edges.
+      topicTitle: subset?.title ?? c.topic.title,
+      parentTopicTitle: subset ? c.topic.title : null,
       itemLabels: items.map((i) => i.label),
       charity: {
         name: c.charity.name,
@@ -1331,6 +1355,7 @@ async function seed() {
       id: pollId,
       favpoll_id: favpollId,
       topic_id: c.topic.id,
+      subset_id: subset?.id ?? null,
       personal_note: story.note,
       created_at: iso(createdAt),
     });
@@ -1340,7 +1365,8 @@ async function seed() {
       );
       continue;
     }
-    if (!c.topic.is_finite) {
+    // A subset poll always carries its rows (as the app writes them).
+    if (!c.topic.is_finite || subset) {
       await supabase.from("favpoll_poll_favourites").insert(
         items.map((f) => ({
           favpoll_poll_id: pollId,
@@ -1666,7 +1692,7 @@ async function regen(name: string) {
   const { data: f, error } = await supabase
     .from("favpolls")
     .select(
-      "id, subject, category, grouping, occasion_type, cause_label, protagonists(id, name, pronoun), favpoll_polls(id, topics(title, is_finite, favourites(id, label, is_canonical)), favpoll_poll_favourites(favourite_id)), favpoll_charities(charities(name, description, activities, cause_family, objects, areas, perfect_topic_reason, perfect_topic:topics!charities_perfect_topic_id_fkey(title)))",
+      "id, subject, category, grouping, occasion_type, cause_label, protagonists(id, name, pronoun), favpoll_polls(id, subset_id, topic_subsets(title, topic_subset_items(favourite_id)), topics(title, is_finite, favourites(id, label, is_canonical)), favpoll_poll_favourites(favourite_id)), favpoll_charities(charities(name, description, activities, cause_family, objects, areas, perfect_topic_reason, perfect_topic:topics!charities_perfect_topic_id_fkey(title)))",
     )
     .eq("created_by", SEED_USER);
   if (error) throw new Error(error.message);
@@ -1700,14 +1726,18 @@ async function regen(name: string) {
       (r) => r.favourite_id,
     ),
   );
-  const items = topic.is_finite
-    ? topic.favourites
-    : topic.favourites.filter((fv) => curated.has(fv.id));
+  // A subset poll carries its rows (favpoll-topic-rules §1): the members.
+  const regenSubset = oneOf(poll.topic_subsets as PerfectSubset | null);
+  const items =
+    topic.is_finite && !poll.subset_id
+      ? topic.favourites
+      : topic.favourites.filter((fv) => curated.has(fv.id));
   const input: StoryInput = {
     register,
     subject: isCause ? "cause" : "someone",
     occasionType: x.occasion_type,
-    topicTitle: topic.title,
+    topicTitle: regenSubset?.title ?? topic.title,
+    parentTopicTitle: regenSubset ? topic.title : null,
     itemLabels: items.map((i) => i.label),
     charity: {
       name: ch.name,

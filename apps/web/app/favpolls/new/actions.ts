@@ -8,6 +8,7 @@ import {
   purposeFromMirror,
 } from "@/lib/register-mirror"
 import { suggestCauseFamily } from "@/lib/cause-family"
+import { proposeSubsetFromSuggestion } from "@/lib/subset-from-suggestion"
 import {
   catalogueForSuggestion,
   suggestPerfectTopic,
@@ -470,6 +471,19 @@ export async function findOrCreateRegisterCharity(input: {
     areas: purpose.areas,
     topics: catalogueForSuggestion(catalogue ?? []),
   })
+  // An existing subset the suggester named, or the one it proposed —
+  // written as a PROPOSED topic_subsets row for /subsets (ruling 2),
+  // never as the charity's private list.
+  const suggestedSubsetId =
+    perfectTopic?.subsetId ??
+    (perfectTopic?.topicId && perfectTopic.proposedSubset
+      ? await proposeSubsetFromSuggestion(
+          supabase,
+          perfectTopic.topicId,
+          perfectTopic.proposedSubset,
+          perfectTopic.reason
+        )
+      : null)
   // The fundraising events it already holds, from its own site
   // (2026-09-27): read here, at insert, never at Generate.
   const signatureEvents = await suggestSignatureEvents({
@@ -502,11 +516,8 @@ export async function findOrCreateRegisterCharity(input: {
       grant_making: purpose.grantMaking,
       cause_family_suggested: causeFamilySuggested,
       perfect_topic_suggested_id: perfectTopic?.topicId ?? null,
-      perfect_subset_suggested_id: perfectTopic?.subsetId ?? null,
+      perfect_subset_suggested_id: suggestedSubsetId,
       perfect_topic_reason: perfectTopic?.reason ?? null,
-      perfect_topic_items: perfectTopic?.items.length
-        ? perfectTopic.items
-        : null,
       signature_events: signatureEvents.length ? signatureEvents : null,
       website_read_at: contact.website ? new Date().toISOString() : null,
     })

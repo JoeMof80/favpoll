@@ -21,6 +21,8 @@ const TOPICS = catalogueForSuggestion([
       { label: "Sheep", is_canonical: true },
       { label: "Goat", is_canonical: true },
       { label: "Donkey", is_canonical: false },
+      { label: "Panda", is_canonical: true },
+      { label: "Giraffe", is_canonical: true },
     ],
     topic_subsets: [
       {
@@ -70,7 +72,33 @@ describe("suggestPerfectTopic", () => {
     })
     const s = await suggestPerfectTopic(INPUT)
     expect(s?.topicId).toBe("animal")
-    expect(s?.items).toEqual(["Cow", "Pig", "Sheep", "Goat", "Donkey"])
+    expect(s?.subsetId).toBeNull()
+    // No existing subset fits and none was named: no proposal, the
+    // whole list (a bare label list is never the charity's own).
+    expect(s?.proposedSubset).toBeNull()
+  })
+
+  it("proposes a NAMED subset when none exists and six labels are on the list", async () => {
+    answer({
+      existing: "Animal",
+      existing_reason: "Your animals are the point.",
+      subset_title: "City farm animal",
+      subset_items: [
+        "Cow",
+        "Pig",
+        "Sheep",
+        "Goat",
+        "Donkey",
+        "Lion",
+        "Unicorn",
+      ],
+    })
+    const s = await suggestPerfectTopic(INPUT)
+    expect(s?.subsetId).toBeNull()
+    expect(s?.proposedSubset).toEqual({
+      title: "City farm animal",
+      items: ["Cow", "Pig", "Sheep", "Goat", "Donkey", "Lion"],
+    })
   })
 
   it("names an existing approved subset instead of inventing a list", async () => {
@@ -83,7 +111,7 @@ describe("suggestPerfectTopic", () => {
     const s = await suggestPerfectTopic(INPUT)
     expect(s?.topicId).toBe("animal")
     expect(s?.subsetId).toBe("farm")
-    expect(s?.items).toEqual([])
+    expect(s?.proposedSubset).toBeNull()
   })
 
   it("a delisted or unknown subset name is ignored", async () => {
@@ -95,13 +123,14 @@ describe("suggestPerfectTopic", () => {
     expect((await suggestPerfectTopic(INPUT))?.subsetId).toBeNull()
   })
 
-  it("fewer than three subset items means the whole list", async () => {
+  it("fewer than six proposed items is no subset", async () => {
     answer({
       existing: "Animal",
       existing_reason: "Yours.",
+      subset_title: "Tiny",
       subset_items: ["Cow", "Pig"],
     })
-    expect((await suggestPerfectTopic(INPUT))?.items).toEqual([])
+    expect((await suggestPerfectTopic(INPUT))?.proposedSubset).toBeNull()
   })
 
   it("a proposed new topic is a suggestion of none, with the proposal in the reason", async () => {
