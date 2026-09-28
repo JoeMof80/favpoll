@@ -74,7 +74,13 @@ altitude:
      bird, Sunday roast) — never a textbook grouping or a cut by letter or decade. At
      least six items ALREADY on the parent's list, at most sixteen. Subsets of one parent
      may overlap (Pet and Farm animal both hold Goat) but one may not contain another
-     whole. Names follow topic grammar: singular, basic level, reads after "Favourite".
+     whole. A subset is defined by what an item IS or WHERE it is, never by a status
+     that changes with the season or the year (founder, 2026-09-28: "Premier League
+     team" arrived with six clubs no longer in it, and would break again every August;
+     "Current F1 driver" likewise). Scottish team and European team are stable; a
+     league table is not; "Classic car" names a kind people say and moves slowly
+     enough to stand, judged item by item. Names follow topic grammar: singular, basic
+     level, reads after "Favourite".
   8. **Promotion creates, never re-homes.** When an admin turns a homemade topic into a
      subset, the favpoll that made it keeps its homemade topic and items (a live favpoll's
      meaning is never changed after the fact); the homemade row is delisted from the
