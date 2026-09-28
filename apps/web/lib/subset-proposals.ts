@@ -100,7 +100,7 @@ Propose the subsets of this topic that ordinary people already ask for, if any. 
 - Six to sixteen items, copied EXACTLY from the list above. Never invent an item; if the list lacks the items a subset would need, the subset does not exist yet.
 - Subsets may overlap (Pet and Farm animal both hold Goat) but one may not contain another whole.
 - A subset is defined by what an item is or where it is, never by a status that changes with the season or the year: "Scottish team" stands, "Premier League team" and "Current F1 driver" do not.
-- None is a fine answer. Most topics have no subset anyone asks for; do not manufacture one. Propose at most six.
+- None is a fine answer. Most topics have no subset anyone asks for; do not manufacture one. Propose at most ten; a long list with many natural corners (a club per subset) may need them all.
 
 Answer with JSON only:
 {"subsets": [{"title": "<name>", "items": ["<items from the list>"], "reason": "<one plain sentence: who asks for this cut and why>"}]}`
