@@ -39,11 +39,12 @@ export type PerfectTopicSuggestion = {
   /** An existing approved SUBSET of that topic, when the cause pulls for
    *  one (a city farm → Farm animal). Confirmed beside the topic. */
   subsetId: string | null
-  /** A SUBSET (favpoll-topic-rules §1): the charity's own subset of the
-   *  topic's items, by label, when the cause pulls for a narrower list
-   *  (a city farm's animals). Empty means the whole list. In step 4 the
-   *  labels are matched to an existing `topic_subsets` row. */
-  items: string[]
+  /** When no existing subset fits but the cause plainly pulls for one:
+   *  a NAMED proposal (topic grammar) with labels from the topic's list,
+   *  written as a proposed `topic_subsets` row for the admin's door on
+   *  /subsets (ruling 2) — never the charity's private list. Null means
+   *  the whole list, or an existing subset (subsetId) fits. */
+  proposedSubset: { title: string; items: string[] } | null
   /** One plain sentence: why it is theirs (for the welcome email), why
    *  none fits, or the new topic proposed for the topic-rules audit. */
   reason: string
@@ -77,12 +78,12 @@ Grant-maker as main activity: ${input.grantMaking ? "yes" : "no"}
 The favpoll catalogue (topic, then a few of its items):
 ${catalogue}
 
-When the cause pulls for a NARROWER list than the topic's (a city farm wants Cow, Pig, Sheep and Goat from Animal, not Lion and Panda; a woodland charity wants native trees), prefer one of the topic's listed SUBSETS by name when it is the charity's corner (a city farm → Farm animal); only when none of them fits, name the SUBSET's items: the items from that topic's list the charity would want to pick from, verbatim from the list, 6 to 16 of them, and only when the narrowing is the charity's own (an air ambulance flies one helicopter: no subset of military aircraft). A narrower slice is never a new topic.
+When the cause pulls for a NARROWER list than the topic's (a city farm wants Cow, Pig, Sheep and Goat from Animal, not Lion and Panda; a woodland charity wants native trees), prefer one of the topic's listed SUBSETS by name when it is the charity's corner (a city farm → Farm animal); only when none of them fits, PROPOSE one — a name in topic grammar (singular, basic level, reads after "Favourite") and its items: the items from that topic's list the charity would want to pick from, verbatim from the list, 6 to 16 of them, and only when the narrowing is the charity's own (an air ambulance flies one helicopter: no subset of military aircraft). A narrower slice is never a new topic.
 
 Rules for a NEW topic, if nothing in the catalogue fits: ordinary people must have a favourite of it and be able to name several without expertise; its items sit at the basic level (Falcon, not Peregrine falcon; not "bird of prey"); different guests would pick different ones. Prefer an existing topic whenever it honestly fits; propose a new one only when the cause is specific and the catalogue has no home for it, and never when its items already sit in an existing topic's list.
 
 Answer with JSON only:
-{"existing": "<catalogue topic title exactly, or null>", "existing_reason": "<one plain sentence addressed to the charity, for the welcome email: why this topic is theirs>", "subset": "<one of that topic's listed subsets, exactly, when the cause pulls for it; else null>", "subset_items": ["<items from that topic's list, only when a narrower list fits the cause; else []>"], "new_topic": "<a new topic title or null>", "new_items": ["<8 to 12 basic-level items>"] or null, "new_reason": "<why the catalogue has no home for it, or null>", "none_reason": "<if no perfect topic exists, one sentence why; else null>"}`
+{"existing": "<catalogue topic title exactly, or null>", "existing_reason": "<one plain sentence addressed to the charity, for the welcome email: why this topic is theirs>", "subset": "<one of that topic's listed subsets, exactly, when the cause pulls for it; else null>", "subset_title": "<the proposed subset's name when proposing one; else null>", "subset_items": ["<items from that topic's list, only when a narrower list fits the cause; else []>"], "new_topic": "<a new topic title or null>", "new_items": ["<8 to 12 basic-level items>"] or null, "new_reason": "<why the catalogue has no home for it, or null>", "none_reason": "<if no perfect topic exists, one sentence why; else null>"}`
 }
 
 /** The model's suggestion. Never throws; null when nothing can be said. */
@@ -111,6 +112,7 @@ export async function suggestPerfectTopic(
       existing?: string | null
       existing_reason?: string | null
       subset?: string | null
+      subset_title?: string | null
       subset_items?: string[] | null
       new_topic?: string | null
       new_items?: string[] | null
@@ -143,11 +145,20 @@ export async function suggestPerfectTopic(
         : (parsed.subset_items ?? [])
             .map((l) => onList.get(norm(String(l))))
             .filter((l): l is string => Boolean(l))
+      const proposed =
+        !subset &&
+        parsed.subset_title &&
+        items.length >= 6 &&
+        items.length < match.items.length
+          ? {
+              title: String(parsed.subset_title).trim().replace(/\s+/g, " "),
+              items,
+            }
+          : null
       return {
         topicId: match.id,
         subsetId: subset?.id ?? null,
-        items:
-          items.length >= 3 && items.length < match.items.length ? items : [],
+        proposedSubset: proposed?.title ? proposed : null,
         reason:
           plain(parsed.existing_reason) ||
           `${match.title} is the favourite closest to what ${input.name} does.`,
@@ -158,14 +169,14 @@ export async function suggestPerfectTopic(
       return {
         topicId: null,
         subsetId: null,
-        items: [],
+        proposedSubset: null,
         reason: `Proposed new topic "${parsed.new_topic}"${items ? ` (${items})` : ""}: ${plain(parsed.new_reason) || "nothing in the catalogue fits"}. Needs the topic-rules audit before it exists.`,
       }
     }
     return {
       topicId: null,
       subsetId: null,
-      items: [],
+      proposedSubset: null,
       reason:
         plain(parsed.none_reason) || "No favourite honestly fits this cause.",
     }

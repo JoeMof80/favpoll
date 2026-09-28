@@ -18,6 +18,7 @@ import {
   catalogueForSuggestion,
   suggestPerfectTopic,
 } from "../apps/web/lib/perfect-topic";
+import { proposeSubsetFromSuggestion } from "../apps/web/lib/subset-from-suggestion";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -65,13 +66,24 @@ async function main() {
       console.log(`  – ${c.name}: nothing to say`);
       continue;
     }
+    // An existing subset by name, or the proposal written as a PROPOSED
+    // topic_subsets row for /subsets — never the charity's private list.
+    const suggestedSubsetId =
+      s.subsetId ??
+      (s.topicId && s.proposedSubset
+        ? await proposeSubsetFromSuggestion(
+            supabase,
+            s.topicId,
+            s.proposedSubset,
+            s.reason,
+          )
+        : null);
     const { error: uErr } = await supabase
       .from("charities")
       .update({
         perfect_topic_suggested_id: s.topicId,
-        perfect_subset_suggested_id: s.subsetId,
+        perfect_subset_suggested_id: suggestedSubsetId,
         perfect_topic_reason: s.reason,
-        perfect_topic_items: s.items.length ? s.items : null,
       })
       .eq("id", c.id);
     if (uErr) console.error(`  ✗ ${c.name}: ${uErr.message}`);
@@ -80,7 +92,7 @@ async function main() {
       const topic = catalogue.find((t) => t.id === s.topicId);
       const subset = topic?.subsets?.find((x) => x.id === s.subsetId)?.title;
       console.log(
-        `  ✓ ${c.name}: ${topic?.title ?? "none"}${subset ? ` › ${subset}` : ""}${s.items.length ? ` [${s.items.join(", ")}]` : ""} — ${s.reason}`,
+        `  ✓ ${c.name}: ${topic?.title ?? "none"}${subset ? ` › ${subset}` : ""}${s.proposedSubset ? ` › proposed ${s.proposedSubset.title} [${s.proposedSubset.items.join(", ")}]` : ""} — ${s.reason}`,
       );
     }
   }

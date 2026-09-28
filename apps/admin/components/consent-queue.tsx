@@ -73,7 +73,7 @@ function welcomeMailto(row: ConsentQueueRow): string {
     // The charity's own topic, when an admin has confirmed one: offered,
     // with the reason, and theirs to overrule (founder, 2026-09-25).
     row.perfect_topic_title
-      ? `1. Your topic — we've set up Favourite ${row.perfect_topic_title.toLowerCase()} as the topic we suggest to organisers raising for you${row.perfect_topic_reason ? `: ${row.perfect_topic_reason.replace(/\.$/, "")}` : ""}.${row.perfect_topic_items?.length ? ` The list is yours: ${row.perfect_topic_items.join(", ")}.` : ""} Reply if you'd rather another, or add more.`
+      ? `1. Your topic — we've set up Favourite ${(row.perfect_subset_title ?? row.perfect_topic_title).toLowerCase()} as the topic we suggest to organisers raising for you${row.perfect_topic_reason ? `: ${row.perfect_topic_reason.replace(/\.$/, "")}` : ""}. Reply if you'd rather another, or add more.`
       : "1. Suggested topics — poll topics you'd like us to suggest to organisers raising for you (some charities suit certain favourites: a hospice might pick Comfort food, a rescue might pick Dog breed).",
     "2. Impact lines — one or two short sentences like \u201c\u00a320 funds an hour of care\u201d, shown to guests as they pick an amount.",
     "3. Your logo — shown wherever your charity is named.",
@@ -247,11 +247,6 @@ function PerfectTopicSelect({
       {row.perfect_topic_reason && (
         <p className="line-clamp-2 text-xs text-muted-foreground">
           {row.perfect_topic_reason}
-        </p>
-      )}
-      {row.perfect_topic_items && row.perfect_topic_items.length > 0 && (
-        <p className="line-clamp-2 text-xs text-muted-foreground">
-          Their list: {row.perfect_topic_items.join(", ")}
         </p>
       )}
       {row.signature_events && row.signature_events.length > 0 && (

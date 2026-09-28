@@ -545,8 +545,13 @@ export type StoryCharity = {
   objects?: string | null
   /** Where it works: local authorities or countries. */
   areas?: { area: string; type: string }[] | null
-  /** The admin-CONFIRMED perfect topic (2026-09-26), if any. */
-  perfectTopic?: { title: string; reason: string | null } | null
+  /** The admin-CONFIRMED perfect topic (2026-09-26), if any, and its
+   *  confirmed SUBSET when it has one (favpoll-topic-rules §1). */
+  perfectTopic?: {
+    title: string
+    subsetTitle?: string | null
+    reason: string | null
+  } | null
 }
 
 export type StoryInput = {
@@ -554,7 +559,10 @@ export type StoryInput = {
   subject: "someone" | "cause"
   /** An `occasion_type` string, or null (pairs with nothing). */
   occasionType: string | null
+  /** The name on the card: the subset's when the poll has one. */
   topicTitle: string
+  /** The parent's title when topicTitle is a subset's (edges inherit). */
+  parentTopicTitle?: string | null
   itemLabels: string[]
   charity: StoryCharity
   pronoun?: Pronoun
@@ -594,6 +602,7 @@ export function storyEdges(input: StoryInput): StoryEdges {
     register: input.register,
     occasionType: input.occasionType,
     topicTitle: input.topicTitle,
+    parentTopicTitle: input.parentTopicTitle ?? null,
     charityName: input.charity.name,
     causeFamily: input.charity.causeFamily,
     charityTopic: input.charity.perfectTopic ?? null,

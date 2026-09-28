@@ -38,7 +38,7 @@ async function fetchCharity(
   const { data } = await supabase
     .from("charities")
     .select(
-      "name, description, activities, cause_family, objects, areas, perfect_topic_reason, perfect_topic:topics!charities_perfect_topic_id_fkey(title)"
+      "name, description, activities, cause_family, objects, areas, perfect_topic_reason, perfect_topic:topics!charities_perfect_topic_id_fkey(title), perfect_subset:topic_subsets!charities_perfect_subset_id_fkey(title)"
     )
     .eq("id", charityId)
     .single()
@@ -59,9 +59,16 @@ async function fetchCharity(
         | null
         | undefined
       const one = Array.isArray(t) ? t[0] : t
+      const ps = data.perfect_subset as
+        | { title: string }
+        | { title: string }[]
+        | null
+        | undefined
+      const subset = Array.isArray(ps) ? ps[0] : ps
       return one?.title
         ? {
             title: one.title,
+            subsetTitle: subset?.title ?? null,
             reason: (data.perfect_topic_reason as string | null) ?? null,
           }
         : null
@@ -251,6 +258,7 @@ export async function generateDraft(
       subject: input.subject,
       occasionType,
       topicTitle,
+      parentTopicTitle: input.subsetId ? (topic.title as string) : null,
       itemLabels,
       charity,
       pronoun: input.pronoun,

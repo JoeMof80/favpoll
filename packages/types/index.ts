@@ -97,9 +97,6 @@ export type Charity = {
   perfect_topic_id?: string | null;
   perfect_topic_suggested_id?: string | null;
   perfect_topic_reason?: string | null;
-  /** The morning's per-charity item list (favpoll-topic-rules §1, first
-   *  step); retires once `perfect_subset_id` carries the subset. */
-  perfect_topic_items?: string[] | null;
   /** A SUBSET of the perfect topic's items, when the cause pulls for
    *  a narrower list (a city farm's Farm animal). Must belong to
    *  perfect_topic_id (a trigger enforces it). */

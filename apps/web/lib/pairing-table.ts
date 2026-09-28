@@ -38,6 +38,9 @@ import type { CauseFamily, Register } from "@favpoll/types"
  */
 
 export type TopicRow = {
+  /** A topic title — or a SUBSET's (favpoll-topic-rules §1, step 5): a row
+   *  may name "Wedding song" on Song. A subset with no row of its own
+   *  inherits its parent's row. */
   topic: string
   star: boolean
   /** The concrete thing that links this topic to the occasion, when the
@@ -871,13 +874,22 @@ export type EdgeLookupInput = {
   /** An `occasion_type` string. Null = the register's default, which
    *  pairs with nothing. */
   occasionType: string | null
+  /** The name on the card: the subset's when the poll has one. */
   topicTitle: string
+  /** The parent topic's title when topicTitle is a subset's; a subset
+   *  with no row of its own inherits the parent's edges. */
+  parentTopicTitle?: string | null
   charityName: string | null
   /** The admin-CONFIRMED family only — never the model's suggestion. */
   causeFamily: CauseFamily | null
   /** The charity's own confirmed PERFECT TOPIC (2026-09-26), when it has
    *  one: beats every table row for the charity→topic edge. */
-  charityTopic?: { title: string; reason: string | null } | null
+  charityTopic?: {
+    title: string
+    /** The charity's confirmed perfect SUBSET, when it has one. */
+    subsetTitle?: string | null
+    reason: string | null
+  } | null
 }
 
 const norm = (s: string) => s.trim().toLowerCase().replace(/[‘’]/g, "'")
@@ -894,9 +906,17 @@ function findOccasionRow(occasionType: string | null): {
   return null
 }
 
-function findTopic(rows: TopicRow[], topicTitle: string): TopicRow | null {
+function findTopic(
+  rows: TopicRow[],
+  topicTitle: string,
+  parentTopicTitle?: string | null
+): TopicRow | null {
   const want = norm(topicTitle)
-  return rows.find((r) => norm(r.topic) === want) ?? null
+  const own = rows.find((r) => norm(r.topic) === want) ?? null
+  if (own || !parentTopicTitle) return own
+  // A subset inherits its parent's row (favpoll-topic-rules §1).
+  const parent = norm(parentTopicTitle)
+  return rows.find((r) => norm(r.topic) === parent) ?? null
 }
 
 function charityRow(charityName: string | null): TopicRow[] | null {
@@ -918,7 +938,11 @@ export function lookupEdges(input: EdgeLookupInput): StoryEdges {
   // E1 — occasion → topic
   let e1: Edge | null = null
   if (occ) {
-    const hit = findTopic(occ.row.topics, input.topicTitle)
+    const hit = findTopic(
+      occ.row.topics,
+      input.topicTitle,
+      input.parentTopicTitle
+    )
     if (hit) {
       const occasion = occ.key.toLowerCase()
       e1 = hit.enacted
@@ -947,10 +971,17 @@ export function lookupEdges(input: EdgeLookupInput): StoryEdges {
   // E2 — charity → topic. The charity's own confirmed topic beats its
   // row, and its row beats its family's.
   let e2: Edge | null = null
+  // The charity's own subset matches the subset on the card; its topic
+  // matches the topic on the card, or the parent behind a subset (a city
+  // farm's Farm animal is Animal's corner: Animal is still its own).
   if (
     input.charityName &&
     input.charityTopic &&
-    norm(input.charityTopic.title) === norm(input.topicTitle)
+    ((input.charityTopic.subsetTitle &&
+      norm(input.charityTopic.subsetTitle) === norm(input.topicTitle)) ||
+      norm(input.charityTopic.title) === norm(input.topicTitle) ||
+      (input.parentTopicTitle &&
+        norm(input.charityTopic.title) === norm(input.parentTopicTitle)))
   ) {
     e2 = {
       star: true,

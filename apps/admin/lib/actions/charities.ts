@@ -356,8 +356,6 @@ export type ConsentQueueRow = {
   perfect_subset_id: string | null;
   perfect_subset_suggested_id: string | null;
   perfect_subset_title: string | null;
-  /** The subset: the charity's own corner of the topic's items, by label. */
-  perfect_topic_items: string[] | null;
   /** The fundraising events read from its website (2026-09-27). */
   signature_events: SignatureEvent[] | null;
   registered_website: string | null;
@@ -387,7 +385,7 @@ export async function getConsentQueue(): Promise<{
   const { data, error } = await supabase
     .from("charities")
     .select(
-      "id, name, registered_number, registered_email, consent_contacted_at, cause_family, cause_family_suggested, activities, perfect_topic_id, perfect_topic_suggested_id, perfect_topic_reason, perfect_topic_items, perfect_subset_id, perfect_subset_suggested_id, signature_events, registered_website, perfect_topic:topics!charities_perfect_topic_id_fkey(title), perfect_subset:topic_subsets!charities_perfect_subset_id_fkey(title)",
+      "id, name, registered_number, registered_email, consent_contacted_at, cause_family, cause_family_suggested, activities, perfect_topic_id, perfect_topic_suggested_id, perfect_topic_reason, perfect_subset_id, perfect_subset_suggested_id, signature_events, registered_website, perfect_topic:topics!charities_perfect_topic_id_fkey(title), perfect_subset:topic_subsets!charities_perfect_subset_id_fkey(title)",
     )
     .eq("consent_status", "pending")
     .in("id", [...counts.keys()])
