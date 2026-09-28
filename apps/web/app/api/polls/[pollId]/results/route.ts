@@ -31,7 +31,7 @@ export async function GET(
   // an infinite topic's items are its curated epf rows.
   const { data: poll, error: pollErr } = await supabase
     .from("favpoll_polls")
-    .select("id, topic_id, favpoll_id, topics ( is_finite )")
+    .select("id, topic_id, favpoll_id, subset_id, topics ( is_finite )")
     .eq("id", pollId)
     .single()
 
@@ -85,8 +85,10 @@ export async function GET(
     (poll?.topics as unknown as { is_finite: boolean } | null)?.is_finite ??
     false
 
+  // A subset poll carries its own rows whatever the parent's openness.
+  const subsetId = (poll as { subset_id?: string | null }).subset_id ?? null
   let items: ItemRow[] = []
-  if (isFinite) {
+  if (isFinite && !subsetId) {
     const { data, error } = await supabase
       .from("favourites")
       .select("id, label")

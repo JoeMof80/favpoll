@@ -95,7 +95,7 @@ export default async function CharityPage({ params }: Props) {
         closed_at, total_raised, is_listed, is_private,
         protagonist:protagonists!favpolls_protagonist_id_fkey ( name ),
         favpoll_charities ( charity:charities ( id, name, logo_url, registered_number ) ),
-        favpoll_polls ( topics ( title ) )
+        favpoll_polls ( topics ( title ), topic_subsets ( title ) )
       )`
     )
     .eq("charity_id", id)
@@ -128,8 +128,9 @@ export default async function CharityPage({ params }: Props) {
       poll: {
         topic:
           (Array.isArray(f.favpoll_polls)
-            ? f.favpoll_polls[0]?.topics
-            : f.favpoll_polls?.topics) ?? null,
+            ? (f.favpoll_polls[0]?.topic_subsets ?? f.favpoll_polls[0]?.topics)
+            : (f.favpoll_polls?.topic_subsets ?? f.favpoll_polls?.topics)) ??
+          null,
       },
     }
   })

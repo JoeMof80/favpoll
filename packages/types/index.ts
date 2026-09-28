@@ -346,6 +346,22 @@ export type TopicWithMeta = Topic & {
   favourites: Favourite[];
   category_ids: string[];
   placeholders?: TopicPlaceholders;
+  /** Set when this picker entry is a SUBSET, not a topic (favpoll-topic-
+   *  rules §1): `id` is the subset's id, `title` its name, `favourites`
+   *  its members; openness, categories and placeholders are the parent's.
+   *  The favpoll stores the parent as its topic and the subset beside it. */
+  subset_of?: { topic_id: string; title: string };
+};
+
+/** A subset's own record (ruling 4, revised 2026-09-28): picks from its
+ *  own favpolls, kept apart from the parent's whole-list record. A
+ *  subset's full standing adds the parent's whole-list picks of the same
+ *  member (down, never up). */
+export type TopicSubsetTotal = {
+  subset_id: string;
+  favourite_id: string;
+  all_time_pledged: number;
+  all_time_count: number;
 };
 
 export type GeneratedDraft = {
@@ -365,6 +381,8 @@ export type GeneratedDraft = {
 export type CanvasPollInput = {
   id?: string;
   topicId: string | null;
+  /** A SUBSET of the topic (favpoll-topic-rules §1), stored beside it. */
+  subsetId?: string | null;
   topicIsCustom: boolean;
   customTopicTitle: string;
   customTopicItems: string[];

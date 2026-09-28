@@ -73,6 +73,14 @@ const modelId = () => process.env.LLM_MODEL_ID ?? "claude-sonnet-5"
 
 /** The table key for the occasion: the caller's, else the register's
  *  default (which pairs with nothing). */
+/** The cache is keyed by the subset when there is one: a Story in the
+ *  subset's name must never be handed to the parent's favpoll. */
+function cacheTopicPart(input: GenerateDraftInput): string {
+  return input.subsetId
+    ? `${input.topicId}:subset:${input.subsetId}`
+    : input.topicId
+}
+
 function resolveOccasionType(input: GenerateDraftInput): string | null {
   return input.occasionType?.trim() || DEFAULT_OCCASION_TYPE[input.register]
 }
@@ -82,6 +90,10 @@ export type GenerateDraftInput = {
   subject: "someone" | "cause"
   /** Empty string for custom (organiser-created) topics. */
   topicId: string
+  /** A SUBSET of the topic (favpoll-topic-rules §1): the Story is written
+   *  in the subset's name with its members as the options, and cached
+   *  apart from the parent's. */
+  subsetId?: string | null
   primaryCharityId?: string | null
   /** Required when topicId is empty — the organiser's custom topic title. */
   topicTitle?: string
@@ -168,7 +180,7 @@ export async function generateDraft(
   const supabase = createAdminClient()
   const cacheKey = buildCacheKey(
     input.register,
-    input.topicId,
+    cacheTopicPart(input),
     input.subject,
     input.primaryCharityId,
     input.pronoun,
@@ -203,13 +215,35 @@ export async function generateDraft(
     .single()
 
   if (topicErr || !topic) throw new Error("Topic not found")
-  const itemLabels: string[] = (
+  let itemLabels: string[] = (
     (topic as { favourites: { label: string }[] }).favourites ?? []
   ).map((i) => i.label)
+  let topicTitle = topic.title as string
+
+  // The subset's name and members, when the poll has one.
+  if (input.subsetId) {
+    const { data: subset } = await supabase
+      .from("topic_subsets")
+      .select("title, topic_subset_items ( favourites ( label ) )")
+      .eq("id", input.subsetId)
+      .maybeSingle()
+    if (subset) {
+      topicTitle = subset.title as string
+      const members = (
+        (
+          subset as unknown as {
+            topic_subset_items: { favourites: { label: string } | null }[]
+          }
+        ).topic_subset_items ?? []
+      )
+        .map((i) => i.favourites?.label)
+        .filter((l): l is string => Boolean(l))
+      if (members.length > 0) itemLabels = members
+    }
+  }
 
   const charity = await fetchCharity(supabase, input.primaryCharityId)
   const occasionType = resolveOccasionType(input)
-  const topicTitle = topic.title as string
 
   const story = await generateStory(
     {
@@ -306,7 +340,7 @@ export async function getCachedDraftGhosts(
   const supabase = createAdminClient()
   const cacheKey = buildCacheKey(
     input.register,
-    input.topicId,
+    cacheTopicPart(input),
     input.subject,
     input.primaryCharityId,
     input.pronoun,

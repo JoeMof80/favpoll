@@ -315,12 +315,18 @@ export function useWizardState(
   // The charity's SUBSET (favpoll-topic-rules §1): when the organiser picks
   // the charity's own topic, the list is the charity's corner of it (a
   // city farm's animals), not the whole shelf.
-  const subsetLabels: string[] | null =
-    primaryCharity &&
-    topics[0] &&
-    !topics[0].isCustom &&
-    primaryCharity.perfect_topic_id === topics[0].topicId &&
-    primaryCharity.perfect_topic_items?.length
+  // A picked SUBSET's members lead (favpoll-topic-rules §1); the charity's
+  // per-item list (the first step, retiring in step 4) stands behind it.
+  const pickedSubset = topics[0]?.subsetId
+    ? data.topics.find((t) => t.id === topics[0].subsetId)
+    : null
+  const subsetLabels: string[] | null = pickedSubset
+    ? pickedSubset.favourites.map((f) => f.label)
+    : primaryCharity &&
+        topics[0] &&
+        !topics[0].isCustom &&
+        primaryCharity.perfect_topic_id === topics[0].topicId &&
+        primaryCharity.perfect_topic_items?.length
       ? primaryCharity.perfect_topic_items
       : null
   const subsetSet = subsetLabels
@@ -521,6 +527,7 @@ export function useWizardState(
         register,
         subject,
         topicId: topic.isCustom ? "" : topic.topicId,
+        subsetId: topic.isCustom ? null : (topic.subsetId ?? null),
         topicTitle: topic.isCustom ? topic.title : undefined,
         itemLabels: topic.isCustom
           ? (topic.customLabels ?? [])
@@ -630,6 +637,7 @@ export function useWizardState(
           poll: {
             id: edit.existingPollId ?? undefined,
             topicId: isCustomTopic ? null : selected.topicId,
+            subsetId: isCustomTopic ? null : (selected.subsetId ?? null),
             topicIsCustom: isCustomTopic,
             customTopicTitle: isCustomTopic ? selected.title : "",
             customTopicItems: isCustomTopic
@@ -673,6 +681,7 @@ export function useWizardState(
         goalAmount: goalAmount ?? null,
         poll: {
           topicId: isCustomTopic ? null : selected.topicId,
+          subsetId: isCustomTopic ? null : (selected.subsetId ?? null),
           customTopic: isCustomTopic
             ? {
                 title: selected.title,

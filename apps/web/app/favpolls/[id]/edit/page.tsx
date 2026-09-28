@@ -112,7 +112,29 @@ export default async function EditFavpollPage({ params }: Props) {
         data.topics.push(topic)
       }
     }
-    if (topic) {
+    // A poll made with a SUBSET (favpoll-topic-rules §1) reopens on the
+    // subset's entry: its name, its members, the parent as the topic.
+    const subsetId =
+      (rawPoll as { subset_id?: string | null }).subset_id ?? null
+    const subsetEntry = subsetId
+      ? data.topics.find((t) => t.id === subsetId && t.subset_of)
+      : null
+    if (subsetEntry) {
+      preselectedTopics = [
+        {
+          topicId: subsetEntry.subset_of!.topic_id,
+          subsetId: subsetEntry.id,
+          subsetOf: subsetEntry.subset_of!.title,
+          title: subsetEntry.title,
+          isCustom: false,
+          items: subsetEntry.favourites.map((i) => ({
+            id: i.id,
+            label: i.label,
+          })),
+          customLabels: [],
+        },
+      ]
+    } else if (topic) {
       preselectedTopics = [
         {
           topicId: topic.id,

@@ -33,6 +33,11 @@ export const favpollFormSchema = z
           topicId: z.string(),
           title: z.string(),
           isCustom: z.boolean().default(false),
+          /** A SUBSET pick (favpoll-topic-rules §1): topicId is the parent,
+           *  this is the subset, title is the subset's name, items its
+           *  members; subsetOf is the parent's title for the marker. */
+          subsetId: z.string().nullable().optional(),
+          subsetOf: z.string().nullable().optional(),
           items: z.array(z.object({ id: z.string(), label: z.string() })),
           customLabels: z.array(z.string().max(50)).default([]),
         })

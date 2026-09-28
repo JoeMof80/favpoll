@@ -9,7 +9,10 @@ import { OG_SITE } from "./site"
 // open it: the <title>, the description and the card. Pure — the fetch is
 // in favpoll-og-data.ts, the pixels in cards.tsx — so it is unit-testable.
 
-type PollJoin = { topics: { title: string } | null }
+type PollJoin = {
+  topics: { title: string } | null
+  topic_subsets?: { title: string } | null
+}
 
 /** The row shape favpoll-og-data.ts selects. */
 export type FavpollOgSource = {
@@ -73,7 +76,10 @@ export function favpollOgCard(
     : src.favpoll_polls
       ? [src.favpoll_polls]
       : []
-  const topicTitle = polls[0]?.topics?.title?.trim()
+  // The subset's name, when the poll has one (favpoll-topic-rules §1).
+  const topicTitle = (
+    polls[0]?.topic_subsets?.title ?? polls[0]?.topics?.title
+  )?.trim()
 
   const charities = (src.favpoll_charities ?? [])
     .map((c) => c.charities?.name?.trim() ?? "")

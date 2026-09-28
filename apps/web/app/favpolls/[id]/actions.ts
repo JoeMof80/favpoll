@@ -456,7 +456,7 @@ export async function addGuestItem(
     const { data: pollData } = await supabase
       .from("favpoll_polls")
       .select(
-        "favpoll_id, favpolls(id, occasion_type, created_by, protagonists(name)), topics(title)"
+        "favpoll_id, favpolls(id, occasion_type, created_by, protagonists(name)), topics(title), topic_subsets(title)"
       )
       .eq("id", favpollPollId)
       .single()
@@ -464,7 +464,9 @@ export async function addGuestItem(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- nested join shape
     const favpollData = pollData?.favpolls as any
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- nested join shape
-    const topicData = pollData?.topics as any
+    // The subset's name when the poll has one (favpoll-topic-rules §1).
+    const topicData = ((pollData as any)?.topic_subsets ??
+      pollData?.topics) as any
     const organizerUserId: string | null = favpollData?.created_by ?? null
 
     if (organizerUserId) {

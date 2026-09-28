@@ -38,7 +38,7 @@ export default async function KeepsakePage({ params }: Props) {
 
   const { data: poll } = await supabase
     .from("favpoll_polls")
-    .select("id, personal_note, topic_id, topics(title)")
+    .select("id, personal_note, topic_id, topics(title), topic_subsets(title)")
     .eq("favpoll_id", id)
     .maybeSingle()
 
@@ -158,7 +158,11 @@ export default async function KeepsakePage({ params }: Props) {
     name,
     context: isCause ? null : (protagonist?.context ?? null),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    topicTitle: (poll.topics as any)?.title ?? "favourites",
+    // The subset's name when the poll has one (favpoll-topic-rules §1).
+    topicTitle:
+      (poll.topic_subsets as any)?.title ??
+      (poll.topics as any)?.title ??
+      "favourites",
     reveal: poll.personal_note,
     totalRaised: pollTotal,
     goalAmount: favpoll.goal_amount ?? null,

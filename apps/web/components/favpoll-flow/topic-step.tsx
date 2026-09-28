@@ -48,7 +48,8 @@ export function TopicStep({
   )
 
   const activeTopics = topics.filter((t) => t.is_active !== false)
-  const selectedId = value[0]?.topicId ?? null
+  // A subset entry's id is the subset's; a topic entry's is the topic's.
+  const selectedId = value[0]?.subsetId ?? value[0]?.topicId ?? null
   const isCustomSelected = value[0]?.isCustom ?? false
 
   // Inject any custom-created topic into the display list, sorted alphabetically
@@ -89,9 +90,14 @@ export function TopicStep({
     }
     const t = activeTopics.find((t) => t.id === id)
     if (!t) return
+    // A SUBSET (favpoll-topic-rules §1): the parent is the topic, the
+    // subset sits beside it; the name is the subset's, the items its
+    // members.
     onChange([
       {
-        topicId: t.id,
+        topicId: t.subset_of?.topic_id ?? t.id,
+        subsetId: t.subset_of ? t.id : null,
+        subsetOf: t.subset_of?.title ?? null,
         title: t.title,
         isCustom: false,
         items: t.favourites.map((i) => ({ id: i.id, label: i.label })),
@@ -191,6 +197,13 @@ export function TopicStep({
                 onClick={() => handleSelect(t.id)}
               >
                 {shortTopicLabel(t.title)}
+                {/* Flat in the list, with the marker (ruling 3): the
+                    organiser sees the corner and the shelf it belongs to. */}
+                {t.subset_of && (
+                  <span className="ml-1.5 text-xs font-normal opacity-60">
+                    of {shortTopicLabel(t.subset_of.title)}
+                  </span>
+                )}
               </Chip>
             ))}
           </div>
