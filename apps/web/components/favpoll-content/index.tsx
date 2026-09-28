@@ -259,9 +259,16 @@ export function FavpollContent({
         ]
       : []),
   ]
+  // The favourites come from the FULL list (the picker's), not the
+  // standings' — those are filtered to pledged items, and a note names
+  // its favourite before anyone has pledged (founder, 2026-09-28: "no
+  // noticeable changes!!!" on a favpoll with no pledges yet).
   const noteMentions: MentionTarget[] = [
     ...aboutMentions,
-    ...effectiveItems.map((i) => ({ kind: "item" as const, label: i.label })),
+    ...(pickerPoll?.topics.favourites ?? effectiveItems).map((i) => ({
+      kind: "item" as const,
+      label: i.label,
+    })),
   ]
 
   const left = (
