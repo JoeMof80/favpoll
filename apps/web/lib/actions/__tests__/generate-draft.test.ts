@@ -158,7 +158,7 @@ describe("buildCacheKey", () => {
       "charity-1"
     )
     expect(key).toBe(
-      "v6:celebrating_one:topic-1:charity-1:someone:none:individual:none:none"
+      "v7:celebrating_one:topic-1:charity-1:someone:none:individual:none:none"
     )
   })
 
@@ -171,23 +171,23 @@ describe("buildCacheKey", () => {
       "he"
     )
     expect(key).toBe(
-      "v6:celebrating_one:topic-1:none:someone:he:individual:none:none"
+      "v7:celebrating_one:topic-1:none:someone:he:individual:none:none"
     )
   })
 
   it("uses charity id when subject is cause", () => {
     const key = buildCacheKey("cause", "topic-1", "cause", "charity-1")
-    expect(key).toBe("v6:cause:topic-1:charity-1:cause:none:none:none:none")
+    expect(key).toBe("v7:cause:topic-1:charity-1:cause:none:none:none:none")
   })
 
   it("falls back to 'none' when cause has no charity", () => {
     const key = buildCacheKey("cause", "topic-1", "cause", null)
-    expect(key).toBe("v6:cause:topic-1:none:cause:none:none:none:none")
+    expect(key).toBe("v7:cause:topic-1:none:cause:none:none:none:none")
   })
 
   it("ignores pronoun for cause favpolls", () => {
     const key = buildCacheKey("cause", "topic-1", "cause", "charity-1", "she")
-    expect(key).toBe("v6:cause:topic-1:charity-1:cause:none:none:none:none")
+    expect(key).toBe("v7:cause:topic-1:charity-1:cause:none:none:none:none")
   })
 })
 
@@ -306,7 +306,7 @@ describe("generateDraft — cache miss, person", () => {
     expect(insertCall?.args[0]).toMatchObject({
       subject: "someone",
       cache_key:
-        "v6:cause:topic-1:charity-1:someone:none:individual:fundraiser:none",
+        "v7:cause:topic-1:charity-1:someone:none:individual:fundraiser:none",
     })
   })
 
@@ -363,7 +363,7 @@ describe("generateDraft — cache miss, cause", () => {
     expect(insertCall?.args[0]).toMatchObject({
       primary_charity_id: "charity-1",
       subject: "cause",
-      cache_key: "v6:cause:topic-1:charity-1:cause:none:none:fundraiser:none",
+      cache_key: "v7:cause:topic-1:charity-1:cause:none:none:fundraiser:none",
     })
   })
 
@@ -822,7 +822,7 @@ describe("buildCacheKey — occasion segment (v6)", () => {
       "Milestone birthday"
     )
     expect(key).toMatch(
-      /^v6:celebrating_one:topic-1:charity-1:someone:he:individual:milestone-birthday:[0-9a-z]+$/
+      /^v7:celebrating_one:topic-1:charity-1:someone:he:individual:milestone-birthday:[0-9a-z]+$/
     )
   })
 })
