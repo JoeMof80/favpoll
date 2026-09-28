@@ -1,3 +1,4 @@
+import { pollTitle } from "@/lib/poll-title"
 import { RegisterScope } from "@/components/register-scope"
 import { PageGround } from "@/components/page-ground"
 import { paletteForRegister } from "@/lib/register-palette"
@@ -157,11 +158,9 @@ export default async function KeepsakePage({ params }: Props) {
     prefix,
     name,
     context: isCause ? null : (protagonist?.context ?? null),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     // The subset's name when the poll has one (favpoll-topic-rules §1).
     topicTitle:
-      (poll.topic_subsets as any)?.title ??
-      (poll.topics as any)?.title ??
+      pollTitle(poll as unknown as Parameters<typeof pollTitle>[0]) ??
       "favourites",
     reveal: poll.personal_note,
     totalRaised: pollTotal,

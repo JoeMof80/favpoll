@@ -1,5 +1,6 @@
 "use server"
 
+import { pollTitle } from "@/lib/poll-title"
 import { auth } from "@clerk/nextjs/server"
 import { headers } from "next/headers"
 import {
@@ -463,10 +464,12 @@ export async function addGuestItem(
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- nested join shape
     const favpollData = pollData?.favpolls as any
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- nested join shape
     // The subset's name when the poll has one (favpoll-topic-rules §1).
-    const topicData = ((pollData as any)?.topic_subsets ??
-      pollData?.topics) as any
+    const topicData = {
+      title: pollTitle(
+        (pollData ?? {}) as unknown as Parameters<typeof pollTitle>[0]
+      ),
+    }
     const organizerUserId: string | null = favpollData?.created_by ?? null
 
     if (organizerUserId) {
