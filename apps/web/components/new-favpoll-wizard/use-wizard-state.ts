@@ -241,9 +241,14 @@ export function useWizardState(
   const customLabels = topics[0]?.customLabels ?? []
   const customItemCount = topics[0]?.isCustom ? customLabels.length : null
 
+  // A picked SUBSET is its own entry (favpoll-topic-rules §1): the items
+  // dialog and the card list its members, not the parent's whole list
+  // (founder, 2026-09-28: "these aren't exclusively farm animals").
   const selectedTopic =
     topics[0] && !topics[0].isCustom
-      ? (data.topics.find((t) => t.id === topics[0].topicId) ?? null)
+      ? (data.topics.find(
+          (t) => t.id === (topics[0].subsetId ?? topics[0].topicId)
+        ) ?? null)
       : null
 
   const sortedExistingItems = selectedTopic
