@@ -417,6 +417,7 @@ export function NewFavpollWizard({
             if (!o) setTopicSearch("")
           }}
           title="Pick a topic"
+          dialogStyle={{ minHeight: "min(600px, 80vh)" }}
           hideCloseButton
           hideMobileTitleBar
           separators
@@ -494,6 +495,10 @@ export function NewFavpollWizard({
           title="Pick a charity"
           hideCloseButton
           hideMobileTitleBar
+          // A floor equal to the cap (founder, 2026-09-29): the dialog
+          // shrank to a short result list mid-search and the Cancel bar
+          // jumped. Desktop only; mobile is fullscreen.
+          dialogStyle={{ minHeight: "min(600px, 80vh)" }}
           headerClassName="px-5 pt-4 pb-3"
           bodyClassName="p-0"
           fullscreenOnMobile
