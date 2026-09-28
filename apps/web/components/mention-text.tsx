@@ -36,6 +36,10 @@ export function MentionText({ text, mentions = [], quiet, className }: Props) {
             : s.target.kind === "topic" && s.target.id
               ? `/topics/${s.target.id}`
               : null
+        // A topic mention shows the topic's name as it stands on the card
+        // (founder, 2026-09-28: prose saved as "asmr sound" reads "ASMR
+        // sound"); a charity or item matched exactly, so the text stands.
+        const shown = s.target.kind === "topic" ? s.target.label : s.text
         return href ? (
           <Link
             key={i}
@@ -43,11 +47,11 @@ export function MentionText({ text, mentions = [], quiet, className }: Props) {
             className={cn(ink, "hover:bg-primary/15")}
             data-mention={s.target.kind}
           >
-            {s.text}
+            {shown}
           </Link>
         ) : (
           <span key={i} className={ink} data-mention={s.target.kind}>
-            {s.text}
+            {shown}
           </span>
         )
       })}

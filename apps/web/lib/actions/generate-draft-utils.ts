@@ -131,6 +131,8 @@ export function buildCacheKey(
   grouping?: string | null,
   occasionType?: string | null
 ): string {
+  // v7 (2026-09-28): the topic keeps its title case in the closing sentence;
+  // every earlier draft carries a lowercased topic and retires.
   // v3: charity ALWAYS keys the cache (the About names it) and the display
   // name is hashed in — the model's is-this-actually-a-person judgement
   // depends on the name, so drafts must not be shared across names. The
@@ -157,5 +159,5 @@ export function buildCacheKey(
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
     : "none"
-  return `v6:${register}:${topicId}:${charityPart}:${subject}:${pronounPart}:${groupPart}:${occasionPart}:${namePart}`
+  return `v7:${register}:${topicId}:${charityPart}:${subject}:${pronounPart}:${groupPart}:${occasionPart}:${namePart}`
 }
