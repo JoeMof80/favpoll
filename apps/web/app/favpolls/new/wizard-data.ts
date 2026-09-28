@@ -28,6 +28,9 @@ export async function getWizardData(): Promise<{
       .from("topics")
       .select("*, favourites(*), topic_categories(category_id)")
       .eq("is_active", true)
+      // A homemade topic promoted to a subset leaves the picker (ruling
+      // 8) but stays active for the favpoll that made it.
+      .eq("is_listed", true)
       .order("title"),
     supabase.from("categories").select("*").order("label"),
     supabase.from("charity_topics").select("charity_id, topic_id"),
