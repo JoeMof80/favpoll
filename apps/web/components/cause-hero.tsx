@@ -1,5 +1,7 @@
 "use client"
 
+import { MentionText } from "@/components/mention-text"
+import type { MentionTarget } from "@/lib/mentions"
 import { HeroLayout } from "./hero-layout"
 import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
 import { getFavpollHeadline, heroNameSizeClass } from "@/lib/display"
@@ -8,6 +10,8 @@ import type { Favpoll } from "@favpoll/types"
 
 type Props = {
   favpoll: Favpoll
+  /** The charity and the topic, lit in the About (lib/mentions). */
+  mentions?: MentionTarget[]
 }
 
 // Hero for subject='cause' — no protagonist row, so the optional image and
@@ -16,7 +20,7 @@ type Props = {
 // padding, sticky header, and scroll-shrink behaviour can never drift
 // between the two (they did: this component used to hand-roll its layout
 // and sat ~72px higher than person pages, found 2026-07-13).
-export function CauseHero({ favpoll }: Props) {
+export function CauseHero({ favpoll, mentions }: Props) {
   const headline = getFavpollHeadline({
     occasionType: favpoll.occasion_type,
     openingLine: favpoll.opening_line,
@@ -60,7 +64,7 @@ export function CauseHero({ favpoll }: Props) {
 
   const about = favpoll.description ? (
     <p className="text-sm leading-relaxed wrap-break-word text-muted-foreground/80 md:text-base">
-      {favpoll.description}
+      <MentionText text={favpoll.description} mentions={mentions} />
     </p>
   ) : undefined
 

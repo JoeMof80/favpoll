@@ -5,12 +5,16 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
 import { getFavpollHeadline, heroNameSizeClass } from "@/lib/display"
 import type { Favpoll, Protagonist } from "@favpoll/types"
+import { MentionText } from "@/components/mention-text"
+import type { MentionTarget } from "@/lib/mentions"
 
 type BaseFavpollHeroProps = {
   favpoll: Favpoll
   protagonist: Protagonist
   hideAvatar?: boolean
   aboutPlaceholder?: string
+  /** The charity and the topic, lit in the About (lib/mentions). */
+  mentions?: MentionTarget[]
 }
 
 export function BaseFavpollHero({
@@ -18,6 +22,7 @@ export function BaseFavpollHero({
   protagonist,
   hideAvatar,
   aboutPlaceholder,
+  mentions,
 }: BaseFavpollHeroProps) {
   const headline = getFavpollHeadline({
     occasionType: favpoll.occasion_type ?? null,
@@ -69,7 +74,11 @@ export function BaseFavpollHero({
   const about =
     protagonist.about || aboutPlaceholder ? (
       <p className="text-sm leading-relaxed wrap-break-word text-muted-foreground/80 md:text-base">
-        {protagonist.about || aboutPlaceholder}
+        {protagonist.about ? (
+          <MentionText text={protagonist.about} mentions={mentions} />
+        ) : (
+          aboutPlaceholder
+        )}
       </p>
     ) : undefined
 

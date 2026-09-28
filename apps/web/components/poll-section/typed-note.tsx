@@ -2,17 +2,25 @@
 
 import { useEffect, useState } from "react"
 import { PollNote } from "@/components/favpoll-card/poll-note"
+import { MentionText } from "@/components/mention-text"
+import type { MentionTarget } from "@/lib/mentions"
 
 type Props = {
   text: string
   active: boolean
   protagonistFirstName: string
+  mentions?: MentionTarget[]
 }
 
 // Rough total duration regardless of reveal length (mirrors the demo panel).
 const TARGET_MS = 1900
 
-export function TypedNote({ text, active, protagonistFirstName }: Props) {
+export function TypedNote({
+  text,
+  active,
+  protagonistFirstName,
+  mentions,
+}: Props) {
   const reduced =
     typeof window !== "undefined" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches
@@ -46,6 +54,7 @@ export function TypedNote({ text, active, protagonistFirstName }: Props) {
       <PollNote
         personalNote={text}
         protagonistFirstName={protagonistFirstName}
+        mentions={mentions}
         role="status"
         aria-live="polite"
       />
@@ -65,7 +74,7 @@ export function TypedNote({ text, active, protagonistFirstName }: Props) {
         className="absolute inset-0 border-l-[2.5px] border-primary-muted pl-3 text-[18px] leading-relaxed font-normal text-muted-foreground italic"
         aria-hidden="true"
       >
-        {shown || " "}
+        {shown ? <MentionText text={shown} mentions={mentions} quiet /> : " "}
       </blockquote>
       {/* Reserves the final height so the quote border spans it from the
           first keystroke and typing never pushes the layout below. Placed
