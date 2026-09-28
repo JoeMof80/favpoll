@@ -501,9 +501,26 @@ describe("setPerfectTopic", () => {
     const update = mock
       .callsFor("charities")
       .find((c) => c.method === "update");
-    expect(update?.args[0]).toEqual({ perfect_topic_id: "topic-9" });
+    expect(update?.args[0]).toEqual({
+      perfect_topic_id: "topic-9",
+      perfect_subset_id: null,
+    });
     mock.queue(null);
     expect((await setPerfectTopic("charity-1", null)).error).toBeNull();
+  });
+
+  it("writes the subset beside the topic, and never without one", async () => {
+    mock.queue(null);
+    await setPerfectTopic("charity-1", "topic-9", "subset-3");
+    expect(
+      mock.callsFor("charities").find((c) => c.method === "update")?.args[0],
+    ).toEqual({ perfect_topic_id: "topic-9", perfect_subset_id: "subset-3" });
+    mock = makeSupabaseMock();
+    mock.queue(null);
+    await setPerfectTopic("charity-1", null, "subset-3");
+    expect(
+      mock.callsFor("charities").find((c) => c.method === "update")?.args[0],
+    ).toEqual({ perfect_topic_id: null, perfect_subset_id: null });
   });
 });
 

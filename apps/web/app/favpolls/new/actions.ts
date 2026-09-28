@@ -448,7 +448,9 @@ export async function findOrCreateRegisterCharity(input: {
     purposeFromMirror(number),
     supabase
       .from("topics")
-      .select("id, title, is_finite, favourites(label, is_canonical)")
+      .select(
+        "id, title, is_finite, favourites(label, is_canonical), topic_subsets(id, title, status, is_active, topic_subset_items(favourites(label)))"
+      )
       .eq("is_active", true),
   ])
   // Both SUGGESTIONS only — the admin confirms them in the outreach queue.
@@ -500,6 +502,7 @@ export async function findOrCreateRegisterCharity(input: {
       grant_making: purpose.grantMaking,
       cause_family_suggested: causeFamilySuggested,
       perfect_topic_suggested_id: perfectTopic?.topicId ?? null,
+      perfect_subset_suggested_id: perfectTopic?.subsetId ?? null,
       perfect_topic_reason: perfectTopic?.reason ?? null,
       perfect_topic_items: perfectTopic?.items.length
         ? perfectTopic.items

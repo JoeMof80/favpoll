@@ -160,14 +160,37 @@ function PerfectTopicSelect({
   const [value, setValue] = useState<string>(
     row.perfect_topic_id ?? row.perfect_topic_suggested_id ?? "",
   );
+  // The SUBSET beside the topic (favpoll-topic-rules §1): the suggester's
+  // pre-selects; "Whole list" is a real answer.
+  const [subsetValue, setSubsetValue] = useState<string>(
+    row.perfect_subset_id ?? row.perfect_subset_suggested_id ?? "",
+  );
   const confirmed = row.perfect_topic_id != null;
-  const suggested = !confirmed && row.perfect_topic_suggested_id != null;
+  const suggested =
+    (!confirmed && row.perfect_topic_suggested_id != null) ||
+    (confirmed &&
+      row.perfect_subset_id == null &&
+      row.perfect_subset_suggested_id != null);
+  const subsetsOf = topics.find((t) => t.id === value)?.subsets ?? [];
 
+  function write(topicId: string, subsetId: string) {
+    startTransition(async () => {
+      await setPerfectTopic(
+        row.id,
+        topicId === "" ? null : topicId,
+        subsetId === "" ? null : subsetId,
+      );
+    });
+  }
   function handleChange(next: string) {
     setValue(next);
-    startTransition(async () => {
-      await setPerfectTopic(row.id, next === "" ? null : next);
-    });
+    // A new topic means a new list: the subset resets to the whole list.
+    setSubsetValue("");
+    write(next, "");
+  }
+  function handleSubsetChange(next: string) {
+    setSubsetValue(next);
+    write(value, next);
   }
 
   return (
@@ -187,6 +210,22 @@ function PerfectTopicSelect({
             </option>
           ))}
         </select>
+        {subsetsOf.length > 0 && (
+          <select
+            value={subsetValue}
+            disabled={isPending}
+            onChange={(e) => handleSubsetChange(e.target.value)}
+            aria-label="Subset"
+            className="h-8 rounded-lg border border-border bg-background px-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+          >
+            <option value="">Whole list</option>
+            {subsetsOf.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.title}
+              </option>
+            ))}
+          </select>
+        )}
         {suggested && (
           <>
             <StatusBadge tone="info">suggested</StatusBadge>
@@ -198,7 +237,7 @@ function PerfectTopicSelect({
               size="sm"
               variant="outline"
               disabled={isPending || value === ""}
-              onClick={() => handleChange(value)}
+              onClick={() => write(value, subsetValue)}
             >
               Confirm
             </Button>

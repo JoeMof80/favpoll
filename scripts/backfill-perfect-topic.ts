@@ -28,7 +28,9 @@ const ALL = process.argv.includes("--all");
 async function main() {
   const { data: topics, error: tErr } = await supabase
     .from("topics")
-    .select("id, title, is_finite, favourites(label, is_canonical)")
+    .select(
+      "id, title, is_finite, favourites(label, is_canonical), topic_subsets(id, title, status, is_active, topic_subset_items(favourites(label)))",
+    )
     .eq("is_active", true);
   if (tErr) throw new Error(tErr.message);
   const catalogue = catalogueForSuggestion(topics ?? []);
@@ -67,6 +69,7 @@ async function main() {
       .from("charities")
       .update({
         perfect_topic_suggested_id: s.topicId,
+        perfect_subset_suggested_id: s.subsetId,
         perfect_topic_reason: s.reason,
         perfect_topic_items: s.items.length ? s.items : null,
       })
@@ -74,9 +77,10 @@ async function main() {
     if (uErr) console.error(`  ✗ ${c.name}: ${uErr.message}`);
     else {
       n++;
-      const title = catalogue.find((t) => t.id === s.topicId)?.title;
+      const topic = catalogue.find((t) => t.id === s.topicId);
+      const subset = topic?.subsets?.find((x) => x.id === s.subsetId)?.title;
       console.log(
-        `  ✓ ${c.name}: ${title ?? "none"}${s.items.length ? ` [${s.items.join(", ")}]` : ""} — ${s.reason}`,
+        `  ✓ ${c.name}: ${topic?.title ?? "none"}${subset ? ` › ${subset}` : ""}${s.items.length ? ` [${s.items.join(", ")}]` : ""} — ${s.reason}`,
       );
     }
   }

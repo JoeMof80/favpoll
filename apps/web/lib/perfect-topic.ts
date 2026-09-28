@@ -208,13 +208,17 @@ export function catalogueForSuggestion(
     // shows the first few.
     items: (t.favourites ?? []).map((f) => f.label),
     subsets: (t.topic_subsets ?? [])
-      .filter((s) => (s.status ?? "approved") === "approved" && s.is_active !== false)
+      .filter(
+        (s) => (s.status ?? "approved") === "approved" && s.is_active !== false
+      )
       .map((s) => ({
         id: s.id,
         title: s.title,
         items: (s.topic_subset_items ?? [])
           .map((i) =>
-            Array.isArray(i.favourites) ? i.favourites[0]?.label : i.favourites?.label
+            Array.isArray(i.favourites)
+              ? i.favourites[0]?.label
+              : i.favourites?.label
           )
           .filter((l): l is string => Boolean(l)),
       })),

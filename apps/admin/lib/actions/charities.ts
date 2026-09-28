@@ -351,6 +351,11 @@ export type ConsentQueueRow = {
   perfect_topic_suggested_id: string | null;
   perfect_topic_reason: string | null;
   perfect_topic_title: string | null;
+  /** A SUBSET of the perfect topic (favpoll-topic-rules §1): confirmed
+   *  id, the suggester's, and the confirmed subset's title. */
+  perfect_subset_id: string | null;
+  perfect_subset_suggested_id: string | null;
+  perfect_subset_title: string | null;
   /** The subset: the charity's own corner of the topic's items, by label. */
   perfect_topic_items: string[] | null;
   /** The fundraising events read from its website (2026-09-27). */
@@ -382,7 +387,7 @@ export async function getConsentQueue(): Promise<{
   const { data, error } = await supabase
     .from("charities")
     .select(
-      "id, name, registered_number, registered_email, consent_contacted_at, cause_family, cause_family_suggested, activities, perfect_topic_id, perfect_topic_suggested_id, perfect_topic_reason, perfect_topic_items, signature_events, registered_website, perfect_topic:topics!charities_perfect_topic_id_fkey(title)",
+      "id, name, registered_number, registered_email, consent_contacted_at, cause_family, cause_family_suggested, activities, perfect_topic_id, perfect_topic_suggested_id, perfect_topic_reason, perfect_topic_items, perfect_subset_id, perfect_subset_suggested_id, signature_events, registered_website, perfect_topic:topics!charities_perfect_topic_id_fkey(title), perfect_subset:topic_subsets!charities_perfect_subset_id_fkey(title)",
     )
     .eq("consent_status", "pending")
     .in("id", [...counts.keys()])
@@ -391,16 +396,23 @@ export async function getConsentQueue(): Promise<{
 
   const rows = (data ?? [])
     .map((c) => {
-      const { perfect_topic, ...rest } = c as Omit<
+      const { perfect_topic, perfect_subset, ...rest } = c as Omit<
         ConsentQueueRow,
-        "favpoll_count" | "perfect_topic_title"
-      > & { perfect_topic?: { title: string } | { title: string }[] | null };
+        "favpoll_count" | "perfect_topic_title" | "perfect_subset_title"
+      > & {
+        perfect_topic?: { title: string } | { title: string }[] | null;
+        perfect_subset?: { title: string } | { title: string }[] | null;
+      };
       const pt = Array.isArray(perfect_topic)
         ? perfect_topic[0]
         : perfect_topic;
+      const ps = Array.isArray(perfect_subset)
+        ? perfect_subset[0]
+        : perfect_subset;
       return {
         ...rest,
         perfect_topic_title: pt?.title ?? null,
+        perfect_subset_title: ps?.title ?? null,
         favpoll_count: counts.get(rest.id) ?? 0,
       };
     })
@@ -457,11 +469,17 @@ export async function setCauseFamily(
 export async function setPerfectTopic(
   id: string,
   topicId: string | null,
+  subsetId: string | null = null,
 ): Promise<{ error: string | null }> {
   const supabase = createAdminClient();
+  // The subset must belong to the topic (a trigger enforces it); no topic
+  // means no subset.
   const { error } = await supabase
     .from("charities")
-    .update({ perfect_topic_id: topicId })
+    .update({
+      perfect_topic_id: topicId,
+      perfect_subset_id: topicId ? subsetId : null,
+    })
     .eq("id", id);
   if (error) return { error: error.message };
   revalidatePath("/charities");
