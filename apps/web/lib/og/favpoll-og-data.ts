@@ -8,7 +8,7 @@ export const FAVPOLL_OG_SELECT =
   "id, subject, cause_label, occasion_type, category, opening_line, is_private, is_listed, photo_url, closes_at, closed_at, " +
   "protagonists!favpolls_protagonist_id_fkey(name, photo_url), " +
   "favpoll_charities(charities(name)), " +
-  "favpoll_polls(topics(title))"
+  "favpoll_polls(topics(title), topic_subsets(title))"
 
 // The slice of a favpoll its share preview needs. Read by generateMetadata
 // on the favpoll page and by its opengraph-image route — two separate

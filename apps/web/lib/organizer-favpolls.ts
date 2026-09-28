@@ -53,6 +53,8 @@ export type RawOrganizerRow = {
     id: string
     personal_note: string | null
     topics: { title: string } | null
+    /** The subset's name leads (favpoll-topic-rules §1). */
+    topic_subsets?: { title: string } | null
     pledges: { count: number }[]
   } | null
   favpoll_pots: { total_deposited: number; total_allocated: number } | null
@@ -79,7 +81,11 @@ export function mapOrganizerFavpoll(ev: RawOrganizerRow): OrganizerFavpoll {
     protagonist: ev.protagonists ? { name: ev.protagonists.name } : null,
     charities: ev.favpoll_charities.map((ec) => ({ charity: ec.charities })),
     poll: ev.favpoll_polls
-      ? { id: ev.favpoll_polls.id, topic: ev.favpoll_polls.topics ?? null }
+      ? {
+          id: ev.favpoll_polls.id,
+          topic:
+            ev.favpoll_polls.topic_subsets ?? ev.favpoll_polls.topics ?? null,
+        }
       : null,
     pot: ev.favpoll_pots ?? null,
     pledge_count: ev.favpoll_polls?.pledges?.[0]?.count ?? 0,

@@ -1,3 +1,4 @@
+import { pollTitle } from "@/lib/poll-title"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { withLiveTotals } from "@/lib/live-totals"
 import { deriveRegister } from "@/lib/registers"
@@ -69,11 +70,13 @@ export async function fetchLiveFavpolls({
       favpoll_polls (
         id,
         topic_id,
+        subset_id,
         topics (
           title,
           is_finite,
           favourites ( id, label )
         ),
+        topic_subsets ( title ),
         favpoll_poll_favourites (
           favourites ( id, label )
         )
@@ -92,6 +95,8 @@ export async function fetchLiveFavpolls({
   type RawPoll = {
     id: string
     topic_id: string | null
+    subset_id?: string | null
+    topic_subsets?: { title: string } | { title: string }[] | null
     topics: {
       title: string
       is_finite: boolean
@@ -132,16 +137,18 @@ export async function fetchLiveFavpolls({
     } | null = null
     if (rawPoll) {
       const isFinite = rawPoll.topics?.is_finite ?? false
-      const favourites = isFinite
-        ? (rawPoll.topics?.favourites ?? [])
-        : (rawPoll.favpoll_poll_favourites ?? [])
-            .map((epf) => epf.favourites)
-            .filter(Boolean)
+      // A subset poll carries its rows whatever the parent's openness.
+      const favourites =
+        isFinite && !rawPoll.subset_id
+          ? (rawPoll.topics?.favourites ?? [])
+          : (rawPoll.favpoll_poll_favourites ?? [])
+              .map((epf) => epf.favourites)
+              .filter(Boolean)
       poll = {
         id: rawPoll.id,
         topic_id: rawPoll.topic_id,
         topic: rawPoll.topics
-          ? { title: rawPoll.topics.title, favourites }
+          ? { title: pollTitle(rawPoll) ?? rawPoll.topics.title, favourites }
           : null,
       }
     }

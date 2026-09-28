@@ -28,6 +28,9 @@ type InfiniteItems = {
 
 type PollInput = {
   topicId: string | null
+  /** A SUBSET of the topic (favpoll-topic-rules §1): stored beside it;
+   *  its members become the poll's rows whatever the parent's openness. */
+  subsetId?: string | null
   customTopic: CustomTopic | null
   note: string | null
   infiniteItems: InfiniteItems | null
@@ -159,11 +162,13 @@ async function createPollForFavpoll(
 
   if (!topicId) return
 
+  const subsetId = poll.customTopic ? null : (poll.subsetId ?? null)
   const { data: favpollPoll, error: pollErr } = await supabase
     .from("favpoll_polls")
     .insert({
       favpoll_id: favpollId,
       topic_id: topicId,
+      subset_id: subsetId,
       personal_note: poll.note?.trim() || null,
     })
     .select("id")
@@ -171,6 +176,14 @@ async function createPollForFavpoll(
 
   if (pollErr || !favpollPoll)
     throw new Error(`Failed to create poll: ${pollErr?.message}`)
+
+  // A SUBSET on a finite parent: the closed list is the subset's members,
+  // written as the poll's rows (an open parent's members arrive through
+  // infiniteItems below, already narrowed by the wizard). Read from the
+  // join, never from the client, so the list is the admin's.
+  if (subsetId && !poll.infiniteItems) {
+    await insertSubsetMembers(supabase, favpollPoll.id, subsetId, userId)
+  }
 
   if (customItemIds.length > 0) {
     await supabase.from("favpoll_poll_favourites").insert(
@@ -243,6 +256,29 @@ async function createPollForFavpoll(
       )
     }
   }
+}
+
+/** The subset's members, as the poll's rows (favpoll-topic-rules §1). */
+export async function insertSubsetMembers(
+  supabase: ReturnType<typeof createAdminClient>,
+  favpollPollId: string,
+  subsetId: string,
+  userId: string
+) {
+  const { data: members } = await supabase
+    .from("topic_subset_items")
+    .select("favourite_id")
+    .eq("subset_id", subsetId)
+  const ids = (members ?? []).map((m) => m.favourite_id as string)
+  if (ids.length === 0) return
+  await supabase.from("favpoll_poll_favourites").insert(
+    ids.map((favourite_id) => ({
+      favpoll_poll_id: favpollPollId,
+      favourite_id,
+      is_guest_added: false,
+      added_by: userId,
+    }))
+  )
 }
 
 export async function createFavpoll(

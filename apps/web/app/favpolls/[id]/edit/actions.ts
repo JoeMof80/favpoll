@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { favpollLocks, readLockInputs } from "@/lib/favpoll-locks"
 import type { CanvasSubmitData } from "@favpoll/types"
+import { insertSubsetMembers } from "@/app/favpolls/new/actions"
 
 type PollInput = CanvasSubmitData["poll"]
 
@@ -17,19 +18,34 @@ async function upsertPollForFavpoll(
     // Check if the topic has changed before touching items
     const { data: currentPoll } = await supabase
       .from("favpoll_polls")
-      .select("topic_id")
+      .select("topic_id, subset_id")
       .eq("id", poll.id)
       .single()
 
-    const topicChanged = currentPoll?.topic_id !== poll.topicId
+    const subsetId = poll.topicIsCustom ? null : (poll.subsetId ?? null)
+    // A changed subset is a changed list (favpoll-topic-rules §1).
+    const topicChanged =
+      currentPoll?.topic_id !== poll.topicId ||
+      (currentPoll?.subset_id ?? null) !== subsetId
 
     await supabase
       .from("favpoll_polls")
       .update({
         topic_id: poll.topicId,
+        subset_id: subsetId,
         personal_note: poll.note?.trim() || null,
       })
       .eq("id", poll.id)
+
+    // A subset on a finite parent: its members are the closed list.
+    if (topicChanged && subsetId && !poll.infiniteItems) {
+      await supabase
+        .from("favpoll_poll_favourites")
+        .delete()
+        .eq("favpoll_poll_id", poll.id)
+        .eq("is_guest_added", false)
+      await insertSubsetMembers(supabase, poll.id, subsetId, userId)
+    }
 
     // Only delete and re-insert items if the topic changed
     if (topicChanged && poll.infiniteItems) {
@@ -113,11 +129,13 @@ async function upsertPollForFavpoll(
 
   if (!topicId) return
 
+  const newSubsetId = poll.topicIsCustom ? null : (poll.subsetId ?? null)
   const { data: favpollPoll, error: pollErr } = await supabase
     .from("favpoll_polls")
     .insert({
       favpoll_id: favpollId,
       topic_id: topicId,
+      subset_id: newSubsetId,
       personal_note: poll.note?.trim() || null,
     })
     .select("id")
@@ -125,6 +143,10 @@ async function upsertPollForFavpoll(
 
   if (pollErr || !favpollPoll)
     throw new Error(`Failed to create poll: ${pollErr?.message}`)
+
+  if (newSubsetId && !poll.infiniteItems) {
+    await insertSubsetMembers(supabase, favpollPoll.id, newSubsetId, userId)
+  }
 
   if (customItemIds.length > 0) {
     await supabase.from("favpoll_poll_favourites").insert(

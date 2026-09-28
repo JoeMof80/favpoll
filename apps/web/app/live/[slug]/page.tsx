@@ -39,7 +39,7 @@ export default async function LiveDisplayPage({ params }: Props) {
 
   const { data: rawPoll } = await supabase
     .from("favpoll_polls")
-    .select("*, topics(id, title, is_finite)")
+    .select("*, topics(id, title, is_finite), topic_subsets(title)")
     .eq("favpoll_id", id)
     .maybeSingle()
 
@@ -60,6 +60,7 @@ export default async function LiveDisplayPage({ params }: Props) {
           isFinite:
             (rawPoll.topics as { is_finite?: boolean } | null)?.is_finite ??
             false,
+          subsetId: (rawPoll as { subset_id?: string | null }).subset_id,
         })
       : Promise.resolve([] as Favourite[]),
     // Total raised — paginated (the telethon figure is money; the silent
@@ -167,7 +168,9 @@ export default async function LiveDisplayPage({ params }: Props) {
           id:
             (rawPoll.topics as { id: string; title: string } | null)?.id ??
             rawPoll.topic_id,
+          // The subset's name on the room screen (favpoll-topic-rules §1).
           title:
+            (rawPoll.topic_subsets as { title: string } | null)?.title ??
             (rawPoll.topics as { id: string; title: string } | null)?.title ??
             "",
         },

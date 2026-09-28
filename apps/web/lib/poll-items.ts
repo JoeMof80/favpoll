@@ -9,6 +9,9 @@ import type { Favourite } from "@favpoll/types"
 //     no favpoll_poll_favourites rows)
 //   - an INFINITE topic's items are its curated favpoll_poll_favourites
 //     rows (hidden rows excluded on public surfaces)
+//   - a SUBSET poll (favpoll-topic-rules §1) always carries its rows — the
+//     subset's members — whatever the parent's openness, so it reads like
+//     an infinite one
 //
 // New surfaces should call this rather than re-implementing the branch;
 // the existing forks migrate here as they're touched.
@@ -20,15 +23,23 @@ type FetchPollItemsInput = {
   pollId: string
   topicId: string
   isFinite: boolean
+  /** The poll's subset, when it was made with one: its rows are the list. */
+  subsetId?: string | null
   /** Organiser surfaces may include hidden items; public surfaces must not */
   includeHidden?: boolean
 }
 
 export async function fetchPollItems(
   supabase: Client,
-  { pollId, topicId, isFinite, includeHidden = false }: FetchPollItemsInput
+  {
+    pollId,
+    topicId,
+    isFinite,
+    subsetId = null,
+    includeHidden = false,
+  }: FetchPollItemsInput
 ): Promise<Favourite[]> {
-  if (isFinite) {
+  if (isFinite && !subsetId) {
     const { data } = await supabase
       .from("favourites")
       .select("*")

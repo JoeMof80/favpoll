@@ -67,7 +67,7 @@ export default async function AppealPage({
        closes_at, closed_at, total_raised,
        protagonist:protagonists!favpolls_protagonist_id_fkey ( name, photo_url ),
        favpoll_charities ( charity:charities ( id, name, logo_url, registered_number ) ),
-       favpoll_polls ( id, topics ( title ) )`
+       favpoll_polls ( id, topics ( title ), topic_subsets ( title ) )`
     )
     .eq("appeal_id", appeal.id)
 
@@ -95,8 +95,10 @@ export default async function AppealPage({
           // charity-shelf lesson, 2026-09-06).
           topic:
             (Array.isArray(f.favpoll_polls)
-              ? f.favpoll_polls[0]?.topics
-              : f.favpoll_polls?.topics) ?? null,
+              ? (f.favpoll_polls[0]?.topic_subsets ??
+                f.favpoll_polls[0]?.topics)
+              : (f.favpoll_polls?.topic_subsets ?? f.favpoll_polls?.topics)) ??
+            null,
         },
       }
     })

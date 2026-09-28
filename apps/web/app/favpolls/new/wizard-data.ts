@@ -21,6 +21,7 @@ export async function getWizardData(): Promise<{
     { data: topicsAll },
     { data: categories },
     { data: charityTopicsRows },
+    { data: subsetsAll },
   ] = await Promise.all([
     supabase.from("charities").select("*").eq("is_active", true).order("name"),
     supabase
@@ -30,15 +31,47 @@ export async function getWizardData(): Promise<{
       .order("title"),
     supabase.from("categories").select("*").order("label"),
     supabase.from("charity_topics").select("charity_id, topic_id"),
+    // SUBSETS (favpoll-topic-rules §1, ruling 3): approved, listed, flat
+    // in the picker beside their parent with an "of Animal" marker.
+    supabase
+      .from("topic_subsets")
+      .select("id, topic_id, title, topic_subset_items(favourite_id)")
+      .eq("status", "approved")
+      .eq("is_active", true)
+      .order("title"),
   ])
 
-  const topics: TopicWithMeta[] = (topicsAll ?? []).map((t) => ({
+  const parentTopics: TopicWithMeta[] = (topicsAll ?? []).map((t) => ({
     ...(t as Topic),
     favourites: (t.favourites ?? []) as Favourite[],
     category_ids: (t.topic_categories ?? []).map(
       (tc: { category_id: string }) => tc.category_id
     ),
   }))
+  const byId = new Map(parentTopics.map((t) => [t.id, t]))
+  // A subset is a picker entry of its own: the parent's openness,
+  // categories and placeholders; its own name and members.
+  const subsetTopics: TopicWithMeta[] = (subsetsAll ?? []).flatMap((s) => {
+    const parent = byId.get(s.topic_id)
+    if (!parent) return []
+    const memberIds = new Set(
+      (s.topic_subset_items ?? []).map(
+        (i: { favourite_id: string }) => i.favourite_id
+      )
+    )
+    return [
+      {
+        ...parent,
+        id: s.id,
+        title: s.title,
+        favourites: parent.favourites.filter((f) => memberIds.has(f.id)),
+        subset_of: { topic_id: parent.id, title: parent.title },
+      },
+    ]
+  })
+  const topics = [...parentTopics, ...subsetTopics].sort((a, b) =>
+    a.title.localeCompare(b.title)
+  )
 
   const suggestedTopicIds: Record<string, string[]> = {}
   // The charity's own confirmed PERFECT TOPIC leads its suggestions

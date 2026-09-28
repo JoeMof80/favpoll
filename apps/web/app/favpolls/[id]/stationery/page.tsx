@@ -24,6 +24,7 @@ export default async function PackPage({ params }: Props) {
        favpoll_polls (
          personal_note,
          topics ( title, favourites ( label ) ),
+         topic_subsets ( title ),
          favpoll_poll_favourites ( favourites ( label ) )
        ),
        favpoll_charities ( charities ( name ) )`
@@ -54,7 +55,8 @@ export default async function PackPage({ params }: Props) {
     prefix,
     name,
     isCause,
-    topicTitle: firstPoll?.topics?.title ?? null,
+    topicTitle:
+      firstPoll?.topic_subsets?.title ?? firstPoll?.topics?.title ?? null,
     // One content-free bit: the pack's step 3 promises the personal note
     // when one exists (2026-09-17 — the old message-vs-favourite
     // detection retired with the "note" rename).

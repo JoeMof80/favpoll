@@ -52,6 +52,7 @@ export default async function ManageFavpollPage({
         id,
         personal_note,
         topics ( title ),
+        topic_subsets ( title ),
         pledges ( count ),
         favpoll_poll_favourites ( is_hidden, is_guest_added, favourites ( id, label ) )
       ),

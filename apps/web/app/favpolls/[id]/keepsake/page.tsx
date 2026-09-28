@@ -1,3 +1,4 @@
+import { pollTitle } from "@/lib/poll-title"
 import { RegisterScope } from "@/components/register-scope"
 import { PageGround } from "@/components/page-ground"
 import { paletteForRegister } from "@/lib/register-palette"
@@ -38,7 +39,7 @@ export default async function KeepsakePage({ params }: Props) {
 
   const { data: poll } = await supabase
     .from("favpoll_polls")
-    .select("id, personal_note, topic_id, topics(title)")
+    .select("id, personal_note, topic_id, topics(title), topic_subsets(title)")
     .eq("favpoll_id", id)
     .maybeSingle()
 
@@ -157,8 +158,10 @@ export default async function KeepsakePage({ params }: Props) {
     prefix,
     name,
     context: isCause ? null : (protagonist?.context ?? null),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    topicTitle: (poll.topics as any)?.title ?? "favourites",
+    // The subset's name when the poll has one (favpoll-topic-rules §1).
+    topicTitle:
+      pollTitle(poll as unknown as Parameters<typeof pollTitle>[0]) ??
+      "favourites",
     reveal: poll.personal_note,
     totalRaised: pollTotal,
     goalAmount: favpoll.goal_amount ?? null,

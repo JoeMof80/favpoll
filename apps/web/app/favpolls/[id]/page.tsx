@@ -1,3 +1,4 @@
+import { pollTitle } from "@/lib/poll-title"
 import { RegisterScope } from "@/components/register-scope"
 import { paletteForFavpoll } from "@/lib/register-palette"
 import type { Metadata } from "next"
@@ -93,7 +94,7 @@ export default async function FavpollPage({ params }: Props) {
   const [{ data: rawPoll }, { data: pot }] = await Promise.all([
     supabase
       .from("favpoll_polls")
-      .select("*")
+      .select("*, topic_subsets ( title )")
       .eq("favpoll_id", id)
       .maybeSingle(),
     supabase
@@ -197,7 +198,16 @@ export default async function FavpollPage({ params }: Props) {
       : Promise.resolve([]),
   ])
 
-  const topic = topicData as Topic | null
+  // The subset's name everywhere on this page (favpoll-topic-rules §1,
+  // ruling 4): hero, guest book, pledge dialog all read `topic.title`.
+  const topic: Topic | null = topicData
+    ? {
+        ...(topicData as Topic),
+        title: pollTitle(rawPoll ?? {}) ?? (topicData as Topic).title,
+      }
+    : null
+  const pollSubsetId: string | null =
+    (rawPoll as { subset_id?: string | null } | null)?.subset_id ?? null
   const userPotAllocation: PotAllocation | null = potAllocData ?? null
 
   const wallClerkIds = [
@@ -218,7 +228,8 @@ export default async function FavpollPage({ params }: Props) {
   const [items, { data: wallUsers }] = await Promise.all([
     (async (): Promise<Favourite[]> => {
       if (!rawPoll) return []
-      if (topic?.is_finite) {
+      // A subset poll carries its rows whatever the parent's openness.
+      if (topic?.is_finite && !pollSubsetId) {
         const { data: finiteItemsData } = await supabase
           .from("favourites")
           .select("*")

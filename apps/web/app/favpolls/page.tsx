@@ -1,3 +1,4 @@
+import { pollTitle } from "@/lib/poll-title"
 import Link from "next/link"
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
@@ -64,12 +65,14 @@ const FAVPOLL_SELECT = `
   favpoll_polls (
     id,
     topic_id,
+    subset_id,
     personal_note,
     topics (
       title,
       is_finite,
       favourites ( id, label )
     ),
+    topic_subsets ( title ),
     favpoll_poll_favourites (
       favourites ( id, label )
     )
@@ -81,6 +84,8 @@ type RawEpf = { favourites: RawFavourite }
 type RawPoll = {
   id: string
   topic_id: string | null
+  subset_id?: string | null
+  topic_subsets?: { title: string } | { title: string }[] | null
   personal_note: string | null
   topics: {
     title: string
@@ -228,11 +233,12 @@ export default async function FavpollsPage({
           const rawPoll = fp.favpoll_polls
           if (!rawPoll || !pledgedPollIds.includes(rawPoll.id)) continue
           const isFinite = rawPoll.topics?.is_finite ?? false
-          const items = isFinite
-            ? (rawPoll.topics?.favourites ?? [])
-            : (rawPoll.favpoll_poll_favourites ?? [])
-                .map((epf) => epf.favourites)
-                .filter(Boolean)
+          const items =
+            isFinite && !rawPoll.subset_id
+              ? (rawPoll.topics?.favourites ?? [])
+              : (rawPoll.favpoll_poll_favourites ?? [])
+                  .map((epf) => epf.favourites)
+                  .filter(Boolean)
           const totals =
             standingsByPoll.get(rawPoll.id)?.totals ?? new Map<string, number>()
           const merged = items.map((item) => ({
@@ -279,18 +285,21 @@ export default async function FavpollsPage({
       // Catalogue fallback: non-finite topics with no poll-specific items
       // fall back to the catalogue's own favourites (same fix as the
       // detail page — founder, 2026-09-22).
-      const favourites = isFinite
-        ? (rawPoll.topics?.favourites ?? [])
-        : epiItems.length > 0
-          ? epiItems
-          : (rawPoll.topics?.favourites ?? [])
+      // A subset poll carries its rows whatever the parent's openness.
+      const favourites =
+        isFinite && !rawPoll.subset_id
+          ? (rawPoll.topics?.favourites ?? [])
+          : epiItems.length > 0
+            ? epiItems
+            : (rawPoll.topics?.favourites ?? [])
       poll = {
         id: rawPoll.id,
         topic_id: rawPoll.topic_id,
         has_note: !!rawPoll.personal_note,
         topic: rawPoll.topics
           ? {
-              title: rawPoll.topics.title,
+              // The subset's name (favpoll-topic-rules §1, ruling 4).
+              title: pollTitle(rawPoll) ?? rawPoll.topics.title,
               is_finite: isFinite,
               favourites,
             }
