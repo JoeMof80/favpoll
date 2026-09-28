@@ -224,13 +224,13 @@ export function FavpollContent({
     expandable: localEntitled,
   }
   const guestBookMobile = <GuestBook {...guestBookProps} />
-  // flex-1: the rail is a flex column, so the guest book takes the
-  // height the cards above it leave and scrolls its list internally.
+  // The guest book FLOWS in the rail (founder, 2026-09-29): the rail is
+  // the scroller, the countdown and organiser pin at its top, and a long
+  // book reads as a page, as the standings do on the left.
   const guestBookRail = (
     <GuestBook
       {...guestBookProps}
       variant="flat"
-      className="flex-1"
       expanded={guestBookExpanded}
       onToggleExpand={() => setGuestBookExpanded((v) => !v)}
     />
@@ -399,10 +399,16 @@ export function FavpollContent({
     </div>
   )
 
+  // The pinned group: the rail's top padding lives here with a
+  // background, so rows scroll under it. Sticky at the RAIL's own top
+  // (the shell's scroller box; see shell-scroller.tsx — never top-14
+  // inside the shell).
   const right = (
     <>
-      {stateCardRail}
-      {organiserCard}
+      <div className="sticky top-0 z-10 divide-y divide-border bg-background pt-16">
+        {stateCardRail}
+        {organiserCard}
+      </div>
       {guestBookRail}
     </>
   )

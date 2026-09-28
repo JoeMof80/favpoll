@@ -55,7 +55,9 @@ export function PageLayout({
       // inner gutter (shellGutter), not its content. The gutters live on
       // the COLUMN, not the rows, so rows, dividers and the guest book's
       // scroll list all line up without each having to agree separately.
-      "hidden min-h-0 flex-col divide-y divide-border overflow-y-auto border-l border-border pt-16 pr-16 pl-8 md:flex"
+      // No top padding here: the rail's pinned group carries it, so rows
+      // scroll under the pinned countdown rather than showing above it.
+      "scrollbar-hide hidden min-h-0 flex-col divide-y divide-border overflow-y-auto border-l border-border pr-16 pl-8 md:flex"
     : rightSticky
       ? "sticky top-14 z-10 hidden max-h-[calc(100vh-3.5rem)] flex-col space-y-4 self-start overflow-y-auto bg-background md:flex md:pt-16"
       : "hidden flex-col space-y-4 self-start md:flex md:pt-16"
@@ -114,7 +116,7 @@ export function PageLayout({
             // scroll-linked children (the hero) read THIS element rather
             // than the window, which never scrolls in shell mode.
             <ShellScroller
-              className={`min-w-0 ${shellGutter} ${mobilePadBottom} md:min-h-0 md:overflow-y-auto md:pb-0 md:[overflow-anchor:none]`}
+              className={`min-w-0 ${shellGutter} ${mobilePadBottom} md:scrollbar-hide md:min-h-0 md:overflow-y-auto md:pb-0 md:[overflow-anchor:none]`}
             >
               {left}
             </ShellScroller>
