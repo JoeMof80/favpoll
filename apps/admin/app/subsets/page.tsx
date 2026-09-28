@@ -1,11 +1,16 @@
-import { getSubsets } from "@/lib/actions/subsets";
+import { getHomemadeTopics, getSubsets } from "@/lib/actions/subsets";
+import { getTopics } from "@/lib/actions/topics";
 import { SubsetsTable } from "@/components/subsets-table";
+import { HomemadeTopicsTable } from "@/components/homemade-topics-table";
 
 // SUBSETS (favpoll-topic-rules §1): the admin's door. The scan proposes,
 // the admin approves; only approved subsets reach the picker.
 export default async function SubsetsPage() {
-  const { data, error } = await getSubsets();
+  const [{ data, error }, { data: homemade }, { data: topics }] =
+    await Promise.all([getSubsets(), getHomemadeTopics(), getTopics()]);
   const rows = data ?? [];
+  // Parents are catalogue topics only.
+  const parents = (topics ?? []).filter((t) => t.is_catalogue);
   const proposed = rows.filter((r) => r.status === "proposed");
   const approved = rows.filter((r) => r.status === "approved");
   const rejected = rows.filter((r) => r.status === "rejected");
@@ -45,6 +50,24 @@ export default async function SubsetsPage() {
           <p className="text-sm text-muted-foreground">None yet.</p>
         ) : (
           <SubsetsTable rows={approved} />
+        )}
+      </section>
+
+      <section>
+        <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
+          Homemade topics ({(homemade ?? []).length})
+        </h2>
+        <p className="mb-3 max-w-2xl text-sm text-muted-foreground">
+          Organisers&rsquo; own topics still in the picker. One whose items all
+          sit on a catalogue topic&rsquo;s list is a subset that arrived by the
+          wrong door: promote it and it becomes one for the next organiser,
+          while the favpoll that made it keeps its own topic and items. The
+          homemade row leaves the picker.
+        </p>
+        {(homemade ?? []).length === 0 ? (
+          <p className="text-sm text-muted-foreground">None in the picker.</p>
+        ) : (
+          <HomemadeTopicsTable rows={homemade ?? []} parents={parents} />
         )}
       </section>
 

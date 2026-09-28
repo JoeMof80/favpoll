@@ -125,6 +125,9 @@ export type Topic = {
   description: string | null;
   is_finite: boolean;
   is_active: boolean;
+  /** In the picker. False once promoted to a subset (favpoll-topic-rules
+   *  §1, ruling 8); the favpoll that made it is untouched. */
+  is_listed?: boolean;
   created_by: string | null;
   created_at: string;
 };
