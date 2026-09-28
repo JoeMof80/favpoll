@@ -14,11 +14,25 @@ type RankingView = "amount" | "count"
 
 type Props = {
   items: Favourite[]
+  /** The name shown: the subset's when one is selected. */
   topicTitle: string
+  /** The parent's title when a subset is selected, else null. */
+  parentTitle?: string | null
+  /** The topic's approved subsets (favpoll-topic-rules §1): each has its
+   *  own record, reached by ?subset=. */
+  subsets?: { id: string; title: string }[]
+  selectedSubsetId?: string | null
   hasColourSwatch: boolean
 }
 
-export function TopicRankings({ items, topicTitle, hasColourSwatch }: Props) {
+export function TopicRankings({
+  items,
+  topicTitle,
+  parentTitle = null,
+  subsets = [],
+  selectedSubsetId = null,
+  hasColourSwatch,
+}: Props) {
   const searchParams = useSearchParams()
   const router = useRouter()
   const view: RankingView =
@@ -41,6 +55,13 @@ export function TopicRankings({ items, topicTitle, hasColourSwatch }: Props) {
     const params = new URLSearchParams(searchParams.toString())
     params.set("view", v)
     router.replace(`?${params.toString()}`, { scroll: false })
+  }
+  function subsetHref(id: string | null) {
+    const params = new URLSearchParams(searchParams.toString())
+    if (id) params.set("subset", id)
+    else params.delete("subset")
+    const q = params.toString()
+    return q ? `?${q}` : "?"
   }
 
   return (
@@ -70,6 +91,43 @@ export function TopicRankings({ items, topicTitle, hasColourSwatch }: Props) {
             </TabsList>
           </Tabs>
         </div>
+        {/* THE SUBSETS' RECORDS (favpoll-topic-rules §1, ruling 4): the
+            whole list first, then each subset; a subset's record adds its
+            own favpolls' picks to its members' whole-list picks. */}
+        {subsets.length > 0 && (
+          <nav
+            aria-label="Subsets of this topic"
+            className="mt-2 flex flex-wrap gap-1.5 pb-2"
+          >
+            <Link
+              href={subsetHref(null)}
+              scroll={false}
+              aria-current={selectedSubsetId ? undefined : "page"}
+              className={
+                selectedSubsetId
+                  ? "rounded-full border border-border px-2.5 py-0.5 text-xs text-muted-foreground hover:text-foreground"
+                  : "rounded-full border border-primary bg-primary/10 px-2.5 py-0.5 text-xs text-primary"
+              }
+            >
+              {parentTitle ?? topicTitle}, the whole list
+            </Link>
+            {subsets.map((s) => (
+              <Link
+                key={s.id}
+                href={subsetHref(s.id)}
+                scroll={false}
+                aria-current={selectedSubsetId === s.id ? "page" : undefined}
+                className={
+                  selectedSubsetId === s.id
+                    ? "rounded-full border border-primary bg-primary/10 px-2.5 py-0.5 text-xs text-primary"
+                    : "rounded-full border border-border px-2.5 py-0.5 text-xs text-muted-foreground hover:text-foreground"
+                }
+              >
+                {s.title}
+              </Link>
+            ))}
+          </nav>
+        )}
       </div>
 
       <ul
