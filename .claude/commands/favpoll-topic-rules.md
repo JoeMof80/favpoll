@@ -48,10 +48,18 @@ altitude:
   3. **Flat in the picker, with a marker.** A subset is a row in the same list as its
      parent, under the same search and category filters, marked "of Animal". Browsing
      shows the parent then its subsets; searching "farm" finds Farm animal. No nesting.
-  4. **Its name everywhere but the record.** Hero, card, share text, live display, guest
-     book all say "Favourite farm animal". The parent shows in one place, the record,
-     where the picks roll up into Animal's numbers. The favpoll stores the parent as its
-     topic and the subset as a pointer beside it.
+  4. **Its name everywhere; its own record, fed from above.** Hero, card, share text,
+     live display, guest book all say "Favourite farm animal". The favpoll stores the
+     parent as its topic and the subset as a pointer beside it. On the RECORD (founder,
+     2026-09-28, revising the first ruling that picks "roll up into the parent"): a pick
+     says only "this beats everything on the list I was shown". So a parent's record
+     counts only picks from favpolls that showed the whole list; a subset's record
+     counts picks from its own favpolls PLUS picks of its members from the parent's
+     whole-list favpolls (your favourite animal is your favourite farm animal if it is
+     one). Picks flow down from parent to every subset the item belongs to, never up —
+     a city farm's favpolls must not push Cow up a ranking its guests never voted in.
+     Subset picks are kept in their own scoped totals (subset × favourite); the
+     favourite row's all-time totals stay the whole-list record.
   5. **Inherits the parent's openness.** A subset narrows only the STARTERS. On a finite
      parent the list is closed to the subset's items; on an open parent guests may still
      add their own (Alpaca on Farm animal rolls into Animal). A subset has **no items of
@@ -76,7 +84,7 @@ altitude:
 
   Build order (2026-09-27): schema + these rules → the scan and its admin approval → the
   picker row, creation narrowing starters (finite parents too), the name on every surface,
-  the Story engine given the name → charities (perfect subset pointer; the suggester
+  the Story engine given the name, the scoped totals and the subset's record → charities (perfect subset pointer; the suggester
   matches to existing subsets; the per-charity `perfect_topic_items` list retires) →
   occasions and the seed → promotion. Stop after the picker step and look at it on the
   phone. Until the schema lands, the first step still stands: a charity's perfect topic
