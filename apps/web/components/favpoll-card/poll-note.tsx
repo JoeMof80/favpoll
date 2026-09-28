@@ -1,6 +1,12 @@
+import { MentionText } from "@/components/mention-text"
+import type { MentionTarget } from "@/lib/mentions"
+
 type PollNoteProps = {
   personalNote?: string | null
   protagonistFirstName?: string
+  /** The charity, topic and favourite, lit as in the About (founder,
+   *  2026-09-28: the same tint in the note; lib/mentions). */
+  mentions?: MentionTarget[]
   role?: string
   "aria-label"?: string
   "aria-live"?: "polite" | "assertive" | "off"
@@ -9,6 +15,7 @@ type PollNoteProps = {
 export function PollNote({
   personalNote,
   protagonistFirstName,
+  mentions,
   role,
   "aria-label": ariaLabel,
   "aria-live": ariaLive,
@@ -28,7 +35,7 @@ export function PollNote({
         role={role}
         aria-live={ariaLive}
       >
-        {personalNote}
+        <MentionText text={personalNote} mentions={mentions} />
       </blockquote>
     </div>
   )

@@ -133,7 +133,7 @@ export function closingSentence(
   // "pick your favourite song", not "pick your own favourite": the
   // founder named the topic in every one of his edits (2026-09-25).
   const what = topicTitle
-    ? `your favourite ${topicTitle.toLowerCase()}`
+    ? `your favourite ${topicTitle}`
     : "your own favourite"
   return `Pledge to ${charityName ?? "charity"}, pick ${what}, ${promise}.`
 }
@@ -326,7 +326,7 @@ ${edgesBlock(edges, subject)}`
       ? `The organiser calls this cause "${displayName!.trim()}" — write around that name; do not rename it.\n`
       : ""
     instructions = `${labelContext}${causeLabelInstruction}- "context" (max 40 characters): one short subline for under the cause name, giving a timeframe or who it helps — like "Winter 2026 appeal" or "For families facing hardship". It must NOT contain the charity's name in any form (the charity is already shown beside it), and must NOT mention pledges, money, or where the money goes — the about owns that. No full stop.
-- "about" (max 2 sentences): first what this favpoll is raising for${hasPurpose ? "" : " (taken from the cause name above only — the charity's own work is unknown and must not be described)"}${occasionType && occasionType !== "Fundraiser" ? `, at what event (say "${occasionType.toLowerCase()}" or its plain equivalent — a guest must know what is happening${EFFORT_OCCASIONS.has(occasionType) ? ", and it is still to come: pledges are gathered in the build-up, so never write it as finished" : ""})` : ""}, then the mechanic in ONE clause — guests pick their favourite ${topicTitle.toLowerCase()} and pledge to ${charityName ?? "the charity"}, where the pick and the pledge are a single action (the pick is made BY pledging). Never present them as separate steps: no "first…", "then…", "tell us…". favpoll takes no platform fee. Do NOT name or hint at any particular option, and do not repeat the context subline's wording.
+- "about" (max 2 sentences): first what this favpoll is raising for${hasPurpose ? "" : " (taken from the cause name above only — the charity's own work is unknown and must not be described)"}${occasionType && occasionType !== "Fundraiser" ? `, at what event (say "${occasionType.toLowerCase()}" or its plain equivalent — a guest must know what is happening${EFFORT_OCCASIONS.has(occasionType) ? ", and it is still to come: pledges are gathered in the build-up, so never write it as finished" : ""})` : ""}, then the mechanic in ONE clause — guests pick their favourite ${topicTitle} and pledge to ${charityName ?? "the charity"}, where the pick and the pledge are a single action (the pick is made BY pledging). Never present them as separate steps: no "first…", "then…", "tell us…". favpoll takes no platform fee. Do NOT name or hint at any particular option, and do not repeat the context subline's wording.
 - "reveal" (guests see it only AFTER pledging): start with exactly "Our pick to start:" then ${pick ? `exactly this option, verbatim: "${pick}"` : "a real option from the list"}, then " — " (this separator is the one place an em dash is allowed) and one short, warm clause, plain and unforced, like "They watched it every Christmas Eve without fail". It need not justify the pick; the about carries the reason. No statistics, numbers, percentages, or invented quotes.`
   } else {
     const opener = revealOpener(register, pronoun, displayName, grouping)
@@ -361,7 +361,7 @@ ${edgesBlock(edges, subject)}`
       givenClosing ??
       (promise
         ? closingSentence(charityName, promise, topicTitle)
-        : `Pledge to ${charityName ?? "charity"} and pick your favourite ${topicTitle.toLowerCase()}.`)
+        : `Pledge to ${charityName ?? "charity"} and pick your favourite ${topicTitle}.`)
     const nameHint = first
       ? ""
       : promise
@@ -396,7 +396,7 @@ ${edgesBlock(edges, subject)}`
     // writer squeezed ("never went a week without one"). The exemplars
     // carry the form; the rules that remain are about truth, not style,
     // and the seed's judge carries realism.
-    const topicLower = topicTitle.toLowerCase()
+    const topicLower = topicTitle
     const edgeRule =
       edges.count === 0
         ? ` No edge links this occasion, this charity and this topic, so the about itself must make a favourite ${topicLower} a natural thing to ask this person, with one plain, believable thing about them.`
@@ -679,7 +679,7 @@ export async function generateStory(
               pickRevealPromise(closingPoss),
               input.topicTitle
             )
-          : `Pledge to ${input.charity.name ?? "charity"} and pick your favourite ${input.topicTitle.toLowerCase()}.`
+          : `Pledge to ${input.charity.name ?? "charity"} and pick your favourite ${input.topicTitle}.`
       : null
   const prompt = buildPrompt({
     register: input.register,

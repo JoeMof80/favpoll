@@ -2,12 +2,14 @@
 
 import { BaseFavpollHero } from "./heroes/base-favpoll-hero"
 import type { Favpoll, Protagonist } from "@favpoll/types"
+import type { MentionTarget } from "@/lib/mentions"
 
 type Props = {
   favpoll: Favpoll
   protagonist: Protagonist
   hideAvatar?: boolean
   aboutPlaceholder?: string
+  mentions?: MentionTarget[]
 }
 
 export function FavpollHero({
@@ -15,6 +17,7 @@ export function FavpollHero({
   protagonist,
   hideAvatar,
   aboutPlaceholder,
+  mentions,
 }: Props) {
   return (
     <BaseFavpollHero
@@ -22,6 +25,7 @@ export function FavpollHero({
       protagonist={protagonist}
       hideAvatar={hideAvatar}
       aboutPlaceholder={aboutPlaceholder}
+      mentions={mentions}
     />
   )
 }

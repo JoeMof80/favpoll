@@ -1,5 +1,6 @@
 "use client"
 
+import type { MentionTarget } from "@/lib/mentions"
 import { protagonistShortName } from "@/lib/display"
 import { RankingList } from "@/components/ranking-list"
 import { PollHeading } from "@/components/poll-heading"
@@ -99,6 +100,8 @@ type Props = {
   entitled: boolean
   /** Real personal_note — null until entitled */
   personalNote: string | null
+  /** The charity, topic and favourites, lit in the note (lib/mentions). */
+  noteMentions?: MentionTarget[]
   /**
    * Whether a reveal exists at all (safe to know pre-pledge). Drives the lock
    * copy: a favpoll without a reveal must offer the results, not promise a
@@ -131,6 +134,7 @@ export function PollSection({
   onViewChange,
   entitled,
   personalNote,
+  noteMentions,
   hasNote = true,
   charityLine = null,
   initialItems,
@@ -253,6 +257,7 @@ export function PollSection({
                 text={personalNote}
                 active={pledgeJustConfirmed ?? false}
                 protagonistFirstName={personFirstName}
+                mentions={noteMentions}
               />
             </div>
           )}

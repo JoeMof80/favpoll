@@ -1,5 +1,6 @@
 "use client"
 
+import type { MentionTarget } from "@/lib/mentions"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -240,12 +241,46 @@ export function FavpollContent({
   // card was a second door to the same room, buried below the fold on
   // mobile. "Give without picking" on step 1 routes to the shared pot.
 
+  // MENTIONS (lib/mentions): the charities and the topic under the name
+  // on the card, lit in the About; the favourites join them in the note.
+  const aboutMentions: MentionTarget[] = [
+    ...favpoll.favpoll_charities.map((ec) => ({
+      kind: "charity" as const,
+      label: ec.charities.name,
+      id: ec.charities.id,
+    })),
+    ...(pollWithItems
+      ? [
+          {
+            kind: "topic" as const,
+            label: pollWithItems.topics.title,
+            id: pollWithItems.topic_id,
+          },
+        ]
+      : []),
+  ]
+  // The favourites come from the FULL list (the picker's), not the
+  // standings' — those are filtered to pledged items, and a note names
+  // its favourite before anyone has pledged (founder, 2026-09-28: "no
+  // noticeable changes!!!" on a favpoll with no pledges yet).
+  const noteMentions: MentionTarget[] = [
+    ...aboutMentions,
+    ...(pickerPoll?.topics.favourites ?? effectiveItems).map((i) => ({
+      kind: "item" as const,
+      label: i.label,
+    })),
+  ]
+
   const left = (
     <>
       {isCause ? (
-        <CauseHero favpoll={favpoll} />
+        <CauseHero favpoll={favpoll} mentions={aboutMentions} />
       ) : (
-        <FavpollHero favpoll={favpoll} protagonist={favpoll.protagonists!} />
+        <FavpollHero
+          favpoll={favpoll}
+          protagonist={favpoll.protagonists!}
+          mentions={aboutMentions}
+        />
       )}
 
       {pollWithItems ? (
@@ -267,6 +302,7 @@ export function FavpollContent({
             onViewChange={handleViewChange}
             entitled={localEntitled}
             personalNote={effectiveNote}
+            noteMentions={noteMentions}
             hasNote={hasNote}
             charityLine={charityLine || null}
             initialItems={effectiveItems}

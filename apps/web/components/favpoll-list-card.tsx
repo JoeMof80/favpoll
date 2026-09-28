@@ -1,5 +1,6 @@
 "use client"
 
+import { MentionText } from "@/components/mention-text"
 import { useRef, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -368,7 +369,25 @@ export function FavpollListCard({
                     />
                     {aboutText && (
                       <p className="text-sm leading-relaxed text-muted-foreground">
-                        {aboutText}
+                        <MentionText
+                          text={aboutText}
+                          mentions={[
+                            ...favpoll.charities.map((c) => ({
+                              kind: "charity" as const,
+                              label: c.charity.name,
+                              id: c.charity.id,
+                            })),
+                            ...(favpoll.poll?.topic
+                              ? [
+                                  {
+                                    kind: "topic" as const,
+                                    label: favpoll.poll.topic.title,
+                                    id: favpoll.poll.topic_id,
+                                  },
+                                ]
+                              : []),
+                          ]}
+                        />
                       </p>
                     )}
                   </div>

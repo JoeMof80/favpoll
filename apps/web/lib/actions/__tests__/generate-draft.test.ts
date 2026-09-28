@@ -158,7 +158,7 @@ describe("buildCacheKey", () => {
       "charity-1"
     )
     expect(key).toBe(
-      "v6:celebrating_one:topic-1:charity-1:someone:none:individual:none:none"
+      "v7:celebrating_one:topic-1:charity-1:someone:none:individual:none:none"
     )
   })
 
@@ -171,23 +171,23 @@ describe("buildCacheKey", () => {
       "he"
     )
     expect(key).toBe(
-      "v6:celebrating_one:topic-1:none:someone:he:individual:none:none"
+      "v7:celebrating_one:topic-1:none:someone:he:individual:none:none"
     )
   })
 
   it("uses charity id when subject is cause", () => {
     const key = buildCacheKey("cause", "topic-1", "cause", "charity-1")
-    expect(key).toBe("v6:cause:topic-1:charity-1:cause:none:none:none:none")
+    expect(key).toBe("v7:cause:topic-1:charity-1:cause:none:none:none:none")
   })
 
   it("falls back to 'none' when cause has no charity", () => {
     const key = buildCacheKey("cause", "topic-1", "cause", null)
-    expect(key).toBe("v6:cause:topic-1:none:cause:none:none:none:none")
+    expect(key).toBe("v7:cause:topic-1:none:cause:none:none:none:none")
   })
 
   it("ignores pronoun for cause favpolls", () => {
     const key = buildCacheKey("cause", "topic-1", "cause", "charity-1", "she")
-    expect(key).toBe("v6:cause:topic-1:charity-1:cause:none:none:none:none")
+    expect(key).toBe("v7:cause:topic-1:charity-1:cause:none:none:none:none")
   })
 })
 
@@ -306,7 +306,7 @@ describe("generateDraft — cache miss, person", () => {
     expect(insertCall?.args[0]).toMatchObject({
       subject: "someone",
       cache_key:
-        "v6:cause:topic-1:charity-1:someone:none:individual:fundraiser:none",
+        "v7:cause:topic-1:charity-1:someone:none:individual:fundraiser:none",
     })
   })
 
@@ -363,7 +363,7 @@ describe("generateDraft — cache miss, cause", () => {
     expect(insertCall?.args[0]).toMatchObject({
       primary_charity_id: "charity-1",
       subject: "cause",
-      cache_key: "v6:cause:topic-1:charity-1:cause:none:none:fundraiser:none",
+      cache_key: "v7:cause:topic-1:charity-1:cause:none:none:fundraiser:none",
     })
   })
 
@@ -822,7 +822,7 @@ describe("buildCacheKey — occasion segment (v6)", () => {
       "Milestone birthday"
     )
     expect(key).toMatch(
-      /^v6:celebrating_one:topic-1:charity-1:someone:he:individual:milestone-birthday:[0-9a-z]+$/
+      /^v7:celebrating_one:topic-1:charity-1:someone:he:individual:milestone-birthday:[0-9a-z]+$/
     )
   })
 })
@@ -1037,7 +1037,7 @@ describe("the reveal promise rotates", () => {
     expect(
       REVEAL_PROMISES.some((f) =>
         prompt.includes(
-          `Pledge to Ocean Trust, pick your favourite colour, ${f.replace("X", "Joan's")}.`
+          `Pledge to Ocean Trust, pick your favourite Colour, ${f.replace("X", "Joan's")}.`
         )
       )
     ).toBe(true)
@@ -1195,7 +1195,7 @@ describe("realism rules in the person prompt (founder review, 2026-09-24)", () =
     })
     const prompt = promptOf()
     expect(prompt).toContain(
-      "pick your favourite song, and the top ten are the playlist for the night."
+      "pick your favourite Song, and the top ten are the playlist for the night."
     )
     expect(prompt).toContain("The guests' picks are ENACTED on the night")
     expect(prompt).toContain("there is no opener and no reveal")
@@ -1339,7 +1339,7 @@ describe("the closing sentence is enforced", () => {
       displayName: "Gordon Mitchell",
     })
     expect(result.about).toMatch(
-      /^Gordon spent most Sundays walking in a garden\. Pledge to Ocean Trust, pick your favourite colour, .*Gordon's.*\.$/
+      /^Gordon spent most Sundays walking in a garden\. Pledge to Ocean Trust, pick your favourite Colour, .*Gordon's.*\.$/
     )
   })
 })
@@ -1353,7 +1353,7 @@ describe("first person: the organiser is the protagonist", () => {
     mock.queue(TOPIC_DATA)
     mock.queue(CHARITY_DATA)
     mockLLMResponse(
-      "I'm retiring in June. Pledge to Ocean Trust, pick your favourite colour, to see mine.",
+      "I'm retiring in June. Pledge to Ocean Trust, pick your favourite Colour, to see mine.",
       "Mine is Blue. I painted the shed in it last summer."
     )
     mock.queue(null)

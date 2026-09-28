@@ -1,6 +1,8 @@
 "use client"
 
-import { InputGroup, InputGroupTextarea } from "@/components/ui/input-group"
+import { InputGroup } from "@/components/ui/input-group"
+import { MentionTextarea } from "@/components/mention-textarea"
+import type { MentionTarget } from "@/lib/mentions"
 import { CharCounter } from "@/components/favpoll-form/edit-helpers"
 import { WizardField } from "./wizard-field"
 import { ghostsFor } from "./wizard-placeholders"
@@ -13,6 +15,28 @@ export function WizardStoryStep({ w }: { w: WizardState }) {
   // cost. The "e.g. " prefix keeps the ghost convention.
   const aboutGhost = w.cachedGhosts ? `e.g. ${w.cachedGhosts.about}` : ph.about
   const revealGhost = w.cachedGhosts ? `e.g. ${w.cachedGhosts.note}` : ph.note
+  // MENTIONS (founder, 2026-09-28): @ offers the charities and the topic
+  // under the name on the card; the note also offers the favourites.
+  const topic = w.topics[0]
+  const aboutMentions: MentionTarget[] = [
+    ...w.selectedCharities.map((c) => ({
+      kind: "charity" as const,
+      label: c.name,
+      id: c.id,
+    })),
+    ...(topic ? [{ kind: "topic" as const, label: topic.title }] : []),
+  ]
+  const noteMentions: MentionTarget[] = [
+    ...aboutMentions,
+    ...(topic?.items ?? []).map((i) => ({
+      kind: "item" as const,
+      label: i.label,
+    })),
+    ...(topic?.customLabels ?? []).map((label) => ({
+      kind: "item" as const,
+      label,
+    })),
+  ]
   return (
     <div className="space-y-5">
       {/* ALWAYS-VISIBLE guidance for the two craft fields (founder,
@@ -27,13 +51,14 @@ export function WizardStoryStep({ w }: { w: WizardState }) {
         hint="Set the scene, link the topic and the cause. Hint at a note, if there is one."
       >
         <InputGroup className="bg-background">
-          <InputGroupTextarea
-            className="md:text-base"
+          <MentionTextarea
             rows={4}
             maxLength={300}
             value={w.about}
             placeholder={aboutGhost}
-            onChange={(e) => w.setAbout(e.target.value)}
+            onChange={w.setAbout}
+            mentions={aboutMentions}
+            aria-label="About"
           />
           <div
             data-align="block-end"
@@ -49,13 +74,14 @@ export function WizardStoryStep({ w }: { w: WizardState }) {
         hint="A direct quote, a memory, or a message to guests. Revealed only after a guest pledges."
       >
         <InputGroup className="bg-background">
-          <InputGroupTextarea
-            className="md:text-base"
+          <MentionTextarea
             rows={4}
             maxLength={280}
             value={w.note}
             placeholder={revealGhost}
-            onChange={(e) => w.setNote(e.target.value)}
+            onChange={w.setNote}
+            mentions={noteMentions}
+            aria-label="Personal note"
           />
           <div
             data-align="block-end"
