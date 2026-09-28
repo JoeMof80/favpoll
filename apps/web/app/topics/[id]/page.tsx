@@ -14,38 +14,86 @@ import {
   type PledgeEvent,
 } from "@/lib/rank-history"
 import { isEstablishedRecord } from "@/lib/record"
+import { subsetStanding } from "@/lib/subset-record"
 import { formatCount, formatPoundsCompact } from "@/lib/i18n"
 
 type Props = {
   params: Promise<{ id: string }>
+  searchParams: Promise<{ subset?: string }>
 }
 
-export default async function TopicPage({ params }: Props) {
+export default async function TopicPage({ params, searchParams }: Props) {
   const { id } = await params
+  const { subset: subsetParam } = await searchParams
   const supabase = createAdminClient()
 
   const { data: topic } = await supabase
     .from("topics")
-    .select("*, favourites(*)")
+    .select(
+      "*, favourites(*), topic_subsets(id, title, status, is_active, topic_subset_items(favourite_id))"
+    )
     .eq("id", id)
     .single()
 
   if (!topic) notFound()
 
-  const items: Favourite[] = [
+  // The parent's whole-list record: the favourite rows' all-time totals
+  // (favpoll-topic-rules §1, ruling 4 — subset picks never flow up).
+  const parentItems: Favourite[] = [
     ...((topic.favourites ?? []) as Favourite[]),
   ].sort((a, b) => b.all_time_pledged - a.all_time_pledged)
 
+  type RawSubset = {
+    id: string
+    title: string
+    status: string
+    is_active: boolean
+    topic_subset_items: { favourite_id: string }[] | null
+  }
+  const subsets = ((topic.topic_subsets ?? []) as RawSubset[])
+    .filter((s) => s.status === "approved" && s.is_active)
+    .map((s) => ({
+      id: s.id,
+      title: s.title,
+      memberIds: (s.topic_subset_items ?? []).map((i) => i.favourite_id),
+    }))
+    .sort((a, b) => a.title.localeCompare(b.title))
+  const selectedSubset = subsetParam
+    ? (subsets.find((s) => s.id === subsetParam) ?? null)
+    : null
+
+  // A SUBSET'S record: its own favpolls' picks plus its members' picks
+  // from the parent's whole-list favpolls (down, never up).
+  let items: Favourite[] = parentItems
+  if (selectedSubset) {
+    const { data: scoped } = await supabase
+      .from("topic_subset_totals")
+      .select("favourite_id, all_time_pledged, all_time_count")
+      .eq("subset_id", selectedSubset.id)
+    items = subsetStanding(
+      parentItems,
+      selectedSubset.memberIds,
+      (scoped ?? []) as {
+        favourite_id: string
+        all_time_pledged: number
+        all_time_count: number
+      }[]
+    )
+  }
+
   const typedTopic = topic as Topic
+  const shownTitle = selectedSubset?.title ?? typedTopic.title
   const hasActivity = items.some((i) => i.all_time_pledged > 0)
 
   // All-time bump chart: how this topic's favourites moved across every
   // favpoll, bucketed by week. Established topics only (same threshold as
   // /record) so a sparse topic doesn't show a sparse chart. Ordinal —
   // amounts never enter the chart.
+  // The chart is the parent's whole-list history: subset polls' picks
+  // are excluded, and a selected subset shows no chart.
   let topicHistory: ReturnType<typeof deriveRankHistory> | null = null
   let bucketDates: string[] = []
-  if (isEstablishedRecord(items)) {
+  if (!selectedSubset && isEstablishedRecord(items)) {
     // Paginated — an established topic's allocations exceed the silent
     // 1,000-row cap (lib/supabase/paginate)
     const allocRows = await fetchAllRows<Record<string, unknown>>((from, to) =>
@@ -54,10 +102,11 @@ export default async function TopicPage({ params }: Props) {
         .select(
           `amount, favourite_id,
              favourites!inner ( label, topic_id ),
-             pledges!inner ( created_at, withdrawn_at )`
+             pledges!inner ( created_at, withdrawn_at, favpoll_polls!inner ( subset_id ) )`
         )
         .eq("favourites.topic_id", id)
         .is("pledges.withdrawn_at", null)
+        .is("pledges.favpoll_polls.subset_id", null)
         .range(from, to)
     )
 
@@ -87,7 +136,10 @@ export default async function TopicPage({ params }: Props) {
     <Suspense fallback={null}>
       <TopicRankings
         items={items}
-        topicTitle={typedTopic.title}
+        topicTitle={shownTitle}
+        parentTitle={selectedSubset ? typedTopic.title : null}
+        subsets={subsets.map((s) => ({ id: s.id, title: s.title }))}
+        selectedSubsetId={selectedSubset?.id ?? null}
         hasColourSwatch={typedTopic.title.toLowerCase().includes("colour")}
       />
     </Suspense>

@@ -16,6 +16,8 @@ import { formatCount, formatPounds } from "@/lib/i18n"
 type TopicWithItems = Topic & {
   favourites: Favourite[]
   category_ids: string[]
+  /** Approved subsets, each with a record of its own (ruling 4). */
+  subsets?: { id: string; title: string }[]
 }
 
 type Props = {
@@ -38,6 +40,33 @@ function formatAmount(amount: number): string {
 }
 
 function TopicCard({ topic }: { topic: TopicWithItems }) {
+  const subsets = topic.subsets ?? []
+  return subsets.length === 0 ? (
+    <TopicCardLink topic={topic} />
+  ) : (
+    <div className="space-y-2">
+      <TopicCardLink topic={topic} />
+      {/* The subsets' records, beside the parent's card — never inside
+          it (a link in a link). */}
+      <nav
+        aria-label={`Subsets of ${topic.title}`}
+        className="flex flex-wrap gap-1.5 px-1"
+      >
+        {subsets.map((s) => (
+          <Link
+            key={s.id}
+            href={`/topics/${topic.id}?subset=${s.id}`}
+            className="rounded-full border border-border px-2.5 py-0.5 text-xs text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground"
+          >
+            {s.title}
+          </Link>
+        ))}
+      </nav>
+    </div>
+  )
+}
+
+function TopicCardLink({ topic }: { topic: TopicWithItems }) {
   const maxPledged = topic.favourites[0]?.all_time_pledged ?? 0
   const hasActivity = maxPledged > 0
   // Breadth signal (founder decision §4): show how many pledges stand
@@ -118,7 +147,8 @@ export function filterTopics(
     if (q) {
       return (
         t.title.toLowerCase().includes(q) ||
-        t.favourites.some((f) => f.label.toLowerCase().includes(q))
+        t.favourites.some((f) => f.label.toLowerCase().includes(q)) ||
+        (t.subsets ?? []).some((s) => s.title.toLowerCase().includes(q))
       )
     }
     return true
