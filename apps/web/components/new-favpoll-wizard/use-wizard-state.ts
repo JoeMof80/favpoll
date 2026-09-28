@@ -320,20 +320,16 @@ export function useWizardState(
   // The charity's SUBSET (favpoll-topic-rules §1): when the organiser picks
   // the charity's own topic, the list is the charity's corner of it (a
   // city farm's animals), not the whole shelf.
-  // A picked SUBSET's members lead (favpoll-topic-rules §1); the charity's
-  // per-item list (the first step, retiring in step 4) stands behind it.
+  // A picked SUBSET's members are the list (favpoll-topic-rules §1). The
+  // charity's own subset reaches here as the leading suggestion; picking
+  // the parent instead means the whole shelf, by the organiser's choice.
+  // (The per-charity label list of the first step is no longer read.)
   const pickedSubset = topics[0]?.subsetId
     ? data.topics.find((t) => t.id === topics[0].subsetId)
     : null
   const subsetLabels: string[] | null = pickedSubset
     ? pickedSubset.favourites.map((f) => f.label)
-    : primaryCharity &&
-        topics[0] &&
-        !topics[0].isCustom &&
-        primaryCharity.perfect_topic_id === topics[0].topicId &&
-        primaryCharity.perfect_topic_items?.length
-      ? primaryCharity.perfect_topic_items
-      : null
+    : null
   const subsetSet = subsetLabels
     ? new Set(subsetLabels.map((l) => l.toLowerCase()))
     : null

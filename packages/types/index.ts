@@ -104,6 +104,8 @@ export type Charity = {
    *  a narrower list (a city farm's Farm animal). Must belong to
    *  perfect_topic_id (a trigger enforces it). */
   perfect_subset_id?: string | null;
+  /** The suggester's subset, confirmed by an admin into perfect_subset_id. */
+  perfect_subset_suggested_id?: string | null;
   /** The fundraising events the charity already holds, read from its own
    *  website (2026-09-27): a suggestion for outreach. */
   signature_events?: SignatureEvent[] | null;
