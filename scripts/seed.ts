@@ -7437,6 +7437,7 @@ const topicItems: Record<string, string[]> = {
     "Fish and chips",
     "Fried chicken",
     "Gyros",
+    "Jalfrezi",
     "Katsu curry",
     "Kebab",
     "Korma",
