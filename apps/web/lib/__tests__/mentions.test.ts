@@ -58,9 +58,20 @@ describe("the @ menu", () => {
     expect(mentionQueryAt("Pledge to @Trus", 15)).toEqual({
       start: 10,
       query: "Trus",
+      implicit: false,
     })
-    expect(mentionQueryAt("email me@x", 10)).toBeNull()
     expect(mentionQueryAt("@a\nb", 4)).toBeNull()
+  })
+
+  it("a bare word opens the menu at three letters, not before", () => {
+    expect(mentionQueryAt("Pledge to Tru", 13)).toEqual({
+      start: 10,
+      query: "Tru",
+      implicit: true,
+    })
+    expect(mentionQueryAt("Pledge to Tr", 12)).toBeNull()
+    expect(mentionQueryAt("Pledge to Tru ", 14)).toBeNull()
+    expect(mentionQueryAt("email me@x", 10)).toBeNull()
   })
 
   it("filters suggestions by the query, keeping order, deduplicated", () => {
@@ -68,6 +79,17 @@ describe("the @ menu", () => {
       "Trussell Trust",
     ])
     expect(mentionSuggestions([...T, T[0]], "").length).toBe(4)
+  })
+
+  it("a bare word matches the start of a word in a name only", () => {
+    const items = [...T, { kind: "item" as const, label: "A crackling fire" }]
+    expect(mentionSuggestions(items, "cra", true).map((t) => t.label)).toEqual([
+      "A crackling fire",
+    ])
+    expect(mentionSuggestions(items, "the", true)).toEqual([])
+    expect(mentionSuggestions(items, "rust", true)).toEqual([])
+    expect(mentionSuggestions(items, "Kestrel", true)).toEqual([])
+    expect(mentionSuggestions(items, "", true)).toEqual([])
   })
 
   it("inserts the label over the query and spaces before a word", () => {

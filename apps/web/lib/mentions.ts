@@ -80,26 +80,50 @@ export function segmentMentions(
   return out
 }
 
-/** The @ query at the caret: the text after the last "@" that opens a
- *  word, when it is short and on the caret's line. Null otherwise. */
+export type MentionQuery = {
+  start: number
+  query: string
+  /** True when no @ was typed: the word itself opened the menu (founder,
+   *  2026-09-28: "detect the charity or topic after a character match"). */
+  implicit: boolean
+}
+
+/** The minimum a bare word needs before it can open the menu: "the"
+ *  and "a" must never pop it. */
+export const IMPLICIT_MIN = 3
+
+/** The query at the caret. With an @ that opens a word: everything after
+ *  it, when short and on the caret's line. Without one: the word being
+ *  typed, once it is IMPLICIT_MIN letters long. Null otherwise. */
 export function mentionQueryAt(
   text: string,
   caret: number
-): { start: number; query: string } | null {
+): MentionQuery | null {
   const upto = text.slice(0, caret)
   const at = upto.lastIndexOf("@")
-  if (at < 0) return null
-  const before = at > 0 ? upto[at - 1] : ""
-  if (before && /[\p{L}\p{N}]/u.test(before)) return null
-  const query = upto.slice(at + 1)
-  if (query.length > 40 || /\n/.test(query)) return null
-  return { start: at, query }
+  if (at >= 0) {
+    const before = at > 0 ? upto[at - 1] : ""
+    const query = upto.slice(at + 1)
+    if (
+      !(before && /[\p{L}\p{N}]/u.test(before)) &&
+      query.length <= 40 &&
+      !/\n/.test(query)
+    )
+      return { start: at, query, implicit: false }
+  }
+  const m = /[\p{L}\p{N}'’-]+$/u.exec(upto)
+  if (!m || m[0].length < IMPLICIT_MIN) return null
+  return { start: caret - m[0].length, query: m[0], implicit: true }
 }
 
-/** Targets matching the query, label-first. */
+/** Targets matching the query, label-first. An explicit (@) query
+ *  matches anywhere in the label; a bare word matches only the START of
+ *  a word in the label — "cra" finds "A crackling fire", "the" finds
+ *  nothing it should not. */
 export function mentionSuggestions(
   targets: MentionTarget[],
-  query: string
+  query: string,
+  implicit = false
 ): MentionTarget[] {
   const q = query.trim().toLowerCase()
   const seen = new Set<string>()
@@ -107,7 +131,13 @@ export function mentionSuggestions(
     const key = `${t.kind}:${t.label.toLowerCase()}`
     if (seen.has(key)) return false
     seen.add(key)
-    return !q || t.label.toLowerCase().includes(q)
+    const label = t.label.toLowerCase()
+    if (!q) return !implicit
+    if (implicit) {
+      if (label === q) return false // already written in full
+      return label.split(/[\s-]+/).some((w) => w.startsWith(q))
+    }
+    return label.includes(q)
   })
 }
 

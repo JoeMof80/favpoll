@@ -7,6 +7,7 @@ import {
   mentionQueryAt,
   mentionSuggestions,
   segmentMentions,
+  type MentionQuery,
   type MentionTarget,
 } from "@/lib/mentions"
 import { cn } from "@/lib/utils"
@@ -57,13 +58,18 @@ export function MentionTextarea({
   const areaRef = useRef<HTMLTextAreaElement>(null)
   const backdropRef = useRef<HTMLDivElement>(null)
   const listId = useId()
-  const [open, setOpen] = useState<{ start: number; query: string } | null>(
-    null
-  )
+  const [open, setOpen] = useState<MentionQuery | null>(null)
   const [active, setActive] = useState(0)
+  // Escape on a bare-word menu keeps it shut until the word changes.
+  const [dismissedAt, setDismissedAt] = useState<number | null>(null)
 
-  const suggestions = open ? mentionSuggestions(mentions, open.query) : []
-  const menuOpen = !!open && suggestions.length > 0
+  const suggestions = open
+    ? mentionSuggestions(mentions, open.query, open.implicit)
+    : []
+  const menuOpen =
+    !!open &&
+    suggestions.length > 0 &&
+    !(open.implicit && dismissedAt === open.start)
 
   // Keep the highlighter's scroll in step with the textarea's.
   function syncScroll() {
@@ -76,6 +82,8 @@ export function MentionTextarea({
     const q = mentionQueryAt(text, caret)
     setOpen(q)
     setActive(0)
+    if (q && dismissedAt !== null && dismissedAt !== q.start)
+      setDismissedAt(null)
   }
 
   function handleChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
@@ -113,6 +121,7 @@ export function MentionTextarea({
       choose(suggestions[active]!)
     } else if (e.key === "Escape") {
       e.preventDefault()
+      if (open?.implicit) setDismissedAt(open.start)
       setOpen(null)
     }
   }
