@@ -4,8 +4,8 @@ import type { MentionTarget } from "@/lib/mentions"
 type PollNoteProps = {
   personalNote?: string | null
   protagonistFirstName?: string
-  /** The charity, topic and favourite, lit in ink without a tint: the
-   *  note is a quotation (lib/mentions). */
+  /** The charity, topic and favourite, lit as in the About (founder,
+   *  2026-09-28: the same tint in the note; lib/mentions). */
   mentions?: MentionTarget[]
   role?: string
   "aria-label"?: string
@@ -35,7 +35,7 @@ export function PollNote({
         role={role}
         aria-live={ariaLive}
       >
-        <MentionText text={personalNote} mentions={mentions} quiet />
+        <MentionText text={personalNote} mentions={mentions} />
       </blockquote>
     </div>
   )

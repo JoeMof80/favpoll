@@ -81,7 +81,6 @@ export function WizardStoryStep({ w }: { w: WizardState }) {
             placeholder={revealGhost}
             onChange={w.setNote}
             mentions={noteMentions}
-            quiet
             aria-label="Personal note"
           />
           <div

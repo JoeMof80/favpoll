@@ -1037,7 +1037,7 @@ describe("the reveal promise rotates", () => {
     expect(
       REVEAL_PROMISES.some((f) =>
         prompt.includes(
-          `Pledge to Ocean Trust, pick your favourite colour, ${f.replace("X", "Joan's")}.`
+          `Pledge to Ocean Trust, pick your favourite Colour, ${f.replace("X", "Joan's")}.`
         )
       )
     ).toBe(true)
@@ -1195,7 +1195,7 @@ describe("realism rules in the person prompt (founder review, 2026-09-24)", () =
     })
     const prompt = promptOf()
     expect(prompt).toContain(
-      "pick your favourite song, and the top ten are the playlist for the night."
+      "pick your favourite Song, and the top ten are the playlist for the night."
     )
     expect(prompt).toContain("The guests' picks are ENACTED on the night")
     expect(prompt).toContain("there is no opener and no reveal")
@@ -1339,7 +1339,7 @@ describe("the closing sentence is enforced", () => {
       displayName: "Gordon Mitchell",
     })
     expect(result.about).toMatch(
-      /^Gordon spent most Sundays walking in a garden\. Pledge to Ocean Trust, pick your favourite colour, .*Gordon's.*\.$/
+      /^Gordon spent most Sundays walking in a garden\. Pledge to Ocean Trust, pick your favourite Colour, .*Gordon's.*\.$/
     )
   })
 })
@@ -1353,7 +1353,7 @@ describe("first person: the organiser is the protagonist", () => {
     mock.queue(TOPIC_DATA)
     mock.queue(CHARITY_DATA)
     mockLLMResponse(
-      "I'm retiring in June. Pledge to Ocean Trust, pick your favourite colour, to see mine.",
+      "I'm retiring in June. Pledge to Ocean Trust, pick your favourite Colour, to see mine.",
       "Mine is Blue. I painted the shed in it last summer."
     )
     mock.queue(null)

@@ -74,7 +74,7 @@ export function TypedNote({
         className="absolute inset-0 border-l-[2.5px] border-primary-muted pl-3 text-[18px] leading-relaxed font-normal text-muted-foreground italic"
         aria-hidden="true"
       >
-        {shown ? <MentionText text={shown} mentions={mentions} quiet /> : " "}
+        {shown ? <MentionText text={shown} mentions={mentions} /> : " "}
       </blockquote>
       {/* Reserves the final height so the quote border spans it from the
           first keystroke and typing never pushes the layout below. Placed
