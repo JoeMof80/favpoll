@@ -31,7 +31,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { Switch } from "@/components/ui/switch"
+import { SwitchLine } from "@/components/ui/switch-line"
 import { Tooltip, TooltipProvider } from "@/components/ui/tooltip"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import {
@@ -515,43 +515,27 @@ export function ManageClient({
             ]}
           />
         </SettingsRow>
-        <SettingsRow
-          label="Guest additions"
-          description={
-            guestItems
-              ? "Guests can add their own favourites to the poll."
-              : "Guests pick from your list only."
-          }
-        >
-          <Switch
+        <SettingsRow label="Guest additions">
+          <SwitchLine
             checked={guestItems}
             onCheckedChange={handleToggleGuestItems}
             disabled={guestItemsPending}
-            aria-label={
-              guestItems
-                ? "Guests can add favourites — click to stop them"
-                : "Guests cannot add favourites — click to allow it"
-            }
-          />
+          >
+            {guestItems
+              ? "Guests can add their own favourites to the poll."
+              : "Guests pick from your list only."}
+          </SwitchLine>
         </SettingsRow>
-        <SettingsRow
-          label="Show donations"
-          description={
-            showGuestAmounts
-              ? "Guests can choose to show their donation in the guest book."
-              : "Only favourite picks appear in the guest book."
-          }
-        >
-          <Switch
+        <SettingsRow label="Show donations">
+          <SwitchLine
             checked={showGuestAmounts}
             onCheckedChange={handleToggleShowGuestAmounts}
             disabled={showGuestAmountsPending}
-            aria-label={
-              showGuestAmounts
-                ? "Donations visible in guest book — click to hide"
-                : "Donations hidden in guest book — click to show"
-            }
-          />
+          >
+            {showGuestAmounts
+              ? "Guests can choose to show their donation in the guest book."
+              : "Only favourite picks appear in the guest book."}
+          </SwitchLine>
         </SettingsRow>
         {!isClosed && (
           <SettingsRow
