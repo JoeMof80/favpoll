@@ -34,8 +34,6 @@ type Props = {
   placeholder?: string
   className?: string
   "aria-label"?: string
-  /** The note is a quotation: ink without the tint. */
-  quiet?: boolean
 }
 
 const KIND_LABEL: Record<MentionTarget["kind"], string> = {
@@ -53,7 +51,6 @@ export function MentionTextarea({
   placeholder,
   className,
   "aria-label": ariaLabel,
-  quiet,
 }: Props) {
   const areaRef = useRef<HTMLTextAreaElement>(null)
   const backdropRef = useRef<HTMLDivElement>(null)
@@ -144,13 +141,9 @@ export function MentionTextarea({
       >
         {segments.map((s, i) =>
           s.target ? (
-            <span
-              key={i}
-              className={cn(
-                "font-medium text-primary",
-                !quiet && "-mx-0.5 rounded-sm bg-primary/10 px-0.5"
-              )}
-            >
+            // Ink alone, as MentionText renders it (founder, 2026-09-29:
+            // the tint was "too prominent").
+            <span key={i} className="font-medium text-primary">
               {s.text}
             </span>
           ) : (
