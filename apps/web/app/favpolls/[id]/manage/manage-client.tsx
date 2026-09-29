@@ -679,7 +679,6 @@ export function ManageClient({
     settings,
   }
   const activeDesktop = section ?? "overview"
-  const sectionLabel = sections.find((s) => s.id === section)?.label
 
   return (
     <>
@@ -780,66 +779,69 @@ export function ManageClient({
       {/* The favpoll sheet's width, not the console's 1320 (founder,
           2026-09-29: "page feels too wide") — a settings page reads in
           a column, and the toolbar's row narrows with it. */}
-      <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">
-        {/* Identity: the eyebrow and name, the close beside them. */}
-        <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
-          <div className="min-w-0">
-            <p className="text-[11px] font-medium tracking-[0.08em] text-primary uppercase">
-              {eyebrow}
-            </p>
-            <h1 className="mt-0.5 truncate text-2xl font-medium text-foreground">
-              {name}
-            </h1>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            {isClosed ? "Closed" : "Closes"}{" "}
-            <span
-              className={cn(
-                "font-medium",
-                !isClosed && isWarning
-                  ? "text-amber-600 dark:text-amber-400"
-                  : "text-foreground"
-              )}
-            >
-              {closesLabel}
-            </span>
-            {!isClosed && (
-              <>
-                {" "}
-                · {Math.max(days, 0)} day{days === 1 ? "" : "s"} left
-              </>
-            )}
-          </p>
-        </div>
-
-        <div className="mt-8 grid items-start gap-8 md:grid-cols-[13rem_minmax(0,1fr)] lg:grid-cols-[14rem_minmax(0,1fr)]">
-          {/* Desktop: the section nav, pinned under the toolbar. */}
-          <div className="sticky top-32 hidden md:block">
-            <SectionNav
-              sections={sections}
-              active={activeDesktop}
-              href={sectionHref}
-            />
-          </div>
-
-          {/* ONE content area, rendered once: a chosen section on every
-              width (the phone adds its heading); no section is the
-              phone's list and the desktop's Overview. */}
-          {section ? (
-            <div className="min-w-0">
-              <h2 className="mb-6 text-xl font-medium text-foreground md:hidden">
-                {sectionLabel}
-              </h2>
-              {content[section]}
+      {/* THE SHEET (founder, 2026-09-29: "page with shadow"): the favpoll
+          page's own white sheet over the register wash — PageLayout's
+          classes, clip-path and all — with the wizard's two columns
+          inside it: the tinted rail on the left, the fields on the
+          right. Below md the sheet is the page, as on the favpoll. */}
+      <div className="mx-auto min-h-[calc(100vh-7rem)] w-full max-w-5xl bg-background md:drop-shadow-lg md:[clip-path:inset(-1px_-24px_-24px_-24px)]">
+        <div className="md:grid md:min-h-[calc(100vh-7rem)] md:grid-cols-[260px_1fr] md:items-stretch">
+          {/* The rail: the wizard's tinted column, sections as stations. */}
+          <aside className="hidden bg-primary/10 p-6 md:block">
+            <div className="sticky top-32">
+              <SectionNav
+                sections={sections}
+                active={activeDesktop}
+                href={sectionHref}
+              />
             </div>
-          ) : (
-            <>
-              <div className="min-w-0 md:hidden">
-                <SectionList sections={sections} href={sectionHref} />
+          </aside>
+
+          {/* The fields: the wizard's column and rhythm. */}
+          <div className="px-6 pt-8 pb-10 md:px-12 md:pt-10">
+            <div className="mx-auto w-full max-w-2xl">
+              <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+                <div className="min-w-0">
+                  <p className="text-[11px] font-medium tracking-[0.08em] text-primary uppercase">
+                    {eyebrow}
+                  </p>
+                  <h1 className="mt-0.5 truncate text-2xl font-medium text-foreground">
+                    {name}
+                  </h1>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {isClosed ? "Closed" : "Closes"}{" "}
+                  <span
+                    className={cn(
+                      "font-medium",
+                      !isClosed && isWarning
+                        ? "text-amber-600 dark:text-amber-400"
+                        : "text-foreground"
+                    )}
+                  >
+                    {closesLabel}
+                  </span>
+                  {!isClosed && (
+                    <>
+                      {" "}
+                      · {Math.max(days, 0)} day{days === 1 ? "" : "s"} left
+                    </>
+                  )}
+                </p>
               </div>
-              <div className="hidden min-w-0 md:block">{overview}</div>
-            </>
-          )}
+
+              {section ? (
+                <div className="mt-6 min-w-0">{content[section]}</div>
+              ) : (
+                <>
+                  <div className="mt-8 min-w-0 md:hidden">
+                    <SectionList sections={sections} href={sectionHref} />
+                  </div>
+                  <div className="mt-6 hidden min-w-0 md:block">{overview}</div>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </>

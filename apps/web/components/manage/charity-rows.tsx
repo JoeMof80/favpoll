@@ -118,16 +118,10 @@ export function CharityRows({
         title="Charities"
         description="Every pledge is split equally between them."
       >
-        {charities.map(({ charity }) => (
+        {charities.map(({ charity }, i) => (
           <SettingsRow
             key={charity.id}
-            label={
-              <CharityRow
-                charity={{ ...charity, created_at: charity.created_at ?? "" }}
-                amountRaised={amountEach}
-                size="sm"
-              />
-            }
+            label={charities.length > 1 ? `Charity ${i + 1}` : "Charity"}
             // STATUS ONLY — favpoll owns the consent outreach, not the
             // organiser (founder, 2026-09-14).
             description={
@@ -138,39 +132,53 @@ export function CharityRows({
                 : undefined
             }
           >
-            {editable ? (
-              <span className="inline-flex items-center gap-1">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="size-8 text-muted-foreground hover:text-foreground"
-                  disabled={busy}
-                  onClick={() => openPicker(charity.id)}
-                  aria-label={`Replace ${charity.name}`}
-                >
-                  <Pencil className="size-4" aria-hidden="true" />
-                </Button>
-                {ids.length > 1 && (
+            <span className="flex w-full items-center gap-3">
+              <span className="min-w-0 flex-1">
+                <CharityRow
+                  charity={{
+                    ...charity,
+                    created_at: charity.created_at ?? "",
+                  }}
+                  amountRaised={amountEach}
+                  size="sm"
+                />
+              </span>
+              {editable ? (
+                <span className="inline-flex items-center gap-1">
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="size-8 text-muted-foreground hover:text-destructive"
+                    className="size-8 text-muted-foreground hover:text-foreground"
                     disabled={busy}
-                    onClick={() => commit(ids.filter((i) => i !== charity.id))}
-                    aria-label={`Remove ${charity.name}`}
+                    onClick={() => openPicker(charity.id)}
+                    aria-label={`Replace ${charity.name}`}
                   >
-                    <Trash2 className="size-4" aria-hidden="true" />
+                    <Pencil className="size-4" aria-hidden="true" />
                   </Button>
-                )}
-              </span>
-            ) : lockReason ? (
-              <Lock
-                className="size-4 text-muted-foreground"
-                aria-label={lockReason}
-              />
-            ) : null}
+                  {ids.length > 1 && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="size-8 text-muted-foreground hover:text-destructive"
+                      disabled={busy}
+                      onClick={() =>
+                        commit(ids.filter((i) => i !== charity.id))
+                      }
+                      aria-label={`Remove ${charity.name}`}
+                    >
+                      <Trash2 className="size-4" aria-hidden="true" />
+                    </Button>
+                  )}
+                </span>
+              ) : lockReason ? (
+                <Lock
+                  className="size-4 text-muted-foreground"
+                  aria-label={lockReason}
+                />
+              ) : null}
+            </span>
           </SettingsRow>
         ))}
         {editable && ids.length < 3 && (

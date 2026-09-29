@@ -183,7 +183,7 @@ export function EditableTextRow({
 
   return (
     <SettingsRow label={label} description={description} stacked>
-      <div className="grid gap-3">
+      <div className="grid w-full gap-3">
         {multiline ? (
           <InputGroup className="bg-background">
             <MentionTextarea
@@ -305,7 +305,7 @@ export function EditableDateRow({
 
   return (
     <SettingsRow label={label} description={description} stacked>
-      <div className="grid gap-3">
+      <div className="grid w-full gap-3">
         <DateTimePicker
           value={draft}
           onChange={setDraft}
@@ -394,7 +394,7 @@ export function EditableAmountRow({
 
   return (
     <SettingsRow label={label} description={description} stacked>
-      <div className="grid gap-3">
+      <div className="grid w-full gap-3">
         <InputGroup className="max-w-xs bg-background">
           <InputGroupAddon>£</InputGroupAddon>
           <InputGroupInput
