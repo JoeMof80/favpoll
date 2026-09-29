@@ -788,10 +788,11 @@ export function ManageClient({
           right. Below md the sheet is the page, as on the favpoll. */}
       <div className="mx-auto min-h-[calc(100vh-7rem)] w-full max-w-5xl bg-background md:drop-shadow-lg md:[clip-path:inset(-1px_-24px_-24px_-24px)]">
         <div className="md:grid md:min-h-[calc(100vh-7rem)] md:grid-cols-[260px_1fr] md:items-stretch">
-          {/* The nav: the plain buttons (founder, 2026-09-29: "I don't
-              want the wizard style rail"), the wizard's icons where the
-              concepts match. */}
-          <aside className="hidden p-6 md:block">
+          {/* The nav: the plain buttons on the wizard rail's tinted
+              column (founder, 2026-09-29: not the rail's stations, but
+              "the nav rail background colour from the wizard"), the
+              wizard's icons where the concepts match. */}
+          <aside className="hidden bg-primary/10 p-6 md:block">
             <div className="sticky top-32">
               <SectionNav
                 sections={sections}

@@ -94,9 +94,10 @@ export function SectionNav({
             aria-current={isActive ? "page" : undefined}
             className={cn(
               "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+              // On the rail's tint the active pill is the sheet's white.
               isActive
-                ? "bg-primary/10 font-medium text-primary"
-                : "text-foreground hover:bg-muted"
+                ? "bg-background font-medium text-primary shadow-xs"
+                : "text-foreground hover:bg-background/60"
             )}
           >
             <Icon className="size-4 shrink-0" aria-hidden />
