@@ -1,88 +1,82 @@
 "use client"
 
-import { useState } from "react"
-import { Pencil } from "lucide-react"
-import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
+import { useEffect, useRef, useState } from "react"
+import { Check } from "lucide-react"
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group"
 import { MentionTextarea } from "@/components/mention-textarea"
-import { MentionText } from "@/components/mention-text"
 import { CharCounter } from "@/components/favpoll-form/edit-helpers"
 import { DateTimePicker } from "@/components/favpoll-form/date-time-picker"
 import { CLOSE_DATE_PRESETS } from "@/components/favpoll-form/date-helpers"
+import { WIZARD_INPUT_SIZE } from "@/components/new-favpoll-wizard/wizard-field"
 import { SettingsRow } from "@/components/manage/settings-rows"
 import type { MentionTarget } from "@/lib/mentions"
-import { TOAST_ERROR_STYLE } from "@/lib/toast-styles"
+import { cn } from "@/lib/utils"
 
-// ROWS THAT EDIT IN PLACE (founder, 2026-09-29: "I thought we were
-// editing in line?"). At rest a row shows its value with a pencil at
-// the edge; the pencil (or the value) opens the field IN the row —
-// the wizard's own input, the same limit, the same counter — with
-// Cancel and Save beneath. Save calls the server, keeps the new value
-// on success, and toasts on failure with the field still open, so
-// nothing typed is lost. A closed favpoll gets no pencil: its rows are
-// the record.
+// FIELDS THAT ARE ALWAYS LIVE (founder, 2026-09-29: "Should each
+// editable field have its own editable field?" — no). The wizard's own
+// inputs, exactly as the wizard shows them, and each saves ITSELF: a
+// line saves on Enter or on leaving it, a paragraph on leaving it, a
+// date or an amount as soon as it changes. Escape puts the old value
+// back. The hint says "Saved" for a moment, or carries the error with
+// the typed text kept. The switches and the visibility control already
+// worked this way; the text fields were the odd ones out behind a
+// pencil. A closed favpoll shows the fields disabled — the record.
 
-const NONE = <span className="text-muted-foreground">None written.</span>
+type Status =
+  | { kind: "idle" }
+  | { kind: "saving" }
+  | { kind: "saved" }
+  | { kind: "error"; message: string }
 
-function EditFooter({
-  saving,
-  onCancel,
-  onSave,
-  disabled,
+function useSaveStatus() {
+  const [status, setStatus] = useState<Status>({ kind: "idle" })
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current)
+    },
+    []
+  )
+  function flash(next: Status) {
+    setStatus(next)
+    if (timer.current) clearTimeout(timer.current)
+    if (next.kind === "saved")
+      timer.current = setTimeout(() => setStatus({ kind: "idle" }), 2000)
+  }
+  return [status, flash] as const
+}
+
+function Hint({
+  description,
+  status,
 }: {
-  saving: boolean
-  onCancel: () => void
-  onSave: () => void
-  disabled?: boolean
+  description?: React.ReactNode
+  status: Status
 }) {
+  if (status.kind === "error")
+    return <span className="text-destructive">{status.message}</span>
   return (
-    <div className="flex justify-end gap-2">
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        disabled={saving}
-        onClick={onCancel}
-      >
-        Cancel
-      </Button>
-      <Button
-        type="button"
-        size="sm"
-        disabled={saving || disabled}
-        onClick={onSave}
-      >
-        {saving ? "Saving…" : "Save"}
-      </Button>
-    </div>
+    <>
+      {description}
+      {status.kind === "saving" && (
+        <span className="ml-2 text-muted-foreground">Saving…</span>
+      )}
+      {status.kind === "saved" && (
+        <span className="ml-2 inline-flex items-center gap-1 text-primary">
+          <Check className="size-3" aria-hidden="true" />
+          Saved
+        </span>
+      )}
+    </>
   )
 }
 
-function PencilButton({
-  label,
-  onClick,
-}: {
-  label: string
-  onClick: () => void
-}) {
-  return (
-    <Button
-      type="button"
-      variant="ghost"
-      size="icon"
-      className="size-8 shrink-0 text-muted-foreground hover:text-foreground"
-      onClick={onClick}
-      aria-label={`Edit ${label}`}
-    >
-      <Pencil className="size-4" aria-hidden="true" />
-    </Button>
-  )
-}
+const errorText = (e: unknown) =>
+  e instanceof Error ? e.message : "Couldn't save — try again."
 
 export function EditableTextRow({
   label,
@@ -101,151 +95,115 @@ export function EditableTextRow({
   value: string
   maxLength: number
   placeholder?: string
-  /** The About and the note: a MentionTextarea, stacked under the label. */
+  /** The About and the note: a MentionTextarea. */
   multiline?: boolean
   mentions?: MentionTarget[]
   required?: boolean
-  /** A closed favpoll: the value, no pencil. */
+  /** A closed favpoll: the field, disabled. */
   readOnly?: boolean
   onSave: (next: string) => Promise<void>
 }) {
   const [current, setCurrent] = useState(value)
   const [draft, setDraft] = useState(value)
-  const [editing, setEditing] = useState(false)
-  const [saving, setSaving] = useState(false)
-  // The server's value wins whenever the row is at rest: after a
-  // refresh, and when React reuses this row for another field (the
-  // section switch — About once showed the opening line, 2026-09-29).
-  // Derived during render (React's own pattern), not in an effect.
+  const [status, flash] = useSaveStatus()
+  const [focused, setFocused] = useState(false)
+  // The server's value wins while the field isn't being typed in:
+  // after a refresh, and when React reuses this row for another field
+  // (React's own derive-in-render pattern, not an effect).
   const [seen, setSeen] = useState(value)
   if (value !== seen) {
     setSeen(value)
-    if (!editing) {
+    if (!focused) {
       setCurrent(value)
       setDraft(value)
     }
   }
 
-  function open() {
-    setDraft(current)
-    setEditing(true)
-  }
-  function cancel() {
-    setEditing(false)
-    setDraft(current)
-  }
-  async function save() {
+  async function commit() {
     const next = draft.trim()
-    if (required && !next) return
-    if (next === current) {
-      setEditing(false)
+    if (next === current) return
+    if (required && !next) {
+      setDraft(current)
+      flash({ kind: "error", message: "This can't be empty." })
       return
     }
-    setSaving(true)
+    flash({ kind: "saving" })
     try {
       await onSave(next)
       setCurrent(next)
-      setEditing(false)
+      flash({ kind: "saved" })
     } catch (e) {
-      toast.error(
-        e instanceof Error ? e.message : "Couldn't save — try again.",
-        {
-          style: TOAST_ERROR_STYLE,
-        }
-      )
-    } finally {
-      setSaving(false)
+      flash({ kind: "error", message: errorText(e) })
     }
   }
 
-  const shown = current ? (
-    multiline ? (
-      <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground">
-        <MentionText text={current} mentions={mentions} />
-      </p>
-    ) : (
-      current
-    )
-  ) : (
-    NONE
-  )
+  function revert() {
+    setDraft(current)
+    flash({ kind: "idle" })
+  }
 
-  if (!editing) {
+  const hint = <Hint description={description} status={status} />
+
+  if (multiline) {
     return (
-      <SettingsRow
-        label={label}
-        description={description}
-        stacked={multiline}
-        className={readOnly ? undefined : "group"}
-      >
-        {multiline ? (
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0 flex-1">{shown}</div>
-            {!readOnly && <PencilButton label={label} onClick={open} />}
+      <SettingsRow label={label} description={hint} required={required}>
+        <InputGroup className="bg-background">
+          <MentionTextarea
+            rows={4}
+            maxLength={maxLength}
+            value={draft}
+            placeholder={placeholder}
+            onChange={setDraft}
+            mentions={mentions}
+            aria-label={label}
+            disabled={readOnly}
+            onFocus={() => setFocused(true)}
+            onBlur={() => {
+              setFocused(false)
+              void commit()
+            }}
+          />
+          <div
+            data-align="block-end"
+            className="order-last flex w-full items-center justify-end px-3 py-1.5"
+          >
+            <CharCounter value={draft} max={maxLength} />
           </div>
-        ) : (
-          <span className="inline-flex max-w-full items-center justify-end gap-1">
-            <span className="min-w-0 break-words">{shown}</span>
-            {!readOnly && <PencilButton label={label} onClick={open} />}
-          </span>
-        )}
+        </InputGroup>
       </SettingsRow>
     )
   }
 
   return (
-    <SettingsRow label={label} description={description} stacked>
-      <div className="grid w-full gap-3">
-        {multiline ? (
-          <InputGroup className="bg-background">
-            <MentionTextarea
-              rows={4}
-              maxLength={maxLength}
-              value={draft}
-              placeholder={placeholder}
-              onChange={setDraft}
-              mentions={mentions}
-              aria-label={label}
-            />
-            <div
-              data-align="block-end"
-              className="order-last flex w-full items-center justify-end px-3 py-1.5"
-            >
-              <CharCounter value={draft} max={maxLength} />
-            </div>
-          </InputGroup>
-        ) : (
-          <InputGroup className="bg-background">
-            <InputGroupInput
-              autoFocus
-              className="md:text-base"
-              value={draft}
-              maxLength={maxLength}
-              placeholder={placeholder}
-              aria-label={label}
-              onChange={(e) => setDraft(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault()
-                  void save()
-                } else if (e.key === "Escape") {
-                  e.preventDefault()
-                  cancel()
-                }
-              }}
-            />
-            <InputGroupAddon align="inline-end">
-              <CharCounter value={draft} max={maxLength} />
-            </InputGroupAddon>
-          </InputGroup>
-        )}
-        <EditFooter
-          saving={saving}
-          onCancel={cancel}
-          onSave={() => void save()}
-          disabled={required && !draft.trim()}
+    <SettingsRow label={label} description={hint} required={required}>
+      <InputGroup className={cn(WIZARD_INPUT_SIZE, "bg-background")}>
+        <InputGroupInput
+          className="md:text-base"
+          value={draft}
+          maxLength={maxLength}
+          placeholder={placeholder}
+          aria-label={label}
+          disabled={readOnly}
+          onChange={(e) => setDraft(e.target.value)}
+          onFocus={() => setFocused(true)}
+          onBlur={() => {
+            setFocused(false)
+            void commit()
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault()
+              e.currentTarget.blur()
+            } else if (e.key === "Escape") {
+              e.preventDefault()
+              revert()
+            }
+          }}
         />
-      </div>
+        <InputGroupAddon align="inline-end">
+          <CharCounter value={draft} max={maxLength} />
+        </InputGroupAddon>
+      </InputGroup>
     </SettingsRow>
   )
 }
@@ -264,82 +222,45 @@ export function EditableDateRow({
   onSave: (next: Date) => Promise<void>
 }) {
   const [current, setCurrent] = useState(value)
-  const [draft, setDraft] = useState<Date>(value)
-  const [editing, setEditing] = useState(false)
-  const [saving, setSaving] = useState(false)
+  const [status, flash] = useSaveStatus()
   const [seen, setSeen] = useState(value.getTime())
   if (value.getTime() !== seen) {
     setSeen(value.getTime())
-    if (!editing) {
-      setCurrent(value)
-      setDraft(value)
-    }
+    setCurrent(value)
   }
 
-  const shown = current.toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  })
-
-  async function save() {
-    if (draft.getTime() === current.getTime()) {
-      setEditing(false)
-      return
-    }
-    setSaving(true)
+  async function change(next: Date) {
+    if (next.getTime() === current.getTime()) return
+    const before = current
+    setCurrent(next)
+    flash({ kind: "saving" })
     try {
-      await onSave(draft)
-      setCurrent(draft)
-      setEditing(false)
+      await onSave(next)
+      flash({ kind: "saved" })
     } catch (e) {
-      toast.error(
-        e instanceof Error ? e.message : "Couldn't save — try again.",
-        {
-          style: TOAST_ERROR_STYLE,
-        }
-      )
-    } finally {
-      setSaving(false)
+      setCurrent(before)
+      flash({ kind: "error", message: errorText(e) })
     }
-  }
-
-  if (!editing) {
-    return (
-      <SettingsRow label={label} description={description}>
-        <span className="inline-flex items-center gap-1">
-          {shown}
-          {!readOnly && (
-            <PencilButton
-              label={label}
-              onClick={() => {
-                setDraft(current)
-                setEditing(true)
-              }}
-            />
-          )}
-        </span>
-      </SettingsRow>
-    )
   }
 
   return (
-    <SettingsRow label={label} description={description} stacked>
-      <div className="grid w-full gap-3">
+    <SettingsRow
+      label={label}
+      description={<Hint description={description} status={status} />}
+    >
+      {readOnly ? (
+        current.toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        })
+      ) : (
         <DateTimePicker
-          value={draft}
-          onChange={setDraft}
+          value={current}
+          onChange={(d) => void change(d)}
           presets={CLOSE_DATE_PRESETS}
         />
-        <EditFooter
-          saving={saving}
-          onCancel={() => {
-            setEditing(false)
-            setDraft(current)
-          }}
-          onSave={() => void save()}
-        />
-      </div>
+      )}
     </SettingsRow>
   )
 }
@@ -362,97 +283,80 @@ export function EditableAmountRow({
 }) {
   const [current, setCurrent] = useState(value)
   const [draft, setDraft] = useState(value ? String(value) : "")
-  const [editing, setEditing] = useState(false)
-  const [saving, setSaving] = useState(false)
+  const [status, flash] = useSaveStatus()
+  const [focused, setFocused] = useState(false)
   const [seen, setSeen] = useState(value)
   if (value !== seen) {
     setSeen(value)
-    if (!editing) {
+    if (!focused) {
       setCurrent(value)
       setDraft(value ? String(value) : "")
     }
   }
 
-  async function save() {
+  async function commit() {
     const n = draft.trim() === "" ? null : Number(draft)
-    if (n !== null && (!Number.isFinite(n) || n < 0)) return
-    if (n === current) {
-      setEditing(false)
+    if (n !== null && (!Number.isFinite(n) || n < 0)) {
+      setDraft(current ? String(current) : "")
+      flash({ kind: "error", message: "The goal must be a positive amount." })
       return
     }
-    setSaving(true)
+    if (n === current) return
+    flash({ kind: "saving" })
     try {
       await onSave(n)
       setCurrent(n)
-      setEditing(false)
+      flash({ kind: "saved" })
     } catch (e) {
-      toast.error(
-        e instanceof Error ? e.message : "Couldn't save — try again.",
-        {
-          style: TOAST_ERROR_STYLE,
-        }
-      )
-    } finally {
-      setSaving(false)
+      flash({ kind: "error", message: errorText(e) })
     }
   }
 
-  if (!editing) {
+  if (readOnly) {
     return (
       <SettingsRow label={label} description={description}>
-        <span className="inline-flex items-center gap-1">
-          {current ? (
-            <span className="tabular-nums">{format(current)}</span>
-          ) : (
-            <span className="text-muted-foreground">No goal</span>
-          )}
-          {!readOnly && (
-            <PencilButton
-              label={label}
-              onClick={() => {
-                setDraft(current ? String(current) : "")
-                setEditing(true)
-              }}
-            />
-          )}
-        </span>
+        {current ? (
+          <span className="tabular-nums">{format(current)}</span>
+        ) : (
+          <span className="text-muted-foreground">No goal</span>
+        )}
       </SettingsRow>
     )
   }
 
   return (
-    <SettingsRow label={label} description={description} stacked>
-      <div className="grid w-full gap-3">
-        <InputGroup className="max-w-xs bg-background">
-          <InputGroupAddon>£</InputGroupAddon>
-          <InputGroupInput
-            autoFocus
-            type="number"
-            inputMode="decimal"
-            min={0}
-            step={1}
-            className="md:text-base"
-            value={draft}
-            placeholder="No goal"
-            aria-label={label}
-            onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault()
-                void save()
-              } else if (e.key === "Escape") {
-                e.preventDefault()
-                setEditing(false)
-              }
-            }}
-          />
-        </InputGroup>
-        <EditFooter
-          saving={saving}
-          onCancel={() => setEditing(false)}
-          onSave={() => void save()}
+    <SettingsRow
+      label={label}
+      description={<Hint description={description} status={status} />}
+    >
+      <InputGroup className={cn(WIZARD_INPUT_SIZE, "max-w-xs bg-background")}>
+        <InputGroupAddon>£</InputGroupAddon>
+        <InputGroupInput
+          type="number"
+          inputMode="decimal"
+          min={0}
+          step={1}
+          className="md:text-base"
+          value={draft}
+          placeholder="No goal"
+          aria-label={label}
+          onChange={(e) => setDraft(e.target.value)}
+          onFocus={() => setFocused(true)}
+          onBlur={() => {
+            setFocused(false)
+            void commit()
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault()
+              e.currentTarget.blur()
+            } else if (e.key === "Escape") {
+              e.preventDefault()
+              setDraft(current ? String(current) : "")
+            }
+          }}
         />
-      </div>
+      </InputGroup>
     </SettingsRow>
   )
 }

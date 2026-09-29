@@ -2,15 +2,15 @@
 
 import { useEffect, useRef, useState } from "react"
 import { FormProvider, useForm } from "react-hook-form"
-import { ImagePlus, Pencil } from "lucide-react"
+import { ImagePlus } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { HeroPhotoOverlay } from "@/components/favpoll-form/hero-photo-overlay"
 import type { FavpollFormValues } from "@/components/favpoll-form/schema"
-import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
 import { SettingsRow } from "@/components/manage/settings-rows"
 import { uploadPersonPhoto } from "@/app/favpolls/new/actions"
 import { TOAST_ERROR_STYLE } from "@/lib/toast-styles"
+import { cn } from "@/lib/utils"
 
 // THE PHOTO ROW (step 3, 2026-09-29): the wizard's crop overlay, in
 // place. The overlay writes a File (or clears) into a scoped form; this
@@ -90,35 +90,26 @@ export function PhotoRow({
             : "Square works best; you can crop it here."
       }
     >
-      <span className="inline-flex items-center gap-3">
+      {/* THE AVATAR IS THE BUTTON (the wizard's own idiom, 2026-09-01):
+          tap the photo — or the empty slot — to open the crop overlay. */}
+      <Button
+        type="button"
+        variant="outline"
+        disabled={readOnly || saving}
+        onClick={() => setOpen(true)}
+        aria-label={current ? "Change photo" : "Add a photo"}
+        className={cn(
+          "h-20 w-20 shrink-0 overflow-hidden rounded-xl p-0",
+          !current && "border-dashed border-border-strong text-muted-foreground"
+        )}
+      >
         {current ? (
-          <ProtagonistAvatar
-            name={name}
-            photoUrl={current}
-            className="h-14 w-14 md:h-14 md:w-14"
-          />
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={current} alt="" className="h-full w-full object-cover" />
         ) : (
-          <span
-            className="flex h-14 w-14 items-center justify-center rounded-xl border border-dashed border-border-strong text-muted-foreground"
-            aria-hidden="true"
-          >
-            <ImagePlus className="size-5" />
-          </span>
+          <ImagePlus className="size-6" aria-hidden="true" />
         )}
-        {!readOnly && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="size-8 shrink-0 text-muted-foreground hover:text-foreground"
-            disabled={saving}
-            onClick={() => setOpen(true)}
-            aria-label={current ? "Change photo" : "Add a photo"}
-          >
-            <Pencil className="size-4" aria-hidden="true" />
-          </Button>
-        )}
-      </span>
+      </Button>
       <FormProvider {...form}>
         <HeroPhotoOverlay open={open} onOpenChange={setOpen} />
       </FormProvider>

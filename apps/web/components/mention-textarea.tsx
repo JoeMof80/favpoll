@@ -34,6 +34,10 @@ type Props = {
   placeholder?: string
   className?: string
   "aria-label"?: string
+  disabled?: boolean
+  onFocus?: () => void
+  /** Fires after the menu's own blur handling. */
+  onBlur?: () => void
 }
 
 const KIND_LABEL: Record<MentionTarget["kind"], string> = {
@@ -51,6 +55,9 @@ export function MentionTextarea({
   placeholder,
   className,
   "aria-label": ariaLabel,
+  disabled,
+  onFocus,
+  onBlur,
 }: Props) {
   const areaRef = useRef<HTMLTextAreaElement>(null)
   const backdropRef = useRef<HTMLDivElement>(null)
@@ -170,7 +177,12 @@ export function MentionTextarea({
         onClick={(e) =>
           refreshMenu(value, e.currentTarget.selectionStart ?? value.length)
         }
-        onBlur={() => setTimeout(() => setOpen(null), 120)}
+        disabled={disabled}
+        onFocus={onFocus}
+        onBlur={() => {
+          setTimeout(() => setOpen(null), 120)
+          onBlur?.()
+        }}
         className={cn(
           "relative flex-1 resize-none rounded-none border-0 bg-transparent text-transparent caret-foreground shadow-none ring-0 placeholder:text-muted-foreground focus-visible:ring-0",
           metrics,
