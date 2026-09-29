@@ -180,8 +180,11 @@ export function PollSection({
       aria-label={`Favourite ${poll.topics.title} poll`}
       className="space-y-4"
     >
-      {/* Merged header: "Favourite {topic}" — button pre-pledge, static post-pledge */}
-      <div className="sticky top-[6.6875rem] z-20 bg-background md:top-(--hero-stuck-bottom,13.75rem)">
+      {/* Merged header: "Favourite {topic}" — button pre-pledge, static post-pledge.
+          Mobile pins under the identity bar's MEASURED height
+          (--identity-bar-h, published while it shows; 51px was the
+          one-row bar the old 6.6875rem was tuned to, 2026-09-29). */}
+      <div className="sticky top-[calc(3.5rem+var(--identity-bar-h,3.1875rem))] z-20 bg-background md:top-(--hero-stuck-bottom,13.75rem)">
         {/* ONE heading row for all breakpoints — PollHeading left,
             ... dropdown right. Same pattern mobile and desktop. */}
         <div className="flex min-h-9 items-center gap-2 py-3">
@@ -316,7 +319,7 @@ export function PollSection({
                wrapper passes events through; the card hovers with the
                list cards' lift idiom. */
             <div className="pointer-events-none z-10 flex flex-col items-center pt-4 [grid-area:1/1]">
-              <span className="sticky top-[calc(7.5rem+4.25rem)] flex w-full flex-col items-center md:top-[calc(var(--hero-stuck-bottom,13.75rem)+4.25rem)]">
+              <span className="sticky top-[calc(3.5rem+var(--identity-bar-h,3.1875rem)+0.8125rem+4.25rem)] flex w-full flex-col items-center md:top-[calc(var(--hero-stuck-bottom,13.75rem)+4.25rem)]">
                 <Button
                   type="button"
                   variant="ghost"
@@ -341,7 +344,7 @@ export function PollSection({
                sticky geometry as the lock card so it sits where guests
                expect the way in to be. */
             <div className="pointer-events-none z-10 flex flex-col items-center pt-4 [grid-area:1/1]">
-              <span className="sticky top-[calc(7.5rem+4.25rem)] flex w-full flex-col items-center md:top-[calc(var(--hero-stuck-bottom,13.75rem)+4.25rem)]">
+              <span className="sticky top-[calc(3.5rem+var(--identity-bar-h,3.1875rem)+0.8125rem+4.25rem)] flex w-full flex-col items-center md:top-[calc(var(--hero-stuck-bottom,13.75rem)+4.25rem)]">
                 <div className="pointer-events-auto w-full max-w-sm rounded-xl bg-background/95 px-5 py-4 text-center shadow-xl ring-1 ring-border">
                   <p className="text-sm text-muted-foreground">
                     {pledgesGatedNotice}

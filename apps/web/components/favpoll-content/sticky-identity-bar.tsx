@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { Countdown } from "@/components/countdown"
 
 type Props = {
@@ -18,11 +18,19 @@ type Props = {
 /**
  * Mobile-only identity bar. Shows when scrolled past 93px (roughly
  * the hero height). Uses a plain scroll listener — no
- * IntersectionObserver, no CSS vars, no ref wiring. md:hidden keeps
- * desktop untouched. Nothing downstream reads its height (checked
- * 2026-09-29, when the countdown row joined it: the state row sits
- * above the identity row, so the bar is the only place the close
- * lives on a phone once the hero has scrolled away).
+ * IntersectionObserver. md:hidden keeps desktop untouched.
+ *
+ * Its HEIGHT is published as --identity-bar-h while it shows
+ * (2026-09-29): the poll section's topic header and pledge pill pin
+ * beneath it, and were hardcoded to the old one-row bar (6.6875rem =
+ * header + 51px) until the state strip joined it and the topic header
+ * slid under (founder screenshot). Measured, not stamped, so the strip
+ * can change without the offsets drifting again.
+ *
+ * The STATE STRIP (founder, 2026-09-29: the countdown "above the Name
+ * and photo, on its own row", then "the countdown creates clutter"):
+ * a thin tinted band in sentence case above the identity row, so it
+ * reads as a status ribbon rather than a third line of caps.
  */
 export function StickyIdentityBar({
   name,
@@ -55,18 +63,38 @@ export function StickyIdentityBar({
     return () => cancelAnimationFrame(rafRef.current)
   }, [show])
 
+  const barRef = useRef<HTMLDivElement>(null)
+  useLayoutEffect(() => {
+    const el = barRef.current
+    const root = document.documentElement
+    if (!el) {
+      root.style.removeProperty("--identity-bar-h")
+      return
+    }
+    const set = () =>
+      root.style.setProperty("--identity-bar-h", `${el.offsetHeight}px`)
+    set()
+    const ro = new ResizeObserver(set)
+    ro.observe(el)
+    return () => {
+      ro.disconnect()
+      root.style.removeProperty("--identity-bar-h")
+    }
+  }, [show])
+
   if (!show) return null
 
   return (
     <div
-      className={`fixed top-14 right-0 left-0 z-30 border-b border-border bg-background px-6 py-1.5 transition-transform duration-200 ease-out md:hidden ${
+      ref={barRef}
+      className={`fixed top-14 right-0 left-0 z-30 border-b border-border bg-background transition-transform duration-200 ease-out md:hidden ${
         entered ? "translate-y-0" : "-translate-y-full"
       }`}
     >
       {(closedLabel || closesAt) && (
-        <div className="mb-1">
+        <div className="border-b border-border bg-primary/5 px-6 py-1">
           {closedLabel ? (
-            <p className="truncate text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
+            <p className="truncate text-xs text-muted-foreground">
               {closedLabel}
             </p>
           ) : (
@@ -74,7 +102,7 @@ export function StickyIdentityBar({
           )}
         </div>
       )}
-      <div className="flex items-center gap-2.5">
+      <div className="flex items-center gap-2.5 px-6 py-1.5">
         <div className="min-w-0 flex-1">
           <p className="truncate text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
             {eyebrow}

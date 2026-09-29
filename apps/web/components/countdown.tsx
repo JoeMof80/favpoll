@@ -204,20 +204,25 @@ export function Countdown({
           ]
 
   if (variant === "bar") {
-    // ONE EYEBROW LINE for the mobile identity bar (founder, 2026-09-29:
-    // the countdown "above the Name and photo, on its own row"): the
-    // three-unit rule, so the bar does not tick every second while days
-    // remain; seconds return for the last-day drama as everywhere else.
+    // ONE SMALL LINE for the mobile identity bar's state strip (founder,
+    // 2026-09-29: the countdown "above the Name and photo, on its own
+    // row" — then "creates clutter" as a third line of caps, so it is
+    // sentence case at text-xs, figures carrying the line and units
+    // stepped back, the card's own hierarchy). Seconds ride along as on
+    // the card (founder: "no reason not to restore seconds").
+    const barParts =
+      days > 0 ? [...parts, { value: seconds, label: "sec" }] : parts
     return (
       <p
         aria-live="off"
         aria-label={`${days} days ${hours} hours ${minutes} minutes remaining`}
-        className="truncate text-[11px] font-medium tracking-widest text-primary uppercase tabular-nums"
+        className="truncate text-xs text-muted-foreground tabular-nums"
       >
         Closes in
-        {parts.map(({ value, label }) => (
-          <span key={label} className="ml-2">
-            {value} {label}
+        {barParts.map(({ value, label }) => (
+          <span key={label} className="ml-2 font-medium text-foreground">
+            {value}
+            <span className="font-normal text-muted-foreground"> {label}</span>
           </span>
         ))}
       </p>
