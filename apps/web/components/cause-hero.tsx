@@ -44,7 +44,9 @@ export function CauseHero({ favpoll, mentions, compact }: Props) {
 
   const title = (
     <h1
-      className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground ${heroNameSizeClass(headline.name, compact)}`}
+      // The size transition keeps step with the rail's expand (page-layout,
+      // 300ms) so the compact step is one motion, not a jump.
+      className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground transition-[font-size] duration-300 ease-out motion-reduce:transition-none ${heroNameSizeClass(headline.name, compact)}`}
     >
       {favpoll.cause_label}
     </h1>
@@ -52,7 +54,7 @@ export function CauseHero({ favpoll, mentions, compact }: Props) {
 
   const subtitle = headline.suffix ? (
     <p
-      className={`mt-4 truncate text-xl font-normal whitespace-normal text-primary ${compact ? "" : "md:text-2xl"}`}
+      className={`mt-4 truncate text-xl font-normal whitespace-normal text-primary transition-[font-size] duration-300 ease-out motion-reduce:transition-none ${compact ? "" : "md:text-2xl"}`}
     >
       {headline.suffix}
     </p>
