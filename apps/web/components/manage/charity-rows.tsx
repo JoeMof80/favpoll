@@ -114,10 +114,7 @@ export function CharityRows({
 
   return (
     <>
-      <SettingsGroup
-        title="Charities"
-        description="Every pledge is split equally between them."
-      >
+      <SettingsGroup>
         {charities.map(({ charity }, i) => (
           <SettingsRow
             key={charity.id}

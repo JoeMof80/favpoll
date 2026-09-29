@@ -21,16 +21,24 @@ export function SettingsGroup({
   description,
   children,
 }: {
-  title: string
+  /** Only where a heading says something the nav doesn't (founder,
+   *  2026-09-30: "Only Favourite Topic header is worth saving"). */
+  title?: string
   description?: React.ReactNode
   children: React.ReactNode
 }) {
-  return (
-    <WizardStepShell title={title}>
+  const body = (
+    <>
       {description && (
         <p className="-mt-2 text-sm text-muted-foreground">{description}</p>
       )}
       <div className="space-y-5">{children}</div>
+    </>
+  )
+  if (!title) return <div className="flex flex-col gap-5 py-6">{body}</div>
+  return (
+    <WizardStepShell title={title} visibleTitle>
+      {body}
     </WizardStepShell>
   )
 }

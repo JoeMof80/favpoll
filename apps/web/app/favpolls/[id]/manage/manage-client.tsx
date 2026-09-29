@@ -11,7 +11,7 @@ import {
   ExternalLink,
   BookOpen,
   Gift,
-  LayoutDashboard,
+  PoundSterling,
   Shapes,
   UserRound,
   Users,
@@ -126,7 +126,8 @@ const formatLongDate = (iso: string) =>
 const SECTIONS: ManageSection[] = [
   // The wizard's own glyphs for the steps it shares (wizard-step-rail
   // STEP_ICONS): a person, a book, an assortment, a gift, settings.
-  { id: "overview", label: "Overview", icon: LayoutDashboard },
+  // Money leads (founder, 2026-09-30: Overview renamed — it is the money).
+  { id: "money", label: "Money", icon: PoundSterling },
   { id: "header", label: "Header", icon: UserRound },
   { id: "story", label: "Story", icon: BookOpen },
   { id: "favourites", label: "Favourites", icon: Shapes },
@@ -369,9 +370,9 @@ export function ManageClient({
 
   // ── The sections ──────────────────────────────────────────────────
 
-  const overview = (
+  const money = (
     <div className="flex flex-col gap-8">
-      <SettingsGroup title="Money">
+      <SettingsGroup>
         <SettingsRow
           label={favpoll.goal_amount ? "Raised so far" : "Raised"}
           description={
@@ -451,7 +452,7 @@ export function ManageClient({
 
   const header = (
     <div className="flex flex-col gap-8">
-      <SettingsGroup title="Header">
+      <SettingsGroup>
         <EditableTextRow
           label="Opening line"
           value={favpoll.opening_line ?? ""}
@@ -487,7 +488,7 @@ export function ManageClient({
 
   const story = (
     <div className="flex flex-col gap-8">
-      <SettingsGroup title="Story">
+      <SettingsGroup>
         <EditableTextRow
           label="About"
           description="Set the scene, link the topic and the cause. Hint at a note, if there is one."
@@ -550,7 +551,7 @@ export function ManageClient({
 
   const settings = (
     <div className="flex flex-col gap-8">
-      <SettingsGroup title="Visibility and guests">
+      <SettingsGroup>
         <SettingsRow
           label="Who can see this favpoll"
           description={VISIBILITY_NOTES[visibility]}
@@ -607,8 +608,6 @@ export function ManageClient({
             }
           />
         </SettingsRow>
-      </SettingsGroup>
-      <SettingsGroup title="Dates">
         {isClosed ? (
           <SettingsRow label="Closed">{closesLabel}</SettingsRow>
         ) : (
@@ -619,9 +618,7 @@ export function ManageClient({
             onSave={saveClosesAt}
           />
         )}
-      </SettingsGroup>
-      {!isClosed && (
-        <SettingsGroup title="Delete">
+        {!isClosed && (
           <SettingsRow
             label="Delete this favpoll"
             description={
@@ -640,13 +637,13 @@ export function ManageClient({
               {deleting ? "Deleting…" : "Delete favpoll"}
             </Button>
           </SettingsRow>
-        </SettingsGroup>
-      )}
+        )}
+      </SettingsGroup>
     </div>
   )
 
   const content: Record<string, React.ReactNode> = {
-    overview,
+    money,
     header,
     story,
     favourites,
@@ -654,7 +651,8 @@ export function ManageClient({
     guestbook,
     settings,
   }
-  const activeDesktop = section ?? "overview"
+  const activeDesktop = section ?? "money"
+  const sectionLabel = sections.find((s) => s.id === section)?.label
 
   return (
     <>
@@ -848,6 +846,13 @@ export function ManageClient({
                 // Keyed: a fresh tree per section, so no row is reused
                 // for another field's value.
                 <div key={section} className="min-w-0">
+                  {/* The phone has no nav in view inside a section, so
+                      the section's name stands in, in the rail's type;
+                      on desktop the nav carries it and nothing repeats
+                      it (founder, 2026-09-30). */}
+                  <h2 className="pt-6 text-lg font-medium tracking-widest text-primary uppercase md:hidden">
+                    {sectionLabel}
+                  </h2>
                   {content[section]}
                 </div>
               ) : (
@@ -855,7 +860,7 @@ export function ManageClient({
                   <div className="mt-6 min-w-0 md:hidden">
                     <SectionList sections={sections} href={sectionHref} />
                   </div>
-                  <div className="hidden min-w-0 md:block">{overview}</div>
+                  <div className="hidden min-w-0 md:block">{money}</div>
                 </>
               )}
             </div>
