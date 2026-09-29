@@ -9,8 +9,11 @@ import {
   Check,
   Copy,
   ExternalLink,
+  BookOpen,
   HeartHandshake,
   LayoutDashboard,
+  ListChecks,
+  UserRound,
   Monitor,
   PenLine,
   Printer,
@@ -115,13 +118,18 @@ const formatLongDate = (iso: string) =>
 // section is its own screen (?section=…). No Sharing section (founder,
 // 2026-09-29: "do we need a share section as well as the dropdown?"):
 // the toolbar's Share popover is the one door — guest link, QR, live
-// display — and the print artefacts ride Overview.
+// display — and the print artefacts ride Overview. Reorganised the
+// same day on the founder's word: Delete lives at the end of Settings,
+// the guest book has its own section, and the wizard's three authored
+// steps — Header, Story, Favourites — are three sections here too.
 const SECTIONS: ManageSection[] = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "header", label: "Header", icon: UserRound },
   { id: "story", label: "Story", icon: PenLine },
+  { id: "favourites", label: "Favourites", icon: ListChecks },
   { id: "charities", label: "Charities", icon: HeartHandshake },
+  { id: "guestbook", label: "Guest book", icon: BookOpen },
   { id: "settings", label: "Settings", icon: Settings2 },
-  { id: "delete", label: "Delete", icon: Trash2 },
 ]
 
 export function ManageClient({
@@ -151,11 +159,7 @@ export function ManageClient({
   const days = daysRemaining(favpoll.closes_at)
   const isWarning = !isClosed && days <= WARNING_THRESHOLD_DAYS
 
-  // Delete is an open-favpoll action (the zero-pledges guard made it
-  // one anyway), so a closed favpoll has no Delete section.
-  const sections = isClosed
-    ? SECTIONS.filter((s) => s.id !== "delete")
-    : SECTIONS
+  const sections = SECTIONS
   const section =
     requested && sections.some((s) => s.id === requested) ? requested : null
   const sectionHref = (id: string) =>
@@ -321,37 +325,6 @@ export function ManageClient({
     )
   }
 
-  // A link as a row's control: the full link in mono, its copy button,
-  // and the door itself.
-  const linkControl = (key: string, href: string, label: string) => (
-    <div className="flex items-center justify-end gap-1">
-      <a
-        href={href}
-        target="_blank"
-        rel="noreferrer"
-        className="min-w-0 truncate font-mono text-xs text-muted-foreground hover:text-foreground hover:underline"
-        title={href}
-        suppressHydrationWarning
-      >
-        {href.replace(/^https?:\/\//, "")}
-      </a>
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        className="size-7 shrink-0 text-muted-foreground hover:text-foreground"
-        onClick={() => copy(key, href)}
-        aria-label={`Copy ${label}`}
-      >
-        {copied === key ? (
-          <Check size={14} aria-hidden="true" />
-        ) : (
-          <Copy size={14} aria-hidden="true" />
-        )}
-      </Button>
-    </div>
-  )
-
   const perCharity =
     favpoll.charities.length > 0
       ? favpoll.total_raised / favpoll.charities.length
@@ -468,15 +441,6 @@ export function ManageClient({
         />
       </SettingsGroup>
 
-      <SettingsGroup title="The room">
-        <SettingsRow
-          label="Live display"
-          description="The standings on a screen in the room, on its own link."
-        >
-          {linkControl("display", displayUrl, "live display link")}
-        </SettingsRow>
-      </SettingsGroup>
-
       <SettingsGroup title="Print and keep">
         <SettingsRow
           label="Stationery"
@@ -503,13 +467,13 @@ export function ManageClient({
           </SettingsRow>
         )}
       </SettingsGroup>
-
-      {/* The wall draws its own card, eyebrow and all. */}
-      <GuestBook entries={wallEntries} teaseBacked={false} />
     </div>
   )
 
-  const story = (
+  // The wall draws its own card, eyebrow and all.
+  const guestbook = <GuestBook entries={wallEntries} teaseBacked={false} />
+
+  const header = (
     <div className="flex flex-col gap-8">
       <SettingsGroup title="Header">
         <EditableTextRow
@@ -542,6 +506,11 @@ export function ManageClient({
           onSave={saveField("photo_url")}
         />
       </SettingsGroup>
+    </div>
+  )
+
+  const story = (
+    <div className="flex flex-col gap-8">
       <SettingsGroup title="Story">
         <EditableTextRow
           label="About"
@@ -565,6 +534,11 @@ export function ManageClient({
           onSave={saveField("note")}
         />
       </SettingsGroup>
+    </div>
+  )
+
+  const favourites = (
+    <div className="flex flex-col gap-8">
       <FavouritesGroup
         favpollId={favpoll.id}
         topicTitle={topicTitle}
@@ -670,38 +644,39 @@ export function ManageClient({
           />
         )}
       </SettingsGroup>
+      {!isClosed && (
+        <SettingsGroup title="Delete">
+          <SettingsRow
+            label="Delete this favpoll"
+            description={
+              canDelete
+                ? "The favpoll and its poll will be gone for good."
+                : "A favpoll with pledges can't be deleted."
+            }
+          >
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={!canDelete || deleting}
+              onClick={() => setConfirmDeleteOpen(true)}
+            >
+              <Trash2 data-icon="inline-start" aria-hidden="true" />
+              {deleting ? "Deleting…" : "Delete favpoll"}
+            </Button>
+          </SettingsRow>
+        </SettingsGroup>
+      )}
     </div>
-  )
-
-  const deleteSection = (
-    <SettingsGroup title="Delete">
-      <SettingsRow
-        label="Delete this favpoll"
-        description={
-          canDelete
-            ? "The favpoll and its poll will be gone for good."
-            : "A favpoll with pledges can't be deleted."
-        }
-      >
-        <Button
-          type="button"
-          variant="destructive"
-          disabled={!canDelete || deleting}
-          onClick={() => setConfirmDeleteOpen(true)}
-        >
-          <Trash2 data-icon="inline-start" aria-hidden="true" />
-          {deleting ? "Deleting…" : "Delete favpoll"}
-        </Button>
-      </SettingsRow>
-    </SettingsGroup>
   )
 
   const content: Record<string, React.ReactNode> = {
     overview,
+    header,
     story,
+    favourites,
     charities,
+    guestbook,
     settings,
-    delete: deleteSection,
   }
   const activeDesktop = section ?? "overview"
   const sectionLabel = sections.find((s) => s.id === section)?.label
