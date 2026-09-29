@@ -89,11 +89,16 @@ export function PageLayout({
           className={[
             // grid-template-columns interpolates (Chrome 107+, Safari
             // 16+), so the expand is a transition rather than a jump;
-            // motion-reduce drops it to a snap.
+            // motion-reduce drops it to a snap. BOTH states must be
+            // LENGTHS for that: 376px ↔ 50% interpolates, 376px ↔ 1fr
+            // does not — the browser snapped (measured 376→512 in one
+            // frame; founder, 2026-09-29: "the rows animate but nothing
+            // else on the page animates"). 50% of the sheet is the old
+            // grid-cols-2 exactly.
             `grid ${
               appShell
                 ? railExpanded
-                  ? "md:grid-cols-2"
+                  ? "md:grid-cols-[1fr_50%]"
                   : "md:grid-cols-[1fr_376px]"
                 : "md:grid-cols-[1fr_300px]"
             }`,
