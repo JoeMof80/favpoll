@@ -11,7 +11,6 @@ import {
   ExternalLink,
   BookOpen,
   Gift,
-  PoundSterling,
   Shapes,
   UserRound,
   Users,
@@ -126,8 +125,8 @@ const formatLongDate = (iso: string) =>
 const SECTIONS: ManageSection[] = [
   // The wizard's own glyphs for the steps it shares (wizard-step-rail
   // STEP_ICONS): a person, a book, an assortment, a gift, settings.
-  // Money leads (founder, 2026-09-30: Overview renamed — it is the money).
-  { id: "money", label: "Money", icon: PoundSterling },
+  // No Money section (founder, 2026-09-30): the goal and the ledger
+  // live on Settings, in the wizard's order.
   { id: "header", label: "Header", icon: UserRound },
   { id: "story", label: "Story", icon: BookOpen },
   { id: "favourites", label: "Favourites", icon: Shapes },
@@ -370,83 +369,6 @@ export function ManageClient({
 
   // ── The sections ──────────────────────────────────────────────────
 
-  const money = (
-    <div className="flex flex-col gap-8">
-      <SettingsGroup>
-        <SettingsRow
-          label={favpoll.goal_amount ? "Raised so far" : "Raised"}
-          description={
-            favpoll.goal_amount
-              ? `Towards a ${formatAmount(favpoll.goal_amount)} goal.`
-              : "Pledges and the shared pot together."
-          }
-          stacked={!!favpoll.goal_amount}
-        >
-          {favpoll.goal_amount ? (
-            <div className="grid gap-2">
-              <p className="text-lg font-medium text-foreground tabular-nums">
-                {formatAmount(favpoll.total_raised)}
-                <span className="text-sm font-normal text-muted-foreground">
-                  {" "}
-                  of {formatAmount(favpoll.goal_amount)}
-                </span>
-              </p>
-              <div
-                className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
-                role="progressbar"
-                aria-label="Progress towards the pledge goal"
-                aria-valuemin={0}
-                aria-valuemax={favpoll.goal_amount}
-                aria-valuenow={Math.min(
-                  favpoll.total_raised,
-                  favpoll.goal_amount
-                )}
-              >
-                <div
-                  className="h-full rounded-full bg-primary transition-[width] duration-700 ease-out"
-                  style={{
-                    width: `${Math.min(100, (favpoll.total_raised / favpoll.goal_amount) * 100)}%`,
-                  }}
-                />
-              </div>
-            </div>
-          ) : (
-            <span className="text-lg font-medium tabular-nums">
-              {formatAmount(favpoll.total_raised)}
-            </span>
-          )}
-        </SettingsRow>
-        <SettingsRow label="Pledges">
-          <span className="tabular-nums">{favpoll.pledge_count}</span>
-        </SettingsRow>
-        <SettingsRow
-          label="Shared pot"
-          description="Given without a favourite, spent on the standings."
-        >
-          {favpoll.pot && favpoll.pot.total_deposited > 0 ? (
-            <span className="tabular-nums">
-              {formatAmount(favpoll.pot.total_deposited)}
-              <span className="text-muted-foreground">
-                {" "}
-                · {formatAmount(favpoll.pot.total_allocated)} used
-              </span>
-            </span>
-          ) : (
-            <span className="text-muted-foreground">Empty</span>
-          )}
-        </SettingsRow>
-        <EditableAmountRow
-          label="Pledge goal"
-          description="Shown to guests as a bar under the total."
-          value={favpoll.goal_amount}
-          format={formatAmount}
-          readOnly={isClosed}
-          onSave={saveField("goal_amount")}
-        />
-      </SettingsGroup>
-    </div>
-  )
-
   // The wall draws its own card, eyebrow and all.
   const guestbook = <GuestBook entries={wallEntries} teaseBacked={false} />
 
@@ -549,9 +471,32 @@ export function ManageClient({
     />
   )
 
+  // SETTINGS IN THE WIZARD'S ORDER (founder, 2026-09-30: "match the
+  // Wizard settings more closely"): goal, close, visibility, guest
+  // additions, show donations — the Details step's list — then Delete.
+  // The ledger follows under a hairline: raised, pledges, the pot are
+  // status, not settings, and Money folded in here on his word.
   const settings = (
     <div className="flex flex-col gap-8">
       <SettingsGroup>
+        <EditableAmountRow
+          label="Pledge goal"
+          description="Shown to guests as a bar under the total."
+          value={favpoll.goal_amount}
+          format={formatAmount}
+          readOnly={isClosed}
+          onSave={saveField("goal_amount")}
+        />
+        {isClosed ? (
+          <SettingsRow label="Closed">{closesLabel}</SettingsRow>
+        ) : (
+          <EditableDateRow
+            label="Closes"
+            description={`${Math.max(days, 0)} day${days === 1 ? "" : "s"} left. Two extensions at most.`}
+            value={new Date(favpoll.closes_at)}
+            onSave={saveClosesAt}
+          />
+        )}
         <SettingsRow
           label="Who can see this favpoll"
           description={VISIBILITY_NOTES[visibility]}
@@ -608,16 +553,6 @@ export function ManageClient({
             }
           />
         </SettingsRow>
-        {isClosed ? (
-          <SettingsRow label="Closed">{closesLabel}</SettingsRow>
-        ) : (
-          <EditableDateRow
-            label="Closes"
-            description={`${Math.max(days, 0)} day${days === 1 ? "" : "s"} left. Two extensions at most.`}
-            value={new Date(favpoll.closes_at)}
-            onSave={saveClosesAt}
-          />
-        )}
         {!isClosed && (
           <SettingsRow
             label="Delete this favpoll"
@@ -639,11 +574,76 @@ export function ManageClient({
           </SettingsRow>
         )}
       </SettingsGroup>
+      <div className="border-t border-border">
+        <SettingsGroup>
+          <SettingsRow
+            label={favpoll.goal_amount ? "Raised so far" : "Raised"}
+            description={
+              favpoll.goal_amount
+                ? `Towards a ${formatAmount(favpoll.goal_amount)} goal.`
+                : "Pledges and the shared pot together."
+            }
+            stacked={!!favpoll.goal_amount}
+          >
+            {favpoll.goal_amount ? (
+              <div className="grid gap-2">
+                <p className="text-lg font-medium text-foreground tabular-nums">
+                  {formatAmount(favpoll.total_raised)}
+                  <span className="text-sm font-normal text-muted-foreground">
+                    {" "}
+                    of {formatAmount(favpoll.goal_amount)}
+                  </span>
+                </p>
+                <div
+                  className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
+                  role="progressbar"
+                  aria-label="Progress towards the pledge goal"
+                  aria-valuemin={0}
+                  aria-valuemax={favpoll.goal_amount}
+                  aria-valuenow={Math.min(
+                    favpoll.total_raised,
+                    favpoll.goal_amount
+                  )}
+                >
+                  <div
+                    className="h-full rounded-full bg-primary transition-[width] duration-700 ease-out"
+                    style={{
+                      width: `${Math.min(100, (favpoll.total_raised / favpoll.goal_amount) * 100)}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            ) : (
+              <span className="text-lg font-medium tabular-nums">
+                {formatAmount(favpoll.total_raised)}
+              </span>
+            )}
+          </SettingsRow>
+          <SettingsRow label="Pledges">
+            <span className="tabular-nums">{favpoll.pledge_count}</span>
+          </SettingsRow>
+          <SettingsRow
+            label="Shared pot"
+            description="Given without a favourite, spent on the standings."
+          >
+            {favpoll.pot && favpoll.pot.total_deposited > 0 ? (
+              <span className="tabular-nums">
+                {formatAmount(favpoll.pot.total_deposited)}
+                <span className="text-muted-foreground">
+                  {" "}
+                  · {formatAmount(favpoll.pot.total_allocated)} used
+                </span>
+              </span>
+            ) : (
+              <span className="text-muted-foreground">Empty</span>
+            )}
+          </SettingsRow>
+        </SettingsGroup>
+      </div>
     </div>
   )
 
   const content: Record<string, React.ReactNode> = {
-    money,
     header,
     story,
     favourites,
@@ -651,7 +651,7 @@ export function ManageClient({
     guestbook,
     settings,
   }
-  const activeDesktop = section ?? "money"
+  const activeDesktop = section ?? "header"
   const sectionLabel = sections.find((s) => s.id === section)?.label
 
   return (
@@ -860,7 +860,7 @@ export function ManageClient({
                   <div className="mt-6 min-w-0 md:hidden">
                     <SectionList sections={sections} href={sectionHref} />
                   </div>
-                  <div className="hidden min-w-0 md:block">{money}</div>
+                  <div className="hidden min-w-0 md:block">{header}</div>
                 </>
               )}
             </div>
