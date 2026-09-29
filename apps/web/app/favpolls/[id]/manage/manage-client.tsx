@@ -442,33 +442,6 @@ export function ManageClient({
           onSave={saveField("goal_amount")}
         />
       </SettingsGroup>
-
-      <SettingsGroup title="Print and keep">
-        <SettingsRow
-          label="Stationery"
-          description="Invitations, insert cards and table signs, with the QR code."
-        >
-          <Button asChild variant="outline">
-            <a href={`/favpolls/${favpoll.id}/stationery`}>
-              <Printer data-icon="inline-start" aria-hidden="true" />
-              Stationery
-            </a>
-          </Button>
-        </SettingsRow>
-        {isClosed && (
-          <SettingsRow
-            label="Keepsake"
-            description="The closed favpoll as one page to keep."
-          >
-            <Button asChild variant="outline">
-              <Link href={`/favpolls/${favpoll.id}/keepsake`}>
-                <Sparkles data-icon="inline-start" aria-hidden="true" />
-                Keepsake
-              </Link>
-            </Button>
-          </SettingsRow>
-        )}
-      </SettingsGroup>
     </div>
   )
 
@@ -705,6 +678,26 @@ export function ManageClient({
             growth lever (founder, 2026-09-14). The doors it used to share
             the toolbar with now live in the sections. */}
         <div className="ml-auto flex items-center gap-2">
+          {/* THE OUTWARD PAIR (founder, 2026-09-29): Share and the print
+              artefact are one act — getting the favpoll in front of
+              guests by link and QR, or by the QR on invitations and
+              table signs. Once closed, the artefact is the keepsake.
+              Icon-only on the phone so the toolbar keeps one row. */}
+          {isClosed ? (
+            <Button asChild variant="outline">
+              <Link href={`/favpolls/${favpoll.id}/keepsake`}>
+                <Sparkles data-icon="inline-start" aria-hidden="true" />
+                <span className="sr-only sm:not-sr-only">Keepsake</span>
+              </Link>
+            </Button>
+          ) : (
+            <Button asChild variant="outline">
+              <a href={`/favpolls/${favpoll.id}/stationery`}>
+                <Printer data-icon="inline-start" aria-hidden="true" />
+                <span className="sr-only sm:not-sr-only">Stationery</span>
+              </a>
+            </Button>
+          )}
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline">
