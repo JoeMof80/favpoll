@@ -111,14 +111,31 @@ export function HeroLayout({
     const set = () => {
       const rest = text.offsetHeight
       const settled = settledEl.offsetHeight
-      if (rest > 0 && settled > 0) setAvatarCfg({ rest, settled })
+      if (rest > 0 && settled > 0) {
+        setAvatarCfg({ rest, settled })
+        // THE COLLAPSE, published (founder, 2026-09-29: "a strange
+        // shuddering when scrolling the left column"): the band settles
+        // by this much of REAL layout in the first 24px of scroll. In the
+        // shell the column is its own scroller, so when it overflows by
+        // less than this, scrolling removes its own overflow, the browser
+        // clamps the scroll back, the band re-expands, and it oscillates
+        // (Quora's collapsing header). The shell scroller reserves this
+        // much spare room (page-layout) so the loop cannot start.
+        document.documentElement.style.setProperty(
+          "--hero-collapse",
+          `${Math.max(0, rest - settled)}px`
+        )
+      }
     }
     set()
     setAvatarMounted(true)
     const ro = new ResizeObserver(set)
     ro.observe(text)
     ro.observe(settledEl)
-    return () => ro.disconnect()
+    return () => {
+      ro.disconnect()
+      document.documentElement.style.removeProperty("--hero-collapse")
+    }
   }, [])
 
   // ONE SETTLE CONSTANT (founder, 2026-09-05: the 120px rest gap under

@@ -118,7 +118,18 @@ export function PageLayout({
             <ShellScroller
               className={`min-w-0 ${shellGutter} ${mobilePadBottom} md:scrollbar-hide md:min-h-0 md:overflow-y-auto md:pb-0 md:[overflow-anchor:none]`}
             >
-              {left}
+              {/* Spare room past the shell's height (100vh - the header)
+                  of the hero's collapse plus the 24px settle window
+                  (--hero-collapse, published by hero-layout): a column
+                  that overflows by less than the band settles would
+                  scroll away its own overflow, clamp back, re-expand and
+                  shudder (measured: 8px/32 spare ↔ 0/48, 2026-09-29). A
+                  percentage minimum never resolves inside the scroller,
+                  so the height is the shell's. Zero on pages with no
+                  hero; no effect on a column that already overflows. */}
+              <div className="md:min-h-[calc(100vh-3.5rem+var(--hero-collapse,0px)+24px)]">
+                {left}
+              </div>
             </ShellScroller>
           ) : (
             <div className="min-w-0">{left}</div>
