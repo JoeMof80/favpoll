@@ -13,7 +13,6 @@ import {
   LayoutDashboard,
   Monitor,
   PenLine,
-  Pencil,
   Printer,
   Settings2,
   Share2,
@@ -45,13 +44,17 @@ import {
   EditableTextRow,
 } from "@/components/manage/editable-row"
 import { updateStoryField, type StoryField } from "./actions"
+import { PhotoRow } from "@/components/manage/photo-row"
+import { CharityRows } from "@/components/manage/charity-rows"
+import {
+  FavouritesGroup,
+  type ManageFavourite,
+} from "@/components/manage/favourites-row"
+import type { Charity } from "@favpoll/types"
 import { updateClosesAt } from "@/app/favpolls/[id]/edit/actions"
 import type { MentionTarget } from "@/lib/mentions"
 import { paletteForFavpoll } from "@/lib/register-palette"
 import type { FavpollCategory, FavpollSubject } from "@favpoll/types"
-import { Chip } from "@/components/ui/chip"
-import { CharityRow } from "@/components/charity-row"
-import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
 import { cn } from "@/lib/utils"
 import { formatAmount } from "@/lib/display"
 import { TOAST_ERROR_STYLE } from "@/lib/toast-styles"
@@ -77,12 +80,13 @@ export type ManageFavpoll = OrganizerFavpoll & {
   about: string | null
   reveal: string | null
   photoUrl: string | null
-  favourites: {
-    id: string
-    label: string
-    isGuestAdded: boolean
-    isHidden: boolean
-  }[]
+  favourites: ManageFavourite[]
+  /** A finite topic takes no organiser additions. */
+  topicIsFinite: boolean
+  /** Why the charity set can't change (an appeal, other people's money), or null. */
+  charityLockReason: string | null
+  /** Why the topic can't change (guests have pledged), or null. */
+  topicLockReason: string | null
 }
 
 type Visibility = "listed" | "unlisted" | "private"
@@ -121,9 +125,14 @@ const SECTIONS: ManageSection[] = [
 export function ManageClient({
   favpoll,
   wallEntries,
+  pickerCharities,
+  consentGatingActive = false,
 }: {
   favpoll: ManageFavpoll
   wallEntries: WallEntry[]
+  /** The charity picker's list: active charities plus this favpoll's own. */
+  pickerCharities: Charity[]
+  consentGatingActive?: boolean
 }) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -497,28 +506,12 @@ export function ManageClient({
           readOnly={isClosed}
           onSave={saveField("context")}
         />
-        <SettingsRow
-          label="Photo"
-          description={
-            isClosed ? undefined : "Change it in the wizard for now."
-          }
-        >
-          <span className="inline-flex items-center gap-3">
-            <ProtagonistAvatar
-              name={name}
-              photoUrl={favpoll.photoUrl}
-              className="h-14 w-14 md:h-14 md:w-14"
-            />
-            {!isClosed && (
-              <Button asChild variant="outline" size="sm">
-                <Link href={`/favpolls/${favpoll.id}/edit`}>
-                  <Pencil data-icon="inline-start" aria-hidden="true" />
-                  Edit
-                </Link>
-              </Button>
-            )}
-          </span>
-        </SettingsRow>
+        <PhotoRow
+          name={name}
+          photoUrl={favpoll.photoUrl}
+          readOnly={isClosed}
+          onSave={saveField("photo_url")}
+        />
       </SettingsGroup>
       <SettingsGroup title="Story">
         <EditableTextRow
@@ -543,100 +536,37 @@ export function ManageClient({
           onSave={saveField("note")}
         />
       </SettingsGroup>
-      <SettingsGroup title={topicTitle ? `Favourite ${topicTitle}` : "Topic"}>
-        <SettingsRow
-          label="Favourites"
-          description={
-            favpoll.favourites.length > 0
-              ? `${favpoll.favourites.length} favourite${favpoll.favourites.length === 1 ? "" : "s"}${
-                  favpoll.favourites.some((f) => f.isGuestAdded)
-                    ? " · tinted = added by guests"
-                    : ""
-                }${
-                  favpoll.favourites.some((f) => f.isHidden)
-                    ? " · faded = hidden from the poll"
-                    : ""
-                }`
-              : undefined
-          }
-          stacked
-        >
-          <div className="flex items-start justify-between gap-3">
-            {favpoll.favourites.length > 0 ? (
-              <div className="flex min-w-0 flex-1 flex-wrap gap-1.5">
-                {favpoll.favourites.map((f) => (
-                  <Chip
-                    key={f.id}
-                    size="sm"
-                    readOnly
-                    className={cn(
-                      f.isGuestAdded &&
-                        "border-primary bg-primary/10 text-primary",
-                      f.isHidden && "opacity-40"
-                    )}
-                  >
-                    {f.label}
-                  </Chip>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">No favourites.</p>
-            )}
-            {!isClosed && (
-              <Button asChild variant="outline" size="sm" className="shrink-0">
-                <Link href={`/favpolls/${favpoll.id}/edit`}>
-                  <Pencil data-icon="inline-start" aria-hidden="true" />
-                  Edit
-                </Link>
-              </Button>
-            )}
-          </div>
-        </SettingsRow>
-      </SettingsGroup>
+      <FavouritesGroup
+        favpollId={favpoll.id}
+        topicTitle={topicTitle}
+        favourites={favpoll.favourites}
+        topicIsFinite={favpoll.topicIsFinite}
+        topicLockReason={favpoll.topicLockReason}
+        readOnly={isClosed}
+        editHref={`/favpolls/${favpoll.id}/edit`}
+        onChanged={() => router.refresh()}
+      />
     </div>
   )
 
   const charities = (
-    <SettingsGroup
-      title="Charities"
-      description="Every pledge is split equally between them."
-    >
-      {favpoll.charities.map(({ charity }) => (
-        <SettingsRow
-          key={charity.id}
-          label={
-            <CharityRow
-              charity={{ ...charity, created_at: charity.created_at ?? "" }}
-              amountRaised={perCharity}
-              size="sm"
-            />
-          }
-          // STATUS ONLY — favpoll owns the consent outreach, not the
-          // organiser (founder, 2026-09-14).
-          description={
-            charity.consent_status && charity.consent_status !== "approved"
-              ? charity.consent_status === "declined"
-                ? "The charity has declined — pledges here are paused."
-                : `Pledges are held until ${charity.name} agrees to receive them.`
-              : undefined
-          }
-          stacked
-        />
-      ))}
-      {!isClosed && (
-        <SettingsRow
-          label="Change the charity"
-          description="In the wizard for now. Locked once guests have pledged."
-        >
-          <Button asChild variant="outline" size="sm">
-            <Link href={`/favpolls/${favpoll.id}/edit`}>
-              <Pencil data-icon="inline-start" aria-hidden="true" />
-              Edit
-            </Link>
-          </Button>
-        </SettingsRow>
-      )}
-    </SettingsGroup>
+    <CharityRows
+      favpollId={favpoll.id}
+      charities={favpoll.charities}
+      pickerCharities={pickerCharities}
+      amountEach={perCharity}
+      lockReason={favpoll.charityLockReason}
+      readOnly={isClosed}
+      consentGatingActive={consentGatingActive}
+      eventCategory={
+        (favpoll.category ?? null) as
+          | "celebration"
+          | "memorial"
+          | "fundraiser"
+          | null
+      }
+      onChanged={() => router.refresh()}
+    />
   )
 
   const sharing = (

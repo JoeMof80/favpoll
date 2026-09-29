@@ -13,6 +13,9 @@ import {
 import type { FavpollCategory, FavpollSubject } from "@favpoll/types"
 import type { WallEntry } from "@/components/guest-book"
 import { ManageClient, type ManageFavpoll } from "./manage-client"
+import { favpollLocks, readLockInputs, lockReason } from "@/lib/favpoll-locks"
+import { consentPosture } from "@/lib/charity-consent"
+import type { Charity } from "@favpoll/types"
 
 export const metadata = {
   title: "Manage favpoll — favpoll",
@@ -46,15 +49,17 @@ export default async function ManageFavpollPage({
       photo_url,
       is_private,
       show_guest_amounts,
+      appeal_id,
+      appeals ( name, charity_id ),
       protagonists!favpolls_protagonist_id_fkey ( name, context, about, photo_url ),
       favpoll_charities ( charities ( id, name, logo_url, registered_number, description, created_at, consent_status, consent_contacted_at, registered_email ) ),
       favpoll_polls (
         id,
         personal_note,
-        topics ( title ),
+        topics ( title, is_finite ),
         topic_subsets ( title ),
         pledges ( count ),
-        favpoll_poll_favourites ( is_hidden, is_guest_added, favourites ( id, label ) )
+        favpoll_poll_favourites ( id, is_hidden, is_guest_added, favourites ( id, label ) )
       ),
       favpoll_pots ( total_deposited, total_allocated )`
     )
@@ -73,6 +78,8 @@ export default async function ManageFavpollPage({
     description: string | null
     photo_url: string | null
     is_private: boolean | null
+    appeal_id: string | null
+    appeals: { name: string; charity_id: string } | null
     protagonists: {
       name: string
       context: string | null
@@ -81,7 +88,9 @@ export default async function ManageFavpollPage({
     } | null
     favpoll_polls:
       | (NonNullable<RawOrganizerRow["favpoll_polls"]> & {
+          topics: { title: string; is_finite: boolean | null } | null
           favpoll_poll_favourites: {
+            id: string
             is_hidden: boolean | null
             is_guest_added: boolean | null
             favourites: { id: string; label: string } | null
@@ -154,6 +163,32 @@ export default async function ManageFavpollPage({
   }
   const isCause = ev.subject === "cause"
 
+  // WHAT THE ROWS MAY CHANGE (step 3, 2026-09-29): the per-field locks
+  // the wizard's edit page reads (lib/favpoll-locks), the charity list
+  // for the picker (active, plus this favpoll's own — register-added
+  // charities sit inactive until approved), and the consent posture.
+  const locks = favpollLocks(
+    await readLockInputs(supabase, id, pollId, ev.created_by ?? null)
+  )
+  const { data: activeCharities } = await supabase
+    .from("charities")
+    .select("*")
+    .eq("is_active", true)
+    .order("name")
+  const pickerCharities = [...((activeCharities ?? []) as Charity[])]
+  for (const ec of ev.favpoll_charities ?? []) {
+    const own = ec.charities as unknown as Charity | null
+    if (own && !pickerCharities.some((c) => c.id === own.id))
+      pickerCharities.push(own)
+  }
+  const appealName = ev.appeals?.name ?? null
+  const charityLockReason = appealName
+    ? `Locked — part of ${appealName}.`
+    : locks.charity
+      ? lockReason(locks, "charity")
+      : null
+  const topicLockReason = locks.topic ? lockReason(locks, "topic") : null
+
   const favpoll: ManageFavpoll = {
     ...mapOrganizerFavpoll(ev),
     // ── The record's ledger fields ──
@@ -168,11 +203,15 @@ export default async function ManageFavpollPage({
       .filter((f) => f.favourites)
       .map((f) => ({
         id: f.favourites!.id,
+        rowId: f.id,
         label: f.favourites!.label,
         isGuestAdded: !!f.is_guest_added,
         isHidden: !!f.is_hidden,
       }))
       .sort((a, b) => a.label.localeCompare(b.label)),
+    topicIsFinite: ev.favpoll_polls?.topics?.is_finite === true,
+    charityLockReason,
+    topicLockReason,
   }
 
   const palette = paletteForFavpoll({
@@ -187,7 +226,12 @@ export default async function ManageFavpollPage({
           (founder, 2026-09-03). */}
       <main className="min-h-[calc(100vh-3.5rem)] bg-primary/5">
         <PageGround color={PRIMARY_WASH} />
-        <ManageClient favpoll={favpoll} wallEntries={wallEntries} />
+        <ManageClient
+          favpoll={favpoll}
+          wallEntries={wallEntries}
+          pickerCharities={pickerCharities}
+          consentGatingActive={consentPosture() === "consent-first"}
+        />
       </main>
     </RegisterScope>
   )

@@ -10,6 +10,8 @@ import { createAdminClient } from "@/lib/supabase/admin"
 // can hold. Structural things — topic, favourites, charities, the who
 // axis — stay with the wizard's locks until their rows arrive.
 
+import { favpollLocks, readLockInputs, lockReason } from "@/lib/favpoll-locks"
+
 export type StoryField =
   | "opening_line"
   | "name"
@@ -17,9 +19,13 @@ export type StoryField =
   | "about"
   | "note"
   | "goal_amount"
+  | "photo_url"
 
 // The wizard's own limits (wizard-info-step, wizard-story-step).
-const LIMITS: Record<Exclude<StoryField, "goal_amount">, number> = {
+const LIMITS: Record<
+  Exclude<StoryField, "goal_amount" | "photo_url">,
+  number
+> = {
   opening_line: 50,
   name: 40,
   context: 40,
@@ -51,6 +57,21 @@ export async function updateStoryField(
 ) {
   const { supabase, favpoll } = await ownedOpenFavpoll(favpollId)
   const isCause = favpoll.subject === "cause"
+
+  if (field === "photo_url") {
+    const url = value ? String(value) : null
+    const { error } = isCause
+      ? await supabase
+          .from("favpolls")
+          .update({ photo_url: url })
+          .eq("id", favpollId)
+      : await supabase
+          .from("protagonists")
+          .update({ photo_url: url })
+          .eq("id", favpoll.protagonist_id!)
+    if (error) throw new Error(error.message)
+    return
+  }
 
   if (field === "goal_amount") {
     const n = value === null || value === "" ? null : Number(value)
@@ -106,4 +127,61 @@ export async function updateStoryField(
     case "note":
       return write("favpoll_polls", { personal_note: text || null })
   }
+}
+
+// THE CHARITY, replaced in place (step 3, 2026-09-29): the wizard's
+// single-select picker in an overlay on the Charities section; this
+// carries the whole-favpoll update's guards for the set — the lock
+// once anyone else's money is in, and an appeal's fixed charity.
+export async function setFavpollCharities(
+  favpollId: string,
+  charityIds: string[]
+) {
+  const { supabase, favpoll } = await ownedOpenFavpoll(favpollId)
+  const ids = [...new Set(charityIds.filter(Boolean))]
+  if (ids.length < 1 || ids.length > 3)
+    throw new Error("Pick between one and three charities.")
+
+  const { data: row } = await supabase
+    .from("favpolls")
+    .select("appeal_id, appeals(charity_id), favpoll_charities(charity_id)")
+    .eq("id", favpollId)
+    .single()
+  const appeal = row?.appeal_id
+    ? ((row as unknown as { appeals: { charity_id: string } | null }).appeals ??
+      null)
+    : null
+  if (appeal && ids.join(",") !== appeal.charity_id)
+    throw new Error("This favpoll's charity is set by its appeal.")
+
+  const current = ((row?.favpoll_charities ?? []) as { charity_id: string }[])
+    .map((c) => c.charity_id)
+    .sort()
+    .join(",")
+  if (current === [...ids].sort().join(",")) return
+
+  const { data: poll } = await supabase
+    .from("favpoll_polls")
+    .select("id")
+    .eq("favpoll_id", favpollId)
+    .maybeSingle()
+  const locks = favpollLocks(
+    await readLockInputs(
+      supabase,
+      favpollId,
+      poll?.id ?? null,
+      favpoll.created_by
+    )
+  )
+  if (locks.charity) throw new Error(lockReason(locks, "charity"))
+
+  await supabase.from("favpoll_charities").delete().eq("favpoll_id", favpollId)
+  const { error } = await supabase.from("favpoll_charities").insert(
+    ids.map((charityId, i) => ({
+      favpoll_id: favpollId,
+      charity_id: charityId,
+      display_order: i,
+    }))
+  )
+  if (error) throw new Error(error.message)
 }
