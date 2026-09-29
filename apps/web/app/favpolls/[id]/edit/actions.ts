@@ -199,7 +199,9 @@ export async function updateClosesAt(favpollId: string, closesAt: string) {
 
   const { data: favpoll } = await supabase
     .from("favpolls")
-    .select("created_by, closed_at, closes_at, hard_close_at, extension_count")
+    .select(
+      "created_by, closed_at, closes_at, hard_close_at, extension_count, appeal_id, appeals(closes_at)"
+    )
     .eq("id", favpollId)
     .single()
 
@@ -210,6 +212,14 @@ export async function updateClosesAt(favpollId: string, closesAt: string) {
   // close. The manage toolbar already hides Edit; this is the truth.
   if (favpoll.closed_at)
     throw new Error("This favpoll has closed and can no longer be edited.")
+
+  // An inherited end date is not the member's to move (appeals concept,
+  // 2026-09-05) — the same guard the whole-favpoll update carries, here
+  // too now that the manage page's Closes row saves through this.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const memberAppeal = favpoll.appeal_id ? (favpoll.appeals as any) : null
+  if (memberAppeal?.closes_at)
+    throw new Error("This favpoll's close date is set by its appeal.")
 
   const newClosesAt = new Date(closesAt).toISOString()
   const currentClosesAt = new Date(favpoll.closes_at)
