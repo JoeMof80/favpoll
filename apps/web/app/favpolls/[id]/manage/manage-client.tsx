@@ -112,12 +112,14 @@ const formatLongDate = (iso: string) =>
 // wizard stays the creator; changing things happens here, field by
 // field, as each row learns to edit in place. Overview is the
 // desktop default; on the phone the page opens as this list and each
-// section is its own screen (?section=…).
+// section is its own screen (?section=…). No Sharing section (founder,
+// 2026-09-29: "do we need a share section as well as the dropdown?"):
+// the toolbar's Share popover is the one door — guest link, QR, live
+// display — and the print artefacts ride Overview.
 const SECTIONS: ManageSection[] = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "story", label: "Story", icon: PenLine },
   { id: "charities", label: "Charities", icon: HeartHandshake },
-  { id: "sharing", label: "Sharing", icon: Share2 },
   { id: "settings", label: "Settings", icon: Settings2 },
   { id: "delete", label: "Delete", icon: Trash2 },
 ]
@@ -475,6 +477,33 @@ export function ManageClient({
         </SettingsRow>
       </SettingsGroup>
 
+      <SettingsGroup title="Print and keep">
+        <SettingsRow
+          label="Stationery"
+          description="Invitations, insert cards and table signs, with the QR code."
+        >
+          <Button asChild variant="outline">
+            <a href={`/favpolls/${favpoll.id}/stationery`}>
+              <Printer data-icon="inline-start" aria-hidden="true" />
+              Stationery
+            </a>
+          </Button>
+        </SettingsRow>
+        {isClosed && (
+          <SettingsRow
+            label="Keepsake"
+            description="The closed favpoll as one page to keep."
+          >
+            <Button asChild variant="outline">
+              <Link href={`/favpolls/${favpoll.id}/keepsake`}>
+                <Sparkles data-icon="inline-start" aria-hidden="true" />
+                Keepsake
+              </Link>
+            </Button>
+          </SettingsRow>
+        )}
+      </SettingsGroup>
+
       {/* The wall draws its own card, eyebrow and all. */}
       <GuestBook entries={wallEntries} teaseBacked={false} />
     </div>
@@ -567,64 +596,6 @@ export function ManageClient({
       }
       onChanged={() => router.refresh()}
     />
-  )
-
-  const sharing = (
-    <div className="flex flex-col gap-8">
-      <SettingsGroup title="Share">
-        <SettingsRow
-          label="Guest link"
-          description="The favpoll as guests see it."
-        >
-          {linkControl("guest", guestUrl, "guest link")}
-        </SettingsRow>
-        <SettingsRow
-          label="QR code"
-          description="Hand it across a table, or print it on the stationery."
-          stacked
-        >
-          <div className="flex justify-center py-2" suppressHydrationWarning>
-            <BrandedQR
-              value={qrUrl}
-              size={180}
-              aria-label="QR code for the guest-facing favpoll page"
-            />
-          </div>
-        </SettingsRow>
-        <SettingsRow
-          label="Live display"
-          description="The standings on a screen in the room."
-        >
-          {linkControl("display", displayUrl, "live display link")}
-        </SettingsRow>
-      </SettingsGroup>
-      <SettingsGroup title="Print and keep">
-        <SettingsRow
-          label="Stationery"
-          description="Invitations, insert cards and table signs, with the QR code."
-        >
-          <Button asChild variant="outline">
-            <a href={`/favpolls/${favpoll.id}/stationery`}>
-              <Printer data-icon="inline-start" aria-hidden="true" />
-              Stationery
-            </a>
-          </Button>
-        </SettingsRow>
-        {isClosed && (
-          <SettingsRow
-            label="Keepsake"
-            description="The closed favpoll as one page to keep."
-          >
-            <Button asChild variant="outline">
-              <Link href={`/favpolls/${favpoll.id}/keepsake`}>
-                <Sparkles data-icon="inline-start" aria-hidden="true" />
-                Keepsake
-              </Link>
-            </Button>
-          </SettingsRow>
-        )}
-      </SettingsGroup>
-    </div>
   )
 
   const settings = (
@@ -729,7 +700,6 @@ export function ManageClient({
     overview,
     story,
     charities,
-    sharing,
     settings,
     delete: deleteSection,
   }
