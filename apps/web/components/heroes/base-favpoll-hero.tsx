@@ -15,6 +15,10 @@ type BaseFavpollHeroProps = {
   aboutPlaceholder?: string
   /** The charity and the topic, lit in the About (lib/mentions). */
   mentions?: MentionTarget[]
+  /** The rail is expanded to half the sheet (the guest book read in
+   *  place): the name and context take the phone's sizes, so the
+   *  narrowed column keeps them on their lines (founder, 2026-09-29). */
+  compact?: boolean
 }
 
 export function BaseFavpollHero({
@@ -23,6 +27,7 @@ export function BaseFavpollHero({
   hideAvatar,
   aboutPlaceholder,
   mentions,
+  compact,
 }: BaseFavpollHeroProps) {
   const headline = getFavpollHeadline({
     occasionType: favpoll.occasion_type ?? null,
@@ -46,14 +51,16 @@ export function BaseFavpollHero({
 
   const title = (
     <h1
-      className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground ${heroNameSizeClass(headline.name)}`}
+      className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground ${heroNameSizeClass(headline.name, compact)}`}
     >
       {favpoll.subject === "cause" ? favpoll.cause_label : protagonist.name}
     </h1>
   )
 
   const subtitle = headline.suffix ? (
-    <p className="mt-4 truncate text-xl font-normal whitespace-normal text-primary md:text-2xl">
+    <p
+      className={`mt-4 truncate text-xl font-normal whitespace-normal text-primary ${compact ? "" : "md:text-2xl"}`}
+    >
       {headline.suffix}
     </p>
   ) : undefined

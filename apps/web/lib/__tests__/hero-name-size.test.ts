@@ -21,6 +21,11 @@ describe("heroNameSizeClass", () => {
     )
   })
 
+  it("takes the phone ramp alone when the rail is expanded (compact, 2026-09-29)", () => {
+    expect(heroNameSizeClass("Donald", true)).toBe("text-3xl")
+    expect(heroNameSizeClass("Arthur & Margaret", true)).toBe("text-2xl")
+  })
+
   it("ignores surrounding whitespace", () => {
     expect(heroNameMobileSizeClass("  Donald  ")).toBe("text-3xl")
   })

@@ -158,6 +158,21 @@ export function HeroLayout({
     return () => mq.removeEventListener("change", h)
   }, [])
 
+  const subtitleRef = useRef<HTMLDivElement>(null)
+  const [subtitleRest, setSubtitleRest] = useState(48)
+  useLayoutEffect(() => {
+    const el = subtitleRef.current
+    if (!el) return
+    const set = () => {
+      const h = el.offsetHeight
+      if (h > 0) setSubtitleRest(h)
+    }
+    set()
+    const ro = new ResizeObserver(set)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
   const SETTLE_SCROLL = 24
   const t = [0, SETTLE_SCROLL]
   const subtitleOpacity = useTransform(scrollY, t, isMobile ? [1, 1] : [1, 0])
@@ -173,11 +188,17 @@ export function HeroLayout({
     isMobile ? [0, 0] : [0, -SETTLE_SCROLL]
   )
   // Collapses to 0 (the old design kept a 12px sliver of air; that job
-  // is now done by the band's static pb-3).
+  // is now done by the band's static pb-3). The rest value is the line's
+  // MEASURED height, not a constant (founder, 2026-09-29: the context
+  // "breaks" with the guest book expanded — the narrowed column wrapped
+  // it to two lines, and a fixed 48px clip, bottom-anchored, cut the
+  // first line off behind the name). Read on layout changes only, like
+  // the avatar's endpoints; 48 (one line at text-2xl plus mt-4) is the
+  // SSR fallback. Still one animated value.
   const subtitleMaxHeight = useTransform(
     scrollY,
     t,
-    isMobile ? [48, 48] : [48, 0]
+    isMobile ? [subtitleRest, subtitleRest] : [subtitleRest, 0]
   )
   const avatarSize = useTransform(scrollY, t, [
     avatarCfg.rest,
@@ -242,7 +263,9 @@ export function HeroLayout({
                   maxHeight: subtitleMaxHeight,
                 }}
               >
-                <motion.div style={{ y: subtitleY }}>{subtitle}</motion.div>
+                <motion.div ref={subtitleRef} style={{ y: subtitleY }}>
+                  {subtitle}
+                </motion.div>
               </motion.div>
             )}
           </div>

@@ -12,6 +12,10 @@ type Props = {
   favpoll: Favpoll
   /** The charity and the topic, lit in the About (lib/mentions). */
   mentions?: MentionTarget[]
+  /** The rail is expanded to half the sheet (the guest book read in
+   *  place): the name and context take the phone's sizes, so the
+   *  narrowed column keeps them on their lines (founder, 2026-09-29). */
+  compact?: boolean
 }
 
 // Hero for subject='cause' — no protagonist row, so the optional image and
@@ -20,7 +24,7 @@ type Props = {
 // padding, sticky header, and scroll-shrink behaviour can never drift
 // between the two (they did: this component used to hand-roll its layout
 // and sat ~72px higher than person pages, found 2026-07-13).
-export function CauseHero({ favpoll, mentions }: Props) {
+export function CauseHero({ favpoll, mentions, compact }: Props) {
   const headline = getFavpollHeadline({
     occasionType: favpoll.occasion_type,
     openingLine: favpoll.opening_line,
@@ -40,14 +44,16 @@ export function CauseHero({ favpoll, mentions }: Props) {
 
   const title = (
     <h1
-      className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground ${heroNameSizeClass(headline.name)}`}
+      className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground ${heroNameSizeClass(headline.name, compact)}`}
     >
       {favpoll.cause_label}
     </h1>
   )
 
   const subtitle = headline.suffix ? (
-    <p className="mt-4 truncate text-xl font-normal whitespace-normal text-primary md:text-2xl">
+    <p
+      className={`mt-4 truncate text-xl font-normal whitespace-normal text-primary ${compact ? "" : "md:text-2xl"}`}
+    >
       {headline.suffix}
     </p>
   ) : undefined
