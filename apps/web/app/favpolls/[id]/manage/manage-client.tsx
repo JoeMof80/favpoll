@@ -39,6 +39,14 @@ import {
   SettingsRow,
   type ManageSection,
 } from "@/components/manage/settings-rows"
+import {
+  EditableAmountRow,
+  EditableDateRow,
+  EditableTextRow,
+} from "@/components/manage/editable-row"
+import { updateStoryField, type StoryField } from "./actions"
+import { updateClosesAt } from "@/app/favpolls/[id]/edit/actions"
+import type { MentionTarget } from "@/lib/mentions"
 import { paletteForFavpoll } from "@/lib/register-palette"
 import type { FavpollCategory, FavpollSubject } from "@favpoll/types"
 import { Chip } from "@/components/ui/chip"
@@ -109,8 +117,6 @@ const SECTIONS: ManageSection[] = [
   { id: "settings", label: "Settings", icon: Settings2 },
   { id: "delete", label: "Delete", icon: Trash2 },
 ]
-
-const NONE = <span className="text-muted-foreground">None written.</span>
 
 export function ManageClient({
   favpoll,
@@ -340,6 +346,36 @@ export function ManageClient({
       ? favpoll.total_raised / favpoll.charities.length
       : 0
 
+  // One save per row: the field's own write, then the server data
+  // refreshed so every other surface of the page agrees.
+  const saveField =
+    (field: StoryField) => async (value: string | number | null) => {
+      await updateStoryField(favpoll.id, field, value)
+      router.refresh()
+    }
+  const saveClosesAt = async (d: Date) => {
+    await updateClosesAt(favpoll.id, d.toISOString())
+    router.refresh()
+  }
+
+  // MENTIONS in the About and note (lib/mentions): the charities, the
+  // topic, and — in the note — the favourites, as the wizard offers.
+  const aboutMentions: MentionTarget[] = [
+    ...favpoll.charities.map(({ charity }) => ({
+      kind: "charity" as const,
+      label: charity.name,
+      id: charity.id,
+    })),
+    ...(topicTitle ? [{ kind: "topic" as const, label: topicTitle }] : []),
+  ]
+  const noteMentions: MentionTarget[] = [
+    ...aboutMentions,
+    ...favpoll.favourites.map((f) => ({
+      kind: "item" as const,
+      label: f.label,
+    })),
+  ]
+
   const closesLabel = formatLongDate(
     isClosed ? (favpoll.closed_at ?? favpoll.closes_at) : favpoll.closes_at
   )
@@ -411,6 +447,14 @@ export function ManageClient({
             <span className="text-muted-foreground">Empty</span>
           )}
         </SettingsRow>
+        <EditableAmountRow
+          label="Pledge goal"
+          description="Shown to guests as a bar under the total."
+          value={favpoll.goal_amount}
+          format={formatAmount}
+          readOnly={isClosed}
+          onSave={saveField("goal_amount")}
+        />
       </SettingsGroup>
 
       <SettingsGroup title="The room">
@@ -429,52 +473,75 @@ export function ManageClient({
 
   const story = (
     <div className="flex flex-col gap-8">
-      {!isClosed && (
-        <SettingsGroup title="Editing">
-          <SettingsRow
-            label="Edit in the wizard"
-            description="Every field, in the order guests will read them."
-          >
-            <Button asChild variant="outline">
-              <Link href={`/favpolls/${favpoll.id}/edit`}>
-                <Pencil data-icon="inline-start" aria-hidden="true" />
-                Edit
-              </Link>
-            </Button>
-          </SettingsRow>
-        </SettingsGroup>
-      )}
       <SettingsGroup title="Header">
-        <SettingsRow label="Opening line">
-          {favpoll.opening_line || NONE}
-        </SettingsRow>
-        <SettingsRow label={favpoll.subject === "cause" ? "Cause" : "Name"}>
-          {name || NONE}
-        </SettingsRow>
-        <SettingsRow label="Context">{favpoll.context || NONE}</SettingsRow>
-        <SettingsRow label="Photo">
-          <ProtagonistAvatar
-            name={name}
-            photoUrl={favpoll.photoUrl}
-            className="ml-auto h-14 w-14 md:h-14 md:w-14"
-          />
+        <EditableTextRow
+          label="Opening line"
+          value={favpoll.opening_line ?? ""}
+          maxLength={50}
+          readOnly={isClosed}
+          onSave={saveField("opening_line")}
+        />
+        <EditableTextRow
+          label={favpoll.subject === "cause" ? "Cause" : "Name"}
+          value={name}
+          maxLength={40}
+          required
+          readOnly={isClosed}
+          onSave={saveField("name")}
+        />
+        <EditableTextRow
+          label="Context"
+          description="A date, an age, a place — the line under the name."
+          value={favpoll.context ?? ""}
+          maxLength={40}
+          readOnly={isClosed}
+          onSave={saveField("context")}
+        />
+        <SettingsRow
+          label="Photo"
+          description={
+            isClosed ? undefined : "Change it in the wizard for now."
+          }
+        >
+          <span className="inline-flex items-center gap-3">
+            <ProtagonistAvatar
+              name={name}
+              photoUrl={favpoll.photoUrl}
+              className="h-14 w-14 md:h-14 md:w-14"
+            />
+            {!isClosed && (
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/favpolls/${favpoll.id}/edit`}>
+                  <Pencil data-icon="inline-start" aria-hidden="true" />
+                  Edit
+                </Link>
+              </Button>
+            )}
+          </span>
         </SettingsRow>
       </SettingsGroup>
       <SettingsGroup title="Story">
-        <SettingsRow label="About" stacked>
-          <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground">
-            {favpoll.about || NONE}
-          </p>
-        </SettingsRow>
-        <SettingsRow
+        <EditableTextRow
+          label="About"
+          description="Set the scene, link the topic and the cause. Hint at a note, if there is one."
+          value={favpoll.about ?? ""}
+          maxLength={300}
+          multiline
+          required
+          mentions={aboutMentions}
+          readOnly={isClosed}
+          onSave={saveField("about")}
+        />
+        <EditableTextRow
           label="Personal note"
-          description="Shown to guests once they have pledged."
-          stacked
-        >
-          <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground">
-            {favpoll.reveal || NONE}
-          </p>
-        </SettingsRow>
+          description="A direct quote, a memory, or a message to guests. Revealed only after a guest pledges."
+          value={favpoll.reveal ?? ""}
+          maxLength={280}
+          multiline
+          mentions={noteMentions}
+          readOnly={isClosed}
+          onSave={saveField("note")}
+        />
       </SettingsGroup>
       <SettingsGroup title={topicTitle ? `Favourite ${topicTitle}` : "Topic"}>
         <SettingsRow
@@ -494,26 +561,36 @@ export function ManageClient({
           }
           stacked
         >
-          {favpoll.favourites.length > 0 ? (
-            <div className="flex flex-wrap gap-1.5">
-              {favpoll.favourites.map((f) => (
-                <Chip
-                  key={f.id}
-                  size="sm"
-                  readOnly
-                  className={cn(
-                    f.isGuestAdded &&
-                      "border-primary bg-primary/10 text-primary",
-                    f.isHidden && "opacity-40"
-                  )}
-                >
-                  {f.label}
-                </Chip>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">No favourites.</p>
-          )}
+          <div className="flex items-start justify-between gap-3">
+            {favpoll.favourites.length > 0 ? (
+              <div className="flex min-w-0 flex-1 flex-wrap gap-1.5">
+                {favpoll.favourites.map((f) => (
+                  <Chip
+                    key={f.id}
+                    size="sm"
+                    readOnly
+                    className={cn(
+                      f.isGuestAdded &&
+                        "border-primary bg-primary/10 text-primary",
+                      f.isHidden && "opacity-40"
+                    )}
+                  >
+                    {f.label}
+                  </Chip>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">No favourites.</p>
+            )}
+            {!isClosed && (
+              <Button asChild variant="outline" size="sm" className="shrink-0">
+                <Link href={`/favpolls/${favpoll.id}/edit`}>
+                  <Pencil data-icon="inline-start" aria-hidden="true" />
+                  Edit
+                </Link>
+              </Button>
+            )}
+          </div>
         </SettingsRow>
       </SettingsGroup>
     </div>
@@ -546,6 +623,19 @@ export function ManageClient({
           stacked
         />
       ))}
+      {!isClosed && (
+        <SettingsRow
+          label="Change the charity"
+          description="In the wizard for now. Locked once guests have pledged."
+        >
+          <Button asChild variant="outline" size="sm">
+            <Link href={`/favpolls/${favpoll.id}/edit`}>
+              <Pencil data-icon="inline-start" aria-hidden="true" />
+              Edit
+            </Link>
+          </Button>
+        </SettingsRow>
+      )}
     </SettingsGroup>
   )
 
@@ -668,22 +758,16 @@ export function ManageClient({
         </SettingsRow>
       </SettingsGroup>
       <SettingsGroup title="Dates">
-        <SettingsRow
-          label={isClosed ? "Closed" : "Closes"}
-          description={
-            !isClosed
-              ? `${Math.max(days, 0)} day${days === 1 ? "" : "s"} left.`
-              : undefined
-          }
-        >
-          <span
-            className={cn(
-              !isClosed && isWarning && "text-amber-600 dark:text-amber-400"
-            )}
-          >
-            {closesLabel}
-          </span>
-        </SettingsRow>
+        {isClosed ? (
+          <SettingsRow label="Closed">{closesLabel}</SettingsRow>
+        ) : (
+          <EditableDateRow
+            label="Closes"
+            description={`${Math.max(days, 0)} day${days === 1 ? "" : "s"} left. Two extensions at most.`}
+            value={new Date(favpoll.closes_at)}
+            onSave={saveClosesAt}
+          />
+        )}
       </SettingsGroup>
     </div>
   )
