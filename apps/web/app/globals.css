@@ -264,3 +264,12 @@ select:not(:disabled) {
 .cl-footer {
   background-color: transparent;
 }
+
+/* The desktop shell's column scrollers scroll without a visible bar
+   (founder, 2026-09-29): the columns read as the page, not as boxes. */
+@utility scrollbar-hide {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

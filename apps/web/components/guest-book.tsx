@@ -360,9 +360,11 @@ export function GuestBook({
           <>
             <ul
               className={
-                expandable
+                // The flat rail panel flows in its column (the rail is
+                // the scroller, 2026-09-29); the card scrolls its own list.
+                expandable && variant !== "flat"
                   ? `mt-3 flex-1 overflow-y-auto ${expanded ? "space-y-5" : "space-y-4"} ${pad}`
-                  : `mt-3 space-y-4 ${pad}`
+                  : `mt-3 ${expanded ? "space-y-5" : "space-y-4"} ${pad}`
               }
               aria-label="Recent pledges"
               style={reserved}
