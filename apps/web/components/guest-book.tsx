@@ -3,7 +3,8 @@
 import { useState, useSyncExternalStore } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-import { Maximize2, Minimize2, User } from "lucide-react"
+import { BookOpen, Maximize2, Minimize2, User } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { formatPoundsExact } from "@/lib/i18n"
 
@@ -219,6 +220,7 @@ export function GuestBook({
   expanded = false,
   onToggleExpand,
   pinned,
+  count,
 }: {
   entries: WallEntry[]
   teaseBacked?: boolean
@@ -230,11 +232,14 @@ export function GuestBook({
    */
   reserveRows?: number
   expandable?: boolean
-  /** "card" — bordered card (mobile stack, manage page, landing).
+  /** "card" — bordered card (manage page, landing).
    *  "border" — left rule only (live display).
    *  "flat" — the card's layout without its chrome: the desktop rail,
-   *  where the column's divider does the separating. */
-  variant?: "card" | "border" | "flat"
+   *  where the column's divider does the separating.
+   *  "button" — one full-width outline button that opens the dialog
+   *  (the mobile stack, founder 2026-09-29: "can we make the guest book
+   *  a button?"), in the pot and keepsake buttons' grammar. */
+  variant?: "card" | "border" | "flat" | "button"
   /** Extra classes on the card wrapper */
   className?: string
   /** Expanded IN PLACE (the desktop rail): rows show messages at the
@@ -252,6 +257,10 @@ export function GuestBook({
    *  so it stays in view as a long book scrolls beneath — one sticky
    *  group, no measuring of what sits above. Divided like the rail. */
   pinned?: React.ReactNode
+  /** "button" only: the count on the label when the entries themselves
+   *  are withheld pre-pledge — the number is the social proof the
+   *  skeleton rows used to be. Defaults to the entries given. */
+  count?: number
 }) {
   const reduced = useReducedMotion()
   const [allOpen, setAllOpen] = useState(false)
@@ -319,6 +328,54 @@ export function GuestBook({
   // book could use padding").
   const listTop = variant === "flat" && pinned ? "" : "mt-3"
   const tail = variant === "flat" ? "pb-10" : ""
+  const overlay = (
+    <ResponsiveOverlay
+      open={allOpen}
+      onOpenChange={setAllOpen}
+      title="Guest book"
+      dialogContentClassName="flex-1 overflow-y-auto px-5 pb-5"
+    >
+      <ul className="space-y-5" aria-label="All pledges">
+        {entries.map((entry) => (
+          <li key={entry.id}>
+            <GuestBookRowFull entry={entry} />
+          </li>
+        ))}
+      </ul>
+      {teaseBacked && (
+        <p className="mt-3 text-xs text-muted-foreground">
+          Pledge to see what everyone backed.
+        </p>
+      )}
+    </ResponsiveOverlay>
+  )
+
+  if (variant === "button") {
+    const n = count ?? entries.length
+    return (
+      <>
+        <Button
+          type="button"
+          variant="outline"
+          className={`flex w-full ${className ?? ""}`}
+          onClick={() => setAllOpen(true)}
+        >
+          <BookOpen data-icon="inline-start" aria-hidden="true" />
+          Guest book
+          {n > 0 && (
+            <>
+              {" · "}
+              <span className="font-normal text-muted-foreground">
+                {n} {n === 1 ? "pledge" : "pledges"}
+              </span>
+            </>
+          )}
+        </Button>
+        {overlay}
+      </>
+    )
+  }
+
   const header = (
     <>
       <SectionEyebrow variant="muted" className="font-semibold">
@@ -443,27 +500,7 @@ export function GuestBook({
       {/* Portal-rendered overlay lives OUTSIDE the button wrapper —
         otherwise closing the overlay fires inside the button,
         which re-opens it immediately. */}
-      {expandable && !inPlace && (
-        <ResponsiveOverlay
-          open={allOpen}
-          onOpenChange={setAllOpen}
-          title="Guest book"
-          dialogContentClassName="flex-1 overflow-y-auto px-5 pb-5"
-        >
-          <ul className="space-y-5" aria-label="All pledges">
-            {entries.map((entry) => (
-              <li key={entry.id}>
-                <GuestBookRowFull entry={entry} />
-              </li>
-            ))}
-          </ul>
-          {teaseBacked && (
-            <p className="mt-3 text-xs text-muted-foreground">
-              Pledge to see what everyone backed.
-            </p>
-          )}
-        </ResponsiveOverlay>
-      )}
+      {expandable && !inPlace && overlay}
     </>
   )
 }

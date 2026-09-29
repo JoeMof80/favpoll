@@ -1,21 +1,36 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { Countdown } from "@/components/countdown"
 
 type Props = {
   name: string
   eyebrow: string
   photoUrl?: string | null
+  /** An open favpoll's close: the countdown row (founder, 2026-09-29:
+   *  "move the countdown to the header… above the Name and photo, on
+   *  its own row"). */
+  closesAt?: string | null
+  /** A closed favpoll's row instead ("Poll closed · 15 July 2026"). */
+  closedLabel?: string | null
 }
 
 /**
  * Mobile-only identity bar. Shows when scrolled past 93px (roughly
  * the hero height). Uses a plain scroll listener — no
  * IntersectionObserver, no CSS vars, no ref wiring. md:hidden keeps
- * desktop untouched. Fixed height (~48px) so downstream offsets can
- * be hardcoded.
+ * desktop untouched. Nothing downstream reads its height (checked
+ * 2026-09-29, when the countdown row joined it: the state row sits
+ * above the identity row, so the bar is the only place the close
+ * lives on a phone once the hero has scrolled away).
  */
-export function StickyIdentityBar({ name, eyebrow, photoUrl }: Props) {
+export function StickyIdentityBar({
+  name,
+  eyebrow,
+  photoUrl,
+  closesAt,
+  closedLabel,
+}: Props) {
   const [show, setShow] = useState<boolean | null>(null)
   // Two-phase mount: render off-screen, then slide in on the next frame
   const [entered, setEntered] = useState(false)
@@ -48,6 +63,17 @@ export function StickyIdentityBar({ name, eyebrow, photoUrl }: Props) {
         entered ? "translate-y-0" : "-translate-y-full"
       }`}
     >
+      {(closedLabel || closesAt) && (
+        <div className="mb-1">
+          {closedLabel ? (
+            <p className="truncate text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
+              {closedLabel}
+            </p>
+          ) : (
+            <Countdown closesAt={closesAt ?? undefined} variant="bar" />
+          )}
+        </div>
+      )}
       <div className="flex items-center gap-2.5">
         <div className="min-w-0 flex-1">
           <p className="truncate text-[11px] font-medium tracking-widest text-muted-foreground uppercase">

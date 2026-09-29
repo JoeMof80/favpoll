@@ -223,7 +223,16 @@ export function FavpollContent({
     animate: true,
     expandable: localEntitled,
   }
-  const guestBookMobile = <GuestBook {...guestBookProps} />
+  // On the phone the guest book is ONE BUTTON (founder, 2026-09-29): the
+  // count is the social proof; the dialog behind it keeps the tease.
+  const guestBookMobile = (
+    <GuestBook
+      {...guestBookProps}
+      variant="button"
+      expandable
+      count={wallEntries.length}
+    />
+  )
 
   // Pot card RETIRED (founder, 2026-09-22): the pledge dialog's step 2
   // now shows the pot balance and has the fund toggle — the standalone
@@ -324,11 +333,12 @@ export function FavpollContent({
         </div>
       )}
 
-      {/* THE MOBILE STACK — the rail's cards, below the standings.
-          State first (and the keepsake route back on closed favpolls),
-          social proof under the results it animates, then the pot. */}
+      {/* THE MOBILE STACK, below the standings. The countdown lives in
+          the identity bar now (founder, 2026-09-29), so an open favpoll
+          stacks only the guest book button; a closed one keeps its state
+          card for the keepsake route back. */}
       <div className="mt-8 space-y-4 md:hidden">
-        {stateCardMobile}
+        {isClosed && stateCardMobile}
         {guestBookMobile}
       </div>
 
@@ -443,6 +453,10 @@ export function FavpollContent({
           }).prefix
         }
         photoUrl={favpoll.protagonists?.photo_url}
+        closesAt={isClosed ? null : favpoll.closes_at}
+        closedLabel={
+          isClosed ? `Poll closed${closedAt ? ` · ${closedAt}` : ""}` : null
+        }
       />
       <MobileCharityFooter
         charities={favpoll.favpoll_charities.map((ec) => ec.charities)}
