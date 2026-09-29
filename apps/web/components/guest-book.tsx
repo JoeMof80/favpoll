@@ -218,6 +218,7 @@ export function GuestBook({
   className,
   expanded = false,
   onToggleExpand,
+  pinned,
 }: {
   entries: WallEntry[]
   teaseBacked?: boolean
@@ -245,6 +246,12 @@ export function GuestBook({
    *  overlay is never rendered: the rail is desktop-only, and the mobile
    *  stack has its own instance that keeps the dialog. */
   onToggleExpand?: () => void
+  /** "flat" only: rows that pin at the top of the rail ABOVE the guest
+   *  book's header (the countdown, the organiser). The header pins with
+   *  them (founder, 2026-09-29: "can the guest book header be sticky?"),
+   *  so it stays in view as a long book scrolls beneath — one sticky
+   *  group, no measuring of what sits above. Divided like the rail. */
+  pinned?: React.ReactNode
 }) {
   const reduced = useReducedMotion()
   const [allOpen, setAllOpen] = useState(false)
@@ -306,6 +313,24 @@ export function GuestBook({
     />
   )
 
+  // With the header pinned the list carries no top margin (the header's
+  // own padding is the gap), and the rail's last row gets room before
+  // the column's edge (founder, 2026-09-29: "the bottom of the guest
+  // book could use padding").
+  const listTop = variant === "flat" && pinned ? "" : "mt-3"
+  const tail = variant === "flat" ? "pb-10" : ""
+  const header = (
+    <>
+      <SectionEyebrow variant="muted" className="font-semibold">
+        Guest book
+        {countLabel && (
+          <span className="font-normal opacity-70">{countLabel}</span>
+        )}
+      </SectionEyebrow>
+      {expandControl}
+    </>
+  )
+
   return (
     <>
       <Wrapper
@@ -314,7 +339,13 @@ export function GuestBook({
           variant === "border"
             ? "border-l-2 border-border pl-5"
             : [
-                "flex min-h-0 w-full flex-col justify-start py-4 text-left",
+                "flex w-full flex-col justify-start text-left",
+                // The card shrinks to its box and scrolls its list; the
+                // flat panel is the rail's content and keeps its height
+                // (a shrunk wrapper is a sticky header's containing
+                // block, and the pinned group let go 480px down).
+                variant === "flat" ? "shrink-0" : "min-h-0",
+                variant === "flat" && pinned ? "" : "py-4",
                 variant === "card" && "rounded-lg border border-border bg-card",
                 className,
                 Wrapper === "button" && "transition-colors hover:bg-muted/50",
@@ -323,17 +354,29 @@ export function GuestBook({
                 .join(" ")
         }
       >
-        <div className={`flex items-start justify-between gap-2 ${pad}`}>
-          <SectionEyebrow variant="muted" className="font-semibold">
-            Guest book
-            {countLabel && (
-              <span className="font-normal opacity-70">{countLabel}</span>
-            )}
-          </SectionEyebrow>
-          {expandControl}
-        </div>
+        {variant === "flat" && pinned ? (
+          // The rail's pinned group: the rail's top padding lives here
+          // with a background, so rows scroll under it. Sticky at the
+          // RAIL's own top (the shell's scroller box; see
+          // shell-scroller.tsx — never top-14 inside the shell). The
+          // header's pt-4 is the panel's old py-4; its pb-3 the list's
+          // old mt-3, so nothing moves at rest.
+          <div className="sticky top-0 z-10 divide-y divide-border bg-background pt-16">
+            {pinned}
+            <div className="flex items-start justify-between gap-2 pt-4 pb-3">
+              {header}
+            </div>
+          </div>
+        ) : (
+          <div className={`flex items-start justify-between gap-2 ${pad}`}>
+            {header}
+          </div>
+        )}
         {shown.length === 0 ? (
-          <div className={`mt-3 space-y-4 ${pad}`} style={reserved}>
+          <div
+            className={`${listTop} space-y-4 ${pad} ${tail}`}
+            style={reserved}
+          >
             {[0.9, 0.75, 0.6, 0.85, 0.5, 0.7].map((w, i) => (
               <div key={i} className="flex gap-3">
                 <div
@@ -364,7 +407,7 @@ export function GuestBook({
                 // the scroller, 2026-09-29); the card scrolls its own list.
                 expandable && variant !== "flat"
                   ? `mt-3 flex-1 overflow-y-auto ${expanded ? "space-y-5" : "space-y-4"} ${pad}`
-                  : `mt-3 ${expanded ? "space-y-5" : "space-y-4"} ${pad}`
+                  : `${listTop} ${expanded ? "space-y-5" : "space-y-4"} ${pad} ${tail}`
               }
               aria-label="Recent pledges"
               style={reserved}

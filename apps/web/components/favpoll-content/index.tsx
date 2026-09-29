@@ -224,17 +224,6 @@ export function FavpollContent({
     expandable: localEntitled,
   }
   const guestBookMobile = <GuestBook {...guestBookProps} />
-  // The guest book FLOWS in the rail (founder, 2026-09-29): the rail is
-  // the scroller, the countdown and organiser pin at its top, and a long
-  // book reads as a page, as the standings do on the left.
-  const guestBookRail = (
-    <GuestBook
-      {...guestBookProps}
-      variant="flat"
-      expanded={guestBookExpanded}
-      onToggleExpand={() => setGuestBookExpanded((v) => !v)}
-    />
-  )
 
   // Pot card RETIRED (founder, 2026-09-22): the pledge dialog's step 2
   // now shows the pot balance and has the fund toggle — the standalone
@@ -399,19 +388,27 @@ export function FavpollContent({
     </div>
   )
 
-  // The pinned group: the rail's top padding lives here with a
-  // background, so rows scroll under it. Sticky at the RAIL's own top
-  // (the shell's scroller box; see shell-scroller.tsx — never top-14
-  // inside the shell).
-  const right = (
-    <>
-      <div className="sticky top-0 z-10 divide-y divide-border bg-background pt-16">
-        {stateCardRail}
-        {organiserCard}
-      </div>
-      {guestBookRail}
-    </>
+  // The guest book FLOWS in the rail (founder, 2026-09-29): the rail is
+  // the scroller and a long book reads as a page, as the standings do
+  // on the left. The countdown and organiser pin at its top, and the
+  // guest book's header pins with them (GuestBook's `pinned` slot; the
+  // sticky group lives there — never top-14 inside the shell), so the
+  // rail is that one panel.
+  const guestBookRail = (
+    <GuestBook
+      {...guestBookProps}
+      variant="flat"
+      expanded={guestBookExpanded}
+      onToggleExpand={() => setGuestBookExpanded((v) => !v)}
+      pinned={
+        <>
+          {stateCardRail}
+          {organiserCard}
+        </>
+      }
+    />
   )
+  const right = guestBookRail
 
   return (
     // appShell: the favpoll page is the only surface built for the
