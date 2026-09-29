@@ -33,6 +33,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Switch } from "@/components/ui/switch"
+import { Tooltip, TooltipProvider } from "@/components/ui/tooltip"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import {
   SectionList,
@@ -657,27 +658,72 @@ export function ManageClient({
 
   return (
     <>
-      <ToolbarBand className="flex max-w-5xl flex-wrap items-center gap-x-3 gap-y-2">
-        {/* The back door. On the phone a section's back goes to the
-            section list; the list's goes to Your favpolls. */}
-        <Button asChild variant="ghost" className="-ml-2 md:hidden">
-          <Link
-            href={section ? `/favpolls/${favpoll.id}/manage` : "/my-favpolls"}
-          >
-            <ArrowLeft data-icon="inline-start" aria-hidden="true" />
-            {section ? "Manage" : "Your favpolls"}
-          </Link>
-        </Button>
-        <Button asChild variant="ghost" className="-ml-2 hidden md:inline-flex">
-          <Link href="/my-favpolls">
-            <ArrowLeft data-icon="inline-start" aria-hidden="true" />
-            Your favpolls
-          </Link>
-        </Button>
-        {/* Share is the one action that earns permanent visibility — the
-            growth lever (founder, 2026-09-14). The doors it used to share
-            the toolbar with now live in the sections. */}
-        <div className="ml-auto flex items-center gap-2">
+      {/* THE TOOLBAR IS THE HEADER (founder, 2026-09-29: "shall we move
+          the header info to the toolbar?"): the back arrow, icon-only
+          and labelled; the register eyebrow and the name as the title;
+          the close in the middle (desktop — the phone has it on
+          Settings); the outward pair and Share flush right. Every
+          section then opens straight on its heading. */}
+      <ToolbarBand className="flex max-w-5xl items-center gap-3">
+        <TooltipProvider>
+          <Tooltip content={section ? "Manage" : "Your favpolls"} side="bottom">
+            <Button
+              asChild
+              variant="ghost"
+              size="icon"
+              className="-ml-2 shrink-0 md:hidden"
+            >
+              <Link
+                href={
+                  section ? `/favpolls/${favpoll.id}/manage` : "/my-favpolls"
+                }
+                aria-label={section ? "Back to manage" : "Your favpolls"}
+              >
+                <ArrowLeft aria-hidden="true" />
+              </Link>
+            </Button>
+          </Tooltip>
+          <Tooltip content="Your favpolls" side="bottom">
+            <Button
+              asChild
+              variant="ghost"
+              size="icon"
+              className="-ml-2 hidden shrink-0 md:inline-flex"
+            >
+              <Link href="/my-favpolls" aria-label="Your favpolls">
+                <ArrowLeft aria-hidden="true" />
+              </Link>
+            </Button>
+          </Tooltip>
+        </TooltipProvider>
+        <div className="flex min-w-0 flex-1 items-baseline gap-x-3">
+          <span className="hidden shrink-0 text-[11px] font-medium tracking-[0.08em] text-primary uppercase sm:inline">
+            {eyebrow}
+          </span>
+          <h1 className="min-w-0 truncate text-base font-medium text-foreground">
+            {name}
+          </h1>
+          <p className="hidden shrink-0 text-sm whitespace-nowrap text-muted-foreground md:block">
+            {isClosed ? "Closed" : "Closes"}{" "}
+            <span
+              className={cn(
+                "font-medium",
+                !isClosed && isWarning
+                  ? "text-amber-600 dark:text-amber-400"
+                  : "text-foreground"
+              )}
+            >
+              {closesLabel}
+            </span>
+            {!isClosed && (
+              <>
+                {" "}
+                · {Math.max(days, 0)} day{days === 1 ? "" : "s"} left
+              </>
+            )}
+          </p>
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
           {/* THE OUTWARD PAIR (founder, 2026-09-29): Share and the print
               artefact are one act — getting the favpoll in front of
               guests by link and QR, or by the QR on invitations and
@@ -796,50 +842,20 @@ export function ManageClient({
           </aside>
 
           {/* The fields: the wizard's column and rhythm. */}
-          <div className="px-6 pt-8 pb-10 md:px-12 md:pt-10">
+          <div className="px-6 pt-2 pb-10 md:px-12 md:pt-4">
             <div className="mx-auto w-full max-w-2xl">
-              <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
-                <div className="min-w-0">
-                  <p className="text-[11px] font-medium tracking-[0.08em] text-primary uppercase">
-                    {eyebrow}
-                  </p>
-                  <h1 className="mt-0.5 truncate text-2xl font-medium text-foreground">
-                    {name}
-                  </h1>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  {isClosed ? "Closed" : "Closes"}{" "}
-                  <span
-                    className={cn(
-                      "font-medium",
-                      !isClosed && isWarning
-                        ? "text-amber-600 dark:text-amber-400"
-                        : "text-foreground"
-                    )}
-                  >
-                    {closesLabel}
-                  </span>
-                  {!isClosed && (
-                    <>
-                      {" "}
-                      · {Math.max(days, 0)} day{days === 1 ? "" : "s"} left
-                    </>
-                  )}
-                </p>
-              </div>
-
               {section ? (
                 // Keyed: a fresh tree per section, so no row is reused
                 // for another field's value.
-                <div key={section} className="mt-6 min-w-0">
+                <div key={section} className="min-w-0">
                   {content[section]}
                 </div>
               ) : (
                 <>
-                  <div className="mt-8 min-w-0 md:hidden">
+                  <div className="mt-6 min-w-0 md:hidden">
                     <SectionList sections={sections} href={sectionHref} />
                   </div>
-                  <div className="mt-6 hidden min-w-0 md:block">{overview}</div>
+                  <div className="hidden min-w-0 md:block">{overview}</div>
                 </>
               )}
             </div>
