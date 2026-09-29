@@ -30,7 +30,7 @@ type Props = {
    * "1942 – 2025" ramp) — the live display's money block uses it so the
    * countdown sits where the hero's dates line sits.
    */
-  variant?: "stacked" | "inline" | "subtitle"
+  variant?: "stacked" | "inline" | "subtitle" | "bar"
 }
 
 function getTimeLeft(closesAt: string) {
@@ -60,6 +60,9 @@ export function Countdown({
     }, 1000)
     return () => clearInterval(interval)
   }, [closesAt])
+
+  // The bar has no placeholder: a favpoll without a close has no row.
+  if (variant === "bar" && (!closesAt || !timeLeft)) return null
 
   if (!closesAt) {
     const inlineValueClass =
@@ -199,6 +202,32 @@ export function Countdown({
             { value: minutes, label: "min" },
             { value: seconds, label: "sec" },
           ]
+
+  if (variant === "bar") {
+    // ONE SMALL LINE for the mobile identity bar's state strip (founder,
+    // 2026-09-29: the countdown "above the Name and photo, on its own
+    // row" — then "creates clutter" as a third line of caps, so it is
+    // sentence case at text-xs, figures carrying the line and units
+    // stepped back, the card's own hierarchy). Seconds ride along as on
+    // the card (founder: "no reason not to restore seconds").
+    const barParts =
+      days > 0 ? [...parts, { value: seconds, label: "sec" }] : parts
+    return (
+      <p
+        aria-live="off"
+        aria-label={`${days} days ${hours} hours ${minutes} minutes remaining`}
+        className="truncate text-xs text-muted-foreground tabular-nums"
+      >
+        Closes in
+        {barParts.map(({ value, label }) => (
+          <span key={label} className="ml-2 font-medium text-foreground">
+            {value}
+            <span className="font-normal text-muted-foreground"> {label}</span>
+          </span>
+        ))}
+      </p>
+    )
+  }
 
   if (variant === "inline") {
     // Seconds ride along even while days remain (founder, 2026-09-23,

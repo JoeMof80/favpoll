@@ -174,6 +174,27 @@ describe("GuestBook — in-place expansion (the desktop rail)", () => {
     },
   ]
 
+  it("renders as one button on the phone and opens the dialog (2026-09-29)", async () => {
+    const user = userEvent.setup()
+    render(
+      <GuestBook
+        entries={[]}
+        teaseBacked
+        variant="button"
+        expandable
+        count={12}
+      />
+    )
+    const button = screen.getByRole("button", {
+      name: /Guest book · 12 pledges/,
+    })
+    expect(screen.queryByText("Pledge to see what everyone backed.")).toBeNull()
+    await user.click(button)
+    expect(
+      await screen.findByText("Pledge to see what everyone backed.")
+    ).toBeInTheDocument()
+  })
+
   it("shows messages once expanded in place", () => {
     render(
       <GuestBook

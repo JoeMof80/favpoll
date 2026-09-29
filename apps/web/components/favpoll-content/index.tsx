@@ -19,10 +19,7 @@ import type {
   FavpollPot,
   PotAllocation,
 } from "@favpoll/types"
-import {
-  charityNames as joinCharityNames,
-  getFavpollHeadline,
-} from "@/lib/display"
+import { charityNames as joinCharityNames } from "@/lib/display"
 import { useFavpollContent } from "./use-favpoll-content"
 import { MobileCharityFooter } from "./mobile-charity-footer"
 import { StickyIdentityBar } from "./sticky-identity-bar"
@@ -223,7 +220,16 @@ export function FavpollContent({
     animate: true,
     expandable: localEntitled,
   }
-  const guestBookMobile = <GuestBook {...guestBookProps} />
+  // On the phone the guest book is ONE BUTTON (founder, 2026-09-29): the
+  // count is the social proof; the dialog behind it keeps the tease.
+  const guestBookMobile = (
+    <GuestBook
+      {...guestBookProps}
+      variant="button"
+      expandable
+      count={wallEntries.length}
+    />
+  )
 
   // Pot card RETIRED (founder, 2026-09-22): the pledge dialog's step 2
   // now shows the pot balance and has the fund toggle — the standalone
@@ -324,11 +330,13 @@ export function FavpollContent({
         </div>
       )}
 
-      {/* THE MOBILE STACK — the rail's cards, below the standings.
-          State first (and the keepsake route back on closed favpolls),
-          social proof under the results it animates, then the pot. */}
-      <div className="mt-8 space-y-4 md:hidden">
-        {stateCardMobile}
+      {/* THE MOBILE STACK, below the standings. The countdown lives in
+          the identity bar now (founder, 2026-09-29), so an open favpoll
+          stacks only the guest book button; a closed one keeps its state
+          card for the keepsake route back. mt-6, not the sections' 8:
+          the book is the standings' tail, not a section of its own. */}
+      <div className="mt-6 space-y-4 md:hidden">
+        {isClosed && stateCardMobile}
         {guestBookMobile}
       </div>
 
@@ -434,15 +442,11 @@ export function FavpollContent({
             ? (favpoll.cause_label ?? "")
             : (favpoll.protagonists?.name ?? "")
         }
-        eyebrow={
-          getFavpollHeadline({
-            occasionType: favpoll.occasion_type ?? null,
-            name: "",
-            openingLine: favpoll.opening_line ?? null,
-            subject: favpoll.subject,
-          }).prefix
-        }
         photoUrl={favpoll.protagonists?.photo_url}
+        closesAt={isClosed ? null : favpoll.closes_at}
+        closedLabel={
+          isClosed ? `Poll closed${closedAt ? ` · ${closedAt}` : ""}` : null
+        }
       />
       <MobileCharityFooter
         charities={favpoll.favpoll_charities.map((ec) => ec.charities)}
