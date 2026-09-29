@@ -5,7 +5,6 @@ import { Countdown } from "@/components/countdown"
 
 type Props = {
   name: string
-  eyebrow: string
   photoUrl?: string | null
   /** An open favpoll's close: the countdown row (founder, 2026-09-29:
    *  "move the countdown to the header… above the Name and photo, on
@@ -30,11 +29,15 @@ type Props = {
  * The STATE STRIP (founder, 2026-09-29: the countdown "above the Name
  * and photo, on its own row", then "the countdown creates clutter"):
  * a thin tinted band in sentence case above the identity row, so it
- * reads as a status ribbon rather than a third line of caps.
+ * reads as a status ribbon rather than a third line of caps. The
+ * occasion eyebrow LEFT the bar with it (founder, 2026-09-29): 93px
+ * after the hero said it, it was redundant, and the bar is chrome —
+ * it must stay quieter and shorter than the topic header it sits
+ * over. Strip (py-0.5), name, a 32px photo: ~65px against the old
+ * one-row bar's 51.
  */
 export function StickyIdentityBar({
   name,
-  eyebrow,
   photoUrl,
   closesAt,
   closedLabel,
@@ -92,7 +95,7 @@ export function StickyIdentityBar({
       }`}
     >
       {(closedLabel || closesAt) && (
-        <div className="border-b border-border bg-primary/5 px-6 py-1">
+        <div className="border-b border-border bg-primary/5 px-6 py-0.5">
           {closedLabel ? (
             <p className="truncate text-xs text-muted-foreground">
               {closedLabel}
@@ -103,24 +106,19 @@ export function StickyIdentityBar({
         </div>
       )}
       <div className="flex items-center gap-2.5 px-6 py-1.5">
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
-            {eyebrow}
-          </p>
-          <p className="truncate text-lg leading-tight font-medium text-foreground">
-            {name}
-          </p>
-        </div>
+        <p className="min-w-0 flex-1 truncate text-lg leading-tight font-medium text-foreground">
+          {name}
+        </p>
         {photoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={photoUrl}
             alt=""
-            className="size-9 shrink-0 rounded-lg object-cover"
+            className="size-8 shrink-0 rounded-lg object-cover"
           />
         ) : (
           <div
-            className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-sm font-medium text-primary"
+            className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-sm font-medium text-primary"
             aria-hidden="true"
           >
             {name.charAt(0)}

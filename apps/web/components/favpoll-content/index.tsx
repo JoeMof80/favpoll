@@ -19,10 +19,7 @@ import type {
   FavpollPot,
   PotAllocation,
 } from "@favpoll/types"
-import {
-  charityNames as joinCharityNames,
-  getFavpollHeadline,
-} from "@/lib/display"
+import { charityNames as joinCharityNames } from "@/lib/display"
 import { useFavpollContent } from "./use-favpoll-content"
 import { MobileCharityFooter } from "./mobile-charity-footer"
 import { StickyIdentityBar } from "./sticky-identity-bar"
@@ -336,8 +333,9 @@ export function FavpollContent({
       {/* THE MOBILE STACK, below the standings. The countdown lives in
           the identity bar now (founder, 2026-09-29), so an open favpoll
           stacks only the guest book button; a closed one keeps its state
-          card for the keepsake route back. */}
-      <div className="mt-8 space-y-4 md:hidden">
+          card for the keepsake route back. mt-6, not the sections' 8:
+          the book is the standings' tail, not a section of its own. */}
+      <div className="mt-6 space-y-4 md:hidden">
         {isClosed && stateCardMobile}
         {guestBookMobile}
       </div>
@@ -443,14 +441,6 @@ export function FavpollContent({
           favpoll.subject === "cause"
             ? (favpoll.cause_label ?? "")
             : (favpoll.protagonists?.name ?? "")
-        }
-        eyebrow={
-          getFavpollHeadline({
-            occasionType: favpoll.occasion_type ?? null,
-            name: "",
-            openingLine: favpoll.opening_line ?? null,
-            subject: favpoll.subject,
-          }).prefix
         }
         photoUrl={favpoll.protagonists?.photo_url}
         closesAt={isClosed ? null : favpoll.closes_at}
