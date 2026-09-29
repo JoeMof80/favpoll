@@ -738,7 +738,7 @@ export function ManageClient({
 
   return (
     <>
-      <ToolbarBand className="flex flex-wrap items-center gap-x-3 gap-y-2">
+      <ToolbarBand className="flex max-w-5xl flex-wrap items-center gap-x-3 gap-y-2">
         {/* The back door. On the phone a section's back goes to the
             section list; the list's goes to Your favpolls. */}
         <Button asChild variant="ghost" className="-ml-2 md:hidden">
@@ -832,7 +832,10 @@ export function ManageClient({
         }
       />
 
-      <div className="mx-auto w-full max-w-330 px-4 py-8 sm:px-6">
+      {/* The favpoll sheet's width, not the console's 1320 (founder,
+          2026-09-29: "page feels too wide") — a settings page reads in
+          a column, and the toolbar's row narrows with it. */}
+      <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">
         {/* Identity: the eyebrow and name, the close beside them. */}
         <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
           <div className="min-w-0">
