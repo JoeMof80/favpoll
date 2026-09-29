@@ -93,6 +93,14 @@ type Props = {
    * Desktop dialog + plain sheet; fullscreen uses hideMobileTitleBar.
    */
   hideTitle?: boolean
+  /**
+   * Mobile (plain sheet only): which edge the sheet enters from. "right"
+   * is for a surface that IS the desktop rail (the guest book, founder
+   * 2026-09-29: its chevron "suggests the guest book should slide in
+   * from the right… consistent anyway since it is a right column on
+   * desktop"). Full height, most of the width. Ignored by fullscreen.
+   */
+  mobileSide?: "bottom" | "right"
 }
 
 // iOS pins fixed bottom sheets to the LAYOUT viewport, and the keyboard
@@ -170,6 +178,7 @@ export function ResponsiveOverlay({
   mobileBack,
   hideMobileTitleBar = false,
   hideTitle = false,
+  mobileSide = "bottom",
 }: Props) {
   const isMobile = useIsMobile()
   // Counteract iOS's focus scroll only while a fullscreen sheet is OPEN —
@@ -292,16 +301,24 @@ export function ResponsiveOverlay({
   }
 
   if (isMobile) {
+    const fromRight = mobileSide === "right"
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent
           data-register={dataRegister ?? undefined}
-          side="bottom"
-          className="flex flex-col gap-0 p-0"
-          style={{
-            maxHeight: `calc(100dvh - 3.5rem - ${keyboardInset}px)`,
-            bottom: keyboardInset,
-          }}
+          side={mobileSide}
+          className={`flex flex-col gap-0 p-0 ${fromRight ? "data-[side=right]:w-[88%]" : ""}`}
+          style={
+            fromRight
+              ? {
+                  paddingTop: "env(safe-area-inset-top)",
+                  paddingBottom: keyboardInset,
+                }
+              : {
+                  maxHeight: `calc(100dvh - 3.5rem - ${keyboardInset}px)`,
+                  bottom: keyboardInset,
+                }
+          }
           showCloseButton={!hideCloseButton}
           // Radix focuses the first focusable on open — on touch that's often
           // a text input, which summons the iOS keyboard over the sheet.

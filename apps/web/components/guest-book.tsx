@@ -3,8 +3,7 @@
 import { useState, useSyncExternalStore } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-import { BookOpen, Maximize2, Minimize2, User } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { ChevronRight, Maximize2, Minimize2, User } from "lucide-react"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { formatPoundsExact } from "@/lib/i18n"
 
@@ -236,9 +235,12 @@ export function GuestBook({
    *  "border" — left rule only (live display).
    *  "flat" — the card's layout without its chrome: the desktop rail,
    *  where the column's divider does the separating.
-   *  "button" — one full-width outline button that opens the dialog
-   *  (the mobile stack, founder 2026-09-29: "can we make the guest book
-   *  a button?"), in the pot and keepsake buttons' grammar. */
+   *  "button" — one full-width ROW that opens the dialog (the mobile
+   *  stack, founder 2026-09-29: "can we make the guest book a button?",
+   *  then "styled differently"): the rail's own header — hairline
+   *  above, the eyebrow with its count, a chevron — so the phone ends
+   *  its standings the way the rail does, and nothing competes with
+   *  the pledge card for the page's one call to action. */
   variant?: "card" | "border" | "flat" | "button"
   /** Extra classes on the card wrapper */
   className?: string
@@ -334,6 +336,9 @@ export function GuestBook({
       onOpenChange={setAllOpen}
       title="Guest book"
       dialogContentClassName="flex-1 overflow-y-auto px-5 pb-5"
+      // The phone's guest book is the desktop rail: it comes in from the
+      // right, where the rail lives, and where the row's chevron points.
+      mobileSide="right"
     >
       <ul className="space-y-5" aria-label="All pledges">
         {entries.map((entry) => (
@@ -354,23 +359,30 @@ export function GuestBook({
     const n = count ?? entries.length
     return (
       <>
-        <Button
+        <button
           type="button"
-          variant="outline"
-          className={`flex w-full ${className ?? ""}`}
           onClick={() => setAllOpen(true)}
+          aria-label={
+            n > 0
+              ? `Guest book · ${n} ${n === 1 ? "pledge" : "pledges"}`
+              : "Guest book"
+          }
+          className={`flex w-full items-center justify-between gap-3 border-t border-border py-4 text-left transition-colors hover:bg-muted/50 ${className ?? ""}`}
         >
-          <BookOpen data-icon="inline-start" aria-hidden="true" />
-          Guest book
-          {n > 0 && (
-            <>
-              {" · "}
-              <span className="font-normal text-muted-foreground">
-                {n} {n === 1 ? "pledge" : "pledges"}
+          <SectionEyebrow variant="muted" className="font-semibold">
+            Guest book
+            {n > 0 && (
+              <span className="font-normal opacity-70">
+                {" "}
+                · {n} {n === 1 ? "pledge" : "pledges"}
               </span>
-            </>
-          )}
-        </Button>
+            )}
+          </SectionEyebrow>
+          <ChevronRight
+            className="size-4 shrink-0 text-muted-foreground"
+            aria-hidden="true"
+          />
+        </button>
         {overlay}
       </>
     )
