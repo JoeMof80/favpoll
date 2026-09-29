@@ -10,6 +10,7 @@ type Props = {
   hideAvatar?: boolean
   aboutPlaceholder?: string
   mentions?: MentionTarget[]
+  compact?: boolean
 }
 
 export function FavpollHero({
@@ -18,6 +19,7 @@ export function FavpollHero({
   hideAvatar,
   aboutPlaceholder,
   mentions,
+  compact,
 }: Props) {
   return (
     <BaseFavpollHero
@@ -26,6 +28,7 @@ export function FavpollHero({
       hideAvatar={hideAvatar}
       aboutPlaceholder={aboutPlaceholder}
       mentions={mentions}
+      compact={compact}
     />
   )
 }

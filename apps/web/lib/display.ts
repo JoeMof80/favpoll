@@ -158,10 +158,17 @@ export function heroNameMobileSizeClass(name: string): string {
   return name.trim().length >= HERO_NAME_STEP_DOWN_AT ? "text-2xl" : "text-3xl"
 }
 
-export function heroNameSizeClass(name: string): string {
+export function heroNameSizeClass(name: string, compact = false): string {
   // The redesign (founder, 2026-09-05): a long name may BREAK onto two
   // lines at a slightly reduced size — so the step-down now reaches sm+
   // too, instead of every name forcing text-4xl into the clamp.
+  //
+  // COMPACT (founder, 2026-09-29: "reduce the size along with the column
+  // width"): with the guest book expanded the rail takes half the sheet
+  // and the name column beside the avatar is ~260px — the phone's
+  // regime (222px), so the phone ramp stands on its own, with no sm+
+  // step up.
+  if (compact) return heroNameMobileSizeClass(name)
   return name.trim().length >= HERO_NAME_STEP_DOWN_AT
     ? `${heroNameMobileSizeClass(name)} sm:text-3xl`
     : `${heroNameMobileSizeClass(name)} sm:text-4xl`

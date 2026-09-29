@@ -262,13 +262,21 @@ export function FavpollContent({
 
   const left = (
     <>
+      {/* The expanded rail halves the sheet, so the hero takes its
+          compact sizes (founder, 2026-09-29: the context "breaks" when
+          the guest book is expanded). */}
       {isCause ? (
-        <CauseHero favpoll={favpoll} mentions={aboutMentions} />
+        <CauseHero
+          favpoll={favpoll}
+          mentions={aboutMentions}
+          compact={guestBookExpanded}
+        />
       ) : (
         <FavpollHero
           favpoll={favpoll}
           protagonist={favpoll.protagonists!}
           mentions={aboutMentions}
+          compact={guestBookExpanded}
         />
       )}
 
