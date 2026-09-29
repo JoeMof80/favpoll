@@ -31,6 +31,11 @@ export function PhotoRow({
   const [open, setOpen] = useState(false)
   const [current, setCurrent] = useState(photoUrl)
   const [saving, setSaving] = useState(false)
+  const [seen, setSeen] = useState(photoUrl)
+  if (photoUrl !== seen) {
+    setSeen(photoUrl)
+    setCurrent(photoUrl)
+  }
   const form = useForm<FavpollFormValues>({
     defaultValues: { name, photoUrl: photoUrl ?? undefined },
   })

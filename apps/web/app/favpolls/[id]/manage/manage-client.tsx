@@ -10,12 +10,12 @@ import {
   Copy,
   ExternalLink,
   BookOpen,
-  HeartHandshake,
+  Gift,
   LayoutDashboard,
-  ListChecks,
+  Shapes,
   UserRound,
+  Users,
   Monitor,
-  PenLine,
   Printer,
   Settings2,
   Share2,
@@ -123,12 +123,14 @@ const formatLongDate = (iso: string) =>
 // the guest book has its own section, and the wizard's three authored
 // steps — Header, Story, Favourites — are three sections here too.
 const SECTIONS: ManageSection[] = [
+  // The wizard's own glyphs for the steps it shares (wizard-step-rail
+  // STEP_ICONS): a person, a book, an assortment, a gift, settings.
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "header", label: "Header", icon: UserRound },
-  { id: "story", label: "Story", icon: PenLine },
-  { id: "favourites", label: "Favourites", icon: ListChecks },
-  { id: "charities", label: "Charities", icon: HeartHandshake },
-  { id: "guestbook", label: "Guest book", icon: BookOpen },
+  { id: "story", label: "Story", icon: BookOpen },
+  { id: "favourites", label: "Favourites", icon: Shapes },
+  { id: "charities", label: "Charities", icon: Gift },
+  { id: "guestbook", label: "Guest book", icon: Users },
   { id: "settings", label: "Settings", icon: Settings2 },
 ]
 
@@ -786,8 +788,10 @@ export function ManageClient({
           right. Below md the sheet is the page, as on the favpoll. */}
       <div className="mx-auto min-h-[calc(100vh-7rem)] w-full max-w-5xl bg-background md:drop-shadow-lg md:[clip-path:inset(-1px_-24px_-24px_-24px)]">
         <div className="md:grid md:min-h-[calc(100vh-7rem)] md:grid-cols-[260px_1fr] md:items-stretch">
-          {/* The rail: the wizard's tinted column, sections as stations. */}
-          <aside className="hidden bg-primary/10 p-6 md:block">
+          {/* The nav: the plain buttons (founder, 2026-09-29: "I don't
+              want the wizard style rail"), the wizard's icons where the
+              concepts match. */}
+          <aside className="hidden p-6 md:block">
             <div className="sticky top-32">
               <SectionNav
                 sections={sections}
@@ -831,7 +835,11 @@ export function ManageClient({
               </div>
 
               {section ? (
-                <div className="mt-6 min-w-0">{content[section]}</div>
+                // Keyed: a fresh tree per section, so no row is reused
+                // for another field's value.
+                <div key={section} className="mt-6 min-w-0">
+                  {content[section]}
+                </div>
               ) : (
                 <>
                   <div className="mt-8 min-w-0 md:hidden">

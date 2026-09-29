@@ -2,7 +2,6 @@
 
 import Link from "next/link"
 import { ChevronRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { WizardField } from "@/components/new-favpoll-wizard/wizard-field"
 import { WizardStepShell } from "@/components/new-favpoll-wizard/wizard-step-shell"
 import { cn } from "@/lib/utils"
@@ -72,9 +71,9 @@ export type ManageSection = {
   icon: React.ComponentType<{ className?: string; "aria-hidden"?: boolean }>
 }
 
-/** Desktop: the wizard rail's stations — a round icon button and an
- *  uppercase primary label per section, the active one filled. No spine:
- *  sections are places, not a journey. */
+/** Desktop: the left column of sections — plain buttons, the active
+ *  one tinted (founder, 2026-09-29: the wizard rail's stations were
+ *  auditioned here and cut). */
 export function SectionNav({
   sections,
   active,
@@ -85,7 +84,7 @@ export function SectionNav({
   href: (id: string) => string
 }) {
   return (
-    <nav aria-label="Manage sections" className="flex flex-col gap-5">
+    <nav aria-label="Manage sections" className="flex flex-col gap-0.5">
       {sections.map(({ id, label, icon: Icon }) => {
         const isActive = id === active
         return (
@@ -93,26 +92,15 @@ export function SectionNav({
             key={id}
             href={href(id)}
             aria-current={isActive ? "page" : undefined}
-            className="group flex items-center gap-1.5"
+            className={cn(
+              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+              isActive
+                ? "bg-primary/10 font-medium text-primary"
+                : "text-foreground hover:bg-muted"
+            )}
           >
-            <Button
-              asChild
-              size="icon-sm"
-              variant={isActive ? "default" : "outline"}
-              className={cn(
-                "-ml-0.5 h-7 w-7 shrink-0 rounded-full",
-                !isActive &&
-                  "border-primary bg-transparent group-hover:bg-primary/10"
-              )}
-              tabIndex={-1}
-            >
-              <span aria-hidden="true">
-                <Icon className={cn("h-4 w-4", !isActive && "text-primary")} />
-              </span>
-            </Button>
-            <span className="text-base font-medium tracking-widest text-primary uppercase">
-              {label}
-            </span>
+            <Icon className="size-4 shrink-0" aria-hidden />
+            {label}
           </Link>
         )
       })}
@@ -121,7 +109,7 @@ export function SectionNav({
 }
 
 /** Mobile: the list of sections you drill into (the iOS Settings
- *  pattern, founder's pick 2026-09-29), in the rail's type. */
+ *  pattern, founder's pick 2026-09-29). */
 export function SectionList({
   sections,
   href,
@@ -135,14 +123,10 @@ export function SectionList({
         <Link
           key={id}
           href={href(id)}
-          className="flex items-center gap-3 py-4 transition-colors hover:bg-muted/50"
+          className="flex items-center gap-3 py-4 text-sm text-foreground transition-colors hover:bg-muted/50"
         >
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-primary">
-            <Icon className="h-4 w-4 text-primary" aria-hidden />
-          </span>
-          <span className="flex-1 text-base font-medium tracking-widest text-primary uppercase">
-            {label}
-          </span>
+          <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+          <span className="flex-1">{label}</span>
           <ChevronRight
             className="size-4 shrink-0 text-muted-foreground"
             aria-hidden

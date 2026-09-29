@@ -113,6 +113,18 @@ export function EditableTextRow({
   const [draft, setDraft] = useState(value)
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
+  // The server's value wins whenever the row is at rest: after a
+  // refresh, and when React reuses this row for another field (the
+  // section switch — About once showed the opening line, 2026-09-29).
+  // Derived during render (React's own pattern), not in an effect.
+  const [seen, setSeen] = useState(value)
+  if (value !== seen) {
+    setSeen(value)
+    if (!editing) {
+      setCurrent(value)
+      setDraft(value)
+    }
+  }
 
   function open() {
     setDraft(current)
@@ -255,6 +267,14 @@ export function EditableDateRow({
   const [draft, setDraft] = useState<Date>(value)
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [seen, setSeen] = useState(value.getTime())
+  if (value.getTime() !== seen) {
+    setSeen(value.getTime())
+    if (!editing) {
+      setCurrent(value)
+      setDraft(value)
+    }
+  }
 
   const shown = current.toLocaleDateString("en-GB", {
     day: "numeric",
@@ -344,6 +364,14 @@ export function EditableAmountRow({
   const [draft, setDraft] = useState(value ? String(value) : "")
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [seen, setSeen] = useState(value)
+  if (value !== seen) {
+    setSeen(value)
+    if (!editing) {
+      setCurrent(value)
+      setDraft(value ? String(value) : "")
+    }
+  }
 
   async function save() {
     const n = draft.trim() === "" ? null : Number(draft)
