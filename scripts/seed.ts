@@ -6739,7 +6739,7 @@ const topicItems: Record<string, string[]> = {
     "After rain",
     "Autumn drizzle",
     "Blustery and wild",
-    "Bright spring day",
+    "A bright spring day",
     "Crisp winter morning",
     "Golden hour",
     "Misty and still",
