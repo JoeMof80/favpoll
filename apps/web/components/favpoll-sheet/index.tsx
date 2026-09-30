@@ -348,10 +348,11 @@ export function FavpollSheet({
               + its hairline), so this row's bottom border meets the
               organiser's (measured 219 vs 222 without it). */}
           <div className="flex min-h-[76px] items-center justify-between gap-3 border-b border-border py-5">
-            {/* ONE LINE (founder, 2026-09-30): "Rooting for Jane Pound ·
-                Great North Run" — the prefix muted before the name (it is
-                a prefix, so no dot between them), the dot only before the
-                context. Too wide, it runs as a TICKER (founder: "a ticker
+            {/* ONE LINE in the hero's own grammar (founder, 2026-09-30):
+                the opening line as the eyebrow (small caps, muted, its own
+                small size — the countdown's label beside its value), the
+                name in ink, the context in the register's ink after a
+                muted dot: "ROOTING FOR Jane Pound · Great North Run". Too wide, it runs as a TICKER (founder: "a ticker
                 is still the best option, wrapping is worse") — see
                 ui/ticker: still when it fits, a slow loop when it does
                 not, truncated under reduced motion. The trailing copy
@@ -361,30 +362,38 @@ export function FavpollSheet({
               shadow={
                 <>
                   {personPrefix && (
-                    <span className="font-normal text-muted-foreground">
-                      {personPrefix}{" "}
-                    </span>
+                    <SectionEyebrow
+                      as="span"
+                      variant="muted"
+                      className="mr-2 align-baseline"
+                    >
+                      {personPrefix}
+                    </SectionEyebrow>
                   )}
                   <span>{personName}</span>
                   {personContext && (
-                    <span className="font-normal text-muted-foreground">
-                      {" "}
-                      ·&nbsp;{personContext}
+                    <span className="font-normal text-primary">
+                      <span className="text-muted-foreground"> ·&nbsp;</span>
+                      {personContext}
                     </span>
                   )}
                 </>
               }
             >
               {personPrefix && (
-                <span className="font-normal text-muted-foreground">
-                  {personPrefix}{" "}
-                </span>
+                <SectionEyebrow
+                  as="span"
+                  variant="muted"
+                  className="mr-2 align-baseline"
+                >
+                  {personPrefix}
+                </SectionEyebrow>
               )}
               <h1 className="inline">{personName}</h1>
               {personContext && (
-                <span className="font-normal text-muted-foreground">
-                  {" "}
-                  ·&nbsp;{personContext}
+                <span className="font-normal text-primary">
+                  <span className="text-muted-foreground"> ·&nbsp;</span>
+                  {personContext}
                 </span>
               )}
             </Ticker>
