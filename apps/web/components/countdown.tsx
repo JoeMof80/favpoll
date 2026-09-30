@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import type { FavpollCardSize } from "@/components/favpoll-card/types"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 // Four, matching the live maximum below. Keep this in step with the
 // inline `parts` or the card reflows the moment the countdown mounts.
@@ -69,16 +70,12 @@ export function Countdown({
       size === "lg" ? "text-3xl" : size === "md" ? "text-2xl" : "text-xl"
     const inlineLabelClass =
       size === "lg" ? "text-sm" : size === "md" ? "text-xs" : "text-[10px]"
-    const inlineHeadingClass =
-      size === "lg" ? "text-xs" : size === "md" ? "text-[10px]" : "text-[10px]"
     if (variant === "inline") {
       return (
         <div>
-          <p
-            className={`mb-2 ${inlineHeadingClass} font-medium text-primary-muted`}
-          >
+          <SectionEyebrow variant="muted" className="mb-2 font-semibold">
             Poll closes in
-          </p>
+          </SectionEyebrow>
           <div
             className="grid items-baseline gap-x-3"
             style={{ gridTemplateColumns: columns(PLACEHOLDER_PARTS) }}
@@ -111,9 +108,9 @@ export function Countdown({
     const labelClass = size === "sm" ? "text-[10px]" : "text-xs"
     return (
       <div>
-        <p className={`mb-2 ${labelClass} text-muted-foreground`}>
+        <SectionEyebrow variant="muted" className="mb-2 font-semibold">
           Poll closes in
-        </p>
+        </SectionEyebrow>
         <div className="flex items-end justify-between">
           {/* The stacked variant keeps the three-unit rule, so it drops
               the inline row's trailing half-column seconds. */}
@@ -246,15 +243,11 @@ export function Countdown({
       size === "lg" ? "text-3xl" : size === "md" ? "text-2xl" : "text-xl"
     const inlineLabelClass =
       size === "lg" ? "text-sm" : size === "md" ? "text-xs" : "text-[10px]"
-    const inlineHeadingClass =
-      size === "lg" ? "text-xs" : size === "md" ? "text-[10px]" : "text-[10px]"
     return (
       <div aria-live="off">
-        <p
-          className={`mb-2 ${inlineHeadingClass} font-medium text-primary-muted`}
-        >
+        <SectionEyebrow variant="muted" className="mb-2 font-semibold">
           Poll closes in
-        </p>
+        </SectionEyebrow>
         <div
           className="grid items-baseline gap-x-3"
           style={{
@@ -297,9 +290,9 @@ export function Countdown({
 
   return (
     <div aria-live="off">
-      <p className={`mb-2 ${labelClass} text-muted-foreground`}>
+      <SectionEyebrow variant="muted" className="mb-2 font-semibold">
         Poll closes in
-      </p>
+      </SectionEyebrow>
       <div
         className="flex items-end justify-between"
         aria-label={`${days} days ${hours} hours ${minutes} minutes remaining`}

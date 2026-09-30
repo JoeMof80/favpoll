@@ -11,6 +11,7 @@ import {
   ExternalLink,
   BookOpen,
   Gift,
+  LayoutDashboard,
   Shapes,
   UserRound,
   Users,
@@ -32,7 +33,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { SwitchLine } from "@/components/ui/switch-line"
-import { Tooltip, TooltipProvider } from "@/components/ui/tooltip"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import {
   SectionList,
@@ -47,6 +47,16 @@ import {
   EditableTextRow,
 } from "@/components/manage/editable-row"
 import { updateStoryField, type StoryField } from "./actions"
+import { BumpChart } from "@/components/bump-chart"
+import { RankingList } from "@/components/ranking-list"
+import { Countdown } from "@/components/countdown"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import {
+  PledgesOverTime,
+  type TimelinePoint,
+} from "@/components/manage/pledges-over-time"
+import type { RankHistory } from "@/lib/rank-history"
+import type { Favourite } from "@favpoll/types"
 import { PhotoRow } from "@/components/manage/photo-row"
 import { CharityRows } from "@/components/manage/charity-rows"
 import {
@@ -69,7 +79,6 @@ import {
 import { ghostsFor } from "@/components/new-favpoll-wizard/wizard-placeholders"
 import { paletteForFavpoll } from "@/lib/register-palette"
 import type { FavpollCategory, FavpollSubject } from "@favpoll/types"
-import { cn } from "@/lib/utils"
 import { formatAmount } from "@/lib/display"
 import { TOAST_ERROR_STYLE } from "@/lib/toast-styles"
 import {
@@ -80,7 +89,6 @@ import {
 } from "@/app/favpolls/[id]/actions"
 import {
   type OrganizerFavpoll,
-  WARNING_THRESHOLD_DAYS,
   isFavpollClosed,
   daysRemaining,
 } from "@/components/organizer-row/utils"
@@ -125,14 +133,15 @@ const formatLongDate = (iso: string) =>
 // the guest book has its own section, and the wizard's three authored
 // steps — Header, Story, Favourites — are three sections here too.
 const SECTIONS: ManageSection[] = [
-  // The wizard's own glyphs for the steps it shares (wizard-step-rail
-  // STEP_ICONS): a person, a book, an assortment, a gift, settings.
-  // No Money section (founder, 2026-09-30): the goal and the ledger
-  // live on Settings, in the wizard's order.
+  // The wizard's order (founder, 2026-09-30: "match the order in the
+  // nav too") — Event has no section, the who and the category lock
+  // the moment anyone gives — with the dashboard first and the guest
+  // book before Settings. The wizard's own glyphs.
+  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { id: "charities", label: "Charities", icon: Gift },
+  { id: "favourites", label: "Favourites", icon: Shapes },
   { id: "header", label: "Header", icon: UserRound },
   { id: "story", label: "Story", icon: BookOpen },
-  { id: "favourites", label: "Favourites", icon: Shapes },
-  { id: "charities", label: "Charities", icon: Gift },
   { id: "guestbook", label: "Guest book", icon: Users },
   { id: "settings", label: "Settings", icon: Settings2 },
 ]
@@ -142,12 +151,20 @@ export function ManageClient({
   wallEntries,
   pickerCharities,
   consentGatingActive = false,
+  dashboard: dash,
 }: {
   favpoll: ManageFavpoll
   wallEntries: WallEntry[]
   /** The charity picker's list: active charities plus this favpoll's own. */
   pickerCharities: Charity[]
   consentGatingActive?: boolean
+  /** The dashboard's data: standings with this poll's numbers, the rank
+   *  history (null under the minimum), the running total by day. */
+  dashboard: {
+    standingItems: Favourite[]
+    rankHistory: RankHistory | null
+    timeline: TimelinePoint[]
+  }
 }) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -162,7 +179,6 @@ export function ManageClient({
 
   const isClosed = isFavpollClosed(favpoll)
   const days = daysRemaining(favpoll.closes_at)
-  const isWarning = !isClosed && days <= WARNING_THRESHOLD_DAYS
 
   const sections = SECTIONS
   const section =
@@ -333,11 +349,6 @@ export function ManageClient({
     )
   }
 
-  const perCharity =
-    favpoll.charities.length > 0
-      ? favpoll.total_raised / favpoll.charities.length
-      : 0
-
   // One save per row: the field's own write, then the server data
   // refreshed so every other surface of the page agrees.
   const saveField =
@@ -373,6 +384,151 @@ export function ManageClient({
   )
 
   // ── The sections ──────────────────────────────────────────────────
+
+  // THE DASHBOARD (founder, 2026-09-30: "a Dashboard that shows Raised
+  // so far, Pledges, Shared Pot… and other dataviz"): the one section
+  // that is a reading surface, so the one allowed cards and charts — a
+  // stat row, the standings, the running total by day, the story of
+  // the poll, and the latest of the guest book with the section a tap
+  // away (it previews the book; the book stays its own section).
+  const card = "rounded-xl border border-border bg-background p-5"
+  const stat = (label: string, body: React.ReactNode) => (
+    <div className={card}>
+      <SectionEyebrow variant="muted" className="font-semibold">
+        {label}
+      </SectionEyebrow>
+      <div className="mt-2">{body}</div>
+    </div>
+  )
+  const dashboard = (
+    <div className="flex flex-col gap-6 py-6">
+      {/* The identity, where it reads as the dashboard's title (founder,
+          2026-09-30: "include the Name") — the close is the countdown
+          tile's. */}
+      <div className="min-w-0">
+        <p className="text-[11px] font-medium tracking-[0.08em] text-primary uppercase">
+          {eyebrow}
+        </p>
+        <h2 className="mt-0.5 truncate text-2xl font-medium text-foreground">
+          {name}
+        </h2>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {stat(
+          "Raised",
+          <>
+            <p className="text-2xl font-medium text-foreground tabular-nums">
+              {formatAmount(favpoll.total_raised)}
+              {favpoll.goal_amount ? (
+                <span className="text-sm font-normal text-muted-foreground">
+                  {" "}
+                  of {formatAmount(favpoll.goal_amount)}
+                </span>
+              ) : null}
+            </p>
+            {favpoll.goal_amount ? (
+              <div
+                className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted"
+                role="progressbar"
+                aria-label="Progress towards the pledge goal"
+                aria-valuemin={0}
+                aria-valuemax={favpoll.goal_amount}
+                aria-valuenow={Math.min(
+                  favpoll.total_raised,
+                  favpoll.goal_amount
+                )}
+              >
+                <div
+                  className="h-full rounded-full bg-primary"
+                  style={{
+                    width: `${Math.min(100, (favpoll.total_raised / favpoll.goal_amount) * 100)}%`,
+                  }}
+                />
+              </div>
+            ) : null}
+          </>
+        )}
+        {stat(
+          "Pledges",
+          <p className="text-2xl font-medium text-foreground tabular-nums">
+            {favpoll.pledge_count}
+          </p>
+        )}
+        {stat(
+          "Shared pot",
+          favpoll.pot && favpoll.pot.total_deposited > 0 ? (
+            <p className="text-2xl font-medium text-foreground tabular-nums">
+              {formatAmount(favpoll.pot.total_deposited)}
+              <span className="text-sm font-normal text-muted-foreground">
+                {" "}
+                · {formatAmount(favpoll.pot.total_allocated)} used
+              </span>
+            </p>
+          ) : (
+            <p className="text-2xl font-medium text-muted-foreground">Empty</p>
+          )
+        )}
+        <div className={card}>
+          {isClosed ? (
+            <>
+              <SectionEyebrow variant="muted" className="font-semibold">
+                Poll closed
+              </SectionEyebrow>
+              <p className="mt-2 text-2xl font-medium text-foreground">
+                {closesLabel}
+              </p>
+            </>
+          ) : (
+            <Countdown closesAt={favpoll.closes_at} size="sm" />
+          )}
+        </div>
+      </div>
+
+      <div className={card}>
+        <SectionEyebrow variant="muted" className="mb-4 font-semibold">
+          Standings
+        </SectionEyebrow>
+        {dash.standingItems.length > 0 && favpoll.poll ? (
+          <RankingList
+            initialItems={dash.standingItems}
+            favpollPollId={favpoll.poll.id}
+            topicId=""
+          />
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            Standings appear here as guests pledge.
+          </p>
+        )}
+      </div>
+
+      {dash.timeline.length > 0 && (
+        <div className={card}>
+          <PledgesOverTime points={dash.timeline} />
+        </div>
+      )}
+
+      {dash.rankHistory && (
+        <div className={card}>
+          <BumpChart history={dash.rankHistory} />
+        </div>
+      )}
+
+      <div>
+        <GuestBook
+          entries={wallEntries.slice(0, 6)}
+          teaseBacked={false}
+          count={wallEntries.length}
+        />
+        {wallEntries.length > 6 && (
+          <Button asChild variant="ghost" size="sm" className="mt-2">
+            <Link href={sectionHref("guestbook")}>
+              All {favpoll.pledge_count} pledges
+            </Link>
+          </Button>
+        )}
+      </div>
+    </div>
+  )
 
   // The wall draws its own card, eyebrow and all.
   const guestbook = <GuestBook entries={wallEntries} teaseBacked={false} />
@@ -465,7 +621,6 @@ export function ManageClient({
       favpollId={favpoll.id}
       charities={favpoll.charities}
       pickerCharities={pickerCharities}
-      amountEach={perCharity}
       lockReason={favpoll.charityLockReason}
       readOnly={isClosed}
       consentGatingActive={consentGatingActive}
@@ -552,6 +707,8 @@ export function ManageClient({
             <Button
               type="button"
               variant="destructive"
+              // The goal presets' size, the page's own (founder, 2026-09-30).
+              className="h-11 px-3.5 md:text-base"
               disabled={!canDelete || deleting}
               onClick={() => setConfirmDeleteOpen(true)}
             >
@@ -561,76 +718,11 @@ export function ManageClient({
           </SettingsRow>
         )}
       </SettingsGroup>
-      <div className="border-t border-border">
-        <SettingsGroup>
-          <SettingsRow
-            label={favpoll.goal_amount ? "Raised so far" : "Raised"}
-            description={
-              favpoll.goal_amount
-                ? `Towards a ${formatAmount(favpoll.goal_amount)} goal.`
-                : "Pledges and the shared pot together."
-            }
-            stacked={!!favpoll.goal_amount}
-          >
-            {favpoll.goal_amount ? (
-              <div className="grid gap-2">
-                <p className="text-lg font-medium text-foreground tabular-nums">
-                  {formatAmount(favpoll.total_raised)}
-                  <span className="text-sm font-normal text-muted-foreground">
-                    {" "}
-                    of {formatAmount(favpoll.goal_amount)}
-                  </span>
-                </p>
-                <div
-                  className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
-                  role="progressbar"
-                  aria-label="Progress towards the pledge goal"
-                  aria-valuemin={0}
-                  aria-valuemax={favpoll.goal_amount}
-                  aria-valuenow={Math.min(
-                    favpoll.total_raised,
-                    favpoll.goal_amount
-                  )}
-                >
-                  <div
-                    className="h-full rounded-full bg-primary transition-[width] duration-700 ease-out"
-                    style={{
-                      width: `${Math.min(100, (favpoll.total_raised / favpoll.goal_amount) * 100)}%`,
-                    }}
-                  />
-                </div>
-              </div>
-            ) : (
-              <span className="text-lg font-medium tabular-nums">
-                {formatAmount(favpoll.total_raised)}
-              </span>
-            )}
-          </SettingsRow>
-          <SettingsRow label="Pledges">
-            <span className="tabular-nums">{favpoll.pledge_count}</span>
-          </SettingsRow>
-          <SettingsRow
-            label="Shared pot"
-            description="Given without a favourite, spent on the standings."
-          >
-            {favpoll.pot && favpoll.pot.total_deposited > 0 ? (
-              <span className="tabular-nums">
-                {formatAmount(favpoll.pot.total_deposited)}
-                <span className="text-muted-foreground">
-                  {" "}
-                  · {formatAmount(favpoll.pot.total_allocated)} used
-                </span>
-              </span>
-            ) : (
-              <span className="text-muted-foreground">Empty</span>
-            )}
-          </SettingsRow>
-        </SettingsGroup>
-      </div>
     </div>
   )
 
   const content: Record<string, React.ReactNode> = {
+    dashboard,
     header,
     story,
     favourites,
@@ -638,7 +730,7 @@ export function ManageClient({
     guestbook,
     settings,
   }
-  const activeDesktop = section ?? "header"
+  const activeDesktop = section ?? "dashboard"
   const sectionLabel = sections.find((s) => s.id === section)?.label
 
   return (
@@ -649,65 +741,27 @@ export function ManageClient({
           the close in the middle (desktop — the phone has it on
           Settings); the outward pair and Share flush right. Every
           section then opens straight on its heading. */}
+      {/* THE TOOLBAR: the back door, then the outward pair and Share
+          flush right. The name and close date left it for the
+          dashboard (founder, 2026-09-30), so the back link has its
+          words again. On the phone a section's back goes to the
+          section list; the list's goes to Your favpolls. */}
       <ToolbarBand className="flex max-w-5xl items-center gap-3">
-        <TooltipProvider>
-          <Tooltip content={section ? "Manage" : "Your favpolls"} side="bottom">
-            <Button
-              asChild
-              variant="ghost"
-              size="icon"
-              className="-ml-2 shrink-0 md:hidden"
-            >
-              <Link
-                href={
-                  section ? `/favpolls/${favpoll.id}/manage` : "/my-favpolls"
-                }
-                aria-label={section ? "Back to manage" : "Your favpolls"}
-              >
-                <ArrowLeft aria-hidden="true" />
-              </Link>
-            </Button>
-          </Tooltip>
-          <Tooltip content="Your favpolls" side="bottom">
-            <Button
-              asChild
-              variant="ghost"
-              size="icon"
-              className="-ml-2 hidden shrink-0 md:inline-flex"
-            >
-              <Link href="/my-favpolls" aria-label="Your favpolls">
-                <ArrowLeft aria-hidden="true" />
-              </Link>
-            </Button>
-          </Tooltip>
-        </TooltipProvider>
-        <div className="flex min-w-0 flex-1 items-baseline gap-x-3">
-          <span className="hidden shrink-0 text-[11px] font-medium tracking-[0.08em] text-primary uppercase sm:inline">
-            {eyebrow}
-          </span>
-          <h1 className="min-w-0 truncate text-base font-medium text-foreground">
-            {name}
-          </h1>
-          <p className="hidden shrink-0 text-sm whitespace-nowrap text-muted-foreground md:block">
-            {isClosed ? "Closed" : "Closes"}{" "}
-            <span
-              className={cn(
-                "font-medium",
-                !isClosed && isWarning
-                  ? "text-amber-600 dark:text-amber-400"
-                  : "text-foreground"
-              )}
-            >
-              {closesLabel}
-            </span>
-            {!isClosed && (
-              <>
-                {" "}
-                · {Math.max(days, 0)} day{days === 1 ? "" : "s"} left
-              </>
-            )}
-          </p>
-        </div>
+        <Button asChild variant="ghost" className="-ml-2 md:hidden">
+          <Link
+            href={section ? `/favpolls/${favpoll.id}/manage` : "/my-favpolls"}
+          >
+            <ArrowLeft data-icon="inline-start" aria-hidden="true" />
+            {section ? "Manage" : "Your favpolls"}
+          </Link>
+        </Button>
+        <Button asChild variant="ghost" className="-ml-2 hidden md:inline-flex">
+          <Link href="/my-favpolls">
+            <ArrowLeft data-icon="inline-start" aria-hidden="true" />
+            Your favpolls
+          </Link>
+        </Button>
+        <div className="flex-1" />
         <div className="flex shrink-0 items-center gap-2">
           {/* THE OUTWARD PAIR (founder, 2026-09-29): Share and the print
               artefact are one act — getting the favpoll in front of
@@ -847,7 +901,7 @@ export function ManageClient({
                   <div className="mt-6 min-w-0 md:hidden">
                     <SectionList sections={sections} href={sectionHref} />
                   </div>
-                  <div className="hidden min-w-0 md:block">{header}</div>
+                  <div className="hidden min-w-0 md:block">{dashboard}</div>
                 </>
               )}
             </div>

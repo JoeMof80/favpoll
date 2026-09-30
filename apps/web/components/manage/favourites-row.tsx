@@ -1,36 +1,33 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
-import { Lock, Pencil, Plus, RotateCcw } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
-import { Chip } from "@/components/ui/chip"
-import {
-  InputGroup,
-  InputGroupButton,
-  InputGroupInput,
-} from "@/components/ui/input-group"
-import { SettingsGroup, SettingsRow } from "@/components/manage/settings-rows"
+import { WizardTopicCard } from "@/components/new-favpoll-wizard/wizard-topic-card"
+import { TopicItemsDialog } from "@/components/favpoll-flow/topic-items-dialog"
 import { addOrganizerItem } from "@/app/favpolls/[id]/actions"
 import {
   hideFavpollPollFavourite,
   showFavpollPollFavourite,
 } from "@/lib/actions/favpoll-poll-favourites"
 import { TOAST_ERROR_STYLE } from "@/lib/toast-styles"
-import { cn } from "@/lib/utils"
+import type { Favourite } from "@favpoll/types"
 
-// THE FAVOURITES, changed in place (step 3, 2026-09-29): a chip's ×
-// HIDES it from the poll (the record keeps it, faded, with its
-// pledges), a faded chip's ↺ restores it, and "Add a favourite" is the
-// organiser's own add on an open-ended topic (the guest add's twin,
-// addOrganizerItem). Changing the TOPIC itself is the wizard's picker
-// still — a door here, or the lock's reason once guests have pledged.
+// THE FAVOURITES IN THE WIZARD'S DESIGN (founder, 2026-09-30): the
+// wizard's topic card — the topic as the poll heading, the first five
+// favourites as chips with "+N more", the pencil to change the topic
+// (the wizard's picker, until step 4) or the lock — and its items
+// dialog for working the list: add (the organiser's own, the guest
+// add's twin), hide from the poll, put back. Organiser-added
+// favourites are the dialog's "Added by you"; the rest are the
+// existing items.
 
 export type ManageFavourite = {
   id: string
   rowId: string
   label: string
+  /** favourites.source — "organiser" is "added by you". */
+  source: string
   isGuestAdded: boolean
   isHidden: boolean
 }
@@ -54,11 +51,10 @@ export function FavouritesGroup({
   editHref: string
   onChanged: () => void
 }) {
-  const [draft, setDraft] = useState("")
-  const [busy, setBusy] = useState<string | null>(null)
+  const router = useRouter()
+  const [open, setOpen] = useState(false)
 
-  async function run(key: string, act: () => Promise<unknown>) {
-    setBusy(key)
+  async function run(act: () => Promise<unknown>) {
     try {
       await act()
       onChanged()
@@ -69,153 +65,68 @@ export function FavouritesGroup({
           style: TOAST_ERROR_STYLE,
         }
       )
-    } finally {
-      setBusy(null)
     }
-  }
-
-  async function add() {
-    const label = draft.trim()
-    if (!label) return
-    await run("add", () => addOrganizerItem(favpollId, label))
-    setDraft("")
   }
 
   const shown = favourites.filter((f) => !f.isHidden)
   const hidden = favourites.filter((f) => f.isHidden)
+  const added = shown.filter((f) => f.source === "organiser" && !f.isGuestAdded)
+  const existing = shown.filter(
+    (f) => !(f.source === "organiser" && !f.isGuestAdded)
+  )
+  const title = topicTitle ?? "Topic"
 
   return (
-    <SettingsGroup title={topicTitle ? `Favourite ${topicTitle}` : "Topic"}>
-      <SettingsRow
-        label="Topic"
-        description={
-          topicLockReason ??
-          (readOnly ? undefined : "Pick a different topic in the wizard.")
+    <div className="py-6">
+      <WizardTopicCard
+        topic={{
+          topicId: "",
+          title,
+          isCustom: false,
+          items: existing.map((f) => ({ id: f.id, label: f.label })),
+          customLabels: added.map((f) => f.label),
+        }}
+        sortedExistingItems={
+          existing.map((f) => ({ id: f.id, label: f.label })) as Favourite[]
         }
-      >
-        <span className="inline-flex items-center gap-2">
-          {topicTitle ?? <span className="text-muted-foreground">None</span>}
-          {!readOnly &&
-            (topicLockReason ? (
-              <Lock
-                className="size-4 text-muted-foreground"
-                aria-label={topicLockReason}
-              />
-            ) : (
-              <Button
-                asChild
-                variant="ghost"
-                size="icon"
-                className="size-8 text-muted-foreground hover:text-foreground"
-              >
-                <Link href={editHref} aria-label="Change the topic">
-                  <Pencil className="size-4" aria-hidden="true" />
-                </Link>
-              </Button>
-            ))}
-        </span>
-      </SettingsRow>
-
-      <SettingsRow
-        label="Favourites"
-        description={
-          shown.length > 0
-            ? `${shown.length} in the poll${
-                shown.some((f) => f.isGuestAdded)
-                  ? " · tinted = added by guests"
-                  : ""
-              }${readOnly ? "" : " · × hides one from the poll"}`
-            : "No favourites in the poll."
+        customLabels={added.map((f) => f.label)}
+        showItemsSection
+        onEdit={() => router.push(editHref)}
+        onOpenItemsDialog={() => setOpen(true)}
+        lockedReason={
+          readOnly ? "This favpoll has closed." : (topicLockReason ?? undefined)
         }
-        stacked
-      >
-        <div className="flex flex-wrap gap-1.5">
-          {shown.map((f) => (
-            <Chip
-              key={f.id}
-              size="sm"
-              readOnly={readOnly}
-              onRemove={
-                readOnly
-                  ? undefined
-                  : () =>
-                      void run(f.rowId, () => hideFavpollPollFavourite(f.rowId))
-              }
-              disabled={busy === f.rowId}
-              className={cn(
-                f.isGuestAdded && "border-primary bg-primary/10 text-primary"
-              )}
-            >
-              {f.label}
-            </Chip>
-          ))}
-        </div>
-      </SettingsRow>
-
-      {hidden.length > 0 && (
-        <SettingsRow
-          label="Hidden"
-          description="Kept on the record with their pledges, out of the poll."
-          stacked
-        >
-          <div className="flex flex-wrap gap-1.5">
-            {hidden.map((f) => (
-              <span key={f.id} className="inline-flex items-center gap-0.5">
-                <Chip size="sm" readOnly className="opacity-40">
-                  {f.label}
-                </Chip>
-                {!readOnly && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="size-7 text-muted-foreground hover:text-foreground"
-                    disabled={busy === f.rowId}
-                    onClick={() =>
-                      void run(f.rowId, () => showFavpollPollFavourite(f.rowId))
-                    }
-                    aria-label={`Put ${f.label} back in the poll`}
-                  >
-                    <RotateCcw className="size-3.5" aria-hidden="true" />
-                  </Button>
-                )}
-              </span>
-            ))}
-          </div>
-        </SettingsRow>
+      />
+      {!readOnly && (
+        <TopicItemsDialog
+          open={open}
+          onOpenChange={setOpen}
+          topicTitle={title}
+          existingItems={existing.map((f) => ({ id: f.id, label: f.label }))}
+          addedItems={added.map((f) => f.label)}
+          onAdd={
+            topicIsFinite
+              ? () =>
+                  toast.error("This topic's list is fixed.", {
+                    style: TOAST_ERROR_STYLE,
+                  })
+              : (label) => void run(() => addOrganizerItem(favpollId, label))
+          }
+          onRemove={(label) => {
+            const f = added.find((a) => a.label === label)
+            if (f) void run(() => hideFavpollPollFavourite(f.rowId))
+          }}
+          onHide={(id) => {
+            const f = existing.find((a) => a.id === id)
+            if (f) void run(() => hideFavpollPollFavourite(f.rowId))
+          }}
+          hiddenItems={hidden.map((f) => ({ id: f.id, label: f.label }))}
+          onRestore={(id) => {
+            const f = hidden.find((a) => a.id === id)
+            if (f) void run(() => showFavpollPollFavourite(f.rowId))
+          }}
+        />
       )}
-
-      {!readOnly && !topicIsFinite && (
-        <SettingsRow
-          label="Add a favourite"
-          description="Your own addition to the list, for guests to pick."
-          stacked
-        >
-          <InputGroup className="max-w-md bg-background">
-            <InputGroupInput
-              value={draft}
-              maxLength={60}
-              placeholder="e.g. Edinburgh"
-              aria-label="Add a favourite"
-              onChange={(e) => setDraft(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault()
-                  void add()
-                }
-              }}
-            />
-            <InputGroupButton
-              type="button"
-              disabled={!draft.trim() || busy === "add"}
-              onClick={() => void add()}
-            >
-              <Plus data-icon="inline-start" aria-hidden="true" />
-              Add
-            </InputGroupButton>
-          </InputGroup>
-        </SettingsRow>
-      )}
-    </SettingsGroup>
+    </div>
   )
 }

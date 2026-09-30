@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Lock, Pencil, Plus, Search, Trash2 } from "lucide-react"
+import { Search } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
@@ -9,8 +9,7 @@ import {
   CharityStep,
   type RegisterPick,
 } from "@/components/favpoll-flow/charity-step"
-import { CharityRow } from "@/components/charity-row"
-import { SettingsGroup, SettingsRow } from "@/components/manage/settings-rows"
+import { WizardCharityCard } from "@/components/new-favpoll-wizard/wizard-charity-card"
 import { findOrCreateRegisterCharity } from "@/app/favpolls/new/actions"
 import { setFavpollCharities } from "@/app/favpolls/[id]/manage/actions"
 import { hasFinePointer } from "@/lib/pointer"
@@ -32,7 +31,6 @@ export function CharityRows({
   favpollId,
   charities,
   pickerCharities,
-  amountEach,
   lockReason,
   readOnly = false,
   consentGatingActive = false,
@@ -42,7 +40,6 @@ export function CharityRows({
   favpollId: string
   charities: Current[]
   pickerCharities: Charity[]
-  amountEach: number
   /** Why the set can't change — an appeal's fixed charity, or other
    *  people's money in. Null when it can. */
   lockReason: string | null
@@ -51,7 +48,6 @@ export function CharityRows({
   eventCategory?: "celebration" | "memorial" | "fundraiser" | null
   onChanged: () => void
 }) {
-  const editable = !readOnly && !lockReason
   const [open, setOpen] = useState(false)
   const [replaceId, setReplaceId] = useState<string | null>(null)
   const [search, setSearch] = useState("")
@@ -114,91 +110,24 @@ export function CharityRows({
 
   return (
     <>
-      <SettingsGroup>
-        {charities.map(({ charity }, i) => (
-          <SettingsRow
-            key={charity.id}
-            label={charities.length > 1 ? `Charity ${i + 1}` : "Charity"}
-            // STATUS ONLY — favpoll owns the consent outreach, not the
-            // organiser (founder, 2026-09-14).
-            description={
-              charity.consent_status && charity.consent_status !== "approved"
-                ? charity.consent_status === "declined"
-                  ? "The charity has declined — pledges here are paused."
-                  : `Pledges are held until ${charity.name} agrees to receive them.`
-                : undefined
-            }
-          >
-            <span className="flex w-full items-center gap-3">
-              <span className="min-w-0 flex-1">
-                <CharityRow
-                  charity={{
-                    ...charity,
-                    created_at: charity.created_at ?? "",
-                  }}
-                  amountRaised={amountEach}
-                  size="sm"
-                />
-              </span>
-              {editable ? (
-                <span className="inline-flex items-center gap-1">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="size-8 text-muted-foreground hover:text-foreground"
-                    disabled={busy}
-                    onClick={() => openPicker(charity.id)}
-                    aria-label={`Replace ${charity.name}`}
-                  >
-                    <Pencil className="size-4" aria-hidden="true" />
-                  </Button>
-                  {ids.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="size-8 text-muted-foreground hover:text-destructive"
-                      disabled={busy}
-                      onClick={() =>
-                        commit(ids.filter((i) => i !== charity.id))
-                      }
-                      aria-label={`Remove ${charity.name}`}
-                    >
-                      <Trash2 className="size-4" aria-hidden="true" />
-                    </Button>
-                  )}
-                </span>
-              ) : lockReason ? (
-                <Lock
-                  className="size-4 text-muted-foreground"
-                  aria-label={lockReason}
-                />
-              ) : null}
-            </span>
-          </SettingsRow>
-        ))}
-        {editable && ids.length < 3 && (
-          <SettingsRow
-            label="Add another charity"
-            description="Up to three; pledges are split equally."
-          >
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={busy}
-              onClick={() => openPicker()}
-            >
-              <Plus data-icon="inline-start" aria-hidden="true" />
-              Add
-            </Button>
-          </SettingsRow>
-        )}
-        {lockReason && (
-          <SettingsRow label="Changing the charity" description={lockReason} />
-        )}
-      </SettingsGroup>
+      {/* The wizard's own card (founder, 2026-09-30: "match the design
+          of the … charities steps from the wizard"): rows with the
+          pencil (replace) and the bin, the "Add another charity" line,
+          the lock reason in place of all three. */}
+      <div className="py-6">
+        <WizardCharityCard
+          charities={charities.map(({ charity }) => charity)}
+          consentGatingActive={consentGatingActive}
+          lockedReason={
+            readOnly ? "This favpoll has closed." : (lockReason ?? undefined)
+          }
+          onEdit={busy ? undefined : (id) => openPicker(id)}
+          onRemove={
+            busy ? undefined : (id) => void commit(ids.filter((i) => i !== id))
+          }
+          onPickAnother={busy ? undefined : () => openPicker()}
+        />
+      </div>
 
       <ResponsiveOverlay
         separators

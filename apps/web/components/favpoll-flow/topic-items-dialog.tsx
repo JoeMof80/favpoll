@@ -17,6 +17,13 @@ type Props = {
   onAdd: (label: string) => void
   onRemove: (label: string) => void
   isNewTopic?: boolean
+  /** The manage page (2026-09-30): an existing item's × HIDES it from
+   *  the poll (the record keeps it with its pledges) — absent in the
+   *  wizard, where existing items are the catalogue's and read-only. */
+  onHide?: (id: string) => void
+  /** Items hidden from the poll, each with a way back. */
+  hiddenItems?: { id: string; label: string }[]
+  onRestore?: (id: string) => void
 }
 
 export function TopicItemsDialog({
@@ -28,6 +35,9 @@ export function TopicItemsDialog({
   onAdd,
   onRemove,
   isNewTopic = false,
+  onHide,
+  hiddenItems = [],
+  onRestore,
 }: Props) {
   const [search, setSearch] = useState("")
   const trimmed = search.trim()
@@ -164,14 +174,50 @@ export function TopicItemsDialog({
                   Existing items
                 </p>
                 <div className="flex flex-wrap gap-1.5">
-                  {(trimmed ? filteredExisting : existingItems).map((item) => (
-                    <Chip key={item.id} size="lg" readOnly>
-                      {item.label}
-                    </Chip>
-                  ))}
+                  {(trimmed ? filteredExisting : existingItems).map((item) =>
+                    onHide ? (
+                      <Chip
+                        key={item.id}
+                        size="lg"
+                        onRemove={() => onHide(item.id)}
+                        removeLabel={`Hide ${item.label} from the poll`}
+                      >
+                        {item.label}
+                      </Chip>
+                    ) : (
+                      <Chip key={item.id} size="lg" readOnly>
+                        {item.label}
+                      </Chip>
+                    )
+                  )}
                 </div>
               </div>
             )}
+
+          {/* Hidden from the poll — the manage page only */}
+          {hiddenItems.length > 0 && !trimmed && (
+            <div>
+              <p className="mb-2 text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
+                Hidden from the poll
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {hiddenItems.map((item) => (
+                  <Chip
+                    key={item.id}
+                    size="lg"
+                    onClick={onRestore ? () => onRestore(item.id) : undefined}
+                    className="opacity-60"
+                    aria-label={`Put ${item.label} back in the poll`}
+                  >
+                    ↺ {item.label}
+                  </Chip>
+                ))}
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Kept on the record with their pledges. Tap one to put it back.
+              </p>
+            </div>
+          )}
 
           {/* Empty state */}
           {!showAddRow &&
