@@ -206,8 +206,8 @@ export function FavpollContent({
           className="mt-1 -ml-2"
           onClick={() => setStoryOpen(true)}
         >
-          <TrendingUpDown data-icon="inline-start" aria-hidden="true" />
-          {"Rank history"}
+          Standings history
+          <TrendingUpDown data-icon="inline-end" aria-hidden="true" />
         </Button>
       )}
     </div>
@@ -339,7 +339,7 @@ export function FavpollContent({
         <ResponsiveOverlay
           open={storyOpen}
           onOpenChange={setStoryOpen}
-          title="Rank history"
+          title="Standings history"
           dialogClassName="flex flex-col gap-0 overflow-hidden p-0 sm:max-w-4xl"
           // Taller than the overlay's default: fifteen lanes need it.
           dialogStyle={{ maxHeight: "min(900px, 90vh)" }}

@@ -238,7 +238,7 @@ export function PollSection({
                     onSelect={onOpenStory}
                     className="md:hidden"
                   >
-                    Rank history
+                    Standings history
                     <TrendingUpDown
                       className="ml-auto size-4"
                       aria-hidden="true"
