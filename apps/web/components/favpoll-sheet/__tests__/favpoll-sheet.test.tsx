@@ -219,7 +219,7 @@ describe("FavpollSheet — the room's fundraiser dial", () => {
     )
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Alice")
     // The card names the charity; the footer says the money no more.
-    expect(screen.getByText("for Ocean Trust")).toBeInTheDocument()
+    expect(screen.getByText("raised for Ocean Trust")).toBeInTheDocument()
     expect(screen.getByText("£1,000")).toBeInTheDocument()
     expect(screen.queryByText(/of the £1,000 goal/)).not.toBeInTheDocument()
     expect(screen.getAllByRole("progressbar")).toHaveLength(1)
@@ -251,7 +251,7 @@ describe("FavpollSheet — the room's fundraiser dial", () => {
         heroVariant="fundraiser"
       />
     )
-    expect(screen.getByText("for 3 charities")).toBeInTheDocument()
+    expect(screen.getByText("raised for 3 charities")).toBeInTheDocument()
     expect(screen.queryByText(/for Ocean Trust/)).not.toBeInTheDocument()
   })
 

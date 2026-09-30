@@ -55,8 +55,12 @@ export function FundraiserStrip({
           >
             {formatPounds(totalRaised)}
           </span>
+          {/* "raised for X" whenever the eyebrow does not already say
+              raised — with a goal ("Pledge goal") and once closed; under
+              "Raised so far" the label is "for X" alone (founder,
+              2026-10-01). */}
           <span className="truncate text-xs text-muted-foreground">
-            {isClosed ? `raised${forCharity}` : forCharity.trim()}
+            {isClosed || goalAmount ? `raised${forCharity}` : forCharity.trim()}
           </span>
         </span>
         {goalAmount && (

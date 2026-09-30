@@ -16,7 +16,7 @@ describe("FundraiserStrip — the pledge goal in the countdown card's grammar", 
     )
     expect(screen.getByText("Pledge goal")).toBeInTheDocument()
     expect(screen.getByText("£250")).toBeInTheDocument()
-    expect(screen.getByText("for Ocean Trust")).toBeInTheDocument()
+    expect(screen.getByText("raised for Ocean Trust")).toBeInTheDocument()
     expect(screen.getByText("of")).toBeInTheDocument()
     expect(screen.getByText("£1,000")).toBeInTheDocument()
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument()
