@@ -24,6 +24,11 @@ type Props = {
       pages that use the rail as a header-row element (charity facts,
       appeal facts) opt out. */
   rightSticky?: boolean
+  /** Shell mode: the sheet's height. Default = the viewport under the
+   *  app header (calc(100vh - 3.5rem)). A STILL of the sheet (the landing
+   *  page's screen-in-a-room) gives the screen's own height instead —
+   *  vh inside a scaled frame is the visitor's viewport, not the screen. */
+  shellHeight?: string
   children?: React.ReactNode
 }
 
@@ -33,6 +38,7 @@ export function PageLayout({
   appShell = false,
   railExpanded = false,
   rightSticky = true,
+  shellHeight = "calc(100vh - 3.5rem)",
   children,
 }: Props) {
   const gutter = "px-6 md:px-16"
@@ -59,7 +65,7 @@ export function PageLayout({
       // scroll under the pinned countdown rather than showing above it.
       "scrollbar-hide hidden min-h-0 flex-col divide-y divide-border overflow-y-auto border-l border-border pr-16 pl-8 md:flex"
     : rightSticky
-      ? "sticky top-14 z-10 hidden max-h-[calc(100vh-3.5rem)] flex-col space-y-4 self-start overflow-y-auto bg-background md:flex md:pt-16"
+      ? "sticky top-14 z-10 hidden max-h-[var(--shell-h)] flex-col space-y-4 self-start overflow-y-auto bg-background md:flex md:pt-16"
       : "hidden flex-col space-y-4 self-start md:flex md:pt-16"
 
   return (
@@ -74,14 +80,17 @@ export function PageLayout({
       <main
         // clip-path (#921) clips the drop shadow above the sheet, which
         // is otherwise visible on overscroll.
+        // --shell-h: the sheet's height (see shellHeight) — every vh this
+        // layout used to spell out reads the variable instead.
+        style={{ "--shell-h": shellHeight } as React.CSSProperties}
         className={[
-          "mx-auto min-h-[calc(100vh-3.5rem)] max-w-5xl bg-background",
+          "mx-auto min-h-[var(--shell-h)] max-w-5xl bg-background",
           "md:drop-shadow-lg md:[clip-path:inset(-1px_-24px_-24px_-24px)]",
           // In shell mode the gutter moves onto the left column, which is
           // the scroller — padding there keeps its scrollbar at the rail
           // divider instead of 4rem inside it.
           appShell
-            ? "md:h-[calc(100vh-3.5rem)] md:min-h-0"
+            ? "md:h-[var(--shell-h)] md:min-h-0"
             : `${gutter} ${mobilePadBottom} md:pb-24`,
         ].join(" ")}
       >
@@ -132,7 +141,7 @@ export function PageLayout({
                   percentage minimum never resolves inside the scroller,
                   so the height is the shell's. Zero on pages with no
                   hero; no effect on a column that already overflows. */}
-              <div className="md:min-h-[calc(100vh-3.5rem+var(--hero-collapse,0px)+24px)]">
+              <div className="md:min-h-[calc(var(--shell-h)+var(--hero-collapse,0px)+24px)]">
                 {left}
               </div>
             </ShellScroller>
