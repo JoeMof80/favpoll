@@ -62,6 +62,7 @@ import { CharityRows } from "@/components/manage/charity-rows"
 import {
   FavouritesGroup,
   type ManageFavourite,
+  type TopicPickerData,
 } from "@/components/manage/favourites-row"
 import type { Charity } from "@favpoll/types"
 import { updateClosesAt } from "@/app/favpolls/[id]/edit/actions"
@@ -105,6 +106,8 @@ export type ManageFavpoll = OrganizerFavpoll & {
   favourites: ManageFavourite[]
   /** A finite topic takes no organiser additions. */
   topicIsFinite: boolean
+  topicId: string | null
+  subsetId: string | null
   /** Why the charity set can't change (an appeal, other people's money), or null. */
   charityLockReason: string | null
   /** Why the topic can't change (guests have pledged), or null. */
@@ -152,6 +155,7 @@ export function ManageClient({
   pickerCharities,
   consentGatingActive = false,
   dashboard: dash,
+  topicPicker,
 }: {
   favpoll: ManageFavpoll
   wallEntries: WallEntry[]
@@ -166,6 +170,8 @@ export function ManageClient({
     rankHistoryDates: string[] | null
     timeline: TimelinePoint[]
   }
+  /** The wizard's topic catalogue, while the topic can still change. */
+  topicPicker: TopicPickerData | null
 }) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -614,7 +620,10 @@ export function ManageClient({
         topicIsFinite={favpoll.topicIsFinite}
         topicLockReason={favpoll.topicLockReason}
         readOnly={isClosed}
-        editHref={`/favpolls/${favpoll.id}/edit`}
+        topicId={favpoll.topicId}
+        subsetId={favpoll.subsetId}
+        picker={topicPicker}
+        primaryCharityName={favpoll.charities[0]?.charity.name}
         onChanged={() => router.refresh()}
       />
     </div>

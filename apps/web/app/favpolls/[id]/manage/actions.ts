@@ -11,6 +11,7 @@ import { createAdminClient } from "@/lib/supabase/admin"
 // axis — stay with the wizard's locks until their rows arrive.
 
 import { favpollLocks, readLockInputs, lockReason } from "@/lib/favpoll-locks"
+import { insertSubsetMembers } from "@/app/favpolls/new/actions"
 
 export type StoryField =
   | "opening_line"
@@ -184,4 +185,75 @@ export async function setFavpollCharities(
     }))
   )
   if (error) throw new Error(error.message)
+}
+
+// THE TOPIC, changed in place (step 4, 2026-09-30): the wizard's picker
+// in an overlay on the Favourites section; this mirrors the wizard's
+// topic-change path — the lock once anyone has pledged, the poll row's
+// topic and subset, the organiser-curated list replaced by the new
+// topic's (a subset's members; an open-ended topic's whole list; a
+// finite topic reads its catalogue and keeps no rows).
+export async function setFavpollTopic(
+  favpollId: string,
+  pick: { topicId: string; subsetId: string | null }
+) {
+  const { supabase, favpoll } = await ownedOpenFavpoll(favpollId)
+  const { data: poll } = await supabase
+    .from("favpoll_polls")
+    .select("id, topic_id, subset_id")
+    .eq("favpoll_id", favpollId)
+    .maybeSingle()
+  if (!poll) throw new Error("No poll found")
+  const subsetId = pick.subsetId ?? null
+  if (poll.topic_id === pick.topicId && (poll.subset_id ?? null) === subsetId)
+    return
+
+  const locks = favpollLocks(
+    await readLockInputs(supabase, favpollId, poll.id, favpoll.created_by)
+  )
+  if (locks.topic) throw new Error(lockReason(locks, "topic"))
+
+  const { data: topic } = await supabase
+    .from("topics")
+    .select("id, is_finite, is_active")
+    .eq("id", pick.topicId)
+    .maybeSingle()
+  if (!topic || topic.is_active === false)
+    throw new Error("That topic isn't available.")
+
+  const { error } = await supabase
+    .from("favpoll_polls")
+    .update({ topic_id: pick.topicId, subset_id: subsetId })
+    .eq("id", poll.id)
+  if (error) throw new Error(error.message)
+
+  // The organiser-curated list goes; guests' additions would stay, as in
+  // the wizard, but a guest addition comes with a pledge and a pledge
+  // locks the topic — so there are none here.
+  await supabase
+    .from("favpoll_poll_favourites")
+    .delete()
+    .eq("favpoll_poll_id", poll.id)
+    .eq("is_guest_added", false)
+
+  const { userId } = await auth()
+  if (subsetId) {
+    await insertSubsetMembers(supabase, poll.id, subsetId, userId!)
+    return
+  }
+  if (topic.is_finite) return
+  const { data: items } = await supabase
+    .from("favourites")
+    .select("id")
+    .eq("topic_id", pick.topicId)
+  if (items && items.length > 0) {
+    await supabase.from("favpoll_poll_favourites").insert(
+      items.map((i) => ({
+        favpoll_poll_id: poll.id,
+        favourite_id: i.id,
+        is_guest_added: false,
+        added_by: userId,
+      }))
+    )
+  }
 }
