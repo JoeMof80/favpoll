@@ -229,6 +229,32 @@ describe("FavpollSheet — the room's fundraiser dial", () => {
     expect(footer.dataset.caption).toBe("no")
   })
 
+  it("counts the charities in the card's label when there are several", () => {
+    render(
+      <FavpollSheet
+        favpoll={{
+          ...FAVPOLL,
+          goal_amount: 1000,
+          favpoll_charities: [
+            { charities: CHARITY },
+            { charities: { ...CHARITY, id: "charity-2", name: "Reef Fund" } },
+            { charities: { ...CHARITY, id: "charity-3", name: "Tide Aid" } },
+          ],
+        }}
+        pollWithItems={POLL}
+        totalRaised={250}
+        isClosed={false}
+        isOrganiser={false}
+        wallEntries={[]}
+        rankHistory={null}
+        presentation="room"
+        heroVariant="fundraiser"
+      />
+    )
+    expect(screen.getByText("for 3 charities")).toBeInTheDocument()
+    expect(screen.queryByText(/for Ocean Trust/)).not.toBeInTheDocument()
+  })
+
   it("keeps the full hero on the tribute dial", () => {
     render(
       <FavpollSheet

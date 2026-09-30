@@ -10,7 +10,7 @@ describe("FundraiserStrip — the pledge goal in the countdown card's grammar", 
           totalRaised: 250,
           goalAmount: 1000,
           isClosed: false,
-          charityLine: "Ocean Trust",
+          charityLabel: "Ocean Trust",
         }}
       />
     )
@@ -20,7 +20,7 @@ describe("FundraiserStrip — the pledge goal in the countdown card's grammar", 
     expect(screen.getByText("of")).toBeInTheDocument()
     expect(screen.getByText("£1,000")).toBeInTheDocument()
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument()
-    expect(screen.getByText("£1,000").className).not.toContain("text-success")
+    expect(screen.getByText("£1,000").className).toContain("text-primary")
     expect(screen.queryByRole("heading")).not.toBeInTheDocument()
   })
 
@@ -31,7 +31,7 @@ describe("FundraiserStrip — the pledge goal in the countdown card's grammar", 
           totalRaised: 1200,
           goalAmount: 1000,
           isClosed: false,
-          charityLine: null,
+          charityLabel: null,
         }}
       />
     )
@@ -46,7 +46,7 @@ describe("FundraiserStrip — the pledge goal in the countdown card's grammar", 
           totalRaised: 40,
           goalAmount: null,
           isClosed: false,
-          charityLine: "Ocean Trust",
+          charityLabel: "Ocean Trust",
         }}
       />
     )
@@ -64,7 +64,7 @@ describe("FundraiserStrip — the pledge goal in the countdown card's grammar", 
           totalRaised: 1200,
           goalAmount: 1000,
           isClosed: true,
-          charityLine: "A & B",
+          charityLabel: "A & B",
         }}
       />
     )

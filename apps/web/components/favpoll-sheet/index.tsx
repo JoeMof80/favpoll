@@ -149,7 +149,10 @@ export function FavpollSheet({
           totalRaised,
           goalAmount: favpoll.goal_amount ?? null,
           isClosed,
-          charityLine: charityLine || null,
+          charityLabel:
+            favpoll.favpoll_charities.length > 1
+              ? `${favpoll.favpoll_charities.length} charities`
+              : charityLine || null,
         }
       : undefined
 

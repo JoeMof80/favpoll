@@ -14,10 +14,11 @@ export type HeroFundraiser = {
   totalRaised: number
   goalAmount: number | null
   isClosed: boolean
-  /** "Marie Curie", "A & B" or "A, B & C" (lib/display charityNames) —
-   *  the card's label names who the money is for, so the charity footer
-   *  need not say the money twice (founder, 2026-09-30). */
-  charityLine: string | null
+  /** Who the money is for: one charity by name — the trust line, and
+   *  the reason the room scanned — or, with several, their count
+   *  ("for 3 charities": as short, more specific than "for charity", and
+   *  the footer names them; founder, 2026-10-01). */
+  charityLabel: string | null
 }
 
 export function FundraiserStrip({
@@ -25,8 +26,8 @@ export function FundraiserStrip({
 }: {
   fundraiser: HeroFundraiser
 }) {
-  const { totalRaised, goalAmount, isClosed, charityLine } = fundraiser
-  const forCharity = charityLine ? ` for ${charityLine}` : ""
+  const { totalRaised, goalAmount, isClosed, charityLabel } = fundraiser
+  const forCharity = charityLabel ? ` for ${charityLabel}` : ""
   const goalReached = !!goalAmount && totalRaised >= goalAmount
 
   return (
@@ -61,9 +62,11 @@ export function FundraiserStrip({
         {goalAmount && (
           <span className="flex shrink-0 items-baseline gap-x-2">
             <span className="text-xs text-muted-foreground">of</span>
+            {/* The goal in the register's ink (founder, 2026-10-01), success
+                once reached, as the bar. */}
             <span
               className={`text-2xl leading-none font-medium ${
-                goalReached ? "text-success" : "text-foreground"
+                goalReached ? "text-success" : "text-primary"
               }`}
             >
               {formatPounds(goalAmount)}
