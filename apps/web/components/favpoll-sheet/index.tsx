@@ -348,8 +348,12 @@ export function FavpollSheet({
                 ui/ticker: still when it fits, a slow loop when it does
                 not, truncated under reduced motion. The trailing copy
                 renders the name as a span so the page keeps one h1. */}
+            {/* leading-normal, not none: the ticker's box clips to its line
+                box, and at leading-none a 20px line has no room for a
+                descender — "Mary" lost its y (founder, 2026-10-01). 30px
+                still sits inside the organiser row's 36px block. */}
             <Ticker
-              className="text-xl leading-none font-medium text-foreground"
+              className="text-xl leading-normal font-medium text-foreground"
               shadow={
                 <>
                   <span>{personName}</span>

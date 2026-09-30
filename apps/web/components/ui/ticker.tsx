@@ -34,7 +34,7 @@ export function Ticker({
   className = "",
 }: Props) {
   const boxRef = useRef<HTMLDivElement>(null)
-  const itemRef = useRef<HTMLSpanElement>(null)
+  const itemRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const [overflows, setOverflows] = useState(false)
   const [reduced, setReduced] = useState(false)
@@ -67,7 +67,10 @@ export function Ticker({
     const track = trackRef.current
     const item = itemRef.current
     if (!animate || !track || !item) return
-    const distance = item.offsetWidth + gap
+    // offsetWidth already carries the gap (it is the copy's padding), so
+    // one copy's width IS the loop's distance — adding the gap again made
+    // every loop jump 48px (found 2026-10-01).
+    const distance = item.offsetWidth
     const animation = track.animate(
       [
         { transform: "translateX(0)" },
@@ -91,14 +94,25 @@ export function Ticker({
           : "truncate"
       } ${className}`}
     >
+      {/* The copies are divs, not spans: a heading may ride inside (the
+          room's person line carries the page's h1), and a heading in a
+          span is invalid HTML that a parser may restructure. */}
       <div ref={trackRef} className="inline-flex will-change-transform">
-        <span ref={itemRef} style={animate ? { paddingRight: gap } : undefined}>
+        <div
+          ref={itemRef}
+          className="shrink-0"
+          style={animate ? { paddingRight: gap } : undefined}
+        >
           {children}
-        </span>
+        </div>
         {animate && (
-          <span aria-hidden="true" style={{ paddingRight: gap }}>
+          <div
+            aria-hidden="true"
+            className="shrink-0"
+            style={{ paddingRight: gap }}
+          >
             {shadow ?? children}
-          </span>
+          </div>
         )}
       </div>
     </div>
