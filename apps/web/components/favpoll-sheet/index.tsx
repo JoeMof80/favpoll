@@ -468,7 +468,13 @@ export function FavpollSheet({
           the book is the standings' tail, not a section of its own. */}
       <div className="mt-6 space-y-4 md:hidden">{guestBookMobile}</div>
 
-      <div className="sticky bottom-0 z-10 mt-8 hidden border-t border-border bg-background py-5 md:block">
+      {/* THE FOOTER IS THE COLUMN'S FLOOR (founder, 2026-10-01): pushed
+          to the bottom when the standings are short (the spacer takes
+          the slack), sticky over them when long, and its charity row
+          sits the sheet's inset above the bottom — the same margin the
+          top of the page keeps — with the sheet's white beneath. */}
+      <div className="hidden md:block md:flex-1" aria-hidden="true" />
+      <div className="sticky bottom-0 z-10 mt-8 hidden border-t border-border bg-background pt-5 pb-[var(--shell-inset)] md:block">
         {appeal && (
           <p className="mb-2 truncate border-b border-border pb-2 text-xs text-muted-foreground">
             Part of{" "}
@@ -569,6 +575,9 @@ export function FavpollSheet({
       appShell
       railExpanded={guestBookExpanded}
       shellHeight={shellHeight}
+      // The bottom inset mirrors the top: 72px in the room (the goal
+      // card's line), 64px on the page (the hero's md:pt-16).
+      shellInset={room ? "72px" : "64px"}
     >
       {children}
     </PageLayout>
