@@ -5,6 +5,7 @@ import { MentionTextarea } from "@/components/mention-textarea"
 import type { MentionTarget } from "@/lib/mentions"
 import { CharCounter } from "@/components/favpoll-form/edit-helpers"
 import { WizardField } from "./wizard-field"
+import { WizardGenerateButton } from "./wizard-generate-button"
 import { ghostsFor } from "./wizard-placeholders"
 import type { WizardState } from "./use-wizard-state"
 import { FIELD_HINTS, FIELD_LABELS, FIELD_LIMITS } from "@/lib/favpoll-fields"
@@ -40,6 +41,16 @@ export function WizardStoryStep({ w }: { w: WizardState }) {
   ]
   return (
     <div className="space-y-5">
+      {/* GENERATE, in the field column (founder, 2026-09-30: "inline with
+          the fields, not the label") — the first row of the step, on the
+          inputs' own left edge, above the About it fills. */}
+      <div className="sm:grid sm:grid-cols-[180px_1fr] sm:gap-x-6">
+        <span className="hidden sm:block" aria-hidden="true" />
+        <div className="min-w-0">
+          <WizardGenerateButton w={w} />
+        </div>
+      </div>
+
       {/* ALWAYS-VISIBLE guidance for the two craft fields (founder,
           2026-09-17, after the Yvette session): the wizard is an
           authoring surface — a sentence of guidance changes the output,
