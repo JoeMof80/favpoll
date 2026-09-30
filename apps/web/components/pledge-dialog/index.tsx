@@ -325,6 +325,9 @@ export function PledgeDialog({
            carries its ask as an eyebrow (step 3 gets a plain eyebrow),
            so a visible title above it said the same thing twice. */
         separators={dialog.step === 1 && !inAddView}
+        /* The footer's hairline on EVERY step (founder, 2026-09-30:
+           "inconsistent styling") — only the header's comes and goes. */
+        footerSeparator
         hideMobileTitleBar
         headerClassName={
           dialog.step === 1 && !inAddView ? "px-5 pt-4 pb-3" : "p-0"
