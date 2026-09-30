@@ -146,14 +146,11 @@ export function FavpollSheet({
         }
       : undefined
 
-  // The person (or cause) as the rail's organiser row has them: name,
-  // one quiet line, a small photo. Read for the fundraiser dial's row.
+  // The person (or cause) for the fundraiser dial's row: the name and a
+  // small photo.
   const personName = isCause
     ? (favpoll.cause_label ?? "")
     : (favpoll.protagonists?.name ?? "")
-  const personContext = isCause
-    ? (favpoll.context ?? null)
-    : (favpoll.protagonists?.context ?? null)
   const personPhoto = isCause
     ? (favpoll.photo_url ?? null)
     : (favpoll.protagonists?.photo_url ?? null)
@@ -303,7 +300,13 @@ export function FavpollSheet({
         // its mirror (measured 64 vs 72 at pt-16).
         <div className="mb-6 pt-6 md:pt-[72px]">
           <FundraiserStrip fundraiser={heroFundraiser} />
-          <div className="mt-5 flex items-center gap-3 border-t border-border pt-5">
+          {/* The person's row: the name, larger than the organiser's
+              (founder, 2026-09-30: "increase the name size"), no context,
+              the photo at the right edge. */}
+          <div className="mt-5 flex items-center justify-between gap-3 border-t border-border pt-5">
+            <h1 className="min-w-0 truncate text-xl font-medium text-foreground">
+              {personName}
+            </h1>
             {personPhoto ? (
               <ProtagonistAvatar
                 name={personName}
@@ -315,14 +318,6 @@ export function FavpollSheet({
                 {personName.charAt(0).toUpperCase()}
               </div>
             )}
-            <div className="min-w-0">
-              <h1 className="truncate text-sm font-medium text-foreground">
-                {personName}
-              </h1>
-              {personContext && (
-                <p className="text-xs text-muted-foreground">{personContext}</p>
-              )}
-            </div>
           </div>
         </div>
       ) : isCause ? (

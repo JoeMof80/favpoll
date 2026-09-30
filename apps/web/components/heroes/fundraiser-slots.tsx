@@ -34,36 +34,43 @@ export function FundraiserStrip({
             ? "Pledge goal"
             : "Raised so far"}
       </SectionEyebrow>
-      {/* The countdown's value + unit-label pair: figure, then what it is
-          against, at one baseline. */}
-      <div className="flex flex-wrap items-baseline gap-x-3 tabular-nums">
-        <span
-          aria-live="polite"
-          className="text-2xl leading-none font-medium text-foreground"
-        >
-          {formatPounds(totalRaised)}
-        </span>
-        {goalAmount && !isClosed && (
-          <span className="text-xs text-muted-foreground">
-            of {formatPounds(goalAmount)}
+      {/* The countdown card's digit line, exactly: a 29px box (the text-2xl
+          line box the digits stand in, measured against the rail: its
+          hairline sat 1px above this one at 30), so this card is as tall as that
+          one and the hairlines beneath them meet on one line (founder,
+          2026-09-30: "make the pledge goal bottom border level with the
+          bottom border of poll closes in"). The figure and its label
+          share the digits' baseline; the bar lies along the box's floor. */}
+      <div className="relative h-[29px]">
+        <div className="flex flex-wrap items-baseline gap-x-3 tabular-nums">
+          <span
+            aria-live="polite"
+            className="text-2xl leading-none font-medium text-foreground"
+          >
+            {formatPounds(totalRaised)}
           </span>
-        )}
-        {goalAmount && !isClosed && goalReached && (
-          <span className="text-xs font-medium text-success">
-            Goal reached — every further pledge still counts
-          </span>
-        )}
-        {isClosed && (
-          <span className="text-xs text-muted-foreground">raised</span>
-        )}
+          {goalAmount && !isClosed && (
+            <span className="text-xs text-muted-foreground">
+              of {formatPounds(goalAmount)}
+            </span>
+          )}
+          {goalAmount && !isClosed && goalReached && (
+            <span className="text-xs font-medium text-success">
+              Goal reached — every further pledge still counts
+            </span>
+          )}
+          {isClosed && (
+            <span className="text-xs text-muted-foreground">raised</span>
+          )}
+        </div>
+        {goalAmount && !isClosed ? (
+          <GoalProgress
+            totalRaised={totalRaised}
+            goalAmount={goalAmount}
+            className="absolute inset-x-0 bottom-0 h-1"
+          />
+        ) : null}
       </div>
-      {goalAmount && !isClosed ? (
-        <GoalProgress
-          totalRaised={totalRaised}
-          goalAmount={goalAmount}
-          className="mt-3 h-2"
-        />
-      ) : null}
     </div>
   )
 }
