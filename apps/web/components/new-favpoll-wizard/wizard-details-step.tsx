@@ -1,44 +1,19 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import { SegmentedControl } from "@/components/ui/segmented-control"
 import { SwitchLine } from "@/components/ui/switch-line"
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from "@/components/ui/input-group"
 import { DateTimePicker } from "@/components/favpoll-form/date-time-picker"
 import { CLOSE_DATE_PRESETS } from "@/components/favpoll-form/date-helpers"
-import { WizardField, WIZARD_INPUT_SIZE } from "./wizard-field"
+import { GoalPicker } from "@/components/favpoll-form/goal-picker"
+import {
+  FIELD_LABELS,
+  VISIBILITY_OPTIONS,
+  guestAdditionsSentence,
+  showDonationsSentence,
+  visibilityHint,
+} from "@/lib/favpoll-fields"
+import { WizardField } from "./wizard-field"
 import type { WizardState, WizardVisibility } from "./use-wizard-state"
-import { cn } from "@/lib/utils"
-
-const GOAL_PRESETS = [100, 250, 500, 1000]
-
-// The three-notch visibility axis (listed ⊃ unlisted ⊃ private) as one
-// control — two stacked switches would leave the hierarchy illegible.
-const VISIBILITY_OPTIONS: {
-  value: WizardVisibility
-  label: string
-  hint: string
-}[] = [
-  {
-    value: "listed",
-    label: "Listed",
-    hint: "Appears on the public favpolls page.",
-  },
-  {
-    value: "unlisted",
-    label: "Link only",
-    hint: "Only people with the link can find it.",
-  },
-  {
-    value: "private",
-    label: "Private",
-    hint: "Guests must sign in; shared links preview no details.",
-  },
-]
 
 export function WizardDetailsStep({ w }: { w: WizardState }) {
   return (
@@ -46,47 +21,20 @@ export function WizardDetailsStep({ w }: { w: WizardState }) {
       {/* Every row is a WizardField (founder, 2026-09-06: the hand-rolled
           rows' inline labels sat flush on mobile, unlike the other steps
           — one grammar, no drift). */}
-      <WizardField label="Pledge goal">
-        <div className="flex flex-wrap gap-2">
-          {GOAL_PRESETS.map((g) => (
-            <Button
-              key={g}
-              type="button"
-              className="h-11 px-3.5 md:text-base"
-              variant={w.goalAmount === g ? "default" : "outline"}
-              onClick={() => {
-                w.setGoalAmount(g)
-                w.setGoalDraft(String(g))
-              }}
-            >
-              £{g}
-            </Button>
-          ))}
-          <InputGroup
-            className={cn(WIZARD_INPUT_SIZE, "min-w-28 flex-1 bg-background")}
-          >
-            <InputGroupAddon align="inline-start">
-              <span className="text-muted-foreground">£</span>
-            </InputGroupAddon>
-            <InputGroupInput
-              className="md:text-base"
-              inputMode="numeric"
-              placeholder="other"
-              aria-label="Custom goal amount"
-              value={w.goalDraft}
-              onChange={(e) => {
-                w.setGoalDraft(e.target.value)
-                const n = parseInt(e.target.value, 10)
-                w.setGoalAmount(Number.isFinite(n) && n > 0 ? n : undefined)
-              }}
-            />
-          </InputGroup>
-        </div>
+      <WizardField label={FIELD_LABELS.goal}>
+        <GoalPicker
+          amount={w.goalAmount ?? null}
+          draft={w.goalDraft}
+          onChange={(n, draft) => {
+            w.setGoalAmount(n ?? undefined)
+            w.setGoalDraft(draft)
+          }}
+        />
       </WizardField>
 
       {/* The 90-day cap lives in the picker's disabled dates and the
           server-side guard — no hint sentence (prototype round 38). */}
-      <WizardField label="Close date" required>
+      <WizardField label={FIELD_LABELS.closeDate} required>
         {w.appeal?.closesAt ? (
           // Inherited from the appeal and locked — one event, one
           // announcement moment (concept decision, 2026-09-05).
@@ -113,8 +61,8 @@ export function WizardDetailsStep({ w }: { w: WizardState }) {
       </WizardField>
 
       <WizardField
-        label="Visibility"
-        hint={VISIBILITY_OPTIONS.find((o) => o.value === w.visibility)?.hint}
+        label={FIELD_LABELS.visibility}
+        hint={visibilityHint(w.visibility)}
       >
         {/* SegmentedControl — the /favpolls toolbar's own status control
             (founder, 2026-09-01: "use this UI"), replacing the fused
@@ -137,25 +85,21 @@ export function WizardDetailsStep({ w }: { w: WizardState }) {
           authored facts, and a default-on toggle isn't one. */}
       {/* The sentence is the switch's label, beside it (founder,
           2026-09-30) — not a hint two lines below. */}
-      <WizardField label="Guest additions">
+      <WizardField label={FIELD_LABELS.guestAdditions}>
         <SwitchLine
           checked={w.allowGuestItems}
           onCheckedChange={w.setAllowGuestItems}
         >
-          {w.allowGuestItems
-            ? "Guests can add their own favourites to the topic."
-            : "Only your favourites appear."}
+          {guestAdditionsSentence(w.allowGuestItems)}
         </SwitchLine>
       </WizardField>
 
-      <WizardField label="Show donations">
+      <WizardField label={FIELD_LABELS.showDonations}>
         <SwitchLine
           checked={w.showGuestAmounts}
           onCheckedChange={w.setShowGuestAmounts}
         >
-          {w.showGuestAmounts
-            ? "Guests can choose to show their donation in the guest book."
-            : "Only favourite picks appear in the guest book."}
+          {showDonationsSentence(w.showGuestAmounts)}
         </SwitchLine>
       </WizardField>
     </div>

@@ -11,6 +11,7 @@ import { MentionTextarea } from "@/components/mention-textarea"
 import { CharCounter } from "@/components/favpoll-form/edit-helpers"
 import { DateTimePicker } from "@/components/favpoll-form/date-time-picker"
 import { CLOSE_DATE_PRESETS } from "@/components/favpoll-form/date-helpers"
+import { GoalPicker } from "@/components/favpoll-form/goal-picker"
 import { WIZARD_INPUT_SIZE } from "@/components/new-favpoll-wizard/wizard-field"
 import { SettingsRow } from "@/components/manage/settings-rows"
 import type { MentionTarget } from "@/lib/mentions"
@@ -258,6 +259,7 @@ export function EditableDateRow({
         <DateTimePicker
           value={current}
           onChange={(d) => void change(d)}
+          size="lg"
           presets={CLOSE_DATE_PRESETS}
         />
       )}
@@ -265,11 +267,10 @@ export function EditableDateRow({
   )
 }
 
-export function EditableAmountRow({
+export function EditableGoalRow({
   label,
   description,
   value,
-  format,
   readOnly = false,
   onSave,
 }: {
@@ -277,30 +278,22 @@ export function EditableAmountRow({
   description?: React.ReactNode
   /** Null: no goal. */
   value: number | null
-  format: (n: number) => string
   readOnly?: boolean
   onSave: (next: number | null) => Promise<void>
 }) {
   const [current, setCurrent] = useState(value)
+  const [amount, setAmount] = useState<number | null>(value)
   const [draft, setDraft] = useState(value ? String(value) : "")
   const [status, flash] = useSaveStatus()
-  const [focused, setFocused] = useState(false)
   const [seen, setSeen] = useState(value)
   if (value !== seen) {
     setSeen(value)
-    if (!focused) {
-      setCurrent(value)
-      setDraft(value ? String(value) : "")
-    }
+    setCurrent(value)
+    setAmount(value)
+    setDraft(value ? String(value) : "")
   }
 
-  async function commit() {
-    const n = draft.trim() === "" ? null : Number(draft)
-    if (n !== null && (!Number.isFinite(n) || n < 0)) {
-      setDraft(current ? String(current) : "")
-      flash({ kind: "error", message: "The goal must be a positive amount." })
-      return
-    }
+  async function commit(n: number | null) {
     if (n === current) return
     flash({ kind: "saving" })
     try {
@@ -312,51 +305,26 @@ export function EditableAmountRow({
     }
   }
 
-  if (readOnly) {
-    return (
-      <SettingsRow label={label} description={description}>
-        {current ? (
-          <span className="tabular-nums">{format(current)}</span>
-        ) : (
-          <span className="text-muted-foreground">No goal</span>
-        )}
-      </SettingsRow>
-    )
-  }
-
   return (
     <SettingsRow
       label={label}
       description={<Hint description={description} status={status} />}
     >
-      <InputGroup className={cn(WIZARD_INPUT_SIZE, "max-w-xs bg-background")}>
-        <InputGroupAddon>£</InputGroupAddon>
-        <InputGroupInput
-          type="number"
-          inputMode="decimal"
-          min={0}
-          step={1}
-          className="md:text-base"
-          value={draft}
-          placeholder="No goal"
-          aria-label={label}
-          onChange={(e) => setDraft(e.target.value)}
-          onFocus={() => setFocused(true)}
-          onBlur={() => {
-            setFocused(false)
-            void commit()
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault()
-              e.currentTarget.blur()
-            } else if (e.key === "Escape") {
-              e.preventDefault()
-              setDraft(current ? String(current) : "")
-            }
-          }}
-        />
-      </InputGroup>
+      {/* The wizard's own picker: a preset saves on the tap, the box on
+          leaving it. */}
+      <GoalPicker
+        amount={amount}
+        draft={draft}
+        disabled={readOnly}
+        onChange={(n, d) => {
+          setAmount(n)
+          setDraft(d)
+          // A preset tap arrives with its own text; the box's typing
+          // does not — that waits for blur.
+          if (d === String(n)) void commit(n)
+        }}
+        onBlur={() => void commit(draft.trim() === "" ? null : amount)}
+      />
     </SettingsRow>
   )
 }

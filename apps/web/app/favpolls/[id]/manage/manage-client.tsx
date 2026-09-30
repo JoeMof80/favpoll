@@ -42,8 +42,8 @@ import {
   type ManageSection,
 } from "@/components/manage/settings-rows"
 import {
-  EditableAmountRow,
   EditableDateRow,
+  EditableGoalRow,
   EditableTextRow,
 } from "@/components/manage/editable-row"
 import { updateStoryField, type StoryField } from "./actions"
@@ -56,6 +56,17 @@ import {
 import type { Charity } from "@favpoll/types"
 import { updateClosesAt } from "@/app/favpolls/[id]/edit/actions"
 import type { MentionTarget } from "@/lib/mentions"
+import {
+  FIELD_HINTS,
+  FIELD_LABELS,
+  FIELD_LIMITS,
+  VISIBILITY_OPTIONS,
+  guestAdditionsSentence,
+  nameLabel,
+  showDonationsSentence,
+  visibilityHint,
+} from "@/lib/favpoll-fields"
+import { ghostsFor } from "@/components/new-favpoll-wizard/wizard-placeholders"
 import { paletteForFavpoll } from "@/lib/register-palette"
 import type { FavpollCategory, FavpollSubject } from "@favpoll/types"
 import { cn } from "@/lib/utils"
@@ -93,15 +104,6 @@ export type ManageFavpoll = OrganizerFavpoll & {
 }
 
 type Visibility = "listed" | "unlisted" | "private"
-
-// One honest sentence per state, shown under the control for the
-// CURRENT value. "private" is a sign-in gate, not organiser-only — the
-// guest page redirects signed-out visitors to sign in.
-const VISIBILITY_NOTES: Record<Visibility, string> = {
-  listed: "Anyone can find this favpoll on the All favpolls list.",
-  unlisted: "Hidden from the list — only people with the link can find it.",
-  private: "Hidden from the list, and guests must sign in to view it.",
-}
 
 const formatLongDate = (iso: string) =>
   new Date(iso).toLocaleDateString("en-GB", {
@@ -191,6 +193,9 @@ export function ManageClient({
       ? (favpoll.cause_label ?? "")
       : (favpoll.protagonist?.name ?? "")
   const topicTitle = favpoll.poll?.topic?.title
+  // The wizard's ghost text, per category — the same words in the
+  // same empty boxes (lib/favpoll-fields).
+  const ghosts = ghostsFor(favpoll.category)
   const eyebrow =
     favpoll.occasion_type ??
     (favpoll.category
@@ -376,25 +381,27 @@ export function ManageClient({
     <div className="flex flex-col gap-8">
       <SettingsGroup>
         <EditableTextRow
-          label="Opening line"
+          label={FIELD_LABELS.openingLine}
           value={favpoll.opening_line ?? ""}
-          maxLength={50}
+          maxLength={FIELD_LIMITS.openingLine}
+          placeholder={ghosts.openingLine}
           readOnly={isClosed}
           onSave={saveField("opening_line")}
         />
         <EditableTextRow
-          label={favpoll.subject === "cause" ? "Cause" : "Name"}
+          label={nameLabel(favpoll.subject, favpoll.category)}
           value={name}
-          maxLength={40}
+          maxLength={FIELD_LIMITS.name}
+          placeholder={ghosts.name}
           required
           readOnly={isClosed}
           onSave={saveField("name")}
         />
         <EditableTextRow
-          label="Context"
-          description="A date, an age, a place — the line under the name."
+          label={FIELD_LABELS.context}
           value={favpoll.context ?? ""}
-          maxLength={40}
+          maxLength={FIELD_LIMITS.context}
+          placeholder={ghosts.context}
           readOnly={isClosed}
           onSave={saveField("context")}
         />
@@ -412,10 +419,11 @@ export function ManageClient({
     <div className="flex flex-col gap-8">
       <SettingsGroup>
         <EditableTextRow
-          label="About"
-          description="Set the scene, link the topic and the cause. Hint at a note, if there is one."
+          label={FIELD_LABELS.about}
+          description={FIELD_HINTS.about}
           value={favpoll.about ?? ""}
-          maxLength={300}
+          maxLength={FIELD_LIMITS.about}
+          placeholder={ghosts.about}
           multiline
           required
           mentions={aboutMentions}
@@ -423,10 +431,11 @@ export function ManageClient({
           onSave={saveField("about")}
         />
         <EditableTextRow
-          label="Personal note"
-          description="A direct quote, a memory, or a message to guests. Revealed only after a guest pledges."
+          label={FIELD_LABELS.note}
+          description={FIELD_HINTS.note}
           value={favpoll.reveal ?? ""}
-          maxLength={280}
+          maxLength={FIELD_LIMITS.note}
+          placeholder={ghosts.note}
           multiline
           mentions={noteMentions}
           readOnly={isClosed}
@@ -479,11 +488,9 @@ export function ManageClient({
   const settings = (
     <div className="flex flex-col gap-8">
       <SettingsGroup>
-        <EditableAmountRow
-          label="Pledge goal"
-          description="Shown to guests as a bar under the total."
+        <EditableGoalRow
+          label={FIELD_LABELS.goal}
           value={favpoll.goal_amount}
-          format={formatAmount}
           readOnly={isClosed}
           onSave={saveField("goal_amount")}
         />
@@ -491,50 +498,46 @@ export function ManageClient({
           <SettingsRow label="Closed">{closesLabel}</SettingsRow>
         ) : (
           <EditableDateRow
-            label="Closes"
+            label={FIELD_LABELS.closeDate}
             description={`${Math.max(days, 0)} day${days === 1 ? "" : "s"} left. Two extensions at most.`}
             value={new Date(favpoll.closes_at)}
             onSave={saveClosesAt}
           />
         )}
         <SettingsRow
-          label="Who can see this favpoll"
-          description={VISIBILITY_NOTES[visibility]}
+          label={FIELD_LABELS.visibility}
+          description={visibilityHint(visibility)}
         >
           <SegmentedControl
+            size="lg"
             label="Who can see this favpoll"
             className="w-fit"
             value={visibility}
             onChange={(v) => {
               if (!visibilityPending) handleVisibility(v as Visibility)
             }}
-            options={[
-              { value: "listed", label: "Listed" },
-              { value: "unlisted", label: "Link only" },
-              { value: "private", label: "Private" },
-            ]}
+            options={VISIBILITY_OPTIONS.map(({ value, label }) => ({
+              value,
+              label,
+            }))}
           />
         </SettingsRow>
-        <SettingsRow label="Guest additions">
+        <SettingsRow label={FIELD_LABELS.guestAdditions}>
           <SwitchLine
             checked={guestItems}
             onCheckedChange={handleToggleGuestItems}
             disabled={guestItemsPending}
           >
-            {guestItems
-              ? "Guests can add their own favourites to the poll."
-              : "Guests pick from your list only."}
+            {guestAdditionsSentence(guestItems)}
           </SwitchLine>
         </SettingsRow>
-        <SettingsRow label="Show donations">
+        <SettingsRow label={FIELD_LABELS.showDonations}>
           <SwitchLine
             checked={showGuestAmounts}
             onCheckedChange={handleToggleShowGuestAmounts}
             disabled={showGuestAmountsPending}
           >
-            {showGuestAmounts
-              ? "Guests can choose to show their donation in the guest book."
-              : "Only favourite picks appear in the guest book."}
+            {showDonationsSentence(showGuestAmounts)}
           </SwitchLine>
         </SettingsRow>
         {!isClosed && (

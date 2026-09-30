@@ -7,6 +7,7 @@ import { CharCounter } from "@/components/favpoll-form/edit-helpers"
 import { WizardField } from "./wizard-field"
 import { ghostsFor } from "./wizard-placeholders"
 import type { WizardState } from "./use-wizard-state"
+import { FIELD_HINTS, FIELD_LABELS, FIELD_LIMITS } from "@/lib/favpoll-fields"
 
 export function WizardStoryStep({ w }: { w: WizardState }) {
   const ph = ghostsFor(w.category)
@@ -45,15 +46,11 @@ export function WizardStoryStep({ w }: { w: WizardState }) {
           so it must not hide in a popover. The About hint coaches the
           note-tease: the withhold is About's job (brand doctrine), and
           cold guests need to know something is waiting. */}
-      <WizardField
-        label="About"
-        required
-        hint="Set the scene, link the topic and the cause. Hint at a note, if there is one."
-      >
+      <WizardField label={FIELD_LABELS.about} required hint={FIELD_HINTS.about}>
         <InputGroup className="bg-background">
           <MentionTextarea
             rows={4}
-            maxLength={300}
+            maxLength={FIELD_LIMITS.about}
             value={w.about}
             placeholder={aboutGhost}
             onChange={w.setAbout}
@@ -64,19 +61,16 @@ export function WizardStoryStep({ w }: { w: WizardState }) {
             data-align="block-end"
             className="order-last flex w-full items-center justify-end px-3 py-1.5"
           >
-            <CharCounter value={w.about} max={300} />
+            <CharCounter value={w.about} max={FIELD_LIMITS.about} />
           </div>
         </InputGroup>
       </WizardField>
 
-      <WizardField
-        label="Personal note"
-        hint="A direct quote, a memory, or a message to guests. Revealed only after a guest pledges."
-      >
+      <WizardField label={FIELD_LABELS.note} hint={FIELD_HINTS.note}>
         <InputGroup className="bg-background">
           <MentionTextarea
             rows={4}
-            maxLength={280}
+            maxLength={FIELD_LIMITS.note}
             value={w.note}
             placeholder={revealGhost}
             onChange={w.setNote}
@@ -87,7 +81,7 @@ export function WizardStoryStep({ w }: { w: WizardState }) {
             data-align="block-end"
             className="order-last flex w-full items-center justify-end px-3 py-1.5"
           >
-            <CharCounter value={w.note} max={280} />
+            <CharCounter value={w.note} max={FIELD_LIMITS.note} />
           </div>
         </InputGroup>
       </WizardField>
