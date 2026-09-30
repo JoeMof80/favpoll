@@ -707,6 +707,8 @@ export function ManageClient({
             <Button
               type="button"
               variant="destructive"
+              // The goal presets' size, the page's own (founder, 2026-09-30).
+              className="h-11 px-3.5 md:text-base"
               disabled={!canDelete || deleting}
               onClick={() => setConfirmDeleteOpen(true)}
             >
