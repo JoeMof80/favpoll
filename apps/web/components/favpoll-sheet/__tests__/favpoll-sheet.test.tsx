@@ -184,6 +184,50 @@ describe("FavpollSheet — the room's screen", () => {
   })
 })
 
+describe("FavpollSheet — the room's fundraiser dial", () => {
+  it("renders the goal card, the bar as its hairline and the person's row — no hero band", () => {
+    render(
+      <FavpollSheet
+        favpoll={{ ...FAVPOLL, goal_amount: 1000 }}
+        pollWithItems={POLL}
+        totalRaised={250}
+        isClosed={false}
+        isOrganiser={false}
+        wallEntries={[]}
+        rankHistory={null}
+        presentation="room"
+        heroVariant="fundraiser"
+      />
+    )
+    expect(screen.queryByTestId("favpoll-hero")).not.toBeInTheDocument()
+    expect(screen.getByText("Pledge goal")).toBeInTheDocument()
+    expect(screen.getByText("£250")).toBeInTheDocument()
+    expect(screen.getByRole("progressbar")).toHaveAttribute(
+      "aria-valuenow",
+      "250"
+    )
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Alice")
+  })
+
+  it("keeps the full hero on the tribute dial", () => {
+    render(
+      <FavpollSheet
+        favpoll={{ ...FAVPOLL, goal_amount: 1000 }}
+        pollWithItems={POLL}
+        totalRaised={250}
+        isClosed={false}
+        isOrganiser={false}
+        wallEntries={[]}
+        rankHistory={null}
+        presentation="room"
+        heroVariant="tribute"
+      />
+    )
+    expect(screen.getByTestId("favpoll-hero")).toBeInTheDocument()
+    expect(screen.queryByText("Pledge goal")).not.toBeInTheDocument()
+  })
+})
+
 describe("FavpollSheet — a guest's phone", () => {
   it("threads the viewer's standing through and withholds the book pre-pledge", () => {
     const open = vi.fn()

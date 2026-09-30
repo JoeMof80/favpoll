@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react"
 import { FundraiserStrip } from "@/components/heroes/fundraiser-slots"
 
 describe("FundraiserStrip — the pledge goal in the countdown card's grammar", () => {
-  it("with a goal: eyebrow, figure, 'of £goal' at its baseline, the bar", () => {
+  it("with a goal: eyebrow, figure, 'of £goal' at its baseline — the bar is the sheet's", () => {
     render(
       <FundraiserStrip
         fundraiser={{ totalRaised: 250, goalAmount: 1000, isClosed: false }}
@@ -12,10 +12,7 @@ describe("FundraiserStrip — the pledge goal in the countdown card's grammar", 
     expect(screen.getByText("Pledge goal")).toBeInTheDocument()
     expect(screen.getByText("£250")).toBeInTheDocument()
     expect(screen.getByText("of £1,000")).toBeInTheDocument()
-    expect(screen.getByRole("progressbar")).toHaveAttribute(
-      "aria-valuenow",
-      "250"
-    )
+    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument()
     expect(screen.queryByText(/Goal reached/)).not.toBeInTheDocument()
     expect(screen.queryByRole("heading")).not.toBeInTheDocument()
   })
