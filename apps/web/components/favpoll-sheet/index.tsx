@@ -300,10 +300,32 @@ export function FavpollSheet({
         // its mirror (measured 64 vs 72 at pt-16).
         <div className="mb-6 pt-6 md:pt-[72px]">
           <FundraiserStrip fundraiser={heroFundraiser} />
-          {/* The person's row: the name, larger than the organiser's
-              (founder, 2026-09-30: "increase the name size"), no context,
-              the photo at the right edge. */}
-          <div className="mt-5 flex items-center justify-between gap-3 border-t border-border pt-5">
+          {/* THE BAR IS THE HAIRLINE (founder, 2026-09-30: "replace the
+              light border with the pledge goal bar"): where the rail draws
+              its hairline under the countdown card, this column draws the
+              goal's bar — the light track full width, the fill along it.
+              Without a goal, the hairline itself. */}
+          {/* A 1px slot, the hairline's own height, so the row beneath
+              sits where the organiser row sits either way; the bar
+              straddles the line rather than pushing the row down. */}
+          <div className="mt-5 flex h-px items-center" aria-hidden="true">
+            {heroFundraiser.goalAmount && !isClosed ? (
+              <GoalProgress
+                totalRaised={totalRaised}
+                goalAmount={heroFundraiser.goalAmount}
+                className="h-1"
+              />
+            ) : (
+              <div className="w-full border-t border-border" />
+            )}
+          </div>
+          {/* The person's row, mirroring the organiser block: the rail's
+              py-5 rhythm and a hairline beneath. The name, larger than the
+              organiser's, no context, the photo at the right edge. */}
+          {/* min-h-[76px] = the organiser row's box (two text lines + py-5
+              + its hairline), so this row's bottom border meets the
+              organiser's (measured 219 vs 222 without it). */}
+          <div className="flex min-h-[76px] items-center justify-between gap-3 border-b border-border py-5">
             <h1 className="min-w-0 truncate text-xl font-medium text-foreground">
               {personName}
             </h1>

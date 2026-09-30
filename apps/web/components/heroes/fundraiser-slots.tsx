@@ -1,5 +1,4 @@
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-import { GoalProgress } from "@/components/goal-progress"
 import { formatPounds } from "@/lib/i18n"
 
 // THE FUNDRAISER STRIP (founder, 2026-09-30, settled over four cuts): on
@@ -40,7 +39,8 @@ export function FundraiserStrip({
           one and the hairlines beneath them meet on one line (founder,
           2026-09-30: "make the pledge goal bottom border level with the
           bottom border of poll closes in"). The figure and its label
-          share the digits' baseline; the bar lies along the box's floor. */}
+          share the digits' baseline. The bar is not here: it IS the card's
+          hairline, drawn by the sheet where the rail's hairline runs. */}
       <div className="relative h-[29px]">
         <div className="flex flex-wrap items-baseline gap-x-3 tabular-nums">
           <span
@@ -63,13 +63,6 @@ export function FundraiserStrip({
             <span className="text-xs text-muted-foreground">raised</span>
           )}
         </div>
-        {goalAmount && !isClosed ? (
-          <GoalProgress
-            totalRaised={totalRaised}
-            goalAmount={goalAmount}
-            className="absolute inset-x-0 bottom-0 h-1"
-          />
-        ) : null}
       </div>
     </div>
   )
