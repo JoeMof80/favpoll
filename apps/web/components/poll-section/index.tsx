@@ -13,7 +13,7 @@ import { Button } from "../ui/button"
 import { buildMechanicSteps } from "@/lib/mechanic-steps"
 import { LockCardContent } from "@/components/lock-card-content"
 import {
-  ChartLine,
+  TrendingUpDown,
   Check,
   EllipsisVertical,
   Share2,
@@ -238,8 +238,11 @@ export function PollSection({
                     onSelect={onOpenStory}
                     className="md:hidden"
                   >
-                    How it unfolded
-                    <ChartLine className="ml-auto size-4" aria-hidden="true" />
+                    Rank history
+                    <TrendingUpDown
+                      className="ml-auto size-4"
+                      aria-hidden="true"
+                    />
                   </DropdownMenuItem>
                 )}
                 {isClosed && (

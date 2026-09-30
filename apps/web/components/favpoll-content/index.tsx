@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation"
 import { Countdown } from "@/components/countdown"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { GuestBook, type WallEntry } from "@/components/guest-book"
-import { ChevronRight } from "lucide-react"
+import { TrendingUpDown } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { BumpChart } from "@/components/bump-chart"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import type { RankHistory } from "@/lib/rank-history"
@@ -198,14 +199,16 @@ export function FavpollContent({
           "below the poll closed eyebrow") — the … menu keeps it on the
           phone, where there is no rail. */}
       {rankHistory && (
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="sm"
+          className="mt-1 -ml-2"
           onClick={() => setStoryOpen(true)}
-          className="mt-1 inline-flex items-center gap-1 text-sm text-primary hover:underline"
         >
-          How it unfolded
-          <ChevronRight className="size-3.5" aria-hidden="true" />
-        </button>
+          <TrendingUpDown data-icon="inline-start" aria-hidden="true" />
+          {"Rank history"}
+        </Button>
       )}
     </div>
   ) : (
@@ -336,7 +339,7 @@ export function FavpollContent({
         <ResponsiveOverlay
           open={storyOpen}
           onOpenChange={setStoryOpen}
-          title="How it unfolded"
+          title="Rank history"
           dialogClassName="flex flex-col gap-0 overflow-hidden p-0 sm:max-w-4xl"
           // Taller than the overlay's default: fifteen lanes need it.
           dialogStyle={{ maxHeight: "min(900px, 90vh)" }}
