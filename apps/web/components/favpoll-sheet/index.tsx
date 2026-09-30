@@ -152,11 +152,15 @@ export function FavpollSheet({
         }
       : undefined
 
-  // The person (or cause) for the fundraiser dial's row: the name and a
-  // small photo.
+  // The person (or cause) for the fundraiser dial's row: the name, the
+  // context as the organiser row's quiet line ("Great North Run" is the
+  // one thing a room wants to know; founder, 2026-09-30), a small photo.
   const personName = isCause
     ? (favpoll.cause_label ?? "")
     : (favpoll.protagonists?.name ?? "")
+  const personContext = isCause
+    ? (favpoll.context ?? null)
+    : (favpoll.protagonists?.context ?? null)
   const personPhoto = isCause
     ? (favpoll.photo_url ?? null)
     : (favpoll.protagonists?.photo_url ?? null)
@@ -325,14 +329,26 @@ export function FavpollSheet({
           </div>
           {/* The person's row, mirroring the organiser block: the rail's
               py-5 rhythm and a hairline beneath. The name, larger than the
-              organiser's, no context, the photo at the right edge. */}
+              organiser's, the context beneath it, the photo at the right
+              edge. */}
           {/* min-h-[76px] = the organiser row's box (two text lines + py-5
               + its hairline), so this row's bottom border meets the
               organiser's (measured 219 vs 222 without it). */}
           <div className="flex min-h-[76px] items-center justify-between gap-3 border-b border-border py-5">
-            <h1 className="min-w-0 truncate text-xl font-medium text-foreground">
-              {personName}
-            </h1>
+            {/* leading-none on both lines with a 3px gap = 36px (the name's line box rounds to 21), the
+                organiser row's two-line block, so the rows' bottoms stay
+                level with the larger name (measured 231 vs 222 with the
+                default leading). */}
+            <div className="min-w-0">
+              <h1 className="truncate text-xl leading-none font-medium text-foreground">
+                {personName}
+              </h1>
+              {personContext && (
+                <p className="mt-[3px] truncate text-xs leading-none text-muted-foreground">
+                  {personContext}
+                </p>
+              )}
+            </div>
             {personPhoto ? (
               <ProtagonistAvatar
                 name={personName}
@@ -440,21 +456,19 @@ export function FavpollSheet({
           </p>
         )}
         {/* On the room's fundraiser dial the goal card at the top carries
-            the money and names the charity, so the footer is the
-            charity's identity line only — name, number, the verified
-            mark — and says nothing twice (founder, 2026-09-30). A zero
-            amount with no caption is how CharityRow hides its money. */}
+            the GOAL and names the charity, so the footer keeps the total
+            beside the charity (founder, 2026-09-30: "include the total in
+            the footer still") but drops the goal caption and the bar —
+            the goal is said once. */}
         <FavpollListCardCharityCarousel
           charities={favpoll.favpoll_charities.map((ec) => ({
             charity: ec.charities,
           }))}
           size="lg"
           perCharity={
-            heroFundraiser
-              ? 0
-              : favpoll.goal_amount
-                ? totalRaised
-                : totalRaised / Math.max(1, favpoll.favpoll_charities.length)
+            favpoll.goal_amount
+              ? totalRaised
+              : totalRaised / Math.max(1, favpoll.favpoll_charities.length)
           }
           amountCaption={
             !heroFundraiser && favpoll.goal_amount

@@ -67,7 +67,18 @@ vi.mock("@/components/countdown", () => ({
 }))
 vi.mock(
   "@/components/favpoll-list-card/favpoll-list-card-charity-carousel",
-  () => ({ FavpollListCardCharityCarousel: () => null })
+  () => ({
+    FavpollListCardCharityCarousel: (props: {
+      perCharity: number
+      amountCaption?: React.ReactNode
+    }) => (
+      <div
+        data-testid="charity-footer"
+        data-amount={props.perCharity}
+        data-caption={props.amountCaption ? "yes" : "no"}
+      />
+    ),
+  })
 )
 import { FavpollSheet } from "@/components/favpoll-sheet"
 
@@ -211,6 +222,10 @@ describe("FavpollSheet — the room's fundraiser dial", () => {
     expect(screen.getByText("of £1,000 for Ocean Trust")).toBeInTheDocument()
     expect(screen.queryByText(/of the £1,000 goal/)).not.toBeInTheDocument()
     expect(screen.getAllByRole("progressbar")).toHaveLength(1)
+    // The footer keeps the total beside the charity; the goal is the card's.
+    const footer = screen.getByTestId("charity-footer")
+    expect(footer.dataset.amount).toBe("250")
+    expect(footer.dataset.caption).toBe("no")
   })
 
   it("keeps the full hero on the tribute dial", () => {
