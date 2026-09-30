@@ -1,40 +1,45 @@
+"use client"
+
 import Link from "next/link"
 import { ChevronRight } from "lucide-react"
+import { WizardField } from "@/components/new-favpoll-wizard/wizard-field"
+import { WizardStepShell } from "@/components/new-favpoll-wizard/wizard-step-shell"
 import { cn } from "@/lib/utils"
 
-// THE SETTINGS GRAMMAR for the manage page (founder, 2026-09-29: "a
-// better layout for the manage favpoll page would be something more
-// like [the Claude app's settings]"; then "this should become where we
-// change things in place"). Groups of rows: the label and a one-line
-// explanation on the left, the control — or, until a field edits in
-// place, its value — on the right, hairlines between. A group is one
-// bordered card with its heading above, so the rows read as a table
-// of decisions rather than a pile of cards.
-//
-// `stacked` rows put the content UNDER the label at full width: long
-// text (the About, the note), chips, a QR. Short values sit right.
+// THE MANAGE PAGE WEARS THE WIZARD (founder, 2026-09-29: "please use
+// design from other parts of the app (e.g. wizard). and page with
+// shadow"). A group is a WizardStepShell — the rail's uppercase primary
+// heading over a column of fields — and a row is a WizardField: label
+// left in the 180px column, the control (or, until a field edits in
+// place, its value) right, the explanation as the field's hint. The
+// section nav is the wizard's rail: tinted column, round icon
+// stations, the active one filled. Nothing here that the wizard
+// doesn't already do.
 
 export function SettingsGroup({
   title,
   description,
   children,
 }: {
-  title: string
+  /** Only where a heading says something the nav doesn't (founder,
+   *  2026-09-30: "Only Favourite Topic header is worth saving"). */
+  title?: string
   description?: React.ReactNode
   children: React.ReactNode
 }) {
+  const body = (
+    <>
+      {description && (
+        <p className="-mt-2 text-sm text-muted-foreground">{description}</p>
+      )}
+      <div className="space-y-5">{children}</div>
+    </>
+  )
+  if (!title) return <div className="flex flex-col gap-5 py-6">{body}</div>
   return (
-    <section>
-      <div className="mb-3">
-        <h2 className="text-base font-medium text-foreground">{title}</h2>
-        {description && (
-          <p className="mt-0.5 text-sm text-muted-foreground">{description}</p>
-        )}
-      </div>
-      <div className="divide-y divide-border rounded-xl border border-border bg-background px-5">
-        {children}
-      </div>
-    </section>
+    <WizardStepShell title={title} visibleTitle>
+      {body}
+    </WizardStepShell>
   )
 }
 
@@ -42,46 +47,28 @@ export function SettingsRow({
   label,
   description,
   children,
-  stacked = false,
+  required = false,
   className,
 }: {
-  label: React.ReactNode
+  label: string
+  /** The wizard's hint line, under the control. */
   description?: React.ReactNode
   /** The control, or the value until the field edits in place. */
   children?: React.ReactNode
-  /** Content under the label at full width (long text, chips, a QR). */
+  required?: boolean
+  /** Kept for callers; the wizard grid stacks below sm on its own. */
   stacked?: boolean
   className?: string
 }) {
   return (
-    <div
-      className={cn(
-        "py-4",
-        stacked ? "grid gap-3" : "flex items-center justify-between gap-6",
-        className
-      )}
-    >
-      <div className="min-w-0">
-        {/* A div, not a p: a label can be a whole row (the charity row). */}
-        <div className="text-sm text-foreground">{label}</div>
-        {description && (
-          <p className="mt-0.5 text-sm text-muted-foreground">{description}</p>
-        )}
-      </div>
-      {children !== undefined && children !== null && (
-        // WRAP, NOT TRUNCATE (founder, 2026-09-14): this page IS the
-        // record — a truncated value hides the very data it exists to
-        // show. A short value sits right and wraps at 60%.
-        <div
-          className={
-            stacked
-              ? "min-w-0"
-              : "max-w-[60%] min-w-0 shrink-0 text-right text-sm break-words text-foreground"
-          }
-        >
+    <div className={className}>
+      <WizardField label={label} required={required} hint={description}>
+        {/* min-h matches the wizard's input height so a value at rest
+            sits on the same baseline as a field mid-edit. */}
+        <div className="flex min-h-11 w-full items-center text-sm text-foreground [&>*]:min-w-0 [&>.grid]:w-full">
           {children}
         </div>
-      )}
+      </WizardField>
     </div>
   )
 }
@@ -92,7 +79,9 @@ export type ManageSection = {
   icon: React.ComponentType<{ className?: string; "aria-hidden"?: boolean }>
 }
 
-/** Desktop: the left column of sections. */
+/** Desktop: the left column of sections — plain buttons, the active
+ *  one tinted (founder, 2026-09-29: the wizard rail's stations were
+ *  auditioned here and cut). */
 export function SectionNav({
   sections,
   active,
@@ -113,9 +102,10 @@ export function SectionNav({
             aria-current={isActive ? "page" : undefined}
             className={cn(
               "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+              // On the rail's tint the active pill is the sheet's white.
               isActive
-                ? "bg-primary/10 font-medium text-primary"
-                : "text-foreground hover:bg-muted"
+                ? "bg-background font-medium text-primary shadow-xs"
+                : "text-foreground hover:bg-background/60"
             )}
           >
             <Icon className="size-4 shrink-0" aria-hidden />
@@ -137,15 +127,12 @@ export function SectionList({
   href: (id: string) => string
 }) {
   return (
-    <nav
-      aria-label="Manage sections"
-      className="divide-y divide-border rounded-xl border border-border bg-background"
-    >
+    <nav aria-label="Manage sections" className="divide-y divide-border">
       {sections.map(({ id, label, icon: Icon }) => (
         <Link
           key={id}
           href={href(id)}
-          className="flex items-center gap-3 px-5 py-4 text-sm text-foreground transition-colors hover:bg-muted/50"
+          className="flex items-center gap-3 py-4 text-sm text-foreground transition-colors hover:bg-muted/50"
         >
           <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
           <span className="flex-1">{label}</span>

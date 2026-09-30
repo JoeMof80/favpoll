@@ -9,11 +9,12 @@ import {
   Check,
   Copy,
   ExternalLink,
-  HeartHandshake,
-  LayoutDashboard,
+  BookOpen,
+  Gift,
+  Shapes,
+  UserRound,
+  Users,
   Monitor,
-  PenLine,
-  Pencil,
   Printer,
   Settings2,
   Share2,
@@ -30,7 +31,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { Switch } from "@/components/ui/switch"
+import { SwitchLine } from "@/components/ui/switch-line"
+import { Tooltip, TooltipProvider } from "@/components/ui/tooltip"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import {
   SectionList,
@@ -45,13 +47,17 @@ import {
   EditableTextRow,
 } from "@/components/manage/editable-row"
 import { updateStoryField, type StoryField } from "./actions"
+import { PhotoRow } from "@/components/manage/photo-row"
+import { CharityRows } from "@/components/manage/charity-rows"
+import {
+  FavouritesGroup,
+  type ManageFavourite,
+} from "@/components/manage/favourites-row"
+import type { Charity } from "@favpoll/types"
 import { updateClosesAt } from "@/app/favpolls/[id]/edit/actions"
 import type { MentionTarget } from "@/lib/mentions"
 import { paletteForFavpoll } from "@/lib/register-palette"
 import type { FavpollCategory, FavpollSubject } from "@favpoll/types"
-import { Chip } from "@/components/ui/chip"
-import { CharityRow } from "@/components/charity-row"
-import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
 import { cn } from "@/lib/utils"
 import { formatAmount } from "@/lib/display"
 import { TOAST_ERROR_STYLE } from "@/lib/toast-styles"
@@ -77,12 +83,13 @@ export type ManageFavpoll = OrganizerFavpoll & {
   about: string | null
   reveal: string | null
   photoUrl: string | null
-  favourites: {
-    id: string
-    label: string
-    isGuestAdded: boolean
-    isHidden: boolean
-  }[]
+  favourites: ManageFavourite[]
+  /** A finite topic takes no organiser additions. */
+  topicIsFinite: boolean
+  /** Why the charity set can't change (an appeal, other people's money), or null. */
+  charityLockReason: string | null
+  /** Why the topic can't change (guests have pledged), or null. */
+  topicLockReason: string | null
 }
 
 type Visibility = "listed" | "unlisted" | "private"
@@ -108,22 +115,37 @@ const formatLongDate = (iso: string) =>
 // wizard stays the creator; changing things happens here, field by
 // field, as each row learns to edit in place. Overview is the
 // desktop default; on the phone the page opens as this list and each
-// section is its own screen (?section=…).
+// section is its own screen (?section=…). No Sharing section (founder,
+// 2026-09-29: "do we need a share section as well as the dropdown?"):
+// the toolbar's Share popover is the one door — guest link, QR, live
+// display — and the print artefacts ride Overview. Reorganised the
+// same day on the founder's word: Delete lives at the end of Settings,
+// the guest book has its own section, and the wizard's three authored
+// steps — Header, Story, Favourites — are three sections here too.
 const SECTIONS: ManageSection[] = [
-  { id: "overview", label: "Overview", icon: LayoutDashboard },
-  { id: "story", label: "Story", icon: PenLine },
-  { id: "charities", label: "Charities", icon: HeartHandshake },
-  { id: "sharing", label: "Sharing", icon: Share2 },
+  // The wizard's own glyphs for the steps it shares (wizard-step-rail
+  // STEP_ICONS): a person, a book, an assortment, a gift, settings.
+  // No Money section (founder, 2026-09-30): the goal and the ledger
+  // live on Settings, in the wizard's order.
+  { id: "header", label: "Header", icon: UserRound },
+  { id: "story", label: "Story", icon: BookOpen },
+  { id: "favourites", label: "Favourites", icon: Shapes },
+  { id: "charities", label: "Charities", icon: Gift },
+  { id: "guestbook", label: "Guest book", icon: Users },
   { id: "settings", label: "Settings", icon: Settings2 },
-  { id: "delete", label: "Delete", icon: Trash2 },
 ]
 
 export function ManageClient({
   favpoll,
   wallEntries,
+  pickerCharities,
+  consentGatingActive = false,
 }: {
   favpoll: ManageFavpoll
   wallEntries: WallEntry[]
+  /** The charity picker's list: active charities plus this favpoll's own. */
+  pickerCharities: Charity[]
+  consentGatingActive?: boolean
 }) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -140,11 +162,7 @@ export function ManageClient({
   const days = daysRemaining(favpoll.closes_at)
   const isWarning = !isClosed && days <= WARNING_THRESHOLD_DAYS
 
-  // Delete is an open-favpoll action (the zero-pledges guard made it
-  // one anyway), so a closed favpoll has no Delete section.
-  const sections = isClosed
-    ? SECTIONS.filter((s) => s.id !== "delete")
-    : SECTIONS
+  const sections = SECTIONS
   const section =
     requested && sections.some((s) => s.id === requested) ? requested : null
   const sectionHref = (id: string) =>
@@ -310,37 +328,6 @@ export function ManageClient({
     )
   }
 
-  // A link as a row's control: the full link in mono, its copy button,
-  // and the door itself.
-  const linkControl = (key: string, href: string, label: string) => (
-    <div className="flex items-center justify-end gap-1">
-      <a
-        href={href}
-        target="_blank"
-        rel="noreferrer"
-        className="min-w-0 truncate font-mono text-xs text-muted-foreground hover:text-foreground hover:underline"
-        title={href}
-        suppressHydrationWarning
-      >
-        {href.replace(/^https?:\/\//, "")}
-      </a>
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        className="size-7 shrink-0 text-muted-foreground hover:text-foreground"
-        onClick={() => copy(key, href)}
-        aria-label={`Copy ${label}`}
-      >
-        {copied === key ? (
-          <Check size={14} aria-hidden="true" />
-        ) : (
-          <Copy size={14} aria-hidden="true" />
-        )}
-      </Button>
-    </div>
-  )
-
   const perCharity =
     favpoll.charities.length > 0
       ? favpoll.total_raised / favpoll.charities.length
@@ -382,98 +369,12 @@ export function ManageClient({
 
   // ── The sections ──────────────────────────────────────────────────
 
-  const overview = (
+  // The wall draws its own card, eyebrow and all.
+  const guestbook = <GuestBook entries={wallEntries} teaseBacked={false} />
+
+  const header = (
     <div className="flex flex-col gap-8">
-      <SettingsGroup title="Money">
-        <SettingsRow
-          label={favpoll.goal_amount ? "Raised so far" : "Raised"}
-          description={
-            favpoll.goal_amount
-              ? `Towards a ${formatAmount(favpoll.goal_amount)} goal.`
-              : "Pledges and the shared pot together."
-          }
-          stacked={!!favpoll.goal_amount}
-        >
-          {favpoll.goal_amount ? (
-            <div className="grid gap-2">
-              <p className="text-lg font-medium text-foreground tabular-nums">
-                {formatAmount(favpoll.total_raised)}
-                <span className="text-sm font-normal text-muted-foreground">
-                  {" "}
-                  of {formatAmount(favpoll.goal_amount)}
-                </span>
-              </p>
-              <div
-                className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
-                role="progressbar"
-                aria-label="Progress towards the pledge goal"
-                aria-valuemin={0}
-                aria-valuemax={favpoll.goal_amount}
-                aria-valuenow={Math.min(
-                  favpoll.total_raised,
-                  favpoll.goal_amount
-                )}
-              >
-                <div
-                  className="h-full rounded-full bg-primary transition-[width] duration-700 ease-out"
-                  style={{
-                    width: `${Math.min(100, (favpoll.total_raised / favpoll.goal_amount) * 100)}%`,
-                  }}
-                />
-              </div>
-            </div>
-          ) : (
-            <span className="text-lg font-medium tabular-nums">
-              {formatAmount(favpoll.total_raised)}
-            </span>
-          )}
-        </SettingsRow>
-        <SettingsRow label="Pledges">
-          <span className="tabular-nums">{favpoll.pledge_count}</span>
-        </SettingsRow>
-        <SettingsRow
-          label="Shared pot"
-          description="Given without a favourite, spent on the standings."
-        >
-          {favpoll.pot && favpoll.pot.total_deposited > 0 ? (
-            <span className="tabular-nums">
-              {formatAmount(favpoll.pot.total_deposited)}
-              <span className="text-muted-foreground">
-                {" "}
-                · {formatAmount(favpoll.pot.total_allocated)} used
-              </span>
-            </span>
-          ) : (
-            <span className="text-muted-foreground">Empty</span>
-          )}
-        </SettingsRow>
-        <EditableAmountRow
-          label="Pledge goal"
-          description="Shown to guests as a bar under the total."
-          value={favpoll.goal_amount}
-          format={formatAmount}
-          readOnly={isClosed}
-          onSave={saveField("goal_amount")}
-        />
-      </SettingsGroup>
-
-      <SettingsGroup title="The room">
-        <SettingsRow
-          label="Live display"
-          description="The standings on a screen in the room, on its own link."
-        >
-          {linkControl("display", displayUrl, "live display link")}
-        </SettingsRow>
-      </SettingsGroup>
-
-      {/* The wall draws its own card, eyebrow and all. */}
-      <GuestBook entries={wallEntries} teaseBacked={false} />
-    </div>
-  )
-
-  const story = (
-    <div className="flex flex-col gap-8">
-      <SettingsGroup title="Header">
+      <SettingsGroup>
         <EditableTextRow
           label="Opening line"
           value={favpoll.opening_line ?? ""}
@@ -497,30 +398,19 @@ export function ManageClient({
           readOnly={isClosed}
           onSave={saveField("context")}
         />
-        <SettingsRow
-          label="Photo"
-          description={
-            isClosed ? undefined : "Change it in the wizard for now."
-          }
-        >
-          <span className="inline-flex items-center gap-3">
-            <ProtagonistAvatar
-              name={name}
-              photoUrl={favpoll.photoUrl}
-              className="h-14 w-14 md:h-14 md:w-14"
-            />
-            {!isClosed && (
-              <Button asChild variant="outline" size="sm">
-                <Link href={`/favpolls/${favpoll.id}/edit`}>
-                  <Pencil data-icon="inline-start" aria-hidden="true" />
-                  Edit
-                </Link>
-              </Button>
-            )}
-          </span>
-        </SettingsRow>
+        <PhotoRow
+          name={name}
+          photoUrl={favpoll.photoUrl}
+          readOnly={isClosed}
+          onSave={saveField("photo_url")}
+        />
       </SettingsGroup>
-      <SettingsGroup title="Story">
+    </div>
+  )
+
+  const story = (
+    <div className="flex flex-col gap-8">
+      <SettingsGroup>
         <EditableTextRow
           label="About"
           description="Set the scene, link the topic and the cause. Hint at a note, if there is one."
@@ -543,163 +433,70 @@ export function ManageClient({
           onSave={saveField("note")}
         />
       </SettingsGroup>
-      <SettingsGroup title={topicTitle ? `Favourite ${topicTitle}` : "Topic"}>
-        <SettingsRow
-          label="Favourites"
-          description={
-            favpoll.favourites.length > 0
-              ? `${favpoll.favourites.length} favourite${favpoll.favourites.length === 1 ? "" : "s"}${
-                  favpoll.favourites.some((f) => f.isGuestAdded)
-                    ? " · tinted = added by guests"
-                    : ""
-                }${
-                  favpoll.favourites.some((f) => f.isHidden)
-                    ? " · faded = hidden from the poll"
-                    : ""
-                }`
-              : undefined
-          }
-          stacked
-        >
-          <div className="flex items-start justify-between gap-3">
-            {favpoll.favourites.length > 0 ? (
-              <div className="flex min-w-0 flex-1 flex-wrap gap-1.5">
-                {favpoll.favourites.map((f) => (
-                  <Chip
-                    key={f.id}
-                    size="sm"
-                    readOnly
-                    className={cn(
-                      f.isGuestAdded &&
-                        "border-primary bg-primary/10 text-primary",
-                      f.isHidden && "opacity-40"
-                    )}
-                  >
-                    {f.label}
-                  </Chip>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">No favourites.</p>
-            )}
-            {!isClosed && (
-              <Button asChild variant="outline" size="sm" className="shrink-0">
-                <Link href={`/favpolls/${favpoll.id}/edit`}>
-                  <Pencil data-icon="inline-start" aria-hidden="true" />
-                  Edit
-                </Link>
-              </Button>
-            )}
-          </div>
-        </SettingsRow>
-      </SettingsGroup>
+    </div>
+  )
+
+  const favourites = (
+    <div className="flex flex-col gap-8">
+      <FavouritesGroup
+        favpollId={favpoll.id}
+        topicTitle={topicTitle}
+        favourites={favpoll.favourites}
+        topicIsFinite={favpoll.topicIsFinite}
+        topicLockReason={favpoll.topicLockReason}
+        readOnly={isClosed}
+        editHref={`/favpolls/${favpoll.id}/edit`}
+        onChanged={() => router.refresh()}
+      />
     </div>
   )
 
   const charities = (
-    <SettingsGroup
-      title="Charities"
-      description="Every pledge is split equally between them."
-    >
-      {favpoll.charities.map(({ charity }) => (
-        <SettingsRow
-          key={charity.id}
-          label={
-            <CharityRow
-              charity={{ ...charity, created_at: charity.created_at ?? "" }}
-              amountRaised={perCharity}
-              size="sm"
-            />
-          }
-          // STATUS ONLY — favpoll owns the consent outreach, not the
-          // organiser (founder, 2026-09-14).
-          description={
-            charity.consent_status && charity.consent_status !== "approved"
-              ? charity.consent_status === "declined"
-                ? "The charity has declined — pledges here are paused."
-                : `Pledges are held until ${charity.name} agrees to receive them.`
-              : undefined
-          }
-          stacked
-        />
-      ))}
-      {!isClosed && (
-        <SettingsRow
-          label="Change the charity"
-          description="In the wizard for now. Locked once guests have pledged."
-        >
-          <Button asChild variant="outline" size="sm">
-            <Link href={`/favpolls/${favpoll.id}/edit`}>
-              <Pencil data-icon="inline-start" aria-hidden="true" />
-              Edit
-            </Link>
-          </Button>
-        </SettingsRow>
-      )}
-    </SettingsGroup>
+    <CharityRows
+      favpollId={favpoll.id}
+      charities={favpoll.charities}
+      pickerCharities={pickerCharities}
+      amountEach={perCharity}
+      lockReason={favpoll.charityLockReason}
+      readOnly={isClosed}
+      consentGatingActive={consentGatingActive}
+      eventCategory={
+        (favpoll.category ?? null) as
+          | "celebration"
+          | "memorial"
+          | "fundraiser"
+          | null
+      }
+      onChanged={() => router.refresh()}
+    />
   )
 
-  const sharing = (
-    <div className="flex flex-col gap-8">
-      <SettingsGroup title="Share">
-        <SettingsRow
-          label="Guest link"
-          description="The favpoll as guests see it."
-        >
-          {linkControl("guest", guestUrl, "guest link")}
-        </SettingsRow>
-        <SettingsRow
-          label="QR code"
-          description="Hand it across a table, or print it on the stationery."
-          stacked
-        >
-          <div className="flex justify-center py-2" suppressHydrationWarning>
-            <BrandedQR
-              value={qrUrl}
-              size={180}
-              aria-label="QR code for the guest-facing favpoll page"
-            />
-          </div>
-        </SettingsRow>
-        <SettingsRow
-          label="Live display"
-          description="The standings on a screen in the room."
-        >
-          {linkControl("display", displayUrl, "live display link")}
-        </SettingsRow>
-      </SettingsGroup>
-      <SettingsGroup title="Print and keep">
-        <SettingsRow
-          label="Stationery"
-          description="Invitations, insert cards and table signs, with the QR code."
-        >
-          <Button asChild variant="outline">
-            <a href={`/favpolls/${favpoll.id}/stationery`}>
-              <Printer data-icon="inline-start" aria-hidden="true" />
-              Stationery
-            </a>
-          </Button>
-        </SettingsRow>
-        {isClosed && (
-          <SettingsRow
-            label="Keepsake"
-            description="The closed favpoll as one page to keep."
-          >
-            <Button asChild variant="outline">
-              <Link href={`/favpolls/${favpoll.id}/keepsake`}>
-                <Sparkles data-icon="inline-start" aria-hidden="true" />
-                Keepsake
-              </Link>
-            </Button>
-          </SettingsRow>
-        )}
-      </SettingsGroup>
-    </div>
-  )
-
+  // SETTINGS IN THE WIZARD'S ORDER (founder, 2026-09-30: "match the
+  // Wizard settings more closely"): goal, close, visibility, guest
+  // additions, show donations — the Details step's list — then Delete.
+  // The ledger follows under a hairline: raised, pledges, the pot are
+  // status, not settings, and Money folded in here on his word.
   const settings = (
     <div className="flex flex-col gap-8">
-      <SettingsGroup title="Visibility and guests">
+      <SettingsGroup>
+        <EditableAmountRow
+          label="Pledge goal"
+          description="Shown to guests as a bar under the total."
+          value={favpoll.goal_amount}
+          format={formatAmount}
+          readOnly={isClosed}
+          onSave={saveField("goal_amount")}
+        />
+        {isClosed ? (
+          <SettingsRow label="Closed">{closesLabel}</SettingsRow>
+        ) : (
+          <EditableDateRow
+            label="Closes"
+            description={`${Math.max(days, 0)} day${days === 1 ? "" : "s"} left. Two extensions at most.`}
+            value={new Date(favpoll.closes_at)}
+            onSave={saveClosesAt}
+          />
+        )}
         <SettingsRow
           label="Who can see this favpoll"
           description={VISIBILITY_NOTES[visibility]}
@@ -718,117 +515,217 @@ export function ManageClient({
             ]}
           />
         </SettingsRow>
-        <SettingsRow
-          label="Guest additions"
-          description={
-            guestItems
-              ? "Guests can add their own favourites to the poll."
-              : "Guests pick from your list only."
-          }
-        >
-          <Switch
+        <SettingsRow label="Guest additions">
+          <SwitchLine
             checked={guestItems}
             onCheckedChange={handleToggleGuestItems}
             disabled={guestItemsPending}
-            aria-label={
-              guestItems
-                ? "Guests can add favourites — click to stop them"
-                : "Guests cannot add favourites — click to allow it"
-            }
-          />
+          >
+            {guestItems
+              ? "Guests can add their own favourites to the poll."
+              : "Guests pick from your list only."}
+          </SwitchLine>
         </SettingsRow>
-        <SettingsRow
-          label="Show donations"
-          description={
-            showGuestAmounts
-              ? "Guests can choose to show their donation in the guest book."
-              : "Only favourite picks appear in the guest book."
-          }
-        >
-          <Switch
+        <SettingsRow label="Show donations">
+          <SwitchLine
             checked={showGuestAmounts}
             onCheckedChange={handleToggleShowGuestAmounts}
             disabled={showGuestAmountsPending}
-            aria-label={
-              showGuestAmounts
-                ? "Donations visible in guest book — click to hide"
-                : "Donations hidden in guest book — click to show"
-            }
-          />
+          >
+            {showGuestAmounts
+              ? "Guests can choose to show their donation in the guest book."
+              : "Only favourite picks appear in the guest book."}
+          </SwitchLine>
         </SettingsRow>
-      </SettingsGroup>
-      <SettingsGroup title="Dates">
-        {isClosed ? (
-          <SettingsRow label="Closed">{closesLabel}</SettingsRow>
-        ) : (
-          <EditableDateRow
-            label="Closes"
-            description={`${Math.max(days, 0)} day${days === 1 ? "" : "s"} left. Two extensions at most.`}
-            value={new Date(favpoll.closes_at)}
-            onSave={saveClosesAt}
-          />
+        {!isClosed && (
+          <SettingsRow
+            label="Delete this favpoll"
+            description={
+              canDelete
+                ? "The favpoll and its poll will be gone for good."
+                : "A favpoll with pledges can't be deleted."
+            }
+          >
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={!canDelete || deleting}
+              onClick={() => setConfirmDeleteOpen(true)}
+            >
+              <Trash2 data-icon="inline-start" aria-hidden="true" />
+              {deleting ? "Deleting…" : "Delete favpoll"}
+            </Button>
+          </SettingsRow>
         )}
       </SettingsGroup>
+      <div className="border-t border-border">
+        <SettingsGroup>
+          <SettingsRow
+            label={favpoll.goal_amount ? "Raised so far" : "Raised"}
+            description={
+              favpoll.goal_amount
+                ? `Towards a ${formatAmount(favpoll.goal_amount)} goal.`
+                : "Pledges and the shared pot together."
+            }
+            stacked={!!favpoll.goal_amount}
+          >
+            {favpoll.goal_amount ? (
+              <div className="grid gap-2">
+                <p className="text-lg font-medium text-foreground tabular-nums">
+                  {formatAmount(favpoll.total_raised)}
+                  <span className="text-sm font-normal text-muted-foreground">
+                    {" "}
+                    of {formatAmount(favpoll.goal_amount)}
+                  </span>
+                </p>
+                <div
+                  className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
+                  role="progressbar"
+                  aria-label="Progress towards the pledge goal"
+                  aria-valuemin={0}
+                  aria-valuemax={favpoll.goal_amount}
+                  aria-valuenow={Math.min(
+                    favpoll.total_raised,
+                    favpoll.goal_amount
+                  )}
+                >
+                  <div
+                    className="h-full rounded-full bg-primary transition-[width] duration-700 ease-out"
+                    style={{
+                      width: `${Math.min(100, (favpoll.total_raised / favpoll.goal_amount) * 100)}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            ) : (
+              <span className="text-lg font-medium tabular-nums">
+                {formatAmount(favpoll.total_raised)}
+              </span>
+            )}
+          </SettingsRow>
+          <SettingsRow label="Pledges">
+            <span className="tabular-nums">{favpoll.pledge_count}</span>
+          </SettingsRow>
+          <SettingsRow
+            label="Shared pot"
+            description="Given without a favourite, spent on the standings."
+          >
+            {favpoll.pot && favpoll.pot.total_deposited > 0 ? (
+              <span className="tabular-nums">
+                {formatAmount(favpoll.pot.total_deposited)}
+                <span className="text-muted-foreground">
+                  {" "}
+                  · {formatAmount(favpoll.pot.total_allocated)} used
+                </span>
+              </span>
+            ) : (
+              <span className="text-muted-foreground">Empty</span>
+            )}
+          </SettingsRow>
+        </SettingsGroup>
+      </div>
     </div>
   )
 
-  const deleteSection = (
-    <SettingsGroup title="Delete">
-      <SettingsRow
-        label="Delete this favpoll"
-        description={
-          canDelete
-            ? "The favpoll and its poll will be gone for good."
-            : "A favpoll with pledges can't be deleted."
-        }
-      >
-        <Button
-          type="button"
-          variant="destructive"
-          disabled={!canDelete || deleting}
-          onClick={() => setConfirmDeleteOpen(true)}
-        >
-          <Trash2 data-icon="inline-start" aria-hidden="true" />
-          {deleting ? "Deleting…" : "Delete favpoll"}
-        </Button>
-      </SettingsRow>
-    </SettingsGroup>
-  )
-
   const content: Record<string, React.ReactNode> = {
-    overview,
+    header,
     story,
+    favourites,
     charities,
-    sharing,
+    guestbook,
     settings,
-    delete: deleteSection,
   }
-  const activeDesktop = section ?? "overview"
+  const activeDesktop = section ?? "header"
   const sectionLabel = sections.find((s) => s.id === section)?.label
 
   return (
     <>
-      <ToolbarBand className="flex flex-wrap items-center gap-x-3 gap-y-2">
-        {/* The back door. On the phone a section's back goes to the
-            section list; the list's goes to Your favpolls. */}
-        <Button asChild variant="ghost" className="-ml-2 md:hidden">
-          <Link
-            href={section ? `/favpolls/${favpoll.id}/manage` : "/my-favpolls"}
-          >
-            <ArrowLeft data-icon="inline-start" aria-hidden="true" />
-            {section ? "Manage" : "Your favpolls"}
-          </Link>
-        </Button>
-        <Button asChild variant="ghost" className="-ml-2 hidden md:inline-flex">
-          <Link href="/my-favpolls">
-            <ArrowLeft data-icon="inline-start" aria-hidden="true" />
-            Your favpolls
-          </Link>
-        </Button>
-        {/* Share is the one action that earns permanent visibility — the
-            growth lever (founder, 2026-09-14). The doors it used to share
-            the toolbar with now live in the sections. */}
-        <div className="ml-auto flex items-center gap-2">
+      {/* THE TOOLBAR IS THE HEADER (founder, 2026-09-29: "shall we move
+          the header info to the toolbar?"): the back arrow, icon-only
+          and labelled; the register eyebrow and the name as the title;
+          the close in the middle (desktop — the phone has it on
+          Settings); the outward pair and Share flush right. Every
+          section then opens straight on its heading. */}
+      <ToolbarBand className="flex max-w-5xl items-center gap-3">
+        <TooltipProvider>
+          <Tooltip content={section ? "Manage" : "Your favpolls"} side="bottom">
+            <Button
+              asChild
+              variant="ghost"
+              size="icon"
+              className="-ml-2 shrink-0 md:hidden"
+            >
+              <Link
+                href={
+                  section ? `/favpolls/${favpoll.id}/manage` : "/my-favpolls"
+                }
+                aria-label={section ? "Back to manage" : "Your favpolls"}
+              >
+                <ArrowLeft aria-hidden="true" />
+              </Link>
+            </Button>
+          </Tooltip>
+          <Tooltip content="Your favpolls" side="bottom">
+            <Button
+              asChild
+              variant="ghost"
+              size="icon"
+              className="-ml-2 hidden shrink-0 md:inline-flex"
+            >
+              <Link href="/my-favpolls" aria-label="Your favpolls">
+                <ArrowLeft aria-hidden="true" />
+              </Link>
+            </Button>
+          </Tooltip>
+        </TooltipProvider>
+        <div className="flex min-w-0 flex-1 items-baseline gap-x-3">
+          <span className="hidden shrink-0 text-[11px] font-medium tracking-[0.08em] text-primary uppercase sm:inline">
+            {eyebrow}
+          </span>
+          <h1 className="min-w-0 truncate text-base font-medium text-foreground">
+            {name}
+          </h1>
+          <p className="hidden shrink-0 text-sm whitespace-nowrap text-muted-foreground md:block">
+            {isClosed ? "Closed" : "Closes"}{" "}
+            <span
+              className={cn(
+                "font-medium",
+                !isClosed && isWarning
+                  ? "text-amber-600 dark:text-amber-400"
+                  : "text-foreground"
+              )}
+            >
+              {closesLabel}
+            </span>
+            {!isClosed && (
+              <>
+                {" "}
+                · {Math.max(days, 0)} day{days === 1 ? "" : "s"} left
+              </>
+            )}
+          </p>
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          {/* THE OUTWARD PAIR (founder, 2026-09-29): Share and the print
+              artefact are one act — getting the favpoll in front of
+              guests by link and QR, or by the QR on invitations and
+              table signs. Once closed, the artefact is the keepsake.
+              Icon-only on the phone so the toolbar keeps one row. */}
+          {isClosed ? (
+            <Button asChild variant="outline">
+              <Link href={`/favpolls/${favpoll.id}/keepsake`}>
+                <Sparkles data-icon="inline-start" aria-hidden="true" />
+                <span className="sr-only sm:not-sr-only">Keepsake</span>
+              </Link>
+            </Button>
+          ) : (
+            <Button asChild variant="outline">
+              <a href={`/favpolls/${favpoll.id}/stationery`}>
+                <Printer data-icon="inline-start" aria-hidden="true" />
+                <span className="sr-only sm:not-sr-only">Stationery</span>
+              </a>
+            </Button>
+          )}
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline">
@@ -902,66 +799,56 @@ export function ManageClient({
         }
       />
 
-      <div className="mx-auto w-full max-w-330 px-4 py-8 sm:px-6">
-        {/* Identity: the eyebrow and name, the close beside them. */}
-        <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
-          <div className="min-w-0">
-            <p className="text-[11px] font-medium tracking-[0.08em] text-primary uppercase">
-              {eyebrow}
-            </p>
-            <h1 className="mt-0.5 truncate text-2xl font-medium text-foreground">
-              {name}
-            </h1>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            {isClosed ? "Closed" : "Closes"}{" "}
-            <span
-              className={cn(
-                "font-medium",
-                !isClosed && isWarning
-                  ? "text-amber-600 dark:text-amber-400"
-                  : "text-foreground"
-              )}
-            >
-              {closesLabel}
-            </span>
-            {!isClosed && (
-              <>
-                {" "}
-                · {Math.max(days, 0)} day{days === 1 ? "" : "s"} left
-              </>
-            )}
-          </p>
-        </div>
-
-        <div className="mt-8 grid items-start gap-8 md:grid-cols-[13rem_minmax(0,1fr)] lg:grid-cols-[14rem_minmax(0,1fr)]">
-          {/* Desktop: the section nav, pinned under the toolbar. */}
-          <div className="sticky top-32 hidden md:block">
-            <SectionNav
-              sections={sections}
-              active={activeDesktop}
-              href={sectionHref}
-            />
-          </div>
-
-          {/* ONE content area, rendered once: a chosen section on every
-              width (the phone adds its heading); no section is the
-              phone's list and the desktop's Overview. */}
-          {section ? (
-            <div className="min-w-0">
-              <h2 className="mb-6 text-xl font-medium text-foreground md:hidden">
-                {sectionLabel}
-              </h2>
-              {content[section]}
+      {/* The favpoll sheet's width, not the console's 1320 (founder,
+          2026-09-29: "page feels too wide") — a settings page reads in
+          a column, and the toolbar's row narrows with it. */}
+      {/* THE SHEET (founder, 2026-09-29: "page with shadow"): the favpoll
+          page's own white sheet over the register wash — PageLayout's
+          classes, clip-path and all — with the wizard's two columns
+          inside it: the tinted rail on the left, the fields on the
+          right. Below md the sheet is the page, as on the favpoll. */}
+      <div className="mx-auto min-h-[calc(100vh-7rem)] w-full max-w-5xl bg-background md:drop-shadow-lg md:[clip-path:inset(-1px_-24px_-24px_-24px)]">
+        <div className="md:grid md:min-h-[calc(100vh-7rem)] md:grid-cols-[220px_1fr] md:items-stretch">
+          {/* The nav: the plain buttons on the wizard rail's tinted
+              column (founder, 2026-09-29: not the rail's stations, but
+              "the nav rail background colour from the wizard"), the
+              wizard's icons where the concepts match. */}
+          <aside className="hidden bg-primary/10 px-3 py-6 md:block">
+            <div className="sticky top-32">
+              <SectionNav
+                sections={sections}
+                active={activeDesktop}
+                href={sectionHref}
+              />
             </div>
-          ) : (
-            <>
-              <div className="min-w-0 md:hidden">
-                <SectionList sections={sections} href={sectionHref} />
-              </div>
-              <div className="hidden min-w-0 md:block">{overview}</div>
-            </>
-          )}
+          </aside>
+
+          {/* The fields: the wizard's column and rhythm. */}
+          <div className="px-6 pt-2 pb-10 md:px-12 md:pt-4">
+            <div className="mx-auto w-full max-w-2xl">
+              {section ? (
+                // Keyed: a fresh tree per section, so no row is reused
+                // for another field's value.
+                <div key={section} className="min-w-0">
+                  {/* The phone has no nav in view inside a section, so
+                      the section's name stands in, in the rail's type;
+                      on desktop the nav carries it and nothing repeats
+                      it (founder, 2026-09-30). */}
+                  <h2 className="pt-6 text-lg font-medium tracking-widest text-primary uppercase md:hidden">
+                    {sectionLabel}
+                  </h2>
+                  {content[section]}
+                </div>
+              ) : (
+                <>
+                  <div className="mt-6 min-w-0 md:hidden">
+                    <SectionList sections={sections} href={sectionHref} />
+                  </div>
+                  <div className="hidden min-w-0 md:block">{header}</div>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </>

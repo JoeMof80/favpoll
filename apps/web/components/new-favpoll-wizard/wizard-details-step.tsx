@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { SegmentedControl } from "@/components/ui/segmented-control"
-import { Switch } from "@/components/ui/switch"
+import { SwitchLine } from "@/components/ui/switch-line"
 import {
   InputGroup,
   InputGroupAddon,
@@ -135,40 +135,28 @@ export function WizardDetailsStep({ w }: { w: WizardState }) {
       {/* Decided here, overridable mid-event from the manage toolbar
           (founder, 2026-09-03). Not a rail line: the rail lists the
           authored facts, and a default-on toggle isn't one. */}
-      <WizardField
-        label="Guest additions"
-        hint={
-          w.allowGuestItems
+      {/* The sentence is the switch's label, beside it (founder,
+          2026-09-30) — not a hint two lines below. */}
+      <WizardField label="Guest additions">
+        <SwitchLine
+          checked={w.allowGuestItems}
+          onCheckedChange={w.setAllowGuestItems}
+        >
+          {w.allowGuestItems
             ? "Guests can add their own favourites to the topic."
-            : "Only your favourites appear."
-        }
-      >
-        {/* The switch is shorter than the 44px control line, so it takes
-            its own min-h-11 centring box. */}
-        <div className="flex min-h-11 items-center">
-          <Switch
-            checked={w.allowGuestItems}
-            onCheckedChange={w.setAllowGuestItems}
-            aria-label="Guests can add favourites"
-          />
-        </div>
+            : "Only your favourites appear."}
+        </SwitchLine>
       </WizardField>
 
-      <WizardField
-        label="Show donations"
-        hint={
-          w.showGuestAmounts
+      <WizardField label="Show donations">
+        <SwitchLine
+          checked={w.showGuestAmounts}
+          onCheckedChange={w.setShowGuestAmounts}
+        >
+          {w.showGuestAmounts
             ? "Guests can choose to show their donation in the guest book."
-            : "Only favourite picks appear in the guest book."
-        }
-      >
-        <div className="flex min-h-11 items-center">
-          <Switch
-            checked={w.showGuestAmounts}
-            onCheckedChange={w.setShowGuestAmounts}
-            aria-label="Allow guests to show donations in the guest book"
-          />
-        </div>
+            : "Only favourite picks appear in the guest book."}
+        </SwitchLine>
       </WizardField>
     </div>
   )
