@@ -1,7 +1,6 @@
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
 import { GoalProgress } from "@/components/goal-progress"
-import { Countdown } from "@/components/countdown"
 import { heroNameSizeClass } from "@/lib/display"
 import { formatPounds } from "@/lib/i18n"
 
@@ -19,8 +18,6 @@ import { formatPounds } from "@/lib/i18n"
 export type HeroFundraiser = {
   totalRaised: number
   goalAmount: number | null
-  /** ISO close — null when closed or undated. */
-  closesAt: string | null
   isClosed: boolean
 }
 
@@ -47,7 +44,7 @@ export function fundraiserHeroSlots({
   byline: HeroByline
   compact?: boolean
 }) {
-  const { totalRaised, goalAmount, closesAt, isClosed } = fundraiser
+  const { totalRaised, goalAmount, isClosed } = fundraiser
   const figure = formatPounds(totalRaised)
   const goalReached = !!goalAmount && totalRaised >= goalAmount
   const isOpen = !isClosed
@@ -102,13 +99,10 @@ export function fundraiserHeroSlots({
         className="mt-3 h-2.5"
       />
     </div>
-  ) : closesAt ? (
-    /* No goal: the countdown takes the subtitle line, where the tribute
-       hero carries its dates (founder, 2026-08-03). */
-    <div className="mt-4">
-      <Countdown closesAt={closesAt} variant="subtitle" />
-    </div>
   ) : undefined
+  // No goal: the figure stands alone under "Raised so far". The display's
+  // old banner put the countdown on this line, but the sheet's rail pins
+  // the countdown at its top, and twice on one screen is noise.
 
   // The byline, in the about's flow position: the identity is a byline
   // here, not the heading (founder, 2026-08-02).

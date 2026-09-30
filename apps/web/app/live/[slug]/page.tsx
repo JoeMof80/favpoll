@@ -6,21 +6,29 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import { fetchAllRows } from "@/lib/supabase/paginate"
 import { overlayStandings, pollStandings } from "@/lib/poll-standings"
 import { fetchPollItems } from "@/lib/poll-items"
-import { DisplayScreen } from "@/components/display-screen"
+import { pollTitle } from "@/lib/poll-title"
+import { RoomShell } from "@/components/room-shell"
 import { deriveRegister } from "@/lib/registers"
 import type {
   Favourite,
   FavpollCategory,
   FavpollGrouping,
+  FavpollPollWithItems,
+  FavpollWithDetails,
+  Topic,
 } from "@favpoll/types"
+
+// THE LIVE DISPLAY — the screen in the room (a TV, a projector), at an
+// unguessable slug so the chrome's way back to manage stays the
+// presenter's. Since 2026-09-30 it is the favpoll page's own sheet in
+// the room presentation (components/room-shell), loaded with the same
+// service-role reads the page makes: nobody is signed in on a projector,
+// and the standings, the book and the totals are what the room watches.
 
 type Props = {
   params: Promise<{ slug: string }>
 }
 
-// Capability-URL surface: the slug is unguessable (uuid), handed out by the
-// organiser. The page shows full standings + the reveal to the room, so
-// possession of the link IS the authorisation.
 export default async function LiveDisplayPage({ params }: Props) {
   const { slug } = await params
   const supabase = createAdminClient()
@@ -34,37 +42,31 @@ export default async function LiveDisplayPage({ params }: Props) {
     .single()
 
   if (!favpoll) notFound()
-
   const id: string = favpoll.id
 
   const { data: rawPoll } = await supabase
     .from("favpoll_polls")
-    .select("*, topics(id, title, is_finite), topic_subsets(title)")
+    .select("*, topics(*), topic_subsets(title)")
     .eq("favpoll_id", id)
     .maybeSingle()
-
   const pollId = rawPoll?.id ?? null
+  const topicRow = (rawPoll?.topics ?? null) as Topic | null
 
-  // One round trip for everything keyed on the poll id. Each branch gates
-  // on pollId — no poll, no query (eq("") is an invalid uuid PostgREST
-  // rejects, which fetchAllRows turns into a crash).
-  const [allItems, pledges, { data: wallRows }, standings] = await Promise.all([
-    // The display's list is THIS poll's items (lib/poll-items): the topic's
-    // closed set for finite topics, the curated visible epf rows for infinite
-    // ones. Previously this read the whole topic canon — an infinite-topic
-    // display showed every canonical item instead of the poll's list.
+  const [
+    allItems,
+    pledges,
+    { data: wallRows },
+    standings,
+    { data: organiserUser },
+  ] = await Promise.all([
     rawPoll?.topic_id && pollId
       ? fetchPollItems(supabase, {
           pollId,
           topicId: rawPoll.topic_id,
-          isFinite:
-            (rawPoll.topics as { is_finite?: boolean } | null)?.is_finite ??
-            false,
+          isFinite: topicRow?.is_finite ?? false,
           subsetId: (rawPoll as { subset_id?: string | null }).subset_id,
         })
       : Promise.resolve([] as Favourite[]),
-    // Total raised — paginated (the telethon figure is money; the silent
-    // 1,000-row cap would under-report a big room)
     pollId
       ? fetchAllRows<{ total_amount: number }>((from, to) =>
           supabase
@@ -75,16 +77,13 @@ export default async function LiveDisplayPage({ params }: Props) {
             .range(from, to)
         )
       : Promise.resolve([]),
-    // Initial wall (kept live client-side via the wall endpoint). The
-    // display is a public, organiser-sanctioned surface: backed-labels are
-    // shown; anonymity still holds (anonymous → "Someone").
     pollId
       ? supabase
           .from("pledges")
           .select(
             `id, display_name, is_anonymous, clerk_user_id, created_at,
-             total_amount, guest_book_display, pot_allocation_id, message,
-             pledge_allocations ( favourites ( label ) )`
+               total_amount, guest_book_display, pot_allocation_id, message,
+               pledge_allocations ( favourites ( label ) )`
           )
           .eq("favpoll_poll_id", pollId)
           .is("withdrawn_at", null)
@@ -92,17 +91,25 @@ export default async function LiveDisplayPage({ params }: Props) {
           .limit(24)
       : Promise.resolve({ data: [] }),
     pollId ? pollStandings(supabase, pollId) : Promise.resolve(null),
+    favpoll.created_by
+      ? supabase
+          .from("users")
+          .select("display_name, avatar_url")
+          .eq("id", favpoll.created_by)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
   ])
 
-  const initialTotalRaised = pledges.reduce((s, p) => s + p.total_amount, 0)
+  const totalRaised = pledges.reduce((s, p) => s + p.total_amount, 0)
 
-  const charityRows = (
-    (favpoll.favpoll_charities ?? []) as {
-      charities: import("@favpoll/types").Charity
-    }[]
-  ).map((ec) => ec.charities)
-  const charityName = charityRows[0]?.name ?? null
+  const organiser = organiserUser
+    ? {
+        name: organiserUser.display_name ?? "Organiser",
+        avatarUrl: organiserUser.avatar_url ?? null,
+      }
+    : null
 
+  // Resolve clerk display names for signed-in pledgers
   const wallClerkIds = [
     ...new Set(
       (wallRows ?? [])
@@ -119,11 +126,12 @@ export default async function LiveDisplayPage({ params }: Props) {
   const wallUserNames = Object.fromEntries(
     (wallUsers ?? []).map((u) => [u.id, u.display_name])
   )
+
+  // The room reads the book as the entitled guest does: labels always,
+  // amounts only where the organiser shows them and the guest let it.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const showAmounts = (favpoll as any).show_guest_amounts === true
-  // Live display: always show everything — picks, amounts (when enabled),
-  // messages. The room's projector is not an individual guest surface.
-  const initialWallEntries = (wallRows ?? []).map((r) => {
+  const wallEntries = (wallRows ?? []).map((r) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const totalAmount: number = (r as any).total_amount ?? 0
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -151,87 +159,60 @@ export default async function LiveDisplayPage({ params }: Props) {
     }
   })
 
-  // The display's bars show THIS poll's pledges — they must sum to the
-  // telethon total above them (see lib/poll-standings). The interval
-  // router.refresh() re-runs this overlay, keeping the room live.
-  // Hide unpledged items from the live display (founder, 2026-09-21):
-  // the room sees only the items people have actually backed.
-  const items = (
-    standings ? overlayStandings(allItems, standings) : allItems
-  ).filter((item) => item.all_time_count > 0)
+  // The standings as the entitled guest sees them: pledged items only,
+  // best first (the page's own rule for an entitled viewer).
+  const items = (standings ? overlayStandings(allItems, standings) : allItems)
+    .filter((item) => item.all_time_count > 0 && !item.is_hidden)
+    .sort((a, b) => {
+      if (b.all_time_pledged !== a.all_time_pledged)
+        return b.all_time_pledged - a.all_time_pledged
+      return a.label.localeCompare(b.label)
+    })
 
-  const displayPoll = rawPoll
-    ? {
-        id: rawPoll.id,
-        personal_note: rawPoll.personal_note ?? null,
-        topic: {
-          id:
-            (rawPoll.topics as { id: string; title: string } | null)?.id ??
-            rawPoll.topic_id,
-          // The subset's name on the room screen (favpoll-topic-rules §1).
-          title:
-            (rawPoll.topic_subsets as { title: string } | null)?.title ??
-            (rawPoll.topics as { id: string; title: string } | null)?.title ??
-            "",
-        },
-        items,
-      }
-    : null
+  const pollWithItems: FavpollPollWithItems | null =
+    rawPoll && topicRow
+      ? ({
+          ...rawPoll,
+          topics: {
+            ...topicRow,
+            // A subset's title stands in for the topic's (lib/poll-title).
+            title: pollTitle(rawPoll) ?? topicRow.title,
+            favourites: items,
+          },
+        } as FavpollPollWithItems)
+      : null
 
-  // Derive base URL for QR code
   const headersList = await headers()
   const host = headersList.get("host") ?? ""
   const proto = headersList.get("x-forwarded-proto") ?? "https"
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? `${proto}://${host}`
 
-  // The presence dial's starting position: memorials open in the quiet
-  // tribute variant, everything else in fundraiser. The presenter can
-  // override live from the display's menu.
   const register = deriveRegister(
     (favpoll.category ?? null) as FavpollCategory | null,
     (favpoll.grouping ?? "individual") as FavpollGrouping,
     favpoll.subject
   )
+  // The presence dial's default: a memorial turns the volume down.
   const defaultVariant = register === "remembering" ? "tribute" : "fundraiser"
 
-  // Cause favpolls have no protagonist row — the cause label is the name.
-  const isCause = favpoll.subject === "cause"
-  const displayName = isCause
-    ? (favpoll.cause_label ?? "")
-    : (favpoll.protagonists?.name ?? "")
+  const isClosed =
+    !!favpoll.closed_at || new Date(favpoll.closes_at) < new Date()
 
   return (
     <RegisterScope palette={paletteForRegister(register)}>
-      <DisplayScreen
-        protagonistName={displayName}
-        dateLabel={isCause ? null : (favpoll.protagonists?.context ?? null)}
-        openingLine={favpoll.opening_line ?? null}
-        occasionType={favpoll.occasion_type ?? null}
-        charityName={charityName}
-        goalAmount={favpoll.goal_amount ?? null}
-        poll={displayPoll}
-        initialTotalRaised={initialTotalRaised}
-        favpollUrl={`${baseUrl}/favpolls/${id}/manage`}
+      <RoomShell
+        favpoll={favpoll as FavpollWithDetails}
+        pollWithItems={pollWithItems}
+        totalRaised={totalRaised}
+        wallEntries={wallEntries}
+        organiser={organiser}
+        isClosed={isClosed}
         // The chrome's menu navigates HERE — to the manage hub, the room
         // the presenter came from (founder, 2026-09-03) — while the QR
         // target stays the guest short form. See app/p/[code]/page.tsx.
+        manageUrl={`${baseUrl}/favpolls/${id}/manage`}
         qrUrl={`${baseUrl}/p/${favpoll.short_code}`}
-        initialWallEntries={initialWallEntries}
-        charities={charityRows}
-        closesAt={favpoll.closed_at ? null : (favpoll.closes_at ?? null)}
-        isClosed={
-          !!favpoll.closed_at || new Date(favpoll.closes_at) < new Date()
-        }
         defaultVariant={defaultVariant}
-        favpollId={id}
-        avatar={
-          isCause
-            ? null
-            : {
-                name: displayName,
-                photoUrl: favpoll.protagonists?.photo_url ?? null,
-              }
-        }
       />
     </RegisterScope>
   )
