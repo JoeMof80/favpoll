@@ -133,15 +133,15 @@ const formatLongDate = (iso: string) =>
 // the guest book has its own section, and the wizard's three authored
 // steps — Header, Story, Favourites — are three sections here too.
 const SECTIONS: ManageSection[] = [
-  // The wizard's own glyphs for the steps it shares (wizard-step-rail
-  // STEP_ICONS): a person, a book, an assortment, a gift, settings.
-  // The dashboard leads (founder, 2026-09-30); the goal lives on
-  // Settings in the wizard's order.
+  // The wizard's order (founder, 2026-09-30: "match the order in the
+  // nav too") — Event has no section, the who and the category lock
+  // the moment anyone gives — with the dashboard first and the guest
+  // book before Settings. The wizard's own glyphs.
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { id: "charities", label: "Charities", icon: Gift },
+  { id: "favourites", label: "Favourites", icon: Shapes },
   { id: "header", label: "Header", icon: UserRound },
   { id: "story", label: "Story", icon: BookOpen },
-  { id: "favourites", label: "Favourites", icon: Shapes },
-  { id: "charities", label: "Charities", icon: Gift },
   { id: "guestbook", label: "Guest book", icon: Users },
   { id: "settings", label: "Settings", icon: Settings2 },
 ]
@@ -348,11 +348,6 @@ export function ManageClient({
       </div>
     )
   }
-
-  const perCharity =
-    favpoll.charities.length > 0
-      ? favpoll.total_raised / favpoll.charities.length
-      : 0
 
   // One save per row: the field's own write, then the server data
   // refreshed so every other surface of the page agrees.
@@ -626,7 +621,6 @@ export function ManageClient({
       favpollId={favpoll.id}
       charities={favpoll.charities}
       pickerCharities={pickerCharities}
-      amountEach={perCharity}
       lockReason={favpoll.charityLockReason}
       readOnly={isClosed}
       consentGatingActive={consentGatingActive}

@@ -63,7 +63,7 @@ export default async function ManageFavpollPage({
         topics ( title, is_finite ),
         topic_subsets ( title ),
         pledges ( count ),
-        favpoll_poll_favourites ( id, is_hidden, is_guest_added, favourites ( id, label ) )
+        favpoll_poll_favourites ( id, is_hidden, is_guest_added, favourites ( id, label, source ) )
       ),
       favpoll_pots ( total_deposited, total_allocated )`
     )
@@ -97,7 +97,7 @@ export default async function ManageFavpollPage({
             id: string
             is_hidden: boolean | null
             is_guest_added: boolean | null
-            favourites: { id: string; label: string } | null
+            favourites: { id: string; label: string; source: string } | null
           }[]
         })
       | null
@@ -269,6 +269,7 @@ export default async function ManageFavpollPage({
         id: f.favourites!.id,
         rowId: f.id,
         label: f.favourites!.label,
+        source: f.favourites!.source,
         isGuestAdded: !!f.is_guest_added,
         isHidden: !!f.is_hidden,
       }))
