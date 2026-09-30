@@ -49,7 +49,7 @@ function shortDate(iso: string): string {
 
 export function BumpChart({
   history,
-  title = "The story of the poll",
+  title = "How it unfolded",
   caption = "Positions only — how each favourite ranked as pledges came in.",
   axisLabels,
   highlightTop,

@@ -262,9 +262,14 @@ export function Countdown({
             <span
               key={label}
               className={`tabular-nums ${
-                // Last column hugs the right edge, so the row still spans
-                // the card the way justify-between used to.
-                i === inlineParts.length - 1 ? "text-right" : ""
+                // The HALF column (seconds beside days) hugs the right
+                // edge, so the row still spans the card the way
+                // justify-between used to. Three full columns read
+                // evenly only left-aligned (founder, 2026-09-30: "the
+                // countdown parts aren't distributed evenly").
+                i === inlineParts.length - 1 && inlineParts[i]?.half
+                  ? "text-right"
+                  : ""
               }`}
             >
               <span

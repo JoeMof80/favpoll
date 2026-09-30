@@ -203,7 +203,7 @@ export function FavpollContent({
           onClick={() => setStoryOpen(true)}
           className="mt-1 inline-flex items-center gap-1 text-sm text-primary hover:underline"
         >
-          The story of the poll
+          How it unfolded
           <ChevronRight className="size-3.5" aria-hidden="true" />
         </button>
       )}
@@ -336,7 +336,7 @@ export function FavpollContent({
         <ResponsiveOverlay
           open={storyOpen}
           onOpenChange={setStoryOpen}
-          title="The story of the poll"
+          title="How it unfolded"
           dialogClassName="flex flex-col gap-0 overflow-hidden p-0 sm:max-w-4xl"
           // Taller than the overlay's default: fifteen lanes need it.
           dialogStyle={{ maxHeight: "min(900px, 90vh)" }}

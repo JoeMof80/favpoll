@@ -17,7 +17,7 @@ import {
   Check,
   EllipsisVertical,
   Share2,
-  Sparkles,
+  FileHeart,
 } from "lucide-react"
 import { toast } from "sonner"
 import {
@@ -238,7 +238,7 @@ export function PollSection({
                     onSelect={onOpenStory}
                     className="md:hidden"
                   >
-                    The story of the poll
+                    How it unfolded
                     <ChartLine className="ml-auto size-4" aria-hidden="true" />
                   </DropdownMenuItem>
                 )}
@@ -246,7 +246,10 @@ export function PollSection({
                   <DropdownMenuItem asChild>
                     <Link href={`/favpolls/${favpollId}/keepsake`}>
                       Keepsake
-                      <Sparkles className="ml-auto size-4" aria-hidden="true" />
+                      <FileHeart
+                        className="ml-auto size-4"
+                        aria-hidden="true"
+                      />
                     </Link>
                   </DropdownMenuItem>
                 )}
