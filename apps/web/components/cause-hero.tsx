@@ -23,6 +23,8 @@ type Props = {
   /** The presence dial's loud setting (founder, 2026-09-30): the money is
    *  the heading and the cause a byline. See heroes/fundraiser-slots. */
   fundraiser?: HeroFundraiser
+  /** Off for the screen in the room: a static band (HeroLayout). */
+  animate?: boolean
 }
 
 // Hero for subject='cause' — no protagonist row, so the optional image and
@@ -31,18 +33,20 @@ type Props = {
 // padding, sticky header, and scroll-shrink behaviour can never drift
 // between the two (they did: this component used to hand-roll its layout
 // and sat ~72px higher than person pages, found 2026-07-13).
-export function CauseHero({ favpoll, mentions, compact, fundraiser }: Props) {
+export function CauseHero({
+  favpoll,
+  mentions,
+  compact,
+  fundraiser,
+  animate,
+}: Props) {
   if (fundraiser) {
     return (
       <HeroLayout
+        animate={animate}
         {...fundraiserHeroSlots({
           fundraiser,
           compact,
-          byline: {
-            name: favpoll.cause_label ?? "",
-            context: favpoll.context ?? null,
-            photoUrl: favpoll.photo_url ?? null,
-          },
         })}
       />
     )
@@ -106,6 +110,7 @@ export function CauseHero({ favpoll, mentions, compact, fundraiser }: Props) {
       subtitle={subtitle}
       avatar={avatar}
       about={about}
+      animate={animate}
     />
   )
 }

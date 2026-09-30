@@ -12,6 +12,7 @@ import type { RankHistory } from "@/lib/rank-history"
 import { FavpollHero } from "@/components/favpoll-hero"
 import { CauseHero } from "@/components/cause-hero"
 import { PollSection } from "@/components/poll-section"
+import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
 import type {
   Favourite,
   FavpollWithDetails,
@@ -140,6 +141,7 @@ export function FavpollSheet({
       ? {
           totalRaised,
           goalAmount: favpoll.goal_amount ?? null,
+          closesAt: isClosed ? null : (favpoll.closes_at ?? null),
           isClosed,
         }
       : undefined
@@ -214,7 +216,47 @@ export function FavpollSheet({
     <Countdown closesAt={favpoll.closes_at} />
   )
 
-  const stateCardRail = <div className={railChrome}>{stateCardInner}</div>
+  // THE FUNDRAISER DIAL'S SWAP (founder, 2026-09-30): the countdown moves
+  // into the hero's band and the person takes its seat at the rail's
+  // top — a byline (small photo, name as the page's h1, context) where
+  // the tribute hero would have had the countdown pinned.
+  const bylineName = isCause
+    ? (favpoll.cause_label ?? "")
+    : (favpoll.protagonists?.name ?? "")
+  const bylineContext = isCause
+    ? (favpoll.context ?? null)
+    : (favpoll.protagonists?.context ?? null)
+  const bylinePhoto = isCause
+    ? (favpoll.photo_url ?? null)
+    : (favpoll.protagonists?.photo_url ?? null)
+  const bylineCard = (
+    <div className={`flex items-center gap-3 ${railChrome}`}>
+      {bylinePhoto && (
+        <ProtagonistAvatar
+          name={bylineName}
+          photoUrl={bylinePhoto}
+          className="h-10 w-10 rounded-lg md:h-10 md:w-10"
+        />
+      )}
+      <div className="min-w-0">
+        <h1 className="truncate text-base font-medium text-foreground">
+          {bylineName}
+        </h1>
+        {bylineContext && (
+          <p className="truncate text-sm text-muted-foreground">
+            {bylineContext}
+          </p>
+        )}
+      </div>
+    </div>
+  )
+
+  const stateCardRail =
+    heroFundraiser && !isClosed ? (
+      bylineCard
+    ) : (
+      <div className={railChrome}>{stateCardInner}</div>
+    )
 
   // Guest book: always visible in the rail (fills the space), but
   // entries are withheld pre-pledge — a teaser with skeleton rows
@@ -283,6 +325,7 @@ export function FavpollSheet({
           mentions={aboutMentions}
           compact={guestBookExpanded}
           fundraiser={heroFundraiser}
+          animate={!room}
         />
       ) : (
         <FavpollHero
@@ -291,6 +334,7 @@ export function FavpollSheet({
           mentions={aboutMentions}
           compact={guestBookExpanded}
           fundraiser={heroFundraiser}
+          animate={!room}
         />
       )}
 

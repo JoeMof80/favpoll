@@ -26,10 +26,6 @@ import type { FavpollWithDetails, FavpollPollWithItems } from "@favpoll/types"
 // menu; the override sticks per favpoll on this machine.
 export type DisplayVariant = "fundraiser" | "tribute"
 
-/** The app header's height, which the chrome takes over on the live
- *  route and the sheet is laid out beneath. */
-const CHROME_H = 56
-
 type Props = {
   favpoll: FavpollWithDetails
   pollWithItems: FavpollPollWithItems | null
@@ -129,11 +125,14 @@ export function RoomShell({
   return (
     <>
       {/* The presenter's chrome: the app header is suppressed on this
-          route (header-mount), and this bar takes its geometry — fixed,
-          h-14 — so the sheet below sits exactly where it does under the
-          app header. The spacer is the header's own height. A still
-          keeps only the brand mark, at the chrome's own geometry (the
-          h-14 row, items-center, px-6), anchored to its box. */}
+          route (header-mount) and NOTHING takes its place — no band, no
+          spacer (founder, 2026-09-30: "remove the header, like the
+          original live page"). The chrome floats over the tinted
+          gutters at the viewport's corners, fixed, pointer-events-none
+          but for its two controls, so the sheet pays no height and runs
+          from the top of the screen. A still keeps only the brand mark,
+          at the chrome's own geometry (the h-14 row, items-center,
+          px-6), anchored to its box. */}
       {live ? (
         <DisplayChrome
           eventUrl={manageUrl}
@@ -145,8 +144,6 @@ export function RoomShell({
           <FavpollLogo />
         </div>
       )}
-      <div className="h-14" aria-hidden="true" />
-
       {/* The QR as chrome (founder, 2026-08-02): a standing instruction to
           the room — the telethon corner phone number — pinned in BOTH
           gutters so it survives scrolling and asymmetric occlusion (a
@@ -203,7 +200,8 @@ export function RoomShell({
         presentation="room"
         heroVariant={variant}
         reveal={localClosed && wasOpenAtMount}
-        shellHeight={still ? `${DISPLAY_ROOM.h - CHROME_H}px` : undefined}
+        // The whole screen: no header above the sheet on this surface.
+        shellHeight={still ? `${DISPLAY_ROOM.h}px` : "100vh"}
       />
     </>
   )

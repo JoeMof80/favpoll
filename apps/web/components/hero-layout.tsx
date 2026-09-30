@@ -10,6 +10,15 @@ type HeroLayoutProps = {
   subtitle?: React.ReactNode
   avatar?: React.ReactNode
   about?: React.ReactNode
+  /** A block at the band's right edge in the avatar's place, at its own
+   *  natural width — the room's fundraiser hero puts the countdown there
+   *  (founder, 2026-09-30). Static only: it never shrinks with scroll. */
+  aside?: React.ReactNode
+  /** The band's scroll-linked life — sticky, the avatar settling, the
+   *  subtitle sliding under the name. Off for the screen in the room,
+   *  which nobody scrolls (founder, 2026-09-30): the band is ordinary
+   *  flow and every slot sits at rest. */
+  animate?: boolean
 }
 
 // Rebuilt after the #423 revert (founder direction, 2026-07-29). The name
@@ -39,6 +48,8 @@ export function HeroLayout({
   subtitle,
   avatar,
   about,
+  aside,
+  animate = true,
 }: HeroLayoutProps) {
   // THE SCROLL ROOT (2026-09-22): on the favpoll page's desktop app
   // shell the left COLUMN scrolls, not the document, so window scroll
@@ -231,11 +242,15 @@ export function HeroLayout({
         // about now lives INSIDE the band as a third collapsing clip
         // (below), so the band hides poll content at its bottom exactly
         // as the original design did.
-        className={`bg-background pt-6 pb-4 md:sticky md:z-30 md:pt-16 md:before:absolute md:before:inset-x-0 md:before:-top-14 md:before:h-14 md:before:bg-background ${
-          // The scrollport already starts below the header in shell mode;
-          // md:top-14 there pins the band 56px too low, which is what was
-          // eating the about line.
-          headerInset === 0 ? "md:top-0" : "md:top-14"
+        className={`bg-background pt-6 pb-4 md:pt-16 ${
+          animate
+            ? `md:sticky md:z-30 md:before:absolute md:before:inset-x-0 md:before:-top-14 md:before:h-14 md:before:bg-background ${
+                // The scrollport already starts below the header in shell
+                // mode; md:top-14 there pins the band 56px too low, which
+                // is what was eating the about line.
+                headerInset === 0 ? "md:top-0" : "md:top-14"
+              }`
+            : ""
         }`}
       >
         {/* min-h = the settled avatar size (0.9×80 / 0.635×132): heroes
@@ -249,7 +264,8 @@ export function HeroLayout({
               {eyebrowText}
               {title}
             </div>
-            {subtitle && (
+            {subtitle && !animate && <div className="w-full">{subtitle}</div>}
+            {subtitle && animate && (
               /* items-end (founder, 2026-09-05): top-anchored text in a
                  bottom-up clip lost its LOWER half first, so mid-scroll
                  the about read as covering the context. Bottom-anchored,
@@ -282,7 +298,7 @@ export function HeroLayout({
             <motion.div
               className="h-26 w-26 shrink-0 md:h-33 md:w-33"
               style={
-                avatarMounted
+                animate && avatarMounted
                   ? { width: avatarSize, height: avatarSize }
                   : undefined
               }
@@ -290,6 +306,7 @@ export function HeroLayout({
               {avatar}
             </motion.div>
           )}
+          {aside && <div className="shrink-0">{aside}</div>}
         </div>
       </div>
 

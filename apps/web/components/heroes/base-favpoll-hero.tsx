@@ -24,6 +24,8 @@ type BaseFavpollHeroProps = {
    *  the heading and the person a byline. Absent = tribute, the hero as
    *  it is. See heroes/fundraiser-slots. */
   fundraiser?: HeroFundraiser
+  /** Off for the screen in the room: a static band (HeroLayout). */
+  animate?: boolean
 }
 
 export function BaseFavpollHero({
@@ -34,18 +36,15 @@ export function BaseFavpollHero({
   mentions,
   compact,
   fundraiser,
+  animate,
 }: BaseFavpollHeroProps) {
   if (fundraiser) {
     return (
       <HeroLayout
+        animate={animate}
         {...fundraiserHeroSlots({
           fundraiser,
           compact,
-          byline: {
-            name: protagonist.name,
-            context: protagonist.context ?? null,
-            photoUrl: hideAvatar ? null : protagonist.photo_url,
-          },
         })}
       />
     )
@@ -120,6 +119,7 @@ export function BaseFavpollHero({
       subtitle={subtitle}
       avatar={avatar}
       about={about}
+      animate={animate}
     />
   )
 }

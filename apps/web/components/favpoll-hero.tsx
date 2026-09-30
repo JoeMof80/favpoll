@@ -13,6 +13,8 @@ type Props = {
   mentions?: MentionTarget[]
   compact?: boolean
   fundraiser?: HeroFundraiser
+  /** Off for the screen in the room: a static band (HeroLayout). */
+  animate?: boolean
 }
 
 export function FavpollHero({
@@ -23,6 +25,7 @@ export function FavpollHero({
   mentions,
   compact,
   fundraiser,
+  animate,
 }: Props) {
   return (
     <BaseFavpollHero
@@ -33,6 +36,7 @@ export function FavpollHero({
       mentions={mentions}
       compact={compact}
       fundraiser={fundraiser}
+      animate={animate}
     />
   )
 }

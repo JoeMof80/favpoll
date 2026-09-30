@@ -1,5 +1,5 @@
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
+import { Countdown } from "@/components/countdown"
 import { GoalProgress } from "@/components/goal-progress"
 import { heroNameSizeClass } from "@/lib/display"
 import { formatPounds } from "@/lib/i18n"
@@ -11,21 +11,16 @@ import { formatPounds } from "@/lib/i18n"
 // quiet. Tribute is the hero as it is. Fundraiser is the SAME three-line
 // silhouette (eyebrow, heading, subtitle line; HeroLayout's band, its
 // collapse, its settle) with the figures in the person's place and the
-// person demoted to a byline beneath the band. One layout, two voices —
+// person a byline in the rail's pinned slot. One layout, two voices —
 // the display used to hand-build a second banner for this, and fell
 // behind every hero change.
 
 export type HeroFundraiser = {
   totalRaised: number
   goalAmount: number | null
+  /** ISO close — null when closed or undated; the band's right edge. */
+  closesAt: string | null
   isClosed: boolean
-}
-
-/** Who the money is for: the person or the cause, as a byline. */
-export type HeroByline = {
-  name: string
-  context: string | null
-  photoUrl: string | null
 }
 
 // The hero's own type, verbatim (base-favpoll-hero / cause-hero), so the
@@ -37,14 +32,12 @@ const SUBTITLE_CLASS =
 
 export function fundraiserHeroSlots({
   fundraiser,
-  byline,
   compact,
 }: {
   fundraiser: HeroFundraiser
-  byline: HeroByline
   compact?: boolean
 }) {
-  const { totalRaised, goalAmount, isClosed } = fundraiser
+  const { totalRaised, goalAmount, closesAt, isClosed } = fundraiser
   const figure = formatPounds(totalRaised)
   const goalReached = !!goalAmount && totalRaised >= goalAmount
   const isOpen = !isClosed
@@ -72,15 +65,26 @@ export function fundraiserHeroSlots({
     </div>
   )
 
-  // A <p>, not the page's <h1>: the heading is the figure, but the
-  // document is still about the person — the byline keeps the h1.
+  // ONE LINE (founder, 2026-09-30: "more horizontal"): the figure and its
+  // goal share a baseline, as the display's banner had them. A <p>, not
+  // the page's <h1>: the heading is the figure, but the document is
+  // still about the person — the rail's byline keeps the h1.
   const title = (
-    <p
-      aria-live="polite"
-      className={`${TITLE_CLASS} ${heroNameSizeClass(figure, compact)}`}
-    >
-      {figure}
-    </p>
+    <div className="flex flex-wrap items-baseline gap-x-3">
+      <p
+        aria-live="polite"
+        className={`${TITLE_CLASS} ${heroNameSizeClass(figure, compact)}`}
+      >
+        {figure}
+      </p>
+      {!isClosed && goalAmount && (
+        <p
+          className={`text-xl font-normal text-muted-foreground ${compact ? "" : "md:text-2xl"}`}
+        >
+          of {formatPounds(goalAmount)}
+        </p>
+      )}
+    </div>
   )
 
   const subtitleSize = compact ? "" : "md:text-2xl"
@@ -89,44 +93,31 @@ export function fundraiserHeroSlots({
       Thank you — the final standings are in.
     </p>
   ) : goalAmount ? (
-    <div>
-      <p className={`${SUBTITLE_CLASS} ${subtitleSize}`}>
-        of {formatPounds(goalAmount)}
-      </p>
-      <GoalProgress
-        totalRaised={totalRaised}
-        goalAmount={goalAmount}
-        className="mt-3 h-2.5"
-      />
-    </div>
+    <GoalProgress
+      totalRaised={totalRaised}
+      goalAmount={goalAmount}
+      className="mt-4 h-2.5"
+    />
   ) : undefined
-  // No goal: the figure stands alone under "Raised so far". The display's
-  // old banner put the countdown on this line, but the sheet's rail pins
-  // the countdown at its top, and twice on one screen is noise.
 
-  // The byline, in the about's flow position: the identity is a byline
-  // here, not the heading (founder, 2026-08-02).
-  const about = (
-    <div className="flex items-center gap-3">
-      {byline.photoUrl && (
-        <ProtagonistAvatar
-          name={byline.name}
-          photoUrl={byline.photoUrl}
-          className="h-10 w-10 rounded-lg md:h-10 md:w-10"
-        />
-      )}
-      <div className="min-w-0">
-        <h1 className="truncate text-base font-medium text-foreground">
-          {byline.name}
-        </h1>
-        {byline.context && (
-          <p className="truncate text-sm text-muted-foreground">
-            {byline.context}
-          </p>
-        )}
+  // The countdown at the band's right edge, in the rail's own grammar —
+  // the rail's pinned slot carries the byline instead (the sheet).
+  // mt-2: the eyebrow row is h-8 with its text centred, so the text's top
+  // sits 8px into the row; the countdown's label starts at the row's top
+  // and needs the same 8px to share the eyebrow's line (measured).
+  const aside =
+    isOpen && closesAt ? (
+      <div className="mt-2">
+        <Countdown closesAt={closesAt} />
       </div>
-    </div>
-  )
+    ) : undefined
 
-  return { eyebrowText, title, subtitle, avatar: undefined, about }
+  return {
+    eyebrowText,
+    title,
+    subtitle,
+    avatar: undefined,
+    aside,
+    about: undefined,
+  }
 }
