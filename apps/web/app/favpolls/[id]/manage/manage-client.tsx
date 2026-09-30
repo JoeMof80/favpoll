@@ -33,7 +33,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { SwitchLine } from "@/components/ui/switch-line"
-import { Tooltip, TooltipProvider } from "@/components/ui/tooltip"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import {
   SectionList,
@@ -80,7 +79,6 @@ import {
 import { ghostsFor } from "@/components/new-favpoll-wizard/wizard-placeholders"
 import { paletteForFavpoll } from "@/lib/register-palette"
 import type { FavpollCategory, FavpollSubject } from "@favpoll/types"
-import { cn } from "@/lib/utils"
 import { formatAmount } from "@/lib/display"
 import { TOAST_ERROR_STYLE } from "@/lib/toast-styles"
 import {
@@ -91,7 +89,6 @@ import {
 } from "@/app/favpolls/[id]/actions"
 import {
   type OrganizerFavpoll,
-  WARNING_THRESHOLD_DAYS,
   isFavpollClosed,
   daysRemaining,
 } from "@/components/organizer-row/utils"
@@ -182,7 +179,6 @@ export function ManageClient({
 
   const isClosed = isFavpollClosed(favpoll)
   const days = daysRemaining(favpoll.closes_at)
-  const isWarning = !isClosed && days <= WARNING_THRESHOLD_DAYS
 
   const sections = SECTIONS
   const section =
@@ -411,6 +407,17 @@ export function ManageClient({
   )
   const dashboard = (
     <div className="flex flex-col gap-6 py-6">
+      {/* The identity, where it reads as the dashboard's title (founder,
+          2026-09-30: "include the Name") — the close is the countdown
+          tile's. */}
+      <div className="min-w-0">
+        <p className="text-[11px] font-medium tracking-[0.08em] text-primary uppercase">
+          {eyebrow}
+        </p>
+        <h2 className="mt-0.5 truncate text-2xl font-medium text-foreground">
+          {name}
+        </h2>
+      </div>
       <div className="grid gap-4 sm:grid-cols-2">
         {stat(
           "Raised",
@@ -738,65 +745,27 @@ export function ManageClient({
           the close in the middle (desktop — the phone has it on
           Settings); the outward pair and Share flush right. Every
           section then opens straight on its heading. */}
+      {/* THE TOOLBAR: the back door, then the outward pair and Share
+          flush right. The name and close date left it for the
+          dashboard (founder, 2026-09-30), so the back link has its
+          words again. On the phone a section's back goes to the
+          section list; the list's goes to Your favpolls. */}
       <ToolbarBand className="flex max-w-5xl items-center gap-3">
-        <TooltipProvider>
-          <Tooltip content={section ? "Manage" : "Your favpolls"} side="bottom">
-            <Button
-              asChild
-              variant="ghost"
-              size="icon"
-              className="-ml-2 shrink-0 md:hidden"
-            >
-              <Link
-                href={
-                  section ? `/favpolls/${favpoll.id}/manage` : "/my-favpolls"
-                }
-                aria-label={section ? "Back to manage" : "Your favpolls"}
-              >
-                <ArrowLeft aria-hidden="true" />
-              </Link>
-            </Button>
-          </Tooltip>
-          <Tooltip content="Your favpolls" side="bottom">
-            <Button
-              asChild
-              variant="ghost"
-              size="icon"
-              className="-ml-2 hidden shrink-0 md:inline-flex"
-            >
-              <Link href="/my-favpolls" aria-label="Your favpolls">
-                <ArrowLeft aria-hidden="true" />
-              </Link>
-            </Button>
-          </Tooltip>
-        </TooltipProvider>
-        <div className="flex min-w-0 flex-1 items-baseline gap-x-3">
-          <span className="hidden shrink-0 text-[11px] font-medium tracking-[0.08em] text-primary uppercase sm:inline">
-            {eyebrow}
-          </span>
-          <h1 className="min-w-0 truncate text-base font-medium text-foreground">
-            {name}
-          </h1>
-          <p className="hidden shrink-0 text-sm whitespace-nowrap text-muted-foreground md:block">
-            {isClosed ? "Closed" : "Closes"}{" "}
-            <span
-              className={cn(
-                "font-medium",
-                !isClosed && isWarning
-                  ? "text-amber-600 dark:text-amber-400"
-                  : "text-foreground"
-              )}
-            >
-              {closesLabel}
-            </span>
-            {!isClosed && (
-              <>
-                {" "}
-                · {Math.max(days, 0)} day{days === 1 ? "" : "s"} left
-              </>
-            )}
-          </p>
-        </div>
+        <Button asChild variant="ghost" className="-ml-2 md:hidden">
+          <Link
+            href={section ? `/favpolls/${favpoll.id}/manage` : "/my-favpolls"}
+          >
+            <ArrowLeft data-icon="inline-start" aria-hidden="true" />
+            {section ? "Manage" : "Your favpolls"}
+          </Link>
+        </Button>
+        <Button asChild variant="ghost" className="-ml-2 hidden md:inline-flex">
+          <Link href="/my-favpolls">
+            <ArrowLeft data-icon="inline-start" aria-hidden="true" />
+            Your favpolls
+          </Link>
+        </Button>
+        <div className="flex-1" />
         <div className="flex shrink-0 items-center gap-2">
           {/* THE OUTWARD PAIR (founder, 2026-09-29): Share and the print
               artefact are one act — getting the favpoll in front of
