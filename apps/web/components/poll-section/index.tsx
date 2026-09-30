@@ -96,7 +96,8 @@ type Props = {
   clerkUserId: string | null
   isClosed: boolean
   /** A closed favpoll with enough pledges: the story-of-the-poll door
-   *  in the … menu (founder, 2026-09-30 — not a card under the standings). */
+   *  in the … menu on the PHONE (founder, 2026-09-30); on desktop the
+   *  rail's closed card carries it. */
   onOpenStory?: () => void
   hasPledged: boolean
   pledgeJustConfirmed?: boolean
@@ -233,7 +234,10 @@ export function PollSection({
                 {/* The keepsake's door on a closed favpoll (founder,
                     2026-09-30: not a button on the rail's state card). */}
                 {onOpenStory && (
-                  <DropdownMenuItem onSelect={onOpenStory}>
+                  <DropdownMenuItem
+                    onSelect={onOpenStory}
+                    className="md:hidden"
+                  >
                     The story of the poll
                     <ChartLine className="ml-auto size-4" aria-hidden="true" />
                   </DropdownMenuItem>

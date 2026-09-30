@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { Countdown } from "@/components/countdown"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { GuestBook, type WallEntry } from "@/components/guest-book"
+import { ChevronRight } from "lucide-react"
 import { BumpChart } from "@/components/bump-chart"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import type { RankHistory } from "@/lib/rank-history"
@@ -193,6 +194,19 @@ export function FavpollContent({
         Poll closed
       </SectionEyebrow>
       {closedAt && <p className="text-sm text-muted-foreground">{closedAt}</p>}
+      {/* The story's door, under the closed state (founder, 2026-09-30:
+          "below the poll closed eyebrow") — the … menu keeps it on the
+          phone, where there is no rail. */}
+      {rankHistory && (
+        <button
+          type="button"
+          onClick={() => setStoryOpen(true)}
+          className="mt-1 inline-flex items-center gap-1 text-sm text-primary hover:underline"
+        >
+          The story of the poll
+          <ChevronRight className="size-3.5" aria-hidden="true" />
+        </button>
+      )}
     </div>
   ) : (
     <Countdown closesAt={favpoll.closes_at} />
@@ -314,11 +328,10 @@ export function FavpollContent({
         </p>
       )}
 
-      {/* THE STORY OF THE POLL behind the … menu (founder, 2026-09-30:
-          the teaser under the standings interrupted results → charity;
-          the keepsake carries the chart, so the page needs only a door,
-          beside Keepsake). The overlay opens the full chart at a width
-          where the lanes and labels have room. */}
+      {/* THE STORY OF THE POLL's overlay (founder, 2026-09-30): opened
+          from the rail's closed card on desktop, from the … menu on the
+          phone; the full chart at a width where the lanes and labels
+          have room. */}
       {rankHistory && (
         <ResponsiveOverlay
           open={storyOpen}
