@@ -7,7 +7,6 @@ import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
 import { getFavpollHeadline, heroNameSizeClass } from "@/lib/display"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import type { Favpoll } from "@favpoll/types"
-import { FundraiserStrip, type HeroFundraiser } from "./heroes/fundraiser-slots"
 
 type Props = {
   favpoll: Favpoll
@@ -17,11 +16,10 @@ type Props = {
    *  place): the name and context take the phone's sizes, so the
    *  narrowed column keeps them on their lines (founder, 2026-09-29). */
   compact?: boolean
-  /** The presence dial's loud setting (founder, 2026-09-30): the money
-   *  strip takes the About's place beneath the person's band. See heroes/fundraiser-slots. */
-  fundraiser?: HeroFundraiser
   /** Off for the screen in the room: a static band (HeroLayout). */
   animate?: boolean
+  /** "sm": type and avatar turned down (HeroLayout `size`). */
+  size?: "default" | "sm"
 }
 
 // Hero for subject='cause' — no protagonist row, so the optional image and
@@ -34,8 +32,8 @@ export function CauseHero({
   favpoll,
   mentions,
   compact,
-  fundraiser,
   animate,
+  size,
 }: Props) {
   const headline = getFavpollHeadline({
     occasionType: favpoll.occasion_type,
@@ -58,7 +56,7 @@ export function CauseHero({
     <h1
       // The size transition keeps step with the rail's expand (page-layout,
       // 300ms) so the compact step is one motion, not a jump.
-      className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground transition-[font-size] duration-300 ease-out motion-reduce:transition-none ${heroNameSizeClass(headline.name, compact)}`}
+      className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground transition-[font-size] duration-300 ease-out motion-reduce:transition-none ${size === "sm" ? "text-2xl" : heroNameSizeClass(headline.name, compact)}`}
     >
       {favpoll.cause_label}
     </h1>
@@ -66,7 +64,7 @@ export function CauseHero({
 
   const subtitle = headline.suffix ? (
     <p
-      className={`mt-4 truncate text-xl font-normal whitespace-normal text-primary transition-[font-size] duration-300 ease-out motion-reduce:transition-none ${compact ? "" : "md:text-2xl"}`}
+      className={`mt-4 truncate font-normal whitespace-normal text-primary transition-[font-size] duration-300 ease-out motion-reduce:transition-none ${size === "sm" ? "text-lg" : `text-xl ${compact ? "" : "md:text-2xl"}`}`}
     >
       {headline.suffix}
     </p>
@@ -83,7 +81,9 @@ export function CauseHero({
   ) : undefined
 
   const about = favpoll.description ? (
-    <p className="text-sm leading-relaxed wrap-break-word text-muted-foreground/80 md:text-base">
+    <p
+      className={`text-sm leading-relaxed wrap-break-word text-muted-foreground/80 ${size === "sm" ? "" : "md:text-base"}`}
+    >
       <MentionText text={favpoll.description} mentions={mentions} />
     </p>
   ) : undefined
@@ -94,16 +94,9 @@ export function CauseHero({
       title={title}
       subtitle={subtitle}
       avatar={avatar}
-      // The fundraiser dial (room only): the money strip takes the
-      // About's place beneath the band — the person stays the heading.
-      about={
-        fundraiser ? (
-          <FundraiserStrip fundraiser={fundraiser} compact={compact} />
-        ) : (
-          about
-        )
-      }
+      about={about}
       animate={animate}
+      size={size}
     />
   )
 }

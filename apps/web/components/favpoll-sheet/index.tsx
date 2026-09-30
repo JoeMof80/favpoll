@@ -12,6 +12,7 @@ import type { RankHistory } from "@/lib/rank-history"
 import { FavpollHero } from "@/components/favpoll-hero"
 import { CauseHero } from "@/components/cause-hero"
 import { PollSection } from "@/components/poll-section"
+import { FundraiserStrip } from "@/components/heroes/fundraiser-slots"
 import type {
   Favourite,
   FavpollWithDetails,
@@ -133,7 +134,7 @@ export function FavpollSheet({
 
   const isCause = favpoll.subject === "cause"
 
-  // The fundraiser hero's figures come from the sheet's own data; only
+  // The fundraiser strip's figures come from the sheet's own data; only
   // the room turns the dial (see heroes/fundraiser-slots).
   const heroFundraiser =
     room && heroVariant === "fundraiser"
@@ -277,13 +278,25 @@ export function FavpollSheet({
       {/* The expanded rail halves the sheet, so the hero takes its
           compact sizes (founder, 2026-09-29: the context "breaks" when
           the guest book is expanded). */}
+      {/* THE FUNDRAISER DIAL (room only; founder, 2026-09-30): the pledge
+          goal ABOVE the person, both turned down a size. The strip takes
+          the band's top padding; the band below runs small. */}
+      {heroFundraiser && (
+        <div className="pt-6 md:pt-16">
+          <FundraiserStrip
+            fundraiser={heroFundraiser}
+            compact={guestBookExpanded}
+            size="sm"
+          />
+        </div>
+      )}
       {isCause ? (
         <CauseHero
           favpoll={favpoll}
           mentions={aboutMentions}
           compact={guestBookExpanded}
-          fundraiser={heroFundraiser}
           animate={!room}
+          size={heroFundraiser ? "sm" : "default"}
         />
       ) : (
         <FavpollHero
@@ -291,8 +304,8 @@ export function FavpollSheet({
           protagonist={favpoll.protagonists!}
           mentions={aboutMentions}
           compact={guestBookExpanded}
-          fundraiser={heroFundraiser}
           animate={!room}
+          size={heroFundraiser ? "sm" : "default"}
         />
       )}
 

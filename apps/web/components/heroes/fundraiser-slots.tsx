@@ -8,8 +8,8 @@ import { formatPounds } from "@/lib/i18n"
 // (founder, 2026-08-02): "fundraiser" is telethon theatre; "tribute"
 // turns the volume down and keeps the money quiet. Tribute is the hero
 // as it is. Fundraiser is the SAME hero — the person stays the heading,
-// with their photo and context — plus a money strip in the band's flow
-// position beneath it, where the About sits: the eyebrow names the
+// with their photo and context — turned down a size, with a money strip
+// ABOVE the band (founder, 2026-09-30, after a beneath-the-band cut): the eyebrow names the
 // figure, the figure and its goal share a baseline, and the bar spans
 // the column. An earlier cut made the money the heading and the person
 // a byline; the founder reversed it the same evening.
@@ -28,9 +28,12 @@ const FIGURE_CLASS =
 export function FundraiserStrip({
   fundraiser,
   compact,
+  size = "default",
 }: {
   fundraiser: HeroFundraiser
   compact?: boolean
+  /** "sm": the strip turned down to sit above the person's band. */
+  size?: "default" | "sm"
 }) {
   const { totalRaised, goalAmount, isClosed } = fundraiser
   const figure = formatPounds(totalRaised)
@@ -63,13 +66,13 @@ export function FundraiserStrip({
       <div className="flex flex-wrap items-baseline gap-x-3">
         <p
           aria-live="polite"
-          className={`${FIGURE_CLASS} ${heroNameSizeClass(figure, compact)}`}
+          className={`${FIGURE_CLASS} ${size === "sm" ? "text-2xl" : heroNameSizeClass(figure, compact)}`}
         >
           {figure}
         </p>
         {!isClosed && goalAmount && (
           <p
-            className={`text-xl font-normal text-muted-foreground ${compact ? "" : "md:text-2xl"}`}
+            className={`font-normal text-muted-foreground ${size === "sm" ? "text-lg" : `text-xl ${compact ? "" : "md:text-2xl"}`}`}
           >
             of {formatPounds(goalAmount)}
           </p>
@@ -79,7 +82,7 @@ export function FundraiserStrip({
         <GoalProgress
           totalRaised={totalRaised}
           goalAmount={goalAmount}
-          className="mt-4 h-2.5"
+          className={size === "sm" ? "mt-3 h-2" : "mt-4 h-2.5"}
         />
       ) : null}
     </div>
