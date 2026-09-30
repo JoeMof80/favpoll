@@ -16,6 +16,7 @@ import { WizardField, WIZARD_INPUT_SIZE } from "./wizard-field"
 import { ghostsFor } from "./wizard-placeholders"
 import type { WizardState } from "./use-wizard-state"
 import { cn } from "@/lib/utils"
+import { FIELD_LABELS, FIELD_LIMITS, nameLabel } from "@/lib/favpoll-fields"
 
 export function WizardInfoStep({ w }: { w: WizardState }) {
   const [photoOpen, setPhotoOpen] = useState(false)
@@ -48,62 +49,57 @@ export function WizardInfoStep({ w }: { w: WizardState }) {
   }, [photoForm])
 
   const ph = ghostsFor(w.category)
-  const nameLabel =
-    w.who === "cause"
-      ? "Cause"
-      : w.category === "fundraiser"
-        ? "Name or cause"
-        : "Name"
+  const nameLabelText = nameLabel(w.who, w.category)
 
   return (
     <div className="space-y-5">
-      <WizardField label="Opening line">
+      <WizardField label={FIELD_LABELS.openingLine}>
         <InputGroup className={cn(WIZARD_INPUT_SIZE, "bg-background")}>
           <InputGroupInput
             className="md:text-base"
             value={w.openingLine}
-            maxLength={50}
+            maxLength={FIELD_LIMITS.openingLine}
             placeholder={ph.openingLine}
             onChange={(e) => w.setOpeningLine(e.target.value)}
           />
           <InputGroupAddon align="inline-end">
-            <CharCounter value={w.openingLine} max={50} />
+            <CharCounter value={w.openingLine} max={FIELD_LIMITS.openingLine} />
           </InputGroupAddon>
         </InputGroup>
       </WizardField>
 
-      <WizardField label={nameLabel} required>
+      <WizardField label={nameLabelText} required>
         <InputGroup className={cn(WIZARD_INPUT_SIZE, "bg-background")}>
           <InputGroupInput
             className="md:text-base"
             value={w.name}
-            maxLength={40}
+            maxLength={FIELD_LIMITS.name}
             placeholder={ph.name}
             onChange={(e) => w.setName(e.target.value)}
           />
           <InputGroupAddon align="inline-end">
-            <CharCounter value={w.name} max={40} />
+            <CharCounter value={w.name} max={FIELD_LIMITS.name} />
           </InputGroupAddon>
         </InputGroup>
       </WizardField>
 
-      <WizardField label="Context">
+      <WizardField label={FIELD_LABELS.context}>
         <InputGroup className={cn(WIZARD_INPUT_SIZE, "bg-background")}>
           <InputGroupInput
             className="md:text-base"
             value={w.context}
-            maxLength={40}
+            maxLength={FIELD_LIMITS.context}
             placeholder={ph.context}
             onChange={(e) => w.setContext(e.target.value)}
           />
           <InputGroupAddon align="inline-end">
-            <CharCounter value={w.context} max={40} />
+            <CharCounter value={w.context} max={FIELD_LIMITS.context} />
           </InputGroupAddon>
         </InputGroup>
       </WizardField>
 
       <div className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-center sm:space-y-0 sm:gap-x-6">
-        <span className="block font-medium">Photo</span>
+        <span className="block font-medium">{FIELD_LABELS.photo}</span>
         {/* The avatar IS the button (founder, 2026-09-01): tap the photo —
             or the empty slot — to open the crop overlay. Same rounded-xl
             shape the page's ProtagonistAvatar wears, so what you press is
