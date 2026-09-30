@@ -20,6 +20,8 @@ import { fetchAllRows } from "@/lib/supabase/paginate"
 import { pollStandings } from "@/lib/poll-standings"
 import { deriveRankHistory } from "@/lib/rank-history"
 import { pledgeTimeline } from "@/components/manage/pledges-over-time"
+import { getWizardData } from "@/app/favpolls/new/wizard-data"
+import type { TopicWithMeta } from "@favpoll/types"
 
 export const metadata = {
   title: "Manage favpoll — favpoll",
@@ -59,6 +61,8 @@ export default async function ManageFavpollPage({
       favpoll_charities ( charities ( id, name, logo_url, registered_number, description, created_at, consent_status, consent_contacted_at, registered_email ) ),
       favpoll_polls (
         id,
+        topic_id,
+        subset_id,
         personal_note,
         topics ( title, is_finite ),
         topic_subsets ( title ),
@@ -92,6 +96,8 @@ export default async function ManageFavpollPage({
     } | null
     favpoll_polls:
       | (NonNullable<RawOrganizerRow["favpoll_polls"]> & {
+          topic_id: string | null
+          subset_id: string | null
           topics: { title: string; is_finite: boolean | null } | null
           favpoll_poll_favourites: {
             id: string
@@ -261,6 +267,29 @@ export default async function ManageFavpollPage({
       : null
   const topicLockReason = locks.topic ? lockReason(locks, "topic") : null
 
+  // THE TOPIC PICKER's catalogue (step 4, 2026-09-30) — the wizard's own
+  // list, loaded only while the topic can still change.
+  const isOpen = !ev.closed_at && new Date(ev.closes_at) > new Date()
+  let topicPicker: {
+    topics: TopicWithMeta[]
+    categories: Awaited<ReturnType<typeof getWizardData>>["categories"]
+    suggested: TopicWithMeta[]
+  } | null = null
+  if (isOpen && !locks.topic) {
+    const data = await getWizardData()
+    const charityIds = (ev.favpoll_charities ?? [])
+      .map((ec) => (ec.charities as unknown as { id: string } | null)?.id)
+      .filter((v): v is string => !!v)
+    const suggestedIds = charityIds.flatMap(
+      (c) => data.suggestedTopicIds[c] ?? []
+    )
+    topicPicker = {
+      topics: data.topics,
+      categories: data.categories,
+      suggested: data.topics.filter((t) => suggestedIds.includes(t.id)),
+    }
+  }
+
   const favpoll: ManageFavpoll = {
     ...mapOrganizerFavpoll(ev),
     // ── The record's ledger fields ──
@@ -283,6 +312,8 @@ export default async function ManageFavpollPage({
       }))
       .sort((a, b) => a.label.localeCompare(b.label)),
     topicIsFinite: ev.favpoll_polls?.topics?.is_finite === true,
+    topicId: ev.favpoll_polls?.topic_id ?? null,
+    subsetId: ev.favpoll_polls?.subset_id ?? null,
     charityLockReason,
     topicLockReason,
   }
@@ -326,6 +357,7 @@ export default async function ManageFavpollPage({
           pickerCharities={pickerCharities}
           consentGatingActive={consentPosture() === "consent-first"}
           dashboard={{ standingItems, rankHistory, rankHistoryDates, timeline }}
+          topicPicker={topicPicker}
         />
       </main>
     </RegisterScope>
