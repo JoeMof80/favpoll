@@ -63,6 +63,8 @@ export function HeroLayout({
   // seeing glitching"). Rects, not offsetTop (the relative row is the
   // offsetParent). Content changes (name wrap, breakpoint) still
   // re-measure via the RO; scroll recomputes the same value.
+  // The scroll over which the band settles (see the transforms below).
+  const SETTLE_SCROLL = 24
   const boxRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const el = boxRef.current
@@ -127,9 +129,20 @@ export function HeroLayout({
         // clamps the scroll back, the band re-expands, and it oscillates
         // (Quora's collapsing header). The shell scroller reserves this
         // much spare room (page-layout) so the loop cannot start.
+        // A STATIC band collapses by nothing, so it reserves nothing:
+        // with the collapse published, the room's column overflowed by
+        // exactly this spare and a nudge scrolled the hero off the top
+        // with nothing to settle (founder, 2026-10-01: "the hero
+        // shouldn't scroll to the top").
         document.documentElement.style.setProperty(
           "--hero-collapse",
-          `${Math.max(0, rest - settled)}px`
+          `${animate ? Math.max(0, rest - settled) : 0}px`
+        )
+        // …and the settle window the scroller reserves with it (the 24px
+        // of scroll the band settles across) — zero for a static band.
+        document.documentElement.style.setProperty(
+          "--hero-settle",
+          `${animate ? SETTLE_SCROLL : 0}px`
         )
       }
     }
@@ -141,8 +154,9 @@ export function HeroLayout({
     return () => {
       ro.disconnect()
       document.documentElement.style.removeProperty("--hero-collapse")
+      document.documentElement.style.removeProperty("--hero-settle")
     }
-  }, [])
+  }, [animate])
 
   // ONE SETTLE CONSTANT (founder, 2026-09-05: the 120px rest gap under
   // the context was "way too low" for the about). Every channel —
@@ -179,7 +193,6 @@ export function HeroLayout({
     return () => ro.disconnect()
   }, [])
 
-  const SETTLE_SCROLL = 24
   const t = [0, SETTLE_SCROLL]
   const subtitleOpacity = useTransform(scrollY, t, isMobile ? [1, 1] : [1, 0])
   // The line rides the SCROLL, 1:1 (founder, 2026-09-05: "move the
