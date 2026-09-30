@@ -263,7 +263,16 @@ export function HeroLayout({
                   maxHeight: subtitleMaxHeight,
                 }}
               >
-                <motion.div ref={subtitleRef} style={{ y: subtitleY }}>
+                {/* w-full: a flex item sizes to its content, which a text
+                    subtitle never notices (a block clamps to the column
+                    either way) but the fundraiser hero's progress bar
+                    does — it wants the column, not the width of
+                    "of £1,000" (2026-09-30). */}
+                <motion.div
+                  ref={subtitleRef}
+                  className="w-full"
+                  style={{ y: subtitleY }}
+                >
                   {subtitle}
                 </motion.div>
               </motion.div>

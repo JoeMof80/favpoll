@@ -80,6 +80,10 @@ export type FavpollSheetProps = {
   /** Organiser name + avatar for the rail card */
   organiser?: { name: string; avatarUrl: string | null } | null
   presentation?: SheetPresentation
+  /** The presence dial (founder, 2026-08-02), room presentation only:
+   *  "fundraiser" makes the money the hero's heading, "tribute" keeps the
+   *  person there and the money quiet. The guest page is always tribute. */
+  heroVariant?: "fundraiser" | "tribute"
   /** Guest presentation only. */
   viewer?: SheetViewer
   /** Rendered in the left column straight after the standings — the
@@ -103,6 +107,7 @@ export function FavpollSheet({
   rankHistoryDates,
   organiser,
   presentation = "guest",
+  heroVariant = "tribute",
   viewer,
   afterPoll,
   children,
@@ -118,6 +123,18 @@ export function FavpollSheet({
   const [storyOpen, setStoryOpen] = useState(false)
 
   const isCause = favpoll.subject === "cause"
+
+  // The fundraiser hero's figures come from the sheet's own data; only
+  // the room turns the dial (see heroes/fundraiser-slots).
+  const heroFundraiser =
+    room && heroVariant === "fundraiser"
+      ? {
+          totalRaised,
+          goalAmount: favpoll.goal_amount ?? null,
+          closesAt: isClosed ? null : (favpoll.closes_at ?? null),
+          isClosed,
+        }
+      : undefined
 
   // THE ROOM'S STANDING: the standings show, the reveal is withheld —
   // entitled to the list, never to the note.
@@ -255,6 +272,7 @@ export function FavpollSheet({
           favpoll={favpoll}
           mentions={aboutMentions}
           compact={guestBookExpanded}
+          fundraiser={heroFundraiser}
         />
       ) : (
         <FavpollHero
@@ -262,6 +280,7 @@ export function FavpollSheet({
           protagonist={favpoll.protagonists!}
           mentions={aboutMentions}
           compact={guestBookExpanded}
+          fundraiser={heroFundraiser}
         />
       )}
 
