@@ -362,11 +362,16 @@ export function FavpollListCard({
                       whole block SCROLLS instead of truncating (founder,
                       2026-09-01) — the step row stays pinned beneath. */}
                   <div className="min-h-0 flex-1 overflow-y-auto px-3 pt-2 pb-1">
-                    <ProtagonistAvatar
-                      name={displayName}
-                      photoUrl={frontPhoto}
-                      className="float-right mb-1 ml-3 h-24 w-24 md:h-24 md:w-24"
-                    />
+                    {/* A photo only — no hatched initials placeholder on
+                        the shop window (founder, 2026-09-30); the about
+                        takes the full width without one. */}
+                    {frontPhoto && (
+                      <ProtagonistAvatar
+                        name={displayName}
+                        photoUrl={frontPhoto}
+                        className="float-right mb-1 ml-3 h-24 w-24 md:h-24 md:w-24"
+                      />
+                    )}
                     {aboutText && (
                       <p className="text-sm leading-relaxed text-muted-foreground">
                         <MentionText
