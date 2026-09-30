@@ -163,6 +163,7 @@ export function ManageClient({
   dashboard: {
     standingItems: Favourite[]
     rankHistory: RankHistory | null
+    rankHistoryDates: string[] | null
     timeline: TimelinePoint[]
   }
 }) {
@@ -509,7 +510,10 @@ export function ManageClient({
 
       {dash.rankHistory && (
         <div className={card}>
-          <BumpChart history={dash.rankHistory} />
+          <BumpChart
+            history={dash.rankHistory}
+            axisLabels={dash.rankHistoryDates ?? undefined}
+          />
         </div>
       )}
 

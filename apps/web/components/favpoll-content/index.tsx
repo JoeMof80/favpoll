@@ -49,6 +49,8 @@ type Props = {
   hasNote: boolean
   wallEntries: WallEntry[]
   rankHistory: RankHistory | null
+  /** One ISO date per step: the chart's dated x-axis. */
+  rankHistoryDates?: string[]
   /** Charities that haven't yet consented to receive pledges (consent-first
    * posture only) — non-empty withholds every pledge entry point. */
   gatedCharityNames?: string[]
@@ -73,6 +75,7 @@ export function FavpollContent({
   hasNote,
   wallEntries,
   rankHistory,
+  rankHistoryDates,
   gatedCharityNames = [],
   showGuestAmounts = false,
   organiser,
@@ -348,7 +351,11 @@ export function FavpollContent({
           dialogStyle={{ maxHeight: "min(900px, 90vh)" }}
           dialogContentClassName="flex-1 overflow-y-auto px-5 pb-5"
         >
-          <BumpChart history={rankHistory} title="" />
+          <BumpChart
+            history={rankHistory}
+            title=""
+            axisLabels={rankHistoryDates}
+          />
         </ResponsiveOverlay>
       )}
 

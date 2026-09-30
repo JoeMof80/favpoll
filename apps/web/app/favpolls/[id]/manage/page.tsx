@@ -244,6 +244,14 @@ export default async function ManageFavpollPage({
     rankHistory = deriveRankHistory(events, labels)
   }
   const timeline = pledgeTimeline(history)
+  const rankHistoryDates = rankHistory
+    ? [...history]
+        .sort(
+          (a, b) =>
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        )
+        .map((r) => r.created_at)
+    : null
 
   const appealName = ev.appeals?.name ?? null
   const charityLockReason = appealName
@@ -317,7 +325,7 @@ export default async function ManageFavpollPage({
           wallEntries={wallEntries}
           pickerCharities={pickerCharities}
           consentGatingActive={consentPosture() === "consent-first"}
-          dashboard={{ standingItems, rankHistory, timeline }}
+          dashboard={{ standingItems, rankHistory, rankHistoryDates, timeline }}
         />
       </main>
     </RegisterScope>
