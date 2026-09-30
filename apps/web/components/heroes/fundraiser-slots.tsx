@@ -39,37 +39,37 @@ export function FundraiserStrip({
             : "Raised so far"}
       </SectionEyebrow>
       {/* The countdown card's digit line, exactly: a 29px box (the text-2xl
-          line box the digits stand in, measured against the rail: its
-          hairline sat 1px above this one at 30), so this card is as tall as that
-          one and the hairlines beneath them meet on one line (founder,
-          2026-09-30: "make the pledge goal bottom border level with the
-          bottom border of poll closes in"). The figure and its label
-          share the digits' baseline. The bar is not here: it IS the card's
-          hairline, drawn by the sheet where the rail's hairline runs. */}
-      <div className="relative h-[29px]">
-        <div className="flex flex-wrap items-baseline gap-x-3 tabular-nums">
+          line box the digits stand in, measured against the rail), so this
+          card is as tall as that one and the hairlines beneath them meet.
+          TWO PAIRS across it, as the countdown has its columns (founder,
+          2026-09-30): the total with who it is for at the left, the goal
+          at the right, both figures in the one style — "£240 for
+          Alzheimer's Society … of £1,000". Once the goal is reached the
+          goal's figure turns success, as the bar does. */}
+      <div className="relative flex h-[29px] items-baseline justify-between gap-x-4 tabular-nums">
+        <span className="flex min-w-0 items-baseline gap-x-2">
           <span
             aria-live="polite"
             className="text-2xl leading-none font-medium text-foreground"
           >
             {formatPounds(totalRaised)}
           </span>
-          {/* The label: what the figure is against, and who it is for —
-              "of £1,000 for Marie Curie", "for Marie Curie", "raised for
-              Marie Curie" once closed. */}
-          <span className="text-xs text-muted-foreground">
-            {isClosed
-              ? `raised${forCharity}`
-              : goalAmount
-                ? `of ${formatPounds(goalAmount)}${forCharity}`
-                : forCharity.trim()}
+          <span className="truncate text-xs text-muted-foreground">
+            {isClosed ? `raised${forCharity}` : forCharity.trim()}
           </span>
-          {goalAmount && !isClosed && goalReached && (
-            <span className="text-xs font-medium text-success">
-              Goal reached — every further pledge still counts
+        </span>
+        {goalAmount && (
+          <span className="flex shrink-0 items-baseline gap-x-2">
+            <span className="text-xs text-muted-foreground">of</span>
+            <span
+              className={`text-2xl leading-none font-medium ${
+                goalReached ? "text-success" : "text-foreground"
+              }`}
+            >
+              {formatPounds(goalAmount)}
             </span>
-          )}
-        </div>
+          </span>
+        )}
       </div>
     </div>
   )

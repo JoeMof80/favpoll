@@ -16,9 +16,11 @@ describe("FundraiserStrip — the pledge goal in the countdown card's grammar", 
     )
     expect(screen.getByText("Pledge goal")).toBeInTheDocument()
     expect(screen.getByText("£250")).toBeInTheDocument()
-    expect(screen.getByText("of £1,000 for Ocean Trust")).toBeInTheDocument()
+    expect(screen.getByText("for Ocean Trust")).toBeInTheDocument()
+    expect(screen.getByText("of")).toBeInTheDocument()
+    expect(screen.getByText("£1,000")).toBeInTheDocument()
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument()
-    expect(screen.queryByText(/Goal reached/)).not.toBeInTheDocument()
+    expect(screen.getByText("£1,000").className).not.toContain("text-success")
     expect(screen.queryByRole("heading")).not.toBeInTheDocument()
   })
 
@@ -33,7 +35,8 @@ describe("FundraiserStrip — the pledge goal in the countdown card's grammar", 
         }}
       />
     )
-    expect(screen.getByText(/Goal reached/)).toBeInTheDocument()
+    // The goal's figure turns success once reached; no separate line.
+    expect(screen.getByText("£1,000").className).toContain("text-success")
   })
 
   it("no goal: 'Raised so far' and the figure alone", () => {
@@ -54,7 +57,7 @@ describe("FundraiserStrip — the pledge goal in the countdown card's grammar", 
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument()
   })
 
-  it("closed: the final figure as 'raised', no goal, no bar, no shout", () => {
+  it("closed: the final figure as 'raised', the goal still beside it, no bar", () => {
     render(
       <FundraiserStrip
         fundraiser={{
@@ -68,8 +71,7 @@ describe("FundraiserStrip — the pledge goal in the countdown card's grammar", 
     expect(screen.getByText("Poll closed")).toBeInTheDocument()
     expect(screen.getByText("£1,200")).toBeInTheDocument()
     expect(screen.getByText("raised for A & B")).toBeInTheDocument()
-    expect(screen.queryByText("of £1,000")).not.toBeInTheDocument()
+    expect(screen.getByText("£1,000")).toBeInTheDocument()
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument()
-    expect(screen.queryByText(/Goal reached/)).not.toBeInTheDocument()
   })
 })

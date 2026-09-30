@@ -14,6 +14,7 @@ import { CauseHero } from "@/components/cause-hero"
 import { PollSection } from "@/components/poll-section"
 import { FundraiserStrip } from "@/components/heroes/fundraiser-slots"
 import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
+import { Ticker } from "@/components/ui/ticker"
 import type {
   Favourite,
   FavpollWithDetails,
@@ -350,13 +351,30 @@ export function FavpollSheet({
             {/* ONE LINE (founder, 2026-09-30): "Rooting for Jane Pound ·
                 Great North Run" — the prefix muted before the name (it is
                 a prefix, so no dot between them), the dot only before the
-                context. Too wide, it WRAPS, never scrolls: a ticker would
-                be the only moving text on a still screen. The dot is glued
-                to the context with a no-break space, so a wrapped second
-                line starts "· Great North Run" rather than leaving the dot
-                dangling. leading-none keeps one line inside the organiser
-                row's block; two lines run 4px over. */}
-            <div className="min-w-0 text-xl leading-none font-medium text-foreground">
+                context. Too wide, it runs as a TICKER (founder: "a ticker
+                is still the best option, wrapping is worse") — see
+                ui/ticker: still when it fits, a slow loop when it does
+                not, truncated under reduced motion. The trailing copy
+                renders the name as a span so the page keeps one h1. */}
+            <Ticker
+              className="text-xl leading-none font-medium text-foreground"
+              shadow={
+                <>
+                  {personPrefix && (
+                    <span className="font-normal text-muted-foreground">
+                      {personPrefix}{" "}
+                    </span>
+                  )}
+                  <span>{personName}</span>
+                  {personContext && (
+                    <span className="font-normal text-muted-foreground">
+                      {" "}
+                      ·&nbsp;{personContext}
+                    </span>
+                  )}
+                </>
+              }
+            >
               {personPrefix && (
                 <span className="font-normal text-muted-foreground">
                   {personPrefix}{" "}
@@ -369,7 +387,7 @@ export function FavpollSheet({
                   ·&nbsp;{personContext}
                 </span>
               )}
-            </div>
+            </Ticker>
             {personPhoto ? (
               <ProtagonistAvatar
                 name={personName}
