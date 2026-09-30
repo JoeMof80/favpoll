@@ -15,7 +15,11 @@ import type { WallEntry } from "@/components/guest-book"
 import { ManageClient, type ManageFavpoll } from "./manage-client"
 import { favpollLocks, readLockInputs, lockReason } from "@/lib/favpoll-locks"
 import { consentPosture } from "@/lib/charity-consent"
-import type { Charity } from "@favpoll/types"
+import type { Charity, Favourite } from "@favpoll/types"
+import { fetchAllRows } from "@/lib/supabase/paginate"
+import { pollStandings } from "@/lib/poll-standings"
+import { deriveRankHistory } from "@/lib/rank-history"
+import { pledgeTimeline } from "@/components/manage/pledges-over-time"
 
 export const metadata = {
   title: "Manage favpoll — favpoll",
@@ -181,6 +185,66 @@ export default async function ManageFavpollPage({
     if (own && !pickerCharities.some((c) => c.id === own.id))
       pickerCharities.push(own)
   }
+  // THE DASHBOARD (founder, 2026-09-30): the story of the poll for the
+  // organiser — the standings with this poll's numbers, the rank
+  // history (the favpoll page draws it for closed polls only, since
+  // guests' standings are gated; the organiser is entitled throughout),
+  // and the running total by day. One chronological, paginated pass
+  // over the pledges feeds the last two.
+  type HistoryRow = {
+    created_at: string
+    total_amount: number | null
+    pledge_allocations: {
+      amount: number | null
+      favourite_id: string
+      favourites: { label: string } | null
+    }[]
+  }
+  const [standings, historyRows] = pollId
+    ? await Promise.all([
+        pollStandings(supabase, pollId),
+        fetchAllRows<{
+          created_at: string
+          total_amount: number | null
+          pledge_allocations: unknown
+        }>((from, to) =>
+          supabase
+            .from("pledges")
+            .select(
+              `created_at, total_amount,
+               pledge_allocations ( amount, favourite_id, favourites ( label ) )`
+            )
+            .eq("favpoll_poll_id", pollId)
+            .is("withdrawn_at", null)
+            .order("created_at", { ascending: true })
+            .range(from, to)
+        ),
+      ])
+    : [
+        {
+          totals: new Map<string, number>(),
+          counts: new Map<string, number>(),
+        },
+        [],
+      ]
+  // The client's fallback types say the to-one embed is an array; it is
+  // an object at runtime (the favpoll page's own cast).
+  const history = historyRows as unknown as HistoryRow[]
+  const RANK_HISTORY_MIN_PLEDGES = 8
+  let rankHistory = null
+  if (history.length >= RANK_HISTORY_MIN_PLEDGES) {
+    const labels: Record<string, string> = {}
+    const events = history.map((r) => ({
+      createdAt: r.created_at,
+      allocations: (r.pledge_allocations ?? []).map((a) => {
+        labels[a.favourite_id] = a.favourites?.label ?? a.favourite_id
+        return { favouriteId: a.favourite_id, amount: a.amount ?? 0 }
+      }),
+    }))
+    rankHistory = deriveRankHistory(events, labels)
+  }
+  const timeline = pledgeTimeline(history)
+
   const appealName = ev.appeals?.name ?? null
   const charityLockReason = appealName
     ? `Locked — part of ${appealName}.`
@@ -214,6 +278,27 @@ export default async function ManageFavpollPage({
     topicLockReason,
   }
 
+  // The standings list's items: this poll's favourites with this poll's
+  // numbers (lib/poll-standings' field reuse), pledged ones only.
+  const standingItems: Favourite[] = favpoll.favourites
+    .filter((f) => (standings.counts.get(f.id) ?? 0) > 0)
+    .map((f) => ({
+      id: f.id,
+      topic_id: "",
+      label: f.label,
+      all_time_pledged: standings.totals.get(f.id) ?? 0,
+      all_time_count: standings.counts.get(f.id) ?? 0,
+      is_canonical: !f.isGuestAdded,
+      source: f.isGuestAdded ? "guest" : "organiser",
+      markets: [],
+      favpoll_count: 0,
+      total_pledge_count: 0,
+      created_at: "",
+      favpoll_poll_item_id: f.rowId,
+      is_hidden: f.isHidden,
+      is_guest_added: f.isGuestAdded,
+    }))
+
   const palette = paletteForFavpoll({
     category: (favpoll.category ?? null) as FavpollCategory | null,
     subject: (favpoll.subject ?? undefined) as FavpollSubject | undefined,
@@ -231,6 +316,7 @@ export default async function ManageFavpollPage({
           wallEntries={wallEntries}
           pickerCharities={pickerCharities}
           consentGatingActive={consentPosture() === "consent-first"}
+          dashboard={{ standingItems, rankHistory, timeline }}
         />
       </main>
     </RegisterScope>

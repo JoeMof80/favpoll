@@ -11,6 +11,7 @@ import {
   ExternalLink,
   BookOpen,
   Gift,
+  LayoutDashboard,
   Shapes,
   UserRound,
   Users,
@@ -47,6 +48,16 @@ import {
   EditableTextRow,
 } from "@/components/manage/editable-row"
 import { updateStoryField, type StoryField } from "./actions"
+import { BumpChart } from "@/components/bump-chart"
+import { RankingList } from "@/components/ranking-list"
+import { Countdown } from "@/components/countdown"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import {
+  PledgesOverTime,
+  type TimelinePoint,
+} from "@/components/manage/pledges-over-time"
+import type { RankHistory } from "@/lib/rank-history"
+import type { Favourite } from "@favpoll/types"
 import { PhotoRow } from "@/components/manage/photo-row"
 import { CharityRows } from "@/components/manage/charity-rows"
 import {
@@ -127,8 +138,9 @@ const formatLongDate = (iso: string) =>
 const SECTIONS: ManageSection[] = [
   // The wizard's own glyphs for the steps it shares (wizard-step-rail
   // STEP_ICONS): a person, a book, an assortment, a gift, settings.
-  // No Money section (founder, 2026-09-30): the goal and the ledger
-  // live on Settings, in the wizard's order.
+  // The dashboard leads (founder, 2026-09-30); the goal lives on
+  // Settings in the wizard's order.
+  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "header", label: "Header", icon: UserRound },
   { id: "story", label: "Story", icon: BookOpen },
   { id: "favourites", label: "Favourites", icon: Shapes },
@@ -142,12 +154,20 @@ export function ManageClient({
   wallEntries,
   pickerCharities,
   consentGatingActive = false,
+  dashboard: dash,
 }: {
   favpoll: ManageFavpoll
   wallEntries: WallEntry[]
   /** The charity picker's list: active charities plus this favpoll's own. */
   pickerCharities: Charity[]
   consentGatingActive?: boolean
+  /** The dashboard's data: standings with this poll's numbers, the rank
+   *  history (null under the minimum), the running total by day. */
+  dashboard: {
+    standingItems: Favourite[]
+    rankHistory: RankHistory | null
+    timeline: TimelinePoint[]
+  }
 }) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -374,6 +394,140 @@ export function ManageClient({
 
   // ── The sections ──────────────────────────────────────────────────
 
+  // THE DASHBOARD (founder, 2026-09-30: "a Dashboard that shows Raised
+  // so far, Pledges, Shared Pot… and other dataviz"): the one section
+  // that is a reading surface, so the one allowed cards and charts — a
+  // stat row, the standings, the running total by day, the story of
+  // the poll, and the latest of the guest book with the section a tap
+  // away (it previews the book; the book stays its own section).
+  const card = "rounded-xl border border-border bg-background p-5"
+  const stat = (label: string, body: React.ReactNode) => (
+    <div className={card}>
+      <SectionEyebrow variant="muted" className="font-semibold">
+        {label}
+      </SectionEyebrow>
+      <div className="mt-2">{body}</div>
+    </div>
+  )
+  const dashboard = (
+    <div className="flex flex-col gap-6 py-6">
+      <div className="grid gap-4 sm:grid-cols-2">
+        {stat(
+          "Raised",
+          <>
+            <p className="text-2xl font-medium text-foreground tabular-nums">
+              {formatAmount(favpoll.total_raised)}
+              {favpoll.goal_amount ? (
+                <span className="text-sm font-normal text-muted-foreground">
+                  {" "}
+                  of {formatAmount(favpoll.goal_amount)}
+                </span>
+              ) : null}
+            </p>
+            {favpoll.goal_amount ? (
+              <div
+                className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted"
+                role="progressbar"
+                aria-label="Progress towards the pledge goal"
+                aria-valuemin={0}
+                aria-valuemax={favpoll.goal_amount}
+                aria-valuenow={Math.min(
+                  favpoll.total_raised,
+                  favpoll.goal_amount
+                )}
+              >
+                <div
+                  className="h-full rounded-full bg-primary"
+                  style={{
+                    width: `${Math.min(100, (favpoll.total_raised / favpoll.goal_amount) * 100)}%`,
+                  }}
+                />
+              </div>
+            ) : null}
+          </>
+        )}
+        {stat(
+          "Pledges",
+          <p className="text-2xl font-medium text-foreground tabular-nums">
+            {favpoll.pledge_count}
+          </p>
+        )}
+        {stat(
+          "Shared pot",
+          favpoll.pot && favpoll.pot.total_deposited > 0 ? (
+            <p className="text-2xl font-medium text-foreground tabular-nums">
+              {formatAmount(favpoll.pot.total_deposited)}
+              <span className="text-sm font-normal text-muted-foreground">
+                {" "}
+                · {formatAmount(favpoll.pot.total_allocated)} used
+              </span>
+            </p>
+          ) : (
+            <p className="text-2xl font-medium text-muted-foreground">Empty</p>
+          )
+        )}
+        <div className={card}>
+          {isClosed ? (
+            <>
+              <SectionEyebrow variant="muted" className="font-semibold">
+                Poll closed
+              </SectionEyebrow>
+              <p className="mt-2 text-2xl font-medium text-foreground">
+                {closesLabel}
+              </p>
+            </>
+          ) : (
+            <Countdown closesAt={favpoll.closes_at} size="sm" />
+          )}
+        </div>
+      </div>
+
+      <div className={card}>
+        <SectionEyebrow variant="muted" className="mb-4 font-semibold">
+          Standings
+        </SectionEyebrow>
+        {dash.standingItems.length > 0 && favpoll.poll ? (
+          <RankingList
+            initialItems={dash.standingItems}
+            favpollPollId={favpoll.poll.id}
+            topicId=""
+          />
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            Standings appear here as guests pledge.
+          </p>
+        )}
+      </div>
+
+      {dash.timeline.length > 0 && (
+        <div className={card}>
+          <PledgesOverTime points={dash.timeline} />
+        </div>
+      )}
+
+      {dash.rankHistory && (
+        <div className={card}>
+          <BumpChart history={dash.rankHistory} />
+        </div>
+      )}
+
+      <div>
+        <GuestBook
+          entries={wallEntries.slice(0, 6)}
+          teaseBacked={false}
+          count={wallEntries.length}
+        />
+        {wallEntries.length > 6 && (
+          <Button asChild variant="ghost" size="sm" className="mt-2">
+            <Link href={sectionHref("guestbook")}>
+              All {favpoll.pledge_count} pledges
+            </Link>
+          </Button>
+        )}
+      </div>
+    </div>
+  )
+
   // The wall draws its own card, eyebrow and all.
   const guestbook = <GuestBook entries={wallEntries} teaseBacked={false} />
 
@@ -561,76 +715,11 @@ export function ManageClient({
           </SettingsRow>
         )}
       </SettingsGroup>
-      <div className="border-t border-border">
-        <SettingsGroup>
-          <SettingsRow
-            label={favpoll.goal_amount ? "Raised so far" : "Raised"}
-            description={
-              favpoll.goal_amount
-                ? `Towards a ${formatAmount(favpoll.goal_amount)} goal.`
-                : "Pledges and the shared pot together."
-            }
-            stacked={!!favpoll.goal_amount}
-          >
-            {favpoll.goal_amount ? (
-              <div className="grid gap-2">
-                <p className="text-lg font-medium text-foreground tabular-nums">
-                  {formatAmount(favpoll.total_raised)}
-                  <span className="text-sm font-normal text-muted-foreground">
-                    {" "}
-                    of {formatAmount(favpoll.goal_amount)}
-                  </span>
-                </p>
-                <div
-                  className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
-                  role="progressbar"
-                  aria-label="Progress towards the pledge goal"
-                  aria-valuemin={0}
-                  aria-valuemax={favpoll.goal_amount}
-                  aria-valuenow={Math.min(
-                    favpoll.total_raised,
-                    favpoll.goal_amount
-                  )}
-                >
-                  <div
-                    className="h-full rounded-full bg-primary transition-[width] duration-700 ease-out"
-                    style={{
-                      width: `${Math.min(100, (favpoll.total_raised / favpoll.goal_amount) * 100)}%`,
-                    }}
-                  />
-                </div>
-              </div>
-            ) : (
-              <span className="text-lg font-medium tabular-nums">
-                {formatAmount(favpoll.total_raised)}
-              </span>
-            )}
-          </SettingsRow>
-          <SettingsRow label="Pledges">
-            <span className="tabular-nums">{favpoll.pledge_count}</span>
-          </SettingsRow>
-          <SettingsRow
-            label="Shared pot"
-            description="Given without a favourite, spent on the standings."
-          >
-            {favpoll.pot && favpoll.pot.total_deposited > 0 ? (
-              <span className="tabular-nums">
-                {formatAmount(favpoll.pot.total_deposited)}
-                <span className="text-muted-foreground">
-                  {" "}
-                  · {formatAmount(favpoll.pot.total_allocated)} used
-                </span>
-              </span>
-            ) : (
-              <span className="text-muted-foreground">Empty</span>
-            )}
-          </SettingsRow>
-        </SettingsGroup>
-      </div>
     </div>
   )
 
   const content: Record<string, React.ReactNode> = {
+    dashboard,
     header,
     story,
     favourites,
@@ -638,7 +727,7 @@ export function ManageClient({
     guestbook,
     settings,
   }
-  const activeDesktop = section ?? "header"
+  const activeDesktop = section ?? "dashboard"
   const sectionLabel = sections.find((s) => s.id === section)?.label
 
   return (
@@ -847,7 +936,7 @@ export function ManageClient({
                   <div className="mt-6 min-w-0 md:hidden">
                     <SectionList sections={sections} href={sectionHref} />
                   </div>
-                  <div className="hidden min-w-0 md:block">{header}</div>
+                  <div className="hidden min-w-0 md:block">{dashboard}</div>
                 </>
               )}
             </div>

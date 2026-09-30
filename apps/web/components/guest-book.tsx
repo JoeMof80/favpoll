@@ -259,9 +259,9 @@ export function GuestBook({
    *  so it stays in view as a long book scrolls beneath — one sticky
    *  group, no measuring of what sits above. Divided like the rail. */
   pinned?: React.ReactNode
-  /** "button" only: the count on the label when the entries themselves
-   *  are withheld pre-pledge — the number is the social proof the
-   *  skeleton rows used to be. Defaults to the entries given. */
+  /** The whole book's count when the entries given are fewer: the
+   *  button's label pre-pledge (entries withheld), the card's eyebrow
+   *  when it previews the latest. Defaults to the entries given. */
   count?: number
 }) {
   const reduced = useReducedMotion()
@@ -274,10 +274,11 @@ export function GuestBook({
     : undefined
   const animated = animate && !reduced
 
+  // The eyebrow's count is the whole book's, even when the card shows
+  // only its latest (the manage dashboard's preview).
+  const total = count ?? entries.length
   const countLabel =
-    entries.length > 0
-      ? ` · ${entries.length} ${entries.length === 1 ? "pledge" : "pledges"}`
-      : ""
+    total > 0 ? ` · ${total} ${total === 1 ? "pledge" : "pledges"}` : ""
 
   // "card" and "flat" are both panels — the live display's "border" is
   // not. A panel that opens the DIALOG is a single tap target (like the
