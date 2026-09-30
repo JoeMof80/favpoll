@@ -13,6 +13,7 @@ import { FavpollHero } from "@/components/favpoll-hero"
 import { CauseHero } from "@/components/cause-hero"
 import { PollSection } from "@/components/poll-section"
 import { FundraiserStrip } from "@/components/heroes/fundraiser-slots"
+import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
 import type {
   Favourite,
   FavpollWithDetails,
@@ -144,6 +145,18 @@ export function FavpollSheet({
           isClosed,
         }
       : undefined
+
+  // The person (or cause) as the rail's organiser row has them: name,
+  // one quiet line, a small photo. Read for the fundraiser dial's row.
+  const personName = isCause
+    ? (favpoll.cause_label ?? "")
+    : (favpoll.protagonists?.name ?? "")
+  const personContext = isCause
+    ? (favpoll.context ?? null)
+    : (favpoll.protagonists?.context ?? null)
+  const personPhoto = isCause
+    ? (favpoll.photo_url ?? null)
+    : (favpoll.protagonists?.photo_url ?? null)
 
   // THE ROOM'S STANDING: the standings show, the reveal is withheld —
   // entitled to the list, never to the note — until the finale, when the
@@ -278,25 +291,46 @@ export function FavpollSheet({
       {/* The expanded rail halves the sheet, so the hero takes its
           compact sizes (founder, 2026-09-29: the context "breaks" when
           the guest book is expanded). */}
-      {/* THE FUNDRAISER DIAL (room only; founder, 2026-09-30): the pledge
-          goal ABOVE the person, both turned down a size. The strip takes
-          the band's top padding; the band below runs small. */}
-      {heroFundraiser && (
-        <div className="pt-6 md:pt-16">
-          <FundraiserStrip
-            fundraiser={heroFundraiser}
-            compact={guestBookExpanded}
-            size="sm"
-          />
+      {/* THE FUNDRAISER DIAL (room only; founder, 2026-09-30, settled over
+          four cuts): no hero band at all. The pledge goal first, in the
+          countdown card's grammar, then the person as a row in the
+          organiser block's grammar — the rail's pinned pair, mirrored
+          on the left. No About: the room is not reading. Tribute keeps
+          the full hero. */}
+      {heroFundraiser ? (
+        // md:pt-[72px], not the band's pt-16: the rail's pinned countdown
+        // eyebrow sits at y=72 in the room, and this strip's eyebrow is
+        // its mirror (measured 64 vs 72 at pt-16).
+        <div className="mb-6 pt-6 md:pt-[72px]">
+          <FundraiserStrip fundraiser={heroFundraiser} />
+          <div className="mt-5 flex items-center gap-3 border-t border-border pt-5">
+            {personPhoto ? (
+              <ProtagonistAvatar
+                name={personName}
+                photoUrl={personPhoto}
+                className="h-8 w-8 rounded border-0 md:h-8 md:w-8"
+              />
+            ) : (
+              <div className="flex size-8 shrink-0 items-center justify-center rounded bg-primary/10 text-xs font-medium text-primary">
+                {personName.charAt(0).toUpperCase()}
+              </div>
+            )}
+            <div className="min-w-0">
+              <h1 className="truncate text-sm font-medium text-foreground">
+                {personName}
+              </h1>
+              {personContext && (
+                <p className="text-xs text-muted-foreground">{personContext}</p>
+              )}
+            </div>
+          </div>
         </div>
-      )}
-      {isCause ? (
+      ) : isCause ? (
         <CauseHero
           favpoll={favpoll}
           mentions={aboutMentions}
           compact={guestBookExpanded}
           animate={!room}
-          size={heroFundraiser ? "sm" : "default"}
         />
       ) : (
         <FavpollHero
@@ -305,7 +339,6 @@ export function FavpollSheet({
           mentions={aboutMentions}
           compact={guestBookExpanded}
           animate={!room}
-          size={heroFundraiser ? "sm" : "default"}
         />
       )}
 

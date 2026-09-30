@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest"
 import { render, screen } from "@testing-library/react"
 import { FundraiserStrip } from "@/components/heroes/fundraiser-slots"
 
-describe("FundraiserStrip — the money beneath the person's band", () => {
-  it("with a goal: eyebrow, figure and 'of £goal' on one line, the bar; no heading of its own", () => {
+describe("FundraiserStrip — the pledge goal in the countdown card's grammar", () => {
+  it("with a goal: eyebrow, figure, 'of £goal' at its baseline, the bar", () => {
     render(
       <FundraiserStrip
         fundraiser={{ totalRaised: 250, goalAmount: 1000, isClosed: false }}
@@ -20,7 +20,7 @@ describe("FundraiserStrip — the money beneath the person's band", () => {
     expect(screen.queryByRole("heading")).not.toBeInTheDocument()
   })
 
-  it("goal reached: the line at the eyebrow's right edge", () => {
+  it("goal reached: the line beside the figure", () => {
     render(
       <FundraiserStrip
         fundraiser={{ totalRaised: 1200, goalAmount: 1000, isClosed: false }}
@@ -41,7 +41,7 @@ describe("FundraiserStrip — the money beneath the person's band", () => {
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument()
   })
 
-  it("closed: the final figure, no goal, no bar, no goal-reached shout", () => {
+  it("closed: the final figure as 'raised', no goal, no bar, no shout", () => {
     render(
       <FundraiserStrip
         fundraiser={{ totalRaised: 1200, goalAmount: 1000, isClosed: true }}
@@ -49,6 +49,7 @@ describe("FundraiserStrip — the money beneath the person's band", () => {
     )
     expect(screen.getByText("Poll closed")).toBeInTheDocument()
     expect(screen.getByText("£1,200")).toBeInTheDocument()
+    expect(screen.getByText("raised")).toBeInTheDocument()
     expect(screen.queryByText("of £1,000")).not.toBeInTheDocument()
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument()
     expect(screen.queryByText(/Goal reached/)).not.toBeInTheDocument()

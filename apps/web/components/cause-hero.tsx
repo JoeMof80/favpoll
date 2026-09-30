@@ -18,8 +18,6 @@ type Props = {
   compact?: boolean
   /** Off for the screen in the room: a static band (HeroLayout). */
   animate?: boolean
-  /** "sm": type and avatar turned down (HeroLayout `size`). */
-  size?: "default" | "sm"
 }
 
 // Hero for subject='cause' — no protagonist row, so the optional image and
@@ -28,13 +26,7 @@ type Props = {
 // padding, sticky header, and scroll-shrink behaviour can never drift
 // between the two (they did: this component used to hand-roll its layout
 // and sat ~72px higher than person pages, found 2026-07-13).
-export function CauseHero({
-  favpoll,
-  mentions,
-  compact,
-  animate,
-  size,
-}: Props) {
+export function CauseHero({ favpoll, mentions, compact, animate }: Props) {
   const headline = getFavpollHeadline({
     occasionType: favpoll.occasion_type,
     openingLine: favpoll.opening_line,
@@ -56,7 +48,7 @@ export function CauseHero({
     <h1
       // The size transition keeps step with the rail's expand (page-layout,
       // 300ms) so the compact step is one motion, not a jump.
-      className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground transition-[font-size] duration-300 ease-out motion-reduce:transition-none ${size === "sm" ? "text-2xl" : heroNameSizeClass(headline.name, compact)}`}
+      className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground transition-[font-size] duration-300 ease-out motion-reduce:transition-none ${heroNameSizeClass(headline.name, compact)}`}
     >
       {favpoll.cause_label}
     </h1>
@@ -64,7 +56,7 @@ export function CauseHero({
 
   const subtitle = headline.suffix ? (
     <p
-      className={`mt-4 truncate font-normal whitespace-normal text-primary transition-[font-size] duration-300 ease-out motion-reduce:transition-none ${size === "sm" ? "text-lg" : `text-xl ${compact ? "" : "md:text-2xl"}`}`}
+      className={`mt-4 truncate text-xl font-normal whitespace-normal text-primary transition-[font-size] duration-300 ease-out motion-reduce:transition-none ${compact ? "" : "md:text-2xl"}`}
     >
       {headline.suffix}
     </p>
@@ -82,7 +74,7 @@ export function CauseHero({
 
   const about = favpoll.description ? (
     <p
-      className={`text-sm leading-relaxed wrap-break-word text-muted-foreground/80 ${size === "sm" ? "" : "md:text-base"}`}
+      className={`text-sm leading-relaxed wrap-break-word text-muted-foreground/80 md:text-base`}
     >
       <MentionText text={favpoll.description} mentions={mentions} />
     </p>
@@ -96,7 +88,6 @@ export function CauseHero({
       avatar={avatar}
       about={about}
       animate={animate}
-      size={size}
     />
   )
 }

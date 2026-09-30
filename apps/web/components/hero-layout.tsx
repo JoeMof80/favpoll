@@ -15,11 +15,6 @@ type HeroLayoutProps = {
    *  which nobody scrolls (founder, 2026-09-30): the band is ordinary
    *  flow and every slot sits at rest. */
   animate?: boolean
-  /** "sm": the band turned down — the room's fundraiser arrangement puts
-   *  the pledge goal ABOVE the person and wants both smaller (founder,
-   *  2026-09-30). Smaller top padding (the strip above carries the
-   *  page's), a smaller avatar seat; the heroes shrink their type. */
-  size?: "default" | "sm"
 }
 
 // Rebuilt after the #423 revert (founder direction, 2026-07-29). The name
@@ -50,7 +45,6 @@ export function HeroLayout({
   avatar,
   about,
   animate = true,
-  size = "default",
 }: HeroLayoutProps) {
   // THE SCROLL ROOT (2026-09-22): on the favpoll page's desktop app
   // shell the left COLUMN scrolls, not the document, so window scroll
@@ -243,7 +237,7 @@ export function HeroLayout({
         // about now lives INSIDE the band as a third collapsing clip
         // (below), so the band hides poll content at its bottom exactly
         // as the original design did.
-        className={`bg-background pt-6 pb-4 ${size === "sm" ? "md:pt-6" : "md:pt-16"} ${
+        className={`bg-background pt-6 pb-4 md:pt-16 ${
           animate
             ? `md:sticky md:z-30 md:before:absolute md:before:inset-x-0 md:before:-top-14 md:before:h-14 md:before:bg-background ${
                 // The scrollport already starts below the header in shell
@@ -259,9 +253,7 @@ export function HeroLayout({
             than person heroes, whose shrunken avatar outgrows the
             eyebrow+name block (founder: cause ribbon "too high" next to
             a person page, on-device 2026-07-30). */}
-        <div
-          className={`relative flex items-start gap-4 md:gap-6 ${size === "sm" ? "min-h-16 md:min-h-16" : "min-h-18 md:min-h-21"}`}
-        >
+        <div className="relative flex min-h-18 items-start gap-4 md:min-h-21 md:gap-6">
           <div ref={textRef} className="min-w-0 flex-1">
             <div ref={settledRef}>
               {eyebrowText}
@@ -299,7 +291,7 @@ export function HeroLayout({
           </div>
           {avatar && (
             <motion.div
-              className={`shrink-0 ${size === "sm" ? "h-20 w-20 md:h-24 md:w-24" : "h-26 w-26 md:h-33 md:w-33"}`}
+              className="h-26 w-26 shrink-0 md:h-33 md:w-33"
               style={
                 animate && avatarMounted
                   ? { width: avatarSize, height: avatarSize }

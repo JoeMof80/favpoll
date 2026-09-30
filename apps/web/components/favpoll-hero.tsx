@@ -13,8 +13,6 @@ type Props = {
   compact?: boolean
   /** Off for the screen in the room: a static band (HeroLayout). */
   animate?: boolean
-  /** "sm": type and avatar turned down (HeroLayout `size`). */
-  size?: "default" | "sm"
 }
 
 export function FavpollHero({
@@ -25,7 +23,6 @@ export function FavpollHero({
   mentions,
   compact,
   animate,
-  size,
 }: Props) {
   return (
     <BaseFavpollHero
@@ -36,7 +33,6 @@ export function FavpollHero({
       mentions={mentions}
       compact={compact}
       animate={animate}
-      size={size}
     />
   )
 }
