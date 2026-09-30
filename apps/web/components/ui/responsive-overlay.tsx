@@ -43,6 +43,10 @@ type Props = {
    *  list's first and last dividers, for full-bleed list dialogs
    *  (founder, 2026-09-08). Same divide token the rows use. */
   separators?: boolean
+  /** The footer's hairline on its own — for a multi-step dialog whose
+   *  header changes shape per step but whose footer should not
+   *  (founder, 2026-09-30: the pledge dialog). Defaults to `separators`. */
+  footerSeparator?: boolean
   /** Override classes on the header section (e.g. "p-0" when the header slot owns its own padding). */
   headerClassName?: string
   /**
@@ -171,6 +175,7 @@ export function ResponsiveOverlay({
   dataRegister,
   hideCloseButton = false,
   separators = false,
+  footerSeparator = separators,
   headerClassName,
   bodyClassName,
   fullscreenOnMobile = false,
@@ -356,7 +361,7 @@ export function ResponsiveOverlay({
           )}
           {footer && (
             <div
-              className={`shrink-0 px-4 py-3 ${separators ? "border-t border-border" : ""}`}
+              className={`shrink-0 px-4 py-3 ${footerSeparator ? "border-t border-border" : ""}`}
               style={{
                 paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))",
               }}
@@ -408,7 +413,7 @@ export function ResponsiveOverlay({
         )}
         {footer && (
           <div
-            className={`shrink-0 px-5 py-4 ${separators ? "border-t border-border" : ""}`}
+            className={`shrink-0 px-5 py-4 ${footerSeparator ? "border-t border-border" : ""}`}
           >
             {footer}
           </div>
