@@ -7,7 +7,6 @@ import { Countdown } from "@/components/countdown"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { GuestBook, type WallEntry } from "@/components/guest-book"
 import { TrendingUpDown } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { BumpChart } from "@/components/bump-chart"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import type { RankHistory } from "@/lib/rank-history"
@@ -189,27 +188,31 @@ export function FavpollContent({
   // Closed: the state and its date, nothing more (founder, 2026-09-30:
   // the settled figure — zero until settlement — duplicated the
   // footer's live total, and the Keepsake door moved to the … menu).
+  // Closed: the guest book's header grammar — the eyebrow with the
+  // standings-history control at its right edge (the expand icon's
+  // seat) — over the countdown at rest, zeroed, and the date (founder,
+  // 2026-09-30). The settled figure and the Keepsake button are gone:
+  // the footer carries the live total, the … menu the keepsake.
   const stateCardInner = isClosed ? (
-    <div className="space-y-1">
-      <SectionEyebrow variant="muted" className="font-semibold">
-        Poll closed
-      </SectionEyebrow>
-      {closedAt && <p className="text-sm text-muted-foreground">{closedAt}</p>}
-      {/* The story's door, under the closed state (founder, 2026-09-30:
-          "below the poll closed eyebrow") — the … menu keeps it on the
-          phone, where there is no rail. */}
-      {rankHistory && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="mt-1 -ml-2"
-          onClick={() => setStoryOpen(true)}
-        >
-          Standings history
-          <TrendingUpDown data-icon="inline-end" aria-hidden="true" />
-        </Button>
-      )}
+    <div className="space-y-2">
+      <div className="flex items-start justify-between gap-2">
+        <SectionEyebrow variant="muted" className="font-semibold">
+          Poll closed
+        </SectionEyebrow>
+        {rankHistory && (
+          <button
+            type="button"
+            onClick={() => setStoryOpen(true)}
+            aria-label="Standings history"
+            // -m-1 p-1: a 24px target without moving the icon off the eyebrow.
+            className="-m-1 shrink-0 rounded p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            <TrendingUpDown className="size-4" aria-hidden="true" />
+          </button>
+        )}
+      </div>
+      <Countdown ended />
+      {closedAt && <p className="text-xs text-muted-foreground">{closedAt}</p>}
     </div>
   ) : (
     <Countdown closesAt={favpoll.closes_at} />

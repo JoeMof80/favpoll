@@ -32,6 +32,12 @@ type Props = {
    * countdown sits where the hero's dates line sits.
    */
   variant?: "stacked" | "inline" | "subtitle" | "bar"
+  /** The countdown at rest, zeroed and muted: the rail's closed card
+   *  keeps the shape of the open one (founder, 2026-09-30: "mirror the
+   *  shape of the countdown but with something to indicate the
+   *  countdown has ended"). Inline only; no heading — the caller's
+   *  eyebrow says "Poll closed". */
+  ended?: boolean
 }
 
 function getTimeLeft(closesAt: string) {
@@ -50,6 +56,7 @@ export function Countdown({
   closesAt,
   size = "md",
   variant = "inline",
+  ended = false,
 }: Props) {
   const [timeLeft, setTimeLeft] = useState<ReturnType<typeof getTimeLeft>>(null)
 
@@ -64,6 +71,38 @@ export function Countdown({
 
   // The bar has no placeholder: a favpoll without a close has no row.
   if (variant === "bar" && (!closesAt || !timeLeft)) return null
+
+  if (ended) {
+    const valueCls =
+      size === "lg" ? "text-3xl" : size === "md" ? "text-2xl" : "text-xl"
+    const labelCls =
+      size === "lg" ? "text-sm" : size === "md" ? "text-xs" : "text-[10px]"
+    return (
+      <div
+        className="grid items-baseline gap-x-3"
+        style={{ gridTemplateColumns: columns(PLACEHOLDER_PARTS) }}
+        aria-label="The poll has closed"
+      >
+        {PLACEHOLDER_PARTS.map(({ label, half }) => (
+          <span
+            key={label}
+            className={`tabular-nums ${half ? "text-right" : ""}`}
+          >
+            {/* Quieter than muted (founder, 2026-09-30: "mute the 00 00
+                00 00") — the shape stays, the figures step back. */}
+            <span
+              className={`${valueCls} leading-none font-medium text-muted-foreground/50`}
+            >
+              00
+            </span>
+            <span className={`ml-1 ${labelCls} text-muted-foreground/50`}>
+              {label}
+            </span>
+          </span>
+        ))}
+      </div>
+    )
+  }
 
   if (!closesAt) {
     const inlineValueClass =
