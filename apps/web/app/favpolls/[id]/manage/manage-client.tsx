@@ -19,7 +19,7 @@ import {
   Printer,
   Settings2,
   Share2,
-  Sparkles,
+  FileHeart,
   Trash2,
 } from "lucide-react"
 import { BrandedQR } from "@/components/branded-qr"
@@ -163,6 +163,7 @@ export function ManageClient({
   dashboard: {
     standingItems: Favourite[]
     rankHistory: RankHistory | null
+    rankHistoryDates: string[] | null
     timeline: TimelinePoint[]
   }
 }) {
@@ -509,7 +510,10 @@ export function ManageClient({
 
       {dash.rankHistory && (
         <div className={card}>
-          <BumpChart history={dash.rankHistory} />
+          <BumpChart
+            history={dash.rankHistory}
+            axisLabels={dash.rankHistoryDates ?? undefined}
+          />
         </div>
       )}
 
@@ -771,7 +775,7 @@ export function ManageClient({
           {isClosed ? (
             <Button asChild variant="outline">
               <Link href={`/favpolls/${favpoll.id}/keepsake`}>
-                <Sparkles data-icon="inline-start" aria-hidden="true" />
+                <FileHeart data-icon="inline-start" aria-hidden="true" />
                 <span className="sr-only sm:not-sr-only">Keepsake</span>
               </Link>
             </Button>

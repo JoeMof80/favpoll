@@ -1,4 +1,4 @@
-import type { RankHistory } from "@/lib/rank-history"
+import type { RankHistory, RankSeries } from "@/lib/rank-history"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 // Bump chart: rank over time, ordinal only (no amounts). The leader in
@@ -49,7 +49,7 @@ function shortDate(iso: string): string {
 
 export function BumpChart({
   history,
-  title = "The story of the poll",
+  title = "Standings history",
   caption = "Positions only — how each favourite ranked as pledges came in.",
   axisLabels,
   highlightTop,
@@ -81,6 +81,25 @@ export function BumpChart({
   const x = (step: number) =>
     PAD_L + (steps <= 1 ? 0 : (step / (steps - 1)) * plotW)
   const y = (rank: number) => PAD_Y + (rank - 0.5) * ROW_H
+
+  // TIED LABELS (founder, 2026-09-30: "Shoes" over "Scarf"): favourites
+  // that finish on the same rank end on the same row, so their labels
+  // overprinted. Each tie's labels fan out ±13px around the row, in
+  // series order — the lines still meet, the words don't.
+  const LABEL_GAP = 13
+  const tieIndex = new Map<string, number>()
+  const tieSize = new Map<number, number>()
+  for (const s of series) {
+    const r = clamp(s.finalRank)
+    tieIndex.set(s.favouriteId, tieSize.get(r) ?? 0)
+    tieSize.set(r, (tieSize.get(r) ?? 0) + 1)
+  }
+  const labelY = (s: RankSeries) => {
+    const r = clamp(s.finalRank)
+    const n = tieSize.get(r) ?? 1
+    const i = tieIndex.get(s.favouriteId) ?? 0
+    return y(r) + (i - (n - 1) / 2) * LABEL_GAP
+  }
   const axisY = PAD_Y + maxRank * ROW_H + AXIS_H - 6
 
   // Show at most ~5 evenly-spaced date ticks so labels never collide.
@@ -180,7 +199,7 @@ export function BumpChart({
                 {!isMinor && (
                   <text
                     x={x(last.step) + 8}
-                    y={y(clamp(last.rank))}
+                    y={labelY(s)}
                     dominantBaseline="middle"
                     className={
                       isLeader

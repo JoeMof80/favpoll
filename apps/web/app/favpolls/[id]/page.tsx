@@ -421,6 +421,16 @@ export default async function FavpollPage({ params }: Props) {
     }))
     rankHistory = deriveRankHistory(events, labels)
   }
+  // One ISO date per step, in the chart's order (the query is ascending),
+  // for the dated x-axis (founder, 2026-09-30: "add a timeline").
+  const rankHistoryDates = rankHistory
+    ? [...historyRows]
+        .sort(
+          (a, b) =>
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        )
+        .map((r) => r.created_at)
+    : undefined
 
   // Hide poll with unvetted custom topic from non-organisers
   const visiblePoll =
@@ -453,6 +463,7 @@ export default async function FavpollPage({ params }: Props) {
           isClosed={isClosed}
           wallEntries={wallEntries}
           rankHistory={rankHistory}
+          rankHistoryDates={rankHistoryDates}
           clerkUserId={userId}
           isOrganiser={isOrganiser}
           entitled={entitled}

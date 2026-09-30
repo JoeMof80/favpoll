@@ -426,12 +426,16 @@ export function GuestBook({
       >
         {variant === "flat" && pinned ? (
           // The rail's pinned group: the rail's top padding lives here
-          // with a background, so rows scroll under it. Sticky at the
+          // with a background, so rows scroll under it. pt-13, not the
+          // hero's 16: the hero's eyebrow sits 8px into its h-8 box and
+          // the rail's first row adds py-5, so 52 + 20 lands the two
+          // eyebrows on one line (measured 128 = 128, founder
+          // 2026-09-30: "the eyebrows in the two columns should line up"). Sticky at the
           // RAIL's own top (the shell's scroller box; see
           // shell-scroller.tsx — never top-14 inside the shell). The
           // header's pt-4 is the panel's old py-4; its pb-3 the list's
           // old mt-3, so nothing moves at rest.
-          <div className="sticky top-0 z-10 divide-y divide-border bg-background pt-16">
+          <div className="sticky top-0 z-10 divide-y divide-border bg-background pt-13">
             {pinned}
             <div className="flex items-start justify-between gap-2 pt-4 pb-3">
               {header}

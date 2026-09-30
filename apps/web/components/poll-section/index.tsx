@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import type { MentionTarget } from "@/lib/mentions"
 import { protagonistShortName } from "@/lib/display"
 import { RankingList } from "@/components/ranking-list"
@@ -11,7 +12,13 @@ import { TypedNote } from "./typed-note"
 import { Button } from "../ui/button"
 import { buildMechanicSteps } from "@/lib/mechanic-steps"
 import { LockCardContent } from "@/components/lock-card-content"
-import { Check, EllipsisVertical, Share2 } from "lucide-react"
+import {
+  TrendingUpDown,
+  Check,
+  EllipsisVertical,
+  Share2,
+  FileHeart,
+} from "lucide-react"
 import { toast } from "sonner"
 import {
   DropdownMenu,
@@ -88,6 +95,10 @@ type Props = {
   poll: FavpollPollWithItems
   clerkUserId: string | null
   isClosed: boolean
+  /** A closed favpoll with enough pledges: the story-of-the-poll door
+   *  in the … menu on the PHONE (founder, 2026-09-30); on desktop the
+   *  rail's closed card carries it. */
+  onOpenStory?: () => void
   hasPledged: boolean
   pledgeJustConfirmed?: boolean
   protagonistName: string
@@ -140,6 +151,8 @@ export function PollSection({
   initialItems,
   onOpenPledgeDialog,
   pledgesGatedNotice,
+  favpollId,
+  onOpenStory,
 }: Props) {
   const { rankingView, setRankingView } = usePollSection({
     pollId: poll.id,
@@ -218,6 +231,31 @@ export function PollSection({
                   )}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
+                {/* The keepsake's door on a closed favpoll (founder,
+                    2026-09-30: not a button on the rail's state card). */}
+                {onOpenStory && (
+                  <DropdownMenuItem
+                    onSelect={onOpenStory}
+                    className="md:hidden"
+                  >
+                    Standings history
+                    <TrendingUpDown
+                      className="ml-auto size-4"
+                      aria-hidden="true"
+                    />
+                  </DropdownMenuItem>
+                )}
+                {isClosed && (
+                  <DropdownMenuItem asChild>
+                    <Link href={`/favpolls/${favpollId}/keepsake`}>
+                      Keepsake
+                      <FileHeart
+                        className="ml-auto size-4"
+                        aria-hidden="true"
+                      />
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem
                   onSelect={() => {
                     // ShareFavpollButton's convention (founder call,
