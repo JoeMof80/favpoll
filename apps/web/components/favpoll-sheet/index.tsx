@@ -20,10 +20,7 @@ import type {
   FavpollWithDetails,
   FavpollPollWithItems,
 } from "@favpoll/types"
-import {
-  charityNames as joinCharityNames,
-  getFavpollHeadline,
-} from "@/lib/display"
+import { charityNames as joinCharityNames } from "@/lib/display"
 import { PageLayout } from "../page-layout"
 import Link from "next/link"
 import { formatPounds } from "@/lib/i18n"
@@ -165,15 +162,6 @@ export function FavpollSheet({
   const personContext = isCause
     ? (favpoll.context ?? null)
     : (favpoll.protagonists?.context ?? null)
-  // The opening line as the page's headline derives it ("Rooting for",
-  // "In memory of"): a prefix to the name, set muted before it.
-  const personPrefix = getFavpollHeadline({
-    occasionType: favpoll.occasion_type ?? null,
-    openingLine: favpoll.opening_line ?? null,
-    name: personName,
-    dateLabel: personContext,
-    subject: favpoll.subject,
-  }).prefix
   const personPhoto = isCause
     ? (favpoll.photo_url ?? null)
     : (favpoll.protagonists?.photo_url ?? null)
@@ -349,10 +337,10 @@ export function FavpollSheet({
               organiser's (measured 219 vs 222 without it). */}
           <div className="flex min-h-[76px] items-center justify-between gap-3 border-b border-border py-5">
             {/* ONE LINE in the hero's own grammar (founder, 2026-09-30):
-                the opening line as the eyebrow (small caps, muted, its own
-                small size — the countdown's label beside its value), the
-                name in ink, the context in the register's ink after a
-                muted dot: "ROOTING FOR Jane Pound · Great North Run". Too wide, it runs as a TICKER (founder: "a ticker
+                the name in ink, the context in the register's ink after a
+                muted dot — "Jane Pound · Great North Run". The opening
+                line was tried as an inline eyebrow and dropped (founder,
+                2026-10-01: "better without"). Too wide, it runs as a TICKER (founder: "a ticker
                 is still the best option, wrapping is worse") — see
                 ui/ticker: still when it fits, a slow loop when it does
                 not, truncated under reduced motion. The trailing copy
@@ -361,15 +349,6 @@ export function FavpollSheet({
               className="text-xl leading-none font-medium text-foreground"
               shadow={
                 <>
-                  {personPrefix && (
-                    <SectionEyebrow
-                      as="span"
-                      variant="muted"
-                      className="mr-2 align-baseline"
-                    >
-                      {personPrefix}
-                    </SectionEyebrow>
-                  )}
                   <span>{personName}</span>
                   {personContext && (
                     <span className="font-normal text-primary">
@@ -380,15 +359,6 @@ export function FavpollSheet({
                 </>
               }
             >
-              {personPrefix && (
-                <SectionEyebrow
-                  as="span"
-                  variant="muted"
-                  className="mr-2 align-baseline"
-                >
-                  {personPrefix}
-                </SectionEyebrow>
-              )}
               <h1 className="inline">{personName}</h1>
               {personContext && (
                 <span className="font-normal text-primary">
