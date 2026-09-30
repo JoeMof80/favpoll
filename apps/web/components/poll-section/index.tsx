@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import type { MentionTarget } from "@/lib/mentions"
 import { protagonistShortName } from "@/lib/display"
 import { RankingList } from "@/components/ranking-list"
@@ -11,7 +12,7 @@ import { TypedNote } from "./typed-note"
 import { Button } from "../ui/button"
 import { buildMechanicSteps } from "@/lib/mechanic-steps"
 import { LockCardContent } from "@/components/lock-card-content"
-import { Check, EllipsisVertical, Share2 } from "lucide-react"
+import { Check, EllipsisVertical, Share2, Sparkles } from "lucide-react"
 import { toast } from "sonner"
 import {
   DropdownMenu,
@@ -140,6 +141,7 @@ export function PollSection({
   initialItems,
   onOpenPledgeDialog,
   pledgesGatedNotice,
+  favpollId,
 }: Props) {
   const { rankingView, setRankingView } = usePollSection({
     pollId: poll.id,
@@ -218,6 +220,16 @@ export function PollSection({
                   )}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
+                {/* The keepsake's door on a closed favpoll (founder,
+                    2026-09-30: not a button on the rail's state card). */}
+                {isClosed && (
+                  <DropdownMenuItem asChild>
+                    <Link href={`/favpolls/${favpollId}/keepsake`}>
+                      Keepsake
+                      <Sparkles className="ml-auto size-4" aria-hidden="true" />
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem
                   onSelect={() => {
                     // ShareFavpollButton's convention (founder call,

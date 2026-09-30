@@ -3,11 +3,12 @@
 import type { MentionTarget } from "@/lib/mentions"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
 import { Countdown } from "@/components/countdown"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { GuestBook, type WallEntry } from "@/components/guest-book"
+import { ChevronRight } from "lucide-react"
 import { BumpChart } from "@/components/bump-chart"
+import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import type { RankHistory } from "@/lib/rank-history"
 import { FavpollHero } from "@/components/favpoll-hero"
 import { CauseHero } from "@/components/cause-hero"
@@ -24,9 +25,8 @@ import { useFavpollContent } from "./use-favpoll-content"
 import { MobileCharityFooter } from "./mobile-charity-footer"
 import { StickyIdentityBar } from "./sticky-identity-bar"
 import { PageLayout } from "../page-layout"
-import { FileText } from "lucide-react"
 import Link from "next/link"
-import { formatPounds, formatPoundsExact } from "@/lib/i18n"
+import { formatPounds } from "@/lib/i18n"
 import { FavpollListCardCharityCarousel } from "@/components/favpoll-list-card/favpoll-list-card-charity-carousel"
 import { GoalProgress } from "@/components/goal-progress"
 
@@ -84,6 +84,7 @@ export function FavpollContent({
   // that width the guest book's comments become readable. Mobile has no
   // columns to swap, so its own GuestBook keeps the dialog.
   const [guestBookExpanded, setGuestBookExpanded] = useState(false)
+  const [storyOpen, setStoryOpen] = useState(false)
 
   // The Pledge FAB (in FavpollSubheader, a sibling) dispatches this
   // event to open the dialog without prop-drilling through the server
@@ -183,32 +184,21 @@ export function FavpollContent({
   // is applied to the rail copy only.
   // The rail COLUMN carries the horizontal gutter; rows set rhythm only.
   const railChrome = "py-5"
-  const cardChrome = "rounded-lg border border-border bg-card px-5 py-4"
 
+  // Closed: the state and its date, nothing more (founder, 2026-09-30:
+  // the settled figure — zero until settlement — duplicated the
+  // footer's live total, and the Keepsake door moved to the … menu).
   const stateCardInner = isClosed ? (
     <div className="space-y-1">
       <SectionEyebrow variant="muted" className="font-semibold">
         Poll closed
       </SectionEyebrow>
       {closedAt && <p className="text-sm text-muted-foreground">{closedAt}</p>}
-      <p className="text-xl font-medium text-primary">
-        {formatPoundsExact(favpoll.total_raised ?? totalRaised)}
-      </p>
-      <p className="text-xs text-muted-foreground">raised in total</p>
-      {/* Outline at default height, matching the pot card's
-          top-up button (founder, 2026-09-14: "larger too"). */}
-      <Button asChild variant="outline" className="mt-3 flex w-full">
-        <a href={`/favpolls/${favpoll.id}/keepsake`}>
-          <FileText data-icon="inline-start" aria-hidden="true" />
-          Keepsake
-        </a>
-      </Button>
     </div>
   ) : (
     <Countdown closesAt={favpoll.closes_at} />
   )
 
-  const stateCardMobile = <div className={cardChrome}>{stateCardInner}</div>
   const stateCardRail = <div className={railChrome}>{stateCardInner}</div>
 
   // Guest book: always visible in the rail (fills the space), but
@@ -324,10 +314,45 @@ export function FavpollContent({
         </p>
       )}
 
+      {/* THE STORY OF THE POLL as a door (founder, 2026-09-30: "not much
+          use at this scale"): a lines-only teaser under the standings —
+          the topic page's own idiom — opening the full chart at a width
+          where the lanes and labels have room. */}
       {rankHistory && (
-        <div className="mt-8 rounded-lg border border-border bg-card px-5 py-5">
-          <BumpChart history={rankHistory} />
-        </div>
+        <>
+          <button
+            type="button"
+            onClick={() => setStoryOpen(true)}
+            className="group mt-8 flex w-full items-center gap-4 rounded-lg border border-border bg-card px-5 py-4 text-left transition-colors hover:bg-muted/50"
+          >
+            <div className="min-w-0 flex-1">
+              <SectionEyebrow variant="muted" className="font-semibold">
+                The story of the poll
+              </SectionEyebrow>
+              <p className="mt-1 text-xs text-muted-foreground">
+                How each favourite ranked as pledges came in.
+              </p>
+            </div>
+            <div className="w-40 shrink-0">
+              <BumpChart history={rankHistory} compact className="h-12" />
+            </div>
+            <ChevronRight
+              className="size-4 shrink-0 text-muted-foreground"
+              aria-hidden="true"
+            />
+          </button>
+          <ResponsiveOverlay
+            open={storyOpen}
+            onOpenChange={setStoryOpen}
+            title="The story of the poll"
+            dialogClassName="flex flex-col gap-0 overflow-hidden p-0 sm:max-w-4xl"
+            // Taller than the overlay's default: fifteen lanes need it.
+            dialogStyle={{ maxHeight: "min(900px, 90vh)" }}
+            dialogContentClassName="flex-1 overflow-y-auto px-5 pb-5"
+          >
+            <BumpChart history={rankHistory} title="" />
+          </ResponsiveOverlay>
+        </>
       )}
 
       {/* THE MOBILE STACK, below the standings. The countdown lives in
@@ -335,10 +360,7 @@ export function FavpollContent({
           stacks only the guest book button; a closed one keeps its state
           card for the keepsake route back. mt-6, not the sections' 8:
           the book is the standings' tail, not a section of its own. */}
-      <div className="mt-6 space-y-4 md:hidden">
-        {isClosed && stateCardMobile}
-        {guestBookMobile}
-      </div>
+      <div className="mt-6 space-y-4 md:hidden">{guestBookMobile}</div>
 
       <div className="sticky bottom-0 z-10 mt-8 hidden border-t border-border bg-background py-5 md:block">
         {appeal && (
