@@ -19,7 +19,10 @@ import type {
   FavpollWithDetails,
   FavpollPollWithItems,
 } from "@favpoll/types"
-import { charityNames as joinCharityNames } from "@/lib/display"
+import {
+  charityNames as joinCharityNames,
+  getFavpollHeadline,
+} from "@/lib/display"
 import { PageLayout } from "../page-layout"
 import Link from "next/link"
 import { formatPounds } from "@/lib/i18n"
@@ -161,6 +164,15 @@ export function FavpollSheet({
   const personContext = isCause
     ? (favpoll.context ?? null)
     : (favpoll.protagonists?.context ?? null)
+  // The opening line as the page's headline derives it ("Rooting for",
+  // "In memory of"): a prefix to the name, set muted before it.
+  const personPrefix = getFavpollHeadline({
+    occasionType: favpoll.occasion_type ?? null,
+    openingLine: favpoll.opening_line ?? null,
+    name: personName,
+    dateLabel: personContext,
+    subject: favpoll.subject,
+  }).prefix
   const personPhoto = isCause
     ? (favpoll.photo_url ?? null)
     : (favpoll.protagonists?.photo_url ?? null)
@@ -335,18 +347,27 @@ export function FavpollSheet({
               + its hairline), so this row's bottom border meets the
               organiser's (measured 219 vs 222 without it). */}
           <div className="flex min-h-[76px] items-center justify-between gap-3 border-b border-border py-5">
-            {/* leading-none on both lines with a 3px gap = 36px (the name's line box rounds to 21), the
-                organiser row's two-line block, so the rows' bottoms stay
-                level with the larger name (measured 231 vs 222 with the
-                default leading). */}
-            <div className="min-w-0">
-              <h1 className="truncate text-xl leading-none font-medium text-foreground">
-                {personName}
-              </h1>
+            {/* ONE LINE (founder, 2026-09-30): "Rooting for Jane Pound ·
+                Great North Run" — the prefix muted before the name (it is
+                a prefix, so no dot between them), the dot only before the
+                context. Too wide, it WRAPS, never scrolls: a ticker would
+                be the only moving text on a still screen. The dot is glued
+                to the context with a no-break space, so a wrapped second
+                line starts "· Great North Run" rather than leaving the dot
+                dangling. leading-none keeps one line inside the organiser
+                row's block; two lines run 4px over. */}
+            <div className="min-w-0 text-xl leading-none font-medium text-foreground">
+              {personPrefix && (
+                <span className="font-normal text-muted-foreground">
+                  {personPrefix}{" "}
+                </span>
+              )}
+              <h1 className="inline">{personName}</h1>
               {personContext && (
-                <p className="mt-[3px] truncate text-xs leading-none text-muted-foreground">
-                  {personContext}
-                </p>
+                <span className="font-normal text-muted-foreground">
+                  {" "}
+                  ·&nbsp;{personContext}
+                </span>
               )}
             </div>
             {personPhoto ? (
