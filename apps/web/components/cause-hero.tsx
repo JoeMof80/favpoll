@@ -7,10 +7,7 @@ import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
 import { getFavpollHeadline, heroNameSizeClass } from "@/lib/display"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import type { Favpoll } from "@favpoll/types"
-import {
-  fundraiserHeroSlots,
-  type HeroFundraiser,
-} from "./heroes/fundraiser-slots"
+import { FundraiserStrip, type HeroFundraiser } from "./heroes/fundraiser-slots"
 
 type Props = {
   favpoll: Favpoll
@@ -20,8 +17,8 @@ type Props = {
    *  place): the name and context take the phone's sizes, so the
    *  narrowed column keeps them on their lines (founder, 2026-09-29). */
   compact?: boolean
-  /** The presence dial's loud setting (founder, 2026-09-30): the money is
-   *  the heading and the cause a byline. See heroes/fundraiser-slots. */
+  /** The presence dial's loud setting (founder, 2026-09-30): the money
+   *  strip takes the About's place beneath the person's band. See heroes/fundraiser-slots. */
   fundraiser?: HeroFundraiser
   /** Off for the screen in the room: a static band (HeroLayout). */
   animate?: boolean
@@ -40,18 +37,6 @@ export function CauseHero({
   fundraiser,
   animate,
 }: Props) {
-  if (fundraiser) {
-    return (
-      <HeroLayout
-        animate={animate}
-        {...fundraiserHeroSlots({
-          fundraiser,
-          compact,
-        })}
-      />
-    )
-  }
-
   const headline = getFavpollHeadline({
     occasionType: favpoll.occasion_type,
     openingLine: favpoll.opening_line,
@@ -109,7 +94,15 @@ export function CauseHero({
       title={title}
       subtitle={subtitle}
       avatar={avatar}
-      about={about}
+      // The fundraiser dial (room only): the money strip takes the
+      // About's place beneath the band — the person stays the heading.
+      about={
+        fundraiser ? (
+          <FundraiserStrip fundraiser={fundraiser} compact={compact} />
+        ) : (
+          about
+        )
+      }
       animate={animate}
     />
   )

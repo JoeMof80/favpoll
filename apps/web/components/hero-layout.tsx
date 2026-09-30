@@ -10,10 +10,6 @@ type HeroLayoutProps = {
   subtitle?: React.ReactNode
   avatar?: React.ReactNode
   about?: React.ReactNode
-  /** A block at the band's right edge in the avatar's place, at its own
-   *  natural width — the room's fundraiser hero puts the countdown there
-   *  (founder, 2026-09-30). Static only: it never shrinks with scroll. */
-  aside?: React.ReactNode
   /** The band's scroll-linked life — sticky, the avatar settling, the
    *  subtitle sliding under the name. Off for the screen in the room,
    *  which nobody scrolls (founder, 2026-09-30): the band is ordinary
@@ -48,7 +44,6 @@ export function HeroLayout({
   subtitle,
   avatar,
   about,
-  aside,
   animate = true,
 }: HeroLayoutProps) {
   // THE SCROLL ROOT (2026-09-22): on the favpoll page's desktop app
@@ -306,7 +301,6 @@ export function HeroLayout({
               {avatar}
             </motion.div>
           )}
-          {aside && <div className="shrink-0">{aside}</div>}
         </div>
       </div>
 

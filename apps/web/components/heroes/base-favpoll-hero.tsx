@@ -7,7 +7,7 @@ import { getFavpollHeadline, heroNameSizeClass } from "@/lib/display"
 import type { Favpoll, Protagonist } from "@favpoll/types"
 import { MentionText } from "@/components/mention-text"
 import type { MentionTarget } from "@/lib/mentions"
-import { fundraiserHeroSlots, type HeroFundraiser } from "./fundraiser-slots"
+import { FundraiserStrip, type HeroFundraiser } from "./fundraiser-slots"
 
 type BaseFavpollHeroProps = {
   favpoll: Favpoll
@@ -20,8 +20,8 @@ type BaseFavpollHeroProps = {
    *  place): the name and context take the phone's sizes, so the
    *  narrowed column keeps them on their lines (founder, 2026-09-29). */
   compact?: boolean
-  /** The presence dial's loud setting (founder, 2026-09-30): the money is
-   *  the heading and the person a byline. Absent = tribute, the hero as
+  /** The presence dial's loud setting (founder, 2026-09-30): the money
+   *  strip takes the About's place beneath the person's band. Absent = tribute, the hero as
    *  it is. See heroes/fundraiser-slots. */
   fundraiser?: HeroFundraiser
   /** Off for the screen in the room: a static band (HeroLayout). */
@@ -38,18 +38,6 @@ export function BaseFavpollHero({
   fundraiser,
   animate,
 }: BaseFavpollHeroProps) {
-  if (fundraiser) {
-    return (
-      <HeroLayout
-        animate={animate}
-        {...fundraiserHeroSlots({
-          fundraiser,
-          compact,
-        })}
-      />
-    )
-  }
-
   const headline = getFavpollHeadline({
     occasionType: favpoll.occasion_type ?? null,
     name:
@@ -118,7 +106,15 @@ export function BaseFavpollHero({
       title={title}
       subtitle={subtitle}
       avatar={avatar}
-      about={about}
+      // The fundraiser dial (room only): the money strip takes the
+      // About's place beneath the band — the person stays the heading.
+      about={
+        fundraiser ? (
+          <FundraiserStrip fundraiser={fundraiser} compact={compact} />
+        ) : (
+          about
+        )
+      }
       animate={animate}
     />
   )
