@@ -6,12 +6,17 @@ describe("FundraiserStrip — the pledge goal in the countdown card's grammar", 
   it("with a goal: eyebrow, figure, 'of £goal' at its baseline — the bar is the sheet's", () => {
     render(
       <FundraiserStrip
-        fundraiser={{ totalRaised: 250, goalAmount: 1000, isClosed: false }}
+        fundraiser={{
+          totalRaised: 250,
+          goalAmount: 1000,
+          isClosed: false,
+          charityLine: "Ocean Trust",
+        }}
       />
     )
     expect(screen.getByText("Pledge goal")).toBeInTheDocument()
     expect(screen.getByText("£250")).toBeInTheDocument()
-    expect(screen.getByText("of £1,000")).toBeInTheDocument()
+    expect(screen.getByText("of £1,000 for Ocean Trust")).toBeInTheDocument()
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument()
     expect(screen.queryByText(/Goal reached/)).not.toBeInTheDocument()
     expect(screen.queryByRole("heading")).not.toBeInTheDocument()
@@ -20,7 +25,12 @@ describe("FundraiserStrip — the pledge goal in the countdown card's grammar", 
   it("goal reached: the line beside the figure", () => {
     render(
       <FundraiserStrip
-        fundraiser={{ totalRaised: 1200, goalAmount: 1000, isClosed: false }}
+        fundraiser={{
+          totalRaised: 1200,
+          goalAmount: 1000,
+          isClosed: false,
+          charityLine: null,
+        }}
       />
     )
     expect(screen.getByText(/Goal reached/)).toBeInTheDocument()
@@ -29,11 +39,17 @@ describe("FundraiserStrip — the pledge goal in the countdown card's grammar", 
   it("no goal: 'Raised so far' and the figure alone", () => {
     render(
       <FundraiserStrip
-        fundraiser={{ totalRaised: 40, goalAmount: null, isClosed: false }}
+        fundraiser={{
+          totalRaised: 40,
+          goalAmount: null,
+          isClosed: false,
+          charityLine: "Ocean Trust",
+        }}
       />
     )
     expect(screen.getByText("Raised so far")).toBeInTheDocument()
     expect(screen.getByText("£40")).toBeInTheDocument()
+    expect(screen.getByText("for Ocean Trust")).toBeInTheDocument()
     expect(screen.queryByText(/^of £/)).not.toBeInTheDocument()
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument()
   })
@@ -41,12 +57,17 @@ describe("FundraiserStrip — the pledge goal in the countdown card's grammar", 
   it("closed: the final figure as 'raised', no goal, no bar, no shout", () => {
     render(
       <FundraiserStrip
-        fundraiser={{ totalRaised: 1200, goalAmount: 1000, isClosed: true }}
+        fundraiser={{
+          totalRaised: 1200,
+          goalAmount: 1000,
+          isClosed: true,
+          charityLine: "A & B",
+        }}
       />
     )
     expect(screen.getByText("Poll closed")).toBeInTheDocument()
     expect(screen.getByText("£1,200")).toBeInTheDocument()
-    expect(screen.getByText("raised")).toBeInTheDocument()
+    expect(screen.getByText("raised for A & B")).toBeInTheDocument()
     expect(screen.queryByText("of £1,000")).not.toBeInTheDocument()
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument()
     expect(screen.queryByText(/Goal reached/)).not.toBeInTheDocument()

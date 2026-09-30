@@ -135,6 +135,11 @@ export function FavpollSheet({
 
   const isCause = favpoll.subject === "cause"
 
+  // "Marie Curie", "A & B" or "A, B & C" — for the pre-pledge trust line
+  const charityLine = joinCharityNames(
+    favpoll.favpoll_charities.map((ec) => ({ charity: ec.charities }))
+  )
+
   // The fundraiser strip's figures come from the sheet's own data; only
   // the room turns the dial (see heroes/fundraiser-slots).
   const heroFundraiser =
@@ -143,6 +148,7 @@ export function FavpollSheet({
           totalRaised,
           goalAmount: favpoll.goal_amount ?? null,
           isClosed,
+          charityLine: charityLine || null,
         }
       : undefined
 
@@ -175,11 +181,6 @@ export function FavpollSheet({
         year: "numeric",
       })
     : null
-
-  // "Marie Curie", "A & B" or "A, B & C" — for the pre-pledge trust line
-  const charityLine = joinCharityNames(
-    favpoll.favpoll_charities.map((ec) => ({ charity: ec.charities }))
-  )
 
   // The rail's cards, shared with the MOBILE STACK below the standings
   // (founder, 2026-09-18): PageLayout hides the right column below md,
@@ -308,7 +309,7 @@ export function FavpollSheet({
           {/* A 1px slot, the hairline's own height, so the row beneath
               sits where the organiser row sits either way; the bar
               straddles the line rather than pushing the row down. */}
-          <div className="mt-5 flex h-px items-center" aria-hidden="true">
+          <div className="mt-5 flex h-px items-center">
             {heroFundraiser.goalAmount && !isClosed ? (
               <GoalProgress
                 totalRaised={totalRaised}
@@ -316,7 +317,10 @@ export function FavpollSheet({
                 className="h-1"
               />
             ) : (
-              <div className="w-full border-t border-border" />
+              <div
+                className="w-full border-t border-border"
+                aria-hidden="true"
+              />
             )}
           </div>
           {/* The person's row, mirroring the organiser block: the rail's
@@ -435,25 +439,32 @@ export function FavpollSheet({
             </Link>
           </p>
         )}
+        {/* On the room's fundraiser dial the goal card at the top carries
+            the money and names the charity, so the footer is the
+            charity's identity line only — name, number, the verified
+            mark — and says nothing twice (founder, 2026-09-30). A zero
+            amount with no caption is how CharityRow hides its money. */}
         <FavpollListCardCharityCarousel
           charities={favpoll.favpoll_charities.map((ec) => ({
             charity: ec.charities,
           }))}
           size="lg"
           perCharity={
-            favpoll.goal_amount
-              ? totalRaised
-              : totalRaised / Math.max(1, favpoll.favpoll_charities.length)
+            heroFundraiser
+              ? 0
+              : favpoll.goal_amount
+                ? totalRaised
+                : totalRaised / Math.max(1, favpoll.favpoll_charities.length)
           }
           amountCaption={
-            favpoll.goal_amount
+            !heroFundraiser && favpoll.goal_amount
               ? totalRaised >= favpoll.goal_amount
                 ? `${formatPounds(favpoll.goal_amount)} goal reached`
                 : `of the ${formatPounds(favpoll.goal_amount)} goal`
               : undefined
           }
         />
-        {favpoll.goal_amount ? (
+        {!heroFundraiser && favpoll.goal_amount ? (
           <GoalProgress
             totalRaised={totalRaised}
             goalAmount={favpoll.goal_amount}

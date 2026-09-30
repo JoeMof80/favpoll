@@ -14,6 +14,10 @@ export type HeroFundraiser = {
   totalRaised: number
   goalAmount: number | null
   isClosed: boolean
+  /** "Marie Curie", "A & B" or "A, B & C" (lib/display charityNames) —
+   *  the card's label names who the money is for, so the charity footer
+   *  need not say the money twice (founder, 2026-09-30). */
+  charityLine: string | null
 }
 
 export function FundraiserStrip({
@@ -21,7 +25,8 @@ export function FundraiserStrip({
 }: {
   fundraiser: HeroFundraiser
 }) {
-  const { totalRaised, goalAmount, isClosed } = fundraiser
+  const { totalRaised, goalAmount, isClosed, charityLine } = fundraiser
+  const forCharity = charityLine ? ` for ${charityLine}` : ""
   const goalReached = !!goalAmount && totalRaised >= goalAmount
 
   return (
@@ -49,18 +54,20 @@ export function FundraiserStrip({
           >
             {formatPounds(totalRaised)}
           </span>
-          {goalAmount && !isClosed && (
-            <span className="text-xs text-muted-foreground">
-              of {formatPounds(goalAmount)}
-            </span>
-          )}
+          {/* The label: what the figure is against, and who it is for —
+              "of £1,000 for Marie Curie", "for Marie Curie", "raised for
+              Marie Curie" once closed. */}
+          <span className="text-xs text-muted-foreground">
+            {isClosed
+              ? `raised${forCharity}`
+              : goalAmount
+                ? `of ${formatPounds(goalAmount)}${forCharity}`
+                : forCharity.trim()}
+          </span>
           {goalAmount && !isClosed && goalReached && (
             <span className="text-xs font-medium text-success">
               Goal reached — every further pledge still counts
             </span>
-          )}
-          {isClosed && (
-            <span className="text-xs text-muted-foreground">raised</span>
           )}
         </div>
       </div>

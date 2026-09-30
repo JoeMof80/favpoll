@@ -207,6 +207,10 @@ describe("FavpollSheet — the room's fundraiser dial", () => {
       "250"
     )
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Alice")
+    // The card names the charity; the footer says the money no more.
+    expect(screen.getByText("of £1,000 for Ocean Trust")).toBeInTheDocument()
+    expect(screen.queryByText(/of the £1,000 goal/)).not.toBeInTheDocument()
+    expect(screen.getAllByRole("progressbar")).toHaveLength(1)
   })
 
   it("keeps the full hero on the tribute dial", () => {
