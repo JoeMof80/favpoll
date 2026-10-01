@@ -159,15 +159,39 @@ export default async function LiveDisplayPage({ params }: Props) {
     }
   })
 
-  // The standings as the entitled guest sees them: pledged items only,
-  // best first (the page's own rule for an entitled viewer).
-  const items = (standings ? overlayStandings(allItems, standings) : allItems)
-    .filter((item) => item.all_time_count > 0 && !item.is_hidden)
+  // THE ROOM'S STANDINGS (founder, 2026-10-01): the pledged favourites,
+  // best first, as the entitled guest sees them — and then the rest at
+  // ZERO, in catalogue order, as the invitation: on a projector an
+  // unpledged favourite is true information ("nobody has picked Tokyo
+  // yet"), where a grey skeleton would read as a screen still loading.
+  // A finite topic shows its whole set; an open topic's catalogue can
+  // run to hundreds, so it shows the first ROOM_ZERO_ROWS. Hidden items
+  // stay hidden. The rows vanish naturally as pledges arrive.
+  const overlaid = (
+    standings ? overlayStandings(allItems, standings) : allItems
+  ).filter((item) => !item.is_hidden)
+  const pledged = overlaid
+    .filter((item) => item.all_time_count > 0)
     .sort((a, b) => {
       if (b.all_time_pledged !== a.all_time_pledged)
         return b.all_time_pledged - a.all_time_pledged
       return a.label.localeCompare(b.label)
     })
+  const unpledged = overlaid
+    .filter((item) => item.all_time_count === 0)
+    .sort((a, b) => {
+      const da = a.display_order ?? null
+      const db = b.display_order ?? null
+      if (da !== null && db !== null && da !== db) return da - db
+      if (da !== null && db === null) return -1
+      if (da === null && db !== null) return 1
+      return a.label.localeCompare(b.label)
+    })
+  const ROOM_ZERO_ROWS = 8
+  const items = [
+    ...pledged,
+    ...(topicRow?.is_finite ? unpledged : unpledged.slice(0, ROOM_ZERO_ROWS)),
+  ]
 
   const pollWithItems: FavpollPollWithItems | null =
     rawPoll && topicRow
