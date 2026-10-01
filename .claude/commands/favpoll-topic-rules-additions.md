@@ -102,3 +102,74 @@ answer to this topic's question?_ If yes, it belongs — regardless of whether i
 also answers another. The data layer permits duplicate labels across topics by
 design, and the reveal→item linter does not police cross-topic overlap. Nothing
 here is enforced by a checker; it is a curation standard.
+
+## D. The enacted shape (founder's rulings, 2 October 2026)
+
+A favpoll has two shapes. The **memento** shape is the core: guests pick
+their own favourite, pledge, and after pledging see the honoured one's
+own in a personal note. The **provision** (enacted) shape is the second:
+the guests' picks decide something on the night (the cheese board, the
+playlist, the game after lunch), so there is no favourite of the group's
+own and nothing to reveal. Both are pick, pledge, see where it stands;
+they differ in what the pick is for.
+
+1. **The signal is the outcome sentence.** One field, "what do the picks
+   decide?", pre-filled where the pairing row is enacted. Filled, the
+   favpoll is enacted and every rule below follows; empty, it is the
+   memento shape. No toggle; the close dates never carry the shape.
+2. **Two sentence shapes only:** "the winner is …" and "the top N are …".
+   The generator and the field accept nothing else.
+3. **"Vote" stays banned.** "Pick" carries it: "the picked songs will be
+   the playlist for the night".
+4. **No reveal.** The post-pledge note is a shared memory in the
+   organiser's voice about the pick ("Under The Bridge was number one
+   the week of our leaving do"), never the organiser's own favourite.
+5. **Timing.** The picks close before the night, because the result
+   feeds it. Giving may run on to a second date, after which the pledge
+   sheet offers the shared pot only; "shared pot" keeps its name and the
+   copy carries the state ("The board is set. The pot is open until
+   Sunday"). The standings stay up afterwards as the night's record.
+6. **The live display's finale** types the outcome where the note would
+   ("The board: Stilton, Brie, Cheddar, Wensleydale, Red Leicester"),
+   then the standings freeze.
+7. **Never a memorial.** No memorial, tribute, remembrance or pet
+   memorial row is enacted; an outcome sentence at a wake is a wrong note.
+8. **Out of the record.** An enacted favpoll's picks never reach the
+   all-time record at any level, topic or subset: the question drifts to
+   "for tonight" and the outcome invites tactical picking. The shape
+   decides; there is no organiser-facing switch (an admin override on the
+   rule may come later).
+9. **Which rows.** Section D of
+   references/subsets-pairing-revisit-2026-10-01.md is the accepted set:
+   Cheese board, Karaoke song, Party and Classic board game, Roast dinner
+   meat and vegetable, Sunday roast, Christmas classic, Family Christmas
+   film, Christmas number one, Christmas carol at home, Takeaway curry,
+   Classic cocktail at a party. Straddlers (Wedding song before the day,
+   Christmas carol, Wedding flower, Classic board game) carry both
+   readings and the timing or the About decides.
+
+## E. Pairing tests beyond the constituent one (1 October 2026)
+
+The constituent test (★: the topic happens AT the occasion, scored on the
+occasion alone) is necessary and not sufficient. Four more, found by
+revisiting the pairing table with subsets:
+
+- **Memorial.** At a memorial the topic is something the person loved,
+  never something the person was. Pet at a pet memorial fails: the reveal
+  is "a dog" and a different pick reads as disloyalty. Dog breed passes:
+  the reveal is the owner's.
+- **Reveal.** The reveal must be something only the subject could tell
+  you. Team sport to play at a club's own celebration fails: it reveals
+  the club.
+- **Surprise.** The reveal must not be a surprise the occasion itself
+  delivers. Wedding song, Wedding flower and Love poem at the wedding
+  leak the first dance, the bouquet and the reading before the day and
+  are redundant after it; they are anniversary rows.
+- **Room.** The pick must be one the room can make without being asked
+  something it does not want to answer. Funeral song asks guests about
+  their own funeral at a wake; Black tea asks them to pick between
+  varieties they cannot tell apart.
+
+Never let the About rescue a row that fails ("Max converted her from
+cats" would carry Pet): that is the About supplying the link the card
+cannot, the trap the pairing-table note of 23 September warns against.

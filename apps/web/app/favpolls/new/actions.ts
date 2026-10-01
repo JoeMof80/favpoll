@@ -1,6 +1,11 @@
 "use server"
 
 import { auth, currentUser } from "@clerk/nextjs/server"
+import {
+  OUTCOME_INVALID,
+  isOutcomeSentence,
+  normaliseOutcome,
+} from "@/lib/favpoll-fields"
 import { createAdminClient } from "@/lib/supabase/admin"
 import {
   verifyOnMirror,
@@ -34,6 +39,8 @@ type PollInput = {
   subsetId?: string | null
   customTopic: CustomTopic | null
   note: string | null
+  /** The enacted shape's sentence (topic rules §D); null = memento. */
+  outcome?: string | null
   infiniteItems: InfiniteItems | null
   addedItems?: string[]
 }
@@ -171,6 +178,7 @@ async function createPollForFavpoll(
       topic_id: topicId,
       subset_id: subsetId,
       personal_note: poll.note?.trim() || null,
+      outcome: normaliseOutcome(poll.outcome),
     })
     .select("id")
     .single()
@@ -297,6 +305,12 @@ export async function createFavpoll(
     throw new Error("A name is required")
   if (input.subject === "cause" && !input.causeLabel?.trim())
     throw new Error("A cause name is required")
+  // The enacted shape's sentence (topic rules §D): two shapes only, and
+  // refused before anything is written.
+  {
+    const outcome = normaliseOutcome(input.poll.outcome)
+    if (outcome && !isOutcomeSentence(outcome)) throw new Error(OUTCOME_INVALID)
+  }
 
   let protagonistId: string | null = null
   if (input.subject === "someone") {

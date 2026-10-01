@@ -64,6 +64,7 @@ export default async function ManageFavpollPage({
         topic_id,
         subset_id,
         personal_note,
+        outcome,
         topics ( title, is_finite ),
         topic_subsets ( title ),
         pledges ( count ),
@@ -299,6 +300,8 @@ export default async function ManageFavpollPage({
     context: ev.protagonists?.context ?? null,
     about: (isCause ? ev.description : ev.protagonists?.about) ?? null,
     reveal: ev.favpoll_polls?.personal_note ?? null,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- new column, TS types lag migration
+    outcome: ((ev.favpoll_polls as any)?.outcome as string | null) ?? null,
     photoUrl: (isCause ? ev.photo_url : ev.protagonists?.photo_url) ?? null,
     favourites: (ev.favpoll_polls?.favpoll_poll_favourites ?? [])
       .filter((f) => f.favourites)

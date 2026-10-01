@@ -1,6 +1,11 @@
 "use server"
 
 import { auth } from "@clerk/nextjs/server"
+import {
+  OUTCOME_INVALID,
+  isOutcomeSentence,
+  normaliseOutcome,
+} from "@/lib/favpoll-fields"
 import { createAdminClient } from "@/lib/supabase/admin"
 
 // IN-PLACE EDITING on the manage page (founder, 2026-09-29: "this
@@ -19,6 +24,7 @@ export type StoryField =
   | "context"
   | "about"
   | "note"
+  | "outcome"
   | "goal_amount"
   | "photo_url"
 
@@ -32,6 +38,7 @@ const LIMITS: Record<
   context: 40,
   about: 300,
   note: 280,
+  outcome: 80,
 }
 
 async function ownedOpenFavpoll(favpollId: string) {
@@ -127,6 +134,13 @@ export async function updateStoryField(
         : write("protagonists", { about: text })
     case "note":
       return write("favpoll_polls", { personal_note: text || null })
+    case "outcome": {
+      // The enacted shape's sentence (topic rules §D): two shapes only.
+      const outcome = normaliseOutcome(text)
+      if (outcome && !isOutcomeSentence(outcome))
+        throw new Error(OUTCOME_INVALID)
+      return write("favpoll_polls", { outcome })
+    }
   }
 }
 

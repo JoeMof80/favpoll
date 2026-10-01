@@ -102,6 +102,8 @@ export type ManageFavpoll = OrganizerFavpoll & {
   context: string | null
   about: string | null
   reveal: string | null
+  /** The enacted shape's sentence (topic rules §D); null = memento. */
+  outcome: string | null
   photoUrl: string | null
   favourites: ManageFavourite[]
   /** A finite topic takes no organiser additions. */
@@ -606,6 +608,17 @@ export function ManageClient({
           mentions={noteMentions}
           readOnly={isClosed}
           onSave={saveField("note")}
+        />
+        {/* THE ENACTED SHAPE'S ONE FIELD (topic rules §D): filled, the
+            guests' picks decide the night; empty, the memento shape. */}
+        <EditableTextRow
+          label={FIELD_LABELS.outcome}
+          description={FIELD_HINTS.outcome}
+          value={favpoll.outcome ?? ""}
+          maxLength={FIELD_LIMITS.outcome}
+          placeholder="e.g. the top five are the board on the night"
+          readOnly={isClosed}
+          onSave={saveField("outcome")}
         />
       </SettingsGroup>
     </div>

@@ -248,6 +248,11 @@ export type FavpollPoll = {
    *  the list is its items (favpoll-topic-rules §1). */
   subset_id?: string | null;
   personal_note: string | null;
+  /** THE ENACTED SHAPE (topic rules §D): what the guests' picks decide on
+   *  the night — "the top five are the board on the night". Filled, the
+   *  poll is enacted (no note, closes before the night, out of the
+   *  record); null, the memento shape. */
+  outcome?: string | null;
   created_at: string;
 };
 
@@ -389,6 +394,8 @@ export type CanvasPollInput = {
   customTopicTitle: string;
   customTopicItems: string[];
   note: string | null;
+  /** The enacted shape's sentence (topic rules §D); null = memento. */
+  outcome?: string | null;
   infiniteItems: { canonicalItemIds: string[]; customLabels: string[] } | null;
 };
 

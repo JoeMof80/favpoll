@@ -466,6 +466,53 @@ describe("createFavpoll — cause favpoll (subject='cause')", () => {
   })
 })
 
+describe("createFavpoll — the enacted shape's sentence", () => {
+  it("persists a well-shaped outcome on the poll, trimmed, without its full stop", async () => {
+    mock.queue({ id: "user-1" }) // users upsert
+    mock.queue({ id: "protagonist-1" }) // protagonists insert
+    mock.queue({ id: "favpoll-1" }) // favpolls insert
+    mock.queue(null) // favpoll_charities insert
+    mock.queue({ id: "poll-1" }) // favpoll_polls insert
+    mock.queue(null) // favpoll_poll_favourites insert
+    mock.queue(null) // favpoll_pots insert
+
+    await createFavpoll({
+      ...BASE_INPUT,
+      poll: {
+        topicId: "topic-1",
+        customTopic: null,
+        note: null,
+        outcome: "  The top five are the board on the night. ",
+        infiniteItems: null,
+      },
+    })
+
+    const pollInsert = mock
+      .callsFor("favpoll_polls")
+      .find((c) => c.method === "insert")!
+    expect(pollInsert.args[0]).toMatchObject({
+      outcome: "The top five are the board on the night",
+    })
+  })
+
+  it("refuses an outcome outside the two shapes, before anything is written", async () => {
+    mock.queue({ id: "user-1" }) // users upsert
+    await expect(
+      createFavpoll({
+        ...BASE_INPUT,
+        poll: {
+          topicId: "topic-1",
+          customTopic: null,
+          note: null,
+          outcome: "we will play the winner",
+          infiniteItems: null,
+        },
+      })
+    ).rejects.toThrow(/the winner is/)
+    expect(mock.callsFor("favpolls")).toHaveLength(0)
+  })
+})
+
 describe("createFavpoll — fundraiser for a person (subject='someone')", () => {
   it("creates protagonist row and stores subject='someone'", async () => {
     mock.queue({ id: "user-1" }) // users upsert

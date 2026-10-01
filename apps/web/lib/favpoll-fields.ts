@@ -16,6 +16,7 @@ export const FIELD_LIMITS = {
   context: 40,
   about: 300,
   note: 280,
+  outcome: 80,
 } as const
 
 export const FIELD_LABELS = {
@@ -24,6 +25,7 @@ export const FIELD_LABELS = {
   photo: "Photo",
   about: "About",
   note: "Personal note",
+  outcome: "What the picks decide",
   goal: "Pledge goal",
   closeDate: "Close date",
   visibility: "Visibility",
@@ -48,7 +50,35 @@ export const FIELD_HINTS = {
   about:
     "Set the scene, link the topic and the cause. Hint at a note, if there is one.",
   note: "A direct quote, a memory, or a message to guests. Revealed only after a guest pledges.",
+  outcome:
+    'Leave blank unless the guests\' picks decide the night. Then there is no personal note. Two shapes: "the winner is …" or "the top five are …".',
 } as const
+
+// THE ENACTED SHAPE'S SENTENCE (favpoll-topic-rules additions §D, founder
+// 2026-10-02): what the guests' picks decide. Two shapes only — the
+// generator and the field accept nothing else — so the card's promise
+// reads the same on every favpoll that makes one.
+export const OUTCOME_SHAPES = [
+  /^the winner is\s+\S/i,
+  /^the top (\d{1,2}|two|three|four|five|six|seven|eight|nine|ten|twelve|twenty) are\s+\S/i,
+] as const
+
+/** True for an outcome sentence in one of the two shapes. */
+export function isOutcomeSentence(text: string): boolean {
+  const t = text.trim()
+  return OUTCOME_SHAPES.some((re) => re.test(t))
+}
+
+/** The sentence as stored: trimmed, no trailing full stop, null when blank. */
+export function normaliseOutcome(
+  text: string | null | undefined
+): string | null {
+  const t = (text ?? "").trim().replace(/[.\s]+$/, "")
+  return t ? t : null
+}
+
+export const OUTCOME_INVALID =
+  'The outcome must read "the winner is …" or "the top five are …".'
 
 export const GOAL_PRESETS = [100, 250, 500, 1000] as const
 

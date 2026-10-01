@@ -1,9 +1,14 @@
 "use server"
 
 import { auth } from "@clerk/nextjs/server"
+import { lookupEdges } from "@/lib/pairing-table"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { DEFAULT_OCCASION_TYPE } from "@/lib/registers"
-import { generateStory, type StoryCharity } from "@/lib/story-engine"
+import {
+  generateStory,
+  type StoryCharity,
+  storyEdges,
+} from "@/lib/story-engine"
 import type {
   CauseFamily,
   FavpollGrouping,
@@ -131,6 +136,12 @@ export type GenerateDraftInput = {
 export type GeneratedDraftResult = {
   about: string
   note: string
+  /** THE ENACTED SHAPE'S SENTENCE (topic rules §D): what the guests'
+   *  picks decide, when the occasion's pairing row is enacted — "the
+   *  top ten are the playlist for the night". Null for every other row.
+   *  Computed from the pairing table, never from the model, so a cache
+   *  hit carries it too. */
+  outcome: string | null
   /** Cause favpolls only — suggested cause name when none was set. */
   causeLabel?: string | null
   /** Cause favpolls only — suggested context subline. */
@@ -158,25 +169,24 @@ export async function generateDraft(
     const charity = await fetchCharity(supabase, input.primaryCharityId)
     const occasionType = resolveOccasionType(input)
 
-    const story = await generateStory(
-      {
-        register: input.register,
-        subject: input.subject,
-        occasionType,
-        topicTitle,
-        itemLabels,
-        charity,
-        pronoun: input.pronoun,
-        grouping: input.grouping,
-        displayName: input.displayName ?? null,
-      },
-      modelId()
-    )
+    const storyInput = {
+      register: input.register,
+      subject: input.subject,
+      occasionType,
+      topicTitle,
+      itemLabels,
+      charity,
+      pronoun: input.pronoun,
+      grouping: input.grouping,
+      displayName: input.displayName ?? null,
+    }
+    const story = await generateStory(storyInput, modelId())
 
     incrementRateLimitCount(userId)
     return {
       about: story.about,
       note: story.note,
+      outcome: outcomeFor(storyInput),
       causeLabel: story.causeLabel,
       context: story.context,
       fromCache: false,
@@ -208,6 +218,7 @@ export async function generateDraft(
       return {
         about: cached.about,
         note: cached.note,
+        outcome: await outcomeForCached(supabase, input),
         causeLabel: cached.cause_label ?? null,
         context: cached.context ?? null,
         fromCache: true,
@@ -251,22 +262,24 @@ export async function generateDraft(
 
   const charity = await fetchCharity(supabase, input.primaryCharityId)
   const occasionType = resolveOccasionType(input)
+  const storyInput = {
+    register: input.register,
+    subject: input.subject,
+    occasionType,
+    topicTitle,
+    parentTopicTitle: input.subsetId ? (topic.title as string) : null,
+    itemLabels,
+    charity,
+    pronoun: input.pronoun,
+    grouping: input.grouping,
+    displayName: input.displayName ?? null,
+  }
+  // The outcome is the pairing table's, not the model's: computed from
+  // the story input here, and on a cache hit (above) from the topic's
+  // title alone.
+  const outcome = outcomeFor(storyInput)
 
-  const story = await generateStory(
-    {
-      register: input.register,
-      subject: input.subject,
-      occasionType,
-      topicTitle,
-      parentTopicTitle: input.subsetId ? (topic.title as string) : null,
-      itemLabels,
-      charity,
-      pronoun: input.pronoun,
-      grouping: input.grouping,
-      displayName: input.displayName ?? null,
-    },
-    modelId()
-  )
+  const story = await generateStory(storyInput, modelId())
   const { causeLabel, context } = story
 
   // A re-roll never writes: the cache row may already exist (unique
@@ -292,10 +305,58 @@ export async function generateDraft(
   return {
     about: story.about,
     note: story.note,
+    outcome,
     causeLabel,
     context,
     fromCache: false,
   }
+}
+
+/**
+ * The enacted sentence on a CACHE HIT, where no story input exists yet:
+ * the occasion edge needs the topic's title (and its parent's, for a
+ * subset) and nothing of the charity, so one read of the titles is all
+ * it costs. Null when the row is not enacted or the titles cannot be read.
+ */
+async function outcomeForCached(
+  supabase: ReturnType<typeof createAdminClient>,
+  input: GenerateDraftInput
+): Promise<string | null> {
+  if (!input.topicId) return null
+  const { data: topic } = await supabase
+    .from("topics")
+    .select("title")
+    .eq("id", input.topicId)
+    .maybeSingle()
+  const parentTitle = (topic as { title?: string } | null)?.title ?? null
+  if (!parentTitle) return null
+  let topicTitle = parentTitle
+  if (input.subsetId) {
+    const { data: subset } = await supabase
+      .from("topic_subsets")
+      .select("title")
+      .eq("id", input.subsetId)
+      .maybeSingle()
+    const t = (subset as { title?: string } | null)?.title
+    if (t) topicTitle = t
+  }
+  return (
+    lookupEdges({
+      register: input.register,
+      occasionType: resolveOccasionType(input),
+      topicTitle,
+      parentTopicTitle: input.subsetId ? parentTitle : null,
+      charityName: null,
+      causeFamily: null,
+    }).e1?.enacted ?? null
+  )
+}
+
+/** The enacted sentence for this story's occasion and topic, or null. */
+function outcomeFor(
+  storyInput: Parameters<typeof generateStory>[0]
+): string | null {
+  return storyEdges(storyInput).e1?.enacted ?? null
 }
 
 // ---------------------------------------------------------------------------

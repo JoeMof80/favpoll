@@ -210,6 +210,7 @@ describe("generateDraft — cache hit", () => {
       note: "Cached note — Red.",
       causeLabel: null,
       context: null,
+      outcome: null,
       fromCache: true,
     })
     expect(mockMessagesCreate).not.toHaveBeenCalled()

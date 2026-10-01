@@ -65,6 +65,7 @@ export type WizardEditConfig = {
     photoUrl: string | null
     about: string
     note: string
+    outcome?: string | null
     goalAmount: number | undefined
     isListed: boolean
     isPrivate: boolean
@@ -158,6 +159,7 @@ export function useWizardState(
   )
   const [about, setAbout] = useState(init?.about ?? "")
   const [note, setNote] = useState(init?.note ?? "")
+  const [outcome, setOutcome] = useState(init?.outcome ?? "")
   const [who, setWho] = useState<WhoValue | "">(
     init ? whoFor(init.subject, init.grouping, init.pronoun) : ""
   )
@@ -554,6 +556,9 @@ export function useWizardState(
       hasGeneratedRef.current = true
       setAbout(result.about)
       setNote(result.note)
+      // The enacted shape's sentence, where the pairing row is enacted:
+      // pre-filled, never overwriting what the organiser typed.
+      if (result.outcome && !outcome.trim()) setOutcome(result.outcome)
       if (isCause) {
         if (!name.trim() && result.causeLabel) setName(result.causeLabel)
         if (!context.trim() && result.context) setContext(result.context)
@@ -645,6 +650,7 @@ export function useWizardState(
               ? (selected.customLabels ?? [])
               : [],
             note: note || null,
+            outcome: outcome.trim() || null,
             infiniteItems:
               !isCustomTopic && topicMeta && !topicMeta.is_finite
                 ? {
@@ -690,6 +696,7 @@ export function useWizardState(
               }
             : null,
           note: note || null,
+          outcome: outcome.trim() || null,
           infiniteItems:
             !isCustomTopic && topicMeta && !topicMeta.is_finite
               ? {
@@ -772,6 +779,8 @@ export function useWizardState(
     setAbout,
     note,
     setNote,
+    outcome,
+    setOutcome,
     who,
     handleWho,
     goalAmount,

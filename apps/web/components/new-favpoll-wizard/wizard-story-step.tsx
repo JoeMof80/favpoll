@@ -1,6 +1,7 @@
 "use client"
 
 import { InputGroup } from "@/components/ui/input-group"
+import { Input } from "@/components/ui/input"
 import { MentionTextarea } from "@/components/mention-textarea"
 import type { MentionTarget } from "@/lib/mentions"
 import { CharCounter } from "@/components/favpoll-form/edit-helpers"
@@ -95,6 +96,21 @@ export function WizardStoryStep({ w }: { w: WizardState }) {
             <CharCounter value={w.note} max={FIELD_LIMITS.note} />
           </div>
         </InputGroup>
+      </WizardField>
+
+      {/* THE ENACTED SHAPE'S ONE FIELD (topic rules §D, founder 2026-10-02):
+          filled, the guests' picks decide the night and every rule
+          follows; empty, the memento shape. Pre-filled by Generate where
+          the pairing row is enacted; the organiser sees the promise in
+          their own words. Two shapes only, checked on save. */}
+      <WizardField label={FIELD_LABELS.outcome} hint={FIELD_HINTS.outcome}>
+        <Input
+          maxLength={FIELD_LIMITS.outcome}
+          value={w.outcome}
+          placeholder="e.g. the top five are the board on the night"
+          onChange={(e) => w.setOutcome(e.target.value)}
+          aria-label="What the picks decide"
+        />
       </WizardField>
     </div>
   )

@@ -1,6 +1,11 @@
 "use server"
 
 import { auth } from "@clerk/nextjs/server"
+import {
+  OUTCOME_INVALID,
+  isOutcomeSentence,
+  normaliseOutcome,
+} from "@/lib/favpoll-fields"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { favpollLocks, readLockInputs } from "@/lib/favpoll-locks"
 import type { CanvasSubmitData } from "@favpoll/types"
@@ -34,6 +39,7 @@ async function upsertPollForFavpoll(
         topic_id: poll.topicId,
         subset_id: subsetId,
         personal_note: poll.note?.trim() || null,
+        outcome: checkedOutcome(poll.outcome),
       })
       .eq("id", poll.id)
 
@@ -137,6 +143,7 @@ async function upsertPollForFavpoll(
       topic_id: topicId,
       subset_id: newSubsetId,
       personal_note: poll.note?.trim() || null,
+      outcome: checkedOutcome(poll.outcome),
     })
     .select("id")
     .single()
@@ -453,4 +460,11 @@ export async function updateFavpoll(
 
   // Upsert the single favpoll poll
   await upsertPollForFavpoll(supabase, favpollId, userId, input.poll)
+}
+
+/** The enacted shape's sentence, normalised and shape-checked (topic rules §D). */
+function checkedOutcome(text: string | null | undefined): string | null {
+  const outcome = normaliseOutcome(text)
+  if (outcome && !isOutcomeSentence(outcome)) throw new Error(OUTCOME_INVALID)
+  return outcome
 }
