@@ -70,7 +70,13 @@ export function PageLayout({
       // scroll list all line up without each having to agree separately.
       // No top padding here: the rail's pinned group carries it, so rows
       // scroll under the pinned countdown rather than showing above it.
-      "scrollbar-hide hidden min-h-0 flex-col divide-y divide-border overflow-y-auto border-l border-border pr-16 pb-[var(--shell-inset)] pl-8 md:flex"
+      // The book DISSOLVES at the inset line (founder, 2026-10-01): a mask
+      // on the rail's box fades its last --shell-inset pixels, so a long
+      // book ends where the charity footer's row ends and the room still
+      // sees there is more. Scrolled to the end, the padding puts the last
+      // entry exactly on the line, fully opaque. The pinned rows at the
+      // top are untouched — the mask is a gradient at the bottom only.
+      "scrollbar-hide hidden min-h-0 flex-col divide-y divide-border overflow-y-auto border-l border-border pr-16 pb-[var(--shell-inset)] pl-8 [mask-image:linear-gradient(to_bottom,black_calc(100%-var(--shell-inset)),transparent_100%)] md:flex"
     : rightSticky
       ? "sticky top-14 z-10 hidden max-h-[var(--shell-h)] flex-col space-y-4 self-start overflow-y-auto bg-background md:flex md:pt-16"
       : "hidden flex-col space-y-4 self-start md:flex md:pt-16"
