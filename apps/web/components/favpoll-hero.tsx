@@ -11,6 +11,8 @@ type Props = {
   aboutPlaceholder?: string
   mentions?: MentionTarget[]
   compact?: boolean
+  /** Off for the screen in the room: a static band (HeroLayout). */
+  animate?: boolean
 }
 
 export function FavpollHero({
@@ -20,6 +22,7 @@ export function FavpollHero({
   aboutPlaceholder,
   mentions,
   compact,
+  animate,
 }: Props) {
   return (
     <BaseFavpollHero
@@ -29,6 +32,7 @@ export function FavpollHero({
       aboutPlaceholder={aboutPlaceholder}
       mentions={mentions}
       compact={compact}
+      animate={animate}
     />
   )
 }
