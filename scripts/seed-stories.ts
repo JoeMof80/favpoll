@@ -63,6 +63,7 @@ import {
   storyEdges,
   type StoryInput,
 } from "../apps/web/lib/story-engine";
+import { SUBSET_PARENTS } from "../apps/web/lib/pairing-table";
 import {
   revealNamesRealItem,
   hasTics,
@@ -746,7 +747,13 @@ type Candidate = {
   topic: Topic;
   charity: Charity;
   count: number;
+  /** A SUBSET the pairing table names in its own right (SUBSET_PARENTS,
+   *  ticked 2026-10-02): the card carries it, the parent sits behind it
+   *  for the edges, and the poll lists only its members. */
+  subset?: TableSubset;
 };
+
+type TableSubset = { id: string; title: string; memberIds: Set<string> };
 
 // Fine as polls, hopeless as a person's story: nobody has a believable
 // ritual around a smell, a sound, a time of day or the weather, and the
@@ -757,7 +764,11 @@ const NO_PERSON_STORY = new Set(["Smell", "Sound", "Time of day", "Weather"]);
 // the cause: Weather and Landscape never could (founder, 2026-09-24).
 const NO_CAUSE_STORY = new Set([...NO_PERSON_STORY, "Landscape"]);
 
-function enumerate(topics: Topic[], charities: Charity[]): Candidate[] {
+function enumerate(
+  topics: Topic[],
+  charities: Charity[],
+  subsetsByTopic: Map<string, TableSubset[]> = new Map(),
+): Candidate[] {
   const out: Candidate[] = [];
   const all: Register[] = [
     "remembering",
@@ -776,35 +787,47 @@ function enumerate(topics: Topic[], charities: Charity[]): Candidate[] {
       for (const topic of topics) {
         if (register !== "cause" && NO_PERSON_STORY.has(topic.title)) continue;
         if (register === "cause" && NO_CAUSE_STORY.has(topic.title)) continue;
-        for (const charity of charities) {
-          const edges = storyEdges({
-            register,
-            subject: register === "cause" ? "cause" : "someone",
-            occasionType: occasion,
-            topicTitle: topic.title,
-            itemLabels: [],
-            charity: {
-              name: charity.name,
-              description: charity.description,
-              activities: charity.activities,
-              causeFamily: charity.cause_family,
-            },
-          });
-          // The bar: 2+ edges for a person; the charity edge plus a stated
-          // event for a cause (no Honour vertex to score).
-          const ok =
-            register === "cause"
-              ? Boolean(edges.e1 && edges.e2)
-              : edges.count >= 2;
-          if (ok)
-            out.push({
+        // The topic itself, then each subset the table names on it: a
+        // subset is its own candidate, scored by its own rows.
+        const cards: { title: string; subset?: TableSubset }[] = [
+          { title: topic.title },
+          ...(subsetsByTopic.get(topic.id) ?? []).map((subset) => ({
+            title: subset.title,
+            subset,
+          })),
+        ];
+        for (const card of cards)
+          for (const charity of charities) {
+            const edges = storyEdges({
               register,
-              occasion,
-              topic,
-              charity,
-              count: edges.count,
+              subject: register === "cause" ? "cause" : "someone",
+              occasionType: occasion,
+              topicTitle: card.title,
+              parentTopicTitle: card.subset ? topic.title : null,
+              itemLabels: [],
+              charity: {
+                name: charity.name,
+                description: charity.description,
+                activities: charity.activities,
+                causeFamily: charity.cause_family,
+              },
             });
-        }
+            // The bar: 2+ edges for a person; the charity edge plus a stated
+            // event for a cause (no Honour vertex to score).
+            const ok =
+              register === "cause"
+                ? Boolean(edges.e1 && edges.e2)
+                : edges.count >= 2;
+            if (ok)
+              out.push({
+                register,
+                occasion,
+                topic,
+                charity,
+                count: edges.count,
+                ...(card.subset ? { subset: card.subset } : {}),
+              });
+          }
       }
     }
   }
@@ -1075,6 +1098,30 @@ async function seed() {
     (t) => t.favourites.length >= 5,
   );
   const charities = (charitiesData ?? []) as Charity[];
+  // The APPROVED subsets the table names in their own right, by parent.
+  const { data: subsetRows, error: sErr } = await supabase
+    .from("topic_subsets")
+    .select("id, title, topic_id, topic_subset_items(favourite_id)")
+    .eq("status", "approved");
+  if (sErr) throw new Error(sErr.message);
+  const subsetsByTopic = new Map<string, TableSubset[]>();
+  for (const r of (subsetRows ?? []) as {
+    id: string;
+    title: string;
+    topic_id: string;
+    topic_subset_items: { favourite_id: string }[] | null;
+  }[]) {
+    if (!(r.title in SUBSET_PARENTS)) continue;
+    const list = subsetsByTopic.get(r.topic_id) ?? [];
+    list.push({
+      id: r.id,
+      title: r.title,
+      memberIds: new Set(
+        (r.topic_subset_items ?? []).map((i) => i.favourite_id),
+      ),
+    });
+    subsetsByTopic.set(r.topic_id, list);
+  }
   if (topics.length === 0 || charities.length === 0)
     throw new Error(
       "Need active topics and charities with a confirmed cause family — run pnpm seed and confirm families first.",
@@ -1096,7 +1143,7 @@ async function seed() {
     if (poll?.topic_id)
       usedTopics.set(poll.topic_id, (usedTopics.get(poll.topic_id) ?? 0) + 1);
   }
-  const candidates = enumerate(topics, charities).filter(
+  const candidates = enumerate(topics, charities, subsetsByTopic).filter(
     (c) => (usedTopics.get(c.topic.id) ?? 0) < 2,
   );
   const triads = candidates.filter((c) => c.count === 3).length;
@@ -1109,7 +1156,7 @@ async function seed() {
   );
   for (const c of chosen)
     console.log(
-      `  ${"★".repeat(c.count).padEnd(3)} ${c.register.padEnd(16)} ${c.occasion.padEnd(20)} ${c.topic.title.padEnd(24)} ${c.charity.name}`,
+      `  ${"★".repeat(c.count).padEnd(3)} ${c.register.padEnd(16)} ${c.occasion.padEnd(20)} ${(c.subset?.title ?? c.topic.title).padEnd(24)} ${c.charity.name}`,
     );
   if (DRY_RUN) {
     console.log("\n--dry-run: no model calls, nothing written.");
@@ -1173,7 +1220,9 @@ async function seed() {
     // The charity's SUBSET (favpoll-topic-rules §1): when the seed's topic
     // is the charity's perfect topic and it has a subset, the poll carries
     // the subset and lists its members, whatever the parent's openness.
-    const subset = subsetFor(c.charity, c.topic);
+    // The table's own subset on the card (ticked rows) beats the charity's
+    // perfect subset; both list only the subset's members.
+    const subset = c.subset ?? subsetFor(c.charity, c.topic);
     const items = subset
       ? c.topic.favourites.filter((f) => subset.memberIds.has(f.id))
       : c.topic.is_finite

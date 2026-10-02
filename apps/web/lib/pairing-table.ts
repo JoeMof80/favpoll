@@ -74,6 +74,48 @@ const enact = (topic: string, outcome: string): TopicRow => ({
 const t = (topic: string, star = false, why?: string): TopicRow =>
   why ? { topic, star, why } : { topic, star }
 
+/** Every SUBSET the table names, with its parent topic (favpoll-topic-
+ *  rules §1, step 5; the revisit of 2026-10-01, ticked by the founder on
+ *  2026-10-02). A row may name a subset only if it is listed here, and
+ *  the drift guard holds each parent to the catalogue. APPROVED subsets
+ *  only: a row cannot name what no poll can carry, and the founder
+ *  rejected the rest on /subsets. Rows the ticks wanted for a rejected
+ *  subset (Cheese board, Christmas carol, Sunday roast, Picture book,
+ *  Fishing village, Comfort smell …) wait on an approval there. */
+export const SUBSET_PARENTS: Record<string, string> = {
+  "Name for a grandmother": "Name for a grandparent",
+  "Surfing beach": "Beach",
+  "British beach": "Beach",
+  "British mountain": "Mountain or peak",
+  "British river": "River",
+  "World river": "River",
+  "Party board game": "Board game",
+  "Classic board game": "Board game",
+  "Children's board game": "Board game",
+  "Karaoke song": "Song",
+  "Wedding song": "Song",
+  "Ballroom dance": "Dance",
+  "Greek island": "Island",
+  "Beach holiday destination": "Country",
+  "Roast dinner meat": "Part of a roast dinner",
+  "Roast dinner vegetable": "Part of a roast dinner",
+  "Takeaway curry": "Takeaway",
+  "Outdoor activity": "Hobby",
+  Berry: "Fruit",
+  "Citrus fruit": "Fruit",
+  "Family dog breed": "Dog breed",
+  "Small dog breed": "Dog breed",
+  Pet: "Animal",
+  "Farm animal": "Animal",
+  "Garden bird": "Bird",
+  "Bird of prey": "Bird",
+  "English castle": "Castle",
+  "Welsh castle": "Castle",
+  "Ancient ruin": "Landmark or building",
+  "Nature sound": "Sound",
+  "Music radio station": "Radio station",
+}
+
 const MEMORIAL: OccasionRow = {
   topics: [
     t("Flower", true),
@@ -105,6 +147,12 @@ const WEDDING: OccasionRow = {
     t("Beach"),
     t("Country"),
     t("Place"),
+    // The first dance is a ballroom dance; the honeymoon, sharpened
+    // (ticked 2026-10-02). Wedding song and Wedding flower belong to the
+    // anniversary: before the day they leak, after it they are heard.
+    t("Ballroom dance", true),
+    t("Greek island", false, "the honeymoon"),
+    t("Beach holiday destination", false, "the honeymoon"),
   ],
   at: "the first dance, the cake and the flowers of the day itself",
   hop: "the honeymoon or the venue",
@@ -119,6 +167,12 @@ const ACHIEVEMENT: OccasionRow = {
     t("Mountain or peak", true),
     t("River", true),
     t("Comfort food"),
+    // The British kinds of place, where the effort happened (ticked
+    // 2026-10-02): a star only once the organiser has picked the subset,
+    // which is the disclosure that the climb or the swim was here.
+    t("Surfing beach", true),
+    t("British mountain", true),
+    t("British river", true),
     t("Song"),
     t("Form of exercise"),
     t("Weather"),
@@ -137,6 +191,8 @@ const NEW_BABY: OccasionRow = {
     t("Nursery rhyme", true),
     t("Name for a grandparent", true),
     t("Fairy tale"),
+    // The subset that names the pair (ticked 2026-10-02).
+    t("Name for a grandmother", true),
     t("Toy"),
     t("Cartoon"),
     t("Childhood game"),
@@ -194,6 +250,9 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Board game"),
       t("Card game"),
       t("Song"),
+      // Played and sung at the party (ticked 2026-10-02).
+      t("Party board game", true),
+      t("Karaoke song", true),
     ],
     at: "the cake on the table",
     hop: "a birthday tea",
@@ -221,6 +280,11 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Way to spend Sunday", false, "every day a Sunday now"),
       t("Garden to visit", false, "the days out there is finally time for"),
       t("Hobby", false, "the hobby there is finally time for"),
+      t(
+        "Outdoor activity",
+        false,
+        "the days outdoors there is finally time for"
+      ),
       t("Way to travel", false, "the freedom to finally go"),
     ],
     at: "",
@@ -232,6 +296,11 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
     topics: [
       t("Beer", false, "the leaving drinks"),
       t("Takeaway", false, "the leaving-night takeaway"),
+      t(
+        "Takeaway curry",
+        false,
+        "the leaving curry, the office's own send-off"
+      ),
       t("Coffee order", false, "the office coffee run they are leaving behind"),
       t("Sandwich", false, "the desk lunches they are leaving behind"),
       t("City", false, "where they are going next"),
@@ -267,6 +336,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
   Recovery: {
     topics: [
       t("Form of exercise"),
+      t("Outdoor activity", false, "being back outdoors, on their feet again"),
       t("Weather for walking"),
       t("Landscape"),
       t("Comfort food"),
@@ -361,6 +431,8 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Song"),
       t("Type of holiday"),
       t("Way to spend Sunday"),
+      // If it is that kind of party (ticked 2026-10-02).
+      t("Karaoke song", true),
     ],
     at: "the drink in hand — it is a party",
     hop: "the first solo trip",
@@ -398,6 +470,9 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Wine"),
       t("Type of holiday"),
       t("Dance"),
+      // Their song was the first dance (ticked 2026-10-02).
+      t("Wedding song", true),
+      t("Ballroom dance", true),
     ],
     at: "their song, and the year they married",
     hop: "the years together",
@@ -415,6 +490,9 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       enact("Cheese", "the winners go on the board"),
       enact("Crisps", "the winners go on the bar"),
       enact("Sweet", "the winners fill the bowls on the tables"),
+      // The night's karaoke IS the enacted outcome (ticked 2026-10-02).
+      // Cheese board waits on its approval on /subsets.
+      enact("Karaoke song", "the top ten are the karaoke list for the night"),
       t("Decade", true),
       t("Music era", true),
       t("School subject"),
@@ -463,6 +541,14 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Christmas film"),
       t("Christmas song"),
       t("Carol"),
+      // The subsets that name the table and the game (ticked 2026-10-02).
+      // Sunday roast, Christmas carol, Christmas classic and Christmas
+      // number one wait on their approval on /subsets.
+      t("Roast dinner meat", true),
+      t("Roast dinner vegetable", true),
+      t("Name for a grandmother", true),
+      t("Classic board game", true),
+      t("Children's board game", true),
     ],
     at: "the table, the names round it and the game after",
     hop: "",
@@ -640,6 +726,10 @@ export const CHARITY_ROWS: Record<string, TopicRow[]> = {
   RNLI: [
     t("Seaside town", true),
     t("Beach", true),
+    // The coast they cover (ticked 2026-10-02); Fishing village waits on
+    // its approval on /subsets.
+    t("British beach", true),
+    t("Surfing beach", true),
     t("Sea creature"),
     t("Island"),
     t("Weather"),
@@ -654,12 +744,15 @@ export const CHARITY_ROWS: Record<string, TopicRow[]> = {
     t("Tree"),
     t("Vegetable"),
     t("Fruit"),
+    t("Berry"),
   ],
   // Guide Dogs breeds and trains its own dogs: the one health charity
   // whose topic is an animal.
   "Guide Dogs": [t("Dog breed", true), t("Animal"), t("Weather for walking")],
   "Mountain Rescue England and Wales": [
     t("Mountain or peak", true),
+    // They rescue on British mountains, not Everest (ticked 2026-10-02).
+    t("British mountain", true),
     t("National park", true),
     t("Landscape"),
     t("Weather for walking"),
@@ -667,15 +760,22 @@ export const CHARITY_ROWS: Record<string, TopicRow[]> = {
   ],
   "Dogs Trust": [
     t("Dog breed", true),
+    t("Family dog breed", true),
+    t("Small dog breed", true),
     t("Animal"),
     t("Weather for walking"),
     t("Beach"),
+    t("British beach"),
   ],
   RSPCA: [
     t("Animal", true),
+    // The remit exactly (ticked 2026-10-02); Zoo animal is not.
+    t("Pet", true),
+    t("Farm animal", true),
     t("Dog breed"),
     t("Cat breed"),
     t("Bird"),
+    t("Garden bird"),
     t("Butterfly"),
     t("Insect"),
   ],
@@ -689,11 +789,20 @@ export const CHARITY_ROWS: Record<string, TopicRow[]> = {
     t("Island"),
     t("National park"),
     t("River"),
+    // WWF's rivers work is global (ticked 2026-10-02).
+    t("World river", true),
+    t("Bird of prey"),
     t("Mountain or peak"),
     t("Planet"),
   ],
   "National Trust": [
     t("Castle", true),
+    // All theirs: the castles, the ruins and the coast (ticked
+    // 2026-10-02); Seaside castle waits on its approval on /subsets.
+    t("English castle", true),
+    t("Welsh castle", true),
+    t("Ancient ruin", true),
+    t("British beach", true),
     t("Garden to visit", true),
     t("Landmark or building"),
     t("National park"),
@@ -718,6 +827,10 @@ export const CHARITY_ROWS: Record<string, TopicRow[]> = {
   ],
   "British Heart Foundation": [
     t("Form of exercise", true),
+    // Heart-healthy, specifically (ticked 2026-10-02).
+    t("Outdoor activity", true),
+    t("Citrus fruit"),
+    t("Berry"),
     t("Sport to play"),
     t("Weather for walking"),
     t("Landscape"),
@@ -728,8 +841,10 @@ export const CHARITY_ROWS: Record<string, TopicRow[]> = {
   // The non-visual senses.
   RNIB: [
     t("Sound", true),
+    t("Nature sound", true),
     t("Smell", true),
     t("Radio station", true),
+    t("Music radio station", true),
     t("Instrument"),
     t("Song"),
     t("Weather"),
@@ -990,7 +1105,10 @@ export function lookupEdges(input: EdgeLookupInput): StoryEdges {
   } else if (input.charityName && input.causeFamily) {
     const family = FAMILY_ROWS[input.causeFamily]
     const rows = charityRow(input.charityName) ?? family.topics
-    const hit = findTopic(rows, input.topicTitle)
+    // A subset inherits its parent's charity row as it does the
+    // occasion's (favpoll-topic-rules §1): Scottish island on RNLI's
+    // Island, unless the row names the subset itself.
+    const hit = findTopic(rows, input.topicTitle, input.parentTopicTitle)
     if (hit) {
       e2 = {
         star: hit.star,
