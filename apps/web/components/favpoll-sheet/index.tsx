@@ -84,6 +84,10 @@ export type FavpollSheetProps = {
    *  "fundraiser" makes the money the hero's heading, "tribute" keeps the
    *  person there and the money quiet. The guest page is always tribute. */
   heroVariant?: "fundraiser" | "tribute"
+  /** THE FINALE (founder, 2026-08-02), room presentation only: the poll
+   *  closed while the room watched, so the note types out over the final
+   *  standings — the one moment a shared screen shows the reveal. */
+  reveal?: boolean
   /** Guest presentation only. */
   viewer?: SheetViewer
   /** Rendered in the left column straight after the standings — the
@@ -108,6 +112,7 @@ export function FavpollSheet({
   organiser,
   presentation = "guest",
   heroVariant = "tribute",
+  reveal = false,
   viewer,
   afterPoll,
   children,
@@ -131,20 +136,21 @@ export function FavpollSheet({
       ? {
           totalRaised,
           goalAmount: favpoll.goal_amount ?? null,
-          closesAt: isClosed ? null : (favpoll.closes_at ?? null),
           isClosed,
         }
       : undefined
 
   // THE ROOM'S STANDING: the standings show, the reveal is withheld —
-  // entitled to the list, never to the note.
+  // entitled to the list, never to the note — until the finale, when the
+  // note arrives as a just-confirmed pledge's does: typed out.
+  const roomReveal = room && reveal
   const standing: SheetViewer = viewer ?? {
     clerkUserId: null,
     entitled: true,
-    personalNote: null,
+    personalNote: roomReveal ? (pollWithItems?.personal_note ?? null) : null,
     hasNote: false,
     items: pollWithItems?.topics.favourites ?? [],
-    pledgeJustConfirmed: false,
+    pledgeJustConfirmed: roomReveal,
   }
 
   const closedAt = favpoll.closed_at

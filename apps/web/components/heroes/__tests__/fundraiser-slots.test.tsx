@@ -1,11 +1,6 @@
-import { describe, it, expect, vi } from "vitest"
+import { describe, it, expect } from "vitest"
 import { render, screen } from "@testing-library/react"
 
-vi.mock("@/components/countdown", () => ({
-  Countdown: ({ closesAt }: { closesAt?: string }) => (
-    <div data-testid="countdown" data-closes={closesAt} />
-  ),
-}))
 import { fundraiserHeroSlots } from "@/components/heroes/fundraiser-slots"
 
 const BYLINE = { name: "Alice", context: "1950 – 2026", photoUrl: null }
@@ -29,7 +24,6 @@ describe("fundraiserHeroSlots — the money is the heading", () => {
         fundraiser: {
           totalRaised: 250,
           goalAmount: 1000,
-          closesAt: "2030-01-01T00:00:00Z",
           isClosed: false,
         },
         byline: BYLINE,
@@ -54,7 +48,6 @@ describe("fundraiserHeroSlots — the money is the heading", () => {
         fundraiser: {
           totalRaised: 1200,
           goalAmount: 1000,
-          closesAt: null,
           isClosed: false,
         },
         byline: BYLINE,
@@ -63,22 +56,19 @@ describe("fundraiserHeroSlots — the money is the heading", () => {
     expect(screen.getByText(/Goal reached/)).toBeInTheDocument()
   })
 
-  it("no goal: 'Raised so far' and the countdown as the subtitle line", () => {
+  it("no goal: 'Raised so far', the figure alone — the rail owns the countdown", () => {
     renderSlots(
       fundraiserHeroSlots({
         fundraiser: {
           totalRaised: 40,
           goalAmount: null,
-          closesAt: "2030-01-01T00:00:00Z",
           isClosed: false,
         },
         byline: { ...BYLINE, photoUrl: "https://x/y.jpg" },
       })
     )
     expect(screen.getByText("Raised so far")).toBeInTheDocument()
-    expect(screen.getByTestId("countdown").dataset.closes).toBe(
-      "2030-01-01T00:00:00Z"
-    )
+    expect(screen.queryByTestId("countdown")).not.toBeInTheDocument()
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument()
     expect(screen.getByRole("img", { name: "Alice" })).toBeInTheDocument()
   })
@@ -89,7 +79,6 @@ describe("fundraiserHeroSlots — the money is the heading", () => {
         fundraiser: {
           totalRaised: 1200,
           goalAmount: 1000,
-          closesAt: null,
           isClosed: true,
         },
         byline: BYLINE,
