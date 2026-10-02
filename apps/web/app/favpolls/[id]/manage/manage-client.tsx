@@ -48,12 +48,7 @@ import {
   EditableGoalRow,
   EditableTextRow,
 } from "@/components/manage/editable-row"
-import {
-  updateStoryField,
-  setPicksSuspendedAt,
-  type StoryField,
-} from "./actions"
-import { picksSuspended } from "@/lib/picks-suspended"
+import { updateStoryField, setPicksSuspended, type StoryField } from "./actions"
 import { BumpChart } from "@/components/bump-chart"
 import { RankingList } from "@/components/ranking-list"
 import { Countdown } from "@/components/countdown"
@@ -244,8 +239,8 @@ export function ManageClient({
     favpoll.show_guest_amounts === true
   )
   const [showGuestAmountsPending, setShowGuestAmountsPending] = useState(false)
-  // THE PICKS (founder, 2026-10-02 — lib/picks-suspended): a switch
-  // suspends them now; the row beneath moves the moment.
+  // THE PICKS (founder, 2026-10-02 — lib/picks-suspended): one button,
+  // suspend now / resume. No schedule.
   const [suspendAt, setSuspendAt] = useState<string | null>(
     favpoll.picks_suspended_at ?? null
   )
@@ -309,11 +304,7 @@ export function ManageClient({
     setSuspendAt(value ? new Date().toISOString() : null)
     setSuspendPending(true)
     try {
-      const saved = await setPicksSuspendedAt(
-        favpoll.id,
-        value ? new Date().toISOString() : null
-      )
-      setSuspendAt(saved)
+      setSuspendAt(await setPicksSuspended(favpoll.id, value))
       router.refresh()
     } catch (e) {
       setSuspendAt(before)
@@ -324,22 +315,14 @@ export function ManageClient({
       setSuspendPending(false)
     }
   }
-  const saveSuspendAt = async (d: Date) => {
-    const saved = await setPicksSuspendedAt(favpoll.id, d.toISOString())
-    setSuspendAt(saved)
-    router.refresh()
-  }
-  const suspendInEffect = picksSuspended({ picks_suspended_at: suspendAt })
-  const picksSentence = !suspendAt
-    ? "End the picks early. Every pledge then goes to the shared pot until the close, and the standings hold."
-    : suspendInEffect
-      ? "The picks are in. Every pledge goes to the shared pot until the close."
-      : `From ${new Date(suspendAt).toLocaleString("en-GB", {
-          day: "numeric",
-          month: "short",
-          hour: "numeric",
-          minute: "2-digit",
-        })}, every pledge goes to the shared pot.`
+  const picksSentence = suspendAt
+    ? `The picks are in since ${new Date(suspendAt).toLocaleString("en-GB", {
+        day: "numeric",
+        month: "short",
+        hour: "numeric",
+        minute: "2-digit",
+      })}. Every pledge goes to the shared pot until the close.`
+    : "End the picks early. Every pledge then goes to the shared pot until the close, and the standings hold."
 
   const canDelete =
     favpoll.pledge_count === 0 && (favpoll.pot?.total_deposited ?? 0) === 0
@@ -783,15 +766,6 @@ export function ManageClient({
                   : "Suspend the picks"}
             </Button>
           </SettingsRow>
-        )}
-        {!isClosed && suspendAt && (
-          <EditableDateRow
-            label={FIELD_LABELS.suspendFrom}
-            description="Before the close date. Set a later moment to keep the picks open until then."
-            value={new Date(suspendAt)}
-            presets={null}
-            onSave={saveSuspendAt}
-          />
         )}
         {!isClosed && (
           <SettingsRow

@@ -258,27 +258,13 @@ export async function setFavpollTopic(
   }
 }
 
-// SUSPEND THE PICKS (founder, 2026-10-02 — lib/picks-suspended). Null
-// resumes; a moment at or before now suspends at once; a future moment
-// schedules it. The moment must fall before the close — after it the
-// close does the same job — and nothing moves on a closed favpoll.
-export async function setPicksSuspendedAt(
-  favpollId: string,
-  at: string | null
-) {
-  const { supabase, favpoll } = await ownedOpenFavpoll(favpollId)
-  let value: string | null = null
-  if (at !== null) {
-    const t = new Date(at)
-    if (!Number.isFinite(t.getTime())) throw new Error("Invalid time")
-    // "Now" arrives a little stale from the client — clamp rather than
-    // reject, so Suspend now never fails on a slow network.
-    const now = new Date()
-    const effective = t < now ? now : t
-    if (effective >= new Date(favpoll.closes_at))
-      throw new Error("The picks must be suspended before the close date.")
-    value = effective.toISOString()
-  }
+// SUSPEND THE PICKS (founder, 2026-10-02 — lib/picks-suspended). One
+// tap: suspend stamps the server's now, resume clears it. No schedule —
+// "if there is a moment at which the guests are ready to act, that is
+// the moment to suspend" — and nothing moves on a closed favpoll.
+export async function setPicksSuspended(favpollId: string, suspend: boolean) {
+  const { supabase } = await ownedOpenFavpoll(favpollId)
+  const value = suspend ? new Date().toISOString() : null
   const { error } = await supabase
     .from("favpolls")
     .update({ picks_suspended_at: value })

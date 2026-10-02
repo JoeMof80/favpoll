@@ -30,7 +30,6 @@ export const FIELD_LABELS = {
   guestAdditions: "Guest additions",
   showDonations: "Show donations",
   picks: "Suspend",
-  suspendFrom: "Suspend from",
 } as const
 
 /** "Cause" for a cause, "Name or cause" on a fundraiser, "Name" otherwise. */

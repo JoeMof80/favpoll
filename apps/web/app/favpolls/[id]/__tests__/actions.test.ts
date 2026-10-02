@@ -240,10 +240,10 @@ describe("createPledge — the picks are in", () => {
     expect(mock.callsFor("pledge_allocations")).toHaveLength(0)
   })
 
-  it("keeps the picks while the suspension is still scheduled", async () => {
+  it("keeps the picks while they are open", async () => {
     mock.queue(null) // PI-unused check
     mock.queue({ id: "pledge-1" })
-    mock.queue({ favpolls: { picks_suspended_at: "2999-01-01T00:00:00Z" } })
+    mock.queue({ favpolls: { picks_suspended_at: null } })
     mock.queue(null) // allocations insert
 
     await createPledge(input)

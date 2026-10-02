@@ -222,7 +222,7 @@ export type Favpoll = {
   closed_at: string | null;
   /** Picks suspended from this moment (founder, 2026-10-02): the pick
    *  step disappears and every pledge goes to the shared pot until the
-   *  close date. Null = open; future-dated = scheduled. */
+   *  close date. Null = open; set = suspended (server-stamped). */
   picks_suspended_at?: string | null;
   total_raised: number;
   /** Optional pledge goal in pounds (same unit as total_raised); null = no goal. */

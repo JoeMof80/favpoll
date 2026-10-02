@@ -215,16 +215,12 @@ export function EditableDateRow({
   value,
   readOnly = false,
   onSave,
-  presets = CLOSE_DATE_PRESETS,
 }: {
   label: string
   description?: React.ReactNode
   value: Date
   readOnly?: boolean
   onSave: (next: Date) => Promise<void>
-  /** The picker's quick presets — the close date's by default; null for
-   *  none (a moment inside the run, like the picks' suspension). */
-  presets?: { label: string; days: number }[] | null
 }) {
   const [current, setCurrent] = useState(value)
   const [status, flash] = useSaveStatus()
@@ -264,7 +260,7 @@ export function EditableDateRow({
           value={current}
           onChange={(d) => void change(d)}
           size="lg"
-          presets={presets ?? undefined}
+          presets={CLOSE_DATE_PRESETS}
         />
       )}
     </SettingsRow>
