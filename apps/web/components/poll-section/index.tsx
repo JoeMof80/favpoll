@@ -130,6 +130,8 @@ type Props = {
   /** The picks are in (lib/picks-suspended): the lock card teaches the
    *  pot's path and the standings say they are frozen. */
   picksSuspended?: boolean
+  /** "display" = the projector's scale, for the room's screen. */
+  size?: "default" | "display"
   /** Real item list — may be zeroed until entitled */
   initialItems: Favourite[]
   /** Called when the merged header-button is clicked pre-pledge */
@@ -158,6 +160,7 @@ export function PollSection({
   favpollId,
   onOpenStory,
   picksSuspended = false,
+  size = "default",
 }: Props) {
   const { rankingView, setRankingView } = usePollSection({
     pollId: poll.id,
@@ -331,6 +334,7 @@ export function PollSection({
                 topicId={poll.topic_id}
                 rankingView={rankingView}
                 isOrganiser={isOrganiser}
+                size={size}
               />
             </>
           ) : (

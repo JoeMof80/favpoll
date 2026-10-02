@@ -66,7 +66,7 @@ const FAQ_ITEMS: { q: string; a: React.ReactNode }[] = [
     // for exactly that reason. First in the list: it is the identity
     // question. Founder note: may be revised.
     q: "Is this a raffle or a competition?",
-    a: "No. Nothing is won and nothing is at stake. A pledge is a gift to the charity, made in the name of a favourite — the standings only show where the giving went. There are no prizes, no odds and no draw, and every pledge reaches the charity in full, whichever favourite leads.",
+    a: "No. Nothing is won and nothing is at stake. A pledge is a gift to the charity, made in the name of a favourite — the standings only show where the giving went. There are no prizes, no odds and no draw, and every pledge goes to the charity, whichever favourite leads.",
   },
   {
     q: "If I set a goal, does pledging stop once it's reached?",
