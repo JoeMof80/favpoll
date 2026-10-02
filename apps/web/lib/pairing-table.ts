@@ -123,7 +123,10 @@ const MEMORIAL: OccasionRow = {
     t("Poem", true),
     t("Song"),
     // Saying was here: a person can be known for one, but guests at a
-    // wake have no favourite saying to pick (founder, 2026-09-25).
+    // wake have no favourite saying to pick (founder, 2026-09-25). The
+    // topic was renamed PROVERB on 2026-10-02 — the list was always
+    // proverbs while the name promised the phrase they always reached
+    // for, which is the mismatch that made it awkward twice.
     t("Season"),
     t("Garden to visit"),
   ],
@@ -402,7 +405,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Sandwich"),
       t("Word"),
       t("Regional or dialect word"),
-      t("Saying"),
+      t("Proverb"),
       t("TV programme"),
       t("Football team"),
       t("Seaside town"),
@@ -638,7 +641,7 @@ export const FAMILY_ROWS: Record<
       t("Type of tea"),
       t("Biscuit"),
       t("Radio station"),
-      t("Saying"),
+      t("Proverb"),
       t("Dance"),
       t("Sitcom"),
     ],
@@ -708,7 +711,7 @@ export const FAMILY_ROWS: Record<
       t("Comedian", true),
       t("Sitcom", true),
       t("TV programme"),
-      t("Saying"),
+      t("Proverb"),
       t("Song"),
     ],
   },
@@ -819,7 +822,7 @@ export const CHARITY_ROWS: Record<string, TopicRow[]> = {
     t("Music era"),
     t("Decade"),
     t("Smell"),
-    t("Saying"),
+    t("Proverb"),
     t("TV theme tune"),
     t("Hymn"),
     t("Childhood game"),
