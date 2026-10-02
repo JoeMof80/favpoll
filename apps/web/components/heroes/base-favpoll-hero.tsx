@@ -19,6 +19,8 @@ type BaseFavpollHeroProps = {
    *  place): the name and context take the phone's sizes, so the
    *  narrowed column keeps them on their lines (founder, 2026-09-29). */
   compact?: boolean
+  /** Off for the screen in the room: a static band (HeroLayout). */
+  animate?: boolean
 }
 
 export function BaseFavpollHero({
@@ -28,6 +30,7 @@ export function BaseFavpollHero({
   aboutPlaceholder,
   mentions,
   compact,
+  animate,
 }: BaseFavpollHeroProps) {
   const headline = getFavpollHeadline({
     occasionType: favpoll.occasion_type ?? null,
@@ -82,7 +85,9 @@ export function BaseFavpollHero({
 
   const about =
     protagonist.about || aboutPlaceholder ? (
-      <p className="text-sm leading-relaxed wrap-break-word text-muted-foreground/80 md:text-base">
+      <p
+        className={`text-sm leading-relaxed wrap-break-word text-muted-foreground/80 md:text-base`}
+      >
         {protagonist.about ? (
           <MentionText text={protagonist.about} mentions={mentions} />
         ) : (
@@ -98,6 +103,7 @@ export function BaseFavpollHero({
       subtitle={subtitle}
       avatar={avatar}
       about={about}
+      animate={animate}
     />
   )
 }

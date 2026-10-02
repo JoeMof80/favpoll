@@ -326,11 +326,13 @@ export function GuestBook({
   )
 
   // With the header pinned the list carries no top margin (the header's
-  // own padding is the gap), and the rail's last row gets room before
-  // the column's edge (founder, 2026-09-29: "the bottom of the guest
-  // book could use padding").
+  // own padding is the gap). The room before the column's edge (founder,
+  // 2026-09-29: "the bottom of the guest book could use padding") is the
+  // rail's own now — page-layout pads its scroll end by --shell-inset
+  // (64px on the page, 72px in the room, 2026-10-01) so the last entry
+  // stops on the charity footer's line; a tail here would push it off.
   const listTop = variant === "flat" && pinned ? "" : "mt-3"
-  const tail = variant === "flat" ? "pb-10" : ""
+  const tail = ""
   const overlay = (
     <ResponsiveOverlay
       open={allOpen}

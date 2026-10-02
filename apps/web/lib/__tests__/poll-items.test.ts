@@ -62,6 +62,18 @@ describe("fetchPollItems", () => {
     expect(eqCalls).not.toContainEqual(["is_hidden", false])
   })
 
+  it("infinite topic with no rows of its own → the topic's catalogue", async () => {
+    mock.queue([]) // favpoll_poll_favourites: nothing linked
+    mock.queue([{ id: "f9", label: "Auden" }]) // favourites: the catalogue
+
+    const items = await fetchPollItems(mock.supabase as never, INPUT)
+
+    expect(items.map((i) => i.label)).toEqual(["Auden"])
+    expect(mock.callsFor("favourites").some((c) => c.method === "select")).toBe(
+      true
+    )
+  })
+
   it("drops epf rows whose favourite failed to join", async () => {
     mock.queue([
       { is_hidden: false, favourites: null },

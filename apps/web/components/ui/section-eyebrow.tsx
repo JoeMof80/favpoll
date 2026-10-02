@@ -7,9 +7,11 @@ type Props = {
   /**
    * Render as the section's heading rather than a paragraph. For sections
    * whose eyebrow IS the only heading — without it their content headings
-   * skip a level. Styling is unchanged either way.
+   * skip a level. Styling is unchanged either way. "span" sets the
+   * eyebrow inline — the room's person line carries the opening line
+   * as the eyebrow beside the name (2026-09-30).
    */
-  as?: "p" | "h2"
+  as?: "p" | "h2" | "span"
 }
 
 export function SectionEyebrow({

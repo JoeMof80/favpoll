@@ -1,125 +1,75 @@
 "use client"
 
-import { DisplayScreen } from "@/components/display-screen"
+import { RoomShell } from "@/components/room-shell"
 import { sceneFavourites } from "@/components/hero-demo-panel/scene-favourites"
 import { DISPLAY_ROOM } from "@/lib/display"
 import type { HeroScene } from "@/components/hero-demo-panel/scenes"
+import type {
+  FavpollWithDetails,
+  FavpollPollWithItems,
+  Protagonist,
+} from "@favpoll/types"
 
-// The live display as the closing beat of the guest arc — the REAL component,
-// not a depiction of it.
-//
-// This was a hand-built reduction until 2026-08-06: a simplified banner over
-// the shared ranking parts, on the reasoning that a visible reduction cannot
-// drift the way a copy does. True as far as it goes, but the founder asked
-// the better question — why not show the actual display? — and the answer
-// turned out to be cheap: DisplayScreen takes `live={false}` and drops the
-// three behaviours that only make sense on a screen someone is presenting
-// from. Nine required props, all of which a demo scene already carries.
-//
-// So there is now ONE definition of the display. Whatever changes there
-// changes here, including the parts a reduction would have quietly lost —
-// the goal-free "Raised so far" silhouette, the charity rows, the guest book,
-// the two-column banner.
+// THE DISPLAY AS A ROOM SEES IT, on a still (founder, 2026-08-27: "Why
+// don't we make it an exact match of the real thing including the
+// logo?"). Since 2026-09-30 the real thing is the favpoll page's sheet
+// in its room presentation (components/room-shell), so this renders that
+// — with a scene turned into the favpoll and poll the sheet reads — at
+// the screen's own size, for a caller to scale into a TV frame. It is
+// pixel-for-pixel the display because it IS the display.
 
-/**
- * Rendered at this width, then scaled by the caller — see the note there.
- *
- * 900 -> 1120 (2026-08-18). The display's body only splits into standings +
- * sidebar at 64rem, so at 900 the still never reached its own two-column form:
- * it stacked the QR and the wall UNDER the standings and came out portrait,
- * 900 x 1097, which reads as a tablet rather than a screen on a wall. The
- * breakpoints are container queries now, so the number that decides this is
- * this one — the box the still is rendered in — rather than the visitor's
- * window. 1120 clears 64rem with room for the surround's own padding.
- */
+/** The still's natural width when a caller wants a screen narrower than
+ *  the room (the live vignette's non-room math). The still itself always
+ *  renders at DISPLAY_STILL_ROOM. */
 export const DISPLAY_STILL_WIDTH = 1120
 
-/**
- * The still as a SCREEN IN A ROOM, rather than as a picture of its content
- * (founder, 2026-08-27: "display too wide (or too short) ... Why don't we
- * make it an exact match of the real thing including the logo?").
- *
- * 1600 WIDE, because that is where the real display has gutters at all: the
- * card is max-w-6xl — 72rem, 1152px — so a 1120 still fills its frame edge to
- * edge with no tinted margin for a code to sit in. At 1600 the gutter is
- * (1600-1152)/2 = 224, which clears the 200px code. Below that the product
- * itself keeps the in-banner QR, so a narrower "with gutters" still would
- * depict a screen that does not exist.
- *
- * 900 TALL, and the height is the half that was missing. Gutters alone made
- * the artefact 1640 x 700 — 2.35:1, a letterbox — because the box was still
- * sized by its CONTENT while the width had grown by 480px of gutter. A screen
- * is not content-shaped. 16:9 is, so the height is declared and the card
- * fills it, exactly as `min-h-screen` fills a projector.
- *
- * It costs ~27% of the on-screen type against the 1120 still, the extra width
- * being pure gutter.
- */
+/** The screen in the room: the display's own 1920×1080. */
 export const DISPLAY_STILL_ROOM = DISPLAY_ROOM
 
-/**
- * Leaders shown. The real display lists every favourite, including the ones
- * on £0 — correct there, and four empty bars in a marketing still. Sorted
- * before slicing: sceneFavourites returns the topic's own (alphabetical)
- * order, so an unsorted slice once dropped the £240 leader entirely and
- * handed the 100% bar to the runner-up.
- */
+/** How many rankings the still shows. */
 const RANKS_SHOWN = 6
 
-/** A display mid-event has pledges on its wall; an empty one reads as broken. */
 const WALL_NAMES = ["Priya", "Tom", null, "Aisha", "Dan"]
 
 /**
- * A choice, not a workaround. Rendering this still with neither a goal nor a
- * close date is what exposed the display's empty-banner bug — the fundraiser
- * column used to render nothing at all in that case — and that is now fixed
- * in DisplayScreen itself, so the still would read correctly without this.
- * It keeps a goal because the progress bar is the fundraiser variant at full
- * voice, and a team walk with a target is truer to the occasion than one
- * without.
+ * A choice, not a workaround: the still keeps a goal because the
+ * progress bar is the fundraiser variant at full voice, and a team walk
+ * with a target is truer to the occasion than one without.
  */
 const DEMO_GOAL = 1000
 
 /**
  * Captured once at module load, not per render: the wall prints relative
- * times ("4m ago"), so the entries need a clock, and reading one during
- * render is an impure call the compiler rightly rejects. Module scope is
- * evaluated on import, and this component only ever renders client-side —
- * its caller gates the media behind `mounted` — so there is no server pass
- * to disagree with.
+ * times ("4m ago") and the rail runs a countdown, so the entries and the
+ * close need a clock, and reading one during render is an impure call
+ * the compiler rightly rejects. Module scope is evaluated on import, and
+ * this component only ever renders client-side — its caller gates the
+ * media behind `mounted` — so there is no server pass to disagree with.
  */
-const WALL_BASE_TIME = Date.now()
+const STILL_BASE_TIME = Date.now()
+/** Three days out: the countdown reads as an event in progress. */
+const STILL_CLOSES_AT = new Date(
+  STILL_BASE_TIME + 3 * 24 * 60 * 60_000
+).toISOString()
 
 export function DisplayStill({
   scene,
   qrUrl,
   wallNames = WALL_NAMES,
-  wallReserveRows,
-  room = false,
 }: {
   scene: HeroScene
   qrUrl: string
-  /**
-   * Override the wall entries. Only /features' live artefact passes this, to
-   * grow the wall a name at a time as its pledges land — the still is
-   * otherwise a fixed picture and every other caller wants that.
-   */
   wallNames?: (string | null)[]
-  /**
-   * Rows the wall holds space for. /features' artefact grows its wall a name
-   * at a time and passes the count it ends on, so nothing beneath it moves
-   * while it fills.
-   */
+  /** Kept for callers' sake: the live vignette reserved wall rows on
+   *  the old banner display. The sheet's rail sizes itself. */
   wallReserveRows?: number
-  /**
-   * Render as a screen in a room — 16:9, the brand mark in the corner, the
-   * gutter QR pair — rather than as a picture of the display's content.
-   */
+  /** Kept for callers' sake: every caller renders the screen in a room
+   *  (the brand mark, the gutter codes), and the still is always that. */
   room?: boolean
 }) {
   const topicId = `${scene.poll.id}-topic`
+  const favpollId = `${scene.poll.id}-favpoll`
   const items = sceneFavourites(scene, topicId)
-  // The TOTAL counts everything; the LIST shows the leaders.
   const ranked = [...items].sort(
     (a, b) => b.all_time_pledged - a.all_time_pledged
   )
@@ -129,69 +79,100 @@ export function DisplayStill({
     id: `wall-${i}`,
     name,
     labels: [ranked[i % ranked.length].label],
-    created_at: new Date(WALL_BASE_TIME - (i + 1) * 4 * 60_000).toISOString(),
+    created_at: new Date(STILL_BASE_TIME - (i + 1) * 4 * 60_000).toISOString(),
   }))
+
+  const isCause = !scene.protagonist
+  const created_at = "2024-01-01T00:00:00Z"
+
+  const protagonist: Protagonist | null = scene.protagonist
+    ? {
+        id: `${favpollId}-protagonist`,
+        name: scene.protagonist.name,
+        context: scene.protagonist.context,
+        about: scene.protagonist.about,
+        photo_url: scene.protagonist.photo_url,
+        pronoun: null,
+        created_by: "demo",
+        created_at,
+      }
+    : null
+
+  // The scene as the favpoll the sheet reads. The scene's own goal where
+  // it has one (the fundraiser), the demo constant otherwise — see
+  // DEMO_GOAL.
+  const favpoll = {
+    id: favpollId,
+    protagonist_id: protagonist?.id ?? null,
+    subject: isCause ? "cause" : "someone",
+    cause_label: isCause ? (scene.heading ?? "") : null,
+    occasion_type: scene.occasion_type,
+    opening_line: scene.opening_line,
+    market: "en-GB",
+    created_by: "demo",
+    closes_at: STILL_CLOSES_AT,
+    original_closes_at: null,
+    hard_close_at: null,
+    extension_count: 0,
+    closed_at: null,
+    total_raised: total,
+    // Never for a memorial: at a wake the number climbing is not the
+    // point (the tribute ruling, 2026-08-02), and the sheet's charity
+    // footer would otherwise shout "goal reached" under a tribute.
+    goal_amount:
+      scene.goal_amount ?? (scene.kind === "memorial" ? null : DEMO_GOAL),
+    is_private: false,
+    is_plural: null,
+    description: isCause ? (scene.blurb ?? null) : null,
+    photo_url: isCause ? (scene.photo_url ?? null) : null,
+    context: isCause ? (scene.context ?? null) : null,
+    created_at,
+    protagonists: protagonist,
+    favpoll_charities: scene.charities.map((c) => ({
+      charities: { ...c, description: null, created_at },
+    })),
+  } as FavpollWithDetails
+
+  const pollWithItems = {
+    id: scene.poll.id,
+    favpoll_id: favpollId,
+    topic_id: topicId,
+    // Never on a still: the reveal is a keepsake, not signage.
+    personal_note: null,
+    created_at,
+    topics: {
+      id: topicId,
+      title: scene.poll.topic.title,
+      description: null,
+      is_finite: false,
+      is_active: true,
+      created_by: null,
+      created_at,
+      favourites: ranked.slice(0, RANKS_SHOWN),
+    },
+  } as FavpollPollWithItems
 
   return (
     <div
-      style={
-        room
-          ? { width: DISPLAY_STILL_ROOM.w, height: DISPLAY_STILL_ROOM.h }
-          : { width: DISPLAY_STILL_WIDTH }
-      }
+      className="relative overflow-hidden"
+      style={{ width: DISPLAY_STILL_ROOM.w, height: DISPLAY_STILL_ROOM.h }}
     >
-      <DisplayScreen
-        live={false}
-        // protagonist FIRST, heading only as the fallback (founder,
-        // 2026-08-21: "the Happy Birthday feels redundant"). It was not
-        // redundant, it was orphaned: `heading` is documented as the h1 for
-        // NO-protagonist scenes, so on a scene that has one the name resolved
-        // to "" and the display rendered a bare "HAPPY BIRTHDAY" prefixing
-        // nothing. demo-fixture had already been doing it this way for the
-        // same scene. Affects the homepage walkthrough as well as /features.
-        protagonistName={scene.protagonist?.name ?? scene.heading ?? ""}
-        dateLabel={null}
-        openingLine={scene.opening_line}
-        occasionType={scene.occasion_type}
-        charityName={scene.charities[0]?.name ?? null}
-        // Scene charities carry the fields a demo needs; Charity also wants
-        // `description` and `created_at`, which no scene has and the display
-        // never shows.
-        charities={scene.charities.map((c) => ({
-          ...c,
-          description: null,
-          created_at: "2024-01-01T00:00:00Z",
-        }))}
-        poll={{
-          id: scene.poll.id,
-          // The reveal is the witnessed finale on the real display and types
-          // out only at the close; a still is not that moment.
-          personal_note: null,
-          topic: { id: topicId, title: scene.poll.topic.title },
-          items: ranked.slice(0, RANKS_SHOWN),
-        }}
-        initialWallEntries={wall}
-        wallReserveRows={wallReserveRows}
-        initialTotalRaised={total}
-        // The scene's own goal where it has one (the fundraiser), the
-        // demo constant otherwise — see DEMO_GOAL.
-        goalAmount={scene.goal_amount ?? DEMO_GOAL}
-        favpollUrl="https://favpoll.com"
+      <RoomShell
+        still
+        favpoll={favpoll}
+        pollWithItems={pollWithItems}
+        totalRaised={total}
+        wallEntries={wall}
+        isClosed={false}
+        manageUrl="https://favpoll.com"
         qrUrl={qrUrl}
         // THE PRESENCE DIAL, derived rather than defaulted (founder,
-        // 2026-08-27: "the live display isn't in tribute mode"). DisplayScreen
-        // falls back to "fundraiser" when nothing is passed, so every still on
-        // the site was running telethon theatre — the goal figure as the
-        // heading — including the one beside copy that says "Display the
-        // favpoll in tribute mode at the wake".
-        //
-        // The rule is the product's own, from /live/[slug]: register
-        // "remembering" takes tribute, everything else fundraiser. A memorial
-        // scene IS the remembering register (deriveRegister: category
-        // "memorial" -> "remembering"), so the scene's kind decides it and the
-        // celebration and cause stills keep the louder variant they want.
+        // 2026-08-27: "the live display isn't in tribute mode"). The rule
+        // is the product's own, from /live/[slug]: register "remembering"
+        // takes tribute, everything else fundraiser. A memorial scene IS
+        // the remembering register, so the scene's kind decides it and
+        // the celebration and cause stills keep the louder variant.
         defaultVariant={scene.kind === "memorial" ? "tribute" : "fundraiser"}
-        room={room}
       />
     </div>
   )

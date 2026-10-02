@@ -55,8 +55,17 @@ export async function fetchPollItems(
     query = query.eq("is_hidden", false)
   }
   const { data } = await query
-
-  return ((data ?? []) as unknown as { favourites: Favourite | null }[])
+  const linked = ((data ?? []) as unknown as { favourites: Favourite | null }[])
     .map((row) => row.favourites)
     .filter((f): f is Favourite => Boolean(f))
+  if (linked.length > 0) return linked
+  // No rows of its own: the poll runs on the topic's whole catalogue —
+  // the favpoll page's rule (app/favpolls/[id]/page.tsx), which the
+  // display and the note route lacked (found 2026-09-30: a seeded
+  // favpoll with eight pledges projected an empty standings list).
+  const { data: catalogue } = await supabase
+    .from("favourites")
+    .select("*")
+    .eq("topic_id", topicId)
+  return (catalogue ?? []) as Favourite[]
 }
