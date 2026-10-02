@@ -7,6 +7,10 @@ import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
 import { getFavpollHeadline, heroNameSizeClass } from "@/lib/display"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import type { Favpoll } from "@favpoll/types"
+import {
+  fundraiserHeroSlots,
+  type HeroFundraiser,
+} from "./heroes/fundraiser-slots"
 
 type Props = {
   favpoll: Favpoll
@@ -16,6 +20,9 @@ type Props = {
    *  place): the name and context take the phone's sizes, so the
    *  narrowed column keeps them on their lines (founder, 2026-09-29). */
   compact?: boolean
+  /** The presence dial's loud setting (founder, 2026-09-30): the money is
+   *  the heading and the cause a byline. See heroes/fundraiser-slots. */
+  fundraiser?: HeroFundraiser
 }
 
 // Hero for subject='cause' — no protagonist row, so the optional image and
@@ -24,7 +31,23 @@ type Props = {
 // padding, sticky header, and scroll-shrink behaviour can never drift
 // between the two (they did: this component used to hand-roll its layout
 // and sat ~72px higher than person pages, found 2026-07-13).
-export function CauseHero({ favpoll, mentions, compact }: Props) {
+export function CauseHero({ favpoll, mentions, compact, fundraiser }: Props) {
+  if (fundraiser) {
+    return (
+      <HeroLayout
+        {...fundraiserHeroSlots({
+          fundraiser,
+          compact,
+          byline: {
+            name: favpoll.cause_label ?? "",
+            context: favpoll.context ?? null,
+            photoUrl: favpoll.photo_url ?? null,
+          },
+        })}
+      />
+    )
+  }
+
   const headline = getFavpollHeadline({
     occasionType: favpoll.occasion_type,
     openingLine: favpoll.opening_line,
