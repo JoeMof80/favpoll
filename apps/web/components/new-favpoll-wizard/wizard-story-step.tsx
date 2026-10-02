@@ -6,6 +6,7 @@ import type { MentionTarget } from "@/lib/mentions"
 import { CharCounter } from "@/components/favpoll-form/edit-helpers"
 import { WizardField } from "./wizard-field"
 import { WizardGenerateButton } from "./wizard-generate-button"
+import { WizardGenerateHelp } from "./wizard-generate-help"
 import { ghostsFor } from "./wizard-placeholders"
 import type { WizardState } from "./use-wizard-state"
 import { FIELD_HINTS, FIELD_LABELS, FIELD_LIMITS } from "@/lib/favpoll-fields"
@@ -46,8 +47,9 @@ export function WizardStoryStep({ w }: { w: WizardState }) {
           inputs' own left edge, above the About it fills. */}
       <div className="sm:grid sm:grid-cols-[180px_1fr] sm:gap-x-6">
         <span className="hidden sm:block" aria-hidden="true" />
-        <div className="min-w-0">
+        <div className="flex min-w-0 items-center gap-1">
           <WizardGenerateButton w={w} />
+          <WizardGenerateHelp />
         </div>
       </div>
 
