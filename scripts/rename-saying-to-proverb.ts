@@ -45,15 +45,24 @@ const TRIM = [
 ];
 
 async function main() {
-  const { data: topic } = await supabase
+  const { data: found } = await supabase
     .from("topics")
     .select("id, title")
-    .in("title", ["Saying", "Proverb"])
-    .maybeSingle();
-  if (!topic) {
+    .in("title", ["Saying", "Proverb"]);
+  const rows = found ?? [];
+  if (rows.length === 0) {
     console.log("No Saying or Proverb topic here — nothing to do.");
     return;
   }
+  // ORDER MATTERS: seeding first creates "Proverb" beside "Saying",
+  // because the seed inserts a title it cannot find. Refuse rather than
+  // rename one of a pair and leave the catalogue holding both.
+  if (rows.length > 1) {
+    throw new Error(
+      'Both "Saying" and "Proverb" exist here — the seed ran before this script. Merge them by hand: move any pledged item to the keeper, delete the empty topic, then re-run.',
+    );
+  }
+  const topic = rows[0];
 
   if (topic.title === "Saying") {
     if (DRY) {
