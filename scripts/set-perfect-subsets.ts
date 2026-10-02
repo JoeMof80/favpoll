@@ -40,14 +40,14 @@ const supabase = createClient(
 const DRY = process.argv.includes("--dry-run");
 const FORCE = process.argv.includes("--force");
 
-/** charity name → [perfect topic, perfect subset]. Section B of
+/** charity name → [perfect topic, perfect subset or null]. Section B of
  *  references/subsets-pairing-revisit-2026-10-01.md, ticked 2 Oct 2026.
  *  Deliberately absent: the charities whose whole list is already right
  *  (Dogs Trust and Battersea rehome every breed; the RSPCA's remit runs
  *  from pets to farm animals to wildlife, so Pet alone would narrow it
  *  wrongly; WWF is every animal), and the ones the suggester declined
  *  because their cause is a condition (Guide Dogs, RNIB, BHF). */
-const PERFECT: [charity: string, topic: string, subset: string][] = [
+const PERFECT: [charity: string, topic: string, subset: string | null][] = [
   ["RNLI", "Beach", "British beach"],
   ["Mountain Rescue England and Wales", "Mountain or peak", "British mountain"],
   ["Surfers Against Sewage", "Beach", "Surfing beach"],
@@ -55,7 +55,23 @@ const PERFECT: [charity: string, topic: string, subset: string][] = [
   ["Blue Cross", "Animal", "Pet"],
   // The Big Garden Birdwatch is the RSPB's own, and it is garden birds.
   ["RSPB", "Bird", "Garden bird"],
+  // Guide Dogs breed and train their own dogs — the pairing table has
+  // always called Dog breed theirs, and the subset names the working
+  // half of the list (section B's gap, closed 2026-10-02 when Working
+  // dog breed was approved). The suggester had declined them because
+  // their cause reads as a condition; the table's reading wins, on the
+  // founder's word.
+  ["Guide Dogs", "Dog breed", "Working dog breed"],
+  // No subset: the whole list is the charity's own.
+  ["Cats Protection", "Cat breed", null],
 ];
+
+/** "No topic of its own" — the confirmation AND the suggestion go, so
+ *  the charity leaves the Perfect topics queue decided. Age UK was
+ *  confirmed to Proverb on 2026-10-02 and cleared the same day: the
+ *  perfect-topic rules name "a saying for an older-people charity" as
+ *  the exact thing that is not a charity's own topic. */
+const CLEAR: string[] = ["Age UK"];
 
 async function main() {
   let set = 0;
@@ -76,26 +92,28 @@ async function main() {
       .select("id")
       .eq("title", topicTitle)
       .maybeSingle();
-    const { data: subset } = await supabase
-      .from("topic_subsets")
-      .select("id, status, topic_id")
-      .eq("title", subsetTitle)
-      .maybeSingle();
-    if (!topic || !subset) {
+    const { data: subset } = subsetTitle
+      ? await supabase
+          .from("topic_subsets")
+          .select("id, status, topic_id")
+          .eq("title", subsetTitle)
+          .maybeSingle()
+      : { data: null };
+    if (!topic || (subsetTitle && !subset)) {
       console.warn(
         `  ✗ ${name}: missing ${!topic ? `topic "${topicTitle}"` : `subset "${subsetTitle}"`}`,
       );
       skipped++;
       continue;
     }
-    if (subset.status !== "approved") {
+    if (subset && subset.status !== "approved") {
       console.warn(
         `  ✗ ${name}: subset "${subsetTitle}" is ${subset.status} — approve it on /subsets first`,
       );
       skipped++;
       continue;
     }
-    if (subset.topic_id !== topic.id) {
+    if (subset && subset.topic_id !== topic.id) {
       console.warn(
         `  ✗ ${name}: "${subsetTitle}" is not a subset of "${topicTitle}"`,
       );
@@ -113,28 +131,74 @@ async function main() {
       skipped++;
       continue;
     }
+    const label = subsetTitle ? `${topicTitle} / ${subsetTitle}` : topicTitle;
     if (
       charity.perfect_topic_id === topic.id &&
-      charity.perfect_subset_id === subset.id
+      charity.perfect_subset_id === (subset?.id ?? null)
     ) {
-      console.log(`  = ${name}: ${topicTitle} / ${subsetTitle} (already set)`);
+      console.log(`  = ${name}: ${label} (already set)`);
       continue;
     }
     if (DRY) {
-      console.log(`  → ${name}: ${topicTitle} / ${subsetTitle}`);
+      console.log(`  → ${name}: ${label}`);
       set++;
       continue;
     }
     const { error } = await supabase
       .from("charities")
-      .update({ perfect_topic_id: topic.id, perfect_subset_id: subset.id })
+      .update({
+        perfect_topic_id: topic.id,
+        perfect_subset_id: subset?.id ?? null,
+        // The suggestion follows the confirmation, so the Perfect topics
+        // queue does not offer a decided charity again.
+        perfect_topic_suggested_id: topic.id,
+        perfect_subset_suggested_id: subset?.id ?? null,
+      })
       .eq("id", charity.id);
     if (error) {
       console.warn(`  ✗ ${name}: ${error.message}`);
       skipped++;
       continue;
     }
-    console.log(`  ✓ ${name}: ${topicTitle} / ${subsetTitle}`);
+    console.log(`  ✓ ${name}: ${label}`);
+    set++;
+  }
+
+  for (const name of CLEAR) {
+    const { data: charity } = await supabase
+      .from("charities")
+      .select("id, name, perfect_topic_id, perfect_topic_suggested_id")
+      .eq("name", name)
+      .maybeSingle();
+    if (!charity) {
+      console.warn(`  ✗ ${name}: no such charity here`);
+      skipped++;
+      continue;
+    }
+    if (!charity.perfect_topic_id && !charity.perfect_topic_suggested_id) {
+      console.log(`  = ${name}: already has no topic of its own`);
+      continue;
+    }
+    if (DRY) {
+      console.log(`  → ${name}: clear (no topic of its own)`);
+      set++;
+      continue;
+    }
+    const { error } = await supabase
+      .from("charities")
+      .update({
+        perfect_topic_id: null,
+        perfect_subset_id: null,
+        perfect_topic_suggested_id: null,
+        perfect_subset_suggested_id: null,
+      })
+      .eq("id", charity.id);
+    if (error) {
+      console.warn(`  ✗ ${name}: ${error.message}`);
+      skipped++;
+      continue;
+    }
+    console.log(`  ✓ ${name}: cleared — no topic of its own`);
     set++;
   }
   console.log(

@@ -105,6 +105,7 @@ export const SUBSET_PARENTS: Record<string, string> = {
   "Citrus fruit": "Fruit",
   "Family dog breed": "Dog breed",
   "Small dog breed": "Dog breed",
+  "Working dog breed": "Dog breed",
   Pet: "Animal",
   "Farm animal": "Animal",
   "Garden bird": "Bird",
@@ -751,7 +752,15 @@ export const CHARITY_ROWS: Record<string, TopicRow[]> = {
   ],
   // Guide Dogs breeds and trains its own dogs: the one health charity
   // whose topic is an animal.
-  "Guide Dogs": [t("Dog breed", true), t("Animal"), t("Weather for walking")],
+  // Section B's one gap, closed 2026-10-02 once Working dog breed was
+  // approved: the herders, retrievers and guardians, which is the half
+  // of the list Guide Dogs actually breeds and trains.
+  "Guide Dogs": [
+    t("Dog breed", true),
+    t("Working dog breed", true),
+    t("Animal"),
+    t("Weather for walking"),
+  ],
   "Mountain Rescue England and Wales": [
     t("Mountain or peak", true),
     // They rescue on British mountains, not Everest (ticked 2026-10-02).
