@@ -82,6 +82,23 @@ const t = (topic: string, star = false, why?: string): TopicRow =>
  *  rejected the rest on /subsets. The ticked ones the September scan
  *  review had rejected were approved on 2026-10-02 and their rows are
  *  here. */
+/** Subsets that NAME AN OCCASION OUTRIGHT (the revisit of 2026-10-01,
+ *  section A). Inheritance is right for an ordinary slice — a Scottish
+ *  island is an island wherever islands pair — but wrong for these: a
+ *  wedding song inheriting Song's row put "favourite wedding song" on a
+ *  REMEMBRANCE in the 2 October exemplar cohort, and a Sunday roast
+ *  inheriting Comfort food put it on an achievement. They pair only
+ *  where a row names them, and nowhere else. */
+const NEVER_INHERIT = new Set([
+  "Cheese board",
+  "Christmas carol",
+  "Christmas classic",
+  "Family Christmas film",
+  "Christmas number one",
+  "Sunday roast",
+  "Wedding song",
+])
+
 export const SUBSET_PARENTS: Record<string, string> = {
   "Name for a grandmother": "Name for a grandparent",
   "Surfing beach": "Beach",
@@ -1110,7 +1127,10 @@ function findTopic(
   const want = norm(topicTitle)
   const own = rows.find((r) => norm(r.topic) === want) ?? null
   if (own || !parentTopicTitle) return own
-  // A subset inherits its parent's row (favpoll-topic-rules §1).
+  // A subset that names an occasion never falls back: the parent's row
+  // would carry it somewhere it does not belong.
+  if (NEVER_INHERIT.has(topicTitle.trim())) return null
+  // Every other subset inherits its parent's row (favpoll-topic-rules §1).
   const parent = norm(parentTopicTitle)
   return rows.find((r) => norm(r.topic) === parent) ?? null
 }
