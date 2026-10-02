@@ -13,6 +13,9 @@ const badgeVariants = cva(
         secondary: "bg-secondary text-secondary-foreground",
         outline: "border-border text-foreground",
         destructive: "bg-destructive/10 text-destructive",
+        // Register ink on a pale tint (the register-ink idiom): a quiet
+        // state mark, like "Picks suspended" on the poll heading.
+        ink: "bg-primary/10 text-primary",
       },
     },
     defaultVariants: {

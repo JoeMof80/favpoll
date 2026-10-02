@@ -431,11 +431,25 @@ describe("PollSection — suspended picks", () => {
     expect(card).not.toHaveTextContent("Don’t have a favourite?")
   })
 
-  it("tells entitled viewers the standings are frozen", () => {
-    render(<PollSection {...BASE_PROPS} entitled hasPledged picksSuspended />)
-    expect(
-      screen.getByText("The picks are in. The standings are frozen.")
-    ).toBeInTheDocument()
+  it("marks the heading row with a Picks suspended pill, pledged or not", () => {
+    const { unmount } = render(
+      <PollSection {...BASE_PROPS} entitled hasPledged picksSuspended />
+    )
+    expect(screen.getByText("Picks suspended")).toBeInTheDocument()
+    unmount()
+    render(
+      <PollSection
+        {...BASE_PROPS}
+        picksSuspended
+        onOpenPledgeDialog={vi.fn()}
+      />
+    )
+    expect(screen.getByText("Picks suspended")).toBeInTheDocument()
+  })
+
+  it("shows no pill while the picks are open", () => {
+    render(<PollSection {...BASE_PROPS} entitled hasPledged />)
+    expect(screen.queryByText("Picks suspended")).not.toBeInTheDocument()
   })
 
   it("says nothing extra once the favpoll has closed", () => {
@@ -448,8 +462,6 @@ describe("PollSection — suspended picks", () => {
         isClosed
       />
     )
-    expect(
-      screen.queryByText("The picks are in. The standings are frozen.")
-    ).not.toBeInTheDocument()
+    expect(screen.queryByText("Picks suspended")).not.toBeInTheDocument()
   })
 })

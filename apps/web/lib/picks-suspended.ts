@@ -23,7 +23,3 @@ export function picksSuspended(favpoll: PicksSuspendable): boolean {
  *  (founder's words, 2026-10-02). */
 export const PICKS_SUSPENDED_NOTICE =
   "The picks are in. Your pledge goes to the pot."
-
-/** The standings' line for everyone who can already see them. */
-export const STANDINGS_FROZEN_NOTICE =
-  "The picks are in. The standings are frozen."

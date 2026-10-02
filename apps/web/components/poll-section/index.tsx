@@ -11,7 +11,7 @@ import { EmptyPollAlert } from "./empty-poll-alert"
 import { TypedNote } from "./typed-note"
 import { Button } from "../ui/button"
 import { buildMechanicSteps } from "@/lib/mechanic-steps"
-import { STANDINGS_FROZEN_NOTICE } from "@/lib/picks-suspended"
+import { Badge } from "@/components/ui/badge"
 import { LockCardContent } from "@/components/lock-card-content"
 import {
   TrendingUpDown,
@@ -212,6 +212,16 @@ export function PollSection({
           <div className="min-w-0 flex-1">
             <PollHeading topicTitle={poll.topics.title} inert />
           </div>
+          {picksSuspended && !isClosed && (
+            /* THE PICKS ARE IN (founder, 2026-10-02): a state mark at the
+               thing it affects, on every viewport and in the room. The
+               lock card's steps still say why for the guest who hasn't
+               pledged; nothing allocates after this, so the standings
+               hold until the close. */
+            <Badge variant="ink" className="shrink-0">
+              Picks suspended
+            </Badge>
+          )}
           {entitled && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -300,14 +310,6 @@ export function PollSection({
       {/* Post-pledge: real reveal + real ranking list */}
       {entitled ? (
         <>
-          {picksSuspended && !isClosed && (
-            /* THE PICKS ARE IN (founder, 2026-10-02): nothing allocates
-               after the suspension, so the standings hold until the
-               close — say so where they are read. */
-            <p className="pb-2 text-sm text-muted-foreground">
-              {STANDINGS_FROZEN_NOTICE}
-            </p>
-          )}
           {personalNote && (
             <div className="pb-2">
               <TypedNote
