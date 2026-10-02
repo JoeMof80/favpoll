@@ -442,3 +442,38 @@ describe("usePledgeDialog — review tip", () => {
     expect(result.current.step).toBe(4)
   })
 })
+
+describe("usePledgeDialog — the picks are in (founder, 2026-10-02)", () => {
+  it("opens on the amount step with nothing picked", () => {
+    const { result } = renderHook(() =>
+      usePledgeDialog({ ...baseOptions, picksSuspended: true })
+    )
+    expect(result.current.firstStep).toBe(2)
+    expect(result.current.step).toBe(2)
+    expect(result.current.selectedIds).toEqual([])
+  })
+
+  it("Back never reaches the picker", async () => {
+    const { result } = renderHook(() =>
+      usePledgeDialog({ ...baseOptions, picksSuspended: true })
+    )
+    await act(async () => {
+      result.current.handleBack()
+    })
+    expect(result.current.step).toBe(2)
+  })
+
+  it("close resets to the amount step", async () => {
+    const { result } = renderHook(() =>
+      usePledgeDialog({ ...baseOptions, picksSuspended: true })
+    )
+    await act(async () => {
+      await result.current.handleNext()
+    })
+    expect(result.current.step).toBe(3)
+    await act(async () => {
+      result.current.handleClose()
+    })
+    expect(result.current.step).toBe(2)
+  })
+})

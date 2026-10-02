@@ -58,6 +58,9 @@ type Props = {
   showGuestAmounts?: boolean
   /** Organiser name + avatar for the rail card */
   organiser?: { name: string; avatarUrl: string | null } | null
+  /** The picks are in (lib/picks-suspended, server-derived): the pick
+   *  step is gone, pledges go to the pot, the standings are frozen. */
+  picksSuspended?: boolean
 }
 
 export function FavpollContent({
@@ -78,6 +81,7 @@ export function FavpollContent({
   rankHistoryDates,
   gatedCharityNames = [],
   showGuestAmounts = false,
+  picksSuspended = false,
   organiser,
 }: Props) {
   const router = useRouter()
@@ -169,6 +173,7 @@ export function FavpollContent({
         }
         showGuestAmounts={showGuestAmounts}
         isListed={isListed}
+        picksSuspended={picksSuspended}
         open={pledgeDialogOpen}
         onOpenChange={setPledgeDialogOpen}
       />
@@ -328,6 +333,7 @@ export function FavpollContent({
                 : undefined
             }
             pledgesGatedNotice={pledgesGatedNotice}
+            picksSuspended={picksSuspended}
           />
           {pledgeDialog}
         </>

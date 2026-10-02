@@ -21,6 +21,7 @@ import { DisplayPollSection } from "./display-poll-section"
 import type { DisplayPoll } from "./display-poll-section"
 import type { Charity } from "@favpoll/types"
 import { formatPounds } from "@/lib/i18n"
+import { STANDINGS_FROZEN_NOTICE } from "@/lib/picks-suspended"
 
 // The projector surface, styled like the favpoll (event) page: content left
 // (hero + rankings), meta right (QR — the room's call to action — countdown,
@@ -83,6 +84,9 @@ type Props = {
   avatar?: { name: string; photoUrl: string | null } | null
   /** Closed favpolls disclose the reveal; open ones withhold it */
   isClosed?: boolean
+  /** The picks are in (lib/picks-suspended): the room's standings say
+   *  they are frozen while pledges keep coming. */
+  picksSuspended?: boolean
   /** Register-derived starting variant; the presenter can override live */
   defaultVariant?: DisplayVariant
   /** Keys the presenter's variant override in localStorage */
@@ -133,6 +137,7 @@ export function DisplayScreen({
   closesAt = null,
   avatar = null,
   isClosed = false,
+  picksSuspended = false,
   defaultVariant = "fundraiser",
   favpollId,
   live = true,
@@ -658,6 +663,11 @@ export function DisplayScreen({
               <DisplayPollSection
                 poll={poll}
                 justClosed={localClosed && wasOpenAtMount}
+                notice={
+                  picksSuspended && !effectiveClosed
+                    ? STANDINGS_FROZEN_NOTICE
+                    : null
+                }
                 protagonistFirstName={
                   avatar
                     ? protagonistShortName(protagonistName)

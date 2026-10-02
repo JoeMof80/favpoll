@@ -37,6 +37,9 @@ type Props = {
   isListed?: boolean
   /** The favpoll's register palette — themes the portalled overlay. */
   dataRegister?: string | null
+  /** The picks are in (lib/picks-suspended): the pick step is gone and
+   *  the pledge goes to the pot. */
+  picksSuspended?: boolean
   /** Controlled mode — if provided, the internal trigger button is suppressed */
   open?: boolean
   onOpenChange?: (open: boolean) => void
@@ -55,6 +58,7 @@ export function PledgeDialog({
   suggestTip,
   showGuestAmounts = false,
   dataRegister,
+  picksSuspended = false,
   open: controlledOpen,
   onOpenChange: controlledOnOpenChange,
 }: Props) {
@@ -93,6 +97,7 @@ export function PledgeDialog({
     },
     onAddItem,
     suggestTip,
+    picksSuspended,
   })
 
   // Reset Stripe state whenever we leave the review step (back or re-entry)
@@ -110,7 +115,7 @@ export function PledgeDialog({
 
   // Reset step state when dialog opens fresh (controlled mode re-open after close)
   useEffect(() => {
-    if (isControlled && open && dialog.step !== 1) {
+    if (isControlled && open && dialog.step !== dialog.firstStep) {
       dialog.handleClose()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -205,15 +210,20 @@ export function PledgeDialog({
       ? "Pledge"
       : "Next"
 
+  // With the picks suspended the amount step is the first — its ghost
+  // button is the exit, as step 1's is.
+  const step2IsFirst = dialog.firstStep === 2
   const step2Footer = (
     <div className="flex gap-3">
       <Button
         type="button"
         variant="ghost"
         className="h-11 flex-1 md:text-base"
-        onClick={dialog.handleBack}
+        onClick={
+          step2IsFirst ? () => handleOpenChange(false) : dialog.handleBack
+        }
       >
-        Back
+        {step2IsFirst ? "Cancel" : "Back"}
       </Button>
       <Button
         type="button"
@@ -370,8 +380,10 @@ export function PledgeDialog({
             pledgeAmount={dialog.pledgeAmount}
             updatePledgeAmount={dialog.handleFavChange}
             useSharedFund={dialog.useSharedFund}
-            hasFund={dialog.hasFund}
+            // No favourite to put pot money on once the picks are in.
+            hasFund={dialog.hasFund && !picksSuspended}
             toggleFund={dialog.toggleFund}
+            picksSuspended={picksSuspended}
             impactStatements={impactStatements}
             favouriteBreakdown={dialog.favouriteBreakdown}
             fundPart={dialog.fundPart}

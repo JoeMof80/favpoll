@@ -33,6 +33,9 @@ type Props = {
    * pledge dialog.
    */
   compact?: boolean
+  /** No shared-pot footer — the steps already send the guest there
+   *  (the picks are in, lib/picks-suspended). */
+  hideFooter?: boolean
 }
 
 export function LockCardContent({
@@ -40,6 +43,7 @@ export function LockCardContent({
   topicTitle,
   ctaLabel = "Pledge your favourite",
   compact = false,
+  hideFooter = false,
 }: Props) {
   return (
     <>
@@ -77,7 +81,7 @@ export function LockCardContent({
             <span className="flex-1">{step}</span>
           </span>
         ))}
-        {!compact && (
+        {!compact && !hideFooter && (
           <span className="pt-1 text-[13px] text-muted-foreground/80">
             {mechanicFooter(topicTitle)}
           </span>

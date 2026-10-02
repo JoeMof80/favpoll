@@ -11,6 +11,7 @@ import { EmptyPollAlert } from "./empty-poll-alert"
 import { TypedNote } from "./typed-note"
 import { Button } from "../ui/button"
 import { buildMechanicSteps } from "@/lib/mechanic-steps"
+import { STANDINGS_FROZEN_NOTICE } from "@/lib/picks-suspended"
 import { LockCardContent } from "@/components/lock-card-content"
 import {
   TrendingUpDown,
@@ -126,6 +127,9 @@ type Props = {
    * agreement; renders as a quiet notice in the lock slot in place of the
    * pledge CTA (which arrives via onOpenPledgeDialog being undefined). */
   pledgesGatedNotice?: string
+  /** The picks are in (lib/picks-suspended): the lock card teaches the
+   *  pot's path and the standings say they are frozen. */
+  picksSuspended?: boolean
   /** Real item list — may be zeroed until entitled */
   initialItems: Favourite[]
   /** Called when the merged header-button is clicked pre-pledge */
@@ -153,6 +157,7 @@ export function PollSection({
   pledgesGatedNotice,
   favpollId,
   onOpenStory,
+  picksSuspended = false,
 }: Props) {
   const { rankingView, setRankingView } = usePollSection({
     pollId: poll.id,
@@ -180,13 +185,16 @@ export function PollSection({
     topicTitle: poll.topics.title,
     charityLine,
     hasNote: hasNote,
+    picksSuspended,
   })
 
   // "A note" covers favourite and message reveals alike (founder,
   // 2026-09-17) — the old favourite/message fork is gone.
-  const unlockAriaLabel = !hasNote
-    ? "Pledge your favourite to see the results"
-    : "Pledge to see a personal note and the results"
+  const unlockAriaLabel = picksSuspended
+    ? "Pledge to the shared pot to see the results"
+    : !hasNote
+      ? "Pledge your favourite to see the results"
+      : "Pledge to see a personal note and the results"
 
   return (
     <section
@@ -292,6 +300,14 @@ export function PollSection({
       {/* Post-pledge: real reveal + real ranking list */}
       {entitled ? (
         <>
+          {picksSuspended && !isClosed && (
+            /* THE PICKS ARE IN (founder, 2026-10-02): nothing allocates
+               after the suspension, so the standings hold until the
+               close — say so where they are read. */
+            <p className="pb-2 text-sm text-muted-foreground">
+              {STANDINGS_FROZEN_NOTICE}
+            </p>
+          )}
           {personalNote && (
             <div className="pb-2">
               <TypedNote
@@ -370,6 +386,8 @@ export function PollSection({
                   <LockCardContent
                     steps={lockSteps}
                     topicTitle={poll.topics.title}
+                    ctaLabel={picksSuspended ? "Pledge to the pot" : undefined}
+                    hideFooter={picksSuspended}
                   />
                 </Button>
               </span>

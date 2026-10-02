@@ -189,6 +189,7 @@ describe("createPledge", () => {
   it("throws when allocation insert returns an error", async () => {
     mock.queue(null) // PI-unused check
     mock.queue({ id: "pledge-1" }) // pledge insert ok
+    mock.queue(null) // picks-suspended lookup → open
     mock.queue(null, { message: "FK violation" }) // alloc insert fails
 
     await expect(createPledge(input)).rejects.toThrow("FK violation")
@@ -212,6 +213,59 @@ describe("createPledge", () => {
 // ─────────────────────────────────────────────────────────────────────────────
 // createGuestPledge
 // ─────────────────────────────────────────────────────────────────────────────
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Suspended picks (lib/picks-suspended, founder 2026-10-02)
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("createPledge — the picks are in", () => {
+  const input = {
+    favpollPollId: "poll-1",
+    potAllocationId: null,
+    totalAmount: 10,
+    allocations: [{ favouriteId: "item-a", amount: 10 }],
+    paymentIntentId: "pi_test_123",
+  }
+
+  it("drops the picks once the favpoll's picks are suspended", async () => {
+    mock.queue(null) // PI-unused check
+    mock.queue({ id: "pledge-1" }) // pledge insert
+    mock.queue({ favpolls: { picks_suspended_at: "2020-01-01T00:00:00Z" } })
+
+    await createPledge(input)
+
+    expect(mock.callsFor("pledges").some((c) => c.method === "insert")).toBe(
+      true
+    )
+    expect(mock.callsFor("pledge_allocations")).toHaveLength(0)
+  })
+
+  it("keeps the picks while the suspension is still scheduled", async () => {
+    mock.queue(null) // PI-unused check
+    mock.queue({ id: "pledge-1" })
+    mock.queue({ favpolls: { picks_suspended_at: "2999-01-01T00:00:00Z" } })
+    mock.queue(null) // allocations insert
+
+    await createPledge(input)
+
+    const insert = mock
+      .callsFor("pledge_allocations")
+      .find((c) => c.method === "insert")
+    expect(insert?.args[0]).toEqual([
+      { pledge_id: "pledge-1", favourite_id: "item-a", amount: 10 },
+    ])
+  })
+
+  it("never looks the favpoll up for a pick-less gift", async () => {
+    mock.queue(null) // PI-unused check
+    mock.queue({ id: "pledge-1" })
+
+    await createPledge({ ...input, allocations: [] })
+
+    expect(mock.callsFor("favpoll_polls")).toHaveLength(0)
+    expect(mock.callsFor("pledge_allocations")).toHaveLength(0)
+  })
+})
 
 describe("createGuestPledge", () => {
   const input = {
@@ -252,6 +306,7 @@ describe("createGuestPledge", () => {
     mock.queue(null) // PI-unused check
     mock.queue(null) // no existing pledge (maybeSingle)
     mock.queue({ id: "pledge-1" }) // pledge insert (single)
+    mock.queue(null) // picks-suspended lookup → open
     mock.queue(null) // allocations insert (await)
     mock.queue({
       // email data fetch (single)
@@ -281,7 +336,8 @@ describe("createGuestPledge", () => {
     mock.queue(null) // PI-unused check
     mock.queue(null) // no existing pledge
     mock.queue({ id: "pledge-1" })
-    mock.queue(null)
+    mock.queue(null) // picks-suspended lookup → open
+    mock.queue(null) // allocations insert
     mock.queue({
       favpolls: {
         closes_at: "2025-12-01T00:00:00Z",
@@ -300,7 +356,8 @@ describe("createGuestPledge", () => {
     mock.queue(null) // PI-unused check
     mock.queue(null) // no existing pledge
     mock.queue({ id: "pledge-1" })
-    mock.queue(null)
+    mock.queue(null) // picks-suspended lookup → open
+    mock.queue(null) // allocations insert
     mock.queue({
       favpolls: {
         closes_at: "2025-12-01T00:00:00Z",
@@ -327,7 +384,8 @@ describe("createGuestPledge", () => {
     mock.queue(null) // PI-unused check
     mock.queue(null) // no existing pledge
     mock.queue({ id: "pledge-1" })
-    mock.queue(null)
+    mock.queue(null) // picks-suspended lookup → open
+    mock.queue(null) // allocations insert
     mock.queue({
       favpolls: {
         closes_at: "",

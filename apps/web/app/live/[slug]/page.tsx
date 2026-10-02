@@ -1,5 +1,6 @@
 import { RegisterScope } from "@/components/register-scope"
 import { paletteForRegister } from "@/lib/register-palette"
+import { picksSuspended } from "@/lib/picks-suspended"
 import { notFound } from "next/navigation"
 import { headers } from "next/headers"
 import { createAdminClient } from "@/lib/supabase/admin"
@@ -222,6 +223,7 @@ export default async function LiveDisplayPage({ params }: Props) {
         isClosed={
           !!favpoll.closed_at || new Date(favpoll.closes_at) < new Date()
         }
+        picksSuspended={picksSuspended(favpoll)}
         defaultVariant={defaultVariant}
         favpollId={id}
         avatar={

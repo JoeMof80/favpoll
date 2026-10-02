@@ -20,6 +20,8 @@ type Props = {
   justClosed?: boolean
   /** Person favpolls: names the typed finale; null for causes */
   protagonistFirstName?: string | null
+  /** A quiet line under the topic — the frozen standings' word. */
+  notice?: string | null
 }
 
 // The display's poll block, in the event page's language: the same
@@ -35,6 +37,7 @@ export function DisplayPollSection({
   poll,
   justClosed = false,
   protagonistFirstName = null,
+  notice = null,
 }: Props) {
   const noteText = poll.personal_note
 
@@ -52,6 +55,12 @@ export function DisplayPollSection({
           {poll.topic.title}
         </span>
       </h2>
+
+      {notice && (
+        <p className="mb-4 text-base text-muted-foreground @3xl:text-lg">
+          {notice}
+        </p>
+      )}
 
       {!!noteText && justClosed && (
         <TypedNote

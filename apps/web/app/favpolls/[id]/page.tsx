@@ -8,6 +8,7 @@ import { notFound, redirect } from "next/navigation"
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { unconsentedNamesByFavpoll } from "@/lib/charity-consent"
+import { picksSuspended } from "@/lib/picks-suspended"
 import { fetchAllRows } from "@/lib/supabase/paginate"
 import { deriveRankHistory } from "@/lib/rank-history"
 import {
@@ -84,6 +85,9 @@ export default async function FavpollPage({ params }: Props) {
 
   const isClosed =
     !!favpoll.closed_at || new Date(favpoll.closes_at) < new Date()
+  // The picks are in (lib/picks-suspended): derived here, on the server's
+  // clock, so a scheduled suspension lands on the next request.
+  const suspended = picksSuspended(favpoll)
 
   // CONSENT GATE — under the consent-first posture (CHARITY_CONSENT_POSTURE),
   // pledging is withheld while any of this favpoll's charities hasn't yet
@@ -461,6 +465,7 @@ export default async function FavpollPage({ params }: Props) {
           userPotAllocation={userPotAllocation}
           totalRaised={totalRaised}
           isClosed={isClosed}
+          picksSuspended={suspended}
           wallEntries={wallEntries}
           rankHistory={rankHistory}
           rankHistoryDates={rankHistoryDates}

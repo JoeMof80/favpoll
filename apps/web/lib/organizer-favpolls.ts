@@ -26,6 +26,7 @@ export const ORGANIZER_FAVPOLL_COLUMNS = `
   goal_amount,
   is_listed,
   allow_guest_items,
+  picks_suspended_at,
   created_at`
 
 export type RawOrganizerRow = {
@@ -44,6 +45,7 @@ export type RawOrganizerRow = {
   goal_amount: number | null
   is_listed: boolean
   allow_guest_items: boolean | null
+  picks_suspended_at?: string | null
   created_at: string
   protagonists: { name: string } | null
   favpoll_charities: {
@@ -77,6 +79,7 @@ export function mapOrganizerFavpoll(ev: RawOrganizerRow): OrganizerFavpoll {
     goal_amount: ev.goal_amount ?? null,
     is_listed: ev.is_listed ?? true,
     allow_guest_items: ev.allow_guest_items ?? true,
+    picks_suspended_at: ev.picks_suspended_at ?? null,
     created_at: ev.created_at,
     protagonist: ev.protagonists ? { name: ev.protagonists.name } : null,
     charities: ev.favpoll_charities.map((ec) => ({ charity: ec.charities })),
