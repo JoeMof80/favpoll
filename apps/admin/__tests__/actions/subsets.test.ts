@@ -44,6 +44,22 @@ describe("approveSubset (favpoll-topic-rules §1, ruling 7)", () => {
       is_active: true,
     });
   });
+
+  it("approves a REJECTED subset — the way back (founder, 2026-10-02)", async () => {
+    mock.queue(
+      ["a", "b", "c", "d", "e", "f"].map((favourite_id) => ({ favourite_id })),
+    );
+    mock.queue(null);
+    const r = await approveSubset("rejected-1");
+    expect(r.error).toBeNull();
+    const update = mock
+      .callsFor("topic_subsets")
+      .find((c) => c.method === "update")!;
+    expect(update.args[0]).toMatchObject({
+      status: "approved",
+      is_active: true,
+    });
+  });
 });
 
 describe("renameSubset", () => {
