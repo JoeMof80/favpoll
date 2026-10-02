@@ -239,3 +239,33 @@ describe("subsets that name an occasion", () => {
     )
   })
 })
+
+describe("Karaoke song", () => {
+  it("never reaches a memorial through Song", () => {
+    expect(
+      lookupEdges({
+        register: "remembering",
+        occasionType: "Memorial",
+        topicTitle: "Karaoke song",
+        parentTopicTitle: "Song",
+        charityName: null,
+        causeFamily: null,
+      }).e1
+    ).toBeNull()
+  })
+
+  it("keeps the rows that name it", () => {
+    for (const occasionType of ["Birthday", "Divorce party"]) {
+      expect(
+        lookupEdges({
+          register: "celebrating_one",
+          occasionType,
+          topicTitle: "Karaoke song",
+          parentTopicTitle: "Song",
+          charityName: null,
+          causeFamily: null,
+        }).e1?.star
+      ).toBe(true)
+    }
+  })
+})

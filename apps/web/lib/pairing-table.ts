@@ -82,13 +82,18 @@ const t = (topic: string, star = false, why?: string): TopicRow =>
  *  rejected the rest on /subsets. The ticked ones the September scan
  *  review had rejected were approved on 2026-10-02 and their rows are
  *  here. */
-/** Subsets that NAME AN OCCASION OUTRIGHT (the revisit of 2026-10-01,
- *  section A). Inheritance is right for an ordinary slice — a Scottish
- *  island is an island wherever islands pair — but wrong for these: a
- *  wedding song inheriting Song's row put "favourite wedding song" on a
- *  REMEMBRANCE in the 2 October exemplar cohort, and a Sunday roast
- *  inheriting Comfort food put it on an achievement. They pair only
- *  where a row names them, and nowhere else. */
+/** Subsets that CARRY AN OCCASION OR A REGISTER of their own, and so
+ *  must never be borrowed. Inheritance is right for an ordinary slice —
+ *  a Scottish island is an island wherever islands pair — and wrong for
+ *  these, as two exemplar cohorts on 2026-10-02 showed: Wedding song
+ *  inheriting Song put "favourite wedding song" on a REMEMBRANCE,
+ *  Sunday roast inheriting Comfort food put it on an achievement, and
+ *  Karaoke song inheriting Song asked a WAKE for its favourite karaoke
+ *  number. The first seven name an occasion outright (the revisit of
+ *  2026-10-01, section A); Karaoke song names a kind of night, which
+ *  section E says is loud rather than tasteless everywhere except the
+ *  one place it is both. They pair where a row names them, and nowhere
+ *  else. */
 const NEVER_INHERIT = new Set([
   "Cheese board",
   "Christmas carol",
@@ -97,6 +102,7 @@ const NEVER_INHERIT = new Set([
   "Christmas number one",
   "Sunday roast",
   "Wedding song",
+  "Karaoke song",
 ])
 
 export const SUBSET_PARENTS: Record<string, string> = {
