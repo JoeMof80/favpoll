@@ -158,3 +158,114 @@ describe("subset rows of their own", () => {
     expect(subset.e2?.text).toContain("scottish island")
   })
 })
+
+// A subset that NAMES AN OCCASION never inherits (revisit section A).
+// Found by the exemplar cohort of 2026-10-02, which paired "favourite
+// wedding song" with a Remembrance and "Sunday roast" with an achievement.
+describe("subsets that name an occasion", () => {
+  it("Wedding song finds no row at a memorial, where Song has one", () => {
+    const parent = lookupEdges({
+      register: "remembering",
+      occasionType: "Remembrance",
+      topicTitle: "Song",
+      charityName: null,
+      causeFamily: null,
+    })
+    expect(parent.e1).not.toBeNull()
+    const subset = lookupEdges({
+      register: "remembering",
+      occasionType: "Remembrance",
+      topicTitle: "Wedding song",
+      parentTopicTitle: "Song",
+      charityName: null,
+      causeFamily: null,
+    })
+    expect(subset.e1).toBeNull()
+  })
+
+  it("but keeps the row that names it, at the anniversary", () => {
+    const e = lookupEdges({
+      register: "celebrating_many",
+      occasionType: "Anniversary",
+      topicTitle: "Wedding song",
+      parentTopicTitle: "Song",
+      charityName: null,
+      causeFamily: null,
+    })
+    expect(e.e1?.star).toBe(true)
+  })
+
+  it("Sunday roast does not reach an achievement through Comfort food", () => {
+    const e = lookupEdges({
+      register: "celebrating_one",
+      occasionType: "Achievement",
+      topicTitle: "Sunday roast",
+      parentTopicTitle: "Comfort food",
+      charityName: null,
+      causeFamily: null,
+    })
+    expect(e.e1).toBeNull()
+  })
+
+  it("and still stars at the family gathering that names it", () => {
+    const e = lookupEdges({
+      register: "celebrating_many",
+      occasionType: "Family gathering",
+      topicTitle: "Sunday roast",
+      parentTopicTitle: "Comfort food",
+      charityName: null,
+      causeFamily: null,
+    })
+    expect(e.e1?.star).toBe(true)
+  })
+
+  it("an ordinary subset still inherits", () => {
+    const e = lookupEdges({
+      register: "celebrating_one",
+      occasionType: "Birthday",
+      topicTitle: "Farm animal",
+      parentTopicTitle: "Animal",
+      charityName: null,
+      causeFamily: null,
+    })
+    expect(e.e1 === null).toBe(
+      lookupEdges({
+        register: "celebrating_one",
+        occasionType: "Birthday",
+        topicTitle: "Animal",
+        charityName: null,
+        causeFamily: null,
+      }).e1 === null
+    )
+  })
+})
+
+describe("Karaoke song", () => {
+  it("never reaches a memorial through Song", () => {
+    expect(
+      lookupEdges({
+        register: "remembering",
+        occasionType: "Memorial",
+        topicTitle: "Karaoke song",
+        parentTopicTitle: "Song",
+        charityName: null,
+        causeFamily: null,
+      }).e1
+    ).toBeNull()
+  })
+
+  it("keeps the rows that name it", () => {
+    for (const occasionType of ["Birthday", "Divorce party"]) {
+      expect(
+        lookupEdges({
+          register: "celebrating_one",
+          occasionType,
+          topicTitle: "Karaoke song",
+          parentTopicTitle: "Song",
+          charityName: null,
+          causeFamily: null,
+        }).e1?.star
+      ).toBe(true)
+    }
+  })
+})

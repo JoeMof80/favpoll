@@ -79,9 +79,32 @@ const t = (topic: string, star = false, why?: string): TopicRow =>
  *  2026-10-02). A row may name a subset only if it is listed here, and
  *  the drift guard holds each parent to the catalogue. APPROVED subsets
  *  only: a row cannot name what no poll can carry, and the founder
- *  rejected the rest on /subsets. Rows the ticks wanted for a rejected
- *  subset (Cheese board, Christmas carol, Sunday roast, Picture book,
- *  Fishing village, Comfort smell …) wait on an approval there. */
+ *  rejected the rest on /subsets. The ticked ones the September scan
+ *  review had rejected were approved on 2026-10-02 and their rows are
+ *  here. */
+/** Subsets that CARRY AN OCCASION OR A REGISTER of their own, and so
+ *  must never be borrowed. Inheritance is right for an ordinary slice —
+ *  a Scottish island is an island wherever islands pair — and wrong for
+ *  these, as two exemplar cohorts on 2026-10-02 showed: Wedding song
+ *  inheriting Song put "favourite wedding song" on a REMEMBRANCE,
+ *  Sunday roast inheriting Comfort food put it on an achievement, and
+ *  Karaoke song inheriting Song asked a WAKE for its favourite karaoke
+ *  number. The first seven name an occasion outright (the revisit of
+ *  2026-10-01, section A); Karaoke song names a kind of night, which
+ *  section E says is loud rather than tasteless everywhere except the
+ *  one place it is both. They pair where a row names them, and nowhere
+ *  else. */
+const NEVER_INHERIT = new Set([
+  "Cheese board",
+  "Christmas carol",
+  "Christmas classic",
+  "Family Christmas film",
+  "Christmas number one",
+  "Sunday roast",
+  "Wedding song",
+  "Karaoke song",
+])
+
 export const SUBSET_PARENTS: Record<string, string> = {
   "Name for a grandmother": "Name for a grandparent",
   "Surfing beach": "Beach",
@@ -115,6 +138,34 @@ export const SUBSET_PARENTS: Record<string, string> = {
   "Ancient ruin": "Landmark or building",
   "Nature sound": "Sound",
   "Music radio station": "Radio station",
+  // Approved 2026-10-02 — the founder's ticks over the September scan
+  // review (scripts/approve-ticked-subsets.ts).
+  "Picture book": "Children's book",
+  // Sunday roast is a subset of THREE topics (Comfort food, Vegetable,
+  // Sauce or condiment); the guard only needs one real parent.
+  "Sunday roast": "Comfort food",
+  "British pudding": "Pudding",
+  "Christmas carol": "Carol",
+  "Christmas classic": "Christmas film",
+  "Family Christmas film": "Christmas film",
+  "Christmas number one": "Christmas song",
+  "Cheese board": "Cheese",
+  "Childhood favourite": "Cartoon",
+  "British proverb": "Proverb",
+  "Life advice": "Proverb",
+  "Bucket and spade beach": "Seaside town",
+  "Fishing village": "Seaside town",
+  "Comfort smell": "Smell",
+  "Fruit tree": "Tree",
+  "Scented flower": "Flower",
+  "Spring flower": "Flower",
+  "Leafy green": "Vegetable",
+  "Salad vegetable": "Vegetable",
+  Terrier: "Dog breed",
+  "Garden insect": "Insect",
+  "Seaside castle": "Castle",
+  "Sunday service": "Hymn",
+  "BBC station": "Radio station",
 }
 
 const MEMORIAL: OccasionRow = {
@@ -123,6 +174,9 @@ const MEMORIAL: OccasionRow = {
     t("Hymn", true),
     t("Poem", true),
     t("Song"),
+    // The proverb she repeated IS something only she could tell you, so
+    // the subset passes the memorial test where its parent did not.
+    t("Life advice", false, "what she always said"),
     // Saying was here: a person can be known for one, but guests at a
     // wake have no favourite saying to pick (founder, 2026-09-25). The
     // topic was renamed PROVERB on 2026-10-02 — the list was always
@@ -192,6 +246,8 @@ const ACHIEVEMENT: OccasionRow = {
 const NEW_BABY: OccasionRow = {
   topics: [
     t("Children's book", true),
+    // What is actually read to a baby; the talking animals come later.
+    t("Picture book", true),
     t("Nursery rhyme", true),
     t("Name for a grandparent", true),
     t("Fairy tale"),
@@ -394,6 +450,8 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("County", false, "the place they have moved to"),
       t("City", false, "the place they have moved to"),
       t("Smell", false, "a house becoming a home"),
+      t("Comfort smell", false, "a house becoming a home"),
+      t("Fruit tree", false, "the garden that comes with the house"),
     ],
     at: "",
     hop: "settling in",
@@ -407,6 +465,14 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Word"),
       t("Regional or dialect word"),
       t("Proverb"),
+      // Britishness IS the constituent here, so the British slice stars
+      // where its parent only gestures (ticked 2026-10-02).
+      t("British proverb", true),
+      t(
+        "Bucket and spade beach",
+        false,
+        "the British seaside, bucket and spade"
+      ),
       t("TV programme"),
       t("Football team"),
       t("Seaside town"),
@@ -495,8 +561,10 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       enact("Crisps", "the winners go on the bar"),
       enact("Sweet", "the winners fill the bowls on the tables"),
       // The night's karaoke IS the enacted outcome (ticked 2026-10-02).
-      // Cheese board waits on its approval on /subsets.
       enact("Karaoke song", "the top ten are the karaoke list for the night"),
+      // The subset names the enacted thing exactly (ticked 2026-10-02).
+      enact("Cheese board", "the winners go on the board"),
+      t("Childhood favourite", false, "what everyone watched then"),
       t("Decade", true),
       t("Music era", true),
       t("School subject"),
@@ -550,6 +618,14 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       // number one wait on their approval on /subsets.
       t("Roast dinner meat", true),
       t("Roast dinner vegetable", true),
+      // Three topics hold a "Sunday roast" subset; at a family gathering
+      // it is the constituent (ticked 2026-10-02).
+      t("Sunday roast", true),
+      t("British pudding"),
+      t("Christmas carol", true),
+      t("Christmas classic", true),
+      t("Family Christmas film", true),
+      t("Christmas number one", true),
       t("Name for a grandmother", true),
       t("Classic board game", true),
       t("Children's board game", true),
@@ -734,6 +810,7 @@ export const CHARITY_ROWS: Record<string, TopicRow[]> = {
     // its approval on /subsets.
     t("British beach", true),
     t("Surfing beach", true),
+    t("Fishing village", true),
     t("Sea creature"),
     t("Island"),
     t("Weather"),
@@ -749,6 +826,10 @@ export const CHARITY_ROWS: Record<string, TopicRow[]> = {
     t("Vegetable"),
     t("Fruit"),
     t("Berry"),
+    t("Scented flower", true),
+    t("Spring flower", true),
+    t("Fruit tree"),
+    t("Leafy green"),
   ],
   // Guide Dogs breeds and trains its own dogs: the one health charity
   // whose topic is an animal.
@@ -774,6 +855,7 @@ export const CHARITY_ROWS: Record<string, TopicRow[]> = {
     t("Dog breed", true),
     t("Family dog breed", true),
     t("Small dog breed", true),
+    t("Terrier"),
     t("Animal"),
     t("Weather for walking"),
     t("Beach"),
@@ -788,6 +870,7 @@ export const CHARITY_ROWS: Record<string, TopicRow[]> = {
     t("Cat breed"),
     t("Bird"),
     t("Garden bird"),
+    t("Garden insect"),
     t("Butterfly"),
     t("Insect"),
   ],
@@ -813,6 +896,7 @@ export const CHARITY_ROWS: Record<string, TopicRow[]> = {
     // 2026-10-02); Seaside castle waits on its approval on /subsets.
     t("English castle", true),
     t("Welsh castle", true),
+    t("Seaside castle", true),
     t("Ancient ruin", true),
     t("British beach", true),
     t("Garden to visit", true),
@@ -831,9 +915,13 @@ export const CHARITY_ROWS: Record<string, TopicRow[]> = {
     t("Music era"),
     t("Decade"),
     t("Smell"),
+    // Reminiscence: the sharper cues (ticked 2026-10-02).
+    t("Comfort smell", true),
     t("Proverb"),
+    t("Life advice"),
     t("TV theme tune"),
     t("Hymn"),
+    t("Sunday service"),
     t("Childhood game"),
     t("Sweet"),
   ],
@@ -843,6 +931,8 @@ export const CHARITY_ROWS: Record<string, TopicRow[]> = {
     t("Outdoor activity", true),
     t("Citrus fruit"),
     t("Berry"),
+    t("Leafy green"),
+    t("Salad vegetable"),
     t("Sport to play"),
     t("Weather for walking"),
     t("Landscape"),
@@ -857,6 +947,8 @@ export const CHARITY_ROWS: Record<string, TopicRow[]> = {
     t("Smell", true),
     t("Radio station", true),
     t("Music radio station", true),
+    t("BBC station", true),
+    t("Comfort smell", true),
     t("Instrument"),
     t("Song"),
     t("Weather"),
@@ -1041,7 +1133,10 @@ function findTopic(
   const want = norm(topicTitle)
   const own = rows.find((r) => norm(r.topic) === want) ?? null
   if (own || !parentTopicTitle) return own
-  // A subset inherits its parent's row (favpoll-topic-rules §1).
+  // A subset that names an occasion never falls back: the parent's row
+  // would carry it somewhere it does not belong.
+  if (NEVER_INHERIT.has(topicTitle.trim())) return null
+  // Every other subset inherits its parent's row (favpoll-topic-rules §1).
   const parent = norm(parentTopicTitle)
   return rows.find((r) => norm(r.topic) === parent) ?? null
 }

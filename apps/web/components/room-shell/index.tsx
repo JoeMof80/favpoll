@@ -7,7 +7,11 @@ import { FavpollLogo } from "@/components/favpoll-logo"
 import { DisplayChrome } from "./display-chrome"
 import { FavpollSheet } from "@/components/favpoll-sheet"
 import type { WallEntry } from "@/components/guest-book"
-import { DISPLAY_ROOM } from "@/lib/display"
+import {
+  DISPLAY_ROOM,
+  roomTypeScale,
+  roomTypeScaleAtWidth,
+} from "@/lib/display"
 import type { FavpollWithDetails, FavpollPollWithItems } from "@favpoll/types"
 
 // THE ROOM LAYER (2026-09-30): the live display is the favpoll page's
@@ -126,8 +130,19 @@ export function RoomShell({
   }, [live, closesAt, isClosed])
   const effectiveClosed = isClosed || localClosed
 
+  // THE PROJECTOR'S TYPE RAMP (lib/display, ROOM_TYPE_RAMP). It came
+  // off with DisplayScreen and the room has been rendering at page
+  // sizes since: the ranking labels, the topic and the money figure all
+  // read small across a room. Live, the ramp is vw-relative; a still
+  // resolves the same clamp against the width it DEPICTS, never the
+  // visitor's viewport — one ramp, two renderings, so the still cannot
+  // drift from the screen it claims to show.
+  const typeScale = (
+    still ? roomTypeScaleAtWidth(DISPLAY_ROOM.w) : roomTypeScale
+  ) as React.CSSProperties
+
   return (
-    <>
+    <div style={typeScale} className="contents">
       {/* The presenter's chrome: the app header is suppressed on this
           route (header-mount) and NOTHING takes its place — no band, no
           spacer (founder, 2026-09-30: "remove the header, like the
@@ -208,6 +223,6 @@ export function RoomShell({
         // The whole screen: no header above the sheet on this surface.
         shellHeight={still ? `${DISPLAY_ROOM.h}px` : "100vh"}
       />
-    </>
+    </div>
   )
 }

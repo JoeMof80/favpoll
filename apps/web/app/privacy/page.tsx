@@ -105,10 +105,10 @@ export default function PrivacyPage() {
         <p>
           Runs your favpoll: showing the poll, the standings and the guest book,
           and delivering the reveal after a pledge. Passes what is raised to the
-          chosen registered charity, in full. Sends service emails, such as
-          confirming a pledge — favpoll does not send marketing email. Adds your
-          favourite — anonymised, with no name attached — to favpoll&rsquo;s
-          all-time record of favourites.
+          chosen registered charity. Sends service emails, such as confirming a
+          pledge — favpoll does not send marketing email. Adds your favourite —
+          anonymised, with no name attached — to favpoll&rsquo;s all-time record
+          of favourites.
         </p>
         <p>
           The lawful bases for this are performing our contract with you
