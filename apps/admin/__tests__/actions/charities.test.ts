@@ -30,6 +30,8 @@ import {
   getCharityTopics,
   setCharityTopics,
   setCharityConsent,
+  getPerfectTopicQueue,
+  dismissPerfectTopicSuggestion,
 } from "@/lib/actions/charities";
 
 beforeEach(() => {
@@ -586,5 +588,59 @@ describe("updateCharity — cause family", () => {
     });
     expect(error).toBe("Unknown cause family: puppies");
     expect(mock.callsFor("charities")).toHaveLength(0);
+  });
+});
+
+// THE PERFECT TOPIC QUEUE (founder, 2026-10-02): the consent queue showed
+// a suggestion only while a charity was pending AND in use, so decided
+// charities kept unconfirmed suggestions nobody could see.
+describe("getPerfectTopicQueue", () => {
+  it("asks for active charities whose suggestion is unconfirmed, whatever their consent", async () => {
+    mock.queue([{ id: "c1", name: "RSPB" }]);
+    const r = await getPerfectTopicQueue();
+    expect(r.error).toBeNull();
+    expect(r.data).toEqual([{ id: "c1", name: "RSPB" }]);
+    const calls = mock.callsFor("charities");
+    expect(calls.find((c) => c.method === "is")?.args).toEqual([
+      "perfect_topic_id",
+      null,
+    ]);
+    expect(calls.find((c) => c.method === "not")?.args).toEqual([
+      "perfect_topic_suggested_id",
+      "is",
+      null,
+    ]);
+    expect(calls.find((c) => c.method === "eq")?.args).toEqual([
+      "is_active",
+      true,
+    ]);
+    // Never filtered by consent status or by favpoll use.
+    expect(
+      calls.some((c) => JSON.stringify(c.args).includes("consent_status")),
+    ).toBe(false);
+  });
+});
+
+describe("dismissPerfectTopicSuggestion", () => {
+  it("clears both suggested ids — 'no topic of its own' is a real answer", async () => {
+    mock.queue(null);
+    const r = await dismissPerfectTopicSuggestion("c1");
+    expect(r.error).toBeNull();
+    const update = mock
+      .callsFor("charities")
+      .find((c) => c.method === "update")!;
+    expect(update.args[0]).toEqual({
+      perfect_topic_suggested_id: null,
+      perfect_subset_suggested_id: null,
+    });
+  });
+
+  it("leaves the CONFIRMED topic alone", async () => {
+    mock.queue(null);
+    await dismissPerfectTopicSuggestion("c1");
+    const update = mock
+      .callsFor("charities")
+      .find((c) => c.method === "update")!;
+    expect(update.args[0]).not.toHaveProperty("perfect_topic_id");
   });
 });

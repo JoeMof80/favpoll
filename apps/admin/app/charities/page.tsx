@@ -1,7 +1,12 @@
-import { getCharities, getConsentQueue } from "@/lib/actions/charities";
+import {
+  getCharities,
+  getConsentQueue,
+  getPerfectTopicQueue,
+} from "@/lib/actions/charities";
 import { getTopics } from "@/lib/actions/topics";
 import { CharitiesTable, AddCharityForm } from "@/components/charities-table";
 import { ConsentQueue } from "@/components/consent-queue";
+import { PerfectTopicQueue } from "@/components/perfect-topic-queue";
 
 const MARKETS = ["en-GB"];
 
@@ -13,12 +18,17 @@ export default async function CharitiesPage({ searchParams }: Props) {
   const { market } = await searchParams;
   const activeMarket = MARKETS.includes(market ?? "") ? market : undefined;
 
-  const [{ data: charities, error }, { data: topics }, { data: queue }] =
-    await Promise.all([
-      getCharities(activeMarket),
-      getTopics(),
-      getConsentQueue(),
-    ]);
+  const [
+    { data: charities, error },
+    { data: topics },
+    { data: queue },
+    { data: perfectQueue },
+  ] = await Promise.all([
+    getCharities(activeMarket),
+    getTopics(),
+    getConsentQueue(),
+    getPerfectTopicQueue(),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -60,6 +70,8 @@ export default async function CharitiesPage({ searchParams }: Props) {
       {error && <p className="text-sm text-destructive">{error}</p>}
 
       <ConsentQueue rows={queue ?? []} topics={topics ?? []} />
+
+      <PerfectTopicQueue rows={perfectQueue ?? []} topics={topics ?? []} />
 
       <CharitiesTable charities={charities ?? []} allTopics={topics ?? []} />
     </div>

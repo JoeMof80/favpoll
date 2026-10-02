@@ -484,6 +484,62 @@ export async function setPerfectTopic(
   return { error: null };
 }
 
+/** PERFECT TOPIC QUEUE — every active charity whose suggestion is still
+ * unconfirmed, whatever its consent status and whether or not a favpoll
+ * uses it. The consent queue shows a suggestion only while the charity is
+ * pending AND in use, so an approved charity left the queue carrying its
+ * suggestion with it and a charity nobody has picked never entered
+ * (founder, 2026-10-02: "where are the perfect topics to be reviewed?").
+ * This is that door. */
+export type PerfectTopicQueueRow = {
+  id: string;
+  name: string;
+  cause_family: CauseFamily | null;
+  perfect_topic_id: string | null;
+  perfect_topic_suggested_id: string | null;
+  perfect_topic_reason: string | null;
+  perfect_subset_id: string | null;
+  perfect_subset_suggested_id: string | null;
+  signature_events: SignatureEvent[] | null;
+};
+
+export async function getPerfectTopicQueue(): Promise<{
+  data: PerfectTopicQueueRow[] | null;
+  error: string | null;
+}> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("charities")
+    .select(
+      "id, name, cause_family, perfect_topic_id, perfect_topic_suggested_id, perfect_topic_reason, perfect_subset_id, perfect_subset_suggested_id, signature_events",
+    )
+    .eq("is_active", true)
+    .is("perfect_topic_id", null)
+    .not("perfect_topic_suggested_id", "is", null)
+    .order("name", { ascending: true });
+  if (error) return { data: null, error: error.message };
+  return { data: (data ?? []) as PerfectTopicQueueRow[], error: null };
+}
+
+/** "No topic of its own" — the other real answer (a hospice, a
+ * grant-maker). Clearing the suggestion is what takes the charity off the
+ * queue; a later backfill --all may suggest again. */
+export async function dismissPerfectTopicSuggestion(
+  id: string,
+): Promise<{ error: string | null }> {
+  const supabase = createAdminClient();
+  const { error } = await supabase
+    .from("charities")
+    .update({
+      perfect_topic_suggested_id: null,
+      perfect_subset_suggested_id: null,
+    })
+    .eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/charities");
+  return { error: null };
+}
+
 /** CONSENT — approve or decline a charity for receiving pledges (the
  * PF/CP posture machinery; see apps/web/lib/charity-consent.ts). Approval
  * also lists the charity — register-added ones arrive is_active=false —
