@@ -11,7 +11,7 @@ vi.mock("@/components/branded-qr", () => ({
     <div data-testid="branded-qr" aria-label={props["aria-label"]} />
   ),
 }))
-vi.mock("@/components/display-screen/display-chrome", () => ({
+vi.mock("@/components/room-shell/display-chrome", () => ({
   DisplayChrome: ({
     variant,
     onVariantChange,
@@ -142,6 +142,21 @@ describe("RoomShell — the sheet on the screen in the room", () => {
       expect(sheet.dataset.closed).toBe("true")
       expect(sheet.dataset.reveal).toBe("true")
       expect(screen.queryAllByTestId("branded-qr")).toHaveLength(0)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it("as a still: the room's furniture, no presenter chrome, no refresh", () => {
+    vi.useFakeTimers()
+    try {
+      renderShell({ still: true })
+      expect(screen.queryByTestId("chrome")).not.toBeInTheDocument()
+      expect(screen.getAllByTestId("branded-qr")).toHaveLength(2)
+      act(() => {
+        vi.advanceTimersByTime(11_000)
+      })
+      expect(refresh).not.toHaveBeenCalled()
     } finally {
       vi.useRealTimers()
     }

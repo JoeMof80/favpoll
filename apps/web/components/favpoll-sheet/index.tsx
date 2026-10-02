@@ -88,6 +88,9 @@ export type FavpollSheetProps = {
    *  closed while the room watched, so the note types out over the final
    *  standings — the one moment a shared screen shows the reveal. */
   reveal?: boolean
+  /** A STILL of the sheet (the landing page's screen-in-a-room): the
+   *  screen's own height for the shell, instead of the viewport's. */
+  shellHeight?: string
   /** Guest presentation only. */
   viewer?: SheetViewer
   /** Rendered in the left column straight after the standings — the
@@ -113,6 +116,7 @@ export function FavpollSheet({
   presentation = "guest",
   heroVariant = "tribute",
   reveal = false,
+  shellHeight,
   viewer,
   afterPoll,
   children,
@@ -449,6 +453,7 @@ export function FavpollSheet({
       right={right}
       appShell
       railExpanded={guestBookExpanded}
+      shellHeight={shellHeight}
     >
       {children}
     </PageLayout>

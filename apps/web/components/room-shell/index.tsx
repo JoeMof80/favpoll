@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { BrandedQR } from "@/components/branded-qr"
-import { DisplayChrome } from "@/components/display-screen/display-chrome"
-import type { DisplayVariant } from "@/components/display-screen"
+import { FavpollLogo } from "@/components/favpoll-logo"
+import { DisplayChrome } from "./display-chrome"
 import { FavpollSheet } from "@/components/favpoll-sheet"
 import type { WallEntry } from "@/components/guest-book"
+import { DISPLAY_ROOM } from "@/lib/display"
 import type { FavpollWithDetails, FavpollPollWithItems } from "@favpoll/types"
 
 // THE ROOM LAYER (2026-09-30): the live display is the favpoll page's
@@ -16,6 +17,18 @@ import type { FavpollWithDetails, FavpollPollWithItems } from "@favpoll/types"
 // the finale. Everything the room WATCHES is the sheet, so a redesign of
 // the page is a redesign of the display; DisplayScreen, a second tree
 // of the same layout, fell behind every time (founder, 2026-09-30).
+
+// The presence dial (founder, 2026-08-02): how loud the room's screen is.
+// "fundraiser" is telethon theatre — the money is the heading; "tribute"
+// turns the volume down — the person is the heading and the money stays
+// quiet. The default derives from the favpoll's register (memorial →
+// tribute), and the presenter can override it live from the chrome
+// menu; the override sticks per favpoll on this machine.
+export type DisplayVariant = "fundraiser" | "tribute"
+
+/** The app header's height, which the chrome takes over on the live
+ *  route and the sheet is laid out beneath. */
+const CHROME_H = 56
 
 type Props = {
   favpoll: FavpollWithDetails
@@ -34,6 +47,19 @@ type Props = {
    *  upstream (remembering → tribute), overridable from the chrome and
    *  remembered per favpoll on this machine. */
   defaultVariant?: DisplayVariant
+  /**
+   * THE DISPLAY AS A ROOM SEES IT, on a still (founder, 2026-08-27: "Why
+   * don't we make it an exact match of the real thing including the
+   * logo?"). A still is a DISPLAY_ROOM-sized box the caller scales down:
+   * it keeps the room's own furniture — the brand mark in the corner and
+   * the two gutter codes — anchored to that box rather than the viewport
+   * (`fixed` resolves against the nearest transformed ancestor, so inside
+   * the landing page's scaled frame the codes landed in the middle of the
+   * rankings). It drops what only a presenter drives: the menu (a
+   * dropdown that opens nothing is worse than an absent one), the refresh
+   * loop, the finale timer, the remembered dial.
+   */
+  still?: boolean
 }
 
 export function RoomShell({
@@ -46,7 +72,9 @@ export function RoomShell({
   manageUrl,
   qrUrl,
   defaultVariant = "fundraiser",
+  still = false,
 }: Props) {
+  const live = !still
   const [variant, setVariant] = useState<DisplayVariant>(defaultVariant)
   const variantKey = `favpoll:display-variant:${favpoll.id}`
 
@@ -54,9 +82,10 @@ export function RoomShell({
   // state: the server render knows nothing of localStorage, and a
   // mismatch would break hydration).
   useEffect(() => {
+    if (!live) return
     const stored = window.localStorage.getItem(variantKey)
     if (stored === "fundraiser" || stored === "tribute") setVariant(stored)
-  }, [variantKey])
+  }, [live, variantKey])
 
   function handleVariantChange(next: DisplayVariant) {
     setVariant(next)
@@ -71,9 +100,10 @@ export function RoomShell({
   // fresh entries, the totals sync.
   const router = useRouter()
   useEffect(() => {
+    if (!live) return
     const id = setInterval(() => router.refresh(), 5000)
     return () => clearInterval(id)
-  }, [router])
+  }, [live, router])
 
   // The close, witnessed live: when closes_at passes while the room is
   // watching, the countdown gives way and the reveal types out — the
@@ -84,7 +114,7 @@ export function RoomShell({
   const [wasOpenAtMount] = useState(!isClosed)
   const closesAt = favpoll.closed_at ? null : (favpoll.closes_at ?? null)
   useEffect(() => {
-    if (isClosed || !closesAt) return
+    if (!live || isClosed || !closesAt) return
     const delta = new Date(closesAt).getTime() - Date.now()
     if (delta <= 0) {
       setLocalClosed(true)
@@ -93,7 +123,7 @@ export function RoomShell({
     if (delta > 2 ** 31 - 1) return // beyond setTimeout range; irrelevant live
     const id = setTimeout(() => setLocalClosed(true), delta)
     return () => clearTimeout(id)
-  }, [closesAt, isClosed])
+  }, [live, closesAt, isClosed])
   const effectiveClosed = isClosed || localClosed
 
   return (
@@ -101,12 +131,20 @@ export function RoomShell({
       {/* The presenter's chrome: the app header is suppressed on this
           route (header-mount), and this bar takes its geometry — fixed,
           h-14 — so the sheet below sits exactly where it does under the
-          app header. The spacer is the header's own height. */}
-      <DisplayChrome
-        eventUrl={manageUrl}
-        variant={variant}
-        onVariantChange={handleVariantChange}
-      />
+          app header. The spacer is the header's own height. A still
+          keeps only the brand mark, at the chrome's own geometry (the
+          h-14 row, items-center, px-6), anchored to its box. */}
+      {live ? (
+        <DisplayChrome
+          eventUrl={manageUrl}
+          variant={variant}
+          onVariantChange={handleVariantChange}
+        />
+      ) : (
+        <div className="pointer-events-none absolute top-0 right-0 left-0 z-20 flex h-14 items-center px-6">
+          <FavpollLogo />
+        </div>
+      )}
       <div className="h-14" aria-hidden="true" />
 
       {/* The QR as chrome (founder, 2026-08-02): a standing instruction to
@@ -119,16 +157,25 @@ export function RoomShell({
           often occluded in a room. The inset = half the gutter's spare
           space, so each QR centres in its gutter at any width (gutter =
           (100vw − 64rem)/2, the sheet's max-w-5xl; spare = gutter −
-          200px). Only from 1440px, where the gutter (208px) fits the
-          200px code. Gone once the poll has closed: nothing to scan for. */}
+          200px). Live: only from 1440px, where the gutter (208px) fits
+          the 200px code. A still: anchored to its box (100%, not 100vw —
+          the still's width IS the screen it depicts) and always shown,
+          the caller guaranteeing the gutters exist. Gone once the poll
+          has closed: nothing to scan for. */}
       {!effectiveClosed &&
         (["left", "right"] as const).map((side) => (
           <div
             key={side}
-            className={`pointer-events-none fixed top-1/2 z-20 hidden -translate-y-1/2 flex-col items-center gap-2 min-[1440px]:flex ${
+            className={`pointer-events-none top-1/2 z-20 -translate-y-1/2 flex-col items-center gap-2 ${
+              live ? "fixed hidden min-[1440px]:flex" : "absolute flex"
+            } ${
               side === "left"
-                ? "left-[calc((100vw-64rem)/4-100px)]"
-                : "right-[calc((100vw-64rem)/4-100px)]"
+                ? live
+                  ? "left-[calc((100vw-64rem)/4-100px)]"
+                  : "left-[calc((100%-64rem)/4-100px)]"
+                : live
+                  ? "right-[calc((100vw-64rem)/4-100px)]"
+                  : "right-[calc((100%-64rem)/4-100px)]"
             }`}
           >
             <BrandedQR
@@ -137,6 +184,9 @@ export function RoomShell({
               colorVar="--qr"
               aria-label="Scan to pledge on your phone"
             />
+            {/* text-qr: the generated utility is the CSS reference that
+                stops the build stripping the --qr token BrandedQR reads
+                at runtime. */}
             <p className="text-sm font-medium text-qr">Scan to pledge</p>
           </div>
         ))}
@@ -153,6 +203,7 @@ export function RoomShell({
         presentation="room"
         heroVariant={variant}
         reveal={localClosed && wasOpenAtMount}
+        shellHeight={still ? `${DISPLAY_ROOM.h - CHROME_H}px` : undefined}
       />
     </>
   )
