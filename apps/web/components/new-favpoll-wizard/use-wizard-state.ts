@@ -9,8 +9,14 @@ import type { FavpollLocks } from "@/lib/favpoll-locks"
 import {
   safeGenerateDraft,
   getCachedDraftGhosts,
+  pairingIsEnacted,
 } from "@/lib/actions/generate-draft"
-import { groupingForWho, subjectForWho, type WhoValue } from "@/lib/who"
+import {
+  groupingForWho,
+  subjectForWho,
+  type WhoValue,
+  pronounForWho,
+} from "@/lib/who"
 import { deriveRegister } from "@/lib/registers"
 import type {
   Category,
@@ -99,9 +105,7 @@ function whoFor(
   if (subject === "cause") return "cause"
   if (grouping === "couple") return "couple"
   if (grouping === "group") return "group"
-  // "i" (the organiser is the protagonist) has no who icon yet — noted
-  // as a product decision, 2026-09-24 — so it reads as unanswered here.
-  return pronoun === "i" ? "" : (pronoun ?? "")
+  return pronoun === "i" ? "me" : (pronoun ?? "")
 }
 
 function sortTopicItems(items: Favourite[]): Favourite[] {
@@ -200,6 +204,14 @@ export function useWizardState(
   // read lands before Story renders; debounced because the name keys
   // the cache and arrives per keystroke. Never fires for custom topics
   // (empty topicId would collide in the cache key).
+  // THE PICKS DECIDE THE NIGHT (topic rules additions §D, founder
+  // 2026-10-02): a switch on Generate. The pairing row pre-sets it where
+  // the occasion and topic pair as enacted (read alongside the ghosts);
+  // the organiser's own press overrides the row either way.
+  const [rowEnacted, setRowEnacted] = useState(false)
+  const [enactedChoice, setEnactedChoice] = useState<boolean | null>(null)
+  const enacted = enactedChoice ?? rowEnacted
+  const setEnacted = (on: boolean) => setEnactedChoice(on)
   const [cachedGhosts, setCachedGhosts] = useState<{
     about: string
     note: string
@@ -455,9 +467,7 @@ export function useWizardState(
     setWho(value)
     setGrouping(groupingForWho(value))
     setSubject(subjectForWho(value))
-    setPronoun(
-      value === "he" || value === "she" || value === "they" ? value : undefined
-    )
+    setPronoun(pronounForWho(value))
   }
 
   // Cause only exists under Fundraiser (the who dropdown hides it
@@ -487,17 +497,28 @@ export function useWizardState(
     }
     const id = ++ghostRequestId.current
     const timer = setTimeout(async () => {
-      const result = await getCachedDraftGhosts({
-        register,
-        subject,
-        topicId: prefetchTopicId,
-        primaryCharityId: primaryCharity?.id ?? null,
-        pronoun,
-        grouping,
-        displayName: prefetchName || null,
-      })
+      const [result, enactedRow] = await Promise.all([
+        getCachedDraftGhosts({
+          register,
+          subject,
+          topicId: prefetchTopicId,
+          primaryCharityId: primaryCharity?.id ?? null,
+          pronoun,
+          grouping,
+          displayName: prefetchName || null,
+        }),
+        pairingIsEnacted({
+          register,
+          subject,
+          topicId: prefetchTopicId,
+          subsetId: prefetchTopic?.subsetId ?? null,
+        }),
+      ])
       // Stale-response guard: only the latest request may land
-      if (ghostRequestId.current === id) setCachedGhosts(result)
+      if (ghostRequestId.current === id) {
+        setCachedGhosts(result)
+        setRowEnacted(enactedRow)
+      }
     }, 500)
     return () => clearTimeout(timer)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -537,6 +558,7 @@ export function useWizardState(
         pronoun,
         grouping,
         displayName: name.trim() || null,
+        enacted,
         skipCache: hasGeneratedRef.current,
       })
       if ("error" in result) {
@@ -795,6 +817,9 @@ export function useWizardState(
     railDone,
     generating,
     generateExample,
+    enacted,
+    rowEnacted,
+    setEnacted,
     cachedGhosts,
     submitting,
     error,

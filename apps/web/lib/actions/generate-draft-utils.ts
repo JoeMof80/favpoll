@@ -129,7 +129,10 @@ export function buildCacheKey(
   pronoun?: string | null,
   displayName?: string | null,
   grouping?: string | null,
-  occasionType?: string | null
+  occasionType?: string | null,
+  /** The Generate switch (topic rules additions §D): a draft written as
+   *  an outcome and one written as a reveal are different drafts. */
+  enacted?: boolean
 ): string {
   // v7 (2026-09-28): the topic keeps its title case in the closing sentence;
   // every earlier draft carries a lowercased topic and retires.
@@ -159,5 +162,6 @@ export function buildCacheKey(
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
     : "none"
-  return `v7:${register}:${topicId}:${charityPart}:${subject}:${pronounPart}:${groupPart}:${occasionPart}:${namePart}`
+  const base = `v7:${register}:${topicId}:${charityPart}:${subject}:${pronounPart}:${groupPart}:${occasionPart}:${namePart}`
+  return enacted === undefined ? base : `${base}|enacted:${enacted ? 1 : 0}`
 }
