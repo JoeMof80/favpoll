@@ -13,6 +13,10 @@ const badgeVariants = cva(
         secondary: "bg-secondary text-secondary-foreground",
         outline: "border-border text-foreground",
         destructive: "bg-destructive/10 text-destructive",
+        // The warning tokens as a state mark (founder, 2026-10-02: the
+        // suspended picks "should take on warning style") — the Button's
+        // warning pill, badge-sized.
+        warning: "bg-warning/15 text-warning-strong",
       },
     },
     defaultVariants: {
