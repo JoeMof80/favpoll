@@ -20,6 +20,8 @@ export type OrganizerFavpoll = {
   goal_amount: number | null
   is_listed: boolean
   allow_guest_items?: boolean
+  /** See lib/picks-suspended: null = open, set = suspended. */
+  picks_suspended_at?: string | null
   created_at: string
   protagonist: { name: string } | null
   charities: {

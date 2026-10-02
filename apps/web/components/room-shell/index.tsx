@@ -33,6 +33,9 @@ type Props = {
   wallEntries: WallEntry[]
   organiser?: { name: string; avatarUrl: string | null } | null
   isClosed: boolean
+  /** The picks are in (lib/picks-suspended): the room's standings say
+   *  they are frozen while pledges keep coming. */
+  picksSuspended?: boolean
   /** Where the chrome's menu leads — the manage hub, the room the
    *  presenter came from (founder, 2026-09-03). */
   manageUrl: string
@@ -65,6 +68,7 @@ export function RoomShell({
   wallEntries,
   organiser,
   isClosed,
+  picksSuspended = false,
   manageUrl,
   qrUrl,
   defaultVariant = "fundraiser",
@@ -193,6 +197,7 @@ export function RoomShell({
         pollWithItems={pollWithItems}
         totalRaised={totalRaised}
         isClosed={effectiveClosed}
+        picksSuspended={picksSuspended}
         isOrganiser={false}
         wallEntries={wallEntries}
         rankHistory={null}

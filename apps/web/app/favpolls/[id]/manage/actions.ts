@@ -257,3 +257,18 @@ export async function setFavpollTopic(
     )
   }
 }
+
+// SUSPEND THE PICKS (founder, 2026-10-02 — lib/picks-suspended). One
+// tap: suspend stamps the server's now, resume clears it. No schedule —
+// "if there is a moment at which the guests are ready to act, that is
+// the moment to suspend" — and nothing moves on a closed favpoll.
+export async function setPicksSuspended(favpollId: string, suspend: boolean) {
+  const { supabase } = await ownedOpenFavpoll(favpollId)
+  const value = suspend ? new Date().toISOString() : null
+  const { error } = await supabase
+    .from("favpolls")
+    .update({ picks_suspended_at: value })
+    .eq("id", favpollId)
+  if (error) throw new Error(error.message)
+  return value
+}

@@ -9,6 +9,7 @@ import {
   RATE_LIMIT_MESSAGE,
 } from "@/lib/rate-limit"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { picksSuspended } from "@/lib/picks-suspended"
 import {
   assertPledgeableCharitiesByPoll,
   assertPledgeableCharitiesByFavpoll,
@@ -95,6 +96,26 @@ type CreatePledgeInput = {
   giftAid?: GiftAidInput | null
 }
 
+// SUSPENDED PICKS (lib/picks-suspended, founder 2026-10-02): once the
+// organiser suspends the picks, every pledge is a gift with no favourite
+// attached. The dialog has already skipped the pick step; this is the
+// permission check behind it. The card is charged by the time we are
+// here, so a stale pick is DROPPED, never refused — the money still
+// lands, on the pot's path, exactly as the suspended page promised.
+async function allocationsAllowed(
+  supabase: ReturnType<typeof createAdminClient>,
+  favpollPollId: string
+): Promise<boolean> {
+  const { data } = await supabase
+    .from("favpoll_polls")
+    .select("favpolls(picks_suspended_at)")
+    .eq("id", favpollPollId)
+    .single()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- nested select
+  const favpoll = (data as any)?.favpolls ?? null
+  return !favpoll || !picksSuspended(favpoll)
+}
+
 export async function createPledge(input: CreatePledgeInput) {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
@@ -143,7 +164,10 @@ export async function createPledge(input: CreatePledgeInput) {
       amount: a.amount,
     }))
 
-  if (allocations.length > 0) {
+  if (
+    allocations.length > 0 &&
+    (await allocationsAllowed(supabase, input.favpollPollId))
+  ) {
     const { error: allocErr } = await supabase
       .from("pledge_allocations")
       .insert(allocations)
@@ -298,7 +322,10 @@ export async function createGuestPledge(input: CreateGuestPledgeInput) {
       amount: a.amount,
     }))
 
-  if (allocations.length > 0) {
+  if (
+    allocations.length > 0 &&
+    (await allocationsAllowed(supabase, input.favpollPollId))
+  ) {
     const { error: allocErr } = await supabase
       .from("pledge_allocations")
       .insert(allocations)
@@ -646,7 +673,10 @@ export async function pledgeFromFund(input: {
       amount: a.amount,
     }))
 
-  if (allocations.length > 0) {
+  if (
+    allocations.length > 0 &&
+    (await allocationsAllowed(supabase, input.favpollPollId))
+  ) {
     const { error: allocErr } = await supabase
       .from("pledge_allocations")
       .insert(allocations)

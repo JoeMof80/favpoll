@@ -75,6 +75,9 @@ export type FavpollSheetProps = {
   pickerPoll?: FavpollPollWithItems | null
   totalRaised: number
   isClosed: boolean
+  /** The picks are in (lib/picks-suspended): the lock card teaches the
+   *  pot's path, the standings say they are frozen — guest and room. */
+  picksSuspended?: boolean
   isOrganiser: boolean
   wallEntries: WallEntry[]
   rankHistory: RankHistory | null
@@ -111,6 +114,7 @@ export function FavpollSheet({
   pickerPoll,
   totalRaised,
   isClosed,
+  picksSuspended = false,
   isOrganiser,
   wallEntries,
   rankHistory,
@@ -430,6 +434,7 @@ export function FavpollSheet({
             initialItems={standing.items}
             onOpenPledgeDialog={standing.onOpenPledgeDialog}
             pledgesGatedNotice={standing.pledgesGatedNotice}
+            picksSuspended={picksSuspended}
           />
           {afterPoll}
         </>

@@ -24,6 +24,9 @@ export type UsePledgeDialogOptions = {
   onAddItem?: (label: string) => Promise<string | void>
   /** false defaults the contribution to None (memorials) */
   suggestTip?: boolean
+  /** The picks are in (lib/picks-suspended): no pick step, no pot to
+   *  draw from — the pledge opens on the amount and goes to the pot. */
+  picksSuspended?: boolean
 }
 
 export function usePledgeDialog({
@@ -36,7 +39,12 @@ export function usePledgeDialog({
   onPledgeSuccess,
   onAddItem,
   suggestTip,
+  picksSuspended = false,
 }: UsePledgeDialogOptions) {
+  // SUSPENDED PICKS (founder, 2026-10-02): the dialog opens on the
+  // amount step and never offers the picker — a gift with no favourite
+  // attached, the path "Give without picking" already takes.
+  const firstStep: PledgeDialogStep = picksSuspended ? 2 : 1
   // --- step 1: the favourite picker (settled 2026-09-16 after a
   // tap-advance audition): chips TOGGLE — multi-select stays visible and
   // self-evident — and the footer's primary commits: "Next →" with a
@@ -46,7 +54,7 @@ export function usePledgeDialog({
   // no standing add gate (creatable combobox — "+ Add ‘X’" auto-selects
   // its chip), and step 2's per-line remove. No draft ids: toggles commit
   // directly.
-  const [step, setStep] = useState<PledgeDialogStep>(1)
+  const [step, setStep] = useState<PledgeDialogStep>(firstStep)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [search, setSearch] = useState("")
   // ADD IS ITS OWN SCREEN (founder, 2026-09-16, option C): the picker is
@@ -286,7 +294,7 @@ export function usePledgeDialog({
       setStep(3)
     } else if (step === 3) {
       setStep(2)
-    } else if (step === 2) {
+    } else if (step === 2 && !picksSuspended) {
       setStep(1)
     }
   }
@@ -300,7 +308,7 @@ export function usePledgeDialog({
   }
 
   function handleClose() {
-    setStep(1)
+    setStep(firstStep)
     setSelectedIds([])
     setSearch("")
     setAddError(null)
@@ -313,6 +321,7 @@ export function usePledgeDialog({
   return {
     // step
     step,
+    firstStep,
     // step 1
     selectedIds,
     toggleFavourite,

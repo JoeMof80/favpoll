@@ -1,6 +1,7 @@
 "use client"
 
 import { formatPoundsExact } from "@/lib/i18n"
+import { PICKS_SUSPENDED_NOTICE } from "@/lib/picks-suspended"
 import { Slider } from "@/components/ui/slider"
 import { Button } from "@/components/ui/button"
 import { InputGroup, InputGroupAddon } from "@/components/ui/input-group"
@@ -163,6 +164,9 @@ type Props = {
   pledgeAmount: string
   updatePledgeAmount: (v: string) => void
   useSharedFund: boolean
+  /** The picks are in (lib/picks-suspended): the note says where the
+   *  pledge goes instead of teaching the split. */
+  picksSuspended?: boolean
   hasFund: boolean
   toggleFund: () => void
   /** Admin-curated impact lines per charity ("£20 funds an hour…") */
@@ -191,6 +195,7 @@ export function StepAmount({
   pledgeAmount,
   updatePledgeAmount,
   useSharedFund,
+  picksSuspended = false,
   hasFund,
   toggleFund,
   impactStatements,
@@ -271,6 +276,7 @@ export function StepAmount({
             pay page only — this caption stays. */}
         {!useSharedFund && (
           <p className="text-[11px] text-muted-foreground">
+            {picksSuspended && `${PICKS_SUSPENDED_NOTICE} `}
             {showSplit &&
               "The shared pot backs guests without a favourite — add to it, or slide to rebalance. "}
             {!showSplit &&

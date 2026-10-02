@@ -408,3 +408,48 @@ describe("PollSection — lock explainer", () => {
     expect(screen.getByText(/all money will go to charity/)).toBeInTheDocument()
   })
 })
+
+// ─── The picks are in (founder, 2026-10-02) ──────────────────────────────────
+
+describe("PollSection — suspended picks", () => {
+  it("the lock card teaches the pot's path and drops the shared-pot footer", () => {
+    render(
+      <PollSection
+        {...BASE_PROPS}
+        picksSuspended
+        onOpenPledgeDialog={vi.fn()}
+      />
+    )
+    const card = screen.getByRole("button", {
+      name: /Pledge to the shared pot to see the results/i,
+    })
+    expect(card).toHaveTextContent(
+      "The picks are in — pledge to the shared pot"
+    )
+    expect(card).toHaveTextContent("Pledge to the pot")
+    expect(card).not.toHaveTextContent("Pick your favourite")
+    expect(card).not.toHaveTextContent("Don’t have a favourite?")
+  })
+
+  it("tells entitled viewers the standings are frozen", () => {
+    render(<PollSection {...BASE_PROPS} entitled hasPledged picksSuspended />)
+    expect(
+      screen.getByText("The picks are in. The standings are frozen.")
+    ).toBeInTheDocument()
+  })
+
+  it("says nothing extra once the favpoll has closed", () => {
+    render(
+      <PollSection
+        {...BASE_PROPS}
+        entitled
+        hasPledged
+        picksSuspended
+        isClosed
+      />
+    )
+    expect(
+      screen.queryByText("The picks are in. The standings are frozen.")
+    ).not.toBeInTheDocument()
+  })
+})

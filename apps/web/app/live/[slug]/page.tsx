@@ -1,5 +1,6 @@
 import { RegisterScope } from "@/components/register-scope"
 import { paletteForRegister } from "@/lib/register-palette"
+import { picksSuspended } from "@/lib/picks-suspended"
 import { notFound } from "next/navigation"
 import { headers } from "next/headers"
 import { createAdminClient } from "@/lib/supabase/admin"
@@ -231,6 +232,7 @@ export default async function LiveDisplayPage({ params }: Props) {
         wallEntries={wallEntries}
         organiser={organiser}
         isClosed={isClosed}
+        picksSuspended={picksSuspended(favpoll)}
         // The chrome's menu navigates HERE — to the manage hub, the room
         // the presenter came from (founder, 2026-09-03) — while the QR
         // target stays the guest short form. See app/p/[code]/page.tsx.

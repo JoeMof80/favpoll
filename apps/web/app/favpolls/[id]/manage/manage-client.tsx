@@ -21,6 +21,8 @@ import {
   Share2,
   FileHeart,
   Trash2,
+  Pause,
+  Play,
 } from "lucide-react"
 import { BrandedQR } from "@/components/branded-qr"
 import { GuestBook, type WallEntry } from "@/components/guest-book"
@@ -46,7 +48,7 @@ import {
   EditableGoalRow,
   EditableTextRow,
 } from "@/components/manage/editable-row"
-import { updateStoryField, type StoryField } from "./actions"
+import { updateStoryField, setPicksSuspended, type StoryField } from "./actions"
 import { BumpChart } from "@/components/bump-chart"
 import { RankingList } from "@/components/ranking-list"
 import { Countdown } from "@/components/countdown"
@@ -237,6 +239,12 @@ export function ManageClient({
     favpoll.show_guest_amounts === true
   )
   const [showGuestAmountsPending, setShowGuestAmountsPending] = useState(false)
+  // THE PICKS (founder, 2026-10-02 — lib/picks-suspended): one button,
+  // suspend now / resume. No schedule.
+  const [suspendAt, setSuspendAt] = useState<string | null>(
+    favpoll.picks_suspended_at ?? null
+  )
+  const [suspendPending, setSuspendPending] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
   const [copied, setCopied] = useState<string | null>(null)
@@ -290,6 +298,31 @@ export function ManageClient({
       setGuestItemsPending(false)
     }
   }
+
+  async function handleToggleSuspend(value: boolean) {
+    const before = suspendAt
+    setSuspendAt(value ? new Date().toISOString() : null)
+    setSuspendPending(true)
+    try {
+      setSuspendAt(await setPicksSuspended(favpoll.id, value))
+      router.refresh()
+    } catch (e) {
+      setSuspendAt(before)
+      toast.error(e instanceof Error ? e.message : "Couldn't save", {
+        style: TOAST_ERROR_STYLE,
+      })
+    } finally {
+      setSuspendPending(false)
+    }
+  }
+  const picksSentence = suspendAt
+    ? `The picks are in since ${new Date(suspendAt).toLocaleString("en-GB", {
+        day: "numeric",
+        month: "short",
+        hour: "numeric",
+        minute: "2-digit",
+      })}. Every pledge goes to the shared pot until the close.`
+    : "End the picks early. Every pledge then goes to the shared pot until the close, and the standings hold."
 
   const canDelete =
     favpoll.pledge_count === 0 && (favpoll.pot?.total_deposited ?? 0) === 0
@@ -708,6 +741,32 @@ export function ManageClient({
             {showDonationsSentence(showGuestAmounts)}
           </SwitchLine>
         </SettingsRow>
+        {!isClosed && (
+          /* A BUTTON ROW in the Delete row's grammar, just above it (founder, 2026-10-02:
+             "not sure the Picks switch is prominent enough … should we
+             call it Suspend"): the verb on the button, the state in the
+             description. Reversible, so no confirm. */
+          <SettingsRow label={FIELD_LABELS.picks} description={picksSentence}>
+            <Button
+              type="button"
+              variant="warning"
+              className="h-11 px-3.5 md:text-base"
+              disabled={suspendPending}
+              onClick={() => handleToggleSuspend(!suspendAt)}
+            >
+              {suspendAt ? (
+                <Play data-icon="inline-start" aria-hidden="true" />
+              ) : (
+                <Pause data-icon="inline-start" aria-hidden="true" />
+              )}
+              {suspendPending
+                ? "Saving…"
+                : suspendAt
+                  ? "Resume the picks"
+                  : "Suspend the picks"}
+            </Button>
+          </SettingsRow>
+        )}
         {!isClosed && (
           <SettingsRow
             label="Delete this favpoll"
