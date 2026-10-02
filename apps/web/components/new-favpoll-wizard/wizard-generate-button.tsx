@@ -53,13 +53,16 @@ const WHO_LABELS: Record<WhoValue, string> = {
   he: "He",
   she: "She",
   they: "They",
-  me: "Me",
+  me: "I",
   couple: "Pair",
   group: "Group",
   cause: "Cause",
 }
 
-const PRONOUN_ORDER: WhoValue[] = ["he", "she", "they", "me", "couple", "group"]
+// "I" first (founder, 2026-10-02): the organiser's own favpoll is the
+// nearest case, and the set reads as the subject pronouns it is — I,
+// He, She, They — before the pair and the group.
+const PRONOUN_ORDER: WhoValue[] = ["me", "he", "she", "they", "couple", "group"]
 const isPronounWho = (w: WhoValue | "") =>
   w === "he" || w === "she" || w === "they" || w === "me"
 
@@ -81,13 +84,15 @@ export function WizardGenerateButton({ w }: { w: WizardState }) {
           <Button
             type="button"
             variant="secondary"
+            size="sm"
             disabled={lockStructural && !whoIsPronoun}
             aria-label={
               w.who ? `Who: ${WHO_LABELS[w.who]}` : "Who is this favpoll for?"
             }
-            // h-11: the group stands in the field column at the fields'
-            // own 44px (founder, 2026-10-02), as Cancel and Save do.
-            className="h-11 rounded-r-none border-0 px-3"
+            // Compact, not the fields' 44px: tried and turned back the
+            // same day (founder, 2026-10-02: "I prefer the button group
+            // height to be less").
+            className="rounded-r-none border-0 px-2"
           >
             {WhoIcon && <WhoIcon className="h-4 w-4" aria-hidden="true" />}
             <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
@@ -138,8 +143,9 @@ export function WizardGenerateButton({ w }: { w: WizardState }) {
             ? "The picks decide the night: Generate writes the outcome. Press to write a reveal instead."
             : "Press if the guests' picks decide the night: Generate writes the outcome instead of a reveal."
         }
+        size="sm"
         onClick={() => w.setEnacted(!w.enacted)}
-        className={`h-11 rounded-none border-0 px-3 ${
+        className={`rounded-none border-0 px-2 ${
           w.enacted ? "bg-primary/15 text-primary hover:bg-primary/20" : ""
         }`}
       >
@@ -149,9 +155,10 @@ export function WizardGenerateButton({ w }: { w: WizardState }) {
       <Button
         type="button"
         variant="secondary"
+        size="sm"
         disabled={w.generating || w.topics.length === 0}
         onClick={w.generateExample}
-        className="h-11 rounded-l-none border-0"
+        className="rounded-l-none border-0"
       >
         {w.generating ? "Generating…" : "✦ Generate an example"}
       </Button>
