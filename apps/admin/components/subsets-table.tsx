@@ -153,7 +153,22 @@ function SubsetRowView({ row }: { row: SubsetRow }) {
             </Button>
           )}
           {row.status === "rejected" && (
-            <StatusBadge tone="destructive">Rejected</StatusBadge>
+            <>
+              <StatusBadge tone="destructive">Rejected</StatusBadge>
+              {/* A rejection is not final (founder, 2026-10-02): the
+                  pairing-table revisit wanted rows for subsets rejected
+                  in the first review, and approveSubset works from any
+                  status — only the way back was missing. */}
+              <Button
+                type="button"
+                size="xs"
+                variant="outline"
+                disabled={isPending || tooFew}
+                onClick={() => run(() => approveSubset(row.id))}
+              >
+                {isPending ? "…" : "Approve"}
+              </Button>
+            </>
           )}
           {row.status === "approved" && !row.is_active && (
             <StatusBadge tone="warning">Delisted</StatusBadge>
