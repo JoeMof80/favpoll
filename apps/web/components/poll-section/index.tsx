@@ -218,7 +218,7 @@ export function PollSection({
                lock card's steps still say why for the guest who hasn't
                pledged; nothing allocates after this, so the standings
                hold until the close. */
-            <Badge variant="ink" className="shrink-0">
+            <Badge variant="warning" className="shrink-0">
               Picks suspended
             </Badge>
           )}
