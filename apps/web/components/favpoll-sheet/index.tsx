@@ -12,6 +12,9 @@ import type { RankHistory } from "@/lib/rank-history"
 import { FavpollHero } from "@/components/favpoll-hero"
 import { CauseHero } from "@/components/cause-hero"
 import { PollSection } from "@/components/poll-section"
+import { FundraiserStrip } from "@/components/heroes/fundraiser-slots"
+import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
+import { Ticker } from "@/components/ui/ticker"
 import type {
   Favourite,
   FavpollWithDetails,
@@ -133,7 +136,12 @@ export function FavpollSheet({
 
   const isCause = favpoll.subject === "cause"
 
-  // The fundraiser hero's figures come from the sheet's own data; only
+  // "Marie Curie", "A & B" or "A, B & C" — for the pre-pledge trust line
+  const charityLine = joinCharityNames(
+    favpoll.favpoll_charities.map((ec) => ({ charity: ec.charities }))
+  )
+
+  // The fundraiser strip's figures come from the sheet's own data; only
   // the room turns the dial (see heroes/fundraiser-slots).
   const heroFundraiser =
     room && heroVariant === "fundraiser"
@@ -141,8 +149,25 @@ export function FavpollSheet({
           totalRaised,
           goalAmount: favpoll.goal_amount ?? null,
           isClosed,
+          charityLabel:
+            favpoll.favpoll_charities.length > 1
+              ? `${favpoll.favpoll_charities.length} charities`
+              : charityLine || null,
         }
       : undefined
+
+  // The person (or cause) for the fundraiser dial's row: the name, the
+  // context as the organiser row's quiet line ("Great North Run" is the
+  // one thing a room wants to know; founder, 2026-09-30), a small photo.
+  const personName = isCause
+    ? (favpoll.cause_label ?? "")
+    : (favpoll.protagonists?.name ?? "")
+  const personContext = isCause
+    ? (favpoll.context ?? null)
+    : (favpoll.protagonists?.context ?? null)
+  const personPhoto = isCause
+    ? (favpoll.photo_url ?? null)
+    : (favpoll.protagonists?.photo_url ?? null)
 
   // THE ROOM'S STANDING: the standings show, the reveal is withheld —
   // entitled to the list, never to the note — until the finale, when the
@@ -164,11 +189,6 @@ export function FavpollSheet({
         year: "numeric",
       })
     : null
-
-  // "Marie Curie", "A & B" or "A, B & C" — for the pre-pledge trust line
-  const charityLine = joinCharityNames(
-    favpoll.favpoll_charities.map((ec) => ({ charity: ec.charities }))
-  )
 
   // The rail's cards, shared with the MOBILE STACK below the standings
   // (founder, 2026-09-18): PageLayout hides the right column below md,
@@ -277,12 +297,102 @@ export function FavpollSheet({
       {/* The expanded rail halves the sheet, so the hero takes its
           compact sizes (founder, 2026-09-29: the context "breaks" when
           the guest book is expanded). */}
-      {isCause ? (
+      {/* THE FUNDRAISER DIAL (room only; founder, 2026-09-30, settled over
+          four cuts): no hero band at all. The pledge goal first, in the
+          countdown card's grammar, then the person as a row in the
+          organiser block's grammar — the rail's pinned pair, mirrored
+          on the left. No About: the room is not reading. Tribute keeps
+          the full hero. */}
+      {heroFundraiser ? (
+        // md:pt-[72px], not the band's pt-16: the rail's pinned countdown
+        // eyebrow sits at y=72 in the room, and this strip's eyebrow is
+        // its mirror (measured 64 vs 72 at pt-16).
+        <div className="mb-6 pt-6 md:pt-[72px]">
+          <FundraiserStrip fundraiser={heroFundraiser} />
+          {/* THE BAR IS THE HAIRLINE (founder, 2026-09-30: "replace the
+              light border with the pledge goal bar"): where the rail draws
+              its hairline under the countdown card, this column draws the
+              goal's bar — the light track full width, the fill along it.
+              Without a goal, the hairline itself. */}
+          {/* A 1px slot, the hairline's own height, so the row beneath
+              sits where the organiser row sits either way; the bar
+              straddles the line rather than pushing the row down. */}
+          <div className="mt-5 flex h-px items-center">
+            {heroFundraiser.goalAmount && !isClosed ? (
+              <GoalProgress
+                totalRaised={totalRaised}
+                goalAmount={heroFundraiser.goalAmount}
+                className="h-1"
+              />
+            ) : (
+              <div
+                className="w-full border-t border-border"
+                aria-hidden="true"
+              />
+            )}
+          </div>
+          {/* The person's row, mirroring the organiser block: the rail's
+              py-5 rhythm and a hairline beneath. The name, larger than the
+              organiser's, the context beneath it, the photo at the right
+              edge. */}
+          {/* min-h-[76px] = the organiser row's box (two text lines + py-5
+              + its hairline), so this row's bottom border meets the
+              organiser's (measured 219 vs 222 without it). */}
+          <div className="flex min-h-[76px] items-center justify-between gap-3 border-b border-border py-5">
+            {/* ONE LINE in the hero's own grammar (founder, 2026-09-30):
+                the name in ink, the context in the register's ink after a
+                muted dot — "Jane Pound · Great North Run". The opening
+                line was tried as an inline eyebrow and dropped (founder,
+                2026-10-01: "better without"). Too wide, it runs as a TICKER (founder: "a ticker
+                is still the best option, wrapping is worse") — see
+                ui/ticker: still when it fits, a slow loop when it does
+                not, truncated under reduced motion. The trailing copy
+                renders the name as a span so the page keeps one h1. */}
+            {/* leading-normal, not none: the ticker's box clips to its line
+                box, and at leading-none a 20px line has no room for a
+                descender — "Mary" lost its y (founder, 2026-10-01). 30px
+                still sits inside the organiser row's 36px block. */}
+            <Ticker
+              className="text-xl leading-normal font-medium text-foreground"
+              shadow={
+                <>
+                  <span>{personName}</span>
+                  {personContext && (
+                    <span className="font-normal text-primary">
+                      <span className="text-muted-foreground"> ·&nbsp;</span>
+                      {personContext}
+                    </span>
+                  )}
+                </>
+              }
+            >
+              <h1 className="inline">{personName}</h1>
+              {personContext && (
+                <span className="font-normal text-primary">
+                  <span className="text-muted-foreground"> ·&nbsp;</span>
+                  {personContext}
+                </span>
+              )}
+            </Ticker>
+            {personPhoto ? (
+              <ProtagonistAvatar
+                name={personName}
+                photoUrl={personPhoto}
+                className="h-8 w-8 rounded border-0 md:h-8 md:w-8"
+              />
+            ) : (
+              <div className="flex size-8 shrink-0 items-center justify-center rounded bg-primary/10 text-xs font-medium text-primary">
+                {personName.charAt(0).toUpperCase()}
+              </div>
+            )}
+          </div>
+        </div>
+      ) : isCause ? (
         <CauseHero
           favpoll={favpoll}
           mentions={aboutMentions}
           compact={guestBookExpanded}
-          fundraiser={heroFundraiser}
+          animate={!room}
         />
       ) : (
         <FavpollHero
@@ -290,7 +400,7 @@ export function FavpollSheet({
           protagonist={favpoll.protagonists!}
           mentions={aboutMentions}
           compact={guestBookExpanded}
-          fundraiser={heroFundraiser}
+          animate={!room}
         />
       )}
 
@@ -358,7 +468,13 @@ export function FavpollSheet({
           the book is the standings' tail, not a section of its own. */}
       <div className="mt-6 space-y-4 md:hidden">{guestBookMobile}</div>
 
-      <div className="sticky bottom-0 z-10 mt-8 hidden border-t border-border bg-background py-5 md:block">
+      {/* THE FOOTER IS THE COLUMN'S FLOOR (founder, 2026-10-01): pushed
+          to the bottom when the standings are short (the spacer takes
+          the slack), sticky over them when long, and its charity row
+          sits the sheet's inset above the bottom — the same margin the
+          top of the page keeps — with the sheet's white beneath. */}
+      <div className="hidden md:block md:flex-1" aria-hidden="true" />
+      <div className="sticky bottom-0 z-10 mt-8 hidden border-t border-border bg-background pt-5 pb-[var(--shell-inset)] md:block">
         {appeal && (
           <p className="mb-2 truncate border-b border-border pb-2 text-xs text-muted-foreground">
             Part of{" "}
@@ -370,6 +486,11 @@ export function FavpollSheet({
             </Link>
           </p>
         )}
+        {/* On the room's fundraiser dial the goal card at the top carries
+            the GOAL and names the charity, so the footer keeps the total
+            beside the charity (founder, 2026-09-30: "include the total in
+            the footer still") but drops the goal caption and the bar —
+            the goal is said once. */}
         <FavpollListCardCharityCarousel
           charities={favpoll.favpoll_charities.map((ec) => ({
             charity: ec.charities,
@@ -381,14 +502,14 @@ export function FavpollSheet({
               : totalRaised / Math.max(1, favpoll.favpoll_charities.length)
           }
           amountCaption={
-            favpoll.goal_amount
+            !heroFundraiser && favpoll.goal_amount
               ? totalRaised >= favpoll.goal_amount
                 ? `${formatPounds(favpoll.goal_amount)} goal reached`
                 : `of the ${formatPounds(favpoll.goal_amount)} goal`
               : undefined
           }
         />
-        {favpoll.goal_amount ? (
+        {!heroFundraiser && favpoll.goal_amount ? (
           <GoalProgress
             totalRaised={totalRaised}
             goalAmount={favpoll.goal_amount}
@@ -454,6 +575,9 @@ export function FavpollSheet({
       appShell
       railExpanded={guestBookExpanded}
       shellHeight={shellHeight}
+      // The bottom inset mirrors the top: 72px in the room (the goal
+      // card's line), 64px on the page (the hero's md:pt-16).
+      shellInset={room ? "72px" : "64px"}
     >
       {children}
     </PageLayout>

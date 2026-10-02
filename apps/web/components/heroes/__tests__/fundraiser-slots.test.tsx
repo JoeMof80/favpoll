@@ -1,93 +1,77 @@
 import { describe, it, expect } from "vitest"
 import { render, screen } from "@testing-library/react"
+import { FundraiserStrip } from "@/components/heroes/fundraiser-slots"
 
-import { fundraiserHeroSlots } from "@/components/heroes/fundraiser-slots"
-
-const BYLINE = { name: "Alice", context: "1950 – 2026", photoUrl: null }
-
-function renderSlots(slots: ReturnType<typeof fundraiserHeroSlots>) {
-  return render(
-    <div>
-      {slots.eyebrowText}
-      {slots.title}
-      {slots.subtitle}
-      {slots.avatar}
-      {slots.about}
-    </div>
-  )
-}
-
-describe("fundraiserHeroSlots — the money is the heading", () => {
-  it("with a goal: eyebrow, figure, 'of £goal' and the bar; the person a byline h1", () => {
-    renderSlots(
-      fundraiserHeroSlots({
-        fundraiser: {
+describe("FundraiserStrip — the pledge goal in the countdown card's grammar", () => {
+  it("with a goal: eyebrow, figure, 'of £goal' at its baseline — the bar is the sheet's", () => {
+    render(
+      <FundraiserStrip
+        fundraiser={{
           totalRaised: 250,
           goalAmount: 1000,
           isClosed: false,
-        },
-        byline: BYLINE,
-      })
+          charityLabel: "Ocean Trust",
+        }}
+      />
     )
     expect(screen.getByText("Pledge goal")).toBeInTheDocument()
     expect(screen.getByText("£250")).toBeInTheDocument()
-    expect(screen.getByText("of £1,000")).toBeInTheDocument()
-    expect(screen.getByRole("progressbar")).toHaveAttribute(
-      "aria-valuenow",
-      "250"
-    )
-    expect(screen.queryByText(/Goal reached/)).not.toBeInTheDocument()
-    expect(screen.queryByTestId("countdown")).not.toBeInTheDocument()
-    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Alice")
-    expect(screen.getByText("1950 – 2026")).toBeInTheDocument()
+    expect(screen.getByText("raised for Ocean Trust")).toBeInTheDocument()
+    expect(screen.getByText("of")).toBeInTheDocument()
+    expect(screen.getByText("£1,000")).toBeInTheDocument()
+    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument()
+    expect(screen.getByText("£1,000").className).toContain("text-primary")
+    expect(screen.queryByRole("heading")).not.toBeInTheDocument()
   })
 
-  it("goal reached: the line at the eyebrow's right edge", () => {
-    renderSlots(
-      fundraiserHeroSlots({
-        fundraiser: {
+  it("goal reached: the line beside the figure", () => {
+    render(
+      <FundraiserStrip
+        fundraiser={{
           totalRaised: 1200,
           goalAmount: 1000,
           isClosed: false,
-        },
-        byline: BYLINE,
-      })
+          charityLabel: null,
+        }}
+      />
     )
-    expect(screen.getByText(/Goal reached/)).toBeInTheDocument()
+    // The goal's figure turns success once reached; no separate line.
+    expect(screen.getByText("£1,000").className).toContain("text-success")
   })
 
-  it("no goal: 'Raised so far', the figure alone — the rail owns the countdown", () => {
-    renderSlots(
-      fundraiserHeroSlots({
-        fundraiser: {
+  it("no goal: 'Raised so far' and the figure alone", () => {
+    render(
+      <FundraiserStrip
+        fundraiser={{
           totalRaised: 40,
           goalAmount: null,
           isClosed: false,
-        },
-        byline: { ...BYLINE, photoUrl: "https://x/y.jpg" },
-      })
+          charityLabel: "Ocean Trust",
+        }}
+      />
     )
     expect(screen.getByText("Raised so far")).toBeInTheDocument()
-    expect(screen.queryByTestId("countdown")).not.toBeInTheDocument()
+    expect(screen.getByText("£40")).toBeInTheDocument()
+    expect(screen.getByText("for Ocean Trust")).toBeInTheDocument()
+    expect(screen.queryByText(/^of £/)).not.toBeInTheDocument()
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument()
-    expect(screen.getByRole("img", { name: "Alice" })).toBeInTheDocument()
   })
 
-  it("closed: the final figure, no goal-reached shout, no countdown", () => {
-    renderSlots(
-      fundraiserHeroSlots({
-        fundraiser: {
+  it("closed: the final figure as 'raised', the goal still beside it, no bar", () => {
+    render(
+      <FundraiserStrip
+        fundraiser={{
           totalRaised: 1200,
           goalAmount: 1000,
           isClosed: true,
-        },
-        byline: BYLINE,
-      })
+          charityLabel: "A & B",
+        }}
+      />
     )
     expect(screen.getByText("Poll closed")).toBeInTheDocument()
     expect(screen.getByText("£1,200")).toBeInTheDocument()
-    expect(screen.getByText(/final standings are in/)).toBeInTheDocument()
-    expect(screen.queryByText(/Goal reached/)).not.toBeInTheDocument()
-    expect(screen.queryByTestId("countdown")).not.toBeInTheDocument()
+    expect(screen.getByText("raised for A & B")).toBeInTheDocument()
+    expect(screen.getByText("£1,000")).toBeInTheDocument()
+    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument()
   })
 })

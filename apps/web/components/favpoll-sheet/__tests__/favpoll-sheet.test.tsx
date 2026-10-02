@@ -67,7 +67,18 @@ vi.mock("@/components/countdown", () => ({
 }))
 vi.mock(
   "@/components/favpoll-list-card/favpoll-list-card-charity-carousel",
-  () => ({ FavpollListCardCharityCarousel: () => null })
+  () => ({
+    FavpollListCardCharityCarousel: (props: {
+      perCharity: number
+      amountCaption?: React.ReactNode
+    }) => (
+      <div
+        data-testid="charity-footer"
+        data-amount={props.perCharity}
+        data-caption={props.amountCaption ? "yes" : "no"}
+      />
+    ),
+  })
 )
 import { FavpollSheet } from "@/components/favpoll-sheet"
 
@@ -181,6 +192,85 @@ describe("FavpollSheet — the room's screen", () => {
     )
     expect(screen.getByTestId("guest-book-flat").dataset.expanded).toBe("true")
     expect(screen.getByTestId("favpoll-hero").dataset.compact).toBe("true")
+  })
+})
+
+describe("FavpollSheet — the room's fundraiser dial", () => {
+  it("renders the goal card, the bar as its hairline and the person's row — no hero band", () => {
+    render(
+      <FavpollSheet
+        favpoll={{ ...FAVPOLL, goal_amount: 1000 }}
+        pollWithItems={POLL}
+        totalRaised={250}
+        isClosed={false}
+        isOrganiser={false}
+        wallEntries={[]}
+        rankHistory={null}
+        presentation="room"
+        heroVariant="fundraiser"
+      />
+    )
+    expect(screen.queryByTestId("favpoll-hero")).not.toBeInTheDocument()
+    expect(screen.getByText("Pledge goal")).toBeInTheDocument()
+    expect(screen.getByText("£250")).toBeInTheDocument()
+    expect(screen.getByRole("progressbar")).toHaveAttribute(
+      "aria-valuenow",
+      "250"
+    )
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Alice")
+    // The card names the charity; the footer says the money no more.
+    expect(screen.getByText("raised for Ocean Trust")).toBeInTheDocument()
+    expect(screen.getByText("£1,000")).toBeInTheDocument()
+    expect(screen.queryByText(/of the £1,000 goal/)).not.toBeInTheDocument()
+    expect(screen.getAllByRole("progressbar")).toHaveLength(1)
+    // The footer keeps the total beside the charity; the goal is the card's.
+    const footer = screen.getByTestId("charity-footer")
+    expect(footer.dataset.amount).toBe("250")
+    expect(footer.dataset.caption).toBe("no")
+  })
+
+  it("counts the charities in the card's label when there are several", () => {
+    render(
+      <FavpollSheet
+        favpoll={{
+          ...FAVPOLL,
+          goal_amount: 1000,
+          favpoll_charities: [
+            { charities: CHARITY },
+            { charities: { ...CHARITY, id: "charity-2", name: "Reef Fund" } },
+            { charities: { ...CHARITY, id: "charity-3", name: "Tide Aid" } },
+          ],
+        }}
+        pollWithItems={POLL}
+        totalRaised={250}
+        isClosed={false}
+        isOrganiser={false}
+        wallEntries={[]}
+        rankHistory={null}
+        presentation="room"
+        heroVariant="fundraiser"
+      />
+    )
+    expect(screen.getByText("raised for 3 charities")).toBeInTheDocument()
+    expect(screen.queryByText(/for Ocean Trust/)).not.toBeInTheDocument()
+  })
+
+  it("keeps the full hero on the tribute dial", () => {
+    render(
+      <FavpollSheet
+        favpoll={{ ...FAVPOLL, goal_amount: 1000 }}
+        pollWithItems={POLL}
+        totalRaised={250}
+        isClosed={false}
+        isOrganiser={false}
+        wallEntries={[]}
+        rankHistory={null}
+        presentation="room"
+        heroVariant="tribute"
+      />
+    )
+    expect(screen.getByTestId("favpoll-hero")).toBeInTheDocument()
+    expect(screen.queryByText("Pledge goal")).not.toBeInTheDocument()
   })
 })
 

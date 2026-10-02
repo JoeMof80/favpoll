@@ -29,6 +29,12 @@ type Props = {
    *  page's screen-in-a-room) gives the screen's own height instead —
    *  vh inside a scaled frame is the visitor's viewport, not the screen. */
   shellHeight?: string
+  /** Shell mode: the sheet's BOTTOM inset, mirroring its top margin
+   *  (founder, 2026-10-01: the charity footer pinned "within the same
+   *  margin as the top of the page rather than dead bottom", and the
+   *  guest book stopping at the same point). Published as --shell-inset:
+   *  the rail pads its scroll end by it, the sheet's footer sits on it. */
+  shellInset?: string
   children?: React.ReactNode
 }
 
@@ -39,6 +45,7 @@ export function PageLayout({
   railExpanded = false,
   rightSticky = true,
   shellHeight = "calc(100vh - 3.5rem)",
+  shellInset = "0px",
   children,
 }: Props) {
   const gutter = "px-6 md:px-16"
@@ -63,7 +70,15 @@ export function PageLayout({
       // scroll list all line up without each having to agree separately.
       // No top padding here: the rail's pinned group carries it, so rows
       // scroll under the pinned countdown rather than showing above it.
-      "scrollbar-hide hidden min-h-0 flex-col divide-y divide-border overflow-y-auto border-l border-border pr-16 pl-8 md:flex"
+      // The book DISSOLVES INTO the inset line (founder, 2026-10-01): a
+      // mask on the rail's box fades the 56px ABOVE the line and shows
+      // nothing below it, so a long book ends exactly where the charity
+      // footer's row ends, the inset beneath is empty on both sides, and
+      // the room still sees there is more. The scroll end pads by inset
+      // + fade, so the last entry clears the fade when scrolled to.
+      // The pinned rows at the top are untouched — the mask is a gradient
+      // at the bottom only.
+      "scrollbar-hide hidden min-h-0 flex-col divide-y divide-border overflow-y-auto border-l border-border pr-16 pb-[calc(var(--shell-inset)+3.5rem)] pl-8 [mask-image:linear-gradient(to_bottom,black_calc(100%-var(--shell-inset)-3.5rem),transparent_calc(100%-var(--shell-inset)))] md:flex"
     : rightSticky
       ? "sticky top-14 z-10 hidden max-h-[var(--shell-h)] flex-col space-y-4 self-start overflow-y-auto bg-background md:flex md:pt-16"
       : "hidden flex-col space-y-4 self-start md:flex md:pt-16"
@@ -82,7 +97,12 @@ export function PageLayout({
         // is otherwise visible on overscroll.
         // --shell-h: the sheet's height (see shellHeight) — every vh this
         // layout used to spell out reads the variable instead.
-        style={{ "--shell-h": shellHeight } as React.CSSProperties}
+        style={
+          {
+            "--shell-h": shellHeight,
+            "--shell-inset": shellInset,
+          } as React.CSSProperties
+        }
         className={[
           "mx-auto min-h-[var(--shell-h)] max-w-5xl bg-background",
           "md:drop-shadow-lg md:[clip-path:inset(-1px_-24px_-24px_-24px)]",
@@ -133,15 +153,20 @@ export function PageLayout({
               className={`min-w-0 ${shellGutter} ${mobilePadBottom} md:scrollbar-hide md:min-h-0 md:overflow-y-auto md:pb-0 md:[overflow-anchor:none]`}
             >
               {/* Spare room past the shell's height (100vh - the header)
-                  of the hero's collapse plus the 24px settle window
-                  (--hero-collapse, published by hero-layout): a column
+                  of the hero's collapse plus its settle window
+                  (--hero-collapse and --hero-settle, both published by
+                  hero-layout; both zero for the room's static band): a column
                   that overflows by less than the band settles would
                   scroll away its own overflow, clamp back, re-expand and
                   shudder (measured: 8px/32 spare ↔ 0/48, 2026-09-29). A
                   percentage minimum never resolves inside the scroller,
                   so the height is the shell's. Zero on pages with no
                   hero; no effect on a column that already overflows. */}
-              <div className="md:min-h-[calc(var(--shell-h)+var(--hero-collapse,0px)+24px)]">
+              {/* md:flex-col: the column's last item (the sheet's charity
+                  footer) can take mt-auto and sit on the floor when the
+                  standings are short — the footer pinned on desktop as it
+                  is on the phone (founder, 2026-10-01). */}
+              <div className="md:flex md:min-h-[calc(var(--shell-h)+var(--hero-collapse,0px)+var(--hero-settle,0px))] md:flex-col">
                 {left}
               </div>
             </ShellScroller>

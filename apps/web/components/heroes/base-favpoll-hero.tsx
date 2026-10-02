@@ -7,7 +7,6 @@ import { getFavpollHeadline, heroNameSizeClass } from "@/lib/display"
 import type { Favpoll, Protagonist } from "@favpoll/types"
 import { MentionText } from "@/components/mention-text"
 import type { MentionTarget } from "@/lib/mentions"
-import { fundraiserHeroSlots, type HeroFundraiser } from "./fundraiser-slots"
 
 type BaseFavpollHeroProps = {
   favpoll: Favpoll
@@ -20,10 +19,8 @@ type BaseFavpollHeroProps = {
    *  place): the name and context take the phone's sizes, so the
    *  narrowed column keeps them on their lines (founder, 2026-09-29). */
   compact?: boolean
-  /** The presence dial's loud setting (founder, 2026-09-30): the money is
-   *  the heading and the person a byline. Absent = tribute, the hero as
-   *  it is. See heroes/fundraiser-slots. */
-  fundraiser?: HeroFundraiser
+  /** Off for the screen in the room: a static band (HeroLayout). */
+  animate?: boolean
 }
 
 export function BaseFavpollHero({
@@ -33,24 +30,8 @@ export function BaseFavpollHero({
   aboutPlaceholder,
   mentions,
   compact,
-  fundraiser,
+  animate,
 }: BaseFavpollHeroProps) {
-  if (fundraiser) {
-    return (
-      <HeroLayout
-        {...fundraiserHeroSlots({
-          fundraiser,
-          compact,
-          byline: {
-            name: protagonist.name,
-            context: protagonist.context ?? null,
-            photoUrl: hideAvatar ? null : protagonist.photo_url,
-          },
-        })}
-      />
-    )
-  }
-
   const headline = getFavpollHeadline({
     occasionType: favpoll.occasion_type ?? null,
     name:
@@ -104,7 +85,9 @@ export function BaseFavpollHero({
 
   const about =
     protagonist.about || aboutPlaceholder ? (
-      <p className="text-sm leading-relaxed wrap-break-word text-muted-foreground/80 md:text-base">
+      <p
+        className={`text-sm leading-relaxed wrap-break-word text-muted-foreground/80 md:text-base`}
+      >
         {protagonist.about ? (
           <MentionText text={protagonist.about} mentions={mentions} />
         ) : (
@@ -120,6 +103,7 @@ export function BaseFavpollHero({
       subtitle={subtitle}
       avatar={avatar}
       about={about}
+      animate={animate}
     />
   )
 }

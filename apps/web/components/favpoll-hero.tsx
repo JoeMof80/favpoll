@@ -3,7 +3,6 @@
 import { BaseFavpollHero } from "./heroes/base-favpoll-hero"
 import type { Favpoll, Protagonist } from "@favpoll/types"
 import type { MentionTarget } from "@/lib/mentions"
-import type { HeroFundraiser } from "./heroes/fundraiser-slots"
 
 type Props = {
   favpoll: Favpoll
@@ -12,7 +11,8 @@ type Props = {
   aboutPlaceholder?: string
   mentions?: MentionTarget[]
   compact?: boolean
-  fundraiser?: HeroFundraiser
+  /** Off for the screen in the room: a static band (HeroLayout). */
+  animate?: boolean
 }
 
 export function FavpollHero({
@@ -22,7 +22,7 @@ export function FavpollHero({
   aboutPlaceholder,
   mentions,
   compact,
-  fundraiser,
+  animate,
 }: Props) {
   return (
     <BaseFavpollHero
@@ -32,7 +32,7 @@ export function FavpollHero({
       aboutPlaceholder={aboutPlaceholder}
       mentions={mentions}
       compact={compact}
-      fundraiser={fundraiser}
+      animate={animate}
     />
   )
 }
