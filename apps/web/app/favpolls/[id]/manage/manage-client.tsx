@@ -21,6 +21,8 @@ import {
   Share2,
   FileHeart,
   Trash2,
+  Pause,
+  Play,
 } from "lucide-react"
 import { BrandedQR } from "@/components/branded-qr"
 import { GuestBook, type WallEntry } from "@/components/guest-book"
@@ -329,9 +331,9 @@ export function ManageClient({
   }
   const suspendInEffect = picksSuspended({ picks_suspended_at: suspendAt })
   const picksSentence = !suspendAt
-    ? "Guests pick a favourite and pledge what it's worth."
+    ? "End the picks early. Every pledge then goes to the shared pot until the close, and the standings hold."
     : suspendInEffect
-      ? "The picks are in. Every pledge goes to the shared pot."
+      ? "The picks are in. Every pledge goes to the shared pot until the close."
       : `From ${new Date(suspendAt).toLocaleString("en-GB", {
           day: "numeric",
           month: "short",
@@ -721,17 +723,29 @@ export function ManageClient({
           />
         )}
         {!isClosed && (
-          <SettingsRow
-            label={FIELD_LABELS.picks}
-            description="Suspend them to end the picks early — every pledge then goes to the shared pot until the close, and the standings hold."
-          >
-            <SwitchLine
-              checked={!!suspendAt}
-              onCheckedChange={handleToggleSuspend}
+          /* A BUTTON ROW in the Delete row's grammar (founder, 2026-10-02:
+             "not sure the Picks switch is prominent enough … should we
+             call it Suspend"): the verb on the button, the state in the
+             description. Reversible, so no confirm. */
+          <SettingsRow label={FIELD_LABELS.picks} description={picksSentence}>
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11 px-3.5 md:text-base"
               disabled={suspendPending}
+              onClick={() => handleToggleSuspend(!suspendAt)}
             >
-              {picksSentence}
-            </SwitchLine>
+              {suspendAt ? (
+                <Play data-icon="inline-start" aria-hidden="true" />
+              ) : (
+                <Pause data-icon="inline-start" aria-hidden="true" />
+              )}
+              {suspendPending
+                ? "Saving…"
+                : suspendAt
+                  ? "Resume the picks"
+                  : "Suspend the picks"}
+            </Button>
           </SettingsRow>
         )}
         {!isClosed && suspendAt && (
