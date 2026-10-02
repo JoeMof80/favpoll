@@ -29,7 +29,7 @@ export const FIELD_LABELS = {
   visibility: "Visibility",
   guestAdditions: "Guest additions",
   showDonations: "Show donations",
-  picks: "Picks",
+  picks: "Suspend",
   suspendFrom: "Suspend from",
 } as const
 

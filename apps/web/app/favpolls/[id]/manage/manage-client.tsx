@@ -722,41 +722,6 @@ export function ManageClient({
             onSave={saveClosesAt}
           />
         )}
-        {!isClosed && (
-          /* A BUTTON ROW in the Delete row's grammar (founder, 2026-10-02:
-             "not sure the Picks switch is prominent enough … should we
-             call it Suspend"): the verb on the button, the state in the
-             description. Reversible, so no confirm. */
-          <SettingsRow label={FIELD_LABELS.picks} description={picksSentence}>
-            <Button
-              type="button"
-              variant="outline"
-              className="h-11 px-3.5 md:text-base"
-              disabled={suspendPending}
-              onClick={() => handleToggleSuspend(!suspendAt)}
-            >
-              {suspendAt ? (
-                <Play data-icon="inline-start" aria-hidden="true" />
-              ) : (
-                <Pause data-icon="inline-start" aria-hidden="true" />
-              )}
-              {suspendPending
-                ? "Saving…"
-                : suspendAt
-                  ? "Resume the picks"
-                  : "Suspend the picks"}
-            </Button>
-          </SettingsRow>
-        )}
-        {!isClosed && suspendAt && (
-          <EditableDateRow
-            label={FIELD_LABELS.suspendFrom}
-            description="Before the close date. Set a later moment to keep the picks open until then."
-            value={new Date(suspendAt)}
-            presets={null}
-            onSave={saveSuspendAt}
-          />
-        )}
         <SettingsRow
           label={FIELD_LABELS.visibility}
           description={visibilityHint(visibility)}
@@ -793,6 +758,41 @@ export function ManageClient({
             {showDonationsSentence(showGuestAmounts)}
           </SwitchLine>
         </SettingsRow>
+        {!isClosed && (
+          /* A BUTTON ROW in the Delete row's grammar, just above it (founder, 2026-10-02:
+             "not sure the Picks switch is prominent enough … should we
+             call it Suspend"): the verb on the button, the state in the
+             description. Reversible, so no confirm. */
+          <SettingsRow label={FIELD_LABELS.picks} description={picksSentence}>
+            <Button
+              type="button"
+              variant="warning"
+              className="h-11 px-3.5 md:text-base"
+              disabled={suspendPending}
+              onClick={() => handleToggleSuspend(!suspendAt)}
+            >
+              {suspendAt ? (
+                <Play data-icon="inline-start" aria-hidden="true" />
+              ) : (
+                <Pause data-icon="inline-start" aria-hidden="true" />
+              )}
+              {suspendPending
+                ? "Saving…"
+                : suspendAt
+                  ? "Resume the picks"
+                  : "Suspend the picks"}
+            </Button>
+          </SettingsRow>
+        )}
+        {!isClosed && suspendAt && (
+          <EditableDateRow
+            label={FIELD_LABELS.suspendFrom}
+            description="Before the close date. Set a later moment to keep the picks open until then."
+            value={new Date(suspendAt)}
+            presets={null}
+            onSave={saveSuspendAt}
+          />
+        )}
         {!isClosed && (
           <SettingsRow
             label="Delete this favpoll"
