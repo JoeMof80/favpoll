@@ -1,6 +1,7 @@
 "use server"
 
 import { auth } from "@clerk/nextjs/server"
+import { lookupEdges } from "@/lib/pairing-table"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { DEFAULT_OCCASION_TYPE } from "@/lib/registers"
 import { generateStory, type StoryCharity } from "@/lib/story-engine"
@@ -119,6 +120,11 @@ export type GenerateDraftInput = {
    * the zero-edge case, where the about must supply a known fact.
    */
   occasionType?: string | null
+  /** THE PICKS DECIDE THE NIGHT (topic rules additions §D): the Generate
+   *  switch. True writes the About's closing as the outcome promise and
+   *  the note as a shared memory; false the reveal promise, even on an
+   *  enacted pairing row; undefined lets the row decide (the seed). */
+  enacted?: boolean
   /**
    * Re-roll (founder, 2026-09-18): bypass the shared cache read AND
    * write — repeat clicks of Generate must produce a fresh example, and
@@ -169,6 +175,7 @@ export async function generateDraft(
         pronoun: input.pronoun,
         grouping: input.grouping,
         displayName: input.displayName ?? null,
+        enacted: input.enacted,
       },
       modelId()
     )
@@ -193,7 +200,8 @@ export async function generateDraft(
     input.pronoun,
     input.displayName,
     input.grouping,
-    resolveOccasionType(input)
+    resolveOccasionType(input),
+    input.enacted
   )
 
   if (!input.skipCache) {
@@ -264,6 +272,7 @@ export async function generateDraft(
       pronoun: input.pronoun,
       grouping: input.grouping,
       displayName: input.displayName ?? null,
+      enacted: input.enacted,
     },
     modelId()
   )
@@ -354,7 +363,8 @@ export async function getCachedDraftGhosts(
     input.pronoun,
     input.displayName,
     input.grouping,
-    resolveOccasionType(input)
+    resolveOccasionType(input),
+    input.enacted
   )
   const { data: cached } = await supabase
     .from("generated_drafts")
@@ -397,4 +407,48 @@ export async function getCachedDraftGhosts(
     return { about: swap(sibling.about), note: swap(sibling.note) }
   }
   return null
+}
+
+/**
+ * Does this occasion and topic pair as ENACTED in the pairing table? The
+ * wizard asks alongside the ghost prefetch to pre-set the Generate
+ * switch; the occasion edge needs only the titles, nothing of the
+ * charity. False for a custom topic or an unreadable title.
+ */
+export async function pairingIsEnacted(input: {
+  register: Register
+  subject: "someone" | "cause"
+  topicId: string
+  subsetId?: string | null
+  occasionType?: string | null
+}): Promise<boolean> {
+  const { userId } = await auth()
+  if (!userId) return false
+  if (!input.topicId) return false
+  const supabase = createAdminClient()
+  const { data: topic } = await supabase
+    .from("topics")
+    .select("title")
+    .eq("id", input.topicId)
+    .maybeSingle()
+  const parentTitle = (topic as { title?: string } | null)?.title ?? null
+  if (!parentTitle) return false
+  let topicTitle = parentTitle
+  if (input.subsetId) {
+    const { data: subset } = await supabase
+      .from("topic_subsets")
+      .select("title")
+      .eq("id", input.subsetId)
+      .maybeSingle()
+    const t = (subset as { title?: string } | null)?.title
+    if (t) topicTitle = t
+  }
+  return !!lookupEdges({
+    register: input.register,
+    occasionType: resolveOccasionType(input),
+    topicTitle,
+    parentTopicTitle: input.subsetId ? parentTitle : null,
+    charityName: null,
+    causeFamily: null,
+  }).e1?.enacted
 }

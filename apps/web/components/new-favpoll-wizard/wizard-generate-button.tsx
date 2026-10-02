@@ -3,9 +3,11 @@
 import {
   Check,
   ChevronDown,
+  ListChecks,
   Mars,
   NonBinary,
   Ribbon,
+  User,
   Venus,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -41,6 +43,7 @@ const WHO_ICONS: Record<WhoValue, React.ElementType> = {
   he: Mars,
   she: Venus,
   they: NonBinary,
+  me: User,
   couple: PairIcon,
   group: GroupIcon,
   cause: Ribbon,
@@ -50,12 +53,15 @@ const WHO_LABELS: Record<WhoValue, string> = {
   he: "He",
   she: "She",
   they: "They",
+  me: "Me",
   couple: "Pair",
   group: "Group",
   cause: "Cause",
 }
 
-const PRONOUN_ORDER: WhoValue[] = ["he", "she", "they", "couple", "group"]
+const PRONOUN_ORDER: WhoValue[] = ["he", "she", "they", "me", "couple", "group"]
+const isPronounWho = (w: WhoValue | "") =>
+  w === "he" || w === "she" || w === "they" || w === "me"
 
 export function WizardGenerateButton({ w }: { w: WizardState }) {
   const WhoIcon = w.who ? WHO_ICONS[w.who] : null
@@ -64,9 +70,9 @@ export function WizardGenerateButton({ w }: { w: WizardState }) {
   // pledged on — but Pair/Group/Cause leave the menu, and a favpoll
   // already outside the pronoun family locks the control entirely.
   const lockStructural = w.stepLocked.event
-  const whoIsPronoun = w.who === "he" || w.who === "she" || w.who === "they"
+  const whoIsPronoun = isPronounWho(w.who)
   const whoOptions = lockStructural
-    ? PRONOUN_ORDER.filter((k) => k === "he" || k === "she" || k === "they")
+    ? PRONOUN_ORDER.filter(isPronounWho)
     : PRONOUN_ORDER
   return (
     <div className="flex">
@@ -75,12 +81,13 @@ export function WizardGenerateButton({ w }: { w: WizardState }) {
           <Button
             type="button"
             variant="secondary"
-            size="sm"
             disabled={lockStructural && !whoIsPronoun}
             aria-label={
               w.who ? `Who: ${WHO_LABELS[w.who]}` : "Who is this favpoll for?"
             }
-            className="rounded-r-none border-0 px-2"
+            // h-11: the group stands in the field column at the fields'
+            // own 44px (founder, 2026-10-02), as Cancel and Save do.
+            className="h-11 rounded-r-none border-0 px-3"
           >
             {WhoIcon && <WhoIcon className="h-4 w-4" aria-hidden="true" />}
             <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
@@ -116,13 +123,35 @@ export function WizardGenerateButton({ w }: { w: WizardState }) {
         </DropdownMenuContent>
       </DropdownMenu>
       <span aria-hidden="true" className="w-px self-stretch bg-primary/15" />
+      {/* THE PICKS DECIDE THE NIGHT (topic rules additions §D, founder
+          2026-10-02): a pressed-state segment, not a menu — one yes or
+          no. On, Generate writes the About's closing as the outcome and
+          the note as a shared memory. The pairing row pre-sets it where
+          the occasion and topic pair as enacted; a press overrides. */}
       <Button
         type="button"
         variant="secondary"
-        size="sm"
+        aria-pressed={w.enacted}
+        aria-label="The picks decide the night"
+        title={
+          w.enacted
+            ? "The picks decide the night: Generate writes the outcome. Press to write a reveal instead."
+            : "Press if the guests' picks decide the night: Generate writes the outcome instead of a reveal."
+        }
+        onClick={() => w.setEnacted(!w.enacted)}
+        className={`h-11 rounded-none border-0 px-3 ${
+          w.enacted ? "bg-primary/15 text-primary hover:bg-primary/20" : ""
+        }`}
+      >
+        <ListChecks className="h-4 w-4" aria-hidden="true" />
+      </Button>
+      <span aria-hidden="true" className="w-px self-stretch bg-primary/15" />
+      <Button
+        type="button"
+        variant="secondary"
         disabled={w.generating || w.topics.length === 0}
         onClick={w.generateExample}
-        className="rounded-l-none border-0"
+        className="h-11 rounded-l-none border-0"
       >
         {w.generating ? "Generating…" : "✦ Generate an example"}
       </Button>

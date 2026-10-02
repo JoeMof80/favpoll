@@ -47,7 +47,7 @@ export function nameLabel(
 export const FIELD_HINTS = {
   about:
     "Set the scene, link the topic and the cause. Hint at a note, if there is one.",
-  note: "A direct quote, a memory, or a message to guests. Revealed only after a guest pledges.",
+  note: "A direct quote, a memory, a message to guests, or what happens next. Revealed only after a guest pledges.",
 } as const
 
 export const GOAL_PRESETS = [100, 250, 500, 1000] as const
