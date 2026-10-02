@@ -26,8 +26,11 @@ vi.mock("@/app/favpolls/new/actions", () => ({
   createFavpoll: mockCreateFavpoll,
   uploadPersonPhoto: mockUploadPersonPhoto,
 }))
+const mockPairingIsEnacted = vi.hoisted(() => vi.fn().mockResolvedValue(false))
 vi.mock("@/lib/actions/generate-draft", () => ({
   safeGenerateDraft: mockSafeGenerateDraft,
+  getCachedDraftGhosts: vi.fn().mockResolvedValue(null),
+  pairingIsEnacted: mockPairingIsEnacted,
 }))
 const mockUpdateFavpoll = vi.hoisted(() => vi.fn().mockResolvedValue(undefined))
 vi.mock("@/app/favpolls/[id]/edit/actions", () => ({
@@ -309,6 +312,26 @@ describe("useWizardState — the who axis", () => {
     act(() => result.current.handleWho("cause"))
     expect(result.current.subject).toBe("cause")
     expect(result.current.isCause).toBe(true)
+  })
+
+  it("'me' is the first person: pronoun i, an individual, someone", () => {
+    const { result } = renderHook(() => useWizardState(DATA))
+    act(() => result.current.handleWho("me"))
+    expect(result.current.who).toBe("me")
+    expect(result.current.pronoun).toBe("i")
+    expect(result.current.grouping).toBe("individual")
+    expect(result.current.subject).toBe("someone")
+  })
+})
+
+describe("useWizardState — the picks decide the night", () => {
+  it("is off until pressed, and a press overrides the row", () => {
+    const { result } = renderHook(() => useWizardState(DATA))
+    expect(result.current.enacted).toBe(false)
+    act(() => result.current.setEnacted(true))
+    expect(result.current.enacted).toBe(true)
+    act(() => result.current.setEnacted(false))
+    expect(result.current.enacted).toBe(false)
   })
 
   it("switching the type away from fundraiser resets a cause who", () => {

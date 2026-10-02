@@ -150,6 +150,38 @@ describe("hasFabricatedStats", () => {
 // ---------------------------------------------------------------------------
 
 describe("buildCacheKey", () => {
+  it("keys the Generate switch: an outcome and a reveal are different drafts", () => {
+    const base = buildCacheKey("celebrating_many", "topic-1", "someone")
+    expect(
+      buildCacheKey(
+        "celebrating_many",
+        "topic-1",
+        "someone",
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        true
+      )
+    ).toBe(`${base}|enacted:1`)
+    expect(
+      buildCacheKey(
+        "celebrating_many",
+        "topic-1",
+        "someone",
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        false
+      )
+    ).toBe(`${base}|enacted:0`)
+    // Unset (the seed) leaves every existing key as it was.
+    expect(base).not.toContain("enacted")
+  })
+
   it("v2 includes the charity for someone (the About names the charity)", () => {
     const key = buildCacheKey(
       "celebrating_one",

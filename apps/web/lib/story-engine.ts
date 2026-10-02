@@ -577,6 +577,11 @@ export type StoryInput = {
    * somebody via the wizard"). Default false: real.
    */
   fiction?: boolean
+  /** THE PICKS DECIDE THE NIGHT (topic rules additions §D): the Generate
+   *  switch. True makes the story an outcome even where the pairing row
+   *  has no sentence (a generic one stands in); false makes it a reveal
+   *  even on an enacted row; undefined lets the row decide. */
+  enacted?: boolean
   /**
    * The favourite, chosen by the caller: the seed picks a random item so
    * the model stops defaulting to Camber Sands, Sissinghurst and Stand by
@@ -654,11 +659,44 @@ export function stripEmDashes(text: string, keep: string[] = []): string {
  * hard-rule breach, one validator retry (a real item named / no invented
  * statistics). Throws when the model returns nothing usable twice.
  */
+/** The outcome sentence when the switch is on and the pairing row has
+ *  none of its own: one of the two shapes, generic enough for any topic.
+ *  The organiser edits the About anyway. */
+export const GENERIC_OUTCOME = "the top five are the picks for the night"
+
+/**
+ * The Generate switch over the pairing row (topic rules additions §D):
+ * on, the occasion edge carries an outcome (the row's, or the generic
+ * one); off, it carries none even on an enacted row; unset, the row
+ * decides. Returns new objects; the row's edges are never mutated.
+ */
+export function applyEnactedChoice(
+  edges: StoryEdges,
+  enacted: boolean | undefined
+): StoryEdges {
+  if (enacted === undefined) return edges
+  if (!enacted) {
+    if (!edges.e1?.enacted) return edges
+    const { enacted: _drop, ...rest } = edges.e1
+    void _drop
+    return { ...edges, e1: rest }
+  }
+  if (edges.e1?.enacted) return edges
+  return {
+    ...edges,
+    e1: {
+      text: edges.e1?.text ?? "The guests' picks decide the night.",
+      star: edges.e1?.star ?? true,
+      enacted: GENERIC_OUTCOME,
+    },
+  }
+}
+
 export async function generateStory(
   input: StoryInput,
   modelId: string
 ): Promise<Story> {
-  const edges = storyEdges(input)
+  const edges = applyEnactedChoice(storyEdges(input), input.enacted)
   const closingPoss =
     input.subject === "someone"
       ? firstPerson(input.pronoun)

@@ -7,7 +7,27 @@ import type { FavpollGrouping, FavpollSubject } from "@favpoll/types"
  * Info step's Name field. These helpers are the single mapping from a
  * who answer to the schema's subject/grouping axes.
  */
-export type WhoValue = "he" | "she" | "they" | "couple" | "group" | "cause"
+/** "me": the organiser IS the protagonist and writes in the first person
+ *  (pronoun "i"; founder, 2026-09-24: "isn't it just another pronoun?";
+ *  on the menu since 2026-10-02). */
+export type WhoValue =
+  | "he"
+  | "she"
+  | "they"
+  | "me"
+  | "couple"
+  | "group"
+  | "cause"
+
+/** The pronoun a who implies — the first-person "i" for "me", none for
+ *  a pair, group or cause. */
+export function pronounForWho(
+  who: WhoValue | ""
+): "he" | "she" | "they" | "i" | undefined {
+  if (who === "he" || who === "she" || who === "they") return who
+  if (who === "me") return "i"
+  return undefined
+}
 
 export function groupingForWho(who: WhoValue | ""): FavpollGrouping {
   return who === "couple" ? "couple" : who === "group" ? "group" : "individual"
