@@ -80,3 +80,81 @@ describe("lookupEdges with a subset on the card", () => {
     expect(other.e2?.star).toBe(true)
   })
 })
+
+// The revisit's rows (2026-10-01, ticked 2026-10-02): a subset with a row
+// of its own beats inheritance, in the occasion rows and the charity rows.
+describe("subset rows of their own", () => {
+  it("Family gathering · Classic board game stars in its own name", () => {
+    const e = lookupEdges({
+      register: "celebrating_many",
+      occasionType: "Family gathering",
+      topicTitle: "Classic board game",
+      parentTopicTitle: "Board game",
+      charityName: null,
+      causeFamily: null,
+    })
+    expect(e.e1?.star).toBe(true)
+    expect(e.e1?.text).toContain("classic board game")
+  })
+
+  it("Reunion · Karaoke song is enacted: the karaoke list", () => {
+    const e = lookupEdges({
+      register: "celebrating_many",
+      occasionType: "Reunion",
+      topicTitle: "Karaoke song",
+      parentTopicTitle: "Song",
+      charityName: null,
+      causeFamily: null,
+    })
+    expect(e.e1?.enacted).toBe("the top ten are the karaoke list for the night")
+  })
+
+  it("Achievement · British mountain stars where Mountain or peak did", () => {
+    const e = lookupEdges({
+      register: "celebrating_one",
+      occasionType: "Achievement",
+      topicTitle: "British mountain",
+      parentTopicTitle: "Mountain or peak",
+      charityName: "Mountain Rescue England and Wales",
+      causeFamily: "health_condition",
+    })
+    expect(e.e1?.star).toBe(true)
+    expect(e.e2?.star).toBe(true)
+    expect(e.e2?.text).toContain("british mountain")
+  })
+
+  it("Wedding · Greek island carries the sharper hop: the honeymoon", () => {
+    const e = lookupEdges({
+      register: "celebrating_many",
+      occasionType: "Wedding",
+      topicTitle: "Greek island",
+      parentTopicTitle: "Island",
+      charityName: null,
+      causeFamily: null,
+    })
+    expect(e.e1?.star).toBe(false)
+    expect(e.e1?.text).toContain("the honeymoon")
+    expect(e.e1?.text).not.toContain("the venue")
+  })
+
+  it("a subset with no charity row of its own inherits its parent's", () => {
+    const parent = lookupEdges({
+      register: "celebrating_one",
+      occasionType: null,
+      topicTitle: "Island",
+      charityName: "RNLI",
+      causeFamily: "sea_rescue",
+    })
+    const subset = lookupEdges({
+      register: "celebrating_one",
+      occasionType: null,
+      topicTitle: "Scottish island",
+      parentTopicTitle: "Island",
+      charityName: "RNLI",
+      causeFamily: "sea_rescue",
+    })
+    expect(!!parent.e2).toBe(true)
+    expect(subset.e2?.star).toBe(parent.e2?.star)
+    expect(subset.e2?.text).toContain("scottish island")
+  })
+})

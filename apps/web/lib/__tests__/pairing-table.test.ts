@@ -7,6 +7,7 @@ import {
   CHARITY_ROWS,
   HONOUR_CHARITY_ROWS,
   REGISTER_ADDED,
+  SUBSET_PARENTS,
   lookupEdges,
 } from "../pairing-table"
 import { OCCASION_TYPES_BY_REGISTER } from "../registers"
@@ -49,11 +50,26 @@ describe("pairing table — vocabulary drift guards", () => {
     ]
     for (const row of rows) {
       for (const { topic } of row) {
+        // A SUBSET's title is allowed only through SUBSET_PARENTS, whose
+        // parent must be a catalogue title (favpoll-topic-rules §1).
+        const parent = SUBSET_PARENTS[topic]
         expect(
-          CATALOGUE.has(topic),
-          `topic "${topic}" is not in scripts/seed.ts`
+          CATALOGUE.has(topic) || (!!parent && CATALOGUE.has(parent)),
+          `topic "${topic}" is not in scripts/seed.ts${parent ? ` (nor is its parent "${parent}")` : ""}`
         ).toBe(true)
       }
+    }
+  })
+
+  it("every subset parent is a catalogue title, and no subset is one", () => {
+    for (const [subset, parent] of Object.entries(SUBSET_PARENTS)) {
+      expect(CATALOGUE.has(parent), `parent "${parent}" of "${subset}"`).toBe(
+        true
+      )
+      expect(
+        CATALOGUE.has(subset),
+        `"${subset}" is a topic, not a subset`
+      ).toBe(false)
     }
   })
 
