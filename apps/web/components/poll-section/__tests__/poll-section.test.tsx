@@ -466,6 +466,45 @@ describe("PollSection — suspended picks", () => {
   })
 })
 
+// ─── A suspension reads as a close ──────────────────────────────────────────
+
+// FOUNDER, 2026-10-04: "just treat a suspended poll like it is closed, with
+// note and standings revealed. the only difference is that users can
+// continue to pledge, but only to the shared pot, via the pledge FAB." So
+// nothing stands between a latecomer and the page — no card, no steps.
+describe("PollSection — a suspended favpoll reads as a closed one", () => {
+  const SUSPENDED = {
+    ...BASE_PROPS,
+    entitled: true,
+    hasPledged: false,
+    picksSuspended: true,
+    charityLine: "Marie Curie",
+    personalNote: "She always picked the Brie.",
+  }
+
+  it("shows the note and the standings with nothing in between", () => {
+    render(<PollSection {...SUSPENDED} onOpenPledgeDialog={vi.fn()} />)
+    expect(screen.getByText("She always picked the Brie.")).toBeInTheDocument()
+    expect(screen.getByLabelText("Rankings")).toBeInTheDocument()
+  })
+
+  it("offers no card to pledge through — the FAB is the way", () => {
+    render(<PollSection {...SUSPENDED} onOpenPledgeDialog={vi.fn()} />)
+    expect(
+      screen.queryByRole("button", { name: /^Pledge to/i })
+    ).not.toBeInTheDocument()
+    expect(screen.queryByText(/^Reveal/)).not.toBeInTheDocument()
+    expect(
+      screen.queryByText(/pledge to the shared pot/i)
+    ).not.toBeInTheDocument()
+  })
+
+  it("still marks the heading so the room knows the picks are in", () => {
+    render(<PollSection {...SUSPENDED} onOpenPledgeDialog={vi.fn()} />)
+    expect(screen.getByText("Picks suspended")).toBeInTheDocument()
+  })
+})
+
 // ─── The projector's type ramp ───────────────────────────────────────────────
 
 // THE ROOM HAD THE HEADING SMALLER THAN ITS OWN LIST (measured at
@@ -488,63 +527,5 @@ describe("PollSection — the projector's type ramp", () => {
     render(<PollSection {...BASE_PROPS} entitled hasPledged />)
     expect(topicLine().className).toContain("text-[17px]")
     expect(topicLine().className).not.toContain("--display-topic")
-  })
-})
-
-// ─── The invitation ──────────────────────────────────────────────────────────
-
-// THE STANDINGS OPEN ON A SUSPENSION (founder, 2026-10-03), so a guest can
-// be entitled to them without having pledged. The lock card keeps its
-// teaching job and loses its covering one.
-describe("PollSection — the invitation", () => {
-  const OPEN = {
-    ...BASE_PROPS,
-    entitled: true,
-    hasPledged: false,
-    picksSuspended: true,
-    charityLine: "Marie Curie",
-    // PollSection defaults hasNote to true, so the no-note cases say so.
-    hasNote: false,
-  }
-
-  it("shows the standings and the invitation together", () => {
-    render(<PollSection {...OPEN} onOpenPledgeDialog={vi.fn()} />)
-    // The real list, not a cover over it.
-    expect(screen.getByLabelText("Rankings")).toBeInTheDocument()
-    const card = screen.getByRole("button", {
-      name: /Pledge to the shared pot$/i,
-    })
-    expect(card).toHaveTextContent(
-      "The picks are in — pledge to the shared pot"
-    )
-    expect(card).toHaveTextContent("Pledge to the pot")
-  })
-
-  it("promises the note and never the standings in view", () => {
-    render(<PollSection {...OPEN} hasNote onOpenPledgeDialog={vi.fn()} />)
-    const card = screen.getByRole("button", {
-      name: /Pledge to see a personal note$/i,
-    })
-    expect(card).toHaveTextContent("Reveal the personal note")
-    expect(card).not.toHaveTextContent("Reveal where the favourites stand")
-  })
-
-  it("offers nothing to reveal where there is no note", () => {
-    render(<PollSection {...OPEN} onOpenPledgeDialog={vi.fn()} />)
-    expect(screen.queryByText(/^Reveal/)).not.toBeInTheDocument()
-  })
-
-  it("goes once the viewer has pledged", () => {
-    render(<PollSection {...OPEN} hasPledged onOpenPledgeDialog={vi.fn()} />)
-    expect(
-      screen.queryByRole("button", { name: /^Pledge to/i })
-    ).not.toBeInTheDocument()
-  })
-
-  it("is absent on the room, which has no pledge entry point", () => {
-    render(<PollSection {...OPEN} />)
-    expect(
-      screen.queryByRole("button", { name: /^Pledge to/i })
-    ).not.toBeInTheDocument()
   })
 })

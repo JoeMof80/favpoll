@@ -184,33 +184,20 @@ export function PollSection({
   // (founder, 2026-08-01). One card, CTA and steps at equal prominence;
   // the steps come from lib/mechanic-steps so the print pack's table
   // cards carry IDENTICAL instructions.
-  // THE INVITATION (founder, 2026-10-03): a suspension opens the
-  // standings to everyone, so this viewer is reading them without having
-  // pledged — the one state in which the lock card has nothing to cover.
-  // It keeps its teaching job and loses its covering one: the same card,
-  // above the standings instead of over them.
-  const invitation = entitled && !hasPledged && !!onOpenPledgeDialog
   const lockSteps = buildMechanicSteps({
     topicTitle: poll.topics.title,
     charityLine,
     hasNote: hasNote,
     picksSuspended,
-    standingsOpen: invitation,
   })
 
   // "A note" covers favourite and message reveals alike (founder,
   // 2026-09-17) — the old favourite/message fork is gone.
-  const unlockAriaLabel = invitation
-    ? // The results are already on screen — only the note is still owed,
-      // and on a note-less favpoll the pledge is simply a pledge.
-      hasNote
-      ? "Pledge to see a personal note"
-      : "Pledge to the shared pot"
-    : picksSuspended
-      ? "Pledge to the shared pot to see the results"
-      : !hasNote
-        ? "Pledge your favourite to see the results"
-        : "Pledge to see a personal note and the results"
+  const unlockAriaLabel = picksSuspended
+    ? "Pledge to the shared pot to see the results"
+    : !hasNote
+      ? "Pledge your favourite to see the results"
+      : "Pledge to see a personal note and the results"
 
   return (
     <section
@@ -332,28 +319,13 @@ export function PollSection({
       {/* Post-pledge: real reveal + real ranking list */}
       {entitled ? (
         <>
-          {invitation && (
-            /* NOT a cover and NOT sticky: the standings below are the
-               point, and a second sticky card would fight the lock
-               card's old slot. Full column width in the page's card
-               idiom, the list cards' hover lift. */
-            <div className="pb-3">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={onOpenPledgeDialog}
-                aria-label={unlockAriaLabel}
-                className="h-auto w-full flex-col items-stretch gap-0 overflow-hidden rounded-xl border-0 bg-background p-0 text-left whitespace-normal ring-1 ring-border transition-all duration-300 hover:bg-background hover:shadow-lg motion-safe:hover:-translate-y-0.5"
-              >
-                <LockCardContent
-                  steps={lockSteps}
-                  topicTitle={poll.topics.title}
-                  ctaLabel={picksSuspended ? "Pledge to the pot" : undefined}
-                  hideFooter={picksSuspended}
-                />
-              </Button>
-            </div>
-          )}
+          {/* NOTHING STANDS BETWEEN A LATECOMER AND THE PAGE (founder,
+              2026-10-04). A suspended favpoll reads as a closed one, so
+              there is no card here: the standings and the note are simply
+              out, and the only way left to give is the Pledge FAB. The
+              mechanic needs no teaching once there is no pick to make —
+              the charity footer names where the money goes and the pledge
+              dialog says the pot's path as it takes the amount. */}
           {personalNote && (
             <div className="pb-2">
               <TypedNote

@@ -37,9 +37,6 @@ type Props = {
   clerkUserId: string | null
   isOrganiser: boolean
   entitled: boolean
-  /** The viewer's own pledge — distinct from `entitled` once a
-   *  suspension opens the standings to everyone (lib/picks-suspended). */
-  hasPledged?: boolean
   /** Whether a personal reveal exists (content withheld until entitled) */
   hasNote: boolean
   wallEntries: WallEntry[]
@@ -70,7 +67,6 @@ export function FavpollContent({
   clerkUserId,
   isOrganiser,
   entitled,
-  hasPledged,
   hasNote,
   wallEntries,
   rankHistory,
@@ -166,9 +162,6 @@ export function FavpollContent({
   const viewer: SheetViewer = {
     clerkUserId,
     entitled: localEntitled,
-    // The pledge dialog's success marks the viewer pledged without a
-    // round trip, the same way localEntitled works.
-    hasPledged: (hasPledged ?? entitled) || pledgeConfirmed,
     personalNote: effectiveNote,
     hasNote,
     items: effectiveItems,
