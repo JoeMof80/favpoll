@@ -8,7 +8,7 @@ import { notFound, redirect } from "next/navigation"
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { unconsentedNamesByFavpoll } from "@/lib/charity-consent"
-import { picksSuspended } from "@/lib/picks-suspended"
+import { picksSuspended, standingsOpened } from "@/lib/picks-suspended"
 import { fetchAllRows } from "@/lib/supabase/paginate"
 import { deriveRankHistory } from "@/lib/rank-history"
 import {
@@ -325,8 +325,19 @@ export default async function FavpollPage({ params }: Props) {
 
   const typedFavpoll = favpoll as FavpollWithDetails
 
-  // Entitlement: viewer may see real reveal + real per-favourite amounts
-  const entitled = !!hasPledged || isClosed || isOrganiser
+  // TWO GATES, NOT ONE (founder, 2026-10-03). The STANDINGS are withheld
+  // so as not to influence picks, so they open the moment no pick can be
+  // influenced: a pledge on record, the close, the organiser — and now a
+  // suspension, which stops the picks and freezes the numbers besides
+  // (lib/picks-suspended; one way, so a resume leaves them open).
+  //
+  // The NOTE is not an influence guard. It is the gift the pledge buys,
+  // and suspension exists so the room keeps giving, so it stays behind a
+  // real pledge. The room has always read this way — FavpollSheet's own
+  // viewer shows a whole room the standings and withholds the note until
+  // the finale.
+  const noteOpen = !!hasPledged || isClosed || isOrganiser
+  const entitled = noteOpen || standingsOpened(typedFavpoll)
 
   // Safe to send even when un-entitled: whether a reveal exists, without its
   // content — the lock pill must not promise a reveal on favpolls without one.
@@ -357,10 +368,13 @@ export default async function FavpollPage({ params }: Props) {
   }
 
   // Gate sensitive data server-side for un-entitled viewers of open polls
+  if (!noteOpen && pollWithItems) {
+    pollWithItems = { ...pollWithItems, personal_note: null }
+  }
+
   if (!entitled && pollWithItems) {
     pollWithItems = {
       ...pollWithItems,
-      personal_note: null,
       topics: {
         ...pollWithItems.topics,
         favourites: pollWithItems.topics.favourites.map((f) => ({
@@ -472,6 +486,7 @@ export default async function FavpollPage({ params }: Props) {
           clerkUserId={userId}
           isOrganiser={isOrganiser}
           entitled={entitled}
+          hasPledged={noteOpen}
           hasNote={hasNote}
           gatedCharityNames={gatedCharityNames}
           showGuestAmounts={showAmounts}

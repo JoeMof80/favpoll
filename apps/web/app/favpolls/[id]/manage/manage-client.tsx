@@ -245,6 +245,11 @@ export function ManageClient({
     favpoll.picks_suspended_at ?? null
   )
   const [suspendPending, setSuspendPending] = useState(false)
+  // Once a suspension has opened the standings they never shut
+  // (lib/picks-suspended), so the warning stops offering to open them.
+  // Local, because suspending stamps it server-side in the same tap.
+  const standingsAlreadyOpen =
+    !!favpoll.standings_opened_at || suspendAt !== null
   const [deleting, setDeleting] = useState(false)
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
   const [copied, setCopied] = useState<string | null>(null)
@@ -315,20 +320,24 @@ export function ManageClient({
       setSuspendPending(false)
     }
   }
+  // THE CONSEQUENCES, NOT THE MECHANICS (founder, 2026-10-03: "we should
+  // warn the user of the consequences of suspending the poll in helper
+  // text under the suspend button"). The tap is reversible; two of the
+  // things it does are not. A pledge made while the picks are suspended
+  // has no favourite attached and resuming does not go back and give it
+  // one, and the standings, once open, stay open (lib/picks-suspended) —
+  // so the warning drops its "open to everyone" clause on a favpoll where
+  // that has already happened, rather than promising it twice.
   const picksSentence = suspendAt
     ? `The picks are in since ${new Date(suspendAt).toLocaleString("en-GB", {
         day: "numeric",
         month: "short",
         hour: "numeric",
         minute: "2-digit",
-      })}. Every pledge goes to the shared pot until the close.`
-    : // THE CONSEQUENCES, NOT THE MECHANICS (founder, 2026-10-03: "we
-      // should warn the user of the consequences of suspending the
-      // poll in helper text under the suspend button"). The tap is
-      // reversible, but what it takes in is not: a pledge made while
-      // the picks are suspended has no favourite attached, and
-      // resuming does not go back and give it one.
-      "Guests stop picking straight away. Every pledge then goes to the shared pot until the close, and the standings hold where they are. You can resume the picks, but pledges taken while suspended stay in the pot."
+      })}. The standings are open and every pledge goes to the shared pot until the close.`
+    : standingsAlreadyOpen
+      ? "Guests stop picking straight away and every pledge then goes to the shared pot until the close. The standings are already open and stay open. You can resume the picks, but pledges taken while suspended stay in the pot."
+      : "Guests stop picking straight away, the standings open to everyone, and every pledge then goes to the shared pot until the close. You can resume the picks, but the standings stay open and pledges taken while suspended stay in the pot."
 
   const canDelete =
     favpoll.pledge_count === 0 && (favpoll.pot?.total_deposited ?? 0) === 0

@@ -26,6 +26,13 @@ function lastUpdate() {
   return mock.callsFor("favpolls").find((c) => c.method === "update")?.args[0]
 }
 
+function updates() {
+  return mock
+    .callsFor("favpolls")
+    .filter((c) => c.method === "update")
+    .map((c) => c.args[0])
+}
+
 beforeEach(() => {
   mock = makeSupabaseMock()
   mockAuth.mockResolvedValue({ userId: "user-1" })
@@ -58,5 +65,34 @@ describe("setPicksSuspended", () => {
     mock.queue(null)
     expect(await setPicksSuspended("f-1", false)).toBeNull()
     expect(lastUpdate()).toEqual({ picks_suspended_at: null })
+  })
+})
+
+// THE STANDINGS OPEN WITH THE FIRST SUSPENSION, AND STAY OPEN (founder,
+// 2026-10-03). A second write, guarded on the column still being null, so
+// the FIRST moment survives a suspend / resume / suspend again.
+describe("setPicksSuspended opening the standings", () => {
+  it("stamps the standings open alongside the suspension", async () => {
+    mock.queue(open)
+    mock.queue(null)
+    mock.queue(null)
+    const value = await setPicksSuspended("f-1", true)
+    expect(updates()).toEqual([
+      { picks_suspended_at: value },
+      { standings_opened_at: value },
+    ])
+    expect(
+      mock
+        .callsFor("favpolls")
+        .filter((c) => c.method === "is")
+        .map((c) => c.args)
+    ).toContainEqual(["standings_opened_at", null])
+  })
+
+  it("writes nothing about the standings on a resume", async () => {
+    mock.queue(open)
+    mock.queue(null)
+    await setPicksSuspended("f-1", false)
+    expect(updates()).toEqual([{ picks_suspended_at: null }])
   })
 })
