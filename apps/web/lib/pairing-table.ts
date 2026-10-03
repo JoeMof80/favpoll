@@ -138,6 +138,8 @@ export const SUBSET_PARENTS: Record<string, string> = {
   "Ancient ruin": "Landmark or building",
   "Nature sound": "Sound",
   "Music radio station": "Radio station",
+  Songbird: "Bird",
+  "Water bird": "Bird",
   // Approved 2026-10-02 — the founder's ticks over the September scan
   // review (scripts/approve-ticked-subsets.ts).
   "Picture book": "Children's book",
@@ -801,6 +803,8 @@ export const REGISTER_ADDED = [
   "Mountain Rescue England and Wales",
   "Guide Dogs",
   "Royal Horticultural Society",
+  "Cats Protection",
+  "RSPB",
 ] as const
 export const CHARITY_ROWS: Record<string, TopicRow[]> = {
   RNLI: [
@@ -850,6 +854,30 @@ export const CHARITY_ROWS: Record<string, TopicRow[]> = {
     t("Landscape"),
     t("Weather for walking"),
     t("Weather"),
+  ],
+  // The RSPB fell through to the animals family row too, which offers
+  // Dog breed and Cat breed — the Rufus shape again, a birds charity
+  // asked for a favourite dog. Garden bird is their confirmed subset:
+  // the Big Garden Birdwatch is their own.
+  RSPB: [
+    t("Bird", true),
+    t("Garden bird", true),
+    t("Bird of prey"),
+    t("Songbird"),
+    t("Water bird"),
+    t("Tree"),
+    t("Season"),
+    t("Weather for walking"),
+  ],
+  // Cats Protection had NO row until 2026-10-03 and fell through to the
+  // animals family row, which lists Dog breed — so a cats charity was
+  // offered a favourite dog breed (the Rufus exemplar: a dog's memorial
+  // raising for cats, scored three edges). A species charity pairs on
+  // its own species.
+  "Cats Protection": [
+    t("Cat breed", true),
+    t("Animal"),
+    t("Weather for walking"),
   ],
   "Dogs Trust": [
     t("Dog breed", true),
@@ -1113,6 +1141,53 @@ export type EdgeLookupInput = {
 
 const norm = (s: string) => s.trim().toLowerCase().replace(/[‘’]/g, "'")
 
+/** A PET MEMORIAL IS FOR ONE ANIMAL, and a charity that works for one
+ *  species does not belong at another's (founder, 2026-10-03, reading
+ *  the seeded cohort: "favourite dog breed for Cats Protection?"). The
+ *  topic on the card is what names the species — there is no species
+ *  field — so a dog topic beside a cats charity is the contradiction,
+ *  whatever the edges would otherwise score. Charities that work for
+ *  both (Battersea, Blue Cross, the RSPCA) are deliberately absent:
+ *  they belong at either. */
+type Species = "dog" | "cat" | "bird"
+
+const CHARITY_SPECIES: Record<string, Species> = {
+  "Cats Protection": "cat",
+  "Dogs Trust": "dog",
+  "Guide Dogs": "dog",
+  RSPB: "bird",
+}
+
+const TOPIC_SPECIES: Record<string, Species> = {
+  "Dog breed": "dog",
+  "Family dog breed": "dog",
+  "Small dog breed": "dog",
+  "Working dog breed": "dog",
+  Terrier: "dog",
+  "Cat breed": "cat",
+  Bird: "bird",
+  "Garden bird": "bird",
+  "Bird of prey": "bird",
+  Songbird: "bird",
+  "Water bird": "bird",
+}
+
+/** True when the card's animal and the charity's animal are both known
+ *  and different. */
+function speciesClash(
+  charityName: string | null,
+  topicTitle: string,
+  parentTopicTitle?: string | null
+): boolean {
+  if (!charityName) return false
+  const charity = CHARITY_SPECIES[charityName.trim()]
+  if (!charity) return false
+  const topic =
+    TOPIC_SPECIES[topicTitle.trim()] ??
+    (parentTopicTitle ? TOPIC_SPECIES[parentTopicTitle.trim()] : undefined)
+  return !!topic && topic !== charity
+}
+
 function findOccasionRow(occasionType: string | null): {
   key: string
   row: OccasionRow
@@ -1240,7 +1315,14 @@ export function lookupEdges(input: EdgeLookupInput): StoryEdges {
         r.occasions.some((o) => norm(o) === want) &&
         !(r.except ?? []).some((x) => norm(x) === name)
     )
-    if (row) {
+    // A cats charity does not belong at a dog's memorial, whatever the
+    // family row says (see CHARITY_SPECIES).
+    const clash = speciesClash(
+      input.charityName,
+      input.topicTitle,
+      input.parentTopicTitle
+    )
+    if (row && !clash) {
       e3 = {
         star: row.star,
         text: `${input.charityName} belongs at ${article(occ.key)} ${occ.key.toLowerCase()}: ${row.why}.`,
