@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest"
 import { lookupEdges } from "../pairing-table"
+import { applyEnactedChoice, GENERIC_OUTCOME } from "../story-engine"
 
 // SUBSETS in the pairing table (favpoll-topic-rules §1, step 5): a subset
 // inherits its parent's row unless a row names the subset; a charity's
@@ -364,5 +365,93 @@ describe("the RSPB is a birds charity", () => {
       charityName: "Dogs Trust",
     })
     expect(e.e3).toBeNull()
+  })
+})
+
+// SECTION D — the provision readings (revisit, 1 October; entered 3 October).
+// A row that is a memento by default can still offer the Generate switch a
+// better sentence than the generic promise. The switch decides; the row only
+// supplies the words.
+describe("provision readings", () => {
+  const sunday = {
+    register: "celebrating_many" as const,
+    occasionType: "Family gathering",
+    topicTitle: "Classic board game",
+    parentTopicTitle: "Board game",
+    charityName: null,
+    causeFamily: null,
+  }
+
+  it("reads as a memento by default, with the offer carried quietly", () => {
+    const e = lookupEdges(sunday).e1!
+    expect(e.star).toBe(true)
+    expect(e.enacted).toBeUndefined()
+    expect(e.text).toContain("is part of a family gathering")
+    expect(e.outcome).toBe("the winner is the game that comes out after lunch")
+  })
+
+  it("the switch turns the row's own sentence on, not the generic one", () => {
+    const on = applyEnactedChoice(lookupEdges(sunday), true)
+    expect(on.e1?.enacted).toBe(
+      "the winner is the game that comes out after lunch"
+    )
+    expect(on.e1?.enacted).not.toBe(GENERIC_OUTCOME)
+  })
+
+  it("a row with no reading of its own still gets the generic promise", () => {
+    const plain = applyEnactedChoice(
+      lookupEdges({
+        ...sunday,
+        topicTitle: "Card game",
+        parentTopicTitle: null,
+      }),
+      true
+    )
+    expect(plain.e1?.enacted).toBe(GENERIC_OUTCOME)
+  })
+
+  it("the switch off leaves a memento, even on a provision row", () => {
+    const off = applyEnactedChoice(lookupEdges(sunday), false)
+    expect(off.e1?.enacted).toBeUndefined()
+    expect(off.e1?.star).toBe(true)
+  })
+
+  it("a reunion's rows stay enacted BY NATURE, switch or no switch", () => {
+    const reunion = {
+      register: "celebrating_many" as const,
+      occasionType: "Reunion",
+      topicTitle: "Sunday roast",
+      parentTopicTitle: "Comfort food",
+      charityName: null,
+      causeFamily: null,
+    }
+    expect(lookupEdges(reunion).e1?.enacted).toBe("the winner is the roast")
+    expect(
+      applyEnactedChoice(lookupEdges(reunion), undefined).e1?.enacted
+    ).toBe("the winner is the roast")
+  })
+
+  it("every occasion section D named now offers one", () => {
+    const cases: [string, string, string | null][] = [
+      ["Birthday", "Party board game", "Board game"],
+      ["Birthday", "Karaoke song", "Song"],
+      ["Divorce party", "Karaoke song", "Song"],
+      ["Family gathering", "Roast dinner meat", "Part of a roast dinner"],
+      ["Family gathering", "Christmas carol", "Carol"],
+      ["Leaving do", "Takeaway curry", "Takeaway"],
+      ["Team celebration", "Takeaway curry", "Takeaway"],
+      ["Charity night", "Karaoke song", "Song"],
+    ]
+    for (const [occasionType, topicTitle, parentTopicTitle] of cases) {
+      const e = lookupEdges({
+        register: "celebrating_many",
+        occasionType,
+        topicTitle,
+        parentTopicTitle,
+        charityName: null,
+        causeFamily: null,
+      }).e1
+      expect(e?.outcome, `${occasionType} · ${topicTitle}`).toBeTruthy()
+    }
   })
 })

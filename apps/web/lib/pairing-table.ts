@@ -51,8 +51,18 @@ export type TopicRow = {
   /** ENACTED: the guests' picks decide something on the night, so the
    *  favpoll needs no favourite of the group's own. The outcome, as the
    *  closing sentence will promise it ("the top ten are the playlist for
-   *  the night"; founder, 2026-09-26: a reunion's Song IS the playlist). */
+   *  the night"; founder, 2026-09-26: a reunion's Song IS the playlist).
+   *  A crowd has no favourite of its own, which is why the reunion's rows
+   *  read this way by default. */
   enacted?: string
+  /** A PROVISION READING that is available but NOT the default (section D
+   *  of the revisit, 2026-10-01, entered 2026-10-03). The row stays a
+   *  memento star — a birthday's favourite party board game is theirs —
+   *  and this is the sentence the organiser's Generate switch uses when
+   *  they say the picks decide the night, in place of the generic "the
+   *  top five are the picks for the night". The switch decides; the row
+   *  only supplies the better words. */
+  outcome?: string
 }
 
 /** A §1 row: what the occasion pairs with, and the two sentences the
@@ -73,6 +83,12 @@ const enact = (topic: string, outcome: string): TopicRow => ({
 })
 const t = (topic: string, star = false, why?: string): TopicRow =>
   why ? { topic, star, why } : { topic, star }
+/** A starred memento row that ALSO offers a provision reading. */
+const provision = (topic: string, outcome: string): TopicRow => ({
+  topic,
+  star: true,
+  outcome,
+})
 
 /** Every SUBSET the table names, with its parent topic (favpoll-topic-
  *  rules §1, step 5; the revisit of 2026-10-01, ticked by the founder on
@@ -312,9 +328,13 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Board game"),
       t("Card game"),
       t("Song"),
-      // Played and sung at the party (ticked 2026-10-02).
-      t("Party board game", true),
-      t("Karaoke song", true),
+      // Played and sung at the party (ticked 2026-10-02). Both carry a
+      // PROVISION reading for the Generate switch (section D).
+      provision(
+        "Party board game",
+        "the winner is the game that comes out after the cake"
+      ),
+      provision("Karaoke song", "the top ten are the set list for the night"),
     ],
     at: "the cake on the table",
     hop: "a birthday tea",
@@ -358,11 +378,9 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
     topics: [
       t("Beer", false, "the leaving drinks"),
       t("Takeaway", false, "the leaving-night takeaway"),
-      t(
-        "Takeaway curry",
-        false,
-        "the leaving curry, the office's own send-off"
-      ),
+      // The leaving curry is a British office ritual, and the one row here
+      // the picks can actually decide (section D).
+      provision("Takeaway curry", "the winner is the order on the last day"),
       t("Coffee order", false, "the office coffee run they are leaving behind"),
       t("Sandwich", false, "the desk lunches they are leaving behind"),
       t("City", false, "where they are going next"),
@@ -504,7 +522,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Type of holiday"),
       t("Way to spend Sunday"),
       // If it is that kind of party (ticked 2026-10-02).
-      t("Karaoke song", true),
+      provision("Karaoke song", "the top ten are the set list for the night"),
     ],
     at: "the drink in hand — it is a party",
     hop: "the first solo trip",
@@ -566,6 +584,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       enact("Karaoke song", "the top ten are the karaoke list for the night"),
       // The subset names the enacted thing exactly (ticked 2026-10-02).
       enact("Cheese board", "the winners go on the board"),
+      enact("Sunday roast", "the winner is the roast"),
       t("Childhood favourite", false, "what everyone watched then"),
       t("Decade", true),
       t("Music era", true),
@@ -591,6 +610,7 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Cricket team"),
       t("Beer"),
       t("Takeaway"),
+      provision("Takeaway curry", "the winner is the order on the last day"),
       t("Biscuit"),
       t("Coffee order"),
       t("Sandwich"),
@@ -615,21 +635,34 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Christmas film"),
       t("Christmas song"),
       t("Carol"),
-      // The subsets that name the table and the game (ticked 2026-10-02).
-      // Sunday roast, Christmas carol, Christmas classic and Christmas
-      // number one wait on their approval on /subsets.
-      t("Roast dinner meat", true),
-      t("Roast dinner vegetable", true),
+      // The subsets that name the table and the game (ticked 2026-10-02),
+      // each carrying the PROVISION reading section D drafted: a family
+      // gathering is the occasion where the picks most often decide what
+      // actually happens, and the switch is what turns them on.
+      provision("Roast dinner meat", "the winner is the joint on the table"),
+      provision(
+        "Roast dinner vegetable",
+        "the top three are on the table beside it"
+      ),
       // Three topics hold a "Sunday roast" subset; at a family gathering
       // it is the constituent (ticked 2026-10-02).
-      t("Sunday roast", true),
+      provision("Sunday roast", "the winner is the roast"),
       t("British pudding"),
-      t("Christmas carol", true),
-      t("Christmas classic", true),
-      t("Family Christmas film", true),
-      t("Christmas number one", true),
+      provision(
+        "Christmas carol",
+        "the top five are the carols the family sings"
+      ),
+      provision("Christmas classic", "the winner is the film after dinner"),
+      provision("Family Christmas film", "the winner is the film after dinner"),
+      provision(
+        "Christmas number one",
+        "the top ten are the playlist for the day"
+      ),
       t("Name for a grandmother", true),
-      t("Classic board game", true),
+      provision(
+        "Classic board game",
+        "the winner is the game that comes out after lunch"
+      ),
       t("Children's board game", true),
     ],
     at: "the table, the names round it and the game after",
@@ -666,6 +699,8 @@ export const OCCASION_ROWS: Record<string, OccasionRow> = {
       t("Comedian"),
       t("Musical"),
       t("Cake"),
+      // The first row a charity night has that the picks can decide.
+      provision("Karaoke song", "the top ten are the set list for the night"),
     ],
     at: "the drinks and the acts of the night",
     hop: "the night's entertainment",
@@ -1103,6 +1138,9 @@ export type Edge = {
   star: boolean
   /** The outcome on the night, when the guests' picks are enacted. */
   enacted?: string
+  /** The provision sentence this row OFFERS the Generate switch, for a
+   *  row that is a memento by default (TopicRow.outcome). */
+  outcome?: string
 }
 
 export type StoryEdges = {
@@ -1252,6 +1290,7 @@ export function lookupEdges(input: EdgeLookupInput): StoryEdges {
           ? {
               star: true,
               text: `A favourite ${topic} is part of ${article(occasion)} ${occasion}: ${occ.row.at}.`,
+              ...(hit.outcome ? { outcome: hit.outcome } : {}),
             }
           : hit.why || occ.row.hop
             ? {

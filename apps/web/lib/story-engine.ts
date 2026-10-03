@@ -687,7 +687,10 @@ export function applyEnactedChoice(
     e1: {
       text: edges.e1?.text ?? "The guests' picks decide the night.",
       star: edges.e1?.star ?? true,
-      enacted: GENERIC_OUTCOME,
+      // The row's own provision sentence when it has one (section D):
+      // "the winner is the game that comes out after lunch" beats the
+      // generic promise, and is why those rows were written.
+      enacted: edges.e1?.outcome ?? GENERIC_OUTCOME,
     },
   }
 }
