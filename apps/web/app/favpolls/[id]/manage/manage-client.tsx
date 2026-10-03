@@ -322,7 +322,13 @@ export function ManageClient({
         hour: "numeric",
         minute: "2-digit",
       })}. Every pledge goes to the shared pot until the close.`
-    : "End the picks early. Every pledge then goes to the shared pot until the close, and the standings hold."
+    : // THE CONSEQUENCES, NOT THE MECHANICS (founder, 2026-10-03: "we
+      // should warn the user of the consequences of suspending the
+      // poll in helper text under the suspend button"). The tap is
+      // reversible, but what it takes in is not: a pledge made while
+      // the picks are suspended has no favourite attached, and
+      // resuming does not go back and give it one.
+      "Guests stop picking straight away. Every pledge then goes to the shared pot until the close, and the standings hold where they are. You can resume the picks, but pledges taken while suspended stay in the pot."
 
   const canDelete =
     favpoll.pledge_count === 0 && (favpoll.pot?.total_deposited ?? 0) === 0
