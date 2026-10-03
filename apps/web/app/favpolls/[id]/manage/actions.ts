@@ -270,5 +270,19 @@ export async function setPicksSuspended(favpollId: string, suspend: boolean) {
     .update({ picks_suspended_at: value })
     .eq("id", favpollId)
   if (error) throw new Error(error.message)
+  // THE STANDINGS OPEN WITH THE FIRST SUSPENSION, AND STAY OPEN
+  // (lib/picks-suspended, founder 2026-10-03). Stamped here rather than
+  // derived from picks_suspended_at, because resuming clears that one and
+  // the unlock must not travel back with it: the guests have seen the
+  // standings. The `is null` guard keeps the FIRST moment through a
+  // suspend / resume / suspend again.
+  if (suspend) {
+    const { error: openError } = await supabase
+      .from("favpolls")
+      .update({ standings_opened_at: value })
+      .eq("id", favpollId)
+      .is("standings_opened_at", null)
+    if (openError) throw new Error(openError.message)
+  }
   return value
 }

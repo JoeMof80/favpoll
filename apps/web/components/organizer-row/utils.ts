@@ -22,6 +22,8 @@ export type OrganizerFavpoll = {
   allow_guest_items?: boolean
   /** See lib/picks-suspended: null = open, set = suspended. */
   picks_suspended_at?: string | null
+  /** Set when a suspension opened the standings — never cleared. */
+  standings_opened_at?: string | null
   created_at: string
   protagonist: { name: string } | null
   charities: {

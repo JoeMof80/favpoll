@@ -83,3 +83,58 @@ describe("buildMechanicSteps — the picks are in (founder, 2026-10-02)", () => 
     )
   })
 })
+
+// THE STANDINGS ARE OUT (founder, 2026-10-03): once a suspension opens
+// them, step 3 cannot offer to reveal what the guest is reading.
+describe("buildMechanicSteps with the standings open", () => {
+  const suspended = {
+    topicTitle: "Hot drink",
+    charityLine: "Marie Curie",
+    picksSuspended: true,
+    standingsOpen: true,
+  }
+
+  it("promises the note, not the standings", () => {
+    expect(buildMechanicSteps({ ...suspended, hasNote: true })).toEqual([
+      "The picks are in — pledge to the shared pot",
+      "All money will go to Marie Curie",
+      "Reveal the personal note",
+    ])
+  })
+
+  it("drops step 3 entirely where there is no note", () => {
+    expect(buildMechanicSteps({ ...suspended, hasNote: false })).toEqual([
+      "The picks are in — pledge to the shared pot",
+      "All money will go to Marie Curie",
+    ])
+  })
+
+  it("asks for the pick again once the picks resume", () => {
+    // One way: the standings stay open, but picking is back on.
+    expect(
+      buildMechanicSteps({
+        ...suspended,
+        picksSuspended: false,
+        hasNote: true,
+      })
+    ).toEqual([
+      "Pick your favourite hot drink",
+      "Pledge what it's worth — all money will go to Marie Curie",
+      "Reveal the personal note",
+    ])
+  })
+
+  it("leaves the covered card's steps alone", () => {
+    expect(
+      buildMechanicSteps({
+        ...suspended,
+        standingsOpen: false,
+        hasNote: true,
+      })
+    ).toEqual([
+      "The picks are in — pledge to the shared pot",
+      "All money will go to Marie Curie",
+      "Reveal where the favourites stand along with a personal note",
+    ])
+  })
+})

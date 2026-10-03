@@ -490,3 +490,61 @@ describe("PollSection — the projector's type ramp", () => {
     expect(topicLine().className).not.toContain("--display-topic")
   })
 })
+
+// ─── The invitation ──────────────────────────────────────────────────────────
+
+// THE STANDINGS OPEN ON A SUSPENSION (founder, 2026-10-03), so a guest can
+// be entitled to them without having pledged. The lock card keeps its
+// teaching job and loses its covering one.
+describe("PollSection — the invitation", () => {
+  const OPEN = {
+    ...BASE_PROPS,
+    entitled: true,
+    hasPledged: false,
+    picksSuspended: true,
+    charityLine: "Marie Curie",
+    // PollSection defaults hasNote to true, so the no-note cases say so.
+    hasNote: false,
+  }
+
+  it("shows the standings and the invitation together", () => {
+    render(<PollSection {...OPEN} onOpenPledgeDialog={vi.fn()} />)
+    // The real list, not a cover over it.
+    expect(screen.getByLabelText("Rankings")).toBeInTheDocument()
+    const card = screen.getByRole("button", {
+      name: /Pledge to the shared pot$/i,
+    })
+    expect(card).toHaveTextContent(
+      "The picks are in — pledge to the shared pot"
+    )
+    expect(card).toHaveTextContent("Pledge to the pot")
+  })
+
+  it("promises the note and never the standings in view", () => {
+    render(<PollSection {...OPEN} hasNote onOpenPledgeDialog={vi.fn()} />)
+    const card = screen.getByRole("button", {
+      name: /Pledge to see a personal note$/i,
+    })
+    expect(card).toHaveTextContent("Reveal the personal note")
+    expect(card).not.toHaveTextContent("Reveal where the favourites stand")
+  })
+
+  it("offers nothing to reveal where there is no note", () => {
+    render(<PollSection {...OPEN} onOpenPledgeDialog={vi.fn()} />)
+    expect(screen.queryByText(/^Reveal/)).not.toBeInTheDocument()
+  })
+
+  it("goes once the viewer has pledged", () => {
+    render(<PollSection {...OPEN} hasPledged onOpenPledgeDialog={vi.fn()} />)
+    expect(
+      screen.queryByRole("button", { name: /^Pledge to/i })
+    ).not.toBeInTheDocument()
+  })
+
+  it("is absent on the room, which has no pledge entry point", () => {
+    render(<PollSection {...OPEN} />)
+    expect(
+      screen.queryByRole("button", { name: /^Pledge to/i })
+    ).not.toBeInTheDocument()
+  })
+})

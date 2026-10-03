@@ -48,10 +48,17 @@ export type SheetPresentation = "guest" | "room"
  *  would spoil each guest's own moment). */
 export type SheetViewer = {
   clerkUserId: string | null
-  /** Entitled to the real standings and the reveal (pledged, or signed
-   *  in with a pledge on record). */
+  /** Entitled to the real STANDINGS — a pledge on record, the close, the
+   *  organiser, or a suspension that opened them to everyone
+   *  (lib/picks-suspended). */
   entitled: boolean
-  /** The real personal note — null until entitled. */
+  /** The viewer has actually pledged. Equal to `entitled` until the
+   *  standings open without one, which is when the page owes them an
+   *  invitation where the lock card stood. */
+  hasPledged?: boolean
+  /** The real personal note — null until the viewer has PLEDGED. It is
+   *  the gift the pledge buys, not an influence guard, so opening the
+   *  standings does not open it. */
   personalNote: string | null
   /** Whether a note exists at all (safe to know pre-pledge). */
   hasNote: boolean
@@ -415,7 +422,7 @@ export function FavpollSheet({
             poll={pollWithItems}
             clerkUserId={standing.clerkUserId}
             isClosed={isClosed}
-            hasPledged={standing.entitled}
+            hasPledged={standing.hasPledged ?? standing.entitled}
             pledgeJustConfirmed={standing.pledgeJustConfirmed}
             protagonistName={
               isCause
