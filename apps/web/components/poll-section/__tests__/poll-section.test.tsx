@@ -465,3 +465,28 @@ describe("PollSection — suspended picks", () => {
     expect(screen.queryByText("Picks suspended")).not.toBeInTheDocument()
   })
 })
+
+// ─── The projector's type ramp ───────────────────────────────────────────────
+
+// THE ROOM HAD THE HEADING SMALLER THAN ITS OWN LIST (measured at
+// 1920x1080: a 17px topic over 24px ranking labels, the same 17px a phone
+// gets). The topic line reads --display-topic, which only the room and the
+// still that depicts it set; the eyebrow keeps the surface's own size so
+// the taller block still fits a 1080-high screen.
+describe("PollSection — the projector's type ramp", () => {
+  const topicLine = () => screen.getByText("Colour")
+
+  it("the room's topic reads the ramp, the eyebrow does not", () => {
+    render(<PollSection {...BASE_PROPS} entitled hasPledged size="display" />)
+    expect(topicLine().className).toContain(
+      "text-[length:var(--display-topic,17px)]"
+    )
+    expect(screen.getByText("Favourite").className).toContain("text-[17px]")
+  })
+
+  it("the guest page keeps its own size, ramp or no ramp", () => {
+    render(<PollSection {...BASE_PROPS} entitled hasPledged />)
+    expect(topicLine().className).toContain("text-[17px]")
+    expect(topicLine().className).not.toContain("--display-topic")
+  })
+})

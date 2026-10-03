@@ -213,7 +213,13 @@ export function PollSection({
             ... dropdown right. Same pattern mobile and desktop. */}
         <div className="flex min-h-9 items-center gap-2 py-3">
           <div className="min-w-0 flex-1">
-            <PollHeading topicTitle={poll.topics.title} inert />
+            <PollHeading
+              topicTitle={poll.topics.title}
+              inert
+              // The room reads the projector's type ramp; the guest page
+              // leaves the variable unset and keeps its own 17px.
+              ramp={size === "display"}
+            />
           </div>
           {picksSuspended && !isClosed && (
             /* THE PICKS ARE IN (founder, 2026-10-02): a state mark at the

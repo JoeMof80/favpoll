@@ -130,13 +130,16 @@ export function RoomShell({
   }, [live, closesAt, isClosed])
   const effectiveClosed = isClosed || localClosed
 
-  // THE PROJECTOR'S TYPE RAMP (lib/display, ROOM_TYPE_RAMP). It came
-  // off with DisplayScreen and the room has been rendering at page
-  // sizes since: the ranking labels, the topic and the money figure all
-  // read small across a room. Live, the ramp is vw-relative; a still
-  // resolves the same clamp against the width it DEPICTS, never the
-  // visitor's viewport — one ramp, two renderings, so the still cannot
-  // drift from the screen it claims to show.
+  // THE PROJECTOR'S TYPE RAMP (lib/display, ROOM_TYPE_RAMP). Live, the
+  // ramp is vw-relative; a still resolves the same clamp against the width
+  // it DEPICTS, never the visitor's viewport — one ramp, two renderings,
+  // so the still cannot drift from the screen it claims to show.
+  //
+  // Three of the four keys are consumed: --display-rank and --display-bar
+  // by RankingBar at size="display", and --display-topic by the poll
+  // heading's topic line (2026-10-03). --display-figure is NOT, and the
+  // note on it in lib/display says why — the money's box is pinned to the
+  // countdown card's height by #984.
   const typeScale = (
     still ? roomTypeScaleAtWidth(DISPLAY_ROOM.w) : roomTypeScale
   ) as React.CSSProperties
