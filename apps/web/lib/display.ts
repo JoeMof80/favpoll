@@ -201,9 +201,37 @@ export function heroNameSizeClass(name: string, compact = false): string {
  * below, growing to the cap at about 2880.
  */
 const ROOM_TYPE_RAMP = {
-  /** Money figure / protagonist name — today's sm:text-4xl at the floor. */
+  /**
+   * Money figure / protagonist name — today's sm:text-4xl at the floor.
+   *
+   * UNCONSUMED SINCE #984, AND DELIBERATELY SO (2026-10-03). It was written
+   * for DisplayScreen, where the money WAS the hero. The room's fundraiser
+   * dial is not that page: its figure is a `text-2xl` line inside a
+   * hard-coded `h-[29px]` box (components/heroes/fundraiser-slots), and the
+   * box exists so the goal card and the countdown card are ONE HEIGHT — the
+   * founder settled that column to the pixel (the hairline the bar
+   * straddles, the organiser row's border it meets). Scaling the figure to
+   * this clamp — 50px at 1920 against a 29px box — breaks every one of
+   * those relationships.
+   *
+   * So applying it is not a type change but a re-tune of the left column,
+   * with the countdown's digits and the still beside it. The founder's
+   * call, not a tidy-up. Measured and left alone.
+   */
   "--display-figure": { floor: 2.25, vw: 2.6, cap: 4.5 },
-  /** "FAVOURITE HOT DRINK" — today's md:text-2xl at the floor. */
+  /**
+   * "FAVOURITE HOT DRINK" — the floor was today's md:text-2xl when this was
+   * tuned, and the heading has since been rebuilt at 17px (poll-heading's
+   * TOPIC_TEXT), so the floor now sits ABOVE the page's own size rather
+   * than level with it. That is the right way round for a projector: the
+   * room was rendering the heading at 17px against 24px ranking labels, a
+   * heading smaller than the list it labels.
+   *
+   * Consumed by the TOPIC LINE ONLY (poll-heading's `ramp`). Two lines at
+   * 1.7vw overflowed a 1080-high screen by 13px, and the room's spare
+   * height is an invariant (#984), so the eyebrow keeps the surface's own
+   * size and the topic takes the ramp alone.
+   */
   "--display-topic": { floor: 1.5, vw: 1.7, cap: 3 },
   /** Ranking labels and amounts — today's text-lg at the floor. */
   "--display-rank": { floor: 1.125, vw: 1.25, cap: 2.25 },

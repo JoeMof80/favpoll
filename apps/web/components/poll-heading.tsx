@@ -15,6 +15,12 @@ type Props = {
    * not a disabled button: there is nothing to enable.
    */
   inert?: boolean
+  /**
+   * Read the PROJECTOR'S type ramp (--display-topic, lib/display), falling
+   * back to `size`'s own px everywhere the variable is unset. The room and
+   * the still that depicts it set it; nothing else does.
+   */
+  ramp?: boolean
 }
 
 // "Favourite" is the EYEBROW — quiet, above the topic word at full size
@@ -45,6 +51,21 @@ const TOPIC_TEXT: Record<string, string> = {
   sm: "text-[11px]",
 }
 const TOPIC_PX: Record<string, number> = { lg: 17, md: 15, sm: 11 }
+// THE PROJECTOR'S TYPE RAMP (lib/display, ROOM_TYPE_RAMP), in the shape the
+// ramp was designed for: the shared component reads the variable with ITS
+// OWN CURRENT SIZE as the fallback, so only the surface that sets the
+// variable — the room, and the still that depicts it — changes, and no flag
+// has to be threaded further than this.
+//
+// It is applied here because the room had the heading SMALLER than the list
+// it labels: measured at 1920x1080, the topic read 17px against 24px
+// ranking labels, the same 17px a phone gets. Literal classes, one per
+// size, because Tailwind scans source text and cannot see a built string.
+const TOPIC_RAMP: Record<string, string> = {
+  lg: "text-[length:var(--display-topic,17px)]",
+  md: "text-[length:var(--display-topic,15px)]",
+  sm: "text-[length:var(--display-topic,11px)]",
+}
 const MIN_SCALE = 0.55
 
 function FitLine({
@@ -62,11 +83,16 @@ function FitLine({
     const el = ref.current
     if (!el) return
     const fit = () => {
-      el.style.fontSize = `${basePx}px`
+      // Clear the inline size first and read what CSS wants: on the room
+      // that is the ramp's clamp, everywhere else the size's own class.
+      // Reading it back rather than trusting basePx is what lets one
+      // variable drive the line without a second source of truth.
+      el.style.fontSize = ""
+      const base = parseFloat(getComputedStyle(el).fontSize) || basePx
       const available = el.clientWidth
       const needed = el.scrollWidth
       if (!available || !needed || needed <= available) return
-      const next = Math.max(basePx * MIN_SCALE, (basePx * available) / needed)
+      const next = Math.max(base * MIN_SCALE, (base * available) / needed)
       el.style.fontSize = `${Math.floor(next * 10) / 10}px`
     }
     fit()
@@ -96,13 +122,23 @@ function HeadingLines({
   eyebrowClass,
   topicClass,
   align = "start",
+  ramp = false,
 }: {
   topicTitle: string
   size: FavpollCardSize
   eyebrowClass: string
   topicClass: string
   align?: "start" | "center"
+  /** Read the projector's type ramp, falling back to this size. */
+  ramp?: boolean
 }) {
+  // THE TOPIC LINE ALONE TAKES THE RAMP. Both lines at 1.7vw made the
+  // heading 81.6px and overflowed a 1080-high room by 13px, and the room's
+  // spare height is an invariant (#984) — a nudge on a column with slack
+  // scrolls the static hero away. The eyebrow keeps the surface's own size,
+  // which also puts a quiet label over a large topic word: the thing the
+  // room has to read from the back is the topic.
+  const topicTextClass = ramp ? TOPIC_RAMP[size] : TOPIC_TEXT[size]
   return (
     <span
       className={cn(
@@ -123,7 +159,7 @@ function HeadingLines({
         text={topicTitle}
         basePx={TOPIC_PX[size]}
         className={cn(
-          TOPIC_TEXT[size],
+          topicTextClass,
           topicClass,
           "leading-tight tracking-[0.09em]",
           align === "center" && "text-center"
@@ -138,6 +174,7 @@ export function PollHeading({
   size = "lg",
   onPledge,
   inert = false,
+  ramp = false,
 }: Props) {
   if (onPledge) {
     return (
@@ -168,6 +205,7 @@ export function PollHeading({
           size={size}
           eyebrowClass="text-primary/55"
           topicClass="text-primary"
+          ramp={ramp}
         />
       </div>
     )
