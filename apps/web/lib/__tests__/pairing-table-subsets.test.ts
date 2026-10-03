@@ -336,3 +336,33 @@ describe("a species charity at another species' memorial", () => {
     expect(e.e3).not.toBeNull()
   })
 })
+
+describe("the RSPB is a birds charity", () => {
+  const petMemorial = {
+    register: "remembering" as const,
+    occasionType: "Pet memorial",
+    charityName: "RSPB",
+    causeFamily: "animals" as const,
+  }
+
+  it("does not take a dog breed off the animals family row", () => {
+    const e = lookupEdges({ ...petMemorial, topicTitle: "Dog breed" })
+    expect(e.e2).toBeNull()
+    expect(e.e3).toBeNull()
+  })
+
+  it("but a bird is theirs, and stars", () => {
+    const e = lookupEdges({ ...petMemorial, topicTitle: "Bird" })
+    expect(e.e2?.star).toBe(true)
+    expect(e.e3).not.toBeNull()
+  })
+
+  it("and a dog charity does not belong at a bird's memorial", () => {
+    const e = lookupEdges({
+      ...petMemorial,
+      topicTitle: "Bird",
+      charityName: "Dogs Trust",
+    })
+    expect(e.e3).toBeNull()
+  })
+})

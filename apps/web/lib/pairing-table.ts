@@ -138,6 +138,8 @@ export const SUBSET_PARENTS: Record<string, string> = {
   "Ancient ruin": "Landmark or building",
   "Nature sound": "Sound",
   "Music radio station": "Radio station",
+  Songbird: "Bird",
+  "Water bird": "Bird",
   // Approved 2026-10-02 — the founder's ticks over the September scan
   // review (scripts/approve-ticked-subsets.ts).
   "Picture book": "Children's book",
@@ -802,6 +804,7 @@ export const REGISTER_ADDED = [
   "Guide Dogs",
   "Royal Horticultural Society",
   "Cats Protection",
+  "RSPB",
 ] as const
 export const CHARITY_ROWS: Record<string, TopicRow[]> = {
   RNLI: [
@@ -851,6 +854,20 @@ export const CHARITY_ROWS: Record<string, TopicRow[]> = {
     t("Landscape"),
     t("Weather for walking"),
     t("Weather"),
+  ],
+  // The RSPB fell through to the animals family row too, which offers
+  // Dog breed and Cat breed — the Rufus shape again, a birds charity
+  // asked for a favourite dog. Garden bird is their confirmed subset:
+  // the Big Garden Birdwatch is their own.
+  RSPB: [
+    t("Bird", true),
+    t("Garden bird", true),
+    t("Bird of prey"),
+    t("Songbird"),
+    t("Water bird"),
+    t("Tree"),
+    t("Season"),
+    t("Weather for walking"),
   ],
   // Cats Protection had NO row until 2026-10-03 and fell through to the
   // animals family row, which lists Dog breed — so a cats charity was
@@ -1132,19 +1149,27 @@ const norm = (s: string) => s.trim().toLowerCase().replace(/[‘’]/g, "'")
  *  whatever the edges would otherwise score. Charities that work for
  *  both (Battersea, Blue Cross, the RSPCA) are deliberately absent:
  *  they belong at either. */
-const CHARITY_SPECIES: Record<string, "dog" | "cat"> = {
+type Species = "dog" | "cat" | "bird"
+
+const CHARITY_SPECIES: Record<string, Species> = {
   "Cats Protection": "cat",
   "Dogs Trust": "dog",
   "Guide Dogs": "dog",
+  RSPB: "bird",
 }
 
-const TOPIC_SPECIES: Record<string, "dog" | "cat"> = {
+const TOPIC_SPECIES: Record<string, Species> = {
   "Dog breed": "dog",
   "Family dog breed": "dog",
   "Small dog breed": "dog",
   "Working dog breed": "dog",
   Terrier: "dog",
   "Cat breed": "cat",
+  Bird: "bird",
+  "Garden bird": "bird",
+  "Bird of prey": "bird",
+  Songbird: "bird",
+  "Water bird": "bird",
 }
 
 /** True when the card's animal and the charity's animal are both known
