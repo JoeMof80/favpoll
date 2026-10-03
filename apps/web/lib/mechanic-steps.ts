@@ -41,9 +41,6 @@ export type MechanicStepsInput = {
   /** The picks are suspended (lib/picks-suspended): the card teaches
    *  the pot's path, not the pick. */
   picksSuspended?: boolean
-  /** The standings are already open (lib/picks-suspended): step 3 cannot
-   *  promise what the guest is looking at. */
-  standingsOpen?: boolean
 }
 
 // isQuoteReveal / isMessageReveal DELETED 2026-09-17: they only ever
@@ -58,32 +55,17 @@ export function buildMechanicSteps({
   charityLine,
   hasNote = false,
   picksSuspended = false,
-  standingsOpen = false,
 }: MechanicStepsInput): string[] {
   const topic = topicTitle.toLowerCase()
   // THE PICKS ARE IN (founder, 2026-10-02): once the organiser suspends
   // the picks there is no favourite to pick — the pledge goes to the
   // shared pot and the reveal is where the favourites stand.
-  // THE STANDINGS ARE OUT (founder, 2026-10-03): a suspension opens them
-  // to everyone, so step 3 cannot offer to reveal what the guest can
-  // already read. What the pledge still buys is the note — and where
-  // there is no note it buys nothing but the giving, which is the whole
-  // of a donation and needs no third step. Steps 1 and 2 are unchanged
-  // founder copy; the trim is the smallest one that stays true.
-  if (standingsOpen) {
-    const open = picksSuspended
-      ? [
-          // Step 1 already says pledge, so step 2 keeps the suspended
-          // card's shorter second line rather than repeating the verb.
-          "The picks are in — pledge to the shared pot",
-          `All money will go to ${charityLine ?? "charity"}`,
-        ]
-      : [
-          `Pick your favourite ${topic}`,
-          `Pledge what it's worth — all money will go to ${charityLine ?? "charity"}`,
-        ]
-    return hasNote ? [...open, "Reveal the personal note"] : open
-  }
+  //
+  // UNREACHABLE FROM THE GUEST PAGE since 2026-10-04, and kept on
+  // purpose: a suspension now opens the reveal to everyone, so the lock
+  // card it feeds never renders suspended (there is nothing to lock).
+  // It is one branch of the founder's own copy, and it is what the card
+  // would say again if suspension ever stopped implying an open reveal.
   if (picksSuspended) {
     return [
       "The picks are in — pledge to the shared pot",

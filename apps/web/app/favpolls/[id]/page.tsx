@@ -325,19 +325,24 @@ export default async function FavpollPage({ params }: Props) {
 
   const typedFavpoll = favpoll as FavpollWithDetails
 
-  // TWO GATES, NOT ONE (founder, 2026-10-03). The STANDINGS are withheld
-  // so as not to influence picks, so they open the moment no pick can be
-  // influenced: a pledge on record, the close, the organiser — and now a
-  // suspension, which stops the picks and freezes the numbers besides
-  // (lib/picks-suspended; one way, so a resume leaves them open).
+  // A SUSPENDED FAVPOLL READS AS A CLOSED ONE (founder, 2026-10-04: "just
+  // treat a suspended poll like it is closed, with note and standings
+  // revealed. the only difference is that users can continue to pledge,
+  // but only to the shared pot, via the pledge FAB").
   //
-  // The NOTE is not an influence guard. It is the gift the pledge buys,
-  // and suspension exists so the room keeps giving, so it stays behind a
-  // real pledge. The room has always read this way — FavpollSheet's own
-  // viewer shows a whole room the standings and withholds the note until
-  // the finale.
-  const noteOpen = !!hasPledged || isClosed || isOrganiser
-  const entitled = noteOpen || standingsOpened(typedFavpoll)
+  // So ONE gate, as before — a suspension simply joins the close in it.
+  // I had split it in two and kept the note behind a pledge, reasoning
+  // that the note is the gift and suspension exists so the room keeps
+  // giving; the founder's reading is simpler and he took it. Nothing on
+  // the page then teaches the mechanic, which is right: with the picks in
+  // and the standings out, a pledge is a donation, the charity footer
+  // already names where the money goes, and the pledge dialog says the
+  // pot's path at the moment of giving.
+  //
+  // One way (lib/picks-suspended): a resume leaves the reveal open,
+  // because the guests have seen it.
+  const entitled =
+    !!hasPledged || isClosed || isOrganiser || standingsOpened(typedFavpoll)
 
   // Safe to send even when un-entitled: whether a reveal exists, without its
   // content — the lock pill must not promise a reveal on favpolls without one.
@@ -368,13 +373,10 @@ export default async function FavpollPage({ params }: Props) {
   }
 
   // Gate sensitive data server-side for un-entitled viewers of open polls
-  if (!noteOpen && pollWithItems) {
-    pollWithItems = { ...pollWithItems, personal_note: null }
-  }
-
   if (!entitled && pollWithItems) {
     pollWithItems = {
       ...pollWithItems,
+      personal_note: null,
       topics: {
         ...pollWithItems.topics,
         favourites: pollWithItems.topics.favourites.map((f) => ({
@@ -486,7 +488,6 @@ export default async function FavpollPage({ params }: Props) {
           clerkUserId={userId}
           isOrganiser={isOrganiser}
           entitled={entitled}
-          hasPledged={noteOpen}
           hasNote={hasNote}
           gatedCharityNames={gatedCharityNames}
           showGuestAmounts={showAmounts}
