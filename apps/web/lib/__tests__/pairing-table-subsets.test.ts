@@ -269,3 +269,70 @@ describe("Karaoke song", () => {
     }
   })
 })
+
+// A PET MEMORIAL IS FOR ONE ANIMAL (founder, 2026-10-03, reading the seeded
+// cohort: "favourite dog breed for Cats Protection?"). That triple scored
+// three edges: Dog breed stars at a pet memorial, Cats Protection had no row
+// of its own so it inherited the animals family row's Dog breed, and an
+// animal charity stars at a pet memorial.
+describe("a species charity at another species' memorial", () => {
+  const rufus = {
+    register: "remembering" as const,
+    occasionType: "Pet memorial",
+    topicTitle: "Dog breed",
+    charityName: "Cats Protection",
+    causeFamily: "animals" as const,
+  }
+
+  it("Cats Protection no longer takes a dog breed edge", () => {
+    expect(lookupEdges(rufus).e2).toBeNull()
+  })
+
+  it("and does not belong at the memorial either", () => {
+    expect(lookupEdges(rufus).e3).toBeNull()
+  })
+
+  it("so the triple scores one edge, not three", () => {
+    expect(lookupEdges(rufus).count).toBe(1)
+  })
+
+  it("its own species still pairs, and stars", () => {
+    const e = lookupEdges({ ...rufus, topicTitle: "Cat breed" })
+    expect(e.e2?.star).toBe(true)
+    expect(e.e3).not.toBeNull()
+  })
+
+  it("the same holds the other way round, for Dogs Trust", () => {
+    const e = lookupEdges({
+      ...rufus,
+      topicTitle: "Cat breed",
+      charityName: "Dogs Trust",
+    })
+    expect(e.e3).toBeNull()
+  })
+
+  it("a dog SUBSET clashes through its parent", () => {
+    const e = lookupEdges({
+      ...rufus,
+      topicTitle: "Family dog breed",
+      parentTopicTitle: "Dog breed",
+    })
+    expect(e.e3).toBeNull()
+  })
+
+  it("a charity that works for both is untouched", () => {
+    for (const charityName of ["Battersea", "Blue Cross", "RSPCA"]) {
+      const e = lookupEdges({ ...rufus, charityName })
+      expect(e.e3, `${charityName} should still belong`).not.toBeNull()
+    }
+  })
+
+  it("the rule bites only where an animal is named", () => {
+    const e = lookupEdges({
+      ...rufus,
+      topicTitle: "Weather for walking",
+      charityName: "Guide Dogs",
+    })
+    expect(e.e3).not.toBeNull()
+  })
+})
