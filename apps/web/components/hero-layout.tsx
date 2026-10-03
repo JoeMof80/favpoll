@@ -250,9 +250,24 @@ export function HeroLayout({
         // about now lives INSIDE the band as a third collapsing clip
         // (below), so the band hides poll content at its bottom exactly
         // as the original design did.
+        //
+        // FROSTED 2026-10-03, which is not a reversal of that: the 2026
+        // experiment was transparency WITHOUT BLUR, and a tint leaves
+        // the text behind it legible, which is the whole of what
+        // ghosted. A backdrop blur destroys that legibility and keeps
+        // only colour and movement. X's own numbers, read off the
+        // stylesheet their server renders: blur(12px) at 0.85 alpha.
+        //
+        // Scoped to the STICKY case and to md, because frosting only
+        // means anything where something passes behind: the room's
+        // static hero and the phone (where the identity bar does this
+        // job) keep the solid band. The before-cover stays opaque on
+        // purpose — it exists for the moment iOS Safari drops the
+        // header's sticky, and a see-through patch in that failure is
+        // the bug it was added to fix.
         className={`bg-background pt-6 pb-4 md:pt-16 ${
           animate
-            ? `md:sticky md:z-30 md:before:absolute md:before:inset-x-0 md:before:-top-14 md:before:h-14 md:before:bg-background ${
+            ? `md:sticky md:z-30 md:before:absolute md:before:inset-x-0 md:before:-top-14 md:before:h-14 md:before:bg-background md:supports-backdrop-filter:bg-background/85 md:supports-backdrop-filter:backdrop-blur-md ${
                 // The scrollport already starts below the header in shell
                 // mode; md:top-14 there pins the band 56px too low, which
                 // is what was eating the about line.
