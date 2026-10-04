@@ -8,8 +8,6 @@ type Props = {
   barStyle?: React.CSSProperties
   className?: string
   labelSuffix?: React.ReactNode
-  /** "display" = projector scale (the live page) — larger text, thicker bar */
-  size?: "default" | "display"
   /**
    * "band" = the bar sits on a coloured band (the landing hero's glass
    * cards), so its ink and track come from the band's foreground rather
@@ -29,24 +27,17 @@ export function RankingBar({
   barStyle,
   className,
   labelSuffix,
-  size = "default",
   tone = "default",
   emphasis = false,
 }: Props) {
-  const isDisplay = size === "display"
   const onBand = tone === "band"
   return (
     <div className={className}>
       <div
-        className={cn(
-          "flex justify-between",
-          // --display-rank is set by DisplayScreen when it is a LIVE room
-          // surface; the fallback is the size this has always been, so every
-          // other caller (and the landing page's framed still) is unaffected.
-          isDisplay
-            ? "mb-1.5 text-[length:var(--display-rank,1.125rem)]"
-            : "mb-1 text-sm"
-        )}
+        // ONE SIZE (founder, 2026-10-04): the room shows the favpoll page,
+        // not an enlarged copy of it, and an organiser who needs it bigger
+        // zooms the browser — which scales everything at once.
+        className="mb-1 flex justify-between text-sm"
       >
         <span className="flex min-w-0 items-center gap-1.5 pr-2">
           <span
@@ -80,7 +71,7 @@ export function RankingBar({
         className={cn(
           "w-full overflow-hidden rounded-full",
           onBand ? "bg-primary-foreground/20" : "bg-muted",
-          isDisplay ? "h-[var(--display-bar,0.5rem)]" : "h-1.5"
+          "h-1.5"
         )}
         role="presentation"
       >

@@ -436,7 +436,7 @@ export function FavpollSheet({
             onOpenPledgeDialog={standing.onOpenPledgeDialog}
             pledgesGatedNotice={standing.pledgesGatedNotice}
             picksSuspended={picksSuspended}
-            size={room ? "display" : "default"}
+            room={room}
           />
           {afterPoll}
         </>
