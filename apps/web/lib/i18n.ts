@@ -69,7 +69,7 @@ export function formatPoundsCompact(pounds: number): string {
   return formatPounds(pounds)
 }
 
-/** Grouped tally ("1,234") for pledge and vote counts. */
+/** Grouped tally ("1,234") for pledge and pick counts. */
 export function formatCount(n: number): string {
   return n.toLocaleString("en-GB")
 }
