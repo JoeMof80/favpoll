@@ -336,9 +336,15 @@ What the decisions above add to that order, none of it large:
   staleness compares against;
 - step 2 gains the wave's eligibility filter (registered, has a
   website, mappable classification, income floor) and the spend cap;
-- the loader gains the removal check, which is the only part of
-  staleness that can hurt someone, and is worth doing BEFORE any of
-  this: it guards accounts that already exist;
+- the loader gained the removal check — DONE 2026-10-04, the first thing
+  built from these decisions, because it is the only part of staleness
+  that can hurt someone and it guards accounts that already exist:
+  `register_account_removals()` (migration 20261004140000) reads every
+  account charity's standing against the mirror with the money pointing
+  at it, `scripts/register/check-removals.ts` runs at the end of every
+  load and alone, admin `/charities` leads with the list, and
+  `setCharityConsent` refuses to approve a number the register has
+  removed;
 - the SC/NIC message is independent of all of it and can ship any time.
 
 The Haiku-vs-Sonnet comparison (decision 4) RAN on 2026-10-04 and

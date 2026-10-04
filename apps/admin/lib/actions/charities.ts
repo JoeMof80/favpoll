@@ -332,6 +332,54 @@ export async function setCharityTopics(
   return { error: null };
 }
 
+/** THE REMOVAL CHECK (references/charity-profiles-2026-09-27.md §3) —
+ * account charities whose standing on the register is not a clean
+ * Registered, with the money pointing at each. Removal is not staleness:
+ * a charity that has left the register is WRONG, not old, and money
+ * moving to a deregistered charity is the one failure here with real
+ * consequences. Written by the mirror load
+ * (scripts/register/check-removals.ts) and read here so an admin sees it
+ * loudly; the function is register_account_removals(), migration
+ * 20261004140000. */
+export type RegisterRemoval = {
+  charity_id: string;
+  name: string;
+  registered_number: string | null;
+  /** removed = deregistered; gone = absent from the latest extract
+   *  (possibly an interrupted load); unknown = no mirror row at all. */
+  verdict: "removed" | "gone" | "unknown";
+  is_active: boolean;
+  consent_status: string | null;
+  register_name: string | null;
+  register_status: string | null;
+  removed_on: string | null;
+  extract_date: string | null;
+  latest_extract: string | null;
+  favpoll_count: number;
+  open_count: number;
+  raised: number;
+  pending_disbursements: number;
+  pending_amount: number;
+  gift_aid_declarations: number;
+};
+
+export async function getRegisterRemovals(): Promise<{
+  data: RegisterRemoval[] | null;
+  error: string | null;
+}> {
+  const { data, error } = await createAdminClient().rpc(
+    "register_account_removals",
+  );
+  if (error) return { data: null, error: error.message };
+  return { data: (data ?? []) as RegisterRemoval[], error: null };
+}
+
+/** The verdicts by charity id, for a queue row to carry. */
+async function removalsById(): Promise<Map<string, RegisterRemoval>> {
+  const { data } = await getRegisterRemovals();
+  return new Map((data ?? []).map((r) => [r.charity_id, r]));
+}
+
 export type ConsentQueueRow = {
   id: string;
   name: string;
@@ -359,6 +407,11 @@ export type ConsentQueueRow = {
   /** The fundraising events read from its website (2026-09-27). */
   signature_events: SignatureEvent[] | null;
   registered_website: string | null;
+  /** The REMOVAL CHECK's verdict, when the register has something to say
+   *  about this number: a removed charity must not be invited or
+   *  approved. Null is the ordinary case — cleanly Registered. */
+  register_verdict: RegisterRemoval["verdict"] | null;
+  register_removed_on: string | null;
 };
 
 /** CONSENT OUTREACH QUEUE — pending charities in use on at least one
@@ -371,9 +424,10 @@ export async function getConsentQueue(): Promise<{
 }> {
   const supabase = createAdminClient();
 
-  const { data: links, error: linkError } = await supabase
-    .from("favpoll_charities")
-    .select("charity_id");
+  const [{ data: links, error: linkError }, removals] = await Promise.all([
+    supabase.from("favpoll_charities").select("charity_id"),
+    removalsById(),
+  ]);
   if (linkError) return { data: null, error: linkError.message };
 
   const counts = new Map<string, number>();
@@ -396,7 +450,11 @@ export async function getConsentQueue(): Promise<{
     .map((c) => {
       const { perfect_topic, perfect_subset, ...rest } = c as Omit<
         ConsentQueueRow,
-        "favpoll_count" | "perfect_topic_title" | "perfect_subset_title"
+        | "favpoll_count"
+        | "perfect_topic_title"
+        | "perfect_subset_title"
+        | "register_verdict"
+        | "register_removed_on"
       > & {
         perfect_topic?: { title: string } | { title: string }[] | null;
         perfect_subset?: { title: string } | { title: string }[] | null;
@@ -407,11 +465,14 @@ export async function getConsentQueue(): Promise<{
       const ps = Array.isArray(perfect_subset)
         ? perfect_subset[0]
         : perfect_subset;
+      const removal = removals.get(rest.id);
       return {
         ...rest,
         perfect_topic_title: pt?.title ?? null,
         perfect_subset_title: ps?.title ?? null,
         favpoll_count: counts.get(rest.id) ?? 0,
+        register_verdict: removal?.verdict ?? null,
+        register_removed_on: removal?.removed_on ?? null,
       };
     })
     .sort(
@@ -550,6 +611,33 @@ export async function setCharityConsent(
   status: "approved" | "declined",
 ): Promise<{ error: string | null }> {
   const supabase = createAdminClient();
+
+  // THE REMOVAL CHECK, as a guard and not just a warning: approval lists
+  // the charity and opens the money rail to it, so a number the register
+  // has deregistered is refused here, where the write happens. Declining
+  // stays open — it is the way out. A name mismatch is somebody else's
+  // problem and does not block.
+  if (status === "approved") {
+    const { data: charity } = await supabase
+      .from("charities")
+      .select("name, registered_number")
+      .eq("id", id)
+      .maybeSingle();
+    const number = (charity as { registered_number: string | null } | null)
+      ?.registered_number;
+    if (number) {
+      const check = await verifyOnMirror(
+        number,
+        (charity as { name: string }).name,
+      );
+      if (check.status === "removed") {
+        return {
+          error:
+            "The register has removed this charity. It cannot be approved — money must not move to a deregistered charity.",
+        };
+      }
+    }
+  }
 
   const { error } = await supabase
     .from("charities")

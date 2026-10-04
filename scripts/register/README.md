@@ -16,6 +16,37 @@ registered rows (migration 20260927170000); the loader refreshes it last.
 Streams the four half-gigabyte extracts rather than parsing them whole;
 main charities only, Registered and Removed both kept.
 
+## The removal check (`check-removals.ts`, migration 20261004140000)
+
+REMOVAL IS NOT STALENESS (`references/charity-profiles-2026-09-27.md` §3).
+Staleness is compared on the derived fields and regenerated lazily; a
+charity that has LEFT the register is wrong, not old, and money moving to
+a deregistered charity is the one failure here with real consequences. So
+every load ends with this check, and it also runs on its own against the
+mirror already in the database:
+
+    pnpm exec tsx --env-file=.env.local ../../scripts/register/check-removals.ts
+
+It reads `register_account_removals()` — the standing of every ACCOUNT
+charity (`charities`) against the mirror, with the money pointing at each
+(favpolls, the equal split of what they raised, payouts still pending,
+Gift Aid declarations). Three verdicts: **removed** (deregistered — loud,
+and `setCharityConsent` refuses to approve it), **gone** (absent from the
+latest extract: a deregistration with no removal date, or a load that
+stopped half way — warns only), **unknown** (no mirror row: registered
+since the extract, a linked number, or a typo — quiet). The loader prints
+the report and never fails a good load over it; run alone it exits 1 when
+something needs a human, so a cron can scream.
+
+The same list is the first thing on admin `/charities`. To see it with
+something in it, point a throwaway account at a removed number:
+
+    insert into charities (name, registered_number, is_active)
+    select 'ZZ probe (delete me)', registered_number::text, false
+    from register_charities
+    where status <> 'Registered' and removed_on is not null limit 1;
+    -- delete from charities where name = 'ZZ probe (delete me)';
+
 ## Mining it for perfect topics (the pilot)
 
 The pilot pipeline behind `references/perfect-topics-2026-09-26.md` (the
