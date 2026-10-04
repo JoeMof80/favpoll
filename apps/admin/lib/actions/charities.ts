@@ -396,8 +396,12 @@ export async function setCharityTopics(
 // drops them.
 
 /** The normalised profile key for an account's number, or null when the
- *  number is not a shape the key accepts (charity_profiles_unkeyable). */
-export function profileKey(registeredNumber: string | null): string | null {
+ *  number is not a shape the key accepts (charity_profiles_unkeyable).
+ *
+ *  NOT exported: this file is "use server", where every export must be an
+ *  async function — exporting it built fine under typecheck and vitest and
+ *  failed the Next build, which is the only thing that checks the rule. */
+function profileKey(registeredNumber: string | null): string | null {
   if (!registeredNumber) return null;
   const key = registeredNumber.trim().toUpperCase();
   return /^([0-9]{6,10}(-[0-9]+)?|SC[0-9]{3,6}|NIC[0-9]{3,6})$/.test(key)
