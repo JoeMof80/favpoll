@@ -541,6 +541,60 @@ describe("setCharityConsent", () => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
+// A GIVEN LOGO DROPS THE SCRAPED IMAGE (decision 2's second guard)
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("a given logo and the scraped image", () => {
+  it("drops the profile's scraped image when a logo is saved", async () => {
+    mock.queue(null); // the account update
+    mock.queue({ registered_number: "207076" }); // the number lookup
+    mock.queue(null); // the profile update
+
+    const { error } = await updateCharity("c1", {
+      logo_url: "https://rspb.org.uk/logo.png",
+    });
+
+    expect(error).toBeNull();
+    const update = mock
+      .callsFor("charity_profiles")
+      .find((c) => c.method === "update")!;
+    expect(update.args[0]).toMatchObject({
+      image_url: null,
+      image_source: null,
+    });
+    // ...and only a SCRAPED one: a logo the charity gave us is theirs.
+    expect(
+      mock.callsFor("charity_profiles").find((c) => c.method === "in")?.args,
+    ).toEqual(["image_source", ["og", "favicon"]]);
+  });
+
+  it("leaves the profile alone when the edit is not a logo", async () => {
+    mock.queue(null);
+
+    await updateCharity("c1", { description: "A bird charity." });
+
+    expect(mock.callsFor("charity_profiles")).toHaveLength(0);
+  });
+
+  it("drops it on create too — a wave may have prepared the profile", async () => {
+    mock.queue(null); // the insert
+    mock.queue(null); // the profile update
+
+    const { error } = await createCharity({
+      name: "RSPB",
+      registered_number: "207076",
+      logo_url: "https://rspb.org.uk/logo.png",
+      market: "en-GB",
+    });
+
+    expect(error).toBeNull();
+    expect(
+      mock.callsFor("charity_profiles").some((c) => c.method === "update"),
+    ).toBe(true);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 // getRegisterRemovals — the removal check's read
 // ─────────────────────────────────────────────────────────────────────────────
 

@@ -376,7 +376,57 @@ closed on an unverifiable charity is correct.
    Climate Foundation → none with its reason; ledger rows carry the model,
    the wave label and the cost.
 3. The number route for the page, private by default, register-only
-   rendering when the profile is empty.
+   rendering when the profile is empty. DONE 2026-10-04.
+   `/charities/<number>` is the same segment as the account page, because
+   the number is the general case the account page is a special case of:
+   `profileKeyFromParam` tells a registered number from a uuid (and keeps
+   a linked charity's "-1" suffix, which stripping hyphens would turn into
+   a different charity). Behaviour, probed against the running app:
+   - a number whose account is APPROVED and listed → 307 to
+     `/charities/<uuid>`, the public page, so there is one canonical URL
+     per charity;
+   - any other number → the PRIVATE page for staff (the appeals
+     allowlist, which that file already says becomes a role check when
+     charity accounts exist) and 404 for everyone else;
+   - a number the register has never held → 404.
+   The page wears the account page's own composition, so the page a
+   charity is shown at onboarding is the page it will have, and the first
+   thing on it says it is not public and why ("no account yet", "agreement
+   still pending", "the register has removed this charity"), with
+   `robots: index:false` on the route. The profile's own image sits on it —
+   private surfaces only, decision 2 — and until 2026-10-04 NOTHING
+   FETCHED ONE, so the slot was schema and render with no producer.
+   `lib/charity-image.ts` + `scripts/backfill-charity-image.ts` close
+   that: the homepage's og:image, else the best favicon it declares
+   (apple-touch-icon first, the one a site makes big enough to be a
+   logo), verified to be an image before it is stored, nothing crawled
+   beyond the URL that page names, no model and so no cap. The
+   GIVEN-logo guard is enforced where a logo is WRITTEN (admin
+   createCharity and updateCharity drop a scraped image), because that is
+   the moment it has to fire. Nothing is copied into our own storage: the
+   stored value is the charity's URL on the charity's site, because taking
+   a copy would be taking the image.
+   WHAT THE FIRST REAL RUN SHOWED (8 charities above £1m, 5 with an
+   image): most og:images are 1200x630 HERO PHOTOS, not logos — English
+   Heritage's "home-page-open-graph.jpg", a university's
+   "hero-sept-2026.jpg" — and a photo shrunk into the 132px logo box is a
+   strip in a field of whitespace. So each kind goes where its shape
+   works: a favicon in the logo box (it is a mark), an og:image as a
+   1.91:1 banner above the header (the shape it was cut for). IF THE
+   FOUNDER WOULD RATHER THE LOGO BOX ALWAYS WIN, the fix is to prefer the
+   favicon over the og:image in `findCharityImage` — one line, and it
+   inverts nothing else. The run also found a Drupal-style signed URL
+   arriving with a literal `&amp;` in its query string, which is a
+   different URL; attribute values are entity-decoded now.
+   With no profile at all it renders from the mirror alone and says what
+   it does not know ("We have not picked a favourite for X yet. Some
+   charities suit one and some honestly do not, and this page says so
+   rather than guessing").
+   NOT CHANGED, and visible here: `placeFromAddress` takes the last two
+   address lines, which on these rows reads "Lever Street, Manchester"
+   rather than "Manchester". The charity picker has shown it that way
+   since September, so it stays as it is rather than being quietly
+   re-cut on this page alone.
 4. Point the wizard's Generate and the Story engine at the mirror for
    purpose and contact (already the case for verification and search).
 5. Drop the register copies from `charities` once nothing reads them.
