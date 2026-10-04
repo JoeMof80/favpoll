@@ -291,7 +291,7 @@ export const regeneratedPlaceholdersBatch3: Record<string, Record<Register, Ph>>
       reveal: "Hers is the Stegosaurus. Every fact retained since 1991, shared unprompted.",
     },
     celebrating_many: {
-      about: "They are decorating a nursery and have put the matter of the presiding creature to a family vote.",
+      about: "They are decorating a nursery and have put the matter of the presiding creature to the family.",
       reveal: "Theirs is the Triceratops. It won the nursery wall by a clear margin.",
     },
     cause: {

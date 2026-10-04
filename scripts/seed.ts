@@ -4204,7 +4204,7 @@ const topics: TopicSeed[] = [
       },
       christening: {
         about:
-          "Lily's nursery is being decorated, and one creature has, by family vote, been chosen to preside over it.",
+          "Lily's nursery is being decorated, and one creature has been picked by the family to preside over it.",
         reveal:
           "The family have settled on the Triceratops for the nursery wall. It won by a clear margin.",
       },
