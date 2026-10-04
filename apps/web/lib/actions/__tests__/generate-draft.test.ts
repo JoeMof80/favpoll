@@ -867,18 +867,32 @@ describe("edge-aware generation — the prompt carries the table's edges", () =>
     title: "Seaside town",
     favourites: [{ label: "Whitby" }, { label: "St Ives" }],
   }
+  // Step 4: the account carries what is AGREED and its number; the
+  // register's own words are read from the mirror, so a charity fixture is
+  // now a pair — the account row, then the mirror row queued behind it.
   const RNLI = {
     name: "RNLI",
     description: "Saving lives at sea.",
+    cause_family: "sea_rescue",
+    registered_number: "209603",
+  }
+  const RNLI_REGISTER = {
+    registered_number: 209603,
+    name: "ROYAL NATIONAL LIFEBOAT INSTITUTION",
+    status: "Registered",
     activities:
       "The RNLI operates lifeboats around the coast of the UK and Ireland.",
-    cause_family: "sea_rescue",
+    objects: null,
+    classification: null,
+    areas: null,
   }
 
   it("states all three edges for a triad and asks for them in one breath", async () => {
     mock.queue(null)
     mock.queue(SEASIDE)
     mock.queue(RNLI)
+    mock.queue(RNLI_REGISTER) // the mirror
+    mock.queue(null) // the profile's suggestion reason
     mockLLMResponse("About.", "Ben's is Whitby. He swims there most mornings.")
     mock.queue(null)
 
@@ -953,6 +967,8 @@ describe("edge-aware generation — the prompt carries the table's edges", () =>
     mock.queue(null)
     mock.queue(SEASIDE)
     mock.queue(RNLI)
+    mock.queue(RNLI_REGISTER) // the mirror
+    mock.queue(null) // the profile's suggestion reason
     mockLLMResponse("About.", "His is Whitby. He swims there.")
     mock.queue(null)
 
@@ -977,10 +993,20 @@ describe("edge-aware generation — the prompt carries the table's edges", () =>
     mock.queue({
       name: "Rescue Kitties",
       description: null,
+      cause_family: null,
+      registered_number: "1157831",
+    })
+    mock.queue({
+      registered_number: 1157831,
+      name: "RESCUE KITTIES",
+      status: "Registered",
       activities:
         "A feral, stray and at-risk cat charity in Greater Manchester.",
-      cause_family: null,
+      objects: null,
+      classification: null,
+      areas: null,
     })
+    mock.queue(null) // the profile's suggestion reason
     mockLLMResponse("About.", "Her favourite was always Blue.")
     mock.queue(null)
 
@@ -1186,9 +1212,13 @@ describe("realism rules in the person prompt (founder review, 2026-09-24)", () =
       ...CHARITY_DATA,
       name: "River Action",
       cause_family: "environment_heritage",
-      perfect_topic_reason: "Rivers are what you protect.",
+      registered_number: "1195537",
       perfect_topic: { title: "River" },
     })
+    mock.queue(null) // the mirror has nothing to add here
+    // The REASON moved to the profile in step 2, so that is where the
+    // prompt's "River Action's own topic: …" sentence comes from.
+    mock.queue({ perfect_topic_reason: "Rivers are what you protect." })
     mockLLMResponse("About.", "Sam's is the Wye. He swims it every August.")
     mock.queue(null)
     await generateDraft({
@@ -1497,12 +1527,23 @@ describe("the register's objects and areas reach the prompt", () => {
     mock.queue({
       name: "St Christopher's Hospice",
       description: null,
-      activities: null,
       cause_family: "end_of_life",
+      registered_number: "210667",
+    })
+    // The objects and the areas are the REGISTER's words, so they arrive
+    // from the mirror now — in its own shape, which the mirror reader maps
+    // ({type, description} → {area, type}).
+    mock.queue({
+      registered_number: 210667,
+      name: "ST CHRISTOPHER'S HOSPICE",
+      status: "Registered",
+      activities: null,
       objects:
         "To promote the relief of suffering by the provision of hospice care.",
-      areas: [{ area: "Bromley", type: "Local Authority" }],
+      classification: null,
+      areas: [{ type: "Local Authority", description: "Bromley" }],
     })
+    mock.queue(null) // the profile's suggestion reason
     mockLLMResponse("About.", "Her favourite was always Blue.")
     mock.queue(null)
     await generateDraft({

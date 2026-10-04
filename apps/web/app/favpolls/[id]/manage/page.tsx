@@ -58,7 +58,7 @@ export default async function ManageFavpollPage({
       appeal_id,
       appeals ( name, charity_id ),
       protagonists!favpolls_protagonist_id_fkey ( name, context, about, photo_url ),
-      favpoll_charities ( charities ( id, name, logo_url, registered_number, description, created_at, consent_status, consent_contacted_at, registered_email ) ),
+      favpoll_charities ( charities ( id, name, logo_url, registered_number, description, created_at, consent_status, consent_contacted_at ) ),
       favpoll_polls (
         id,
         topic_id,

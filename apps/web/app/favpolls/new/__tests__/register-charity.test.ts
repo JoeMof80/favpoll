@@ -99,16 +99,22 @@ describe("findOrCreateRegisterCharity", () => {
       consent_status: "pending",
       verification_status: "verified",
       verified_name: "DOGS TRUST",
-      registered_email: "enquiries@dogstrust.org.uk",
-      registered_website: "www.dogstrust.org.uk",
-      // What the charity is FOR, captured at insert (2026-09-23)
-      activities: "Rescues and rehomes dogs across the UK.",
-      classification: {
-        what: ["Animals"],
-        who: [],
-        how: ["Provides Services"],
-      },
     })
+    // STEP 4: the register's own words are no longer COPIED onto the
+    // account. The number is the link, and contact and purpose are read
+    // from the mirror wherever they are shown — which is what lets step 5
+    // drop these columns.
+    for (const copied of [
+      "registered_email",
+      "registered_website",
+      "activities",
+      "classification",
+      "objects",
+      "areas",
+      "grant_making",
+    ]) {
+      expect(insert.args[0]).not.toHaveProperty(copied)
+    }
   })
 
   it("refuses a charity no longer on the register", async () => {

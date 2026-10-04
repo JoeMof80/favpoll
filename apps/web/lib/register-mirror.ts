@@ -140,6 +140,40 @@ export async function purposeFromMirror(
   }
 }
 
+/** THE REGISTER'S OWN CONTACT AND PURPOSE for a set of numbers, in one
+ *  query, keyed by the number as text (step 4 of
+ *  references/charity-profiles-2026-09-27.md: read from the mirror
+ *  instead of the copies on `charities`, which step 5 drops).
+ *
+ *  No API fallback here, unlike the single-row readers: a list of
+ *  charities is not worth a round trip per miss, and a charity registered
+ *  since the extract simply shows nothing until the next load. */
+export async function mirrorContactAndPurpose(
+  numbers: (string | null | undefined)[]
+): Promise<Map<string, MirrorRow>> {
+  const digits = [
+    ...new Set(
+      numbers
+        .map((n) => (n ?? "").replace(/\D/g, ""))
+        .filter((n) => n.length > 0)
+    ),
+  ].map(Number)
+  if (digits.length === 0) return new Map()
+  const { data, error } = await createAdminClient()
+    .from("register_charities")
+    .select(
+      "registered_number, name, status, latest_income, address, postcode, email, website, activities, objects, classification, areas, removed_on"
+    )
+    .in("registered_number", digits)
+  if (error) {
+    console.error("[register-mirror] list read failed:", error.message)
+    return new Map()
+  }
+  return new Map(
+    (data as MirrorRow[]).map((row) => [String(row.registered_number), row])
+  )
+}
+
 export type MirrorSearchResult = RegisterSearch["results"][number] & {
   place: string | null
   website: string | null
