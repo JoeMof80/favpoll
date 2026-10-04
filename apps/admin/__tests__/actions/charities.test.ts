@@ -30,6 +30,8 @@ import {
   getCharityTopics,
   setCharityTopics,
   setCharityConsent,
+  getConsentQueue,
+  getRegisterRemovals,
   getPerfectTopicQueue,
   dismissPerfectTopicSuggestion,
 } from "@/lib/actions/charities";
@@ -483,11 +485,146 @@ describe("setCharityConsent", () => {
   });
 
   it("returns error on DB failure", async () => {
+    // Approval reads the charity first (the removal check), so the
+    // update's response is the second in the queue.
+    mock.queue({ name: "Cancer Research UK", registered_number: null });
     mock.queue(null, { message: "update failed" });
 
     const { error } = await setCharityConsent("charity-1", "approved");
 
     expect(error).toBe("update failed");
+  });
+
+  // ─── THE REMOVAL CHECK reaches the write ─────────────────────────────────
+  // profiles note §3: approval lists the charity and opens the money rail,
+  // so a deregistered number is refused where the write happens, not only
+  // in the button that calls it.
+
+  it("refuses approval when the register has removed the charity", async () => {
+    mock.queue({ name: "Gone Trust", registered_number: "1000002" });
+    mock.queue({
+      name: "GONE TRUST",
+      status: "Removed",
+      removed_on: "2023-02-16",
+    });
+
+    const { error } = await setCharityConsent("charity-1", "approved");
+
+    expect(error).toMatch(/removed this charity/i);
+    expect(mock.callsFor("charities").some((c) => c.method === "update")).toBe(
+      false,
+    );
+  });
+
+  it("approves when the mirror says Registered", async () => {
+    mock.queue({ name: "Age UK", registered_number: "1128267" });
+    mock.queue({ name: "AGE UK", status: "Registered", removed_on: null });
+    mock.queue(null);
+
+    const { error } = await setCharityConsent("charity-1", "approved");
+
+    expect(error).toBeNull();
+    const update = mock
+      .callsFor("charities")
+      .find((c) => c.method === "update")!;
+    expect(update.args[0]).toMatchObject({ consent_status: "approved" });
+  });
+
+  it("declining a removed charity is never blocked — it is the way out", async () => {
+    mock.queue(null);
+
+    const { error } = await setCharityConsent("charity-1", "declined");
+
+    expect(error).toBeNull();
+    expect(mock.callsFor("register_charities")).toHaveLength(0);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// getRegisterRemovals — the removal check's read
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("getRegisterRemovals", () => {
+  it("returns the rows the function found", async () => {
+    mock.queue([
+      {
+        charity_id: "charity-1",
+        name: "Gone Trust",
+        verdict: "removed",
+        raised: 120,
+      },
+    ]);
+
+    const { data, error } = await getRegisterRemovals();
+
+    expect(error).toBeNull();
+    expect(data).toHaveLength(1);
+    expect(mock.callsFor("rpc:register_account_removals")).toHaveLength(1);
+  });
+
+  it("an empty result is no rows, not an error", async () => {
+    mock.queue([]);
+
+    const { data, error } = await getRegisterRemovals();
+
+    expect(error).toBeNull();
+    expect(data).toEqual([]);
+  });
+
+  it("surfaces the function's error", async () => {
+    mock.queue(null, {
+      message: "canceling statement due to statement timeout",
+    });
+
+    const { data, error } = await getRegisterRemovals();
+
+    expect(data).toBeNull();
+    expect(error).toMatch(/statement timeout/);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// getConsentQueue — the verdict travels with the row
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("getConsentQueue", () => {
+  // The queue reads the removals and the favpoll links together; the rpc
+  // is called while the array is built, so its response is queued first.
+  const queueResponses = (removals: unknown[], charities: unknown[]) => {
+    mock.queue(removals);
+    mock.queue([{ charity_id: "charity-1" }]);
+    mock.queue(charities);
+  };
+
+  it("carries the register verdict onto the row it affects", async () => {
+    queueResponses(
+      [
+        {
+          charity_id: "charity-1",
+          verdict: "removed",
+          removed_on: "2023-02-16",
+        },
+      ],
+      [{ id: "charity-1", name: "Gone Trust", registered_number: "1000002" }],
+    );
+
+    const { data, error } = await getConsentQueue();
+
+    expect(error).toBeNull();
+    expect(data![0].register_verdict).toBe("removed");
+    expect(data![0].register_removed_on).toBe("2023-02-16");
+  });
+
+  it("leaves the verdict null for a charity the register is happy with", async () => {
+    queueResponses(
+      [],
+      [{ id: "charity-1", name: "Age UK", registered_number: "1128267" }],
+    );
+
+    const { data } = await getConsentQueue();
+
+    expect(data![0].register_verdict).toBeNull();
+    expect(data![0].favpoll_count).toBe(1);
   });
 });
 

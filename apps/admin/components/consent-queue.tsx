@@ -154,6 +154,10 @@ function QueueRow({
 }) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  // A charity the register has removed is neither invited nor approved:
+  // the invite asks it to receive money, and approval opens the rail.
+  // Decline stays available — it is the way out.
+  const removed = row.register_verdict === "removed";
 
   function handleConsent(status: "approved" | "declined") {
     setError(null);
@@ -194,23 +198,46 @@ function QueueRow({
         </StatusBadge>
       )}
 
+      {/* THE REMOVAL CHECK (profiles note §3) reaches the queue, because
+          this is where a charity gets written to and emailed. Removed
+          blocks both; gone only warns — a load that stopped half way
+          looks the same, and the mirror is the thing to fix. */}
+      {removed && (
+        <StatusBadge tone="destructive">
+          Removed from the register
+          {row.register_removed_on
+            ? ` ${new Date(row.register_removed_on).toLocaleDateString("en-GB")}`
+            : ""}
+        </StatusBadge>
+      )}
+      {row.register_verdict === "gone" && (
+        <StatusBadge tone="warning">Not in the latest extract</StatusBadge>
+      )}
+
       <CauseFamilySelect row={row} />
       <PerfectTopicSelect row={row} topics={topics} />
 
       <div className="flex items-center gap-2">
-        <Button asChild size="sm" variant="outline" disabled={isPending}>
-          <a
-            href={inviteMailto(row)}
-            onClick={() => void markCharityContacted(row.id)}
-          >
+        {removed ? (
+          <Button size="sm" variant="outline" disabled>
             <Mail className="size-3.5" aria-hidden="true" />
-            {row.consent_contacted_at ? "Draft again" : "Draft invite"}
-          </a>
-        </Button>
+            Draft invite
+          </Button>
+        ) : (
+          <Button asChild size="sm" variant="outline" disabled={isPending}>
+            <a
+              href={inviteMailto(row)}
+              onClick={() => void markCharityContacted(row.id)}
+            >
+              <Mail className="size-3.5" aria-hidden="true" />
+              {row.consent_contacted_at ? "Draft again" : "Draft invite"}
+            </a>
+          </Button>
+        )}
         <Button
           type="button"
           size="sm"
-          disabled={isPending}
+          disabled={isPending || removed}
           onClick={() => handleConsent("approved")}
         >
           {isPending ? "…" : "Approve"}

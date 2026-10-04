@@ -20,6 +20,11 @@
  * pending lists mid-load on production) is halved and retried, down to
  * single rows, so one slow flush never ends the run.
  *
+ * Every load ends with THE REMOVAL CHECK (check-removals.ts): removal is
+ * not staleness, so an account charity that has left the register is
+ * reported now rather than on next touch — money points at those
+ * accounts. The load itself never fails over it.
+ *
  * The extracts are half a gigabyte each, so they are streamed, never
  * JSON.parsed whole: three passes build lookups (classification, areas,
  * objects) and the fourth walks the charity file and upserts in batches.
@@ -27,6 +32,7 @@
  * ---------------------------------------------------------------------------
  */
 import { createClient } from "@supabase/supabase-js";
+import { checkRemovals, reportRemovals } from "./check-removals";
 import { createReadStream, existsSync, mkdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { join, resolve } from "node:path";
@@ -253,6 +259,11 @@ async function main() {
     } else {
       console.log("refreshed register_search_rows");
     }
+
+    // THE REMOVAL CHECK — the standing of every account charity against
+    // the register we have just refreshed. Printed, never fatal: the load
+    // succeeded, and what it found is a human's call.
+    reportRemovals(await checkRemovals(supabase));
   }
 }
 
