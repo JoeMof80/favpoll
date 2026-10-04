@@ -47,6 +47,41 @@ something in it, point a throwaway account at a removed number:
     where status <> 'Registered' and removed_on is not null limit 1;
     -- delete from charities where name = 'ZZ probe (delete me)';
 
+## The profile floor (`charity_profiles`, migration 20261004160000)
+
+Layer two of the charity model (`references/charity-profiles-2026-09-27.md`):
+what WE derived about a charity that has agreed to nothing. Keyed by
+registered number as TEXT, so a hand-written Scottish or Northern Irish
+profile has a key at all.
+
+After a load, give the new charities their floor — one statement in the SQL
+editor, because it takes ~11s against an 8s API statement timeout:
+
+    select refresh_charity_profiles();
+
+It inserts a profile for every Registered charity that has none and
+refreshes the ones that are still only a floor; a drafted, reviewed or
+superseded profile is never touched, because its FINGERPRINTS are the
+record of what it was derived from. On dev: 171,909 profiles, 20s for the
+backfill, 11s for a pass that changes nothing.
+
+**The floor is a topic FAMILY and never a topic** (decision 1):
+`charity_topic_family()` maps five subject codes to a catalogue category —
+Animals, Nature, Sport, Books & Arts, Music — and says nothing otherwise,
+including when a MISSION code (health, disability, poverty, overseas aid,
+housing) makes a subject code incidental. Measured on the 59 account
+charities with a confirmed cause family: with the guard it speaks for 11
+and is right 11 times; without it, it also offered the RNLI a favourite
+poem, FareShare a favourite river and RNIB a favourite football team.
+Coverage is 36% of the register (61,339 of 171,909), and the other 64% is
+honest silence — the model still runs.
+
+**Staleness is never the date** (decision 3): `charity_profiles_stale`
+compares the four fingerprints (name, objects, activities, classification)
+against the mirror's current text, so it catches a change WITHIN one
+extract date — which `extract_date` cannot, since income and year-end move
+for all 172k every quarter.
+
 ## Mining it for perfect topics (the pilot)
 
 The pilot pipeline behind `references/perfect-topics-2026-09-26.md` (the
