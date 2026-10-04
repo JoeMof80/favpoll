@@ -159,24 +159,126 @@ the number route is the general case it becomes a special case of.
   `backfill-signature-events.ts` write to `charity_profiles` for any
   registered number, not only account rows.
 
-## Open questions for the founder
+## Decided (founder, 2026-10-04)
 
-- **Rule floor, how far?** A classification→topic-family map is
-  cheap and honest; a classification→perfect-topic guess is not (a
-  hospice classified "Health" must still get none). Proposal: family
-  only by rule; topic only by model.
-- **Whose image?** Preview from the site's own og:image is a fair
-  reading of a public page; the public favpoll page shows only what
-  the charity supplied. Confirm.
-- **Off-register charities** (OSCR, NI): an account row with no
-  register row, profile written by hand. Rare; keep the columns that
-  make it possible.
-- **Staleness**: a new extract changes objects or removes a charity.
-  The profile stores its `extract_date`; the loader can flag profiles
-  older than the row. Regenerate on demand, not in bulk.
-- **Cost line**: the model per profile is pence; the batch that
-  prepares a 2,000-charity slice is tens of pounds. Fine per outreach
-  wave; not fine for all 172k at once.
+All five taken one at a time. The question each answers is kept, so the
+reasoning is not lost; the answer is what builds.
+
+### 1. Rule floor — family by rule, topic only by model
+
+*How much may be derived from the classification codes alone?*
+
+A rule may name the topic FAMILY and never the topic. Family from codes
+is mechanical and free for all 172k, so every charity has something the
+moment its page exists. The perfect topic needs the model to read the
+charity's own words, because the codes are coarse exactly where it
+matters: a hospice and a research institute share "Health", and the
+hospice's right answer is none. A rule cannot tell them apart, and the
+failure is the worst kind — confidently offering a bereavement charity
+a cheerful favourite.
+
+### 2. Image — their own og:image, private surfaces only
+
+*May a profile show a charity's image before it has agreed to anything?*
+
+Yes, on the PRIVATE page and the admin preview, stored with
+`image_source` so a scraped image is never mistaken for a given one.
+The private page is shown to the charity itself ("here is your page, in
+your own words"), and they are the one audience who cannot object to
+their own mark; replacing it is step 3 of onboarding.
+
+Two guards, which the design above did not spell out:
+
+- the scraped image NEVER survives onboarding. When the charity
+  supplies a logo the scraped one is dropped, not kept as a fallback,
+  or `superseded` leaks and we serve a scraped image publicly by
+  accident.
+- og:image or favicon only. No crawling further for a better picture:
+  an og:image is published FOR being shown elsewhere; a site's photo
+  library is not.
+
+The public page was never in question — it is private until consent is
+approved, and by then the logo is the charity's own.
+
+### 3. Staleness — flag on the fields that matter, regenerate on touch
+
+*What happens when a new extract lands?*
+
+Flag and regenerate lazily, but compare the fields the profile was
+DERIVED from — `objects`, `activities`, `classification`, `name` — not
+the row's `extract_date`. Almost every row changes every extract
+(`latest_income`, `latest_expenditure`, `financial_year_end` update
+annually for all 172k), so dating alone would flag the whole table and
+charge for regenerations that change nothing.
+
+Bulk regeneration after a load is refused: it turns a quarterly data
+load into an unbudgeted model bill, spent mostly on charities nobody
+will contact this year.
+
+REMOVAL IS NOT STALENESS. The extract also deregisters charities
+(`status`, `removed_on`). A profile whose charity is gone is wrong, not
+old, and two things follow at load time rather than on next touch: it
+drops out of outreach eligibility, so no wave can email a removed
+charity; and if that number has an ACCOUNT row an admin sees it
+loudly, because favpolls, pledges, settlements and Gift Aid claims
+point at that account and money moving to a deregistered charity is the
+one failure here with real consequences.
+
+### 4. Cost — the batch filter is the lever, not the model price
+
+*When do we spend model money on profiles?*
+
+Per outreach wave, with a cap covering admin on-demand touches as well
+(clicking through the queue is the motion that spends invisibly). But
+the "half of it on parish halls with nothing to write about" is
+avoidable before a single call, with free SQL on the mirror. A wave's
+candidates must be:
+
+- `status` Registered
+- have a website (no site = no og:image, no signature events, nothing
+  to read beyond the filing: a thin profile and a weak pitch)
+- a classification the rule floor can map to a family we serve
+- above an income floor (a £3,673 canal society is one person and a
+  bank account; an outreach email will not land)
+
+Each is a `where` clause on a table we already hold, and together they
+make the per-profile price much less interesting than it looks.
+
+THE MODEL ITSELF IS A THIRD LEVER (founder, 2026-10-04, asking whether
+this could be outsourced to bring costs down). Profile work is
+EXTRACTION, not authorship — read these objects, pick from a fixed
+catalogue, or say none — which is Haiku-shaped. To be measured, not
+assumed: run both models over the gold set that exists (the 11 perfect
+topics confirmed by hand on production, plus the honest "none"
+answers) and compare. If Haiku agrees, the per-profile cost drops by
+roughly an order of magnitude and the cap stops mattering much.
+
+### 5. Off-register — hand-written, and say so out loud
+
+*Scotland (OSCR) and Northern Ireland (CCNI) are not on this register.*
+
+No loaders for them now. Every account charity is England and Wales,
+each other regulator is a separate register with its own schema and
+loader, and nobody is waiting. It already fails in the safe direction:
+a Scottish number falls through the mirror to the Commission API, which
+does not have it either, so verification fails and no account is
+created. For a system that routes money to the verified party, failing
+closed on an unverifiable charity is correct.
+
+- Keep the columns that make a HAND-WRITTEN account possible: admin
+  creates the account, writes the profile, status `reviewed`, no
+  `extract_date` because no extract produced it, and verification is a
+  recorded human act rather than an API call.
+- MAKE THE DEAD END LEGIBLE. An `SC` or `NIC` number currently reads as
+  "not found", which looks like a typo and sends the user round the
+  loop. Recognising the prefix and saying "Scottish and Northern Irish
+  charities aren't supported yet" is a few lines, turns a mystery into
+  a known limit, and gives a demand signal: if that message starts
+  firing, you will know before anyone complains.
+- The trigger to revisit is the first real request, not a date. OSCR
+  publishes a downloadable register in much the same shape, so it is a
+  loader and a column mapping — roughly a day. The three-layer model
+  does not change; layer one gains a second source.
 
 ## What happens next
 
@@ -188,6 +290,21 @@ the number route is the general case it becomes a special case of.
 4. Point the wizard's Generate and the Story engine at the mirror for
    purpose and contact (already the case for verification and search).
 5. Drop the register copies from `charities` once nothing reads them.
+
+What the decisions above add to that order, none of it large:
+
+- step 1 also computes the rule floor as FAMILY only, and the profile
+  carries `image_source` and the four derived-field fingerprints
+  staleness compares against;
+- step 2 gains the wave's eligibility filter (registered, has a
+  website, mappable classification, income floor) and the spend cap;
+- the loader gains the removal check, which is the only part of
+  staleness that can hurt someone, and is worth doing BEFORE any of
+  this: it guards accounts that already exist;
+- the SC/NIC message is independent of all of it and can ship any time.
+
+The Haiku-vs-Sonnet comparison (decision 4) should run before step 2 is
+budgeted, since it moves the per-profile cost by an order of magnitude.
 
 Related: `perfect-topics-2026-09-26.md` (the register pilot and the
 founder's lens ruling), `appeals-concept-2026-09-05.md` (the other
