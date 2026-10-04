@@ -74,7 +74,11 @@ export function eventLinks(html: string, base: URL): string[] {
   return [...out].slice(0, 3)
 }
 
-async function fetchPage(url: string): Promise<string | null> {
+/** One page of HTML, or null. Exported because the image reader
+ *  (lib/charity-image.ts) reads a charity's homepage under exactly the
+ *  same discipline — our own user agent with a contact address, an 8s
+ *  timeout, redirects followed, and anything that is not HTML refused. */
+export async function fetchPage(url: string): Promise<string | null> {
   try {
     const res = await fetch(url, {
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),

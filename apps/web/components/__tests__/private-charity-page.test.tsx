@@ -134,6 +134,49 @@ describe("PrivateCharityPage", () => {
     ).toBeInTheDocument()
   })
 
+  // Each kind of image where its own shape works: measured on the first
+  // real run, most og:images are 1200x630 hero photos, and a photo shrunk
+  // into the square logo box is a strip in a field of whitespace.
+  it("puts a favicon in the logo box — it is a mark", () => {
+    render(
+      <PrivateCharityPage
+        page={page({
+          imageUrl: "https://example.org/apple-touch-icon.png",
+          imageSource: "favicon",
+        })}
+        contactEmail="hello@x.com"
+      />
+    )
+    const img = screen.getByAltText("The Arts Council Of England")
+    expect(img).toHaveAttribute(
+      "src",
+      "https://example.org/apple-touch-icon.png"
+    )
+    expect(img.className).toMatch(/rounded-xl/)
+    expect(img.className).not.toMatch(/aspect-/)
+  })
+
+  it("puts an og:image in the banner, in the shape it was cut for", () => {
+    render(
+      <PrivateCharityPage
+        page={page({
+          imageUrl: "https://example.org/open-graph.jpg",
+          imageSource: "og",
+        })}
+        contactEmail="hello@x.com"
+      />
+    )
+    const banner = screen.getByAltText(
+      "The Arts Council Of England, from their own site"
+    )
+    expect(banner.className).toMatch(/aspect-\[1\.91\/1\]/)
+    // ...and the logo box keeps its initial tile rather than letterboxing
+    // the same photo into a square.
+    expect(
+      screen.queryByAltText("The Arts Council Of England")
+    ).not.toBeInTheDocument()
+  })
+
   it("shows the events read from the charity's own site", () => {
     render(
       <PrivateCharityPage

@@ -133,6 +133,35 @@ Story generator's and is pinned to a Haiku id on dev, so a cost decision
 about Story copy was silently reassigning this call to the model the
 measurement rejected.
 
+## The charity's own image (decision 2)
+
+`backfill-charity-image.ts` reads a charity's homepage and takes its
+og:image, or failing that the best favicon it declares
+(`apple-touch-icon` first — it is the one a site makes big enough to be a
+logo). No model, so no spend and no cap; one page read per charity, and
+nothing followed but the image URL that page names.
+
+    pnpm exec tsx --env-file=.env.local ../../scripts/backfill-charity-image.ts \
+      --wave --income=1000000 --limit=50
+
+Private surfaces only, and `image_source` is stored beside the URL so a
+scraped image is never mistaken for a given one. A GIVEN logo DROPS the
+scraped one — enforced in `apps/admin` at `createCharity` and
+`updateCharity`, the moment a logo is written, because that is the moment
+it has to fire.
+
+Nothing is copied into our own storage: the stored value is the charity's
+own URL on the charity's own site. Taking a copy would be taking the
+image, which is what decision 2 avoids.
+
+Measured on the first real run (8 charities above £1m): 5 had an image, and
+**most og:images are 1200x630 hero photos** rather than logos — English
+Heritage's "home-page-open-graph.jpg", a university's "hero-sept-2026.jpg".
+So each kind goes where its shape works: a favicon into the square logo
+box, an og:image into a 1.91:1 banner above the header. That run also found
+a Drupal-style signed URL arriving with a literal `&amp;` in its query
+string, which is a different URL — attribute values are entity-decoded now.
+
 ## Mining it for perfect topics (the pilot)
 
 The pilot pipeline behind `references/perfect-topics-2026-09-26.md` (the

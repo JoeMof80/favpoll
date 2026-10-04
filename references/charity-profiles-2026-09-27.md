@@ -393,9 +393,31 @@ closed on an unverifiable charity is correct.
    charity is shown at onboarding is the page it will have, and the first
    thing on it says it is not public and why ("no account yet", "agreement
    still pending", "the register has removed this charity"), with
-   `robots: index:false` on the route. The profile's og:image sits where
-   the logo goes — private surfaces only, decision 2 — and falls back to
-   the initial tile, which is all it can do until something fetches one.
+   `robots: index:false` on the route. The profile's own image sits on it —
+   private surfaces only, decision 2 — and until 2026-10-04 NOTHING
+   FETCHED ONE, so the slot was schema and render with no producer.
+   `lib/charity-image.ts` + `scripts/backfill-charity-image.ts` close
+   that: the homepage's og:image, else the best favicon it declares
+   (apple-touch-icon first, the one a site makes big enough to be a
+   logo), verified to be an image before it is stored, nothing crawled
+   beyond the URL that page names, no model and so no cap. The
+   GIVEN-logo guard is enforced where a logo is WRITTEN (admin
+   createCharity and updateCharity drop a scraped image), because that is
+   the moment it has to fire. Nothing is copied into our own storage: the
+   stored value is the charity's URL on the charity's site, because taking
+   a copy would be taking the image.
+   WHAT THE FIRST REAL RUN SHOWED (8 charities above £1m, 5 with an
+   image): most og:images are 1200x630 HERO PHOTOS, not logos — English
+   Heritage's "home-page-open-graph.jpg", a university's
+   "hero-sept-2026.jpg" — and a photo shrunk into the 132px logo box is a
+   strip in a field of whitespace. So each kind goes where its shape
+   works: a favicon in the logo box (it is a mark), an og:image as a
+   1.91:1 banner above the header (the shape it was cut for). IF THE
+   FOUNDER WOULD RATHER THE LOGO BOX ALWAYS WIN, the fix is to prefer the
+   favicon over the og:image in `findCharityImage` — one line, and it
+   inverts nothing else. The run also found a Drupal-style signed URL
+   arriving with a literal `&amp;` in its query string, which is a
+   different URL; attribute values are entity-decoded now.
    With no profile at all it renders from the mirror alone and says what
    it does not know ("We have not picked a favourite for X yet. Some
    charities suit one and some honestly do not, and this page says so

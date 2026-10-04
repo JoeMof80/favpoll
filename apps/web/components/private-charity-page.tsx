@@ -103,6 +103,18 @@ export function PrivateCharityPage({
         </p>
       </div>
 
+      {/* The charity's own og:image, in its own shape: a sharing card is
+          cut at about 1.91:1, which is what this is. Private surfaces
+          only, like every other scraped image. */}
+      {page.imageUrl && page.imageSource === "og" && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={page.imageUrl}
+          alt={`${page.name}, from their own site`}
+          className="mt-6 aspect-[1.91/1] w-full max-w-full rounded-xl border border-border bg-background object-cover"
+        />
+      )}
+
       <header className="flex items-start gap-4 pt-6 md:gap-6 md:pt-10">
         <div className="min-w-0 flex-1">
           <SectionEyebrow
@@ -130,11 +142,18 @@ export function PrivateCharityPage({
             </a>
           )}
         </div>
-        {/* The charity's own og:image where the logo sits, and only on
-            this private page (decision 2): it is shown to the charity
-            itself, which cannot object to its own mark, and it is replaced
-            by a given logo at onboarding rather than kept beside one. */}
-        {page.imageUrl ? (
+        {/* The charity's own mark where the logo sits, and only on this
+            private page (decision 2): it is shown to the charity itself,
+            which cannot object to its own mark, and a given logo replaces
+            it at onboarding rather than sitting beside it.
+            A FAVICON belongs here — it is a mark, square by nature. An
+            og:image does not: measured on the first real run, most of them
+            are 1200x630 HERO PHOTOS (English Heritage's "home-page-open-
+            graph", a university's "hero-sept-2026"), and a photo shrunk
+            into a 132px square is a thin strip in a box of whitespace. So
+            the og:image gets the banner above, in the shape it was cut
+            for, and this slot keeps the initial tile. */}
+        {page.imageUrl && page.imageSource === "favicon" ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={page.imageUrl}

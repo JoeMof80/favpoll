@@ -149,6 +149,7 @@ export async function createCharity(input: {
         },
       ];
 
+  const logoUrl = input.logo_url?.trim() || null;
   const { error } = await supabase.from("charities").insert({
     name,
     description: input.description?.trim() || null,
@@ -163,13 +164,19 @@ export async function createCharity(input: {
     grant_making: purpose.grantMaking,
     // Hand-entered by an admin, so this IS the confirmed value.
     cause_family: family.family,
-    logo_url: input.logo_url?.trim() || null,
+    logo_url: logoUrl,
     market: input.market,
     is_active: true,
     ...(await verificationFields(name, registeredNumber)),
   });
 
   if (error) return { error: error.message };
+
+  // The same guard as updateCharity: an admin may well be adding a charity
+  // a wave has already prepared a profile for, scraped image and all.
+  if (logoUrl && registeredNumber) {
+    await dropScrapedImageByNumber(registeredNumber);
+  }
 
   revalidatePath("/charities");
   return { error: null };
@@ -236,8 +243,56 @@ export async function updateCharity(
 
   if (error) return { error: error.message };
 
+  // A GIVEN LOGO DROPS THE SCRAPED IMAGE (decision 2's second guard). The
+  // charity's own og:image lives on the profile for the private page; the
+  // moment the charity supplies a logo it must be dropped, not kept as a
+  // fallback, or a scraped image ends up served publicly by accident.
+  // Here is the moment it has to fire.
+  if (updates.logo_url) {
+    await dropScrapedImage(id);
+  }
+
   revalidatePath("/charities");
   return { error: null };
+}
+
+/** Clears a scraped og:image or favicon from a charity's profile, leaving
+ *  a logo the charity GAVE us ('given') alone. Best-effort: a logo that is
+ *  saved and an image that is not dropped must not look like a failed
+ *  save, but it must be loud in the logs. */
+async function dropScrapedImageByNumber(
+  registeredNumber: string | null,
+): Promise<void> {
+  const key = profileKey(registeredNumber);
+  if (!key) return;
+  const { error } = await createAdminClient()
+    .from("charity_profiles")
+    .update({
+      image_url: null,
+      image_source: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("registered_number", key)
+    .in("image_source", ["og", "favicon"]);
+  if (error) {
+    console.error(
+      "[charity-profile] scraped image not dropped:",
+      error.message,
+    );
+  }
+}
+
+/** The same guard, reached from an account id. */
+async function dropScrapedImage(charityId: string): Promise<void> {
+  const { data: charity } = await createAdminClient()
+    .from("charities")
+    .select("registered_number")
+    .eq("id", charityId)
+    .maybeSingle();
+  await dropScrapedImageByNumber(
+    (charity as { registered_number: string | null } | null)
+      ?.registered_number ?? null,
+  );
 }
 
 export async function deactivateCharity(
