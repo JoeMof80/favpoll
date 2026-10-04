@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk"
+import { recordSpend, spendAvailable } from "@/lib/model-spend"
 
 // A charity's SIGNATURE EVENTS (founder, 2026-09-27: "it would be great
 // data to know which kind of fundraising events charities already hold").
@@ -73,7 +74,11 @@ export function eventLinks(html: string, base: URL): string[] {
   return [...out].slice(0, 3)
 }
 
-async function fetchPage(url: string): Promise<string | null> {
+/** One page of HTML, or null. Exported because the image reader
+ *  (lib/charity-image.ts) reads a charity's homepage under exactly the
+ *  same discipline — our own user agent with a contact address, an 8s
+ *  timeout, redirects followed, and anything that is not HTML refused. */
+export async function fetchPage(url: string): Promise<string | null> {
   try {
     const res = await fetch(url, {
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
@@ -126,6 +131,10 @@ export type SignatureEventsInput = {
   occasionTypes: string[]
   /** The catalogue's topic titles. */
   topicTitles: string[]
+  /** For the spend ledger: which charity the money went on, and the
+   *  outreach wave it was spent for. */
+  registeredNumber?: string | null
+  wave?: string | null
 }
 
 function buildPrompt(
@@ -155,14 +164,33 @@ export async function suggestSignatureEvents(
   input: SignatureEventsInput
 ): Promise<SignatureEvent[]> {
   if (!process.env.ANTHROPIC_API_KEY || !input.website) return []
+  // THE CAP (decision 4) before the site is even fetched: reading a
+  // charity's pages costs nothing in model tokens but everything in time.
+  if (!(await spendAvailable())) {
+    console.warn("[charity-events] the model spend cap is reached — skipped")
+    return []
+  }
   const pages = await readCharityWebsite(input.website)
   if (pages.length === 0) return []
   try {
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+    // THE CHEAP MODEL, deliberately (decision 4): this is EXTRACTION —
+    // read these pages, pull out the events, match them to a fixed list of
+    // occasions and topics. The measurement that kept the perfect topic on
+    // the better model said the saving lives here, on the summarising work
+    // either side of that judgement. Model per task, not per pipeline.
+    const model = process.env.LLM_CLASSIFIER_MODEL_ID ?? "claude-haiku-4-5"
     const message = await client.messages.create({
-      model: process.env.LLM_MODEL_ID ?? "claude-sonnet-5",
+      model,
       max_tokens: 1500,
       messages: [{ role: "user", content: buildPrompt(input, pages) }],
+    })
+    void recordSpend({
+      task: "signature_events",
+      model,
+      usage: message.usage,
+      registeredNumber: input.registeredNumber ?? null,
+      wave: input.wave ?? null,
     })
     const text =
       message.content.find(

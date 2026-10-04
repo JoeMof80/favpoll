@@ -455,12 +455,17 @@ export async function findOrCreateRegisterCharity(input: {
       .eq("is_active", true),
   ])
   // Both SUGGESTIONS only — the admin confirms them in the outreach queue.
+  // They are written to the PROFILE below, not to the account (step 2 of
+  // the charity-profiles note): a suggestion is a derivation. All three
+  // calls pay into the model spend cap, and a reached cap costs the
+  // suggestions, never the charity or the favpoll.
   const causeFamilySuggested = await suggestCauseFamily({
     name,
     activities: purpose.activities,
     classification: purpose.classification,
     objects: purpose.objects,
     grantMaking: purpose.grantMaking,
+    registeredNumber: number,
   })
   const perfectTopic = await suggestPerfectTopic({
     name,
@@ -470,6 +475,7 @@ export async function findOrCreateRegisterCharity(input: {
     grantMaking: purpose.grantMaking,
     areas: purpose.areas,
     topics: catalogueForSuggestion(catalogue ?? []),
+    registeredNumber: number,
   })
   // An existing subset the suggester named, or the one it proposed —
   // written as a PROPOSED topic_subsets row for /subsets (ruling 2),
@@ -494,6 +500,7 @@ export async function findOrCreateRegisterCharity(input: {
       ...new Set(Object.values(OCCASION_TYPES_BY_REGISTER).flat()),
     ],
     topicTitles: (catalogue ?? []).map((t) => t.title),
+    registeredNumber: number,
   })
 
   const { data: created, error } = await supabase
@@ -514,17 +521,39 @@ export async function findOrCreateRegisterCharity(input: {
       objects: purpose.objects,
       areas: purpose.areas,
       grant_making: purpose.grantMaking,
-      cause_family_suggested: causeFamilySuggested,
-      perfect_topic_suggested_id: perfectTopic?.topicId ?? null,
-      perfect_subset_suggested_id: suggestedSubsetId,
-      perfect_topic_reason: perfectTopic?.reason ?? null,
-      signature_events: signatureEvents.length ? signatureEvents : null,
-      website_read_at: contact.website ? new Date().toISOString() : null,
     })
     .select("*")
     .single()
   if (error || !created) {
     throw new Error(error?.message ?? "Failed to add charity")
+  }
+
+  // The suggestions go to the PROFILE, keyed by the registered number. Its
+  // floor row already exists for a Registered charity, so this is an
+  // update in all but name; the upsert covers the one case it does not —
+  // a charity the mirror has not got yet (registered since the extract).
+  // A failure here must not cost the organiser their charity: the account
+  // is created, the favpoll can proceed, and the next backfill will fill
+  // the profile in.
+  const { error: profileError } = await supabase
+    .from("charity_profiles")
+    .upsert(
+      {
+        registered_number: number,
+        cause_family_suggested: causeFamilySuggested,
+        perfect_topic_suggested_id: perfectTopic?.topicId ?? null,
+        perfect_subset_suggested_id: suggestedSubsetId,
+        perfect_topic_reason: perfectTopic?.reason ?? null,
+        signature_events: signatureEvents.length ? signatureEvents : null,
+        website_read_at: contact.website ? new Date().toISOString() : null,
+        status: "drafted",
+        generated_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "registered_number" }
+    )
+  if (profileError) {
+    console.error("[charity-profile] not written:", profileError.message)
   }
   return created as Charity
 }

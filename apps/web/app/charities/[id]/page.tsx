@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 import Link from "next/link"
 import { BadgeCheck, Plus } from "lucide-react"
 import { createAdminClient } from "@/lib/supabase/admin"
@@ -15,8 +15,31 @@ import {
   type FavpollSummaryCardFavpoll,
 } from "@/components/favpoll-summary-card"
 import { formatPounds } from "@/lib/i18n"
+import {
+  loadPrivateCharityPage,
+  profileKeyFromParam,
+} from "@/lib/charity-profile-page"
+import { PrivateCharityPage } from "@/components/private-charity-page"
 
 type Props = { params: Promise<{ id: string }> }
+
+const contactEmail = () =>
+  process.env.PARTNERSHIPS_EMAIL ??
+  process.env.SUPPORT_EMAIL ??
+  "hello@favpoll.com"
+
+// THE NUMBER ROUTE (step 3 of references/charity-profiles-2026-09-27.md).
+// This segment takes either an account's id or a REGISTERED NUMBER, and
+// the number is the general case the account page is a special case of:
+// every registered charity has a page that can render, from the mirror row
+// plus its profile if there is one.
+//
+// A page that is not public must not be indexed, whatever else goes wrong.
+export async function generateMetadata({ params }: Props) {
+  const { id } = await params
+  if (!profileKeyFromParam(id)) return {}
+  return { robots: { index: false, follow: false } }
+}
 
 type CharityStats = {
   total_raised: number
@@ -41,6 +64,24 @@ export default async function CharityPage({ params }: Props) {
   const { userId } = await auth()
   const canManage = canManageAppeals(userId)
   const supabase = createAdminClient()
+
+  // A registered number: the private page, unless the charity has earned a
+  // public one. Visibility follows the consent doctrine exactly as the
+  // account page does — approved and listed is public, everything else is
+  // staff-only, because a public page implies an endorsement we have not
+  // got. (The charity's own link into this page carries a token; that
+  // belongs with onboarding and is not built yet, so the audience today is
+  // the team — the same allowlist the appeals pages use, which becomes a
+  // role check when charity accounts exist.)
+  const numberKey = profileKeyFromParam(id)
+  if (numberKey) {
+    const page = await loadPrivateCharityPage(numberKey)
+    // One canonical URL per charity: an account that is on the shelf is
+    // served by its own public page.
+    if (page?.account?.isActive) redirect(`/charities/${page.account.id}`)
+    if (!canManage || !page) notFound()
+    return <PrivateCharityPage page={page} contactEmail={contactEmail()} />
+  }
 
   const { data: charity } = await supabase
     .from("charities")
@@ -136,10 +177,6 @@ export default async function CharityPage({ params }: Props) {
   })
 
   const isVerified = charity.verification_status === "verified"
-  const contactEmail =
-    process.env.PARTNERSHIPS_EMAIL ??
-    process.env.SUPPORT_EMAIL ??
-    "hello@favpoll.com"
 
   // The card fills the avatar's own height (md:h-33) so the header row
   // reads as one unit: text stack, logo, facts (founder, 2026-09-06 —
@@ -324,7 +361,7 @@ export default async function CharityPage({ params }: Props) {
         <p className="mt-8 text-sm text-muted-foreground">
           Is this your charity?{" "}
           <a
-            href={`mailto:${contactEmail}?subject=${encodeURIComponent(
+            href={`mailto:${contactEmail()}?subject=${encodeURIComponent(
               `Charity page — ${charity.name}`
             )}&body=${encodeURIComponent(
               `We'd like to help keep ${charity.name}'s favpoll page up to date (logo, description, impact statement).\n\nCharity: ${charity.name}\nReference: ${charity.id}`

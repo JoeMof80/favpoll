@@ -30,6 +30,8 @@ import {
   getCharityTopics,
   setCharityTopics,
   setCharityConsent,
+  getConsentQueue,
+  getRegisterRemovals,
   getPerfectTopicQueue,
   dismissPerfectTopicSuggestion,
 } from "@/lib/actions/charities";
@@ -483,11 +485,233 @@ describe("setCharityConsent", () => {
   });
 
   it("returns error on DB failure", async () => {
+    // Approval reads the charity first (the removal check), so the
+    // update's response is the second in the queue.
+    mock.queue({ name: "Cancer Research UK", registered_number: null });
     mock.queue(null, { message: "update failed" });
 
     const { error } = await setCharityConsent("charity-1", "approved");
 
     expect(error).toBe("update failed");
+  });
+
+  // ─── THE REMOVAL CHECK reaches the write ─────────────────────────────────
+  // profiles note §3: approval lists the charity and opens the money rail,
+  // so a deregistered number is refused where the write happens, not only
+  // in the button that calls it.
+
+  it("refuses approval when the register has removed the charity", async () => {
+    mock.queue({ name: "Gone Trust", registered_number: "1000002" });
+    mock.queue({
+      name: "GONE TRUST",
+      status: "Removed",
+      removed_on: "2023-02-16",
+    });
+
+    const { error } = await setCharityConsent("charity-1", "approved");
+
+    expect(error).toMatch(/removed this charity/i);
+    expect(mock.callsFor("charities").some((c) => c.method === "update")).toBe(
+      false,
+    );
+  });
+
+  it("approves when the mirror says Registered", async () => {
+    mock.queue({ name: "Age UK", registered_number: "1128267" });
+    mock.queue({ name: "AGE UK", status: "Registered", removed_on: null });
+    mock.queue(null);
+
+    const { error } = await setCharityConsent("charity-1", "approved");
+
+    expect(error).toBeNull();
+    const update = mock
+      .callsFor("charities")
+      .find((c) => c.method === "update")!;
+    expect(update.args[0]).toMatchObject({ consent_status: "approved" });
+  });
+
+  it("declining a removed charity is never blocked — it is the way out", async () => {
+    mock.queue(null);
+
+    const { error } = await setCharityConsent("charity-1", "declined");
+
+    expect(error).toBeNull();
+    expect(mock.callsFor("register_charities")).toHaveLength(0);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// A GIVEN LOGO DROPS THE SCRAPED IMAGE (decision 2's second guard)
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("a given logo and the scraped image", () => {
+  it("drops the profile's scraped image when a logo is saved", async () => {
+    mock.queue(null); // the account update
+    mock.queue({ registered_number: "207076" }); // the number lookup
+    mock.queue(null); // the profile update
+
+    const { error } = await updateCharity("c1", {
+      logo_url: "https://rspb.org.uk/logo.png",
+    });
+
+    expect(error).toBeNull();
+    const update = mock
+      .callsFor("charity_profiles")
+      .find((c) => c.method === "update")!;
+    expect(update.args[0]).toMatchObject({
+      image_url: null,
+      image_source: null,
+    });
+    // ...and only a SCRAPED one: a logo the charity gave us is theirs.
+    expect(
+      mock.callsFor("charity_profiles").find((c) => c.method === "in")?.args,
+    ).toEqual(["image_source", ["og", "favicon"]]);
+  });
+
+  it("leaves the profile alone when the edit is not a logo", async () => {
+    mock.queue(null);
+
+    await updateCharity("c1", { description: "A bird charity." });
+
+    expect(mock.callsFor("charity_profiles")).toHaveLength(0);
+  });
+
+  it("drops it on create too — a wave may have prepared the profile", async () => {
+    mock.queue(null); // the insert
+    mock.queue(null); // the profile update
+
+    const { error } = await createCharity({
+      name: "RSPB",
+      registered_number: "207076",
+      logo_url: "https://rspb.org.uk/logo.png",
+      market: "en-GB",
+    });
+
+    expect(error).toBeNull();
+    expect(
+      mock.callsFor("charity_profiles").some((c) => c.method === "update"),
+    ).toBe(true);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// getRegisterRemovals — the removal check's read
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("getRegisterRemovals", () => {
+  it("returns the rows the function found", async () => {
+    mock.queue([
+      {
+        charity_id: "charity-1",
+        name: "Gone Trust",
+        verdict: "removed",
+        raised: 120,
+      },
+    ]);
+
+    const { data, error } = await getRegisterRemovals();
+
+    expect(error).toBeNull();
+    expect(data).toHaveLength(1);
+    expect(mock.callsFor("rpc:register_account_removals")).toHaveLength(1);
+  });
+
+  it("an empty result is no rows, not an error", async () => {
+    mock.queue([]);
+
+    const { data, error } = await getRegisterRemovals();
+
+    expect(error).toBeNull();
+    expect(data).toEqual([]);
+  });
+
+  it("surfaces the function's error", async () => {
+    mock.queue(null, {
+      message: "canceling statement due to statement timeout",
+    });
+
+    const { data, error } = await getRegisterRemovals();
+
+    expect(data).toBeNull();
+    expect(error).toMatch(/statement timeout/);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// getConsentQueue — the verdict travels with the row
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("getConsentQueue", () => {
+  // The queue reads the removals and the favpoll links together; the rpc
+  // is called while the array is built, so its response is queued first.
+  const queueResponses = (removals: unknown[], charities: unknown[]) => {
+    mock.queue(removals);
+    mock.queue([{ charity_id: "charity-1" }]);
+    mock.queue(charities);
+  };
+
+  it("carries the register verdict onto the row it affects", async () => {
+    queueResponses(
+      [
+        {
+          charity_id: "charity-1",
+          verdict: "removed",
+          removed_on: "2023-02-16",
+        },
+      ],
+      [{ id: "charity-1", name: "Gone Trust", registered_number: "1000002" }],
+    );
+
+    const { data, error } = await getConsentQueue();
+
+    expect(error).toBeNull();
+    expect(data![0].register_verdict).toBe("removed");
+    expect(data![0].register_removed_on).toBe("2023-02-16");
+  });
+
+  it("shows the suggestion the PROFILE holds, with its title looked up", async () => {
+    // rpc(removals), favpoll_charities, charities, charity_profiles, then
+    // the title lookups the suggested ids need.
+    mock.queue([]);
+    mock.queue([{ charity_id: "charity-1" }]);
+    mock.queue([
+      { id: "charity-1", name: "RSPB", registered_number: "207076" },
+    ]);
+    mock.queue([
+      {
+        registered_number: "207076",
+        perfect_topic_suggested_id: "t-bird",
+        perfect_subset_suggested_id: null,
+        perfect_topic_reason: "Birds are the whole point.",
+        cause_family_suggested: "animals",
+        signature_events: [{ name: "Big Garden Birdwatch" }],
+        website_read_at: "2026-10-01T00:00:00Z",
+      },
+    ]);
+    mock.queue([{ id: "t-bird", title: "Bird" }]);
+
+    const { data, error } = await getConsentQueue();
+
+    expect(error).toBeNull();
+    expect(data![0]).toMatchObject({
+      perfect_topic_suggested_id: "t-bird",
+      perfect_topic_title: "Bird",
+      perfect_topic_reason: "Birds are the whole point.",
+      cause_family_suggested: "animals",
+    });
+    expect(data![0].signature_events).toHaveLength(1);
+  });
+
+  it("leaves the verdict null for a charity the register is happy with", async () => {
+    queueResponses(
+      [],
+      [{ id: "charity-1", name: "Age UK", registered_number: "1128267" }],
+    );
+
+    const { data } = await getConsentQueue();
+
+    expect(data![0].register_verdict).toBeNull();
+    expect(data![0].favpoll_count).toBe(1);
   });
 });
 
@@ -595,52 +819,92 @@ describe("updateCharity — cause family", () => {
 // a suggestion only while a charity was pending AND in use, so decided
 // charities kept unconfirmed suggestions nobody could see.
 describe("getPerfectTopicQueue", () => {
-  it("asks for active charities whose suggestion is unconfirmed, whatever their consent", async () => {
-    mock.queue([{ id: "c1", name: "RSPB" }]);
+  // Step 2 of the profiles note: the SUGGESTION lives on the profile, so
+  // "has a suggestion" is no longer a column on `charities` to filter by.
+  // The account query asks only for the unconfirmed ones; the profiles
+  // decide which of them have anything to show.
+  it("asks for active, unconfirmed accounts and takes the suggestion from the profile", async () => {
+    mock.queue([
+      { id: "c1", name: "RSPB", registered_number: "207076" },
+      { id: "c2", name: "Nothing Yet", registered_number: "1089464" },
+    ]);
+    mock.queue([
+      {
+        registered_number: "207076",
+        perfect_topic_suggested_id: "t-bird",
+        perfect_topic_reason: "Birds are the whole point.",
+        signature_events: null,
+      },
+    ]);
+
     const r = await getPerfectTopicQueue();
+
     expect(r.error).toBeNull();
-    expect(r.data).toEqual([{ id: "c1", name: "RSPB" }]);
+    // Only the charity whose profile holds a suggestion.
+    expect(r.data).toHaveLength(1);
+    expect(r.data![0]).toMatchObject({
+      id: "c1",
+      perfect_topic_suggested_id: "t-bird",
+      perfect_topic_reason: "Birds are the whole point.",
+    });
+
     const calls = mock.callsFor("charities");
     expect(calls.find((c) => c.method === "is")?.args).toEqual([
       "perfect_topic_id",
-      null,
-    ]);
-    expect(calls.find((c) => c.method === "not")?.args).toEqual([
-      "perfect_topic_suggested_id",
-      "is",
       null,
     ]);
     expect(calls.find((c) => c.method === "eq")?.args).toEqual([
       "is_active",
       true,
     ]);
+    // The old filter is gone — it would ask for a column nothing writes.
+    expect(calls.some((c) => c.method === "not")).toBe(false);
     // Never filtered by consent status or by favpoll use.
     expect(
       calls.some((c) => JSON.stringify(c.args).includes("consent_status")),
     ).toBe(false);
+    // The suggestions were read from the profile, by its own key.
+    expect(mock.callsFor("charity_profiles").length).toBeGreaterThan(0);
   });
 });
 
 describe("dismissPerfectTopicSuggestion", () => {
-  it("clears both suggested ids — 'no topic of its own' is a real answer", async () => {
+  it("clears both suggested ids on the PROFILE — 'no topic of its own' is a real answer", async () => {
+    mock.queue({ registered_number: "207076" });
     mock.queue(null);
+
     const r = await dismissPerfectTopicSuggestion("c1");
+
     expect(r.error).toBeNull();
     const update = mock
-      .callsFor("charities")
+      .callsFor("charity_profiles")
       .find((c) => c.method === "update")!;
-    expect(update.args[0]).toEqual({
+    expect(update.args[0]).toMatchObject({
       perfect_topic_suggested_id: null,
       perfect_subset_suggested_id: null,
     });
+    expect(
+      mock.callsFor("charity_profiles").find((c) => c.method === "eq")?.args,
+    ).toEqual(["registered_number", "207076"]);
   });
 
-  it("leaves the CONFIRMED topic alone", async () => {
+  it("never touches the account — the CONFIRMED topic lives there", async () => {
+    mock.queue({ registered_number: "207076" });
     mock.queue(null);
+
     await dismissPerfectTopicSuggestion("c1");
-    const update = mock
-      .callsFor("charities")
-      .find((c) => c.method === "update")!;
-    expect(update.args[0]).not.toHaveProperty("perfect_topic_id");
+
+    expect(mock.callsFor("charities").some((c) => c.method === "update")).toBe(
+      false,
+    );
+  });
+
+  it("says so when the number is not a shape the profile key accepts", async () => {
+    mock.queue({ registered_number: "GB-CHC-99999999" });
+
+    const r = await dismissPerfectTopicSuggestion("c1");
+
+    expect(r.error).toMatch(/no profile/i);
+    expect(mock.callsFor("charity_profiles")).toHaveLength(0);
   });
 });

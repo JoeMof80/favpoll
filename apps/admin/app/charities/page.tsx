@@ -2,11 +2,13 @@ import {
   getCharities,
   getConsentQueue,
   getPerfectTopicQueue,
+  getRegisterRemovals,
 } from "@/lib/actions/charities";
 import { getTopics } from "@/lib/actions/topics";
 import { CharitiesTable, AddCharityForm } from "@/components/charities-table";
 import { ConsentQueue } from "@/components/consent-queue";
 import { PerfectTopicQueue } from "@/components/perfect-topic-queue";
+import { RegisterRemovals } from "@/components/register-removals";
 
 const MARKETS = ["en-GB"];
 
@@ -23,11 +25,13 @@ export default async function CharitiesPage({ searchParams }: Props) {
     { data: topics },
     { data: queue },
     { data: perfectQueue },
+    { data: removals },
   ] = await Promise.all([
     getCharities(activeMarket),
     getTopics(),
     getConsentQueue(),
     getPerfectTopicQueue(),
+    getRegisterRemovals(),
   ]);
 
   return (
@@ -68,6 +72,10 @@ export default async function CharitiesPage({ searchParams }: Props) {
       </div>
 
       {error && <p className="text-sm text-destructive">{error}</p>}
+
+      {/* The removal check comes first: a deregistered charity outranks
+          every queue below it (profiles note §3). */}
+      <RegisterRemovals rows={removals ?? []} />
 
       <ConsentQueue rows={queue ?? []} topics={topics ?? []} />
 

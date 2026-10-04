@@ -321,10 +321,112 @@ closed on an unverifiable charity is correct.
 ## What happens next
 
 1. Migration: `charity_profiles` keyed by registered number, with the
-   rule-floor `topic_family` computed for every registered row.
-2. Move the two backfills and the outreach queue onto it.
+   rule-floor `topic_family` computed for every registered row. DONE
+   2026-10-04 (migration 20261004160000): 171,909 profiles on dev, the
+   floor for all of them up front (the founder's call — the model's work
+   is still made on touch, as below; only the free part is pre-computed).
+   Two things the data changed:
+   - THE FLOOR IS A CATALOGUE CATEGORY, as the examples in this note
+     always said (Animals → animal topics, Environment → landscapes and
+     rivers, Religious → hymns), and NEVER a cause family. Mapping the
+     same codes to cause families scores 26 of 59 against the founder's
+     confirmed set and fails worst where it matters: every hospice comes
+     out `health_condition`, every mental-health charity the same, Age UK
+     comes out `homelessness`. The WHO axis cannot save it —
+     "Children/young People" is ticked by 95,769 charities, five of our
+     seven hospices among them.
+   - A MISSION GUARD was needed. A subject code sitting incidentally on a
+     charity whose work is care gave the RNLI "Books & Arts", FareShare
+     "Nature" and RNIB "Sport". So any of health, disability, poverty,
+     overseas aid or housing silences the subject claim: the rule then
+     speaks for 11 of the 59 and is right 11 times, covering 36% of the
+     register instead of 51%. Decision 1's own reasoning picks that
+     trade.
+   Also found: the register has an EIGHT-digit number (19262026, a CIO
+   registered in March 2026), which broke the first backfill — nothing in
+   the code should assume six or seven.
+2. Move the two backfills and the outreach queue onto it. DONE 2026-10-04
+   (migration 20261004180000): the suggestions (perfect topic, subset,
+   reason, cause family, signature events, website_read_at) are carried
+   onto `charity_profiles` and read from there by both admin queues, by
+   the organiser's add-a-charity path, and by both backfills, which now
+   take `--wave` and write for any registered number. The old columns on
+   `charities` are untouched and read by nothing — step 5 drops them with
+   the register copies; copying and dropping in one migration would make a
+   rollback a data loss. `cause_family_suggested` moved with them (the
+   note's list predates it; same species).
+   The WAVE FILTER is `charity_outreach_candidates(income_floor, limit)`:
+   171,909 Registered → 103,392 with a website → 40,255 with a
+   classification the floor maps → 12,904 above £100k, accounts excluded.
+   93% gone before a call, as decision 4 said it would be.
+   THE CAP is `apps/web/lib/model-spend.ts` + the `model_spend` ledger,
+   checked where the model is CALLED so a wave, a backfill, the wizard and
+   an admin's click all pay into one monthly budget
+   (`MODEL_SPEND_CAP_USD`, default $25); a reached cap costs the
+   suggestion and never the charity.
+   MODEL PER TASK: the none/not-none judgement now reads its own
+   `LLM_JUDGEMENT_MODEL_ID` (default claude-sonnet-5). It used to read
+   `LLM_MODEL_ID` — the STORY GENERATOR's variable, which is pinned to
+   `claude-haiku-4-5-20251001` on dev and is also set in production. So
+   until today the judgement decision 4 was run to settle was silently
+   being made by the model it rejected. WORTH CHECKING what production's
+   `LLM_MODEL_ID` is set to, for the Story generator's own sake.
+   Verified on dev by running a real two-charity wave: Arts Council
+   England → Painter or artist, Canal & River Trust → River, Quadrature
+   Climate Foundation → none with its reason; ledger rows carry the model,
+   the wave label and the cost.
 3. The number route for the page, private by default, register-only
-   rendering when the profile is empty.
+   rendering when the profile is empty. DONE 2026-10-04.
+   `/charities/<number>` is the same segment as the account page, because
+   the number is the general case the account page is a special case of:
+   `profileKeyFromParam` tells a registered number from a uuid (and keeps
+   a linked charity's "-1" suffix, which stripping hyphens would turn into
+   a different charity). Behaviour, probed against the running app:
+   - a number whose account is APPROVED and listed → 307 to
+     `/charities/<uuid>`, the public page, so there is one canonical URL
+     per charity;
+   - any other number → the PRIVATE page for staff (the appeals
+     allowlist, which that file already says becomes a role check when
+     charity accounts exist) and 404 for everyone else;
+   - a number the register has never held → 404.
+   The page wears the account page's own composition, so the page a
+   charity is shown at onboarding is the page it will have, and the first
+   thing on it says it is not public and why ("no account yet", "agreement
+   still pending", "the register has removed this charity"), with
+   `robots: index:false` on the route. The profile's own image sits on it —
+   private surfaces only, decision 2 — and until 2026-10-04 NOTHING
+   FETCHED ONE, so the slot was schema and render with no producer.
+   `lib/charity-image.ts` + `scripts/backfill-charity-image.ts` close
+   that: the homepage's og:image, else the best favicon it declares
+   (apple-touch-icon first, the one a site makes big enough to be a
+   logo), verified to be an image before it is stored, nothing crawled
+   beyond the URL that page names, no model and so no cap. The
+   GIVEN-logo guard is enforced where a logo is WRITTEN (admin
+   createCharity and updateCharity drop a scraped image), because that is
+   the moment it has to fire. Nothing is copied into our own storage: the
+   stored value is the charity's URL on the charity's site, because taking
+   a copy would be taking the image.
+   WHAT THE FIRST REAL RUN SHOWED (8 charities above £1m, 5 with an
+   image): most og:images are 1200x630 HERO PHOTOS, not logos — English
+   Heritage's "home-page-open-graph.jpg", a university's
+   "hero-sept-2026.jpg" — and a photo shrunk into the 132px logo box is a
+   strip in a field of whitespace. So each kind goes where its shape
+   works: a favicon in the logo box (it is a mark), an og:image as a
+   1.91:1 banner above the header (the shape it was cut for). IF THE
+   FOUNDER WOULD RATHER THE LOGO BOX ALWAYS WIN, the fix is to prefer the
+   favicon over the og:image in `findCharityImage` — one line, and it
+   inverts nothing else. The run also found a Drupal-style signed URL
+   arriving with a literal `&amp;` in its query string, which is a
+   different URL; attribute values are entity-decoded now.
+   With no profile at all it renders from the mirror alone and says what
+   it does not know ("We have not picked a favourite for X yet. Some
+   charities suit one and some honestly do not, and this page says so
+   rather than guessing").
+   NOT CHANGED, and visible here: `placeFromAddress` takes the last two
+   address lines, which on these rows reads "Lever Street, Manchester"
+   rather than "Manchester". The charity picker has shown it that way
+   since September, so it stays as it is rather than being quietly
+   re-cut on this page alone.
 4. Point the wizard's Generate and the Story engine at the mirror for
    purpose and contact (already the case for verification and search).
 5. Drop the register copies from `charities` once nothing reads them.
@@ -336,9 +438,15 @@ What the decisions above add to that order, none of it large:
   staleness compares against;
 - step 2 gains the wave's eligibility filter (registered, has a
   website, mappable classification, income floor) and the spend cap;
-- the loader gains the removal check, which is the only part of
-  staleness that can hurt someone, and is worth doing BEFORE any of
-  this: it guards accounts that already exist;
+- the loader gained the removal check — DONE 2026-10-04, the first thing
+  built from these decisions, because it is the only part of staleness
+  that can hurt someone and it guards accounts that already exist:
+  `register_account_removals()` (migration 20261004140000) reads every
+  account charity's standing against the mirror with the money pointing
+  at it, `scripts/register/check-removals.ts` runs at the end of every
+  load and alone, admin `/charities` leads with the list, and
+  `setCharityConsent` refuses to approve a number the register has
+  removed;
 - the SC/NIC message is independent of all of it and can ship any time.
 
 The Haiku-vs-Sonnet comparison (decision 4) RAN on 2026-10-04 and

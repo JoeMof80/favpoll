@@ -149,6 +149,7 @@ export async function createCharity(input: {
         },
       ];
 
+  const logoUrl = input.logo_url?.trim() || null;
   const { error } = await supabase.from("charities").insert({
     name,
     description: input.description?.trim() || null,
@@ -163,13 +164,19 @@ export async function createCharity(input: {
     grant_making: purpose.grantMaking,
     // Hand-entered by an admin, so this IS the confirmed value.
     cause_family: family.family,
-    logo_url: input.logo_url?.trim() || null,
+    logo_url: logoUrl,
     market: input.market,
     is_active: true,
     ...(await verificationFields(name, registeredNumber)),
   });
 
   if (error) return { error: error.message };
+
+  // The same guard as updateCharity: an admin may well be adding a charity
+  // a wave has already prepared a profile for, scraped image and all.
+  if (logoUrl && registeredNumber) {
+    await dropScrapedImageByNumber(registeredNumber);
+  }
 
   revalidatePath("/charities");
   return { error: null };
@@ -236,8 +243,56 @@ export async function updateCharity(
 
   if (error) return { error: error.message };
 
+  // A GIVEN LOGO DROPS THE SCRAPED IMAGE (decision 2's second guard). The
+  // charity's own og:image lives on the profile for the private page; the
+  // moment the charity supplies a logo it must be dropped, not kept as a
+  // fallback, or a scraped image ends up served publicly by accident.
+  // Here is the moment it has to fire.
+  if (updates.logo_url) {
+    await dropScrapedImage(id);
+  }
+
   revalidatePath("/charities");
   return { error: null };
+}
+
+/** Clears a scraped og:image or favicon from a charity's profile, leaving
+ *  a logo the charity GAVE us ('given') alone. Best-effort: a logo that is
+ *  saved and an image that is not dropped must not look like a failed
+ *  save, but it must be loud in the logs. */
+async function dropScrapedImageByNumber(
+  registeredNumber: string | null,
+): Promise<void> {
+  const key = profileKey(registeredNumber);
+  if (!key) return;
+  const { error } = await createAdminClient()
+    .from("charity_profiles")
+    .update({
+      image_url: null,
+      image_source: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("registered_number", key)
+    .in("image_source", ["og", "favicon"]);
+  if (error) {
+    console.error(
+      "[charity-profile] scraped image not dropped:",
+      error.message,
+    );
+  }
+}
+
+/** The same guard, reached from an account id. */
+async function dropScrapedImage(charityId: string): Promise<void> {
+  const { data: charity } = await createAdminClient()
+    .from("charities")
+    .select("registered_number")
+    .eq("id", charityId)
+    .maybeSingle();
+  await dropScrapedImageByNumber(
+    (charity as { registered_number: string | null } | null)
+      ?.registered_number ?? null,
+  );
 }
 
 export async function deactivateCharity(
@@ -332,6 +387,159 @@ export async function setCharityTopics(
   return { error: null };
 }
 
+// ─── SUGGESTIONS LIVE ON THE PROFILE (step 2 of the profiles note) ──────────
+// A suggestion is a derivation, not an agreement, so it sits on
+// `charity_profiles` keyed by registered number — where it can exist for a
+// charity with no account at all. The CONFIRMED values stay on the account
+// and are still read from `charities`. The old columns are still there,
+// carried over by migration 20261004180000 and read by nothing; step 5
+// drops them.
+
+/** The normalised profile key for an account's number, or null when the
+ *  number is not a shape the key accepts (charity_profiles_unkeyable).
+ *
+ *  NOT exported: this file is "use server", where every export must be an
+ *  async function — exporting it built fine under typecheck and vitest and
+ *  failed the Next build, which is the only thing that checks the rule. */
+function profileKey(registeredNumber: string | null): string | null {
+  if (!registeredNumber) return null;
+  const key = registeredNumber.trim().toUpperCase();
+  return /^([0-9]{6,10}(-[0-9]+)?|SC[0-9]{3,6}|NIC[0-9]{3,6})$/.test(key)
+    ? key
+    : null;
+}
+
+type ProfileSuggestions = {
+  perfect_topic_suggested_id: string | null;
+  perfect_subset_suggested_id: string | null;
+  perfect_topic_reason: string | null;
+  cause_family_suggested: CauseFamily | null;
+  signature_events: SignatureEvent[] | null;
+  website_read_at: string | null;
+  topic_family: string | null;
+};
+
+/** The profiles for a set of account numbers, keyed by the profile key. */
+async function suggestionsByKey(
+  numbers: (string | null)[],
+): Promise<Map<string, ProfileSuggestions>> {
+  const keys = [
+    ...new Set(numbers.map(profileKey).filter((k): k is string => !!k)),
+  ];
+  if (keys.length === 0) return new Map();
+  const { data, error } = await createAdminClient()
+    .from("charity_profiles")
+    .select(
+      "registered_number, perfect_topic_suggested_id, perfect_subset_suggested_id, perfect_topic_reason, cause_family_suggested, signature_events, website_read_at, topic_family",
+    )
+    .in("registered_number", keys);
+  if (error) {
+    console.error("[charities] profiles unreadable:", error.message);
+    return new Map();
+  }
+  return new Map(
+    (data ?? []).map((row) => {
+      const { registered_number, ...rest } = row as ProfileSuggestions & {
+        registered_number: string;
+      };
+      return [registered_number, rest];
+    }),
+  );
+}
+
+/** Titles for the suggested topic and subset ids a set of profiles holds.
+ *  The account's CONFIRMED titles arrive on its own joins; a suggestion
+ *  lives on the profile, which holds ids and not names. */
+async function suggestionTitles(
+  profiles: Map<string, ProfileSuggestions>,
+): Promise<{ topics: Map<string, string>; subsets: Map<string, string> }> {
+  const topicIds = new Set<string>();
+  const subsetIds = new Set<string>();
+  for (const p of profiles.values()) {
+    if (p.perfect_topic_suggested_id)
+      topicIds.add(p.perfect_topic_suggested_id);
+    if (p.perfect_subset_suggested_id)
+      subsetIds.add(p.perfect_subset_suggested_id);
+  }
+  const supabase = createAdminClient();
+  const [topics, subsets] = await Promise.all([
+    topicIds.size
+      ? supabase
+          .from("topics")
+          .select("id, title")
+          .in("id", [...topicIds])
+      : Promise.resolve({ data: [] }),
+    subsetIds.size
+      ? supabase
+          .from("topic_subsets")
+          .select("id, title")
+          .in("id", [...subsetIds])
+      : Promise.resolve({ data: [] }),
+  ]);
+  return {
+    topics: new Map(
+      ((topics.data ?? []) as { id: string; title: string }[]).map((t) => [
+        t.id,
+        t.title,
+      ]),
+    ),
+    subsets: new Map(
+      ((subsets.data ?? []) as { id: string; title: string }[]).map((t) => [
+        t.id,
+        t.title,
+      ]),
+    ),
+  };
+}
+
+/** THE REMOVAL CHECK (references/charity-profiles-2026-09-27.md §3) —
+ * account charities whose standing on the register is not a clean
+ * Registered, with the money pointing at each. Removal is not staleness:
+ * a charity that has left the register is WRONG, not old, and money
+ * moving to a deregistered charity is the one failure here with real
+ * consequences. Written by the mirror load
+ * (scripts/register/check-removals.ts) and read here so an admin sees it
+ * loudly; the function is register_account_removals(), migration
+ * 20261004140000. */
+export type RegisterRemoval = {
+  charity_id: string;
+  name: string;
+  registered_number: string | null;
+  /** removed = deregistered; gone = absent from the latest extract
+   *  (possibly an interrupted load); unknown = no mirror row at all. */
+  verdict: "removed" | "gone" | "unknown";
+  is_active: boolean;
+  consent_status: string | null;
+  register_name: string | null;
+  register_status: string | null;
+  removed_on: string | null;
+  extract_date: string | null;
+  latest_extract: string | null;
+  favpoll_count: number;
+  open_count: number;
+  raised: number;
+  pending_disbursements: number;
+  pending_amount: number;
+  gift_aid_declarations: number;
+};
+
+export async function getRegisterRemovals(): Promise<{
+  data: RegisterRemoval[] | null;
+  error: string | null;
+}> {
+  const { data, error } = await createAdminClient().rpc(
+    "register_account_removals",
+  );
+  if (error) return { data: null, error: error.message };
+  return { data: (data ?? []) as RegisterRemoval[], error: null };
+}
+
+/** The verdicts by charity id, for a queue row to carry. */
+async function removalsById(): Promise<Map<string, RegisterRemoval>> {
+  const { data } = await getRegisterRemovals();
+  return new Map((data ?? []).map((r) => [r.charity_id, r]));
+}
+
 export type ConsentQueueRow = {
   id: string;
   name: string;
@@ -359,6 +567,11 @@ export type ConsentQueueRow = {
   /** The fundraising events read from its website (2026-09-27). */
   signature_events: SignatureEvent[] | null;
   registered_website: string | null;
+  /** The REMOVAL CHECK's verdict, when the register has something to say
+   *  about this number: a removed charity must not be invited or
+   *  approved. Null is the ordinary case — cleanly Registered. */
+  register_verdict: RegisterRemoval["verdict"] | null;
+  register_removed_on: string | null;
 };
 
 /** CONSENT OUTREACH QUEUE — pending charities in use on at least one
@@ -371,9 +584,10 @@ export async function getConsentQueue(): Promise<{
 }> {
   const supabase = createAdminClient();
 
-  const { data: links, error: linkError } = await supabase
-    .from("favpoll_charities")
-    .select("charity_id");
+  const [{ data: links, error: linkError }, removals] = await Promise.all([
+    supabase.from("favpoll_charities").select("charity_id"),
+    removalsById(),
+  ]);
   if (linkError) return { data: null, error: linkError.message };
 
   const counts = new Map<string, number>();
@@ -385,18 +599,36 @@ export async function getConsentQueue(): Promise<{
   const { data, error } = await supabase
     .from("charities")
     .select(
-      "id, name, registered_number, registered_email, consent_contacted_at, cause_family, cause_family_suggested, activities, perfect_topic_id, perfect_topic_suggested_id, perfect_topic_reason, perfect_subset_id, perfect_subset_suggested_id, signature_events, registered_website, perfect_topic:topics!charities_perfect_topic_id_fkey(title), perfect_subset:topic_subsets!charities_perfect_subset_id_fkey(title)",
+      "id, name, registered_number, registered_email, consent_contacted_at, cause_family, activities, perfect_topic_id, perfect_subset_id, registered_website, perfect_topic:topics!charities_perfect_topic_id_fkey(title), perfect_subset:topic_subsets!charities_perfect_subset_id_fkey(title)",
     )
     .eq("consent_status", "pending")
     .in("id", [...counts.keys()])
     .order("name", { ascending: true });
   if (error) return { data: null, error: error.message };
 
+  // The suggestions, from the profile. A charity whose number has no
+  // profile simply has none — the row still works, with nothing suggested.
+  const suggestions = await suggestionsByKey(
+    (data ?? []).map(
+      (c) => (c as { registered_number: string | null }).registered_number,
+    ),
+  );
+  const titles = await suggestionTitles(suggestions);
+
   const rows = (data ?? [])
     .map((c) => {
       const { perfect_topic, perfect_subset, ...rest } = c as Omit<
         ConsentQueueRow,
-        "favpoll_count" | "perfect_topic_title" | "perfect_subset_title"
+        | "favpoll_count"
+        | "perfect_topic_title"
+        | "perfect_subset_title"
+        | "register_verdict"
+        | "register_removed_on"
+        | "perfect_topic_suggested_id"
+        | "perfect_subset_suggested_id"
+        | "perfect_topic_reason"
+        | "cause_family_suggested"
+        | "signature_events"
       > & {
         perfect_topic?: { title: string } | { title: string }[] | null;
         perfect_subset?: { title: string } | { title: string }[] | null;
@@ -407,11 +639,30 @@ export async function getConsentQueue(): Promise<{
       const ps = Array.isArray(perfect_subset)
         ? perfect_subset[0]
         : perfect_subset;
+      const removal = removals.get(rest.id);
+      const key = profileKey(rest.registered_number);
+      const profile = key ? suggestions.get(key) : undefined;
+      // The CONFIRMED titles come from the account's own joins; a
+      // suggestion's title is looked up from the profile's ids.
+      const suggestedTopic = profile?.perfect_topic_suggested_id
+        ? titles.topics.get(profile.perfect_topic_suggested_id)
+        : undefined;
+      const suggestedSubset = profile?.perfect_subset_suggested_id
+        ? titles.subsets.get(profile.perfect_subset_suggested_id)
+        : undefined;
       return {
         ...rest,
-        perfect_topic_title: pt?.title ?? null,
-        perfect_subset_title: ps?.title ?? null,
+        perfect_topic_suggested_id: profile?.perfect_topic_suggested_id ?? null,
+        perfect_subset_suggested_id:
+          profile?.perfect_subset_suggested_id ?? null,
+        perfect_topic_reason: profile?.perfect_topic_reason ?? null,
+        cause_family_suggested: profile?.cause_family_suggested ?? null,
+        signature_events: profile?.signature_events ?? null,
+        perfect_topic_title: pt?.title ?? suggestedTopic ?? null,
+        perfect_subset_title: ps?.title ?? suggestedSubset ?? null,
         favpoll_count: counts.get(rest.id) ?? 0,
+        register_verdict: removal?.verdict ?? null,
+        register_removed_on: removal?.removed_on ?? null,
       };
     })
     .sort(
@@ -508,33 +759,74 @@ export async function getPerfectTopicQueue(): Promise<{
   error: string | null;
 }> {
   const supabase = createAdminClient();
+  // Unconfirmed accounts first, then the profiles that have something to
+  // say about them: the suggestion moved to the profile (step 2), so the
+  // "has a suggestion" filter is no longer a column on this table.
   const { data, error } = await supabase
     .from("charities")
     .select(
-      "id, name, cause_family, perfect_topic_id, perfect_topic_suggested_id, perfect_topic_reason, perfect_subset_id, perfect_subset_suggested_id, signature_events",
+      "id, name, registered_number, cause_family, perfect_topic_id, perfect_subset_id",
     )
     .eq("is_active", true)
     .is("perfect_topic_id", null)
-    .not("perfect_topic_suggested_id", "is", null)
     .order("name", { ascending: true });
   if (error) return { data: null, error: error.message };
-  return { data: (data ?? []) as PerfectTopicQueueRow[], error: null };
+
+  const suggestions = await suggestionsByKey(
+    (data ?? []).map(
+      (c) => (c as { registered_number: string | null }).registered_number,
+    ),
+  );
+  const rows = (data ?? [])
+    .map((c) => {
+      const row = c as Omit<
+        PerfectTopicQueueRow,
+        | "perfect_topic_suggested_id"
+        | "perfect_subset_suggested_id"
+        | "perfect_topic_reason"
+        | "signature_events"
+      > & { registered_number: string | null };
+      const key = profileKey(row.registered_number);
+      const profile = key ? suggestions.get(key) : undefined;
+      return {
+        ...row,
+        perfect_topic_suggested_id: profile?.perfect_topic_suggested_id ?? null,
+        perfect_subset_suggested_id:
+          profile?.perfect_subset_suggested_id ?? null,
+        perfect_topic_reason: profile?.perfect_topic_reason ?? null,
+        signature_events: profile?.signature_events ?? null,
+      } as PerfectTopicQueueRow;
+    })
+    .filter((r) => r.perfect_topic_suggested_id != null);
+  return { data: rows, error: null };
 }
 
 /** "No topic of its own" — the other real answer (a hospice, a
  * grant-maker). Clearing the suggestion is what takes the charity off the
- * queue; a later backfill --all may suggest again. */
+ * queue; a later backfill --all may suggest again. The suggestion lives on
+ * the PROFILE now, so that is what is cleared (step 2). */
 export async function dismissPerfectTopicSuggestion(
   id: string,
 ): Promise<{ error: string | null }> {
   const supabase = createAdminClient();
-  const { error } = await supabase
+  const { data: charity } = await supabase
     .from("charities")
+    .select("registered_number")
+    .eq("id", id)
+    .maybeSingle();
+  const key = profileKey(
+    (charity as { registered_number: string | null } | null)
+      ?.registered_number ?? null,
+  );
+  if (!key) return { error: "That charity has no profile to clear." };
+  const { error } = await supabase
+    .from("charity_profiles")
     .update({
       perfect_topic_suggested_id: null,
       perfect_subset_suggested_id: null,
+      updated_at: new Date().toISOString(),
     })
-    .eq("id", id);
+    .eq("registered_number", key);
   if (error) return { error: error.message };
   revalidatePath("/charities");
   return { error: null };
@@ -550,6 +842,33 @@ export async function setCharityConsent(
   status: "approved" | "declined",
 ): Promise<{ error: string | null }> {
   const supabase = createAdminClient();
+
+  // THE REMOVAL CHECK, as a guard and not just a warning: approval lists
+  // the charity and opens the money rail to it, so a number the register
+  // has deregistered is refused here, where the write happens. Declining
+  // stays open — it is the way out. A name mismatch is somebody else's
+  // problem and does not block.
+  if (status === "approved") {
+    const { data: charity } = await supabase
+      .from("charities")
+      .select("name, registered_number")
+      .eq("id", id)
+      .maybeSingle();
+    const number = (charity as { registered_number: string | null } | null)
+      ?.registered_number;
+    if (number) {
+      const check = await verifyOnMirror(
+        number,
+        (charity as { name: string }).name,
+      );
+      if (check.status === "removed") {
+        return {
+          error:
+            "The register has removed this charity. It cannot be approved — money must not move to a deregistered charity.",
+        };
+      }
+    }
+  }
 
   const { error } = await supabase
     .from("charities")
