@@ -460,6 +460,48 @@ closed on an unverifiable charity is correct.
    Left for step 5 to clear with the columns: `scripts/backfill-charity-register.ts`
    now fills columns nobody reads.
 5. Drop the register copies from `charities` once nothing reads them.
+   DONE 2026-10-04 (migration 20261004200000, applied dev/staging only).
+   Thirteen columns gone: the register's words (registered_email,
+   registered_website, activities, classification, objects, areas,
+   grant_making) and the suggestions step 2 moved
+   (perfect_topic_suggested_id, perfect_subset_suggested_id,
+   perfect_topic_reason, cause_family_suggested, signature_events,
+   website_read_at). `charities` is 18 columns now, every one of them
+   something the charity agreed to, and the registered NUMBER is the only
+   link to the register.
+   HOW IT WAS MADE SAFE, in this order: the fields came off the shared
+   `Charity` type first, so the compiler had to find every reader (both
+   apps typecheck clean); the database was asked what still mentioned the
+   columns (one trigger and its function, nothing else — the policy and
+   the other trigger were false positives); and the carry-over was
+   re-counted immediately before the drop — 62 accounts holding
+   suggestions, 62 with a profile, zero not carried on any of the five
+   fields.
+   THE INVARIANT MOVED WITH THE COLUMNS, which it should have done in
+   step 2: a suggested subset must belong to its suggested topic, so
+   `charities_perfect_subset_suggested_check` became
+   `charity_profiles_subset_suggested_check` on the profile. The confirmed
+   pair keeps its own trigger on the account.
+   THE SCRIPTS MOVED TOO. `set-perfect-subsets` clears both halves (the
+   account's confirmation and the profile's suggestion, or the next wave's
+   suggestion quietly reappears in the queue); `seed-stories` reads the
+   mirror and the profile exactly as the generator does, which is the
+   point — one source, two callers; `backfill-cause-family` reads the
+   mirror and writes the profile. DELETED: `backfill-charity-purpose.ts`
+   and `backfill-charity-register.ts`, whose whole job was filling columns
+   that no longer exist.
+   AND ONE SIMPLIFICATION the step earned: `profileKey()` and
+   `CHARITY_NUMBER_KEY` now live in `packages/types`, replacing four
+   copies of the same regex across both apps and three scripts. The key is
+   the link, so it belongs where both ends can see it.
+   VERIFIED AFTER THE DROP: both suites (1379 + 157), the running app on
+   home, /charities, a charity page and /record with no column error in
+   the log, `seed-stories --dry-run` (1723 triples from 138 topics x 54
+   charities, unchanged), `set-perfect-subsets --dry`,
+   `backfill-cause-family` (skipped all 54 real charities, wrote the
+   probe's suggestion to its profile), and the wizard's shelf — 54
+   charities, all 54 with a site address from the mirror where the copies
+   used to hold them.
 
 What the decisions above add to that order, none of it large:
 

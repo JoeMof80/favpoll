@@ -7,9 +7,14 @@
  * Two paths, deliberately different:
  *   - The SEEDED charities get their family from the founder-approved table
  *     below, written as CONFIRMED (cause_family). No model involved.
- *   - Every other charity with register `activities` gets a model
- *     SUGGESTION (cause_family_suggested) for an admin to confirm in the
- *     outreach queue. Never written as confirmed.
+ *   - Every other charity gets a model SUGGESTION for an admin to confirm
+ *     in the outreach queue. Never written as confirmed, and written to
+ *     the PROFILE (charity_profiles.cause_family_suggested) — step 2 of
+ *     the charity-profiles note moved every suggestion there, and step 5
+ *     dropped the column it used to live in.
+ *
+ * The charity's words come from the MIRROR, like every other register
+ * word (step 4).
  *
  * Idempotent: skips rows that already have the relevant value.
  *
@@ -18,8 +23,9 @@
  * ---------------------------------------------------------------------------
  */
 import { createClient } from "@supabase/supabase-js";
-import type { CauseFamily } from "../packages/types";
+import { profileKey, type CauseFamily } from "../packages/types";
 import { suggestCauseFamily } from "../apps/web/lib/cause-family";
+import { mirrorContactAndPurpose } from "../apps/web/lib/register-mirror";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -68,15 +74,42 @@ async function main() {
 
   const { data: rows, error } = await supabase
     .from("charities")
-    .select(
-      "id, name, activities, classification, cause_family, cause_family_suggested",
-    );
+    .select("id, name, registered_number, cause_family");
   if (error) throw new Error(error.message);
+  const accounts = (rows ?? []) as {
+    id: string;
+    name: string;
+    registered_number: string | null;
+    cause_family: CauseFamily | null;
+  }[];
+
+  // The register's words, and the suggestions already made, in one read
+  // each.
+  const mirror = await mirrorContactAndPurpose(
+    accounts.map((c) => c.registered_number),
+  );
+  const keys = accounts
+    .map((c) => profileKey(c.registered_number))
+    .filter((k): k is string => k !== null);
+  const { data: profileRows } = keys.length
+    ? await supabase
+        .from("charity_profiles")
+        .select("registered_number, cause_family_suggested")
+        .in("registered_number", keys)
+    : { data: [] };
+  const suggestedAlready = new Map(
+    (
+      (profileRows ?? []) as {
+        registered_number: string;
+        cause_family_suggested: CauseFamily | null;
+      }[]
+    ).map((r) => [r.registered_number, r.cause_family_suggested]),
+  );
 
   let confirmed = 0;
   let suggested = 0;
   let none = 0;
-  for (const c of rows ?? []) {
+  for (const c of accounts) {
     const known = CONFIRMED[c.name];
     if (known) {
       if (c.cause_family === known) continue;
@@ -91,24 +124,44 @@ async function main() {
       }
       continue;
     }
-    if (c.cause_family_suggested || c.cause_family) continue;
+    const key = profileKey(c.registered_number);
+    if (c.cause_family || (key && suggestedAlready.get(key))) continue;
+    const row = mirror.get((c.registered_number ?? "").replace(/\D/g, ""));
     const guess = await suggestCauseFamily({
       name: c.name,
-      activities: c.activities,
-      classification: c.classification,
+      activities: row?.activities ?? null,
+      classification: row?.classification ?? null,
+      objects: row?.objects ?? null,
+      registeredNumber: key,
     });
     if (!guess) {
-      console.log(`  –  ${c.name.padEnd(30)} no cause of its own (or nothing to go on)`);
+      console.log(
+        `  –  ${c.name.padEnd(30)} no cause of its own (or nothing to go on)`,
+      );
       none++;
       continue;
     }
-    const { error: e } = await supabase
-      .from("charities")
-      .update({ cause_family_suggested: guess })
-      .eq("id", c.id);
+    if (!key) {
+      console.log(
+        `  –  ${c.name.padEnd(30)} no profile key (the number is not one)`,
+      );
+      none++;
+      continue;
+    }
+    const { error: e } = await supabase.from("charity_profiles").upsert(
+      {
+        registered_number: key,
+        cause_family_suggested: guess,
+        status: "drafted",
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "registered_number" },
+    );
     if (e) console.error(`  ✗  ${c.name}: ${e.message}`);
     else {
-      console.log(`  ?  ${c.name.padEnd(30)} suggested  ${guess}  (confirm in the outreach queue)`);
+      console.log(
+        `  ?  ${c.name.padEnd(30)} suggested  ${guess}  (confirm in the outreach queue)`,
+      );
       suggested++;
     }
   }

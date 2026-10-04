@@ -28,6 +28,7 @@
  * ---------------------------------------------------------------------------
  */
 import { createClient } from "@supabase/supabase-js";
+import { profileKey } from "../packages/types";
 import { suggestSignatureEvents } from "../apps/web/lib/charity-events";
 import { OCCASION_TYPES_BY_REGISTER } from "../apps/web/lib/registers";
 import {
@@ -50,8 +51,6 @@ const WAVE = flag("wave") || opt("wave") !== null;
 const WAVE_LABEL = opt("wave");
 const INCOME_FLOOR = Number(opt("income") ?? 100000);
 const LIMIT = Number(opt("limit") ?? (WAVE ? 50 : 0)) || 0;
-
-const KEYABLE = /^([0-9]{6,10}(-[0-9]+)?|SC[0-9]{3,6}|NIC[0-9]{3,6})$/;
 
 type Target = { registeredNumber: string; readAt: string | null };
 
@@ -86,7 +85,7 @@ async function accountTargets(): Promise<Target[]> {
   if (error) throw new Error(error.message);
   const numbers = (data ?? [])
     .map((c) => String(c.registered_number).trim().toUpperCase())
-    .filter((n) => KEYABLE.test(n));
+    .filter((n) => profileKey(n) !== null);
   if (numbers.length === 0) return [];
   const { data: profiles } = await supabase
     .from("charity_profiles")

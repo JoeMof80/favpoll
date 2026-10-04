@@ -24,6 +24,7 @@
  * ---------------------------------------------------------------------------
  */
 import { createClient } from "@supabase/supabase-js";
+import { profileKey } from "../packages/types";
 import { findCharityImage } from "../apps/web/lib/charity-image";
 
 const supabase = createClient(
@@ -39,8 +40,6 @@ const ALL = flag("all");
 const WAVE = flag("wave") || opt("wave") !== null;
 const INCOME_FLOOR = Number(opt("income") ?? 100000);
 const LIMIT = Number(opt("limit") ?? (WAVE ? 50 : 0)) || 0;
-
-const KEYABLE = /^([0-9]{6,10}(-[0-9]+)?|SC[0-9]{3,6}|NIC[0-9]{3,6})$/;
 
 type Target = { registeredNumber: string; website: string | null };
 
@@ -65,7 +64,7 @@ async function accountTargets(): Promise<Target[]> {
   if (error) throw new Error(error.message);
   const numbers = (data ?? [])
     .map((c) => String(c.registered_number).trim().toUpperCase())
-    .filter((n) => KEYABLE.test(n));
+    .filter((n) => profileKey(n) !== null);
   if (numbers.length === 0) return [];
   // The site address comes from the mirror, like every other register word.
   const digits = numbers.filter((n) => /^[0-9]+$/.test(n)).map(Number);
