@@ -5,6 +5,7 @@ import {
   searchMirrorWithPlaceRetry,
 } from "@/lib/register-mirror"
 import { isRateLimited, RATE_LIMIT_MESSAGE } from "@/lib/rate-limit"
+import { offRegisterNumber } from "@/lib/off-register"
 
 // The wizard's any-charity typeahead, over the REGISTER MIRROR
 // (2026-09-27): substring-ranked in our own database, each row carrying the
@@ -46,5 +47,13 @@ export async function GET(req: Request) {
   }
   const { results, total } =
     mirror.results.length > 0 ? mirror : await searchApiAsMirror(q, limit)
+  // THE DEMAND SIGNAL (profiles note §5). Scotland and Northern Ireland
+  // are off the register favpoll mirrors, and the trigger to add one is
+  // the first real request, not a date. The picker explains the boundary;
+  // this is where it gets counted, so we know before anyone complains.
+  const offRegister = results.length === 0 ? offRegisterNumber(q) : null
+  if (offRegister) {
+    console.log(`[off-register] ${offRegister} number searched: ${q}`)
+  }
   return NextResponse.json({ results, total })
 }

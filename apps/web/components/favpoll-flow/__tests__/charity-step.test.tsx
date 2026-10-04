@@ -259,3 +259,69 @@ describe("CharityStep — search rows", () => {
     ).not.toBeInTheDocument()
   })
 })
+
+// ─── Off-register numbers (profiles note §5) ────────────────────────────────
+// Scotland and Northern Ireland keep their own registers and neither is
+// mirrored, so an SC or NIC number finds nothing and reads as a typo. The
+// picker names the boundary instead of repeating "no match".
+describe("CharityStep — an off-register number", () => {
+  const emptySearch = () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({ results: [], total: 0 }),
+    })
+  }
+
+  it("names the limit for a Scottish number", async () => {
+    emptySearch()
+    render(
+      <CharityStep
+        charities={[]}
+        value={[]}
+        onPick={vi.fn()}
+        search="SC003558"
+        onRegisterAdd={vi.fn()}
+      />
+    )
+    await screen.findByText(/Scottish charities \(SC numbers\)/, undefined, {
+      timeout: 2000,
+    })
+    expect(
+      screen.queryByText(/No registered charity matches/)
+    ).not.toBeInTheDocument()
+  })
+
+  it("names the limit for a Northern Irish number", async () => {
+    emptySearch()
+    render(
+      <CharityStep
+        charities={[]}
+        value={[]}
+        onPick={vi.fn()}
+        search="NIC100000"
+        onRegisterAdd={vi.fn()}
+      />
+    )
+    await screen.findByText(
+      /Northern Irish charities \(NIC numbers\)/,
+      undefined,
+      { timeout: 2000 }
+    )
+  })
+
+  it("an ordinary miss still reads as a miss", async () => {
+    emptySearch()
+    render(
+      <CharityStep
+        charities={[]}
+        value={[]}
+        onPick={vi.fn()}
+        search="zzzznothing"
+        onRegisterAdd={vi.fn()}
+      />
+    )
+    await screen.findByText(/No registered charity matches/, undefined, {
+      timeout: 2000,
+    })
+  })
+})

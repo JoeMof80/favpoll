@@ -5,6 +5,7 @@ import { ExternalLink, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Chip } from "@/components/ui/chip"
 import type { Charity } from "@favpoll/types"
+import { OFF_REGISTER_MESSAGE, offRegisterNumber } from "@/lib/off-register"
 
 export type RegisterPick = {
   registeredNumber: string
@@ -175,6 +176,11 @@ export function CharityStep({
     visible.length === 0 &&
     (!registerActive || (freshResults.length === 0 && !registerLoading))
 
+  // An SC or NIC number finds nothing and reads as a typo (profiles note
+  // §5). Name the boundary instead: Scotland and Northern Ireland keep
+  // their own registers, and neither is mirrored yet.
+  const offRegister = offRegisterNumber(trimmed)
+
   // FULL-BLEED ROWS (founder, 2026-09-08): rows hug the dialog's edges —
   // hairline dividers, pale tint on hover, the register-ink idiom
   // (#587/#588) rather than cards-inside-a-card. The whole row is the
@@ -227,10 +233,12 @@ export function CharityStep({
   return (
     <div>
       {noMatches && (trimmed || !onRegisterAdd) ? (
-        <p className="py-3 text-center text-sm text-muted-foreground">
-          {registerActive
-            ? `No registered charity matches “${trimmed}”.`
-            : "No results."}
+        <p className="px-5 py-3 text-center text-sm text-muted-foreground">
+          {offRegister
+            ? OFF_REGISTER_MESSAGE[offRegister]
+            : registerActive
+              ? `No registered charity matches “${trimmed}”.`
+              : "No results."}
         </p>
       ) : noMatches ? (
         /* The empty shelf — a cold start, so the prompt comes with seed
