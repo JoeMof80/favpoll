@@ -1,6 +1,7 @@
 "use server"
 
 import { createAdminClient } from "@/lib/supabase/admin"
+import { mirrorContactAndPurpose } from "@/lib/register-mirror"
 import type {
   Category,
   Charity,
@@ -43,6 +44,22 @@ export async function getWizardData(): Promise<{
       .eq("is_active", true)
       .order("title"),
   ])
+
+  // THE SITE ADDRESS COMES FROM THE MIRROR (step 4 of the charity-profiles
+  // note), not from the copy on `charities` that step 5 drops. The picker
+  // shows it on every catalogue row, so it is overlaid here rather than
+  // read per row: one query for the whole shelf.
+  const register = await mirrorContactAndPurpose(
+    (charities ?? []).map((c) => (c as Charity).registered_number)
+  )
+  const charitiesWithSite: Charity[] = ((charities ?? []) as Charity[]).map(
+    (c) => {
+      const row = register.get((c.registered_number ?? "").replace(/\D/g, ""))
+      return row
+        ? { ...c, registered_website: row.website, registered_email: row.email }
+        : c
+    }
+  )
 
   const parentTopics: TopicWithMeta[] = (topicsAll ?? []).map((t) => ({
     ...(t as Topic),
@@ -98,7 +115,7 @@ export async function getWizardData(): Promise<{
   }
 
   return {
-    charities: (charities ?? []) as Charity[],
+    charities: charitiesWithSite,
     topics,
     categories: (categories ?? []) as Category[],
     suggestedTopicIds,

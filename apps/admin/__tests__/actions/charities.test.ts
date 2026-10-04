@@ -62,8 +62,17 @@ const makeCharity = (overrides: Record<string, unknown> = {}) => ({
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("getCharities", () => {
+  // The account rows come first, then the overlays: the suggested cause
+  // family from the PROFILE (step 2) and the register's own words from the
+  // MIRROR (step 4). Three responses, in that order.
+  const queueCharities = (rows: unknown[]) => {
+    mock.queue(rows);
+    mock.queue([]); // charity_profiles
+    mock.queue([]); // register_charities
+  };
+
   it("returns all charities ordered by name", async () => {
-    mock.queue([
+    queueCharities([
       makeCharity(),
       makeCharity({ id: "charity-2", name: "Diabetes UK" }),
     ]);
@@ -75,7 +84,7 @@ describe("getCharities", () => {
   });
 
   it("filters by market when provided", async () => {
-    mock.queue([makeCharity()]);
+    queueCharities([makeCharity()]);
 
     await getCharities("en-GB");
 
@@ -86,7 +95,7 @@ describe("getCharities", () => {
   });
 
   it("does not add market filter when market is not provided", async () => {
-    mock.queue([makeCharity()]);
+    queueCharities([makeCharity()]);
 
     await getCharities();
 
@@ -644,10 +653,17 @@ describe("getRegisterRemovals", () => {
 describe("getConsentQueue", () => {
   // The queue reads the removals and the favpoll links together; the rpc
   // is called while the array is built, so its response is queued first.
-  const queueResponses = (removals: unknown[], charities: unknown[]) => {
+  const queueResponses = (
+    removals: unknown[],
+    charities: unknown[],
+    profiles: unknown[] = [],
+    register: unknown[] = [],
+  ) => {
     mock.queue(removals);
     mock.queue([{ charity_id: "charity-1" }]);
     mock.queue(charities);
+    mock.queue(profiles); // charity_profiles — the suggestions
+    mock.queue(register); // register_charities — contact and its own words
   };
 
   it("carries the register verdict onto the row it affects", async () => {
@@ -670,24 +686,31 @@ describe("getConsentQueue", () => {
   });
 
   it("shows the suggestion the PROFILE holds, with its title looked up", async () => {
-    // rpc(removals), favpoll_charities, charities, charity_profiles, then
-    // the title lookups the suggested ids need.
-    mock.queue([]);
-    mock.queue([{ charity_id: "charity-1" }]);
-    mock.queue([
-      { id: "charity-1", name: "RSPB", registered_number: "207076" },
-    ]);
-    mock.queue([
-      {
-        registered_number: "207076",
-        perfect_topic_suggested_id: "t-bird",
-        perfect_subset_suggested_id: null,
-        perfect_topic_reason: "Birds are the whole point.",
-        cause_family_suggested: "animals",
-        signature_events: [{ name: "Big Garden Birdwatch" }],
-        website_read_at: "2026-10-01T00:00:00Z",
-      },
-    ]);
+    // rpc(removals), favpoll_charities, charities, charity_profiles,
+    // register_charities, then the title lookups the suggested ids need.
+    queueResponses(
+      [],
+      [{ id: "charity-1", name: "RSPB", registered_number: "207076" }],
+      [
+        {
+          registered_number: "207076",
+          perfect_topic_suggested_id: "t-bird",
+          perfect_subset_suggested_id: null,
+          perfect_topic_reason: "Birds are the whole point.",
+          cause_family_suggested: "animals",
+          signature_events: [{ name: "Big Garden Birdwatch" }],
+          website_read_at: "2026-10-01T00:00:00Z",
+        },
+      ],
+      [
+        {
+          registered_number: 207076,
+          email: "enquiries@rspb.org.uk",
+          website: "www.rspb.org.uk",
+          activities: "We protect wild birds.",
+        },
+      ],
+    );
     mock.queue([{ id: "t-bird", title: "Bird" }]);
 
     const { data, error } = await getConsentQueue();
@@ -698,6 +721,11 @@ describe("getConsentQueue", () => {
       perfect_topic_title: "Bird",
       perfect_topic_reason: "Birds are the whole point.",
       cause_family_suggested: "animals",
+      // Step 4: the contact and the register's own words come from the
+      // mirror, not from a copy on the account.
+      registered_email: "enquiries@rspb.org.uk",
+      registered_website: "www.rspb.org.uk",
+      activities: "We protect wild birds.",
     });
     expect(data![0].signature_events).toHaveLength(1);
   });

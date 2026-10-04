@@ -429,6 +429,36 @@ closed on an unverifiable charity is correct.
    re-cut on this page alone.
 4. Point the wizard's Generate and the Story engine at the mirror for
    purpose and contact (already the case for verification and search).
+   DONE 2026-10-04. Every reader moved; no migration, so it is reversible
+   by revert alone:
+   - `generate-draft.ts fetchCharity` reads the account for what is
+     AGREED (name, description, cause family, the confirmed topic) and the
+     mirror for the register's own words (`purposeFromMirror`, which keeps
+     its live-API fallback for a charity registered since the extract or a
+     mirror that is empty on a fresh environment). The SUGGESTION REASON
+     now comes from the profile, where step 2 moved it — reading the
+     account's frozen copy would have quoted a reason no wave can refresh,
+     which was a live defect this step closes.
+   - the wizard's charity shelf (`wizard-data.ts`) overlays the site
+     address from the mirror in one query, so the picker's link survives
+     the column going;
+   - admin's consent queue and charities table overlay contact, the
+     register's words and the suggested family from the mirror and the
+     profile;
+   - NOTHING COPIES THE REGISTER ONTO THE ACCOUNT ANY MORE: the web
+     register-add path and admin's createCharity both stopped, so step 5
+     is a pure drop;
+   - `charities.registered_email` was being SELECTED in the web app and
+     never rendered — dropped from the manage query and the organiser-row
+     type rather than pointed anywhere.
+   MEASURED BEFORE THE SWITCH, over the 54 active accounts: the mirror has
+   activities for all 54 where the copies had 53, and nothing would lose
+   its email, website, objects or areas. Eleven accounts DIFFER from the
+   mirror — all by one to four characters of whitespace, the API-sourced
+   copy against the extract-sourced row — so the switch loses nothing,
+   corrects eleven and gains one charity words it never had.
+   Left for step 5 to clear with the columns: `scripts/backfill-charity-register.ts`
+   now fills columns nobody reads.
 5. Drop the register copies from `charities` once nothing reads them.
 
 What the decisions above add to that order, none of it large:
