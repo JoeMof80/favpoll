@@ -412,24 +412,9 @@ describe("PollSection — lock explainer", () => {
 // ─── The picks are in (founder, 2026-10-02) ──────────────────────────────────
 
 describe("PollSection — suspended picks", () => {
-  it("the lock card teaches the pot's path and drops the shared-pot footer", () => {
-    render(
-      <PollSection
-        {...BASE_PROPS}
-        picksSuspended
-        onOpenPledgeDialog={vi.fn()}
-      />
-    )
-    const card = screen.getByRole("button", {
-      name: /Pledge to the shared pot to see the results/i,
-    })
-    expect(card).toHaveTextContent(
-      "The picks are in — pledge to the shared pot"
-    )
-    expect(card).toHaveTextContent("Pledge to the pot")
-    expect(card).not.toHaveTextContent("Pick your favourite")
-    expect(card).not.toHaveTextContent("Don’t have a favourite?")
-  })
+  // The suspended LOCK CARD went 2026-10-04 with the copy it showed: a
+  // suspension makes the page read as a closed one, so the card cannot
+  // render on one. What survives here is the pill.
 
   it("marks the heading row with a Picks suspended pill, pledged or not", () => {
     const { unmount } = render(

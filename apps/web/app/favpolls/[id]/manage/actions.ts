@@ -279,9 +279,9 @@ export async function setPicksSuspended(favpollId: string, suspend: boolean) {
   if (suspend) {
     const { error: openError } = await supabase
       .from("favpolls")
-      .update({ standings_opened_at: value })
+      .update({ picks_first_suspended_at: value })
       .eq("id", favpollId)
-      .is("standings_opened_at", null)
+      .is("picks_first_suspended_at", null)
     if (openError) throw new Error(openError.message)
   }
   return value

@@ -68,10 +68,10 @@ describe("setPicksSuspended", () => {
   })
 })
 
-// THE STANDINGS OPEN WITH THE FIRST SUSPENSION, AND STAY OPEN (founder,
-// 2026-10-03). A second write, guarded on the column still being null, so
-// the FIRST moment survives a suspend / resume / suspend again.
-describe("setPicksSuspended opening the standings", () => {
+// THE FIRST SUSPENSION IS STAMPED, AND STAYS (founder, 2026-10-03). A
+// second write, guarded on the column still being null, so the FIRST
+// moment survives a suspend / resume / suspend again.
+describe("setPicksSuspended stamping the first suspension", () => {
   it("stamps the standings open alongside the suspension", async () => {
     mock.queue(open)
     mock.queue(null)
@@ -79,14 +79,14 @@ describe("setPicksSuspended opening the standings", () => {
     const value = await setPicksSuspended("f-1", true)
     expect(updates()).toEqual([
       { picks_suspended_at: value },
-      { standings_opened_at: value },
+      { picks_first_suspended_at: value },
     ])
     expect(
       mock
         .callsFor("favpolls")
         .filter((c) => c.method === "is")
         .map((c) => c.args)
-    ).toContainEqual(["standings_opened_at", null])
+    ).toContainEqual(["picks_first_suspended_at", null])
   })
 
   it("writes nothing about the standings on a resume", async () => {

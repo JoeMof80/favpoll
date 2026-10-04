@@ -11,7 +11,7 @@
 
 export type PicksSuspendable = {
   picks_suspended_at?: string | null
-  standings_opened_at?: string | null
+  picks_first_suspended_at?: string | null
 }
 
 /** The picks are suspended — the server stamps the moment, so set means
@@ -25,25 +25,21 @@ export function picksSuspended(favpoll: PicksSuspendable): boolean {
 export const PICKS_SUSPENDED_NOTICE =
   "The picks are in. Your pledge goes to the pot."
 
-// THE STANDINGS OPEN, ONE WAY (founder, 2026-10-03: "i wonder if it is
-// better to unlock the page when the poll is suspended. the main reason
-// the standings are hidden is so as not to influence picks"). Closing
-// already unlocks them for everyone, because no pick can follow;
-// suspending creates that condition early, and freezes the numbers
-// besides, so the lock guards something nothing can move.
+// A SUSPENDED FAVPOLL READS AS A CLOSED ONE (founder, 2026-10-04: "just
+// treat a suspended poll like it is closed, with note and standings
+// revealed. the only difference is that users can continue to pledge, but
+// only to the shared pot, via the pledge FAB"). The standings were
+// withheld so as not to influence picks; once there are no picks to
+// influence, and the numbers are frozen besides, the lock guards nothing.
 //
-// It does not close again. The tap is reversible, the knowledge is not:
-// resuming the picks after a room has seen the standings would let those
-// guests pick with exactly what the lock withholds. So the column is
-// stamped at the first suspension and never cleared, and resuming leaves
-// the standings open — see the migration.
+// It does not shut again. The tap is reversible, the knowledge is not:
+// resuming the picks after a room has seen the reveal would let those
+// guests pick with exactly what the lock withholds. So the moment is
+// stamped at the FIRST suspension and never cleared — which is what the
+// column is named for, rather than for what it opens.
 
-/** The standings show to everyone, pledge or no pledge. */
-export function standingsOpened(favpoll: PicksSuspendable): boolean {
-  return !!favpoll.standings_opened_at
+/** The picks have been suspended at some point, so the reveal is out —
+ *  standings and note — and stays out even if the picks resume. */
+export function picksEverSuspended(favpoll: PicksSuspendable): boolean {
+  return !!favpoll.picks_first_suspended_at
 }
-
-/** What the pledge still buys once the standings are out: the note, and
- *  nothing else. Shown on the invitation where the lock card stood. */
-export const STANDINGS_OPEN_NOTICE =
-  "The standings are open. Your pledge still goes to the pot."

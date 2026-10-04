@@ -8,7 +8,7 @@ import { notFound, redirect } from "next/navigation"
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { unconsentedNamesByFavpoll } from "@/lib/charity-consent"
-import { picksSuspended, standingsOpened } from "@/lib/picks-suspended"
+import { picksSuspended, picksEverSuspended } from "@/lib/picks-suspended"
 import { fetchAllRows } from "@/lib/supabase/paginate"
 import { deriveRankHistory } from "@/lib/rank-history"
 import {
@@ -341,8 +341,15 @@ export default async function FavpollPage({ params }: Props) {
   //
   // One way (lib/picks-suspended): a resume leaves the reveal open,
   // because the guests have seen it.
+  // Both terms, so a suspension set by hand reads the same as one set by
+  // the manage page: `suspended` is the live state, picksEverSuspended the
+  // stamp that outlives a resume.
   const entitled =
-    !!hasPledged || isClosed || isOrganiser || standingsOpened(typedFavpoll)
+    !!hasPledged ||
+    isClosed ||
+    isOrganiser ||
+    suspended ||
+    picksEverSuspended(typedFavpoll)
 
   // Safe to send even when un-entitled: whether a reveal exists, without its
   // content — the lock pill must not promise a reveal on favpolls without one.

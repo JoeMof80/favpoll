@@ -224,8 +224,9 @@ export type Favpoll = {
    *  step disappears and every pledge goes to the shared pot until the
    *  close date. Null = open; set = suspended (server-stamped). */
   picks_suspended_at?: string | null;
-  /** The standings were opened by a suspension — one way (lib/picks-suspended). */
-  standings_opened_at?: string | null;
+  /** The first suspension's moment, never cleared: the reveal is out and
+   *  stays out (lib/picks-suspended). */
+  picks_first_suspended_at?: string | null;
   total_raised: number;
   /** Optional pledge goal in pounds (same unit as total_raised); null = no goal. */
   goal_amount?: number | null;
