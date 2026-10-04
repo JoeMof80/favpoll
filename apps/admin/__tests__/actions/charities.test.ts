@@ -615,6 +615,39 @@ describe("getConsentQueue", () => {
     expect(data![0].register_removed_on).toBe("2023-02-16");
   });
 
+  it("shows the suggestion the PROFILE holds, with its title looked up", async () => {
+    // rpc(removals), favpoll_charities, charities, charity_profiles, then
+    // the title lookups the suggested ids need.
+    mock.queue([]);
+    mock.queue([{ charity_id: "charity-1" }]);
+    mock.queue([
+      { id: "charity-1", name: "RSPB", registered_number: "207076" },
+    ]);
+    mock.queue([
+      {
+        registered_number: "207076",
+        perfect_topic_suggested_id: "t-bird",
+        perfect_subset_suggested_id: null,
+        perfect_topic_reason: "Birds are the whole point.",
+        cause_family_suggested: "animals",
+        signature_events: [{ name: "Big Garden Birdwatch" }],
+        website_read_at: "2026-10-01T00:00:00Z",
+      },
+    ]);
+    mock.queue([{ id: "t-bird", title: "Bird" }]);
+
+    const { data, error } = await getConsentQueue();
+
+    expect(error).toBeNull();
+    expect(data![0]).toMatchObject({
+      perfect_topic_suggested_id: "t-bird",
+      perfect_topic_title: "Bird",
+      perfect_topic_reason: "Birds are the whole point.",
+      cause_family_suggested: "animals",
+    });
+    expect(data![0].signature_events).toHaveLength(1);
+  });
+
   it("leaves the verdict null for a charity the register is happy with", async () => {
     queueResponses(
       [],
@@ -732,52 +765,92 @@ describe("updateCharity — cause family", () => {
 // a suggestion only while a charity was pending AND in use, so decided
 // charities kept unconfirmed suggestions nobody could see.
 describe("getPerfectTopicQueue", () => {
-  it("asks for active charities whose suggestion is unconfirmed, whatever their consent", async () => {
-    mock.queue([{ id: "c1", name: "RSPB" }]);
+  // Step 2 of the profiles note: the SUGGESTION lives on the profile, so
+  // "has a suggestion" is no longer a column on `charities` to filter by.
+  // The account query asks only for the unconfirmed ones; the profiles
+  // decide which of them have anything to show.
+  it("asks for active, unconfirmed accounts and takes the suggestion from the profile", async () => {
+    mock.queue([
+      { id: "c1", name: "RSPB", registered_number: "207076" },
+      { id: "c2", name: "Nothing Yet", registered_number: "1089464" },
+    ]);
+    mock.queue([
+      {
+        registered_number: "207076",
+        perfect_topic_suggested_id: "t-bird",
+        perfect_topic_reason: "Birds are the whole point.",
+        signature_events: null,
+      },
+    ]);
+
     const r = await getPerfectTopicQueue();
+
     expect(r.error).toBeNull();
-    expect(r.data).toEqual([{ id: "c1", name: "RSPB" }]);
+    // Only the charity whose profile holds a suggestion.
+    expect(r.data).toHaveLength(1);
+    expect(r.data![0]).toMatchObject({
+      id: "c1",
+      perfect_topic_suggested_id: "t-bird",
+      perfect_topic_reason: "Birds are the whole point.",
+    });
+
     const calls = mock.callsFor("charities");
     expect(calls.find((c) => c.method === "is")?.args).toEqual([
       "perfect_topic_id",
-      null,
-    ]);
-    expect(calls.find((c) => c.method === "not")?.args).toEqual([
-      "perfect_topic_suggested_id",
-      "is",
       null,
     ]);
     expect(calls.find((c) => c.method === "eq")?.args).toEqual([
       "is_active",
       true,
     ]);
+    // The old filter is gone — it would ask for a column nothing writes.
+    expect(calls.some((c) => c.method === "not")).toBe(false);
     // Never filtered by consent status or by favpoll use.
     expect(
       calls.some((c) => JSON.stringify(c.args).includes("consent_status")),
     ).toBe(false);
+    // The suggestions were read from the profile, by its own key.
+    expect(mock.callsFor("charity_profiles").length).toBeGreaterThan(0);
   });
 });
 
 describe("dismissPerfectTopicSuggestion", () => {
-  it("clears both suggested ids — 'no topic of its own' is a real answer", async () => {
+  it("clears both suggested ids on the PROFILE — 'no topic of its own' is a real answer", async () => {
+    mock.queue({ registered_number: "207076" });
     mock.queue(null);
+
     const r = await dismissPerfectTopicSuggestion("c1");
+
     expect(r.error).toBeNull();
     const update = mock
-      .callsFor("charities")
+      .callsFor("charity_profiles")
       .find((c) => c.method === "update")!;
-    expect(update.args[0]).toEqual({
+    expect(update.args[0]).toMatchObject({
       perfect_topic_suggested_id: null,
       perfect_subset_suggested_id: null,
     });
+    expect(
+      mock.callsFor("charity_profiles").find((c) => c.method === "eq")?.args,
+    ).toEqual(["registered_number", "207076"]);
   });
 
-  it("leaves the CONFIRMED topic alone", async () => {
+  it("never touches the account — the CONFIRMED topic lives there", async () => {
+    mock.queue({ registered_number: "207076" });
     mock.queue(null);
+
     await dismissPerfectTopicSuggestion("c1");
-    const update = mock
-      .callsFor("charities")
-      .find((c) => c.method === "update")!;
-    expect(update.args[0]).not.toHaveProperty("perfect_topic_id");
+
+    expect(mock.callsFor("charities").some((c) => c.method === "update")).toBe(
+      false,
+    );
+  });
+
+  it("says so when the number is not a shape the profile key accepts", async () => {
+    mock.queue({ registered_number: "GB-CHC-99999999" });
+
+    const r = await dismissPerfectTopicSuggestion("c1");
+
+    expect(r.error).toMatch(/no profile/i);
+    expect(mock.callsFor("charity_profiles")).toHaveLength(0);
   });
 });

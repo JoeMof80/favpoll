@@ -345,7 +345,36 @@ closed on an unverifiable charity is correct.
    Also found: the register has an EIGHT-digit number (19262026, a CIO
    registered in March 2026), which broke the first backfill — nothing in
    the code should assume six or seven.
-2. Move the two backfills and the outreach queue onto it.
+2. Move the two backfills and the outreach queue onto it. DONE 2026-10-04
+   (migration 20261004180000): the suggestions (perfect topic, subset,
+   reason, cause family, signature events, website_read_at) are carried
+   onto `charity_profiles` and read from there by both admin queues, by
+   the organiser's add-a-charity path, and by both backfills, which now
+   take `--wave` and write for any registered number. The old columns on
+   `charities` are untouched and read by nothing — step 5 drops them with
+   the register copies; copying and dropping in one migration would make a
+   rollback a data loss. `cause_family_suggested` moved with them (the
+   note's list predates it; same species).
+   The WAVE FILTER is `charity_outreach_candidates(income_floor, limit)`:
+   171,909 Registered → 103,392 with a website → 40,255 with a
+   classification the floor maps → 12,904 above £100k, accounts excluded.
+   93% gone before a call, as decision 4 said it would be.
+   THE CAP is `apps/web/lib/model-spend.ts` + the `model_spend` ledger,
+   checked where the model is CALLED so a wave, a backfill, the wizard and
+   an admin's click all pay into one monthly budget
+   (`MODEL_SPEND_CAP_USD`, default $25); a reached cap costs the
+   suggestion and never the charity.
+   MODEL PER TASK: the none/not-none judgement now reads its own
+   `LLM_JUDGEMENT_MODEL_ID` (default claude-sonnet-5). It used to read
+   `LLM_MODEL_ID` — the STORY GENERATOR's variable, which is pinned to
+   `claude-haiku-4-5-20251001` on dev and is also set in production. So
+   until today the judgement decision 4 was run to settle was silently
+   being made by the model it rejected. WORTH CHECKING what production's
+   `LLM_MODEL_ID` is set to, for the Story generator's own sake.
+   Verified on dev by running a real two-charity wave: Arts Council
+   England → Painter or artist, Canal & River Trust → River, Quadrature
+   Climate Foundation → none with its reason; ledger rows carry the model,
+   the wave label and the cost.
 3. The number route for the page, private by default, register-only
    rendering when the profile is empty.
 4. Point the wizard's Generate and the Story engine at the mirror for

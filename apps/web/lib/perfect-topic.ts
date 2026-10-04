@@ -1,4 +1,20 @@
 import Anthropic from "@anthropic-ai/sdk"
+import { recordSpend, spendAvailable } from "@/lib/model-spend"
+
+/** THE BETTER MODEL, deliberately (decision 4 of the charity-profiles
+ *  note, measured 2026-10-04): over the gold set Sonnet and Haiku both
+ *  score 27/33, but Haiku offered "Children's book" to the NSPCC and to
+ *  Save the Children, while Sonnet refused all 21 charities that must have
+ *  none. A missed topic costs a click; that costs the relationship.
+ *
+ *  Its OWN env var, not `LLM_MODEL_ID`. That one is the Story generator's,
+ *  and it is pinned to a Haiku id on dev and set in production too — so
+ *  reading it here meant a cost decision about Story copy silently
+ *  reassigned this judgement to the model the measurement rejected. Model
+ *  per task, not per pipeline: the saving belongs on the summarising work
+ *  either side (lib/charity-events.ts), never on the none/not-none call. */
+export const PERFECT_TOPIC_MODEL = () =>
+  process.env.LLM_JUDGEMENT_MODEL_ID ?? "claude-sonnet-5"
 import type { CauseFamily } from "@favpoll/types"
 
 // A charity's PERFECT TOPIC (founder, 2026-09-25): the one favourite a
@@ -21,6 +37,10 @@ export type PerfectTopicInput = {
   causeFamily: CauseFamily | null
   grantMaking: boolean | null
   areas?: { area: string; type: string }[] | null
+  /** For the spend ledger: which charity the money went on, and the
+   *  outreach wave it was spent for. */
+  registeredNumber?: string | null
+  wave?: string | null
   /** The live catalogue: every active topic with a few of its items and
    *  its approved SUBSETS (favpoll-topic-rules §1), which the model may
    *  name instead of inventing a list. */
@@ -93,13 +113,26 @@ export async function suggestPerfectTopic(
   if (!process.env.ANTHROPIC_API_KEY) return null
   if (!input.activities && !input.objects) return null
   if (input.topics.length === 0) return null
+  // THE CAP (decision 4) is checked where the model is called, so a wave
+  // and an admin's click are held to the same budget.
+  if (!(await spendAvailable())) {
+    console.warn("[perfect-topic] the model spend cap is reached — skipped")
+    return null
+  }
   try {
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+    const model = PERFECT_TOPIC_MODEL()
     const message = await client.messages.create({
-      // The Story generator's model: the judgement is the same kind.
-      model: process.env.LLM_MODEL_ID ?? "claude-sonnet-5",
+      model,
       max_tokens: 800,
       messages: [{ role: "user", content: buildPrompt(input) }],
+    })
+    void recordSpend({
+      task: "perfect_topic",
+      model,
+      usage: message.usage,
+      registeredNumber: input.registeredNumber ?? null,
+      wave: input.wave ?? null,
     })
     const text =
       message.content.find(
