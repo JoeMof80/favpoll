@@ -13,15 +13,12 @@ type Props = {
   useAllTime?: boolean
   rankingView?: "amount" | "count"
   isOrganiser?: boolean
-  /** "display" = projector scale (the live page) */
-  size?: "default" | "display"
 }
 
 export function RankingList({
   initialItems,
   rankingView = "amount",
   isOrganiser = false,
-  size = "default",
 }: Props) {
   const { items, announcement, maxValue } = useRankingItems(
     initialItems,
@@ -38,10 +35,7 @@ export function RankingList({
       >
         {announcement}
       </span>
-      <ol
-        aria-label="Rankings"
-        className={size === "display" ? "space-y-5" : "space-y-3"}
-      >
+      <ol aria-label="Rankings" className="space-y-3">
         {items.map((item) => {
           const value =
             rankingView === "amount"
@@ -84,7 +78,6 @@ export function RankingList({
                 widthPercent={barWidth}
                 barClassName="transition-all duration-700 ease-out"
                 labelSuffix={labelSuffix}
-                size={size}
               />
             </li>
           )

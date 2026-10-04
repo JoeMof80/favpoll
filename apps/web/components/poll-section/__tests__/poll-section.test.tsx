@@ -505,27 +505,40 @@ describe("PollSection — a suspended favpoll reads as a closed one", () => {
   })
 })
 
-// ─── The projector's type ramp ───────────────────────────────────────────────
+// ─── The room is the page ───────────────────────────────────────────────────
 
-// THE ROOM HAD THE HEADING SMALLER THAN ITS OWN LIST (measured at
-// 1920x1080: a 17px topic over 24px ranking labels, the same 17px a phone
-// gets). The topic line reads --display-topic, which only the room and the
-// still that depicts it set; the eyebrow keeps the surface's own size so
-// the taller block still fits a 1080-high screen.
-describe("PollSection — the projector's type ramp", () => {
-  const topicLine = () => screen.getByText("Colour")
+// FOUNDER, 2026-10-04: "the topic heading is sticky on the live page. why?
+// we don't need the live page to be sticky" — and, on the type: "i don't
+// know why you scaled up the standings from the favpoll page design". The
+// room renders the page, at the page's sizes; an organiser who needs it
+// bigger zooms the browser.
+describe("PollSection — the room is the page", () => {
+  // The heading row is the section's first child.
+  const headingRow = (c: HTMLElement) =>
+    c.querySelector("section > div")!.className
 
-  it("the room's topic reads the ramp, the eyebrow does not", () => {
-    render(<PollSection {...BASE_PROPS} entitled hasPledged size="display" />)
-    expect(topicLine().className).toContain(
-      "text-[length:var(--display-topic,17px)]"
+  it("pins the heading on the guest page", () => {
+    const { container } = render(
+      <PollSection {...BASE_PROPS} entitled hasPledged />
     )
-    expect(screen.getByText("Favourite").className).toContain("text-[17px]")
+    expect(headingRow(container)).toContain("sticky")
   })
 
-  it("the guest page keeps its own size, ramp or no ramp", () => {
+  it("does not pin it in the room, which has nothing to pin under", () => {
+    const { container } = render(
+      <PollSection {...BASE_PROPS} entitled hasPledged room />
+    )
+    expect(headingRow(container)).not.toContain("sticky")
+    expect(headingRow(container)).not.toContain("hero-stuck-bottom")
+  })
+
+  it("renders the topic at the page's own size in both", () => {
+    const { unmount } = render(
+      <PollSection {...BASE_PROPS} entitled hasPledged room />
+    )
+    expect(screen.getByText("Colour").className).toContain("text-[17px]")
+    unmount()
     render(<PollSection {...BASE_PROPS} entitled hasPledged />)
-    expect(topicLine().className).toContain("text-[17px]")
-    expect(topicLine().className).not.toContain("--display-topic")
+    expect(screen.getByText("Colour").className).toContain("text-[17px]")
   })
 })

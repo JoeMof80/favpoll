@@ -174,105 +174,24 @@ export function heroNameSizeClass(name: string, compact = false): string {
     : `${heroNameMobileSizeClass(name)} sm:text-4xl`
 }
 
-/**
- * The projector type ramp (founder, 2026-08-06).
- *
- * The display is the one surface meant to be read from the far side of a
- * room, and every size on it was fixed: an 18px ranking label on a 1920
- * projector is roughly 13mm of text on a 65" screen, which from ten metres
- * is around 4-5 arcminutes of visual angle where comfortable reading wants
- * closer to 10. Widening the content column would not have moved that by a
- * millimetre — it spreads the same small type further apart. SIZE is the
- * lever, not width, which is why the gutters were left alone: from 1600px
- * they are the QR rail, and that is real work.
- *
- * Delivered as custom properties rather than props because the ranking bars
- * and the poll section are shared components — they read these with the
- * CURRENT size as the fallback, so every other surface is untouched and no
- * flag has to be threaded down.
- *
- * vw, not container units: a projector IS the viewport. That also means the
- * landing page's framed still must NOT opt in — it renders at a fixed 900px
- * inside whatever viewport the visitor has, so vw-scaled type would burst
- * its layout on a large monitor. DisplayScreen applies these only when
- * `live`.
- *
- * Each is clamp(today's size, vw-relative, ceiling): unchanged at 1440 and
- * below, growing to the cap at about 2880.
- */
-const ROOM_TYPE_RAMP = {
-  /**
-   * Money figure / protagonist name — today's sm:text-4xl at the floor.
-   *
-   * UNCONSUMED SINCE #984, AND DELIBERATELY SO (2026-10-03). It was written
-   * for DisplayScreen, where the money WAS the hero. The room's fundraiser
-   * dial is not that page: its figure is a `text-2xl` line inside a
-   * hard-coded `h-[29px]` box (components/heroes/fundraiser-slots), and the
-   * box exists so the goal card and the countdown card are ONE HEIGHT — the
-   * founder settled that column to the pixel (the hairline the bar
-   * straddles, the organiser row's border it meets). Scaling the figure to
-   * this clamp — 50px at 1920 against a 29px box — breaks every one of
-   * those relationships.
-   *
-   * So applying it is not a type change but a re-tune of the left column,
-   * with the countdown's digits and the still beside it. The founder's
-   * call, not a tidy-up. Measured and left alone.
-   */
-  "--display-figure": { floor: 2.25, vw: 2.6, cap: 4.5 },
-  /**
-   * "FAVOURITE HOT DRINK" — the floor was today's md:text-2xl when this was
-   * tuned, and the heading has since been rebuilt at 17px (poll-heading's
-   * TOPIC_TEXT), so the floor now sits ABOVE the page's own size rather
-   * than level with it. That is the right way round for a projector: the
-   * room was rendering the heading at 17px against 24px ranking labels, a
-   * heading smaller than the list it labels.
-   *
-   * Consumed by the TOPIC LINE ONLY (poll-heading's `ramp`). Two lines at
-   * 1.7vw overflowed a 1080-high screen by 13px, and the room's spare
-   * height is an invariant (#984), so the eyebrow keeps the surface's own
-   * size and the topic takes the ramp alone.
-   */
-  "--display-topic": { floor: 1.5, vw: 1.7, cap: 3 },
-  /** Ranking labels and amounts — today's text-lg at the floor. */
-  "--display-rank": { floor: 1.125, vw: 1.25, cap: 2.25 },
-  /** Bar thickness, so the bars keep their weight against the labels. */
-  "--display-bar": { floor: 0.5, vw: 0.55, cap: 1 },
-} as const
-
-type RoomTypeScale = Record<keyof typeof ROOM_TYPE_RAMP, string>
-
-const RAMP_KEYS = Object.keys(ROOM_TYPE_RAMP) as (keyof typeof ROOM_TYPE_RAMP)[]
-
-export const roomTypeScale = RAMP_KEYS.reduce((out, key) => {
-  const r = ROOM_TYPE_RAMP[key]
-  out[key] = `clamp(${r.floor}rem, ${r.vw}vw, ${r.cap}rem)`
-  return out
-}, {} as RoomTypeScale)
-
-/**
- * The same ramp RESOLVED AT A FIXED WIDTH, for a still.
- *
- * A still depicting a screen has a width of its own and must not use the vw
- * form: vw would track the visitor's browser window, so the same depicted
- * screen would render different type on a laptop and a large monitor — which
- * is the bug the note above warns about, and the reason `live` gated the ramp
- * in the first place. Resolving the clamp against the DEPICTED width gives a
- * still the room's own type without ever consulting the viewport.
- *
- * One definition of the ramp, two renderings of it, so a change to the
- * projector's type cannot miss the still that claims to show it.
- */
-export function roomTypeScaleAtWidth(width: number): RoomTypeScale {
-  return RAMP_KEYS.reduce((out, key) => {
-    const r = ROOM_TYPE_RAMP[key]
-    const px = Math.min(
-      Math.max(r.floor * 16, (r.vw / 100) * width),
-      r.cap * 16
-    )
-    out[key] = `${px}px`
-    return out
-  }, {} as RoomTypeScale)
-}
+// THE PROJECTOR TYPE RAMP IS GONE (founder, 2026-10-04: "i don't know why
+// you scaled up the standings from the favpoll page design" — and, on
+// uniform scaling, "I tested zooming in the browser to 110% and 125% and it
+// works nicely if an organiser needs to uniform scale. I want it that way").
+//
+// It was tuned 2026-08-06 for DisplayScreen, where the money was the hero,
+// and I carried it onto the composed room in #984: the room's ranking
+// labels read 24px against the page's 14px, and #1003 took the topic
+// heading to 32.64px. That is a hand-tweak of a copy of the page, which is
+// the opposite of the direction the room was rebuilt under — the display IS
+// the favpoll page, presented in a room.
+//
+// So the room renders the page's own sizes, and BROWSER ZOOM is the lever
+// when a room needs it bigger: it scales every relationship at once, which
+// is what the per-element ramp could not do without breaking the geometry
+// settled in #984 (the goal card's 29px box against the countdown's).
+// ROOM_TYPE_RAMP, roomTypeScale, roomTypeScaleAtWidth and RoomTypeScale
+// were deleted here; git history has the numbers if a ramp is ever wanted.
 
 /**
  * The display as a screen in a room: 1920 x 1080, the size a projector

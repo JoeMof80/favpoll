@@ -130,8 +130,8 @@ type Props = {
   /** The picks are in (lib/picks-suspended): the lock card teaches the
    *  pot's path and the standings say they are frozen. */
   picksSuspended?: boolean
-  /** "display" = the projector's scale, for the room's screen. */
-  size?: "default" | "display"
+  /** The screen in the room: no sticky heading, nothing to pin under. */
+  room?: boolean
   /** Real item list — may be zeroed until entitled */
   initialItems: Favourite[]
   /** Called when the merged header-button is clicked pre-pledge */
@@ -160,7 +160,7 @@ export function PollSection({
   favpollId,
   onOpenStory,
   picksSuspended = false,
-  size = "default",
+  room = false,
 }: Props) {
   const { rankingView, setRankingView } = usePollSection({
     pollId: poll.id,
@@ -208,18 +208,25 @@ export function PollSection({
           Mobile pins under the identity bar's MEASURED height
           (--identity-bar-h, published while it shows; 51px was the
           one-row bar the old 6.6875rem was tuned to, 2026-09-29). */}
-      <div className="sticky top-[calc(3.5rem+var(--identity-bar-h,3.1875rem))] z-20 bg-background md:top-(--hero-stuck-bottom,13.75rem)">
+      <div
+        className={
+          room
+            ? // NOTHING TO PIN UNDER (founder, 2026-10-04: "the topic
+              // heading is sticky on the live page. why? we don't need the
+              // live page to be sticky"). The offsets below are the guest
+              // page's furniture — the identity bar on a phone, the settled
+              // hero on a desktop — and the room has neither, so it was
+              // falling back to a literal 13.75rem and pinning the heading
+              // 220px down the screen the moment that column scrolled.
+              "bg-background"
+            : "sticky top-[calc(3.5rem+var(--identity-bar-h,3.1875rem))] z-20 bg-background md:top-(--hero-stuck-bottom,13.75rem)"
+        }
+      >
         {/* ONE heading row for all breakpoints — PollHeading left,
             ... dropdown right. Same pattern mobile and desktop. */}
         <div className="flex min-h-9 items-center gap-2 py-3">
           <div className="min-w-0 flex-1">
-            <PollHeading
-              topicTitle={poll.topics.title}
-              inert
-              // The room reads the projector's type ramp; the guest page
-              // leaves the variable unset and keeps its own 17px.
-              ramp={size === "display"}
-            />
+            <PollHeading topicTitle={poll.topics.title} inert />
           </div>
           {picksSuspended && !isClosed && (
             /* THE PICKS ARE IN (founder, 2026-10-02): a state mark at the
@@ -347,7 +354,6 @@ export function PollSection({
                 topicId={poll.topic_id}
                 rankingView={rankingView}
                 isOrganiser={isOrganiser}
-                size={size}
               />
             </>
           ) : (
