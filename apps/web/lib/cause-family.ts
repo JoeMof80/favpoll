@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk"
+import { recordSpend, spendAvailable } from "@/lib/model-spend"
 import { CAUSE_FAMILIES, type CauseFamily } from "@favpoll/types"
 
 // Suggests a charity's cause family from what the register says it does
@@ -40,6 +41,8 @@ export type CauseFamilyInput = {
   objects?: string | null
   /** The register's own grant-making flag: true means no family. */
   grantMaking?: boolean | null
+  /** For the spend ledger: which charity the money went on. */
+  registeredNumber?: string | null
 }
 
 function buildPrompt(input: CauseFamilyInput): string {
@@ -78,15 +81,28 @@ export async function suggestCauseFamily(
   // BHF and Save the Children all carry it, because they fund others.
   // It goes to the model as a fact, 2026-09-25.)
   if (!input.activities && !input.classification && !input.objects) return null
+  // THE CAP (decision 4): an admin adding a charity spends here, and that
+  // touch counts against the same budget as a wave.
+  if (!(await spendAvailable())) {
+    console.warn("[cause-family] the model spend cap is reached — skipped")
+    return null
+  }
 
   try {
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+    // A one-word classification: Haiku, per the pairing table's cost
+    // note. LLM_MODEL_ID is the Story generator's model — kept separate.
+    const model = process.env.LLM_CLASSIFIER_MODEL_ID ?? "claude-haiku-4-5"
     const message = await client.messages.create({
-      // A one-word classification: Haiku, per the pairing table's cost
-      // note. LLM_MODEL_ID is the Story generator's model — kept separate.
-      model: process.env.LLM_CLASSIFIER_MODEL_ID ?? "claude-haiku-4-5",
+      model,
       max_tokens: 64,
       messages: [{ role: "user", content: buildPrompt(input) }],
+    })
+    void recordSpend({
+      task: "cause_family",
+      model,
+      usage: message.usage,
+      registeredNumber: input.registeredNumber ?? null,
     })
     const text = message.content
       .find(

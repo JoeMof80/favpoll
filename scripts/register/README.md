@@ -82,6 +82,57 @@ against the mirror's current text, so it catches a change WITHIN one
 extract date — which `extract_date` cannot, since income and year-end move
 for all 172k every quarter.
 
+## An outreach wave (step 2)
+
+A wave spends model money on register charities nobody has ever contacted,
+so the first question is who is worth spending it on.
+`charity_outreach_candidates(income_floor, limit)` answers it with four
+`where` clauses on tables we already hold — Registered, has a website, has
+a classification the rule floor maps, income above a floor — and excludes
+anyone who already has an account (that is the consent queue's business,
+not a wave's). Measured on dev:
+
+| | charities |
+|---|---|
+| Registered | 171,909 |
+| + has a website | 103,392 |
+| + a classification the floor maps | 40,255 |
+| + income >= £100,000 | 12,904 |
+
+93% of the register is gone before a single call. That is decision 4's
+point: the filter is the lever, not the model price. £25k leaves 22,341 and
+£500k leaves 3,687, so a wave passes the floor it wants.
+
+Both profile backfills take `--wave`, writing to `charity_profiles` for any
+registered number:
+
+    pnpm exec tsx --env-file=.env.local ../../scripts/backfill-perfect-topic.ts \
+      --wave="2026-10 arts" --income=500000 --limit=50
+    pnpm exec tsx --env-file=.env.local ../../scripts/backfill-signature-events.ts \
+      --wave="2026-10 arts" --income=500000 --limit=50
+
+Without `--wave` they do what they always did: account charities, whose
+suggestions the admin consent queue shows.
+
+**The spend cap** lives in `apps/web/lib/model-spend.ts`, not in a script
+flag — decision 4 asks it to cover "admin on-demand touches as well", and
+clicking through the queue is the motion that spends invisibly. So the
+check sits where the model is CALLED: a wave, a backfill, the organiser's
+wizard adding a charity, and an admin's click all pay into one ledger
+(`model_spend`) and stop at the same monthly cap (`MODEL_SPEND_CAP_USD`,
+default $25). A reached cap costs the suggestions and never the charity or
+the favpoll.
+
+**Model per task, not per pipeline.** The none/not-none judgement runs on
+the better model (`LLM_JUDGEMENT_MODEL_ID`, default `claude-sonnet-5`) — on
+the gold set Haiku offered "Children's book" to the NSPCC and to Save the
+Children. The extraction either side of it runs on the cheap one
+(`LLM_CLASSIFIER_MODEL_ID`, default `claude-haiku-4-5`). The judgement has
+its own env var deliberately: it used to read `LLM_MODEL_ID`, which is the
+Story generator's and is pinned to a Haiku id on dev, so a cost decision
+about Story copy was silently reassigning this call to the model the
+measurement rejected.
+
 ## Mining it for perfect topics (the pilot)
 
 The pilot pipeline behind `references/perfect-topics-2026-09-26.md` (the
