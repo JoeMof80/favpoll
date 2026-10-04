@@ -376,7 +376,35 @@ closed on an unverifiable charity is correct.
    Climate Foundation → none with its reason; ledger rows carry the model,
    the wave label and the cost.
 3. The number route for the page, private by default, register-only
-   rendering when the profile is empty.
+   rendering when the profile is empty. DONE 2026-10-04.
+   `/charities/<number>` is the same segment as the account page, because
+   the number is the general case the account page is a special case of:
+   `profileKeyFromParam` tells a registered number from a uuid (and keeps
+   a linked charity's "-1" suffix, which stripping hyphens would turn into
+   a different charity). Behaviour, probed against the running app:
+   - a number whose account is APPROVED and listed → 307 to
+     `/charities/<uuid>`, the public page, so there is one canonical URL
+     per charity;
+   - any other number → the PRIVATE page for staff (the appeals
+     allowlist, which that file already says becomes a role check when
+     charity accounts exist) and 404 for everyone else;
+   - a number the register has never held → 404.
+   The page wears the account page's own composition, so the page a
+   charity is shown at onboarding is the page it will have, and the first
+   thing on it says it is not public and why ("no account yet", "agreement
+   still pending", "the register has removed this charity"), with
+   `robots: index:false` on the route. The profile's og:image sits where
+   the logo goes — private surfaces only, decision 2 — and falls back to
+   the initial tile, which is all it can do until something fetches one.
+   With no profile at all it renders from the mirror alone and says what
+   it does not know ("We have not picked a favourite for X yet. Some
+   charities suit one and some honestly do not, and this page says so
+   rather than guessing").
+   NOT CHANGED, and visible here: `placeFromAddress` takes the last two
+   address lines, which on these rows reads "Lever Street, Manchester"
+   rather than "Manchester". The charity picker has shown it that way
+   since September, so it stays as it is rather than being quietly
+   re-cut on this page alone.
 4. Point the wizard's Generate and the Story engine at the mirror for
    purpose and contact (already the case for verification and search).
 5. Drop the register copies from `charities` once nothing reads them.
