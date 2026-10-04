@@ -52,7 +52,7 @@ import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createClient } from "@supabase/supabase-js";
-import type { CauseFamily, Pronoun } from "@favpoll/types";
+import { profileKey, type CauseFamily, type Pronoun } from "@favpoll/types";
 import {
   aboutNamesEvent,
   BABY_OCCASIONS,
@@ -69,6 +69,7 @@ import {
   hasTics,
   slipsToSingular,
 } from "../apps/web/lib/actions/generate-draft-utils";
+import { mirrorContactAndPurpose } from "../apps/web/lib/register-mirror";
 import { OCCASION_TYPES_BY_REGISTER } from "../apps/web/lib/registers";
 import { OCCASIONS, type OccasionContext } from "../apps/web/lib/occasions";
 
@@ -1087,7 +1088,7 @@ async function seed() {
     supabase
       .from("charities")
       .select(
-        "id, name, description, activities, cause_family, objects, areas, perfect_topic_reason, perfect_topic:topics!charities_perfect_topic_id_fkey(title), perfect_subset:topic_subsets!charities_perfect_subset_id_fkey(id, title, topic_subset_items(favourite_id))",
+        "id, name, description, registered_number, cause_family, perfect_topic:topics!charities_perfect_topic_id_fkey(title), perfect_subset:topic_subsets!charities_perfect_subset_id_fkey(id, title, topic_subset_items(favourite_id))",
       )
       .eq("is_active", true)
       .not("cause_family", "is", null),
@@ -1097,7 +1098,47 @@ async function seed() {
   const topics = ((topicsData ?? []) as Topic[]).filter(
     (t) => t.favourites.length >= 5,
   );
-  const charities = (charitiesData ?? []) as Charity[];
+  // STEP 4/5: the register's own words come from the MIRROR and the
+  // suggestion's reason from the PROFILE — the copies on `charities` are
+  // gone. The generator reads exactly the same way (generate-draft's
+  // fetchCharity), which is the point: one source, two callers.
+  const accounts = (charitiesData ?? []) as (Charity & {
+    registered_number: string | null;
+  })[];
+  const mirror = await mirrorContactAndPurpose(
+    accounts.map((c) => c.registered_number),
+  );
+  const { data: profileRows } = await supabase
+    .from("charity_profiles")
+    .select("registered_number, perfect_topic_reason")
+    .in(
+      "registered_number",
+      accounts
+        .map((c) => profileKey(c.registered_number))
+        .filter((k): k is string => k !== null),
+    );
+  const reasons = new Map(
+    (
+      (profileRows ?? []) as {
+        registered_number: string;
+        perfect_topic_reason: string | null;
+      }[]
+    ).map((r) => [r.registered_number, r.perfect_topic_reason]),
+  );
+  const charities = accounts.map((c) => {
+    const row = mirror.get((c.registered_number ?? "").replace(/\D/g, ""));
+    const key = profileKey(c.registered_number);
+    return {
+      ...c,
+      activities: row?.activities ?? null,
+      objects: row?.objects ?? null,
+      areas: (row?.areas ?? []).map((a) => ({
+        area: a.description,
+        type: a.type,
+      })),
+      perfect_topic_reason: (key ? reasons.get(key) : null) ?? null,
+    } as Charity;
+  });
   // The APPROVED subsets the table names in their own right, by parent.
   const { data: subsetRows, error: sErr } = await supabase
     .from("topic_subsets")
