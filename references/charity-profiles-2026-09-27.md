@@ -321,7 +321,30 @@ closed on an unverifiable charity is correct.
 ## What happens next
 
 1. Migration: `charity_profiles` keyed by registered number, with the
-   rule-floor `topic_family` computed for every registered row.
+   rule-floor `topic_family` computed for every registered row. DONE
+   2026-10-04 (migration 20261004160000): 171,909 profiles on dev, the
+   floor for all of them up front (the founder's call — the model's work
+   is still made on touch, as below; only the free part is pre-computed).
+   Two things the data changed:
+   - THE FLOOR IS A CATALOGUE CATEGORY, as the examples in this note
+     always said (Animals → animal topics, Environment → landscapes and
+     rivers, Religious → hymns), and NEVER a cause family. Mapping the
+     same codes to cause families scores 26 of 59 against the founder's
+     confirmed set and fails worst where it matters: every hospice comes
+     out `health_condition`, every mental-health charity the same, Age UK
+     comes out `homelessness`. The WHO axis cannot save it —
+     "Children/young People" is ticked by 95,769 charities, five of our
+     seven hospices among them.
+   - A MISSION GUARD was needed. A subject code sitting incidentally on a
+     charity whose work is care gave the RNLI "Books & Arts", FareShare
+     "Nature" and RNIB "Sport". So any of health, disability, poverty,
+     overseas aid or housing silences the subject claim: the rule then
+     speaks for 11 of the 59 and is right 11 times, covering 36% of the
+     register instead of 51%. Decision 1's own reasoning picks that
+     trade.
+   Also found: the register has an EIGHT-digit number (19262026, a CIO
+   registered in March 2026), which broke the first backfill — nothing in
+   the code should assume six or seven.
 2. Move the two backfills and the outreach queue onto it.
 3. The number route for the page, private by default, register-only
    rendering when the profile is empty.

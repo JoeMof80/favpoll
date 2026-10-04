@@ -260,6 +260,20 @@ async function main() {
       console.log("refreshed register_search_rows");
     }
 
+    // THE PROFILE FLOOR (charity_profiles, migration 20261004160000)
+    // follows the mirror: every Registered charity gets its rule-floor
+    // profile. Deliberately NOT called from here — measured at 11s over
+    // 172k rows against an 8s statement timeout on the API, so the call
+    // would be cancelled and rolled back every time. One statement in the
+    // SQL editor, like the search view's refresh when that times out. (If
+    // it ever wants automating, batch it by registered_number range: a
+    // range is an index scan, where the whole-table pass is a 5s seq scan
+    // of the mirror's wide rows.)
+    console.log(
+      "run this in the SQL editor to give new charities their profile:\n" +
+        "  select refresh_charity_profiles();",
+    );
+
     // THE REMOVAL CHECK — the standing of every account charity against
     // the register we have just refreshed. Printed, never fatal: the load
     // succeeded, and what it found is a human's call.
