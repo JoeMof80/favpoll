@@ -245,13 +245,51 @@ Each is a `where` clause on a table we already hold, and together they
 make the per-profile price much less interesting than it looks.
 
 THE MODEL ITSELF IS A THIRD LEVER (founder, 2026-10-04, asking whether
-this could be outsourced to bring costs down). Profile work is
-EXTRACTION, not authorship — read these objects, pick from a fixed
-catalogue, or say none — which is Haiku-shaped. To be measured, not
-assumed: run both models over the gold set that exists (the 11 perfect
-topics confirmed by hand on production, plus the honest "none"
-answers) and compare. If Haiku agrees, the per-profile cost drops by
-roughly an order of magnitude and the cap stops mattering much.
+this could be outsourced to bring costs down). Profile work looked like
+EXTRACTION rather than authorship — read these objects, pick from a
+fixed catalogue, or say none — which is Haiku-shaped. It was measured
+rather than assumed, and the answer is NO for this call.
+
+MEASURED 2026-10-04. Both models run over the gold set on production
+(the 12 confirmed perfect topics and the 21 explicit "none"s with
+recorded reasons; 9 never-processed charities excluded), reading the
+real register rows and the live 140-topic catalogue. `perfect-topic.ts`
+already takes its model from `LLM_MODEL_ID`, so no code changed.
+
+| | agrees with the label | must say none (21) | has a topic (12) |
+|---|---|---|---|
+| claude-sonnet-5 | 27/33 | **21/21** | 6/12 |
+| claude-haiku-4-5 | 27/33 | 19/21 | **8/12** |
+
+The headline is a tie and the headline is misleading. The models are
+OPPOSITES: Haiku finds more real topics, Sonnet refuses more reliably,
+and the two Haiku got wrong are the ones that matter —
+
+- NSPCC → "Children's book"
+- Save the Children → "Children's book"
+
+which is exactly the failure the none rule exists to prevent, and the
+one that would go out in an outreach email. Sonnet never once offered a
+topic to a charity that should have none; its six misses are all
+over-caution (Trussell Trust, WWF, Barnardos → NONE), which costs an
+admin a click rather than a relationship. The asymmetry decides it: a
+missed topic is recoverable, a cheerful favourite suggested to a
+child-protection charity is not.
+
+SO: the none/not-none judgement stays on the better model — one short
+call per charity. The saving is still available on the SUMMARISING work
+either side of it, which is most of the tokens: the profile paragraph,
+the signature-events extraction, the examples. Model per task, not per
+pipeline.
+
+TWO THINGS THE RUN TURNED UP, for the founder's eye:
+
+- COMIC RELIEF: both models independently said "Comedian" against the
+  confirmed "Film genre". When two models disagree with a label the
+  same way, the label is worth a second look.
+- TRUSSELL TRUST: both said none; the founder ruled "Comfort food" by
+  hand (2026-09-27). A known divergence — the model will keep proposing
+  none there, so the confirmation has to hold it.
 
 ### 5. Off-register — hand-written, and say so out loud
 
@@ -303,8 +341,10 @@ What the decisions above add to that order, none of it large:
   this: it guards accounts that already exist;
 - the SC/NIC message is independent of all of it and can ship any time.
 
-The Haiku-vs-Sonnet comparison (decision 4) should run before step 2 is
-budgeted, since it moves the per-profile cost by an order of magnitude.
+The Haiku-vs-Sonnet comparison (decision 4) RAN on 2026-10-04 and
+settled the wrong way: the cheap model is not safe for the none
+judgement. Step 2's budget assumes the better model for that one call
+and the cheap one for the summarising either side of it.
 
 Related: `perfect-topics-2026-09-26.md` (the register pilot and the
 founder's lens ruling), `appeals-concept-2026-09-05.md` (the other
