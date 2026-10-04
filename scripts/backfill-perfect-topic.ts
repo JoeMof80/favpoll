@@ -38,7 +38,7 @@
  * ---------------------------------------------------------------------------
  */
 import { createClient } from "@supabase/supabase-js";
-import type { CauseFamily } from "../packages/types";
+import { profileKey, type CauseFamily } from "../packages/types";
 import {
   PERFECT_TOPIC_MODEL,
   catalogueForSuggestion,
@@ -112,9 +112,7 @@ async function accountTargets(): Promise<Target[]> {
       number: String(c.registered_number).trim().toUpperCase(),
       causeFamily: (c.cause_family as CauseFamily | null) ?? null,
     }))
-    .filter((c) =>
-      /^([0-9]{6,10}(-[0-9]+)?|SC[0-9]{3,6}|NIC[0-9]{3,6})$/.test(c.number),
-    );
+    .filter((c) => profileKey(c.number) !== null);
   if (numbers.length === 0) return [];
   const { data: profiles } = await supabase
     .from("charity_profiles")

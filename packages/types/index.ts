@@ -61,9 +61,26 @@ export type Charity = {
   consent_status?: "pending" | "approved" | "declined";
   consent_contacted_at?: string | null;
   consent_decided_at?: string | null;
-  /** The register's public contact (2026-09-08) — outreach + row identity */
+  /** THE REGISTER'S OWN WORDS ARE NOT HERE (step 5 of
+   *  references/charity-profiles-2026-09-27.md). Contact, activities,
+   *  classification, objects, areas and the grant-making flag were copies
+   *  of `register_charities`, kept on the account because the account was
+   *  once the only table. They are read from the mirror now
+   *  (`mirrorContactAndPurpose`, `purposeFromMirror`), and every
+   *  SUGGESTION — the perfect topic, its subset and reason, the cause
+   *  family the model guessed, the events read from the site — lives on
+   *  `charity_profiles`, keyed by the registered number.
+   *
+   *  What stays below is what the account AGREED to. Two fields are
+   *  overlaid onto this type by the readers that still display them
+   *  (admin's queue and table, the wizard's shelf): `registered_email`,
+   *  `registered_website`, `activities` and `cause_family_suggested` are
+   *  declared as optional so those overlays type, and they are never
+   *  columns on `charities` again. */
   registered_email?: string | null;
   registered_website?: string | null;
+  activities?: string | null;
+  cause_family_suggested?: CauseFamily | null;
   /** On the public catalogue — /charities/[id] 404s when false
    *  (register-added charities arrive inactive, pre-consent). */
   is_active?: boolean;
@@ -79,43 +96,17 @@ export type Charity = {
     | null;
   verified_name?: string | null;
   verified_at?: string | null;
-  /** What the charity is FOR, from the Commission register (2026-09-23).
-   *  `activities` is the charity's own free text — prompt source only,
-   *  never displayed raw. `classification` is who_what_where normalised.
-   *  Both null for charities without a registered number. */
-  activities?: string | null;
-  classification?: { what: string[]; who: string[]; how: string[] } | null;
-  /** The charitable objects from the governing document (2026-09-25):
-   *  the legal purpose in the charity's own words. Prompt source only. */
-  objects?: string | null;
-  /** Where it works, from the register: local authorities or countries.
-   *  Local vs national is the relevance axis. */
-  areas?: { area: string; type: string }[] | null;
-  /** The charity's PERFECT TOPIC (2026-09-26): the admin-confirmed one the
-   *  generator and the wizard read, the model's suggestion beside it, and
-   *  one sentence saying why (or why none). */
+  /** The charity's CONFIRMED perfect topic (2026-09-26) — the one the
+   *  generator and the wizard read. The model's suggestion and its reason
+   *  are the profile's. */
   perfect_topic_id?: string | null;
-  perfect_topic_suggested_id?: string | null;
-  perfect_topic_reason?: string | null;
   /** A SUBSET of the perfect topic's items, when the cause pulls for
    *  a narrower list (a city farm's Farm animal). Must belong to
    *  perfect_topic_id (a trigger enforces it). */
   perfect_subset_id?: string | null;
-  /** The suggester's subset, confirmed by an admin into perfect_subset_id. */
-  perfect_subset_suggested_id?: string | null;
-  /** The fundraising events the charity already holds, read from its own
-   *  website (2026-09-27): a suggestion for outreach. */
-  signature_events?: SignatureEvent[] | null;
-  website_read_at?: string | null;
-  /** The register's own flag: grant-making is the main activity, so no
-   *  cause family of its own. */
-  grant_making?: boolean | null;
   /** Admin-CONFIRMED cause family — the only one the generator reads.
    *  null = no cause of its own (a grant-maker), which is a valid answer. */
   cause_family?: CauseFamily | null;
-  /** The model's guess from `activities`; shown to the admin, never read
-   *  by the generator. */
-  cause_family_suggested?: CauseFamily | null;
   created_at: string;
 };
 
@@ -422,3 +413,29 @@ export type CanvasSubmitData = {
   goalAmount?: number | null;
   poll: CanvasPollInput;
 };
+
+// ─── The charity number as a key ─────────────────────────────────────────────
+// `charity_profiles` is keyed by the registered number as the register
+// writes it, and from step 5 of the charity-profiles note that key is the
+// ONLY link between an account and the register's own words. Both apps and
+// the scripts need the same answer to "is this a number, and what is its
+// canonical form", so it lives here rather than in four regexes.
+//
+// Six to ten digits, not the six or seven everyone assumes: the register
+// holds 19262026 (a CIO registered in March 2026). A linked charity's
+// "-1" suffix is KEPT — it is a different charity, and stripping it would
+// silently point at the parent.
+
+export const CHARITY_NUMBER_KEY =
+  /^([0-9]{6,10}(-[0-9]+)?|SC[0-9]{3,6}|NIC[0-9]{3,6})$/;
+
+/** The profile key for a registered number, or null when it is not one
+ *  (a typo, or a regulator we do not mirror). Trimmed and upper-cased;
+ *  nothing else is touched. */
+export function profileKey(
+  registeredNumber: string | null | undefined,
+): string | null {
+  if (!registeredNumber) return null;
+  const key = registeredNumber.trim().toUpperCase();
+  return CHARITY_NUMBER_KEY.test(key) ? key : null;
+}

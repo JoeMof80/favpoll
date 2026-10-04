@@ -32,6 +32,7 @@
  * ---------------------------------------------------------------------------
  */
 import { createClient } from "@supabase/supabase-js";
+import { profileKey } from "../packages/types";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -167,7 +168,7 @@ async function main() {
   for (const name of CLEAR) {
     const { data: charity } = await supabase
       .from("charities")
-      .select("id, name, perfect_topic_id, perfect_topic_suggested_id")
+      .select("id, name, registered_number, perfect_topic_id")
       .eq("name", name)
       .maybeSingle();
     if (!charity) {
@@ -175,7 +176,21 @@ async function main() {
       skipped++;
       continue;
     }
-    if (!charity.perfect_topic_id && !charity.perfect_topic_suggested_id) {
+    // Clearing means both halves: the CONFIRMED topic on the account and
+    // the SUGGESTION on the profile, which step 2 moved there — or the
+    // next wave's suggestion quietly reappears in the queue.
+    const key = profileKey(charity.registered_number as string | null);
+    const { data: profile } = key
+      ? await supabase
+          .from("charity_profiles")
+          .select("perfect_topic_suggested_id")
+          .eq("registered_number", key)
+          .maybeSingle()
+      : { data: null };
+    const suggested =
+      (profile as { perfect_topic_suggested_id: string | null } | null)
+        ?.perfect_topic_suggested_id ?? null;
+    if (!charity.perfect_topic_id && !suggested) {
       console.log(`  = ${name}: already has no topic of its own`);
       continue;
     }
@@ -186,13 +201,18 @@ async function main() {
     }
     const { error } = await supabase
       .from("charities")
-      .update({
-        perfect_topic_id: null,
-        perfect_subset_id: null,
-        perfect_topic_suggested_id: null,
-        perfect_subset_suggested_id: null,
-      })
+      .update({ perfect_topic_id: null, perfect_subset_id: null })
       .eq("id", charity.id);
+    if (!error && key) {
+      await supabase
+        .from("charity_profiles")
+        .update({
+          perfect_topic_suggested_id: null,
+          perfect_subset_suggested_id: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("registered_number", key);
+    }
     if (error) {
       console.warn(`  ✗ ${name}: ${error.message}`);
       skipped++;
