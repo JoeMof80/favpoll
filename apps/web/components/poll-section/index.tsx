@@ -184,20 +184,21 @@ export function PollSection({
   // (founder, 2026-08-01). One card, CTA and steps at equal prominence;
   // the steps come from lib/mechanic-steps so the print pack's table
   // cards carry IDENTICAL instructions.
+  // The lock card cannot render on a suspended favpoll: a suspension
+  // makes the page read as a closed one (lib/picks-suspended), so the
+  // viewer is entitled and there is nothing to cover. Its copy knows
+  // nothing about suspension for the same reason.
   const lockSteps = buildMechanicSteps({
     topicTitle: poll.topics.title,
     charityLine,
     hasNote: hasNote,
-    picksSuspended,
   })
 
   // "A note" covers favourite and message reveals alike (founder,
   // 2026-09-17) — the old favourite/message fork is gone.
-  const unlockAriaLabel = picksSuspended
-    ? "Pledge to the shared pot to see the results"
-    : !hasNote
-      ? "Pledge your favourite to see the results"
-      : "Pledge to see a personal note and the results"
+  const unlockAriaLabel = !hasNote
+    ? "Pledge your favourite to see the results"
+    : "Pledge to see a personal note and the results"
 
   return (
     <section
@@ -411,8 +412,6 @@ export function PollSection({
                   <LockCardContent
                     steps={lockSteps}
                     topicTitle={poll.topics.title}
-                    ctaLabel={picksSuspended ? "Pledge to the pot" : undefined}
-                    hideFooter={picksSuspended}
                   />
                 </Button>
               </span>

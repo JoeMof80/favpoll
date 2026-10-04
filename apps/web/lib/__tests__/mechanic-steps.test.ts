@@ -54,32 +54,3 @@ describe("buildMechanicSteps — the personal note (founder, 2026-09-17)", () =>
     expect(steps[2]).toBe("Reveal where your favourite stands among the others")
   })
 })
-
-describe("buildMechanicSteps — the picks are in (founder, 2026-10-02)", () => {
-  it("teaches the pot's path once the picks are suspended", () => {
-    expect(
-      buildMechanicSteps({
-        topicTitle: "Seaside town",
-        charityLine: "Samaritans",
-        picksSuspended: true,
-      })
-    ).toEqual([
-      "The picks are in — pledge to the shared pot",
-      "All money will go to Samaritans",
-      "Reveal where the favourites stand",
-    ])
-  })
-
-  it("still promises the note", () => {
-    const steps = buildMechanicSteps({
-      topicTitle: "Seaside town",
-      charityLine: null,
-      hasNote: true,
-      picksSuspended: true,
-    })
-    expect(steps[1]).toBe("All money will go to charity")
-    expect(steps[2]).toBe(
-      "Reveal where the favourites stand along with a personal note"
-    )
-  })
-})

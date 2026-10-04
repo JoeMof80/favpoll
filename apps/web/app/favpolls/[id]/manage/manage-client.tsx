@@ -249,7 +249,7 @@ export function ManageClient({
   // (lib/picks-suspended), so the warning stops offering to open them.
   // Local, because suspending stamps it server-side in the same tap.
   const standingsAlreadyOpen =
-    !!favpoll.standings_opened_at || suspendAt !== null
+    !!favpoll.picks_first_suspended_at || suspendAt !== null
   const [deleting, setDeleting] = useState(false)
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
   const [copied, setCopied] = useState<string | null>(null)

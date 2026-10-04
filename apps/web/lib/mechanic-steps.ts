@@ -38,9 +38,6 @@ export type MechanicStepsInput = {
   charityLine: string | null
   /** The poll holds a personal note — step 3 says so. */
   hasNote?: boolean
-  /** The picks are suspended (lib/picks-suspended): the card teaches
-   *  the pot's path, not the pick. */
-  picksSuspended?: boolean
 }
 
 // isQuoteReveal / isMessageReveal DELETED 2026-09-17: they only ever
@@ -54,27 +51,8 @@ export function buildMechanicSteps({
   topicTitle,
   charityLine,
   hasNote = false,
-  picksSuspended = false,
 }: MechanicStepsInput): string[] {
   const topic = topicTitle.toLowerCase()
-  // THE PICKS ARE IN (founder, 2026-10-02): once the organiser suspends
-  // the picks there is no favourite to pick — the pledge goes to the
-  // shared pot and the reveal is where the favourites stand.
-  //
-  // UNREACHABLE FROM THE GUEST PAGE since 2026-10-04, and kept on
-  // purpose: a suspension now opens the reveal to everyone, so the lock
-  // card it feeds never renders suspended (there is nothing to lock).
-  // It is one branch of the founder's own copy, and it is what the card
-  // would say again if suspension ever stopped implying an open reveal.
-  if (picksSuspended) {
-    return [
-      "The picks are in — pledge to the shared pot",
-      `All money will go to ${charityLine ?? "charity"}`,
-      hasNote
-        ? "Reveal where the favourites stand along with a personal note"
-        : "Reveal where the favourites stand",
-    ]
-  }
   // "A personal note" (founder, 2026-09-17): authorship-neutral — a
   // personal note can be by them or about them — with no name variants.
   // "From X" and the possessive were both auditioned and rejected as
