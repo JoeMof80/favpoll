@@ -514,13 +514,10 @@ export async function findOrCreateRegisterCharity(input: {
       verification_status: check.status,
       verified_name: check.registeredName,
       verified_at: new Date().toISOString(),
-      registered_email: contact.email,
-      registered_website: contact.website,
-      activities: purpose.activities,
-      classification: purpose.classification,
-      objects: purpose.objects,
-      areas: purpose.areas,
-      grant_making: purpose.grantMaking,
+      // The register's own words are NOT copied here any more (step 4 of
+      // the charity-profiles note): contact and purpose are read from the
+      // mirror wherever they are shown, and step 5 drops these columns.
+      // What the account keeps is what it agrees to.
     })
     .select("*")
     .single()

@@ -85,7 +85,7 @@ export async function getCharities(
   let query = supabase
     .from("charities")
     .select(
-      "id, name, description, logo_url, impact_statement, registered_number, verification_status, verified_name, verified_at, consent_status, consent_contacted_at, consent_decided_at, is_active, market, created_at, cause_family, cause_family_suggested, activities",
+      "id, name, description, logo_url, impact_statement, registered_number, verification_status, verified_name, verified_at, consent_status, consent_decided_at, consent_contacted_at, is_active, market, created_at, cause_family",
     )
     .order("name", { ascending: true });
 
@@ -96,7 +96,31 @@ export async function getCharities(
   const { data, error } = await query;
 
   if (error) return { data: null, error: error.message };
-  return { data: data as Charity[], error: null };
+
+  // The suggested family comes from the PROFILE (step 2) and the
+  // register's own words from the MIRROR (step 4); the account row keeps
+  // what it agreed to.
+  const rows = (data ?? []) as Charity[];
+  const numbers = rows.map((c) => c.registered_number);
+  const [suggestions, register] = await Promise.all([
+    suggestionsByKey(numbers),
+    registerByKey(numbers),
+  ]);
+  return {
+    data: rows.map((c) => {
+      const key = profileKey(c.registered_number);
+      return {
+        ...c,
+        cause_family_suggested: key
+          ? (suggestions.get(key)?.cause_family_suggested ?? null)
+          : null,
+        activities:
+          register.get((c.registered_number ?? "").replace(/\D/g, ""))
+            ?.activities ?? null,
+      };
+    }),
+    error: null,
+  };
 }
 
 /** The form sends the family as a string ("" = no cause of its own). */
@@ -155,13 +179,9 @@ export async function createCharity(input: {
     description: input.description?.trim() || null,
     impact_statement: input.impact_statement?.trim() || null,
     registered_number: registeredNumber,
-    registered_email: contact.email,
-    registered_website: contact.website,
-    activities: purpose.activities,
-    classification: purpose.classification,
-    objects: purpose.objects,
-    areas: purpose.areas,
-    grant_making: purpose.grantMaking,
+    // The register's own words are NOT copied here any more (step 4): the
+    // number is the link, and contact and purpose are read from the mirror
+    // wherever they are shown. Step 5 drops the columns.
     // Hand-entered by an admin, so this IS the confirmed value.
     cause_family: family.family,
     logo_url: logoUrl,
@@ -447,6 +467,52 @@ async function suggestionsByKey(
   );
 }
 
+type RegisterContactAndPurpose = {
+  email: string | null;
+  website: string | null;
+  activities: string | null;
+};
+
+/** THE REGISTER'S OWN CONTACT AND PURPOSE for a set of account numbers
+ *  (step 4 of the charity-profiles note): read from the mirror, not from
+ *  the copies on `charities` that step 5 drops. One query for the queue.
+ *  A charity registered since the extract has no row and simply shows
+ *  nothing — the single-row readers keep the API fallback, a list does
+ *  not earn one. */
+async function registerByKey(
+  numbers: (string | null)[],
+): Promise<Map<string, RegisterContactAndPurpose>> {
+  const digits = [
+    ...new Set(
+      numbers
+        .map((n) => (n ?? "").replace(/\D/g, ""))
+        .filter((n) => n.length > 0),
+    ),
+  ].map(Number);
+  if (digits.length === 0) return new Map();
+  const { data, error } = await createAdminClient()
+    .from("register_charities")
+    .select("registered_number, email, website, activities")
+    .in("registered_number", digits);
+  if (error) {
+    console.error("[charities] mirror unreadable:", error.message);
+    return new Map();
+  }
+  return new Map(
+    (
+      data as {
+        registered_number: number;
+        email: string | null;
+        website: string | null;
+        activities: string | null;
+      }[]
+    ).map((row) => [
+      String(row.registered_number),
+      { email: row.email, website: row.website, activities: row.activities },
+    ]),
+  );
+}
+
 /** Titles for the suggested topic and subset ids a set of profiles holds.
  *  The account's CONFIRMED titles arrive on its own joins; a suggestion
  *  lives on the profile, which holds ids and not names. */
@@ -599,20 +665,23 @@ export async function getConsentQueue(): Promise<{
   const { data, error } = await supabase
     .from("charities")
     .select(
-      "id, name, registered_number, registered_email, consent_contacted_at, cause_family, activities, perfect_topic_id, perfect_subset_id, registered_website, perfect_topic:topics!charities_perfect_topic_id_fkey(title), perfect_subset:topic_subsets!charities_perfect_subset_id_fkey(title)",
+      "id, name, registered_number, consent_contacted_at, cause_family, perfect_topic_id, perfect_subset_id, perfect_topic:topics!charities_perfect_topic_id_fkey(title), perfect_subset:topic_subsets!charities_perfect_subset_id_fkey(title)",
     )
     .eq("consent_status", "pending")
     .in("id", [...counts.keys()])
     .order("name", { ascending: true });
   if (error) return { data: null, error: error.message };
 
-  // The suggestions, from the profile. A charity whose number has no
-  // profile simply has none — the row still works, with nothing suggested.
-  const suggestions = await suggestionsByKey(
-    (data ?? []).map(
-      (c) => (c as { registered_number: string | null }).registered_number,
-    ),
+  // The suggestions, from the profile; the contact and the register's own
+  // words, from the mirror. A charity whose number has neither simply has
+  // nothing to show — the row still works.
+  const numbers = (data ?? []).map(
+    (c) => (c as { registered_number: string | null }).registered_number,
   );
+  const [suggestions, register] = await Promise.all([
+    suggestionsByKey(numbers),
+    registerByKey(numbers),
+  ]);
   const titles = await suggestionTitles(suggestions);
 
   const rows = (data ?? [])
@@ -624,6 +693,9 @@ export async function getConsentQueue(): Promise<{
         | "perfect_subset_title"
         | "register_verdict"
         | "register_removed_on"
+        | "registered_email"
+        | "registered_website"
+        | "activities"
         | "perfect_topic_suggested_id"
         | "perfect_subset_suggested_id"
         | "perfect_topic_reason"
@@ -642,6 +714,9 @@ export async function getConsentQueue(): Promise<{
       const removal = removals.get(rest.id);
       const key = profileKey(rest.registered_number);
       const profile = key ? suggestions.get(key) : undefined;
+      const onRegister = register.get(
+        (rest.registered_number ?? "").replace(/\D/g, ""),
+      );
       // The CONFIRMED titles come from the account's own joins; a
       // suggestion's title is looked up from the profile's ids.
       const suggestedTopic = profile?.perfect_topic_suggested_id
@@ -652,6 +727,9 @@ export async function getConsentQueue(): Promise<{
         : undefined;
       return {
         ...rest,
+        registered_email: onRegister?.email ?? null,
+        registered_website: onRegister?.website ?? null,
+        activities: onRegister?.activities ?? null,
         perfect_topic_suggested_id: profile?.perfect_topic_suggested_id ?? null,
         perfect_subset_suggested_id:
           profile?.perfect_subset_suggested_id ?? null,

@@ -3,6 +3,7 @@
 import { auth } from "@clerk/nextjs/server"
 import { lookupEdges } from "@/lib/pairing-table"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { purposeFromMirror } from "@/lib/register-mirror"
 import { DEFAULT_OCCASION_TYPE } from "@/lib/registers"
 import { generateStory, type StoryCharity } from "@/lib/story-engine"
 import type {
@@ -25,6 +26,14 @@ import {
 // Main action
 // ---------------------------------------------------------------------------
 
+// THE CHARITY'S PURPOSE COMES FROM THE MIRROR (step 4 of
+// references/charity-profiles-2026-09-27.md). The account keeps what is
+// AGREED — its name, the description an admin or the charity wrote, the
+// confirmed cause family and topic — and the register's own words
+// (activities, objects, areas) are read from `register_charities`, whose
+// copies on `charities` step 5 drops. The reason behind the suggested
+// topic moved to the PROFILE in step 2, so it is read there: reading the
+// account's frozen copy would have quoted a reason no wave can refresh.
 async function fetchCharity(
   supabase: ReturnType<typeof createAdminClient>,
   charityId: string | null | undefined
@@ -39,20 +48,35 @@ async function fetchCharity(
   const { data } = await supabase
     .from("charities")
     .select(
-      "name, description, activities, cause_family, objects, areas, perfect_topic_reason, perfect_topic:topics!charities_perfect_topic_id_fkey(title), perfect_subset:topic_subsets!charities_perfect_subset_id_fkey(title)"
+      "name, description, cause_family, registered_number, perfect_topic:topics!charities_perfect_topic_id_fkey(title), perfect_subset:topic_subsets!charities_perfect_subset_id_fkey(title)"
     )
     .eq("id", charityId)
     .single()
   if (!data) return none
+
+  const number = (data.registered_number as string | null) ?? null
+  const key = number ? number.trim().toUpperCase() : null
+  const [purpose, profile] = await Promise.all([
+    number ? purposeFromMirror(number) : Promise.resolve(null),
+    key
+      ? supabase
+          .from("charity_profiles")
+          .select("perfect_topic_reason")
+          .eq("registered_number", key)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+  ])
+  const reason =
+    (profile.data as { perfect_topic_reason: string | null } | null)
+      ?.perfect_topic_reason ?? null
+
   return {
     name: data.name ?? null,
     description: data.description ?? null,
-    activities: data.activities ?? null,
+    activities: purpose?.activities ?? null,
     causeFamily: (data.cause_family as CauseFamily | null | undefined) ?? null,
-    objects: (data.objects as string | null | undefined) ?? null,
-    areas:
-      (data.areas as { area: string; type: string }[] | null | undefined) ??
-      null,
+    objects: purpose?.objects ?? null,
+    areas: purpose?.areas ?? null,
     perfectTopic: (() => {
       const t = data.perfect_topic as
         | { title: string }
@@ -70,7 +94,7 @@ async function fetchCharity(
         ? {
             title: one.title,
             subsetTitle: subset?.title ?? null,
-            reason: (data.perfect_topic_reason as string | null) ?? null,
+            reason,
           }
         : null
     })(),
