@@ -96,6 +96,13 @@ export type Charity = {
     | null;
   verified_name?: string | null;
   verified_at?: string | null;
+  /** A name the register does not recognise, accepted by an admin: ours
+   *  is "WWF" where the register's is "WWF - UK". Dated, attributable,
+   *  and tied to the register name it was accepted against, so it lapses
+   *  if that name changes. See isCharityVerified. */
+  name_accepted_at?: string | null;
+  name_accepted_by?: string | null;
+  name_accepted_name?: string | null;
   /** The charity's CONFIRMED perfect topic (2026-09-26) — the one the
    *  generator and the wizard read. The model's suggestion and its reason
    *  are the profile's. */
@@ -438,4 +445,52 @@ export function profileKey(
   if (!registeredNumber) return null;
   const key = registeredNumber.trim().toUpperCase();
   return CHARITY_NUMBER_KEY.test(key) ? key : null;
+}
+
+// ─── What the verified tick means ────────────────────────────────────────────
+// "We checked the number, the register says this charity is live, and the
+// name is accounted for" — not "our name is identical to the legal name".
+// The name comparison's job is catching a WRONG NUMBER (it found Dogs
+// Trust pointing at DOGS TRUST LEGACY); a name difference the register
+// itself explains is no reason to withhold the tick, and one nothing
+// explains is for a human to look at, not to hide.
+//
+// So the tick shows when the register verified the name, OR when an admin
+// accepted the difference — and that acceptance lapses the moment the
+// register's name changes, because it was an acceptance of one specific
+// discrepancy.
+
+export function isCharityVerified(
+  charity: Pick<
+    Charity,
+    | "verification_status"
+    | "verified_name"
+    | "name_accepted_at"
+    | "name_accepted_name"
+  >,
+): boolean {
+  if (charity.verification_status === "verified") return true;
+  if (charity.verification_status !== "name_mismatch") return false;
+  if (!charity.name_accepted_at) return false;
+  // The acceptance was of a specific register name. A different one now
+  // means it was accepted about something else.
+  return (
+    (charity.name_accepted_name ?? null) === (charity.verified_name ?? null)
+  );
+}
+
+/** The review queue's own question: a name nobody has accounted for. */
+export function charityNameNeedsReview(
+  charity: Pick<
+    Charity,
+    | "verification_status"
+    | "verified_name"
+    | "name_accepted_at"
+    | "name_accepted_name"
+  >,
+): boolean {
+  return (
+    charity.verification_status === "name_mismatch" &&
+    !isCharityVerified(charity)
+  );
 }

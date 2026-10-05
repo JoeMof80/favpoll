@@ -2,10 +2,12 @@
 
 import {
   CAUSE_FAMILIES,
+  charityNameNeedsReview,
   type CauseFamily,
   type SignatureEvent,
 } from "@favpoll/types";
 
+import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
@@ -13,8 +15,6 @@ import {
   type VerificationStatus,
 } from "@/lib/charity-commission";
 import {
-  contactFromMirror,
-  purposeFromMirror,
   searchRegisterMirrorFirst,
   verifyOnMirror,
 } from "@/lib/register-mirror";
@@ -157,22 +157,10 @@ export async function createCharity(input: {
   const name = input.name.trim();
   const registeredNumber = input.registered_number?.trim() || null;
 
-  const [contact, purpose] = registeredNumber
-    ? await Promise.all([
-        contactFromMirror(registeredNumber),
-        purposeFromMirror(registeredNumber),
-      ])
-    : [
-        { email: null, website: null },
-        {
-          activities: null,
-          classification: null,
-          objects: null,
-          areas: null,
-          grantMaking: null,
-        },
-      ];
-
+  // Nothing fetches the register's contact or purpose here any more:
+  // step 4 pointed every reader at the mirror, so copying them onto the
+  // account was removed and these two round trips were left fetching
+  // values that went straight in the bin (the linter noticed).
   const logoUrl = input.logo_url?.trim() || null;
   const { error } = await supabase.from("charities").insert({
     name,
@@ -905,6 +893,166 @@ export async function dismissPerfectTopicSuggestion(
       updated_at: new Date().toISOString(),
     })
     .eq("registered_number", key);
+  if (error) return { error: error.message };
+  revalidatePath("/charities");
+  return { error: null };
+}
+
+// ─── ACCEPTING A NAME THE REGISTER DOES NOT RECOGNISE ───────────────────────
+//
+// The verified tick means "we checked the number, the register says this
+// charity is live, and the name is accounted for". After the working
+// names landed, two charities are left where the register's name differs
+// only by a country qualifier — our WWF is their "WWF - UK" — and
+// loosening the rule to catch them would also make "Age" match "Age UK",
+// where the UK is the brand. So a human says "yes, that's them", once.
+//
+// The acceptance is NOT a status. `verification_status` is the register's
+// answer and the nightly cron recomputes it, so an accepted status would
+// be gone by morning. It is a dated, attributable fact beside the status,
+// tied to the register name it was accepted against — change that name
+// and the acceptance lapses (isCharityVerified in @favpoll/types).
+
+export type NameReviewRow = {
+  id: string;
+  name: string;
+  registered_number: string | null;
+  verified_name: string | null;
+  verified_at: string | null;
+  consent_status: "pending" | "approved" | "declined" | null;
+  is_active: boolean;
+  /** Every name the register knows for the number, so an admin can see
+   *  what they are being asked to accept rather than take it on trust. */
+  register_knows: string[];
+};
+
+/** The charities whose display name the register does not recognise and
+ *  nobody has accepted. Not an error list — a short queue of judgements. */
+export async function getNameReviewQueue(): Promise<{
+  data: NameReviewRow[] | null;
+  error: string | null;
+}> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("charities")
+    .select(
+      "id, name, registered_number, verification_status, verified_name, verified_at, consent_status, is_active, name_accepted_at, name_accepted_name",
+    )
+    .eq("verification_status", "name_mismatch")
+    .order("name", { ascending: true });
+  if (error) return { data: null, error: error.message };
+
+  // Exactly the columns selected — `charityNameNeedsReview` asks for four
+  // of them and the queue row shows the rest.
+  type Selected = {
+    id: string;
+    name: string;
+    registered_number: string | null;
+    verification_status: VerificationStatus | null;
+    verified_name: string | null;
+    verified_at: string | null;
+    consent_status: "pending" | "approved" | "declined" | null;
+    is_active: boolean;
+    name_accepted_at: string | null;
+    name_accepted_name: string | null;
+  };
+  const rows = ((data ?? []) as Selected[]).filter((c) =>
+    charityNameNeedsReview(c),
+  );
+  if (rows.length === 0) return { data: [], error: null };
+
+  // What the register calls them, so the decision is informed.
+  const digits = rows
+    .map((c) => (c.registered_number ?? "").replace(/\D/g, ""))
+    .filter(Boolean)
+    .map(Number);
+  const { data: names } = digits.length
+    ? await supabase
+        .from("register_charity_names")
+        .select("registered_number, name, name_type")
+        .in("registered_number", digits)
+    : { data: [] };
+  const known = new Map<string, string[]>();
+  for (const n of (names ?? []) as {
+    registered_number: number;
+    name: string;
+    name_type: string;
+  }[]) {
+    const key = String(n.registered_number);
+    known.set(key, [...(known.get(key) ?? []), `${n.name} (${n.name_type})`]);
+  }
+
+  return {
+    data: rows.map((c) => ({
+      id: c.id,
+      name: c.name,
+      registered_number: c.registered_number,
+      verified_name: c.verified_name,
+      verified_at: c.verified_at,
+      consent_status: c.consent_status,
+      is_active: c.is_active,
+      register_knows:
+        known.get((c.registered_number ?? "").replace(/\D/g, "")) ?? [],
+    })),
+    error: null,
+  };
+}
+
+/** "Yes, that is them." Records WHO and WHEN, and the register name the
+ *  acceptance was about. */
+export async function acceptCharityName(
+  id: string,
+): Promise<{ error: string | null }> {
+  const { userId } = await auth();
+  if (!userId) return { error: "Not signed in." };
+  const supabase = createAdminClient();
+
+  const { data: charity } = await supabase
+    .from("charities")
+    .select("verification_status, verified_name")
+    .eq("id", id)
+    .maybeSingle();
+  const row = charity as {
+    verification_status: string | null;
+    verified_name: string | null;
+  } | null;
+  if (!row) return { error: "No such charity." };
+  // An acceptance is about a NAME. A charity the register has removed, or
+  // a number that resolves to nothing, is not a name problem and must not
+  // be waved through here.
+  if (row.verification_status !== "name_mismatch") {
+    return {
+      error:
+        "That charity is not waiting on a name — only a name difference can be accepted.",
+    };
+  }
+
+  const { error } = await supabase
+    .from("charities")
+    .update({
+      name_accepted_at: new Date().toISOString(),
+      name_accepted_by: userId,
+      name_accepted_name: row.verified_name,
+    })
+    .eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/charities");
+  return { error: null };
+}
+
+/** Undo — the name goes back to being unaccounted for. */
+export async function clearCharityNameAcceptance(
+  id: string,
+): Promise<{ error: string | null }> {
+  const supabase = createAdminClient();
+  const { error } = await supabase
+    .from("charities")
+    .update({
+      name_accepted_at: null,
+      name_accepted_by: null,
+      name_accepted_name: null,
+    })
+    .eq("id", id);
   if (error) return { error: error.message };
   revalidatePath("/charities");
   return { error: null };

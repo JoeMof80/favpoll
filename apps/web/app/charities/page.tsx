@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { BadgeCheck } from "lucide-react"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { isCharityVerified } from "@favpoll/types"
 import { formatPounds } from "@/lib/i18n"
 
 export const metadata = {
@@ -17,7 +18,9 @@ export default async function CharitiesIndexPage() {
   const [{ data: charities }, { data: statsData }] = await Promise.all([
     supabase
       .from("charities")
-      .select("id, name, logo_url, verification_status")
+      .select(
+        "id, name, logo_url, verification_status, verified_name, name_accepted_at, name_accepted_name"
+      )
       // THE EARNED SHELF (founder, 2026-09-08): the public catalogue lists
       // only charities that have AGREED to receive pledges — privilege is
       // earned by consent, never by dev-era seeding.
@@ -79,7 +82,7 @@ export default async function CharitiesIndexPage() {
               <div className="min-w-0 flex-1">
                 <p className="flex items-center gap-1.5 font-medium text-foreground">
                   <span className="truncate">{c.name}</span>
-                  {c.verification_status === "verified" && (
+                  {isCharityVerified(c) && (
                     <BadgeCheck
                       className="size-4 shrink-0 text-primary"
                       role="img"
