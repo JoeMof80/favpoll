@@ -34,7 +34,26 @@ type RegisterDetails = {
  *  verified against the API came back as a name mismatch. Two answers to
  *  one question; now there is one. */
 export function normaliseName(name: string): string {
-  return name.toLowerCase().replace(/[^a-z0-9]+/g, "");
+  return (
+    name
+      .toLowerCase()
+      // Accents FOLD, they do not vanish: we hold Médecins Sans
+      // Frontières where the register holds MEDECINS SANS FRONTIERES, and
+      // dropping the character outright left "mdecins".
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      // A leading "the" is not a different charity: the register holds
+      // THE TRUSSELL TRUST and THE CHILDREN'S SOCIETY where we hold the
+      // names people use. As a WORD and before the punctuation collapses
+      // — doing it after turned "Theatre Royal" into "atreroyal".
+      .replace(/^\s*the\s+/, "")
+      // Nor is a trailing legal form: RE-ENGAGE LTD and LONDON'S AIR
+      // AMBULANCE LIMITED are the charities we call Re-engage and
+      // London's Air Ambulance. A country qualifier is NOT stripped —
+      // "UK" is part of the brand in Diabetes UK and Age UK.
+      .replace(/[\s,.]*\b(limited|ltd)\.?\s*$/, "")
+      .replace(/[^a-z0-9]+/g, "")
+  );
 }
 
 /**
