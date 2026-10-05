@@ -15,6 +15,7 @@ import {
   type FavpollSummaryCardFavpoll,
 } from "@/components/favpoll-summary-card"
 import { formatPounds } from "@/lib/i18n"
+import { isCharityVerified } from "@favpoll/types"
 import {
   loadPrivateCharityPage,
   profileKeyFromParam,
@@ -86,7 +87,7 @@ export default async function CharityPage({ params }: Props) {
   const { data: charity } = await supabase
     .from("charities")
     .select(
-      "id, name, description, impact_statement, logo_url, registered_number, verification_status, is_active"
+      "id, name, description, impact_statement, logo_url, registered_number, verification_status, verified_name, name_accepted_at, name_accepted_name, is_active"
     )
     .eq("id", id)
     .single()
@@ -176,7 +177,11 @@ export default async function CharityPage({ params }: Props) {
     }
   })
 
-  const isVerified = charity.verification_status === "verified"
+  // The tick means "the number is live and the name is accounted for" —
+  // by the register, or by an admin who accepted a difference the register
+  // explains no further (our WWF against their "WWF - UK"). The rule is
+  // shared so the index, this page and the admin all agree.
+  const isVerified = isCharityVerified(charity)
 
   // The card fills the avatar's own height (md:h-33) so the header row
   // reads as one unit: text stack, logo, facts (founder, 2026-09-06 —

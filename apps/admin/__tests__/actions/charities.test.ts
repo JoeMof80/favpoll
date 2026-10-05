@@ -4,6 +4,12 @@ import { makeSupabaseMock } from "@/tests/mocks/supabase-admin";
 
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
+// Accepting a name records WHO, so the action reads the signed-in admin.
+const mockAuth = vi.hoisted(() =>
+  vi.fn().mockResolvedValue({ userId: "user-1" }),
+);
+vi.mock("@clerk/nextjs/server", () => ({ auth: mockAuth }));
+
 const mockVerify = vi.hoisted(() => vi.fn());
 const mockContact = vi.hoisted(() =>
   vi.fn().mockResolvedValue({ email: null, website: null }),
@@ -35,6 +41,8 @@ import {
   getCharityTopics,
   setCharityTopics,
   setCharityConsent,
+  acceptCharityName,
+  getNameReviewQueue,
   getConsentQueue,
   getRegisterRemovals,
   getPerfectTopicQueue,
@@ -605,6 +613,118 @@ describe("a given logo and the scraped image", () => {
     expect(
       mock.callsFor("charity_profiles").some((c) => c.method === "update"),
     ).toBe(true);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Accepting a name the register does not recognise
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("acceptCharityName", () => {
+  it("records who, when, and the register name it was about", async () => {
+    mock.queue({
+      verification_status: "name_mismatch",
+      verified_name: "WWF - UK",
+    });
+    mock.queue(null);
+
+    const { error } = await acceptCharityName("c1");
+
+    expect(error).toBeNull();
+    const update = mock
+      .callsFor("charities")
+      .find((c) => c.method === "update")!;
+    expect(update.args[0]).toMatchObject({
+      name_accepted_by: "user-1",
+      name_accepted_name: "WWF - UK",
+    });
+    expect(update.args[0].name_accepted_at).toEqual(expect.any(String));
+  });
+
+  // An acceptance is about a NAME. A charity the register has removed is
+  // not a name problem, and must not be waved through from this queue.
+  it("refuses when nobody is signed in — an acceptance needs an author", async () => {
+    mockAuth.mockResolvedValueOnce({ userId: null });
+
+    const { error } = await acceptCharityName("c1");
+
+    expect(error).toMatch(/not signed in/i);
+    expect(mock.callsFor("charities")).toHaveLength(0);
+  });
+
+  it("refuses anything that is not a name difference", async () => {
+    for (const status of ["removed", "not_found", "verified"]) {
+      mock = makeSupabaseMock();
+      mock.queue({ verification_status: status, verified_name: "GONE" });
+
+      const { error } = await acceptCharityName("c1");
+
+      expect(error).toMatch(/only a name difference/i);
+      expect(
+        mock.callsFor("charities").some((c) => c.method === "update"),
+      ).toBe(false);
+    }
+  });
+});
+
+describe("getNameReviewQueue", () => {
+  it("leaves out a mismatch an admin has already accepted", async () => {
+    mock.queue([
+      {
+        id: "c1",
+        name: "WWF",
+        registered_number: "1081247",
+        verification_status: "name_mismatch",
+        verified_name: "WWF - UK",
+        is_active: true,
+        consent_status: "approved",
+        name_accepted_at: "2026-10-05T00:00:00Z",
+        name_accepted_name: "WWF - UK",
+      },
+      {
+        id: "c2",
+        name: "Battersea",
+        registered_number: "206394",
+        verification_status: "name_mismatch",
+        verified_name: "BATTERSEA DOGS' AND CATS' HOME",
+        is_active: true,
+        consent_status: "approved",
+        name_accepted_at: null,
+        name_accepted_name: null,
+      },
+    ]);
+    mock.queue([]); // register_charity_names
+
+    const { data } = await getNameReviewQueue();
+
+    expect(data).toHaveLength(1);
+    expect(data![0].name).toBe("Battersea");
+  });
+
+  // …and brings one back when the register renames the charity, because
+  // the acceptance was about the name it had then.
+  it("brings back an acceptance the register has outdated", async () => {
+    mock.queue([
+      {
+        id: "c1",
+        name: "WWF",
+        registered_number: "1081247",
+        verification_status: "name_mismatch",
+        verified_name: "WORLD WIDE FUND FOR NATURE UK",
+        is_active: true,
+        consent_status: "approved",
+        name_accepted_at: "2026-10-05T00:00:00Z",
+        name_accepted_name: "WWF - UK",
+      },
+    ]);
+    mock.queue([
+      { registered_number: 1081247, name: "WWF", name_type: "Working name" },
+    ]);
+
+    const { data } = await getNameReviewQueue();
+
+    expect(data).toHaveLength(1);
+    expect(data![0].register_knows).toEqual(["WWF (Working name)"]);
   });
 });
 
