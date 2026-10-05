@@ -60,15 +60,32 @@ export function placeFromAddress(address: string | null): string | null {
     .join(", ");
 }
 
-/** The verification the API would give, from a mirror row. */
+/** The verification the API would give, from a mirror row — plus the
+ *  OTHER NAMES the register publishes for that number (2026-10-05).
+ *
+ *  A charity's display name is ours: our case, our apostrophes, our
+ *  accents (the register holds MEDECINS SANS FRONTIERES where we hold
+ *  Médecins Sans Frontières). But it must be ACCOUNTABLE to the
+ *  register, and the register knows more names than the legal one —
+ *  COMIC RELIEF for CHARITY PROJECTS, NSPCC, RNLI, MIND, "R S P C A".
+ *  Matching the legal name alone left 17 of 42 account charities reading
+ *  as a name mismatch, which silently costs them the verified tick.
+ *
+ *  `registeredName` stays the LEGAL name whatever matched: it is the
+ *  identity we show beside the number, and what Gift Aid needs. */
 export function verificationFromRow(
   row: Pick<MirrorRow, "name" | "status" | "removed_on">,
   ourName: string,
+  otherNames: string[] = [],
 ): CharityVerification {
   if (row.status !== "Registered" || row.removed_on) {
     return { status: "removed", registeredName: row.name };
   }
-  if (normaliseName(row.name) !== normaliseName(ourName)) {
+  const ours = normaliseName(ourName);
+  const known = [row.name, ...otherNames].some(
+    (n) => normaliseName(n) === ours,
+  );
+  if (!known) {
     return { status: "name_mismatch", registeredName: row.name };
   }
   return { status: "verified", registeredName: row.name };
@@ -89,13 +106,37 @@ async function rowByNumber(
   return (data as MirrorRow | null) ?? null;
 }
 
-/** Verify against the mirror; the API only when the mirror has no row. */
+/** Every name the register knows for a number: working and previous,
+ *  from register_charity_names (migration 20261005120000). */
+export async function otherNamesFor(
+  registeredNumber: string,
+): Promise<string[]> {
+  const digits = registeredNumber.replace(/\D/g, "");
+  if (!digits) return [];
+  const { data, error } = await createAdminClient()
+    .from("register_charity_names")
+    .select("name")
+    .eq("registered_number", Number(digits));
+  if (error) {
+    console.error("[register-mirror] other names unreadable:", error.message);
+    return [];
+  }
+  return ((data ?? []) as { name: string }[]).map((r) => r.name);
+}
+
+/** Verify against the mirror; the API only when the mirror has no row.
+ *  (The API path cannot see the other names — it returns the legal name
+ *  alone — so it stays stricter. It is only reached for a charity the
+ *  mirror has not got.) */
 export async function verifyOnMirror(
   registeredNumber: string,
   ourName: string,
 ): Promise<CharityVerification> {
-  const row = await rowByNumber(registeredNumber);
-  if (row) return verificationFromRow(row, ourName);
+  const [row, otherNames] = await Promise.all([
+    rowByNumber(registeredNumber),
+    otherNamesFor(registeredNumber),
+  ]);
+  if (row) return verificationFromRow(row, ourName, otherNames);
   return verifyCharityNumber(registeredNumber, ourName);
 }
 

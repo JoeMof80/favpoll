@@ -15,6 +15,9 @@
  *     --registered-only     skip Removed charities
  *     --skip=<n>            resume: skip the first n main charities (the
  *                           count a failed run last printed as written)
+ *     --names-only          load ONLY charity_other_names (4MB) and stop:
+ *                           the working and previous names, which are
+ *                           independent of the other three extracts
  *
  * A batch that hits the statement timeout (the GIN indexes flush their
  * pending lists mid-load on production) is halved and retried, down to
@@ -50,12 +53,17 @@ const DRY = flag("dry-run");
 const REGISTERED_ONLY = flag("registered-only");
 const BATCH = 500;
 const SKIP = parseInt(opt("skip", "0"), 10) || 0;
+const NAMES_ONLY = flag("names-only");
 
 const FILES = [
   "charity",
   "charity_classification",
   "charity_governing_document",
   "charity_area_of_operation",
+  // The WORKING and PREVIOUS names (2026-10-05): the brand name is on the
+  // register, and verification needs it — matching the legal name alone
+  // made 17 of 42 account charities read as a name mismatch.
+  "charity_other_names",
 ] as const;
 const BASE =
   "https://ccewuksprdoneregsadata1.blob.core.windows.net/data/json/publicextract";
@@ -117,8 +125,76 @@ const str = (v: unknown) =>
 const int = (v: unknown) => (typeof v === "number" ? Math.round(v) : null);
 const bool = (v: unknown) => (typeof v === "boolean" ? v : null);
 
+/** THE OTHER NAMES. Its own pass, because the file is 4MB and
+ *  independent of the other three: `--names-only` loads it without them.
+ *  Rows carry the extract date, so names the register has DROPPED are
+ *  cleared at the end rather than lingering for ever. */
+async function loadOtherNames(): Promise<void> {
+  type NameRow = {
+    registered_charity_number: number;
+    linked_charity_number: number;
+    charity_name_type: string;
+    charity_name: string;
+    date_of_extract: string;
+  };
+  let extractDate: string | null = null;
+  let batch: Record<string, unknown>[] = [];
+  let kept = 0;
+  const seen = new Set<string>();
+  const flush = async () => {
+    if (batch.length === 0) return;
+    if (!DRY) {
+      const { error } = await supabase
+        .from("register_charity_names")
+        .upsert(batch, {
+          onConflict: "registered_number,name_type,name",
+        });
+      if (error) throw new Error(`names upsert: ${error.message}`);
+    }
+    kept += batch.length;
+    batch = [];
+    if (kept % 50000 < BATCH) console.log(`  … ${kept} names written`);
+  };
+  const total = await each<NameRow>("charity_other_names", async (r) => {
+    if (r.linked_charity_number !== 0) return;
+    if (!r.charity_name_type || !r.charity_name) return;
+    extractDate ??= date(r.date_of_extract);
+    // The primary key is (number, type, name); a file that repeats a row
+    // would make the upsert complain about affecting it twice.
+    const key = `${r.registered_charity_number}|${r.charity_name_type}|${r.charity_name}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    batch.push({
+      registered_number: r.registered_charity_number,
+      name_type: r.charity_name_type,
+      name: r.charity_name,
+      extract_date: extractDate ?? new Date().toISOString().slice(0, 10),
+    });
+    if (batch.length >= BATCH) await flush();
+  });
+  await flush();
+  console.log(
+    `${DRY ? "would write" : "wrote"} ${kept} other names of ${total} rows (dated ${extractDate})`,
+  );
+  if (!DRY && extractDate) {
+    // Anything the latest extract did not carry is no longer a name of
+    // that charity.
+    const { error, count } = await supabase
+      .from("register_charity_names")
+      .delete({ count: "exact" })
+      .lt("extract_date", extractDate);
+    if (error) throw new Error(`names cleanup: ${error.message}`);
+    if (count) console.log(`  cleared ${count} names the register dropped`);
+  }
+}
+
 async function main() {
   if (flag("download")) await download();
+
+  if (NAMES_ONLY) {
+    await loadOtherNames();
+    return;
+  }
 
   // Pass 1–3: lookups by organisation_number, main charities only.
   const classification = new Map<
@@ -259,6 +335,8 @@ async function main() {
     } else {
       console.log("refreshed register_search_rows");
     }
+
+    await loadOtherNames();
 
     // THE PROFILE FLOOR (charity_profiles, migration 20261004160000)
     // follows the mirror: every Registered charity gets its rule-floor
