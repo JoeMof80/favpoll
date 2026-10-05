@@ -23,7 +23,17 @@ type RegisterDetails = {
   date_of_removal: string | null;
 };
 
-function normaliseName(name: string): string {
+/** The ONE answer to "is this the same charity name": case, spaces and
+ *  punctuation all dropped, so "BARNARDO'S" and "Barnardos" are the same
+ *  name and "CHARITY PROJECTS" and "Comic Relief" are not.
+ *
+ *  Exported because the MIRROR verifies names too (lib/register-mirror),
+ *  and when verification moved there in September it brought its own copy
+ *  of this that replaced punctuation with a SPACE — so the mirror read
+ *  "barnardo s" where this reads "barnardos", and a charity that had
+ *  verified against the API came back as a name mismatch. Two answers to
+ *  one question; now there is one. */
+export function normaliseName(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "");
 }
 

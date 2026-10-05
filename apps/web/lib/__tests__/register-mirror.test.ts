@@ -18,6 +18,42 @@ describe("the register mirror", () => {
     expect(placeFromAddress("SW1A 1AA")).toBeNull()
   })
 
+  // The mirror took over verification in September with its own copy of
+  // the name comparison, which turned punctuation into a SPACE — so
+  // "BARNARDO'S" read as "barnardo s" against our "barnardos" and a
+  // charity that verified against the API came back a name mismatch.
+  // One comparison now, shared with charity-commission.
+  it("treats punctuation inside a name as nothing, as the API does", () => {
+    for (const [register, ours] of [
+      ["BARNARDO'S", "Barnardos"],
+      ["BARNARDO’S", "Barnardos"], // the curly one too
+      ["ST. MUNGO'S", "St Mungos"],
+      ["WWF-UK", "WWF UK"],
+    ] as const) {
+      expect(
+        verificationFromRow(
+          { name: register, status: "Registered", removed_on: null },
+          ours
+        ).status
+      ).toBe("verified")
+    }
+  })
+
+  it("still calls a genuinely different legal name a mismatch", () => {
+    for (const [register, ours] of [
+      ["CHARITY PROJECTS", "Comic Relief"],
+      ["THE BRITISH DIABETIC ASSOCIATION", "Diabetes UK"],
+      ["CHURCH OF ENGLAND CHILDREN'S SOCIETY", "Children's Society"],
+    ] as const) {
+      expect(
+        verificationFromRow(
+          { name: register, status: "Registered", removed_on: null },
+          ours
+        ).status
+      ).toBe("name_mismatch")
+    }
+  })
+
   it("verifies from a row the way the API would", () => {
     expect(
       verificationFromRow(
