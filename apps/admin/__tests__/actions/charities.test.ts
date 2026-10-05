@@ -11,7 +11,12 @@ const mockContact = vi.hoisted(() =>
 const mockPurpose = vi.hoisted(() =>
   vi.fn().mockResolvedValue({ activities: null, classification: null }),
 );
-vi.mock("@/lib/charity-commission", () => ({
+// importOriginal, not a hand-written stand-in: `normaliseName` is the
+// real comparison the mirror verifies names with, and a copy of it in a
+// mock is how the two definitions drifted apart in the first place. Only
+// the network calls are mocked.
+vi.mock("@/lib/charity-commission", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/charity-commission")>()),
   verifyCharityNumber: mockVerify,
   fetchRegisterContact: mockContact,
   fetchRegisterPurpose: mockPurpose,

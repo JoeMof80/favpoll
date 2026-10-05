@@ -3,6 +3,7 @@ import {
   fetchRegisterContact,
   fetchRegisterPurpose,
   searchRegisterRanked,
+  normaliseName,
   titleCaseCharityName,
   verifyCharityNumber,
   type CharityVerification,
@@ -36,12 +37,6 @@ export type MirrorRow = {
   removed_on: string | null;
 };
 
-const norm = (s: string) =>
-  s
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim();
-
 /** "Town, County" from the register's joined address, title-cased: the
  *  last two parts, the postcode never being one of them. */
 export function placeFromAddress(address: string | null): string | null {
@@ -73,7 +68,7 @@ export function verificationFromRow(
   if (row.status !== "Registered" || row.removed_on) {
     return { status: "removed", registeredName: row.name };
   }
-  if (norm(row.name) !== norm(ourName)) {
+  if (normaliseName(row.name) !== normaliseName(ourName)) {
     return { status: "name_mismatch", registeredName: row.name };
   }
   return { status: "verified", registeredName: row.name };
