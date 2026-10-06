@@ -20,6 +20,7 @@ import {
   loadPrivateCharityPage,
   profileKeyFromParam,
 } from "@/lib/charity-profile-page"
+import { legalNameToShow } from "@/lib/charity-legal-name"
 import { PrivateCharityPage } from "@/components/private-charity-page"
 
 type Props = { params: Promise<{ id: string }> }
@@ -183,6 +184,11 @@ export default async function CharityPage({ params }: Props) {
   // shared so the index, this page and the admin all agree.
   const isVerified = isCharityVerified(charity)
 
+  // The number is checkable against the LEGAL name, not the name the
+  // charity is known by: 326568 is Charity Projects, not Comic Relief.
+  // Null when they are the same name — see lib/charity-legal-name.
+  const legalName = legalNameToShow(charity.name, charity.verified_name)
+
   // The card fills the avatar's own height (md:h-33) so the header row
   // reads as one unit: text stack, logo, facts (founder, 2026-09-06 —
   // and no stickiness: it is a header element, not a rail companion).
@@ -227,9 +233,20 @@ export default async function CharityPage({ params }: Props) {
             )}
           </h1>
           {charity.registered_number && (
-            <p className="mt-4 truncate text-xl font-normal whitespace-normal text-primary md:text-2xl">
-              Registered charity {charity.registered_number}
-            </p>
+            <>
+              <p className="mt-4 truncate text-xl font-normal whitespace-normal text-primary md:text-2xl">
+                Registered charity {charity.registered_number}
+              </p>
+              {/* The legal name takes its own line, quiet and small: the
+                  longest of them runs to 96 characters (the National
+                  Trust), which at the number's size would be three lines
+                  of primary shouting under the brand name. */}
+              {legalName && (
+                <p className="mt-1 text-sm wrap-break-word text-muted-foreground">
+                  {legalName}
+                </p>
+              )}
+            </>
           )}
         </div>
         {charity.logo_url ? (

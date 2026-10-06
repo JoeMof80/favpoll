@@ -167,8 +167,44 @@ describe("titleCaseCharityName", () => {
     expect(titleCaseCharityName("ST RICHARDS HOSPICE FOUNDATION")).toBe(
       "St Richards Hospice Foundation",
     );
+  });
+
+  it("keeps connecting words lower-case inside a name", () => {
     expect(titleCaseCharityName("FRIENDS OF THE EARTH")).toBe(
-      "Friends Of The Earth",
+      "Friends of the Earth",
+    );
+    expect(titleCaseCharityName("SAVE THE CHILDREN FUND")).toBe(
+      "Save the Children Fund",
+    );
+    expect(titleCaseCharityName("HELP FOR HEROES")).toBe("Help for Heroes");
+    // Four-letter connectors: before the rule these read as acronyms,
+    // because every token of four letters or fewer did.
+    expect(titleCaseCharityName("SHELTER FROM THE STORM")).toBe(
+      "Shelter from the Storm",
+    );
+    expect(titleCaseCharityName("HOSPICE UPON THAMES")).toBe(
+      "Hospice upon Thames",
+    );
+  });
+
+  it("capitalises a connecting word at either end", () => {
+    expect(titleCaseCharityName("THE ROYAL BRITISH LEGION")).toBe(
+      "The Royal British Legion",
+    );
+    expect(titleCaseCharityName("A CHANCE TO SHINE")).toBe("A Chance to Shine");
+    expect(titleCaseCharityName("SOMETHING TO SHOUT FOR")).toBe(
+      "Something to Shout For",
+    );
+    // A name that is one connecting word is both ends at once.
+    expect(titleCaseCharityName("THE")).toBe("The");
+  });
+
+  it("treats punctuation as the start of a fresh phrase", () => {
+    expect(
+      titleCaseCharityName("SHELTER: THE NATIONAL CAMPAIGN FOR HOMELESS"),
+    ).toBe("Shelter: The National Campaign for Homeless");
+    expect(titleCaseCharityName("SCOPE - FOR DISABLED PEOPLE")).toBe(
+      "Scope - For Disabled People",
     );
   });
 });

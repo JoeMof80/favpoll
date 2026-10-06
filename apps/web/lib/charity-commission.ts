@@ -196,9 +196,50 @@ const COMMON_SHORT_WORDS = new Set([
   "york",
 ])
 
+/** Connecting words that stay lower-case INSIDE a name — "Friends of the
+ *  Earth", "Newcastle upon Tyne" — but take a capital at either end,
+ *  where title case always capitalises ("The Children's Society",
+ *  "Something to Live For"). They are decided BEFORE the acronym rules,
+ *  or the four-letter ones come back shouting ("Newcastle UPON Tyne"). */
+const MINOR_WORDS = new Set([
+  "a",
+  "an",
+  "and",
+  "as",
+  "at",
+  "but",
+  "by",
+  "for",
+  "from",
+  "in",
+  "into",
+  "nor",
+  "of",
+  "on",
+  "or",
+  "the",
+  "to",
+  "upon",
+  "via",
+  "with",
+])
+
 export function titleCaseCharityName(name: string): string {
-  return name.toLowerCase().replace(/[a-z']+/g, (w) => {
-    if (!COMMON_SHORT_WORDS.has(w)) {
+  const lower = name.toLowerCase()
+  const words = [...lower.matchAll(/[a-z']+/g)]
+  const firstAt = words[0]?.index
+  const lastAt = words[words.length - 1]?.index
+  /** A connecting word is only "inside" the name between two other words:
+   *  punctuation starts a fresh phrase, so "Shelter: The National Campaign"
+   *  keeps its capital where "Friends of the Earth" does not. */
+  const inside = (offset: number) =>
+    offset !== firstAt &&
+    offset !== lastAt &&
+    !/[.:;!?\-\u2013\u2014(\[/|&]\s*$/.test(lower.slice(0, offset))
+  return lower.replace(/[a-z']+/g, (w, offset: number) => {
+    if (MINOR_WORDS.has(w)) {
+      if (inside(offset)) return w
+    } else if (!COMMON_SHORT_WORDS.has(w)) {
       const shortAcronym = w.length <= 4
       const vowelless = !/[aeiou]/.test(w) // NSPCC and friends
       if (shortAcronym || vowelless) return w.toUpperCase()
