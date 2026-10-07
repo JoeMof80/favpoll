@@ -12,11 +12,23 @@ import { GroupIcon, PairIcon } from "@/components/icons/people"
 // WHY GENERATE ASKS (founder, 2026-10-02: "we need an instruction icon
 // popup … graphics to describe why we need pronouns here and why we
 // need to know the shape of the favpoll"). One info icon at the group's
-// end; two panels. The copy is organiser-facing and the founder's to
-// edit before it ships. GRAPHIC SLOTS are marked below: today each panel
-// shows the icons the menu already uses with a sample line under each;
-// a drawn strip (the who panel) and a drawn card pair (the switch panel)
-// can replace them without touching the copy.
+// end; two panels.
+//
+// COPY PASS 2026-10-07. Two things were wrong rather than merely rough.
+// "The honoured one's own favourite" quantified HONOUR over every
+// favpoll, which the brand rules forbid (a cause favpoll honours nobody),
+// and the panel mixed the two vocabularies: the ACT is a reveal, which is
+// what the Generate button beside it already says, and the ARTEFACT is
+// the personal note, which is what every public surface calls it.
+//
+// THE GRAPHICS ARE DELIBERATELY NOT DRAWINGS. The founder asked for
+// graphics; what each panel needs is an EXAMPLE, and an example reads
+// faster than an illustration at this size. The voice strip shows the six
+// menu icons with the line each one produces; the card pair shows one
+// favpoll written both ways. Both are the real vocabulary, not a picture
+// of it, and they stay correct when the copy changes. If a drawn strip or
+// a drawn card pair is wanted later it can replace either block without
+// touching a word.
 
 const VOICES: {
   Icon: React.ElementType
@@ -51,11 +63,11 @@ export function WizardGenerateHelp() {
             Who
           </h3>
           <p className="leading-relaxed text-muted-foreground">
-            The Story is written in a voice, and the voice is the pronoun. Pick
-            who this favpoll is for and Generate writes it their way.
+            The Story needs a voice. Pick who this favpoll is for and Generate
+            writes it their way. Pick I and it writes as you.
           </p>
-          {/* GRAPHIC SLOT: a drawn "voice" strip could stand here — the
-              figures with their sample line beneath each. */}
+          {/* THE GRAPHIC: the six menu icons with the line each produces,
+              so the choice and its consequence sit on one row. */}
           <ul className="space-y-1.5">
             {VOICES.map(({ Icon, who, line }) => (
               <li key={who} className="flex items-center gap-2.5">
@@ -75,12 +87,13 @@ export function WizardGenerateHelp() {
             What the picks decide
           </h3>
           <p className="leading-relaxed text-muted-foreground">
-            Most favpolls end in a reveal: guests pick, and after pledging they
-            see the honoured one&rsquo;s own favourite. On some nights the picks
-            decide something instead. The switch tells Generate which to write.
+            Most favpolls end in a reveal. Guests pick, and once they have
+            pledged they see the favourite the favpoll was holding. On some
+            nights the picks decide something instead, and the night follows the
+            result. The switch tells Generate which one to write.
           </p>
-          {/* GRAPHIC SLOT: a drawn card pair, reveal and outcome, the
-              same favpoll both ways. */}
+          {/* THE GRAPHIC: one favpoll written both ways, so the switch is
+              shown rather than described. */}
           <div className="grid grid-cols-2 gap-2">
             <div className="rounded-md border border-border p-2.5">
               <p className="mb-1 text-[10px] font-medium tracking-widest text-muted-foreground uppercase">
