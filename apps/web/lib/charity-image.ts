@@ -156,12 +156,34 @@ export async function findCharityImage(
   const html = await fetchPage(base.toString())
   if (!html) return null
 
-  const og = ogImage(html, base)
-  if (og && (await servesAnImage(og))) return { url: og, source: "og" }
+  // THE LOGO BOX WINS (founder, 2026-10-07), but not at any price.
+  //
+  // The first run found that most og:images are 1200x630 hero photographs,
+  // so the two sources land in different slots on the page: an icon goes in
+  // the square logo box beside the name, an og:image becomes a 1.91:1
+  // banner above it. Only one image is stored, so taking og first filled
+  // the banner and left the identity slot showing an initial letter. A
+  // charity recognises itself by its mark, and an apple-touch-icon is the
+  // more stable asset — an og:image is often a campaign photo or a social
+  // card with text baked in, and it changes with the campaign.
+  //
+  // The exception is the CONVENTIONAL /favicon.ico, which faviconCandidates
+  // appends as a last resort whether or not the site declares it. That one
+  // is usually 16 pixels, and 16 pixels in a 132-pixel box is worse than no
+  // logo at all — so it ranks BELOW the og:image, not above it.
+  const fallbackIcon = new URL("/favicon.ico", base).toString()
+  const candidates = faviconCandidates(html, base)
 
-  for (const candidate of faviconCandidates(html, base)) {
+  for (const candidate of candidates) {
+    if (candidate === fallbackIcon) continue
     if (await servesAnImage(candidate))
       return { url: candidate, source: "favicon" }
   }
+
+  const og = ogImage(html, base)
+  if (og && (await servesAnImage(og))) return { url: og, source: "og" }
+
+  if (await servesAnImage(fallbackIcon))
+    return { url: fallbackIcon, source: "favicon" }
   return null
 }
