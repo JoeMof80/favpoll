@@ -125,75 +125,97 @@ type RegisterSearchRow = {
 
 /**
  * Title-case a register name (stored ALL CAPS) for use as a display-name
- * suggestion. Tokens of up to 4 letters read as acronyms (RNLI, WWF, UK)
- * unless they are common words (St, Fund, Age...). Only a suggestion --
- * admin can always edit the result.
+ * suggestion. Only a suggestion — admin can always edit the result.
  */
-const COMMON_SHORT_WORDS = new Set([
-  "a",
-  "age",
-  "aid",
-  "air",
-  "and",
-  "art",
-  "arts",
-  "at",
-  "band",
-  "bank",
-  "blue",
-  "boys",
-  "care",
-  "cats",
-  "city",
-  "club",
-  "de",
-  "dogs",
-  "du",
-  "east",
-  "farm",
-  "food",
-  "for",
-  "fund",
-  "gift",
-  "girl",
-  "good",
-  "hall",
-  "hand",
-  "help",
-  "home",
-  "hope",
-  "in",
-  "kids",
-  "land",
-  "life",
-  "link",
-  "love",
-  "mind",
-  "new",
-  "of",
-  "old",
-  "on",
-  "open",
-  "our",
-  "park",
-  "play",
-  "red",
-  "road",
-  "safe",
-  "save",
-  "sea",
-  "song",
-  "sons",
-  "st",
-  "star",
-  "team",
-  "the",
-  "to",
-  "town",
-  "tree",
-  "west",
-  "york",
+/** Acronyms that contain a vowel, so the vowel-less test cannot find them.
+ *  Deliberately short: an acronym we have not listed renders as a word
+ *  ("Cruk"), which is one admin edit, where the old rule shouted thousands
+ *  of ordinary words to catch these. */
+const ACRONYMS = new Set([
+  "afc",
+  "aids",
+  "cab",
+  "cic",
+  "cio",
+  "cruk",
+  "eu",
+  "gb",
+  "hiv",
+  "icw",
+  "nct",
+  "nhs",
+  "ni",
+  "phab",
+  "pta",
+  "ptfa",
+  "raf",
+  "rnib",
+  "rnli",
+  "rspca",
+  "un",
+  "uk",
+  "usa",
+  "wi",
+  "yfc",
+  "yha",
+  "ymca",
+  "ywca",
 ]);
+
+/** Short tokens with no vowel that are words all the same: the ordinal
+ *  suffixes (1st, 2nd, 3rd, 25th), the titles, and the Welsh place-names
+ *  the register is full of. */
+const VOWELLESS_WORDS = new Set([
+  "bryn",
+  "clwb",
+  "cwm",
+  "dr",
+  "dry",
+  "fry",
+  "glyn",
+  "gt",
+  "gwyl",
+  "gwyn",
+  "lydd",
+  "lymm",
+  "lynn",
+  "ltd",
+  "mr",
+  "mrs",
+  "ms",
+  "nd",
+  "plc",
+  "rd",
+  "rhyl",
+  "rhys",
+  "st",
+  "th",
+  "ty",
+  "wm",
+  "wych",
+  "wynn",
+  "yn",
+  "ynys",
+  "yr",
+]);
+
+/** Does this token read as an acronym? The default is NO — a short token is
+ *  a word unless there is reason to think otherwise.
+ *
+ *  INVERTED 2026-10-07. The old rule read every token of four letters or
+ *  fewer as an acronym unless it was on a ~70-word allowlist, which over the
+ *  register's 174,556 names shouted 3,601 DISTINCT ordinary words to catch
+ *  about a dozen real acronyms: "St JOHN Ambulance" (3,754 names), "PRE
+ *  School" (2,700), "The POOR Clares" (2,076), MARY, SIR, LADY, HILL, WAR.
+ *  A denylist of every short word in the language was never going to close;
+ *  an allowlist of real acronyms is finite. */
+function readsAsAcronym(word: string): boolean {
+  const letters = word.replace(/[^a-z]/g, "");
+  if (letters.length < 2) return false; // an initial, or a stray "'s"
+  if (ACRONYMS.has(word)) return true;
+  if (VOWELLESS_WORDS.has(word)) return false;
+  return !/[aeiou]/.test(letters); // NSPCC, RSPB, BHF and friends
+}
 
 /** Connecting words that stay lower-case INSIDE a name — "Friends of the
  *  Earth", "Newcastle upon Tyne" — but take a capital at either end,
@@ -223,6 +245,23 @@ const MINOR_WORDS = new Set([
   "with",
 ]);
 
+/** The ordinal suffixes, which stay lower-case when a digit runs into them:
+ *  the register holds thousands of scout groups ("128TH OLDHAM...", "1ST
+ *  MITCHAM...") and "128Th" is as wrong as "128TH". Away from a digit these
+ *  are words again — "ST JOHN" is a saint, not an ordinal. */
+const ORDINAL_SUFFIXES = new Set(["st", "nd", "rd", "th"]);
+
+/** Capitalise the first LETTER, not the first character: 390 register names
+ *  open with a quote ("'CHESTNUTS' PRE-SCHOOL"), and the token the matcher
+ *  hands back is "'chestnuts" — uppercasing character 0 uppercased the
+ *  apostrophe and left the name lower-case. A lone letter after an
+ *  apostrophe is a possessive, not an initial, so "60'S" stays "60's". */
+function capitaliseWord(word: string): string {
+  const letters = word.replace(/[^a-z]/g, "");
+  if (letters.length === 1 && word.startsWith("'")) return word;
+  return word.replace(/[a-z]/, (c) => c.toUpperCase());
+}
+
 export function titleCaseCharityName(name: string): string {
   const lower = name.toLowerCase();
   const words = [...lower.matchAll(/[a-z']+/g)];
@@ -236,14 +275,21 @@ export function titleCaseCharityName(name: string): string {
     offset !== lastAt &&
     !/[.:;!?\-\u2013\u2014(\[/|&]\s*$/.test(lower.slice(0, offset));
   return lower.replace(/[a-z']+/g, (w, offset: number) => {
-    if (MINOR_WORDS.has(w)) {
-      if (inside(offset)) return w;
-    } else if (!COMMON_SHORT_WORDS.has(w)) {
-      const shortAcronym = w.length <= 4;
-      const vowelless = !/[aeiou]/.test(w); // NSPCC and friends
-      if (shortAcronym || vowelless) return w.toUpperCase();
+    // Both lookups go through the letters, so a quoted "'the" is still the
+    // connecting word "the" and "'nspcc" is still the acronym.
+    const letters = w.replace(/[^a-z]/g, "");
+    if (
+      ORDINAL_SUFFIXES.has(letters) &&
+      /[0-9]/.test(lower.charAt(offset - 1))
+    ) {
+      return w;
     }
-    return w.charAt(0).toUpperCase() + w.slice(1);
+    if (MINOR_WORDS.has(letters)) {
+      if (inside(offset)) return w;
+    } else if (readsAsAcronym(letters)) {
+      return w.toUpperCase();
+    }
+    return capitaliseWord(w);
   });
 }
 

@@ -163,9 +163,74 @@ describe("titleCaseCharityName", () => {
     expect(titleCaseCharityName("WWF - UK")).toBe("WWF - UK");
   });
 
-  it("does not treat short common words as acronyms", () => {
+  // A short token is a WORD unless there is reason to think otherwise
+  // (inverted 2026-10-07). Every example below is a real register name.
+  it("treats an ordinary short word as a word, not an acronym", () => {
+    expect(titleCaseCharityName("ST JOHN AMBULANCE")).toBe("St John Ambulance");
     expect(titleCaseCharityName("ST RICHARDS HOSPICE FOUNDATION")).toBe(
       "St Richards Hospice Foundation",
+    );
+    expect(titleCaseCharityName("THE POOR CLARES OF ARKLEY")).toBe(
+      "The Poor Clares of Arkley",
+    );
+    expect(titleCaseCharityName("RIVER CHRISTIAN ASSOCIATION YATE")).toBe(
+      "River Christian Association Yate",
+    );
+    expect(titleCaseCharityName("MEDECINS SANS FRONTIERES (UK)")).toBe(
+      "Medecins Sans Frontieres (UK)",
+    );
+    // Welsh place-names have no a/e/i/o/u, so the vowel-less test would
+    // otherwise shout them.
+    expect(titleCaseCharityName("BRYN HAFOD COMMUNITY TRUST")).toBe(
+      "Bryn Hafod Community Trust",
+    );
+    expect(titleCaseCharityName("CWM TAF HOSPICE")).toBe("Cwm Taf Hospice");
+    expect(titleCaseCharityName("SIGNALS ESSEX MEDIA CENTRE LTD")).toBe(
+      "Signals Essex Media Centre Ltd",
+    );
+  });
+
+  it("keeps a listed acronym upper-case", () => {
+    expect(titleCaseCharityName("AGE UK")).toBe("Age UK");
+    expect(titleCaseCharityName("ACLE ACADEMY PTA")).toBe("Acle Academy PTA");
+    expect(titleCaseCharityName("ABERCONWY PHAB CLUB")).toBe(
+      "Aberconwy PHAB Club",
+    );
+    expect(titleCaseCharityName("YMCA SCARBOROUGH")).toBe("YMCA Scarborough");
+  });
+
+  it("keeps an ordinal suffix lower-case after a digit", () => {
+    // Thousands of scout groups: "128Th" is as wrong as "128TH".
+    expect(
+      titleCaseCharityName("128TH OLDHAM SCOUT GROUP ST JOHN THE BAPTIST"),
+    ).toBe("128th Oldham Scout Group St John the Baptist");
+    expect(titleCaseCharityName("1ST MITCHAM SCOUT GROUP")).toBe(
+      "1st Mitcham Scout Group",
+    );
+    expect(titleCaseCharityName("25TH ANNIVERSARY FUND")).toBe(
+      "25th Anniversary Fund",
+    );
+    // Away from a digit the same tokens are words again.
+    expect(titleCaseCharityName("ST LUKE'S CHESHIRE HOSPICE")).toBe(
+      "St Luke's Cheshire Hospice",
+    );
+  });
+
+  it("capitalises the first letter, not the first character", () => {
+    // 390 register names open with a quote; the token is "'chestnuts".
+    expect(titleCaseCharityName("'CHESTNUTS' PRE-SCHOOL")).toBe(
+      "'Chestnuts' Pre-School",
+    );
+    expect(titleCaseCharityName("'THE BLUE HUT' YOUTH CLUB")).toBe(
+      "'The Blue Hut' Youth Club",
+    );
+    // A lone letter after an apostrophe is a possessive, not an initial.
+    expect(titleCaseCharityName("CENTRE FOR OVER 60'S")).toBe(
+      "Centre for Over 60's",
+    );
+    // ...but a lone letter on its own is an initial.
+    expect(titleCaseCharityName("A J CUNNINGHAM TRUST")).toBe(
+      "A J Cunningham Trust",
     );
   });
 
