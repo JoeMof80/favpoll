@@ -113,12 +113,34 @@ describe("findCharityImage", () => {
     headers: new Headers({ "content-type": "text/html" }),
   }
 
-  it("takes the og:image when the site serves one", async () => {
+  // THE LOGO BOX WINS (founder, 2026-10-07): a declared icon beats the
+  // og:image, because the icon fills the identity slot beside the name and
+  // the og:image only fills a banner above it.
+  it("takes a declared icon ahead of the og:image", async () => {
+    fetchMock
+      .mockResolvedValueOnce(
+        page(
+          `<meta property="og:image" content="/og.png">
+           <link rel="apple-touch-icon" href="/touch.png">`
+        )
+      )
+      .mockResolvedValueOnce(image) // HEAD on the touch icon
+
+    expect(await findCharityImage("example.org")).toEqual({
+      url: "https://example.org/touch.png",
+      source: "favicon",
+    })
+  })
+
+  // ...but the CONVENTIONAL /favicon.ico is not a declared icon. It is
+  // usually 16 pixels, and 16 pixels in a 132-pixel box is worse than no
+  // logo, so a real og:image beats it.
+  it("takes the og:image ahead of the bare /favicon.ico", async () => {
     fetchMock
       .mockResolvedValueOnce(
         page(`<meta property="og:image" content="/og.png">`)
       )
-      .mockResolvedValueOnce(image)
+      .mockResolvedValueOnce(image) // HEAD on the og:image
 
     expect(await findCharityImage("example.org")).toEqual({
       url: "https://example.org/og.png",
@@ -128,21 +150,18 @@ describe("findCharityImage", () => {
 
   // An og:image that 404s, or redirects to a homepage, must not be stored
   // as a logo: the page would show a broken box to the charity itself.
-  it("falls through to the favicon when the og:image is not an image", async () => {
+  it("falls back to /favicon.ico when the og:image is not an image", async () => {
     fetchMock
       .mockResolvedValueOnce(
-        page(
-          `<meta property="og:image" content="/gone.png">
-           <link rel="apple-touch-icon" href="/touch.png">`
-        )
+        page(`<meta property="og:image" content="/gone.png">`)
       )
       // A definite "not an image" is an answer, so there is no GET retry —
       // that only exists for a site answering HEAD with 405.
       .mockResolvedValueOnce(notAnImage) // HEAD on the og:image
-      .mockResolvedValueOnce(image) // HEAD on the touch icon
+      .mockResolvedValueOnce(image) // HEAD on /favicon.ico
 
     expect(await findCharityImage("example.org")).toEqual({
-      url: "https://example.org/touch.png",
+      url: "https://example.org/favicon.ico",
       source: "favicon",
     })
   })
@@ -152,7 +171,7 @@ describe("findCharityImage", () => {
       .mockResolvedValueOnce(
         page(`<meta property="og:image" content="/og.png">`)
       )
-      .mockResolvedValueOnce({ ok: false, headers: new Headers() }) // 405
+      .mockResolvedValueOnce({ ok: false, headers: new Headers() }) // 405 on og
       .mockResolvedValueOnce(image)
 
     expect(await findCharityImage("example.org")).toEqual({
