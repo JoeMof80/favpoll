@@ -40,7 +40,7 @@ export type Charity = {
   verified_name: string | null;
   verified_at: string | null;
   consent_status: "pending" | "approved" | "declined" | null;
-  consent_contacted_at: string | null;
+  invite_drafted_at: string | null;
   consent_decided_at: string | null;
   is_active: boolean;
   market: string;
@@ -85,7 +85,7 @@ export async function getCharities(
   let query = supabase
     .from("charities")
     .select(
-      "id, name, description, logo_url, impact_statement, registered_number, verification_status, verified_name, verified_at, consent_status, consent_decided_at, consent_contacted_at, is_active, market, created_at, cause_family",
+      "id, name, description, logo_url, impact_statement, registered_number, verification_status, verified_name, verified_at, consent_status, consent_decided_at, invite_drafted_at, is_active, market, created_at, cause_family",
     )
     .order("name", { ascending: true });
 
@@ -112,7 +112,7 @@ export async function getCharities(
       return {
         ...c,
         cause_family_suggested: key
-          ? (suggestions.get(key)?.cause_family_suggested ?? null)
+          ? suggestions.get(key)?.cause_family_suggested ?? null
           : null,
         activities:
           register.get((c.registered_number ?? "").replace(/\D/g, ""))
@@ -599,7 +599,7 @@ export type ConsentQueueRow = {
   name: string;
   registered_number: string | null;
   registered_email: string | null;
-  consent_contacted_at: string | null;
+  invite_drafted_at: string | null;
   favpoll_count: number;
   /** Cause family (references/favpoll-pairing-table §2): the confirmed
    *  value, the model's suggestion, and the register text it came from. */
@@ -631,7 +631,7 @@ export type ConsentQueueRow = {
 /** CONSENT OUTREACH QUEUE — pending charities in use on at least one
  * favpoll: the ones where pledges are actually waiting on an agreement.
  * favpoll owns outreach (the organiser invite path was retired, web
- * #868); this is the team's list to work. Not-yet-contacted first. */
+ * #868); this is the team's list to work. Never-drafted first. */
 export async function getConsentQueue(): Promise<{
   data: ConsentQueueRow[] | null;
   error: string | null;
@@ -653,7 +653,7 @@ export async function getConsentQueue(): Promise<{
   const { data, error } = await supabase
     .from("charities")
     .select(
-      "id, name, registered_number, consent_contacted_at, cause_family, perfect_topic_id, perfect_subset_id, perfect_topic:topics!charities_perfect_topic_id_fkey(title), perfect_subset:topic_subsets!charities_perfect_subset_id_fkey(title)",
+      "id, name, registered_number, invite_drafted_at, cause_family, perfect_topic_id, perfect_subset_id, perfect_topic:topics!charities_perfect_topic_id_fkey(title), perfect_subset:topic_subsets!charities_perfect_subset_id_fkey(title)",
     )
     .eq("consent_status", "pending")
     .in("id", [...counts.keys()])
@@ -732,8 +732,7 @@ export async function getConsentQueue(): Promise<{
       };
     })
     .sort(
-      (a, b) =>
-        Number(!!a.consent_contacted_at) - Number(!!b.consent_contacted_at),
+      (a, b) => Number(!!a.invite_drafted_at) - Number(!!b.invite_drafted_at),
     );
   return { data: rows, error: null };
 }
@@ -748,7 +747,7 @@ export async function markCharityContacted(
 
   const { error } = await supabase
     .from("charities")
-    .update({ consent_contacted_at: new Date().toISOString() })
+    .update({ invite_drafted_at: new Date().toISOString() })
     .eq("id", id);
 
   if (error) return { error: error.message };

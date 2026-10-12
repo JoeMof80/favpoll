@@ -29,7 +29,7 @@ import { PerfectTopicSelect } from "@/components/perfect-topic-select";
 //
 // "Draft invite" opens the team's own mail client with the platform-voice
 // email prefilled (recipient from the Commission register's public
-// contact where we hold it) and stamps consent_contacted_at. Sending is
+// contact where we hold it) and stamps invite_drafted_at. Sending is
 // manual — the stamp records the attempt, Approve records the reply.
 
 function inviteMailto(row: ConsentQueueRow): string {
@@ -191,10 +191,10 @@ function QueueRow({
         </p>
       </div>
 
-      {row.consent_contacted_at && (
+      {row.invite_drafted_at && (
         <StatusBadge tone="info">
-          Invited{" "}
-          {new Date(row.consent_contacted_at).toLocaleDateString("en-GB")}
+          Draft opened{" "}
+          {new Date(row.invite_drafted_at).toLocaleDateString("en-GB")}
         </StatusBadge>
       )}
 
@@ -230,7 +230,7 @@ function QueueRow({
               onClick={() => void markCharityContacted(row.id)}
             >
               <Mail className="size-3.5" aria-hidden="true" />
-              {row.consent_contacted_at ? "Draft again" : "Draft invite"}
+              {row.invite_drafted_at ? "Draft again" : "Draft invite"}
             </a>
           </Button>
         )}
