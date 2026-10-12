@@ -9,6 +9,8 @@ import {
 import { useEffect, useState, useTransition } from "react";
 import { ChevronDown, ChevronRight, Search } from "lucide-react";
 import type { Charity } from "@/lib/actions/charities";
+import { CharityBankAccount } from "@/components/charity-bank-account";
+import type { CharityBankAccountView } from "@/lib/actions/bank-accounts";
 import {
   createCharity,
   updateCharity,
@@ -541,9 +543,11 @@ function TopicsEditor({
 function CharityRow({
   charity,
   allTopics,
+  bankAccount,
 }: {
   charity: Charity;
   allTopics: AdminTopic[];
+  bankAccount: CharityBankAccountView | null;
 }) {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -813,6 +817,14 @@ function CharityRow({
                       </Button>
                     )}
                   </div>
+
+                  {/* Payable comes after agreed: favpoll collects as agent
+                      and remits directly, so an approved charity with no
+                      account on file still cannot be paid. */}
+                  <CharityBankAccount
+                    charityId={charity.id}
+                    account={bankAccount ?? null}
+                  />
                 </>
               )}
             </div>
@@ -828,9 +840,11 @@ function CharityRow({
 export function CharitiesTable({
   charities,
   allTopics,
+  bankAccounts,
 }: {
   charities: Charity[];
   allTopics: AdminTopic[];
+  bankAccounts: Record<string, CharityBankAccountView>;
 }) {
   if (charities.length === 0) {
     return <p className="text-sm text-muted-foreground">No charities found.</p>;
@@ -857,6 +871,7 @@ export function CharitiesTable({
               key={charity.id}
               charity={charity}
               allTopics={allTopics}
+              bankAccount={bankAccounts[charity.id] ?? null}
             />
           ))}
         </TableBody>

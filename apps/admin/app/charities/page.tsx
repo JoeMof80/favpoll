@@ -6,6 +6,7 @@ import {
   getRegisterRemovals,
 } from "@/lib/actions/charities";
 import { getTopics } from "@/lib/actions/topics";
+import { getCharityBankAccounts } from "@/lib/actions/bank-accounts";
 import { CharitiesTable, AddCharityForm } from "@/components/charities-table";
 import { ConsentQueue } from "@/components/consent-queue";
 import { PerfectTopicQueue } from "@/components/perfect-topic-queue";
@@ -29,6 +30,7 @@ export default async function CharitiesPage({ searchParams }: Props) {
     { data: perfectQueue },
     { data: removals },
     { data: nameReviews },
+    { data: bankAccounts },
   ] = await Promise.all([
     getCharities(activeMarket),
     getTopics(),
@@ -36,6 +38,7 @@ export default async function CharitiesPage({ searchParams }: Props) {
     getPerfectTopicQueue(),
     getRegisterRemovals(),
     getNameReviewQueue(),
+    getCharityBankAccounts(),
   ]);
 
   return (
@@ -88,7 +91,11 @@ export default async function CharitiesPage({ searchParams }: Props) {
 
       <PerfectTopicQueue rows={perfectQueue ?? []} topics={topics ?? []} />
 
-      <CharitiesTable charities={charities ?? []} allTopics={topics ?? []} />
+      <CharitiesTable
+        charities={charities ?? []}
+        allTopics={topics ?? []}
+        bankAccounts={bankAccounts ?? {}}
+      />
     </div>
   );
 }
