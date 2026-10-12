@@ -59,7 +59,7 @@ export type Charity = {
   /** Consent gate (2026-09-07): has the charity AGREED to appear and
    *  receive pledges? Enforcement rides CHARITY_CONSENT_POSTURE. */
   consent_status?: "pending" | "approved" | "declined";
-  consent_contacted_at?: string | null;
+  invite_drafted_at?: string | null;
   consent_decided_at?: string | null;
   /** THE REGISTER'S OWN WORDS ARE NOT HERE (step 5 of
    *  references/charity-profiles-2026-09-27.md). Contact, activities,

@@ -79,10 +79,10 @@ const CONSENT_BADGES: Record<string, { label: string; tone: StatusTone }> = {
 
 function ConsentBadge({
   status,
-  contactedAt,
+  draftedAt,
 }: {
   status: string | null;
-  contactedAt: string | null;
+  draftedAt: string | null;
 }) {
   if (!status) return <span className="text-muted-foreground">—</span>;
   const badge = CONSENT_BADGES[status];
@@ -91,8 +91,8 @@ function ConsentBadge({
     <StatusBadge
       tone={badge.tone}
       title={
-        status === "pending" && contactedAt
-          ? `Invited ${new Date(contactedAt).toLocaleDateString("en-GB")}`
+        status === "pending" && draftedAt
+          ? `Invite draft opened ${new Date(draftedAt).toLocaleDateString("en-GB")}`
           : undefined
       }
     >
@@ -636,7 +636,7 @@ function CharityRow({
         <TableCell>
           <ConsentBadge
             status={charity.consent_status}
-            contactedAt={charity.consent_contacted_at}
+            draftedAt={charity.invite_drafted_at}
           />
         </TableCell>
         <TableCell>
@@ -788,7 +788,7 @@ function CharityRow({
                     </span>
                     <ConsentBadge
                       status={charity.consent_status}
-                      contactedAt={charity.consent_contacted_at}
+                      draftedAt={charity.invite_drafted_at}
                     />
                     {charity.consent_status !== "approved" && (
                       <Button
