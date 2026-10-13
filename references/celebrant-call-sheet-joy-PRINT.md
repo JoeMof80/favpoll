@@ -128,8 +128,8 @@ suitable family sometime — no obligation at all?"*
 
 - Guests **pledge to charity** and share a favourite; the person's own
   favourite is revealed after pledging.
-- **No fee — 100% of every pledge reaches the charity** (favpoll runs
-  on optional tips).
+- **No fee — favpoll takes nothing from a pledge** (card processing is
+  met at settlement; favpoll runs on optional tips).
 - **Registered UK charities only** — never funeral costs, never
   personal funds.
 - Guests need **no account** — email only; payments by card, Apple Pay
