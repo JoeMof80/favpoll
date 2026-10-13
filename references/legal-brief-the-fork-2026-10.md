@@ -107,9 +107,19 @@ Structure B is not secured. An approach is in progress and may fail.
    matters unusually much in our context and may be decisive for whether B is
    viable for us at all.
 
+7. **Under B, what must we tell guests about the intermediary's discretion?**
+   PayPal Giving Fund's own disclosure says that where it cannot fund the
+   recommended charity it will ask for another recommendation, and *"grant the
+   funds to a similar charity if you don't respond"*. That discretion is what
+   keeps the Gift Aid valid, so we do not want it removed — but it means money
+   given in a named person's memory, for a named charity, may reach a
+   different one. Our guests are often at a funeral. What must be said to
+   them, and when, for that to be a fair representation rather than a
+   misdescription?
+
 **And on Gift Aid, which may not depend on the structure at all:**
 
-7. **Does a pledge qualify for Gift Aid?** We currently capture declarations
+8. **Does a pledge qualify for Gift Aid?** We currently capture declarations
    and pass them to the charity to claim; we claim nothing and take nothing
    from Gift Aid. Two features give us pause:
 
@@ -139,9 +149,9 @@ Structure B is not secured. An approach is in progress and may fail.
 
 **And independently of all of it — these do not wait on anything:**
 
-8. **Terms of service.** We have none at all. The site is live with card
+9. **Terms of service.** We have none at all. The site is live with card
    payments integrated and will take them the moment we begin.
-9. **A review of our privacy policy**, which is live.
+10. **A review of our privacy policy**, which is live.
 
 ---
 
@@ -152,8 +162,8 @@ that follow from it, and an hour of conversation if that is the efficient way
 to get there. If a written opinion is genuinely necessary for part of this,
 please say which part and why.
 
-**Fees:** a fixed fee would suit us, and we would welcome 8 and 9 priced
-separately from 1–7 so they can proceed first. A draft collection agreement
+**Fees:** a fixed fee would suit us, and we would welcome 9 and 10 priced
+separately from 1–8 so they can proceed first. A draft collection agreement
 exists (it has never been reviewed by a solicitor) — reviewing it is a
 different job from drafting one, and we are happy for it to be discarded if
 the structure makes it the wrong document.

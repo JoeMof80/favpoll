@@ -160,3 +160,51 @@ CLAIM and not patched: `charity-collection-agreement-DRAFT.md` (lines 38, 193
 — a contractual promise, left for the solicitor), `draft-terms-of-service-2026-09-15.md`
 (line 36), `organiser-pitch.md` (line 59), `PROJECT.md`, and two PRINTED call
 sheets (hospice, celebrant) that may already have been used with real people.
+
+
+---
+
+## Questions for the partnership conversation — HOLD until they engage
+
+Not to be sent now. Two messages went out on 13 October and a third before any
+reply is noise. These are for the moment PPGF picks it up.
+
+**THE FEE, CORRECTED.** PPGF charges no platform fee, but a PARTNER FLOW IS
+NOT FREE. Thrift+'s own donation screen discloses: *"You're donating to PayPal
+Giving Fund UK (PPGF), a registered charity (No. 1110538). Your donation is
+subject to processing fees of 1.4% + 20p."* PayPal absorbs processing on its
+OWN surfaces; a partner integration does not get that. So the real comparison
+is 1.4% + 20p against favpoll's current Stripe cost of 1.5% + 20p — roughly
+FEE-NEUTRAL, marginally cheaper, which is a stronger and more checkable case
+than "it's free". It also means the retired "100% reaches the charity" claim
+does NOT come back under PPGF either.
+
+**THE DISCRETION CLAUSE, which matters more than the fee.** The same screen
+says: *"In the rare event PPGF can't fund your chosen charity, it will
+(whenever possible) ask you to recommend another, and grant the funds to a
+similar charity if you don't respond."* PPGF retains discretion — that is what
+keeps Gift Aid valid — but it means money raised in a named person's memory,
+for the hospice that cared for them, could be granted ELSEWHERE. A footnote
+for a clothing resale platform; not a footnote for a funeral.
+
+So, three questions (founder, 2026-10-13):
+
+1. **What makes a charity unfundable, and what proportion of the register is
+   affected?** The base rate across all charities is probably genuinely rare.
+   The rate that matters to us is among the LONG TAIL — small, local, stale
+   register entries — which is exactly where favpoll's core case lives. Only
+   PPGF can tell us that number.
+
+2. **Does the API expose fundability at SELECTION time, and does it cover all
+   162,000 or only the ~8,000 enrolled?** This is the same question as the
+   8,000-vs-162,000 gap. If we can know at the moment an organiser picks, the
+   problem mostly disappears — we never offer what cannot be paid. Catching it
+   after the pledge is far worse.
+
+3. **When it does happen, can the platform be notified?** THE ONE TO PUSH
+   HARDEST. For a memorial, PPGF quietly granting elsewhere and nobody telling
+   the family is worse than the problem itself.
+
+Partial mitigation already built: an organiser may nominate up to THREE
+charities, so one unfundable charity can be absorbed by the others rather than
+failing the favpoll.
