@@ -51,6 +51,12 @@ export type Charity = {
   cause_family?: CauseFamily | null;
   cause_family_suggested?: CauseFamily | null;
   activities?: string | null;
+  /** The fundraising events read from the charity's own website, and when
+   *  it was read. BOTH, because "no events" is otherwise ambiguous between
+   *  "we have never looked" and "we looked and there were none" — and the
+   *  difference is the whole point of showing them here. */
+  signature_events?: SignatureEvent[] | null;
+  website_read_at?: string | null;
 };
 
 /** Charity Commission fields for an insert/update, from a (name, number) pair. */
@@ -113,6 +119,12 @@ export async function getCharities(
         ...c,
         cause_family_suggested: key
           ? suggestions.get(key)?.cause_family_suggested ?? null
+          : null,
+        signature_events: key
+          ? suggestions.get(key)?.signature_events ?? null
+          : null,
+        website_read_at: key
+          ? suggestions.get(key)?.website_read_at ?? null
           : null,
         activities:
           register.get((c.registered_number ?? "").replace(/\D/g, ""))
