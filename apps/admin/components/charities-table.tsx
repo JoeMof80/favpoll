@@ -9,6 +9,7 @@ import {
 import { useEffect, useState, useTransition } from "react";
 import { ChevronDown, ChevronRight, Search } from "lucide-react";
 import type { Charity } from "@/lib/actions/charities";
+import { CharityRegisterFacts } from "@/components/charity-register-facts";
 import { CharitySignatureEvents } from "@/components/charity-signature-events";
 import {
   createCharity,
@@ -711,6 +712,17 @@ function CharityRow({
                 </div>
               ) : (
                 <>
+                  {/* The register's own facts, directly under the name and
+                      number the row claims — see the Dogs Trust incident in
+                      charity-register-facts.tsx. First, because this is what
+                      you open a row to check. */}
+                  <CharityRegisterFacts
+                    status={charity.register_status}
+                    income={charity.register_income}
+                    place={charity.register_place}
+                    registeredOn={charity.register_registered_on}
+                  />
+
                   {charity.description && (
                     <p className="text-sm text-muted-foreground">
                       {charity.description}

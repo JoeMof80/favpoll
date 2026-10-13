@@ -17,6 +17,7 @@ import {
 import {
   searchRegisterMirrorFirst,
   verifyOnMirror,
+  placeFromAddress,
 } from "@/lib/register-mirror";
 
 /** Live search of the Register of Charities for the admin typeahead. */
@@ -57,6 +58,12 @@ export type Charity = {
    *  difference is the whole point of showing them here. */
   signature_events?: SignatureEvent[] | null;
   website_read_at?: string | null;
+  /** What the REGISTER says about this number, beside what the account
+   *  claims. See registerByKey for why. */
+  register_status?: string | null;
+  register_income?: number | null;
+  register_place?: string | null;
+  register_registered_on?: string | null;
 };
 
 /** Charity Commission fields for an insert/update, from a (name, number) pair. */
@@ -115,20 +122,23 @@ export async function getCharities(
   return {
     data: rows.map((c) => {
       const key = profileKey(c.registered_number);
+      const reg = register.get((c.registered_number ?? "").replace(/\D/g, ""));
       return {
         ...c,
         cause_family_suggested: key
-          ? suggestions.get(key)?.cause_family_suggested ?? null
+          ? (suggestions.get(key)?.cause_family_suggested ?? null)
           : null,
         signature_events: key
-          ? suggestions.get(key)?.signature_events ?? null
+          ? (suggestions.get(key)?.signature_events ?? null)
           : null,
         website_read_at: key
-          ? suggestions.get(key)?.website_read_at ?? null
+          ? (suggestions.get(key)?.website_read_at ?? null)
           : null,
-        activities:
-          register.get((c.registered_number ?? "").replace(/\D/g, ""))
-            ?.activities ?? null,
+        activities: reg?.activities ?? null,
+        register_status: reg?.status ?? null,
+        register_income: reg?.latest_income ?? null,
+        register_place: reg?.place ?? null,
+        register_registered_on: reg?.registered_on ?? null,
       };
     }),
     error: null,
@@ -471,6 +481,17 @@ type RegisterContactAndPurpose = {
   email: string | null;
   website: string | null;
   activities: string | null;
+  /** THE REGISTER'S OWN FACTS, which admin had no way to see. The account
+   *  row says what we agreed; these say what the Commission holds, and the
+   *  two sitting side by side is how a wrong number announces itself —
+   *  Dogs Trust pointed at 227523 "DOGS TRUST LEGACY" (£67m, the old
+   *  National Canine Defence League number most sources still quote)
+   *  instead of 1167663 "DOGS TRUST" (£143m) from the day it was created,
+   *  and nothing on this page could have shown it. */
+  status: string | null;
+  latest_income: number | null;
+  place: string | null;
+  registered_on: string | null;
 };
 
 /** THE REGISTER'S OWN CONTACT AND PURPOSE for a set of account numbers
@@ -492,7 +513,9 @@ async function registerByKey(
   if (digits.length === 0) return new Map();
   const { data, error } = await createAdminClient()
     .from("register_charities")
-    .select("registered_number, email, website, activities")
+    .select(
+      "registered_number, email, website, activities, status, latest_income, address, registered_on",
+    )
     .in("registered_number", digits);
   if (error) {
     console.error("[charities] mirror unreadable:", error.message);
@@ -505,10 +528,22 @@ async function registerByKey(
         email: string | null;
         website: string | null;
         activities: string | null;
+        status: string | null;
+        latest_income: number | null;
+        address: string | null;
+        registered_on: string | null;
       }[]
     ).map((row) => [
       String(row.registered_number),
-      { email: row.email, website: row.website, activities: row.activities },
+      {
+        email: row.email,
+        website: row.website,
+        activities: row.activities,
+        status: row.status,
+        latest_income: row.latest_income,
+        place: placeFromAddress(row.address),
+        registered_on: row.registered_on,
+      },
     ]),
   );
 }
