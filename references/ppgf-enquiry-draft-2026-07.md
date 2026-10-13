@@ -160,3 +160,118 @@ CLAIM and not patched: `charity-collection-agreement-DRAFT.md` (lines 38, 193
 — a contractual promise, left for the solicitor), `draft-terms-of-service-2026-09-15.md`
 (line 36), `organiser-pitch.md` (line 59), `PROJECT.md`, and two PRINTED call
 sheets (hospice, celebrant) that may already have been used with real people.
+
+
+---
+
+## Questions for the partnership conversation — HOLD until they engage
+
+Not to be sent now. Two messages went out on 13 October and a third before any
+reply is noise. These are for the moment PPGF picks it up.
+
+**THE FEE, CORRECTED.** PPGF charges no platform fee, but a PARTNER FLOW IS
+NOT FREE. Thrift+'s own donation screen discloses: *"You're donating to PayPal
+Giving Fund UK (PPGF), a registered charity (No. 1110538). Your donation is
+subject to processing fees of 1.4% + 20p."* PayPal absorbs processing on its
+OWN surfaces; a partner integration does not get that. So the real comparison
+is 1.4% + 20p against favpoll's current Stripe cost of 1.5% + 20p — roughly
+FEE-NEUTRAL, marginally cheaper, which is a stronger and more checkable case
+than "it's free". It also means the retired "100% reaches the charity" claim
+does NOT come back under PPGF either.
+
+**THE DISCRETION CLAUSE, which matters more than the fee.** The same screen
+says: *"In the rare event PPGF can't fund your chosen charity, it will
+(whenever possible) ask you to recommend another, and grant the funds to a
+similar charity if you don't respond."* PPGF retains discretion — that is what
+keeps Gift Aid valid — but it means money raised in a named person's memory,
+for the hospice that cared for them, could be granted ELSEWHERE. A footnote
+for a clothing resale platform; not a footnote for a funeral.
+
+So, three questions (founder, 2026-10-13):
+
+1. **What makes a charity unfundable, and what proportion of the register is
+   affected?** The base rate across all charities is probably genuinely rare.
+   The rate that matters to us is among the LONG TAIL — small, local, stale
+   register entries — which is exactly where favpoll's core case lives. Only
+   PPGF can tell us that number.
+
+2. **Does the API expose fundability at SELECTION time, and does it cover all
+   162,000 or only the ~8,000 enrolled?** This is the same question as the
+   8,000-vs-162,000 gap. If we can know at the moment an organiser picks, the
+   problem mostly disappears — we never offer what cannot be paid. Catching it
+   after the pledge is far worse.
+
+3. **When it does happen, can the platform be notified?** THE ONE TO PUSH
+   HARDEST. For a memorial, PPGF quietly granting elsewhere and nobody telling
+   the family is worse than the problem itself.
+
+Partial mitigation already built: an organiser may nominate up to THREE
+charities, so one unfundable charity can be absorbed by the others rather than
+failing the favpoll.
+
+### How the failure case gets handled — FOUNDER'S RULING, 2026-10-13
+
+I had framed PPGF granting elsewhere as close to unacceptable for a memorial.
+The founder disagreed and was right: *"even in memorial cases, i think it is
+forgivable to try and fail to donate, notifying the family and requesting an
+alternative. Surely they wouldn't mind."*
+
+**Handled openly it is a service recovery, not a scandal.** "We tried to send
+£340 to St Luke's, they cannot receive it this way, would you like to pick
+another?" is a reasonable thing to say, and people forgive honest failures
+handled well. What is unforgivable is them finding out afterwards — which is
+why notification (question 3 above) is the one to push hardest, and the only
+part of my original framing that survives.
+
+One cost worth remembering: the family has usually already told forty guests
+they are raising for that hospice, so going back to them is their
+embarrassment as well as ours. That is an argument for catching unfundability
+at SELECTION time, not for treating recovery as unacceptable.
+
+**THE BUILT-IN FALLBACK IS ALREADY THERE:** an organiser may nominate up to
+three charities, so one unfundable charity is absorbed by the others, the
+money still goes where the family chose, and nobody has to go back to anyone.
+Free, and needs no promise.
+
+**MATCHING: available, never promised.** The founder raised matching the
+donation if a family did mind, and that he could give personally rather than
+through favpoll. Personally is the clean version — a private individual giving
+to a charity is just that: no agreement, no bank details held by favpoll, no
+commercial-participator question, and he can Gift Aid it himself so the
+charity receives more than the original pledge. Everything I had objected to
+was about FAVPOLL paying a charity directly, and none of it attaches to him
+doing it.
+
+**THE LINE IS THE PROMISE, NOT THE PAYMENT.** Never say it in advance and
+never put it anywhere a guest or organiser can read. In writing it stops being
+a kindness and becomes a term — one that triggers exactly where it is most
+expensive to honour, and that turns one quiet gesture into an expectation the
+next family inherits. Said afterwards, to one family, as a thing he chose to
+do: entirely fine.
+
+### Peer intelligence — Thrift+ (Joe Metcalfe, CEO)
+
+**LinkedIn connection note SENT 2026-10-13.** Founder-to-founder, asking about
+their experience running PPGF. LinkedIn rather than email because it confirms
+he is still there (the article below is from 2020), because a guessed address
+at thrift.plus could bounce silently, and because a connection note worked for
+this founder once already (Goodstack trustees, 11 July 2026, accepted).
+
+**WHY THRIFT+ IS THE PROOF POINT.** UKBAA, 14 April 2020: nine staff, a £950k
+impact raise after Dragons' Den, and **"over £150,000 for charity in the
+preceding 12 months"**. Their donation page today reads £2M+ raised, 6.8K+
+charities, 36.8K+ donors. So Thrift+ has never been anywhere near PPGF's
+stated "$10m+ per year" interest threshold, at any point — which is a better
+answer to "what are our chances" than anything inferable from PPGF's partner
+list.
+
+**WHAT TO ASK ONCE HE ACCEPTS** (three is the most a stranger will answer):
+how long PPGF took from first contact to live and what they wanted to see;
+whether the Charity Search API covers the whole register or only enrolled
+charities; and how often a chosen charity turns out unfundable, and whether
+they are told. The third is worth most — PPGF will give a policy answer, a
+peer can say what actually happens. The FEE question is deliberately not
+asked: it is already visible on their own donation screen, and asking what you
+can see wastes one of three.
+
+**Note for the thread:** they are both Joe. Sign as Joseph Moffatt.
