@@ -13,6 +13,7 @@ const INCLUDED = [
   /^\/$/, // landing
   /^\/about$/,
   /^\/privacy$/,
+  /^\/terms$/,
   /^\/features$/,
   /^\/record$/,
   // /favpolls removed (2026-09-12): an organiser surface, not marketing —
