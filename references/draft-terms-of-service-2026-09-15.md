@@ -23,8 +23,9 @@
 
 favpoll is operated by **Josmo Services Limited**, registered in England
 and Wales (company no. **11511585**). By using favpoll.com you agree to
-these terms. **[FOUNDER: confirm this matches the entity disclosure on
-the privacy policy.]**
+these terms. *(Entity disclosure confirmed by the founder 2026-10-13 as
+matching the privacy policy — the deliberate exception to his
+no-disclosure rule, which a privacy notice forces anyway.)*
 
 ### What favpoll is
 
