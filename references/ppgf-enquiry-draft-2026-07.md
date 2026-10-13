@@ -208,3 +208,43 @@ So, three questions (founder, 2026-10-13):
 Partial mitigation already built: an organiser may nominate up to THREE
 charities, so one unfundable charity can be absorbed by the others rather than
 failing the favpoll.
+
+### How the failure case gets handled — FOUNDER'S RULING, 2026-10-13
+
+I had framed PPGF granting elsewhere as close to unacceptable for a memorial.
+The founder disagreed and was right: *"even in memorial cases, i think it is
+forgivable to try and fail to donate, notifying the family and requesting an
+alternative. Surely they wouldn't mind."*
+
+**Handled openly it is a service recovery, not a scandal.** "We tried to send
+£340 to St Luke's, they cannot receive it this way, would you like to pick
+another?" is a reasonable thing to say, and people forgive honest failures
+handled well. What is unforgivable is them finding out afterwards — which is
+why notification (question 3 above) is the one to push hardest, and the only
+part of my original framing that survives.
+
+One cost worth remembering: the family has usually already told forty guests
+they are raising for that hospice, so going back to them is their
+embarrassment as well as ours. That is an argument for catching unfundability
+at SELECTION time, not for treating recovery as unacceptable.
+
+**THE BUILT-IN FALLBACK IS ALREADY THERE:** an organiser may nominate up to
+three charities, so one unfundable charity is absorbed by the others, the
+money still goes where the family chose, and nobody has to go back to anyone.
+Free, and needs no promise.
+
+**MATCHING: available, never promised.** The founder raised matching the
+donation if a family did mind, and that he could give personally rather than
+through favpoll. Personally is the clean version — a private individual giving
+to a charity is just that: no agreement, no bank details held by favpoll, no
+commercial-participator question, and he can Gift Aid it himself so the
+charity receives more than the original pledge. Everything I had objected to
+was about FAVPOLL paying a charity directly, and none of it attaches to him
+doing it.
+
+**THE LINE IS THE PROMISE, NOT THE PAYMENT.** Never say it in advance and
+never put it anywhere a guest or organiser can read. In writing it stops being
+a kindness and becomes a term — one that triggers exactly where it is most
+expensive to honour, and that turns one quiet gesture into an expectation the
+next family inherits. Said afterwards, to one family, as a thing he chose to
+do: entirely fine.
