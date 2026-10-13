@@ -184,8 +184,10 @@ _____________________________________________________________________
 
 - Guests **pledge to a charity** and share their own favourite; the
   person's own favourite is revealed to them after they pledge.
-- **No fee — 100% of every pledge reaches the charity.** favpoll runs on
-  optional tips, collected separately from the donation.
+- **No fee — favpoll takes nothing from a pledge.** Card processing is
+  met at settlement, so the charity receives the pledge less its share of
+  processing. favpoll runs on optional tips, collected separately from the
+  donation.
 - **Registered UK charities only** — never funeral costs, never personal
   funds.
 - Guests need **no account** — email only; card, Apple Pay or Google Pay.
