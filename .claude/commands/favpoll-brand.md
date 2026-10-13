@@ -84,8 +84,8 @@ This is not a "pay to unlock" mechanic. Frame it as something waiting for them, 
 **The dual purpose:**
 favpoll is genuinely both things simultaneously — a fundraising platform and a data project. Neither is a pretence. In user-facing copy, lead with whichever is more relevant to the audience. For organisers and guests: fundraising and experience. For press or investors: the data story.
 
-**Fee model (decided July 2026 — replaces the earlier 5% fee):**
-favpoll charges no platform fee. 100% of every pledge reaches the charity; Stripe processes payments. favpoll's costs are never taken from donations — the platform is sustained by optional guest contributions and, in future, physical stationery and partner services. State the 0% plainly and proudly; never frame the optional contribution apologetically — it is what keeps favpoll running.
+**Fee model (decided July 2026 — replaces the earlier 5% fee; the 100% claim RETIRED 2026-09-06):**
+favpoll charges no platform fee and takes nothing from a pledge. Card processing is absorbed at settlement, so a charity receives the pledge less its share of processing — which is why **"100% of every pledge reaches the charity" must no longer be written anywhere.** The founder retired that claim estate-wide on 2026-09-06, consciously, in exchange for a calmer checkout (the guest had been paying the card fee to keep it literally true; see `apps/web/lib/card-fee.ts`). The honest claim is the no-fee one, and it is still strong: favpoll takes less from charities than JustGiving, which charges charity plans and deducts 5% from Gift Aid. Stripe processes payments. favpoll's costs are never taken from donations — the platform is sustained by optional guest contributions and, in future, physical stationery and partner services. State the 0% plainly and proudly; never frame the optional contribution apologetically — it is what keeps favpoll running.
 
 **Maximum 3 charities per favpoll.** Proceeds split equally.
 
@@ -393,9 +393,14 @@ When writing for the platform generally: acknowledge the full range without lead
 
 Always transparent, never apologetic:
 
-✓ "favpoll takes no fee from donations. 100% of every pledge reaches your chosen charity in full."
+✓ "favpoll takes no fee from donations."
 ✓ "favpoll is supported by optional contributions — never by your pledge."
 ✗ "We take a small fee to keep the lights on." (there is no fee; never imply one)
+✗ "100% of every pledge reaches your chosen charity in full." (RETIRED 2026-09-06
+  — processing is absorbed at settlement, so it is no longer true. This was an
+  approved example here until 2026-10-13, which is how it kept getting written;
+  it reached the collection agreement, the draft terms and two printed call
+  sheets before anyone noticed.)
 ✗ "100% goes to charity!!" (no exclamation marks, no hard sell — state it quietly)
 
 ---

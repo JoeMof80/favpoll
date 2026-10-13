@@ -1,8 +1,45 @@
 # PPGF partnership enquiry — draft
 
-**Status: SENT 4 July 2026** (email body below, trimmed version).
-Awaiting reply — chase via the partner-page form or LinkedIn if quiet
-by ~18 July.
+**Status: SENT 4 July 2026 — AND THEY REPLIED. Found 2026-10-13, three
+months later, in the founder's mail; it was never recorded here, because
+Goodstack was chosen on 6 July and the thread was abandoned mid-sentence.**
+
+PPGF WAS NEVER TOLD NO, AND NEVER SAID NO. Reference
+`C826-L003-TPPGF001-S999-W000000`. The sequence:
+
+- **4 Jul 19:11** — the form below, seven numbered questions.
+- **6 Jul** — Tiernan replies, having read it as a CHARITY enrolment:
+  "complete your account profile on paypal and get your charity confirmed".
+  He had missed the point entirely.
+- **6 Jul 02:12** — founder corrects it clearly: favpoll is not a charity,
+  this is about "PayPal Giving Fund's platform-partner arrangement, the
+  model behind things like eBay for Charity or Meta fundraisers"; asks to
+  be pointed at the right team.
+- **6 Jul** — PayPal replies: **"What platform will you be raising the
+  funds on? Is it a case that you want to then pass them on to PayPal
+  giving fund?"**
+
+AND THAT IS WHERE IT STOPS. Goodstack was made the lead rail the same
+day. Their closing question is not a brush-off — it is someone checking
+WHICH integration model is wanted, and its second half describes Model B
+(we collect, then grant onward with per-charity recommendations) almost
+exactly. It needed a two-line answer and never got one.
+
+SO THE 6 JULY DECISION RESTS ON A FALSE PREMISE. `disbursement-enquiries-2026-07.md`
+demoted PPGF for being "a business-development conversation, not an API
+key" while preferring Goodstack's "API and self-serve onboarding" — but
+Goodstack turned out to be sales-led with no API keys before a demo, then
+never replied at all, while PPGF had answered within 48 hours and asked a
+direct question.
+
+CAVEATS, kept honest: both replies came from general PayPal customer
+service, not PPGF partnerships, and the first proves that queue did not
+understand the enquiry. The form template code is TPPGF001, so it routed
+to a PPGF-tagged workflow, but it is unlikely to reach the partnerships
+team unaided — the proper route stays the "Become a Partner" form below.
+There is also a lesson in the shape: 2,500 characters and seven numbered
+questions, into a support queue, returned boilerplate. Answer their short
+question shortly.
 
 _July 2026. Companion to `charity-register-and-paypal-2026-07.md` (§2–3).
 Send from joseph.moffatt@gmail.com or hello@favpoll.com if it exists —
@@ -85,3 +122,41 @@ Founder, favpoll
   structurally awkward flow now than during due diligence.
 - If a web form imposes a character limit, send questions 1–3 + 7 only
   and offer the rest by call; those four decide the strategy.
+
+
+---
+
+## 2026-10-13 — REOPENED, both routes
+
+**1. Replied on the old thread** (ref `C826-L003-TPPGF001-S999-W000000`),
+answering the question they left hanging on 6 July: funds are raised on our
+own platform and processed via Stripe; yes, we would pass them to PPGF with a
+per-charity recommendation (Model B); we are a company, not a charity; please
+route to the partnerships team. Kept deliberately SHORT — the July message was
+2,500 characters with seven numbered questions and came back as boilerplate.
+
+**2. Submitted the "Become a Partner" survey** — the route July identified as
+primary and which, as far as the record shows, had never been used.
+
+**THE SURVEY STATES A THRESHOLD:** "We are particularly interested in hearing
+from you if you operate one of the following, and **raise more than $10m for
+charity each year**" — fundraising/social giving platforms, retail
+marketplaces, streaming platforms. favpoll is orders of magnitude below that.
+But the form's own Q6 offers "£0 - £1,000,000" as a band, so submissions far
+below the bar are expected. Send it; keep expectations low. Answered Q6
+honestly at the lowest band — anything else unravels in diligence.
+
+**CHASE DATE: Monday 20 October.** If silent, one chase, then treat it as
+signal (the July failure was not a refusal, it was three months of unexamined
+silence).
+
+**FEE WORDING USED, and a correction it forced.** The submission says favpoll
+charges no platform fee and takes nothing from a pledge, with card processing
+absorbed at settlement so the charity receives the pledge less its share. It
+does NOT say "100% reaches the charity" — that claim was retired 2026-09-06
+and I nearly restated it, because the BRAND SKILL still instructed it. Fixed
+in `.claude/commands/favpoll-brand.md` on 2026-10-13. STILL CARRYING THE DEAD
+CLAIM and not patched: `charity-collection-agreement-DRAFT.md` (lines 38, 193
+— a contractual promise, left for the solicitor), `draft-terms-of-service-2026-09-15.md`
+(line 36), `organiser-pitch.md` (line 59), `PROJECT.md`, and two PRINTED call
+sheets (hospice, celebrant) that may already have been used with real people.
