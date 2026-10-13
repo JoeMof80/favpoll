@@ -248,3 +248,30 @@ a kindness and becomes a term — one that triggers exactly where it is most
 expensive to honour, and that turns one quiet gesture into an expectation the
 next family inherits. Said afterwards, to one family, as a thing he chose to
 do: entirely fine.
+
+### Peer intelligence — Thrift+ (Joe Metcalfe, CEO)
+
+**LinkedIn connection note SENT 2026-10-13.** Founder-to-founder, asking about
+their experience running PPGF. LinkedIn rather than email because it confirms
+he is still there (the article below is from 2020), because a guessed address
+at thrift.plus could bounce silently, and because a connection note worked for
+this founder once already (Goodstack trustees, 11 July 2026, accepted).
+
+**WHY THRIFT+ IS THE PROOF POINT.** UKBAA, 14 April 2020: nine staff, a £950k
+impact raise after Dragons' Den, and **"over £150,000 for charity in the
+preceding 12 months"**. Their donation page today reads £2M+ raised, 6.8K+
+charities, 36.8K+ donors. So Thrift+ has never been anywhere near PPGF's
+stated "$10m+ per year" interest threshold, at any point — which is a better
+answer to "what are our chances" than anything inferable from PPGF's partner
+list.
+
+**WHAT TO ASK ONCE HE ACCEPTS** (three is the most a stranger will answer):
+how long PPGF took from first contact to live and what they wanted to see;
+whether the Charity Search API covers the whole register or only enrolled
+charities; and how often a chosen charity turns out unfundable, and whether
+they are told. The third is worth most — PPGF will give a policy answer, a
+peer can say what actually happens. The FEE question is deliberately not
+asked: it is already visible on their own donation screen, and asking what you
+can see wastes one of three.
+
+**Note for the thread:** they are both Joe. Sign as Joseph Moffatt.
