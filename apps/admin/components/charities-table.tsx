@@ -9,6 +9,7 @@ import {
 import { useEffect, useState, useTransition } from "react";
 import { ChevronDown, ChevronRight, Search } from "lucide-react";
 import type { Charity } from "@/lib/actions/charities";
+import { CharitySignatureEvents } from "@/components/charity-signature-events";
 import {
   createCharity,
   updateCharity,
@@ -813,6 +814,14 @@ function CharityRow({
                       </Button>
                     )}
                   </div>
+
+                  {/* What the website reader found — on every row, because
+                      the queues only ever showed the charities where it
+                      SUCCEEDED. */}
+                  <CharitySignatureEvents
+                    events={charity.signature_events}
+                    readAt={charity.website_read_at}
+                  />
                 </>
               )}
             </div>
