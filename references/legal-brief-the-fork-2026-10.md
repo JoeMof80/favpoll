@@ -34,9 +34,16 @@ settlement, so a charity receives the pledge less its share of processing. Our
 only revenue is **optional contributions** guests may add for favpoll,
 collected separately from the donation.
 
-**Scale, stated plainly:** live since 7 September 2026, six favpolls created,
-**£0.96 raised in total**. We are asking these questions before volume, not
-after.
+**Status, stated plainly: we are not yet operating.** The site has been live
+since 7 September 2026, but the only favpolls on it are our own tests and the
+only transaction is a 96p test donation. **No money has been raised for any
+charity, and no charity has agreed anything with us.** We are asking these
+questions before we begin, not after.
+
+One qualification we would rather raise than have found: until 12 October the
+test favpolls were publicly reachable and named charities that had not agreed
+to receive anything. They are now unlisted, every charity is marked pending,
+and the platform refuses to take money for any charity that has not agreed.
 
 **What the regulator has already said.** The Fundraising Regulator (1 September
 2026) confirmed it cannot rule on professional fundraiser / commercial
@@ -102,8 +109,8 @@ Structure B is not secured. An approach is in progress and may fail.
 
 **And independently of both — these do not wait on the structure:**
 
-7. **Terms of service.** We have none. The site is live and taking card
-   payments.
+7. **Terms of service.** We have none at all. The site is live with card
+   payments integrated and will take them the moment we begin.
 8. **A review of our privacy policy**, which is live.
 
 ---
