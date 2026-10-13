@@ -107,11 +107,41 @@ Structure B is not secured. An approach is in progress and may fail.
    matters unusually much in our context and may be decisive for whether B is
    viable for us at all.
 
-**And independently of both — these do not wait on the structure:**
+**And on Gift Aid, which may not depend on the structure at all:**
 
-7. **Terms of service.** We have none at all. The site is live with card
+7. **Does a pledge qualify for Gift Aid?** We currently capture declarations
+   and pass them to the charity to claim; we claim nothing and take nothing
+   from Gift Aid. Two features give us pause:
+
+   - a guest's pledge is allocated to the favourite they pick, and the
+     standings on a favpoll are the **sum of pledges** per favourite — so a
+     larger pledge moves the result more; and
+   - an optional **personal note**, written in advance by or about the person
+     being honoured, is shown to a guest only after they have pledged.
+
+   National Funding Scheme, a registered charity running a pay-per-vote
+   fundraising product, publishes this reading: *"A vote buys something (a say
+   in the result), so under HMRC's rules it usually doesn't qualify as a
+   donation for Gift Aid."* Our pledge differs — any amount, one pick per
+   guest, and a note with no market value — but we would rather be told than
+   assume. **If these are benefits that disqualify, we must stop capturing
+   declarations immediately**, because the claim is made by the charity, and
+   an invalid claim is the charity's problem with HMRC rather than ours.
+
+   If it does disqualify, we would want to know which feature causes it: the
+   money-weighted standing is a design dial we could change; the note is the
+   product.
+
+   Related: a guest may pledge from a communal "shared pot" topped up by other
+   guests, so the person who paid and the person who receives the note can be
+   different people, and the pot is pooled and anonymous. We do not know
+   whether that distinction helps.
+
+**And independently of all of it — these do not wait on anything:**
+
+8. **Terms of service.** We have none at all. The site is live with card
    payments integrated and will take them the moment we begin.
-8. **A review of our privacy policy**, which is live.
+9. **A review of our privacy policy**, which is live.
 
 ---
 
@@ -122,8 +152,8 @@ that follow from it, and an hour of conversation if that is the efficient way
 to get there. If a written opinion is genuinely necessary for part of this,
 please say which part and why.
 
-**Fees:** a fixed fee would suit us, and we would welcome 7 and 8 priced
-separately from 1–6 so they can proceed first. A draft collection agreement
+**Fees:** a fixed fee would suit us, and we would welcome 8 and 9 priced
+separately from 1–7 so they can proceed first. A draft collection agreement
 exists (it has never been reviewed by a solicitor) — reviewing it is a
 different job from drafting one, and we are happy for it to be discarded if
 the structure makes it the wrong document.
