@@ -613,11 +613,51 @@ campaign owner's actions or decisions after grant disbursement" and do not
 REGISTERED CHARITY running a DONOR-ADVISED FUND, a direct funding programme, a
 DAF agreement and published grant policies.
 
-**SO THEY DID NOT ESCAPE THE CHARITABLE-INTERMEDIARY PROBLEM. THEY BUILT ONE.**
-That is the PPGF architecture with the intermediary owned in house. Pay-the-
-organiser is what they use for PERSONAL fundraising, where there is no charity
-and no tax deduction on offer. It is not an alternative regulatory model for
-charitable giving; it is what you do when the recipient is a person.
+Pay-the-organiser is what they use for PERSONAL fundraising, where there is no
+charity and no tax deduction on offer. It is not an alternative regulatory
+model for charitable giving; it is what you do when the recipient is a person.
+
+**CORRECTION, SAME DAY.** I first wrote that GiveSendGo Charities is "the PPGF
+architecture with the intermediary owned in house" — their rail for campaign
+money. THE EVIDENCE DOES NOT SUPPORT THAT. It is a separate charitable
+VENTURE: a donor-advised fund with a **$10,000 minimum**, a "V.I.P. Very
+Important Projects" programme, and its own funds (Help A Veteran, GiverArmy
+Charitable Causes), formed in 2022. That is a major-donor philanthropy product
+and a grant-making arm, not the plumbing that moves an ordinary $50 campaign
+donation — the main platform still pays campaign owners and beneficiaries
+direct. They did not replace PPGF with it; they built a different business
+alongside.
+
+### Why PPGF was never available to GiveSendGo — and the one reason that transfers
+
+No stated reason exists; theirs is mission language ("a greater impact of
+hope"). But the structure is decisive: **A DONOR-ADVISED FUND CAN ONLY GRANT
+TO QUALIFIED 501(c)(3)s.** GiveSendGo's core beneficiaries are individuals,
+missionaries, families, legal-defence funds and small churches. PPGF cannot pay
+any of those. For the bulk of their volume PPGF was not a rail they rejected —
+it was one they could not use.
+
+Two likely secondary reasons, inferred: DEPENDENCY RISK (their positioning is
+that they do not refuse campaigns others do, and building on PayPal's charity
+hands a veto to a company that has used one) and THE FLOAT (interest on held
+funds, kept as a treasury fee).
+
+**THREE OF THOSE DO NOT TRANSFER TO FAVPOLL.** We pay ONLY registered
+charities, by design and as the trust proposition, so we fit a DAF the way
+GiveSendGo never could; we are not exposed to deplatforming; we are not selling
+philanthropy services. And they founded theirs in 2022 AFTER the convoy
+campaign put them at scale — favpoll has raised £0, where founding a charity is
+absurd.
+
+**THE FIRST ONE TRANSFERS EXACTLY, AND IT IS WHAT HENRY'S COVERAGE QUESTION
+TESTS.** If PPGF reaches only the ~8,000 enrolled charities out of 171,886 on
+the register, then favpoll's core case — the small local hospice, the stale
+register entry — hits precisely the wall that made PPGF unusable for
+GiveSendGo. That is the point at which we would FACE their fork rather than
+study it. And it is already framed: "own charitable intermediary" is the second
+structure in references/legal-brief-the-fork-2026-10.md. So the coverage answer
+does not merely size a feature — IT DECIDES WHICH HALF OF THAT BRIEF WE ARE
+LIVING IN.
 
 ### And the saving would be illusory, which is what actually settles it
 
