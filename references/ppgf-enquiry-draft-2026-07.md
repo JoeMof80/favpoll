@@ -1031,3 +1031,50 @@ document attached:
    **is a pre-selected optional contribution compliant under the DMCC Act**.
 
 That is a scopable, fixed-fee brief instead of an open opinion.
+
+### THE QUESTION THAT MAY UNBLOCK THE PRODUCT (founder, 2026-10-14)
+
+*"why would we need per-charity agreement if we are using ppgf?"*
+
+**s.59 requires a written agreement with THE CHARITABLE INSTITUTION.** If PPGF
+is the **NPO of record** — the donation is made to PPGF, and PPGF decides the
+grant — then the charitable institution receiving favpoll's solicited funds is
+arguably **PPGF**. In which case favpoll needs **ONE AGREEMENT, WITH PPGF**,
+not 42 and eventually thousands.
+
+**AND THAT WOULD EXPLAIN GOFUNDME'S SILENCE.** Their terms mention no
+commercial participator status, no solicitation statement and no per-charity
+agreements — which read as a conspicuous gap when first found. If their s.59
+counterparty is PPGF and the arrangement lives in their PPGF partner contract,
+there would be nothing to put in public terms.
+
+**THE COUNTER-ARGUMENT, so both are on the table.** favpoll's pages say a
+pledge is "a gift to the favpoll's chosen registered charity". If favpoll
+represents that contributions benefit MARIE CURIE, a regulator might hold that
+Marie Curie is the charitable institution however the money transits. GoFundMe
+names nonprofits too, so they are exposed to the same reading — which is either
+reassurance or shared risk, and we cannot tell which.
+
+**WHY THIS IS WORTH MORE THAN ANYTHING ELSE IN THIS FILE.** If one PPGF
+agreement suffices it does not merely save drafting — IT UNBLOCKS THE PRODUCT.
+The consent gate exists because of the agreement requirement: 42 charities sit
+pending, nothing is listed, no favpoll can accept a pledge, and outreach gates
+everything downstream. If the counterparty is PPGF rather than each charity,
+the gate could open across the register. **42 charities against 171,886.**
+
+Charities may still WANT to be asked — reputationally, and consent-first was
+partly the founder's own ethical choice. But wanting and being legally required
+are different things, and only one of them blocks launch.
+
+**IT ALSO WEAKENS THE JUSTGIVING LEAN I HAD JUST OFFERED.** That rested on
+three legs: favpoll already has Stripe and a one-charge flow; it needs a
+per-charity agreement anyway; and it does not depend on PPGF saying yes. THE
+MIDDLE LEG MAY NOT HOLD, and it was doing real work. If PPGF collapses the
+agreement requirement from thousands to one, that is a serious — possibly
+decisive — advantage for copying GoFundMe, because it is the difference between
+launching and waiting on outreach.
+
+**SO THIS IS NOW FIRST ON PIPPA'S LIST**, ahead of agent-vs-principal: under
+the PPGF-as-NPO-of-record architecture, is our s.59 counterparty PPGF or each
+named charity? And if PPGF, does the consent gate remain a choice rather than a
+requirement?
