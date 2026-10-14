@@ -190,10 +190,11 @@ export function PledgeHint({ hints = MEMORIAL_HINTS }: { hints?: HintScene }) {
             { label: `To ${CHARITY.name}`, amount: PICKED_AMOUNT },
             // £0, deliberately (founder, 2026-08-27). A non-zero shared-fund
             // line reads as money diverted AWAY from the charity, directly
-            // against the sentence beside it — "Every penny goes to the
+            // against the sentence beside it — "Every pledge goes to the
             // chosen charity" — and against the 0% promise. The line still
             // earns its place at zero: it shows the split exists without
-            // showing it taking anything.
+            // showing it taking anything. (That sentence said "Every penny"
+            // until 2026-10-14; the reasoning is unchanged, the quote is not.)
             { label: "Shared pot", amount: 0 },
             // The guest's, not the charity's and not favpoll's — it goes to
           ]}
