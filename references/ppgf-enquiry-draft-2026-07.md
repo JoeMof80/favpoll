@@ -537,3 +537,57 @@ narrow question. The real lever is the one already pulled — Hannah's £5,000
 bought a broad opinion that excluded drafting, where a single structured
 question (agent or principal, and what follows) is a fraction of it. The fork
 brief is already written to be answered that way.
+
+### THE TWO MODELS COSTED (2026-10-14) — and a correction to my own framing
+
+Founder, working the logic through: *"PPGF file model is good because it
+avoids checkout fees... But would invalidate gift aid. We would need PPGF
+checkout to support giftaid AND also Stripe for tips. But this wouldn't mean
+double fees, would it?"*
+
+**THE FEES. Nothing is charged twice on the same money — but the 20p FIXED fee
+is paid twice, and it lands on the tip.** Stripe UK domestic 1.5% + 20p
+(`lib/card-fee.ts`) against PPGF's disclosed partner rate of 1.4% + 20p, with
+processing split proportionally as `/terms` promises:
+
+| £10 pledge + £1 tip        | Charity | favpoll keeps of the tip |
+|----------------------------|---------|--------------------------|
+| FILE (one £11 Stripe charge) | £9.67 | **96.7p** |
+| CHECKOUT (PPGF £10 + Stripe £1) | £9.66 | **78.5p** |
+
+THE CHARITY LANDS WITHIN 3p EITHER WAY, at every size tested (£5/£1,
+£10/£1, £25/£2.50, £50/£5). The whole difference falls on FAVPOLL'S TIP: a
+flat ~18p per guest, which is 22% of a £1 tip and 6% of a £5 one. Being a
+fixed-fee problem it bites hardest exactly where tips sit. So the file
+model's advantage is not the pledge at all — it is that favpoll keeps its own
+revenue.
+
+**CORRECTION, MINE: THE FILE MODEL DOES NOT INHERENTLY INVALIDATE GIFT AID.**
+I introduced the "Gift Aid may cut the other way" framing above and he
+reasonably hardened it into "the file model would invalidate Gift Aid". It
+would not, necessarily — JUSTGIVING COLLECTS AND PASSES DECLARATIONS to the
+receiving charity, which is a collect-and-grant model with Gift Aid intact.
+What the file model needs is two things, both open QUESTIONS rather than
+blockers:
+1. favpoll collecting AS AGENT and not as principal — Pippa's.
+2. PPGF ACCEPTING PARTNER-COLLECTED DECLARATIONS — PPGF's, and standard
+   practice elsewhere.
+If either fails, Gift Aid dies on that rail. Neither is known to fail.
+
+**HIS STRONGEST POINT: the prior question swallows all of this.** The live
+`[COUNSEL]` marker in the draft terms asks whether a favpoll pledge qualifies
+for Gift Aid AT ALL, since the guest's pick weights the standings and they may
+receive a personal note. If that is a disqualifying benefit, Gift Aid fails on
+EVERY rail, the dimension drops out, and the file model wins on everything
+else including the 18p. His own earlier idea also survives either model: GIFT
+AID ONLY ON THE SHARED POT, where the giver gets no pick and no note, so
+nothing comes back to them.
+
+**SO ASK ABOUT THE OTHER FEES — they never appear on a donation screen:**
+- JOE: did Thrift+ pay PPGF anything at all — a platform charge, a monthly
+  minimum, anything per payment file?
+- HENRY: is there a per-row or per-grant cost on an uploaded file, and a
+  minimum file value or frequency?
+
+If the answer is "nothing", the file model's total cost is simply Stripe —
+exactly what favpoll pays today, with no new fee anywhere in the chain.
