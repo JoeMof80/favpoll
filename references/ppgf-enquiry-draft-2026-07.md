@@ -1431,3 +1431,44 @@ principles, and naming it will get her attention.
 asking Hannah to advise on PPGF now would read badly. (It also puts the £5,000
 quote in a different light: an opinion that excluded drafting may have been the
 most she could scope without touching the client relationship.)
+
+### CONTACT ROUTES, CHECKED 2026-10-15 (and one to avoid)
+
+The founder asked who to contact at PPGF via LinkedIn. Checked what is public:
+
+**A PHONE LINE, which July's record did not have: 0800 587 0461, stating
+"charity help" or just "charity".** Mon-Sun 8am-6:30pm. Also +44 203 901 7000.
+Contact form responses "typically within one working day". Registered office:
+c/o PayPal UK, 5 Fleet Place, London EC4M 7RD.
+
+**This is the best unused route, and it suits them.** Joe: "just a small team so
+a few calls." A phone call reaches a human who can route the enquiry, and it is
+not a cold message to a named individual whose function we have guessed.
+
+**THE UK PARTNER PAGE IS CHARITY-FACING, not partner-facing** —
+paypal.com/uk/paypal-giving-fund/paypal-partner is for charities enrolling.
+Checked directly. So July's finding stands: the US "Become a Partner" form is
+the only partner intake, and it has been used.
+
+**DO NOT APPROACH THE TRUSTEES.** They are public on the Charity Commission
+register (David John Jones, Simon Daniel Bladon, Andrew Seager, Vanessa
+Onyemem, Sukhraj Singh Dhadwar, Amit Ghosh) but they are GOVERNANCE, not
+business development; several are likely PayPal employees serving as trustees;
+and a cold partnership message to a trustee goes to the wrong function AND over
+the staff's heads. For a small team that is a bad first impression.
+
+**NO PARTNERSHIPS STAFF ARE PUBLICLY INDEXED.** A LinkedIn approach therefore
+means picking a name off a search page and guessing their role. Wrong-function
+messages get forwarded at best.
+
+**ORDER OF ESCALATION IF MONDAY 20 OCTOBER IS SILENT:**
+1. Chase on the referenced thread `C826-L003-TPPGF001-S999-W000000` — it is the
+   provable contact, and traceable.
+2. Phone 0800 587 0461, say "charity".
+3. LinkedIn last, and to a PARTNERSHIPS title, never a trustee.
+
+**AND ON THE MISSING RECEIPT:** the "Become a Partner" form is a MICROSOFT FORM,
+which sends no confirmation unless the owner enables it. Silence after
+submitting is expected behaviour, not evidence of failure, and there is no way
+to verify it from our side. DO NOT RESUBMIT — a duplicate from the same company
+reads as disorganised to a small team. The thread reply is the provable contact.
