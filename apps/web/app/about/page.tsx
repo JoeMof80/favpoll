@@ -13,8 +13,12 @@ import { ContactForm } from "@/components/contact-form"
 // stays out — "Where the money goes" makes that argument above.
 const BASICS: { label: string; body: string }[] = [
   {
+    // Rewritten 2026-10-14 (founder spotted it): "none taken from the gift"
+    // had no agent, so it read as NOTHING being taken — the claim retired on
+    // 2026-09-06, since processing is met from the pledge at settlement.
+    // Naming the fee is the whole fix: no fee is taken, which is true.
     label: "Free to create",
-    body: "No fee to set one up, and none taken from the gift.",
+    body: "No fee to set one up, and no fee taken from the gift.",
   },
   {
     label: "One to three charities",
@@ -236,8 +240,14 @@ export default function AboutPage() {
             <SectionEyebrow className="mb-2">
               Where the money goes
             </SectionEyebrow>
+            {/* "All of it, to the charity." until 2026-10-14 — the claim
+                the founder retired estate-wide on 2026-09-06, surviving as a
+                HEADING that its own paragraph contradicted three lines below
+                ("only card processing costs apply"). The replacement states
+                the destination, which is true, rather than completeness,
+                which is not. See apps/web/lib/card-fee.ts. */}
             <h2 className="mb-6 max-w-xl text-3xl font-light tracking-tight text-foreground">
-              All of it, to the charity.
+              Straight to the charity.
             </h2>
           </FadeIn>
           <div className="flex max-w-2xl flex-col gap-5">
