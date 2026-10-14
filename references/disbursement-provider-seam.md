@@ -1,5 +1,22 @@
 # The disbursement-provider seam
 
+> **2026-10-14 — THE LIKELY PARTNER MOVES MONEY BY FILE, NOT BY API.** Joe
+> Metcalfe (Thrift+, to June 2026) on their PPGF integration: *"We used them
+> in a semi automated way — uploading mass payments files, rather than full
+> API integration. Which worked fine for us."* They used PPGF's API only to
+> look up available charities.
+>
+> The per-charity interface below SURVIVES: for a file-based partner the
+> existing no-op — write a ledger row, return `pending` — is already the
+> correct first half, and the ledger is the queue. What is missing is an
+> EXPORT that turns pending rows into the partner's file and an IMPORT that
+> reconciles the outcome back. That is cheaper than a payments client and
+> keeps a human at the moment money leaves, which at favpoll's scale is a
+> feature. Do not design a per-grant API client for PPGF.
+>
+> See `ppgf-enquiry-draft-2026-07.md`, 2026-10-14.
+
+
 _Split out of `goodstack-call-brief-2026-07.md` on 7 August 2026 — it is
 engineering design, not call material, and it was the bulk of a document
 meant to be read in the five minutes before a meeting._
