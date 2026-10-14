@@ -17,6 +17,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { PerfectTopicSelect } from "@/components/perfect-topic-select";
+// The words live in lib/outreach-email.ts so /outreach can render the
+// same ones without opening a draft. Behaviour here is unchanged.
+import { inviteEmail, welcomeEmail, mailtoFor } from "@/lib/outreach-email";
 
 // ─── Consent outreach queue ──────────────────────────────────────────────────
 //
@@ -31,58 +34,6 @@ import { PerfectTopicSelect } from "@/components/perfect-topic-select";
 // email prefilled (recipient from the Commission register's public
 // contact where we hold it) and stamps invite_drafted_at. Sending is
 // manual — the stamp records the attempt, Approve records the reply.
-
-function inviteMailto(row: ConsentQueueRow): string {
-  const subject = `Receiving pledges through favpoll — ${row.name}`;
-  const body = [
-    "Hello,",
-    "",
-    `favpoll (https://favpoll.com) is a pledge poll for occasions — guests pick a favourite and pledge money, and everything raised goes to a chosen charity. An organiser has picked ${row.name} to receive what their favpoll raises.`,
-    "",
-    "Before any money is collected, we ask each charity to confirm it's happy to receive donations this way. Could you confirm by reply? We'll follow up with the details.",
-    "",
-    "Thank you,",
-    "The favpoll team",
-  ].join("\n");
-  return `mailto:${encodeURIComponent(row.registered_email ?? "")}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-}
-
-// The WELCOME follows Approve (founder, 2026-09-18): the invite stays a
-// single ask, and the promised "details" get an artefact — the three
-// optional enrichments a charity can hand us (suggested topics, impact
-// lines, logo), which otherwise nobody remembers to collect. Drafted in
-// the team's own mail client like the invite; sending stays manual.
-function welcomeMailto(row: ConsentQueueRow): string {
-  const subject = `Welcome to favpoll — ${row.name}`;
-  // The charity's own signature event, when its site showed one, is the
-  // strongest hook: it names the occasion as well as the favourite.
-  const event = row.signature_events?.find((e) => e.topic) ?? null;
-  const body = [
-    "Hello,",
-    "",
-    `Thank you for confirming — ${row.name} can now receive pledges through favpoll, and everything raised is passed on when each favpoll closes.`,
-    "",
-    ...(event
-      ? [
-          `We noticed your ${event.name}${event.when ? ` (${event.when})` : ""}: a favpoll on favourite ${event.topic!.toLowerCase()} would suit it, and we can set one up for you to share.`,
-          "",
-        ]
-      : []),
-    "Three optional things that make your favpolls work harder — just reply with any of them:",
-    "",
-    // The charity's own topic, when an admin has confirmed one: offered,
-    // with the reason, and theirs to overrule (founder, 2026-09-25).
-    row.perfect_topic_title
-      ? `1. Your topic — we've set up Favourite ${(row.perfect_subset_title ?? row.perfect_topic_title).toLowerCase()} as the topic we suggest to organisers raising for you${row.perfect_topic_reason ? `: ${row.perfect_topic_reason.replace(/\.$/, "")}` : ""}. Reply if you'd rather another, or add more.`
-      : "1. Suggested topics — poll topics you'd like us to suggest to organisers raising for you (some charities suit certain favourites: a hospice might pick Comfort food, a rescue might pick Dog breed).",
-    "2. Impact lines — one or two short sentences like \u201c\u00a320 funds an hour of care\u201d, shown to guests as they pick an amount.",
-    "3. Your logo — shown wherever your charity is named.",
-    "",
-    "Thank you,",
-    "The favpoll team",
-  ].join("\n");
-  return `mailto:${encodeURIComponent(row.registered_email ?? "")}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-}
 
 // The cause family (references/favpoll-pairing-table §2) is confirmed
 // HERE, because this is the one moment an admin already has the charity in
@@ -168,7 +119,7 @@ function QueueRow({
       } else if (status === "approved" && row.registered_email) {
         // Approval removes the row from the queue, so the welcome email
         // drafts NOW — the one moment the ask can't be forgotten.
-        window.location.href = welcomeMailto(row);
+        window.location.href = mailtoFor(welcomeEmail(row));
       }
     });
   }
@@ -226,7 +177,7 @@ function QueueRow({
         ) : (
           <Button asChild size="sm" variant="outline" disabled={isPending}>
             <a
-              href={inviteMailto(row)}
+              href={mailtoFor(inviteEmail(row))}
               onClick={() => void markCharityContacted(row.id)}
             >
               <Mail className="size-3.5" aria-hidden="true" />
