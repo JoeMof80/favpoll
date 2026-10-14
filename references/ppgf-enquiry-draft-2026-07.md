@@ -359,3 +359,50 @@ are currently blocking estimates rather than decisions.
 
 The PPGF chase date (Monday 20 October) stands regardless: Henry can
 describe the plumbing but cannot approve us.
+
+### The two questions the founder wants asked (2026-10-14)
+
+Both go back to Joe rather than to Henry, because only he can answer them:
+
+1. **How established was Thrift+ when they first approached PPGF — what
+   volume?** THE ONE WORTH MOST. The whole case for applying at pre-launch
+   rests on Thrift+ having been nowhere near the survey's stated "$10m+ per
+   year", and that is currently INFERRED from a 2020 UKBAA profile (nine
+   staff, £150k for charity in the preceding year) plus their present-day
+   "£2M+ raised". Joe can confirm or demolish it in one sentence, and if he
+   confirms it, the threshold is an aspiration rather than a gate.
+2. **How long from first contact to moving money?** Sets the expectation the
+   chase date cannot: whether the rail is weeks or quarters away decides how
+   much else gets parked behind it.
+
+The COVERAGE question (whole register, or only the ~8,000 enrolled?) moved to
+Henry, and PPGF must answer it formally anyway — so it is not worth one of
+Joe's slots.
+
+### How the file model actually works
+
+Established from Joe: files not API, and the lookup API used for charities.
+The rest is the standard shape of that flow and matches model (b) of the July
+enquiry — collect, then grant onward with per-charity recommendations.
+
+- **Per pledge, nothing reaches PPGF.** Stripe settles to favpoll's bank less
+  processing; the pledge sits in the ledger. Already built.
+- **At close**, `close-favpolls` splits `total_raised` equally across the ≤3
+  charities and writes one `disbursements` row each, `pending`, keyed
+  `${favpollId}:${charityId}`. Already built — the ledger IS the queue.
+- **The batch run is the missing part:** EXPORT pending rows to a file (one
+  line per grant), make ONE bank transfer to PPGF for the file's total,
+  upload the file so they know how to break it apart, then IMPORT the result
+  to mark each row sent / unpayable / failed on its reference.
+- **PPGF grants onward** — enrolled charities by transfer, unenrolled by
+  cheque or their own recommendation route.
+
+Why it is cheaper than an API: no per-grant client, no retry or network
+idempotency (the reference column already is the key), and a human sees the
+total before money leaves — correct at £0 raised.
+
+**THE LEGAL CONSEQUENCE, which is not PPGF's question.** This model means
+favpoll HOLDS other people's donations between a favpoll closing and the file
+going up. That is the heart of the Part II / agent-vs-principal question and
+belongs in the brief for Pippa Garland, not in a technical conversation with
+Henry. See references/legal-brief-the-fork-2026-10.md.
