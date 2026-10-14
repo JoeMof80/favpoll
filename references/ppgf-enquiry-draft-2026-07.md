@@ -1178,3 +1178,256 @@ they have published a practice, follow it rather than inventing a position.
 Designing the file-model export/import pair. It was built on one sentence of
 Joe's that PPGF's own policies do not support, and under this ruling it is not
 the architecture anyway.
+
+---
+
+## 2026-10-15 — JOE'S SECOND REPLY. The practitioner's answer to the s.59 question.
+
+Quoted in full, because it is the most consequential paragraph in this file:
+
+> PPGF is the middle man, so you just need to have a contract with them that
+> makes you one of their partners. After that you are then able to present the
+> charities and their logos to your customers. **You don't need any direct
+> relationship with the charities themselves.** PPGF are then strict on how you
+> present the donation and wording etc in your TS and C's and on the donation
+> page.
+>
+> Having said that, I do think they aim for something like **£10k per year**. We
+> were relatively established but not very.
+>
+> But yes, it is a small team at PPGF and requires effort on their side to
+> integrate and manage your account, so there will be a process of explaining
+> who you are and **that there are a significant volume of donations expected**.
+>
+> In terms of how long - I can't quite remember, I'm afraid. It's not some big
+> bureaucratic thing, just a small team so a few calls. Then they share the
+> process / tech docs.
+
+### 1. ONE CONTRACT, NO CHARITY RELATIONSHIPS — practised, not theorised
+
+This is the founder's model, described by someone who ran it: a partner
+contract with PPGF, after which you may present charities AND THEIR LOGOS,
+with no relationship with any of them.
+
+**WHAT IT DOES NOT SETTLE, and the distinction matters.** Joe is describing
+PPGF's COMMERCIAL requirement, not UK statutory compliance. "PPGF says you do
+not need charity relationships" is PPGF's position on its own contract; it is
+not a view on whether favpoll is a commercial participator under s.58 or whose
+agreement s.59 then requires. Joe is not a lawyer and does not claim to be.
+
+**BUT IT IS STRONG EVIDENCE, and it narrows the legal question to almost
+nothing.** PPGF is a UK registered charity (1110538) that presumably takes its
+own advice, and the giveaway is the next sentence: they are **STRICT ON THE
+WORDING** in our T&Cs and on the donation page. That is exactly what you would
+expect if the wording is engineered so the donor's gift is legally TO PPGF —
+which is what makes PPGF the s.59 counterparty. The mandated wording is the
+mechanism, and it is theirs.
+
+So the ask of Pippa collapses from "advise us on Part II" to: **here is PPGF's
+partner agreement and the wording they require — does it make PPGF our s.59
+counterparty?** One document, one question.
+
+**A CONSEQUENCE WORTH NAMING: `/terms` IS PARTLY NOT OURS TO WRITE.** The money
+paragraph and the pledge-page copy will be constrained by PPGF. Which also
+dissolves the worry recorded above that our own wording ("a gift to the
+favpoll's chosen registered charity") creates the per-charity reading — we will
+be told what to say instead.
+
+**AND THE LOGOS COME WITH IT.** "Present the charities and their logos" bears on
+the charity-image work (#1014/#1023): scraped favicons and og:images may be
+replaceable by whatever PPGF supplies. Worth asking before more scraping.
+
+### 2. THE THRESHOLD IS NOT $10m
+
+Joe: "something like £10k per year". The survey's line is **"We are
+particularly interested in hearing from you if you operate one of the
+following, and raise more than $10m for charity each year"** — a PREFERENCE,
+not a bar, and the form's own Q6 offers a "£0 - £1,000,000" band, which already
+said submissions far below are expected. Both can be true: $10m is who they
+court, £10k is what they will take.
+
+**THE REAL REQUIREMENT IS A CREDIBLE VOLUME STORY, NOT A NUMBER WE ALREADY
+HIT.** "A process of explaining who you are and that there are a significant
+volume of donations expected." favpoll has raised nothing, so this is work:
+the application needs projections it can defend, and the funeral-director
+channel (Co-op's ~93,000 services a year) is the strongest thing we have to
+put in it. See [[project-funeral-directors]].
+
+### 3. THE TIMELINE IS CALLS, NOT BUREAUCRACY
+
+"Not some big bureaucratic thing, just a small team so a few calls. Then they
+share the process / tech docs."
+
+**SO HENRY'S QUESTIONS MAY ANSWER THEMSELVES.** The file format, what comes
+back after an upload, the lookup API's coverage — Joe says PPGF share the
+process and tech docs once engaged. Henry is still worth asking (he is free and
+immediate, where PPGF is a few calls away), but the plumbing questions stop
+being blockers and become things that arrive with the partnership.
+
+### WHAT THIS MEANS FOR MONDAY
+
+The chase stops being "will you consider us" and becomes **"we would like to
+be a partner — may we have a call?"** with a volume story attached. And the
+single question to put to Pippa afterwards is the partner agreement plus their
+mandated wording, which is one document and one question instead of an opinion.
+
+### THE MANDATED WORDING, FOUND IN THE WILD (2026-10-15)
+
+Joe said PPGF "are strict on how you present the donation and wording etc in
+your TS and C's and on the donation page". So we read a UK partner's terms. The
+founder's idea; it paid.
+
+**THRIFT+'S OWN TERMS (thrift.plus/terms-of-service) — the closest precedent we
+have, because Thrift+ is a UK company where GoFundMe's UK arm has a US parent:**
+
+> "In both scenarios, **we make a donation on your behalf to PayPal Giving Fund
+> (registered charity No. 1110538)**" — which then "makes a grant to your
+> **Suggested Charity**."
+>
+> Users select from charities "**enrolled with PayPal Giving Fund**". If a
+> preferred charity is not available, Thrift+ recommends contacting them about
+> enrolment.
+>
+> "There is no additional fee to you or your Suggested Charity for processing
+> this donation."
+
+**PPGF UK'S OWN FRAMING:**
+
+> "All donations through PayPal Giving Fund programmes are **gifts made
+> voluntarily to PayPal Giving Fund**, a registered charity in England and
+> Wales (No. 1110538), **for the benefit of a charity chosen by the donor**."
+>
+> "PayPal Giving Fund has **legal control over all donations**."
+>
+> Grants monthly, typically 15-45 days after receipt; where funds cannot be
+> delivered, PPGF reassigns them.
+
+**"SUGGESTED CHARITY" IS THE GIVEAWAY.** The vocabulary carries the legal
+architecture: the donor SUGGESTS, PPGF GRANTS, PPGF holds LEGAL CONTROL. That is
+what makes PPGF the recipient, and so arguably the s.59 counterparty. The
+discretion clause the founder already ruled on is the same sentence seen from
+the other side.
+
+**SO WE KNOW THE SHAPE OF OUR `/terms` CHANGE WITHOUT PAYING FOR IT.** Today:
+"A pledge is a gift to the favpoll's chosen registered charity — never to the
+organiser, and never to favpoll." Under PPGF's framing it becomes closer to:
+a gift to PayPal Giving Fund, for the benefit of the charity you suggest. The
+word "pledge" survives; "chosen" becomes "suggested"; the recipient changes.
+NOT TO BE WRITTEN until a partnership exists, but no longer unknown.
+
+### THE PATTERN IN WHAT IS ABSENT
+
+Thrift+'s terms mention NO Gift Aid, NO Charities Act 1992, NO commercial
+participator or professional fundraiser status, NO solicitation statement.
+Exactly as GoFundMe's do not.
+
+Two UK-operating PPGF partners, the same silence — and Thrift+ is the weightier
+case: a UK company selling goods and donating a share while naming charities is
+close to the PARADIGM commercial participator. Its silence either strongly
+supports the PPGF-as-counterparty reading or is two partners making the same
+omission. PIPPA DECIDES WHICH, but it is a far better-evidenced question than
+it was this morning, and the evidence is free.
+
+(Also: no Gift Aid anywhere in their terms, which confirms the earlier
+reasoning that Gift Aid never applied to Thrift+ — their donation is resale
+proceeds, not a cash gift from taxed income.)
+
+### A NEW CONSTRAINT: THE PICKER MAY BE THE ENROLLED SET, NOT THE REGISTER
+
+Thrift+ offered only charities "enrolled with PayPal Giving Fund", and told
+users to ask an unenrolled charity to enrol. That matches their published
+"6.8K+ charities" — the ENROLLED set, not the register's 171,886.
+
+So even though PPGF can CHEQUE an unenrolled charity (their own policy, above),
+a partner's SELECTION LIST may be limited to the enrolled. Those are consistent:
+the picker uses the enrolled list; the cheque route covers donations made
+elsewhere, such as GoFundMe's auto-created nonprofit pages.
+
+**THIS SHARPENS THE COVERAGE QUESTION INTO ITS FINAL FORM, FOR PPGF:** can our
+picker offer ANY registered charity, or only your enrolled list? Thousands
+either way, and vastly more than 42 — but favpoll's core case is the small
+local hospice, and that is exactly the kind most likely to be unenrolled.
+
+### CORRECTION, SAME HOUR: THE PICKER IS NOT LIMITED TO THE ENROLLED
+
+The founder: *"gofundme offer more than the enrolled charities, don't they?"*
+They do, and the constraint I had just introduced was wrong.
+
+**PAYPAL'S OWN PARTNER PAGE:** the Charity Search API provides access to "a
+global directory of **over a million vetted charities**" and "quickly updates
+the list of **eligible** charities with **registration and status data**".
+
+**GOFUNDME'S OWN SUPPORT:** "If you're enrolled with PPGF, you can receive
+funds directly to your business PayPal account, and **if you aren't enrolled,
+funds will be disbursed via a check in the mail.**"
+
+So ELIGIBILITY IS DRIVEN BY REGISTRATION, NOT ENROLMENT. Thrift+'s
+enrolled-only picker was **Thrift+'s own choice**, not a PPGF limitation —
+plausibly operational, since 90-day cheques across thousands of tiny resale
+donations would be miserable to run.
+
+Which restores the conclusion reached two days ago from PPGF's help pages and
+then talked out of an hour later: **ENROLMENT IS LATENCY, NOT REACH.**
+
+**MY OWN PATTERN, WORTH NAMING SO IT STOPS.** Twice in this thread I narrowed
+the picture on partial evidence and the founder pushed back, and both times the
+published facts were MORE favourable than my reading: first "PPGF's reach stops
+at the enrolled 8,000" (wrong — unenrolled charities get a cheque), then "a
+partner's picker may be limited to the enrolled set" (wrong — the API's universe
+is the register). The error was the same both times: reading ONE partner's
+implementation as the platform's constraint. Read the platform's own
+documentation for what is POSSIBLE, and a partner's terms only for what is
+PRACTISED.
+
+**SO THE COVERAGE QUESTION IS LARGELY ANSWERED, AND FAVOURABLY.** It stays on
+the list for PPGF to confirm in writing, but the expected answer is now: the
+picker can offer the register, and enrolment decides whether a charity is paid
+by monthly transfer or by cheque within 90 days. That is the answer favpoll's
+model needs — the small local hospice is reachable.
+
+One residual: PPGF's API does its own vetting with "registration and status
+data", which overlaps our register mirror. The mirror still earns its keep —
+it carries activities, objects, classification and areas for the topic and
+profile work, which a fundability API would not — but for FUNDABILITY the
+authoritative source becomes theirs, not ours.
+
+### PPGF UK'S OWN SOLICITORS ARE BATES WELLS (2026-10-15)
+
+The founder asked whether GoFundMe's or Thrift+'s law firm could be found — a
+firm that has already advised a PPGF partner on Part II would have the answer
+on a shelf. Neither is public. But PPGF UK's filed annual report names its
+professional advisers, and they are:
+
+- **Solicitors: BATES WELLS**, 10 Queen Street Place, London EC4R 1BE
+- Auditor: Sayer Vincent
+
+(Named in their filed accounts, so "named in the report" rather than
+"currently acting"; and being named as solicitors does not prove they advised
+on the PARTNER PROGRAMME specifically.)
+
+**1. IT PROBABLY ANSWERS HIS QUESTION OF 2026-10-13.** He asked "why would
+Hannah recommend somebody with the same compliance risk as her?", and I
+answered about risk appetite. The likelier explanation is a **CONFLICT**: a firm
+acting for PPGF cannot comfortably advise a prospective PPGF partner on its
+position relative to PPGF. The referral to Pippa Garland at Russell Cooke is
+what a conflicts check produces, not a brush-off. Worth knowing, because it
+means the referral was professional rather than evasive.
+
+**2. IT MAKES PPGF'S MANDATED WORDING MORE TRUSTWORTHY.** "Gifts made
+voluntarily to PayPal Giving Fund … for the benefit of a charity chosen by the
+donor", and "Suggested Charity", were drafted with a leading UK charity-law firm
+advising the charity. The architecture favpoll is about to adopt has had proper
+attention — not ours, but proper. That is the strongest evidence yet that the
+PPGF-as-counterparty reading is sound, and it is better than the inference from
+two partners' silence.
+
+**3. IT MAKES PIPPA'S JOB SMALLER AND THE BRIEF SHARPER.** The ask becomes:
+*"PPGF's partner terms were drafted with Bates Wells advising PPGF. Does that
+architecture make PPGF our s.59 counterparty?"* Reading a document drafted by a
+specialist firm for a charity client is far less work than reasoning from first
+principles, and naming it will get her attention.
+
+**DO NOT APPROACH BATES WELLS FOR THIS.** The conflict runs both ways, and
+asking Hannah to advise on PPGF now would read badly. (It also puts the £5,000
+quote in a different light: an opinion that excluded drafting may have been the
+most she could scope without touching the client relationship.)
