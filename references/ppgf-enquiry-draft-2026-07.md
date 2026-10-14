@@ -275,3 +275,87 @@ asked: it is already visible on their own donation screen, and asking what you
 can see wastes one of three.
 
 **Note for the thread:** they are both Joe. Sign as Joseph Moffatt.
+
+---
+
+## 2026-10-14 — JOE METCALFE REPLIED, and two of it changes the build
+
+He answered the next day. Quoted in full because the detail matters more
+than the endorsement:
+
+> Thanks for reaching out. I left Thrift+ in June but happy to say that
+> PPGF as a team were brilliantly supportive and I massively approve of
+> their mission. We used them in a semi automated way — uploading mass
+> payments files, rather than full API integration. Which worked fine for
+> us. No concerns. If you want a technical perspective then it was @Henry
+> McIntosh who looked after that part. Though again noting we never did a
+> full API integration for the actual payments. We used their API to look
+> up available charities.
+
+**THE REFERENCE IS CLEAN.** "Brilliantly supportive", "no concerns", from
+a founder with no reason to flatter them and no stake left in the company.
+Against a partner we cannot otherwise audit, that is the most useful thing
+a peer could have said. Caveat: he left in JUNE 2026, so this is a picture
+of the relationship to that date.
+
+### 1. The money moves by FILE, not by API
+
+Thrift+ never built a payments integration. They uploaded **mass payment
+files** — "semi automated", and it "worked fine". That is a batch of
+charity-plus-amount rows handed over, not a call per grant.
+
+**This is good news, and it reshapes the seam** (see
+`disbursement-provider-seam.md`). The interface there is per-charity —
+`disburse(req): Promise<DisbursementResult>` — and the active provider is
+a no-op that writes a ledger row and returns `pending`. For a file-based
+partner **that no-op is already the correct first half**: the ledger is
+the queue. What is missing is not a payments client but a PAIR either side
+of it:
+
+  - an EXPORT that turns pending ledger rows into PPGF's file format, and
+  - an IMPORT that reconciles the outcome back onto those rows.
+
+Cheaper than an API client, and it keeps a human in the loop at the exact
+moment money leaves — which at favpoll's current scale (nothing raised,
+nothing operating) is a feature rather than a compromise. It also means
+the per-charity `disburse` signature survives untouched; only the provider
+behind it becomes "write the row and wait for the batch".
+
+**UNANSWERED, and now worth asking Henry rather than PPGF:** the file's
+format and identifiers (does it key on registered charity number, or on a
+PPGF id we must first resolve?), the cadence PPGF accepts it on, and what
+comes back — a per-row result, or silence unless something fails. The
+third decides whether question 3 below is solved or merely promised.
+
+### 2. There IS a charity-lookup API, and it is the one we need
+
+"We used their API to look up available charities." That is a partial
+answer to **question 2** above — fundability at SELECTION time — from a
+source other than PPGF's own sales answer. An API that returns AVAILABLE
+charities is exactly the shape that lets us never offer what cannot be
+paid.
+
+Still open, and the whole value of it: **coverage.** Available means what —
+the ~8,000 enrolled, or anything on the register PPGF can reach by cheque?
+Joe's wording does not settle it and he may not know. Henry would.
+
+**CONSEQUENCE FOR THE OUTREACH WAVE:** if that API answers fundability
+across the register, the **donate-route HTTP probe is obsolete before it is
+built** — see [[project-outreach-wave]], where it is currently the one
+filter measurement had not killed. An authoritative list from the party
+that actually moves the money beats inferring intent from whether a charity
+has a donate button. DO NOT BUILD THE PROBE until the API's coverage is
+known.
+
+### Next step: take the Henry McIntosh offer
+
+Joe offered him unprompted, which makes an introduction cheap to ask for
+and likely to land. The questions are no longer the peer-experience three
+from the LinkedIn plan — those are answered. They are now technical and
+narrow: the file format and its identifiers, what comes back after an
+upload, and the lookup API's coverage. All three are things PPGF would
+answer slowly and a predecessor can answer in a paragraph, and all three
+are currently blocking estimates rather than decisions.
+
+The PPGF chase date (Monday 20 October) stands regardless: Henry can
+describe the plumbing but cannot approve us.
