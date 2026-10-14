@@ -816,3 +816,61 @@ It stops being "does the lookup API cover the register" and becomes **"does the
 lookup tell us whether this SPECIFIC charity is enrolled?"** Enrolled-vs-not is
 the difference between prompt electronic payment and a 90-day cheque — worth
 knowing at the moment an organiser picks, and possibly worth telling them.
+
+### GIVESENDGO DOES NOT USE PPGF — correcting a premise I accepted
+
+The founder asked "why did GiveSendGo choose to create a charity rather than
+use PPGF?", and I answered it — reasoning about why PPGF would not have suited
+their missionaries and individuals — WITHOUT FIRST CHECKING WHETHER PPGF WAS
+EVER A CANDIDATE. It was not. There is no PPGF anywhere in their model. The
+earlier section's reasoning about "why PPGF was never available to them" is
+answering a question nobody established.
+
+**What they actually do** (their own policies and filings):
+
+- **GiveSendGo Charities, Inc.** — a New Hampshire 501(c)(3), EIN 88-3776392,
+  LEGALLY DISTINCT from GiveSendGo.com.
+- It USES the platform to receive and distribute tax-deductible donations.
+- "All donations to GiveSendGo Charities, Inc. become the property of the
+  charity, and the Board of Directors retains FULL CHARITABLE DISCRETION over
+  all disbursements."
+- "GiveSendGo disburses funds to recipients via third-party payment processors,
+  ACH transfers, or other disbursement methods" — THEY DO IT THEMSELVES.
+- The charity issues the tax receipts. Disaster relief within 30 days; grants to
+  individuals or families 2-4 weeks after verification.
+- The TIP MODEL sits on the shared platform and serves both arms. That part
+  favpoll already copies.
+
+### So this is the SECOND FORK, with a proof point at scale behind it
+
+Their charitable model is: OWN A CHARITY, take the donation INTO it, hold board
+discretion, grant out. That is `legal-brief-the-fork-2026-10.md`'s charitable
+intermediary — with favpoll owning the intermediary instead of renting PPGF's.
+
+**What it would buy:**
+- NOBODY CAN REFUSE US. No $10m threshold, no eligibility survey, no enrolment
+  latency, no third party re-granting a memorial's money elsewhere.
+- Our own charity claims the Gift Aid.
+- TIPS RIDE THE SAME STRIPE CHARGE — GiveSendGo demonstrably does this, which
+  is the first evidence in this file that a one-charge split is workable.
+- We could pay a small local hospice DIRECTLY, which is favpoll's core case.
+
+**What it costs, and two are UK-specific:**
+- Running a charity: Commission registration, trustees, annual accounts,
+  independent governance.
+- THE COMMISSION SCRUTINISES A CHARITY CONTROLLED BY A COMMERCIAL COMPANY.
+  Trustee independence is the issue, and "Josmo Services Ltd's charity" invites
+  exactly that question. Probably a CIO, and probably slow.
+- DISCRETION DOES NOT DISAPPEAR, IT BECOMES OURS. Board discretion over grants
+  is inherent to the structure, not a PPGF quirk — we would inherit the same
+  inability to promise a donor their chosen charity absolutely.
+- Months and real money at £0 raised. GiveSendGo built theirs in 2022, AFTER
+  the convoy campaign put them at scale.
+
+**And it does not fix QUESTION B.** Whether a pledge is a pure gift depends on
+what the GUEST gets back — the pick weighting the standings, the personal note.
+Changing who receives the money does not touch that.
+
+NOT TO PURSUE NOW. But it is the first time the second fork has had a working
+proof at scale behind it, which changes the question for Pippa from "could we?"
+to "GiveSendGo does — what would it take here?"
