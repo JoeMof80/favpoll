@@ -123,7 +123,12 @@ export function StepPay({
             extraRow={
               <>
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-muted-foreground">Tip for favpoll</span>
+                  {/* "Optional" is VISIBLE now, not only in the aria-label
+                      (2026-10-15): the DMCC Act names pre-selected optional
+                      charges, and a sighted guest never read the word. */}
+                  <span className="text-muted-foreground">
+                    Optional tip for favpoll
+                  </span>
                   <div
                     className="flex gap-1"
                     role="radiogroup"

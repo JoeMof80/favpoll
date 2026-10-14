@@ -68,18 +68,16 @@ function flagsFor(row: OutreachPreviewRow, kind: OutreachKind): Flag[] {
   }
 
   if (kind === "welcome") {
-    const hook = row.signature_events?.find((e) => e.topic) ?? null;
-    if (!hook) {
-      const read = row.website_read_at;
-      const count = row.signature_events?.length ?? 0;
+    // Any fundraisable event now carries the paragraph (2026-10-15); a
+    // topic only sharpens it. So the flag means NO EVENT AT ALL.
+    const count = row.signature_events?.length ?? 0;
+    if (count === 0) {
       flags.push({
         blocking: false,
         label: "No event hook",
-        detail: !read
+        detail: !row.website_read_at
           ? "Its website was never read, so the strongest paragraph — naming the charity's own event — is missing entirely."
-          : count === 0
-            ? "Its website was read and no events were found, so the event paragraph is missing."
-            : `${count} event${count === 1 ? "" : "s"} were found but none carries a topic, so the paragraph is dropped silently.`,
+          : "Its website was read and nothing fundraisable was found, so the event paragraph is missing.",
       });
     }
 

@@ -243,11 +243,14 @@ export default function AboutPage() {
             {/* "All of it, to the charity." until 2026-10-14 — the claim
                 the founder retired estate-wide on 2026-09-06, surviving as a
                 HEADING that its own paragraph contradicted three lines below
-                ("only card processing costs apply"). The replacement states
-                the destination, which is true, rather than completeness,
-                which is not. See apps/web/lib/card-fee.ts. */}
+                ("only card processing costs apply"). Briefly "Straight to
+                the charity.", which states the destination — but under a
+                PayPal Giving Fund partnership the destination is PPGF first,
+                so that would have needed revisiting. This one is true under
+                every rail and sets up the paragraph exactly (founder,
+                2026-10-15). See apps/web/lib/card-fee.ts. */}
             <h2 className="mb-6 max-w-xl text-3xl font-light tracking-tight text-foreground">
-              Straight to the charity.
+              Nothing to favpoll.
             </h2>
           </FadeIn>
           <div className="flex max-w-2xl flex-col gap-5">
