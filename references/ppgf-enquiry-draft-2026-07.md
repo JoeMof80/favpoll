@@ -1178,3 +1178,95 @@ they have published a practice, follow it rather than inventing a position.
 Designing the file-model export/import pair. It was built on one sentence of
 Joe's that PPGF's own policies do not support, and under this ruling it is not
 the architecture anyway.
+
+---
+
+## 2026-10-15 — JOE'S SECOND REPLY. The practitioner's answer to the s.59 question.
+
+Quoted in full, because it is the most consequential paragraph in this file:
+
+> PPGF is the middle man, so you just need to have a contract with them that
+> makes you one of their partners. After that you are then able to present the
+> charities and their logos to your customers. **You don't need any direct
+> relationship with the charities themselves.** PPGF are then strict on how you
+> present the donation and wording etc in your TS and C's and on the donation
+> page.
+>
+> Having said that, I do think they aim for something like **£10k per year**. We
+> were relatively established but not very.
+>
+> But yes, it is a small team at PPGF and requires effort on their side to
+> integrate and manage your account, so there will be a process of explaining
+> who you are and **that there are a significant volume of donations expected**.
+>
+> In terms of how long - I can't quite remember, I'm afraid. It's not some big
+> bureaucratic thing, just a small team so a few calls. Then they share the
+> process / tech docs.
+
+### 1. ONE CONTRACT, NO CHARITY RELATIONSHIPS — practised, not theorised
+
+This is the founder's model, described by someone who ran it: a partner
+contract with PPGF, after which you may present charities AND THEIR LOGOS,
+with no relationship with any of them.
+
+**WHAT IT DOES NOT SETTLE, and the distinction matters.** Joe is describing
+PPGF's COMMERCIAL requirement, not UK statutory compliance. "PPGF says you do
+not need charity relationships" is PPGF's position on its own contract; it is
+not a view on whether favpoll is a commercial participator under s.58 or whose
+agreement s.59 then requires. Joe is not a lawyer and does not claim to be.
+
+**BUT IT IS STRONG EVIDENCE, and it narrows the legal question to almost
+nothing.** PPGF is a UK registered charity (1110538) that presumably takes its
+own advice, and the giveaway is the next sentence: they are **STRICT ON THE
+WORDING** in our T&Cs and on the donation page. That is exactly what you would
+expect if the wording is engineered so the donor's gift is legally TO PPGF —
+which is what makes PPGF the s.59 counterparty. The mandated wording is the
+mechanism, and it is theirs.
+
+So the ask of Pippa collapses from "advise us on Part II" to: **here is PPGF's
+partner agreement and the wording they require — does it make PPGF our s.59
+counterparty?** One document, one question.
+
+**A CONSEQUENCE WORTH NAMING: `/terms` IS PARTLY NOT OURS TO WRITE.** The money
+paragraph and the pledge-page copy will be constrained by PPGF. Which also
+dissolves the worry recorded above that our own wording ("a gift to the
+favpoll's chosen registered charity") creates the per-charity reading — we will
+be told what to say instead.
+
+**AND THE LOGOS COME WITH IT.** "Present the charities and their logos" bears on
+the charity-image work (#1014/#1023): scraped favicons and og:images may be
+replaceable by whatever PPGF supplies. Worth asking before more scraping.
+
+### 2. THE THRESHOLD IS NOT $10m
+
+Joe: "something like £10k per year". The survey's line is **"We are
+particularly interested in hearing from you if you operate one of the
+following, and raise more than $10m for charity each year"** — a PREFERENCE,
+not a bar, and the form's own Q6 offers a "£0 - £1,000,000" band, which already
+said submissions far below are expected. Both can be true: $10m is who they
+court, £10k is what they will take.
+
+**THE REAL REQUIREMENT IS A CREDIBLE VOLUME STORY, NOT A NUMBER WE ALREADY
+HIT.** "A process of explaining who you are and that there are a significant
+volume of donations expected." favpoll has raised nothing, so this is work:
+the application needs projections it can defend, and the funeral-director
+channel (Co-op's ~93,000 services a year) is the strongest thing we have to
+put in it. See [[project-funeral-directors]].
+
+### 3. THE TIMELINE IS CALLS, NOT BUREAUCRACY
+
+"Not some big bureaucratic thing, just a small team so a few calls. Then they
+share the process / tech docs."
+
+**SO HENRY'S QUESTIONS MAY ANSWER THEMSELVES.** The file format, what comes
+back after an upload, the lookup API's coverage — Joe says PPGF share the
+process and tech docs once engaged. Henry is still worth asking (he is free and
+immediate, where PPGF is a few calls away), but the plumbing questions stop
+being blockers and become things that arrive with the partnership.
+
+### WHAT THIS MEANS FOR MONDAY
+
+The chase stops being "will you consider us" and becomes **"we would like to
+be a partner — may we have a call?"** with a volume story attached. And the
+single question to put to Pippa afterwards is the partner agreement plus their
+mandated wording, which is one document and one question instead of an opinion.
