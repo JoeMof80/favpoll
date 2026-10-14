@@ -144,6 +144,8 @@ function buildPrompt(
   const body = pages.map((p) => `=== ${p.url} ===\n${p.text}`).join("\n\n")
   return `favpoll is a fundraising page for an occasion: guests pledge to a charity by picking their favourite of something (their favourite cake, hymn, beach). We are reading a charity's own website to learn which fundraising EVENTS it already holds — its signature events, the ones it runs every year or asks supporters to run (a coffee morning, a sponsored walk, a memorial service, a quiz night, a tea party, a dog show, a fish supper). Not its services, not one-off news, not events run by other organisations.
 
+An event counts only if a SUPPORTER COULD RAISE MONEY AT IT. So: no support-group meetings or peer-support walks (they are a service to beneficiaries, however they are listed on an events page), no conferences, no professional or training courses, no AGMs, no awareness days with nothing to attend, and no retail or shop promotions.
+
 Charity: ${input.name}
 What the register says it does: ${input.activities ?? "(nothing)"}
 
@@ -156,6 +158,45 @@ ${body}
 List the signature events you can actually see on these pages (none is a fine answer). For each, name it as the charity does, say its kind in plain words, when it runs if the page says, the favpoll occasion type it maps to (or null), and the one favpoll topic a favpoll at that event would run on (or null): a coffee morning runs on Cake, a memorial service on Hymn, a fish supper on Sea creature, a dog show on Dog breed. Never invent an event the pages do not show.
 
 Answer with JSON only: {"events": [{"name": "...", "kind": "...", "when": "..." or null, "occasion_type": "..." or null, "topic": "..." or null, "source_url": "..."}]}`
+}
+
+/** Could a supporter raise money at this? The prompt asks for fundraising
+ *  events and mostly gets them, but an events page lists everything the
+ *  charity puts on, and the model reasonably reads a calendar as a calendar.
+ *
+ *  THE CASE THAT PROVED IT: Diabetes UK sat on the founder's list for a
+ *  fortnight as a charity with no usable events. The reader had found eight,
+ *  all from the regional SUPPORT-GROUP calendar — "support group meeting",
+ *  "support group walk and talk". Those are a service to beneficiaries, not
+ *  something to fundraise at, and they crowded out the question of whether
+ *  the charity has a signature event at all.
+ *
+ *  Measured against production's 82 stored events (2026-10-15): this drops
+ *  9 — five support-group entries, plus Hospice UK's National Conference,
+ *  MSF's Scientific Days and a Global Health course. It keeps every
+ *  half marathon, sponsored walk, bake sale and carol concert, which are the
+ *  real answer even when they map to no topic.
+ *
+ *  A DENYLIST ALONE WAS TOO BLUNT, and the measurement caught it: the first
+ *  version dropped Scope's "Tough Mudder 2026 — sponsored obstacle COURSE",
+ *  one of the largest charity challenge events in the country, because
+ *  "course" is also what a training course is. So an explicit fundraising
+ *  signal WINS over the denylist. That ordering is the robust way round: the
+ *  words that mean "money is being raised here" are few and unambiguous,
+ *  where the words that mean "this is a service" collide with ordinary
+ *  English. */
+const FUNDRAISING_SIGNAL = /\bsponsored\b|\bfundrais/i
+
+const NOT_FUNDRAISING =
+  /\bsupport group\b|\bpeer support\b|\bsupport meeting\b|\bconference\b|\bsymposium\b|\btraining\b|\bcourse\b|\bwebinar\b|\bworkshop\b|\bagm\b|annual general meeting|\bdrop-?in\b|\bclinic\b/i
+
+export function couldFundraiseAt(event: {
+  name: string
+  kind: string
+}): boolean {
+  const text = `${event.name} ${event.kind}`
+  if (FUNDRAISING_SIGNAL.test(text)) return true
+  return !NOT_FUNDRAISING.test(text)
 }
 
 /** The signature events read from the charity's site. Never throws; an
@@ -214,23 +255,30 @@ export async function suggestSignatureEvents(
     const occasions = new Map(input.occasionTypes.map((o) => [norm(o), o]))
     const topics = new Map(input.topicTitles.map((t) => [norm(t), t]))
     const urls = new Set(pages.map((p) => p.url))
-    return (parsed.events ?? [])
-      .filter((e) => e.name && e.kind)
-      .slice(0, 8)
-      .map((e) => ({
-        name: String(e.name).trim(),
-        kind: String(e.kind).trim().toLowerCase(),
-        when: e.when ? String(e.when).trim() : null,
-        // only an occasion type and a topic favpoll actually has
-        occasionType: e.occasion_type
-          ? (occasions.get(norm(String(e.occasion_type))) ?? null)
-          : null,
-        topic: e.topic ? (topics.get(norm(String(e.topic))) ?? null) : null,
-        sourceUrl:
-          e.source_url && urls.has(String(e.source_url))
-            ? String(e.source_url)
-            : pages[0].url,
-      }))
+    return (
+      (parsed.events ?? [])
+        .filter((e) => e.name && e.kind)
+        // BEFORE the slice, or junk displaces a real event: Diabetes UK's
+        // eight support-group entries filled the list on their own.
+        .filter((e) =>
+          couldFundraiseAt({ name: String(e.name), kind: String(e.kind) })
+        )
+        .slice(0, 8)
+        .map((e) => ({
+          name: String(e.name).trim(),
+          kind: String(e.kind).trim().toLowerCase(),
+          when: e.when ? String(e.when).trim() : null,
+          // only an occasion type and a topic favpoll actually has
+          occasionType: e.occasion_type
+            ? (occasions.get(norm(String(e.occasion_type))) ?? null)
+            : null,
+          topic: e.topic ? (topics.get(norm(String(e.topic))) ?? null) : null,
+          sourceUrl:
+            e.source_url && urls.has(String(e.source_url))
+              ? String(e.source_url)
+              : pages[0].url,
+        }))
+    )
   } catch (err) {
     console.error(
       "suggestSignatureEvents failed:",
