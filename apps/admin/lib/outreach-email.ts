@@ -68,7 +68,17 @@ export function inviteEmail(row: OutreachRow): OutreachEmail {
 export function welcomeEmail(row: OutreachRow): OutreachEmail {
   // The charity's own signature event, when its site showed one, is the
   // strongest hook: it names the occasion as well as the favourite.
-  const event = row.signature_events?.find((e) => e.topic) ?? null;
+  //
+  // PREFER AN EVENT THAT MAPS TO A TOPIC, BUT TAKE ANY (founder, 2026-10-15).
+  // Only 9 of 32 active charities have an event carrying a topic, so the
+  // paragraph fired for 9 and vanished silently for 13 that had a real event
+  // — half marathons, sponsored walks, carol concerts — which map to no
+  // favourite because there is none to pick at a half marathon. Naming the
+  // event is the hook; the topic is a bonus. So: topic-matched first, else
+  // the first fundraisable event with different wording. 9 → 22.
+  const events = row.signature_events ?? [];
+  const event = events.find((e) => e.topic) ?? events[0] ?? null;
+  const when = event?.when ? ` (${event.when})` : "";
   return {
     to: row.registered_email,
     subject: `Welcome to favpoll — ${row.name}`,
@@ -79,7 +89,9 @@ export function welcomeEmail(row: OutreachRow): OutreachEmail {
       "",
       ...(event
         ? [
-            `We noticed your ${event.name}${event.when ? ` (${event.when})` : ""}: a favpoll on favourite ${event.topic!.toLowerCase()} would suit it, and we can set one up for you to share.`,
+            event.topic
+              ? `We noticed your ${event.name}${when}: a favpoll on favourite ${event.topic.toLowerCase()} would suit it, and we can set one up for you to share.`
+              : `We noticed your ${event.name}${when}: your supporters could each run a favpoll for it — guests pledge by picking a favourite — and we can set one up for you to share.`,
             "",
           ]
         : []),

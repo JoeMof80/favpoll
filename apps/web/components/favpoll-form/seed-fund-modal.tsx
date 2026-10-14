@@ -202,7 +202,12 @@ export function SeedFundModal({
 
       {isValid && (
         <p className="-mt-2 text-xs text-muted-foreground">
-          Every penny of your {formatPoundsExact(numeric)} reaches the fund.
+          {/* Was "Every penny of your £X reaches the fund" — the retired
+              completeness claim (processing is met at settlement), and "the
+              fund" where this modal says "shared pot" three times elsewhere.
+              The honest claim is the fee one (2026-10-15). */}
+          Your {formatPoundsExact(numeric)} goes to the shared pot. favpoll
+          takes no fee from it.
         </p>
       )}
 

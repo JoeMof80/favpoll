@@ -56,10 +56,19 @@ const DRY = process.argv.includes("--dry-run");
  */
 const FORCE = process.argv.includes("--force-seeded-rename");
 
-const RECREDIT = {
-  from: "You'll Never Walk Alone — traditional",
-  to: "You'll Never Walk Alone — Gerry and The Pacemakers",
-};
+const RECREDITS = [
+  {
+    from: "You'll Never Walk Alone — traditional",
+    to: "You'll Never Walk Alone — Gerry and The Pacemakers",
+  },
+  // The chart credits the duet. "Andrea Bocelli" alone was incomplete
+  // rather than wrong, so it was left as the founder's call; he took it
+  // (2026-10-15). Same shape as "Simon & Garfunkel".
+  {
+    from: "Time to Say Goodbye — Andrea Bocelli",
+    to: "Time to Say Goodbye — Andrea Bocelli & Sarah Brightman",
+  },
+];
 /** Joins Funeral song as well: it is the chart's recording. */
 const SECOND_VERSION = "Over the Rainbow — Eva Cassidy";
 
@@ -80,31 +89,33 @@ async function main() {
     .eq("topic_id", topic.id);
   const byLabel = new Map((favs ?? []).map((f) => [f.label.toLowerCase(), f]));
 
-  // ── 1. The credit ────────────────────────────────────────────────────────
-  const wrong = byLabel.get(RECREDIT.from.toLowerCase());
-  if (!wrong) {
-    console.log(`Credit: "${RECREDIT.from}" is not here — already done.`);
-  } else if (
-    (wrong.all_time_count || wrong.event_count || wrong.total_pledge_count) &&
-    !FORCE
-  ) {
-    // A label someone has picked is a record of what they picked. Renaming
-    // it would rewrite their pick, so this stops rather than guesses.
-    console.log(
-      `Credit: REFUSING to rename "${RECREDIT.from}" — it has history ` +
-        `(${wrong.all_time_count} picks, ${wrong.event_count} events). ` +
-        `Pass --force-seeded-rename if and only if that history is the ` +
-        `seeded exemplars (dev/staging), never on production.`,
-    );
-  } else if (DRY) {
-    console.log(`→ would recredit to "${RECREDIT.to}"`);
-  } else {
-    const { error } = await supabase
-      .from("favourites")
-      .update({ label: RECREDIT.to })
-      .eq("id", wrong.id);
-    if (error) throw new Error(error.message);
-    console.log(`Credit: recredited to "${RECREDIT.to}"`);
+  // ── 1. The credits ───────────────────────────────────────────────────────
+  for (const RECREDIT of RECREDITS) {
+    const wrong = byLabel.get(RECREDIT.from.toLowerCase());
+    if (!wrong) {
+      console.log(`Credit: "${RECREDIT.from}" is not here — already done.`);
+    } else if (
+      (wrong.all_time_count || wrong.event_count || wrong.total_pledge_count) &&
+      !FORCE
+    ) {
+      // A label someone has picked is a record of what they picked. Renaming
+      // it would rewrite their pick, so this stops rather than guesses.
+      console.log(
+        `Credit: REFUSING to rename "${RECREDIT.from}" — it has history ` +
+          `(${wrong.all_time_count} picks, ${wrong.event_count} events). ` +
+          `Pass --force-seeded-rename if and only if that history is the ` +
+          `seeded exemplars (dev/staging), never on production.`,
+      );
+    } else if (DRY) {
+      console.log(`→ would recredit to "${RECREDIT.to}"`);
+    } else {
+      const { error } = await supabase
+        .from("favourites")
+        .update({ label: RECREDIT.to })
+        .eq("id", wrong.id);
+      if (error) throw new Error(error.message);
+      console.log(`Credit: recredited to "${RECREDIT.to}"`);
+    }
   }
 
   // ── 2. The second version ────────────────────────────────────────────────

@@ -6495,7 +6495,7 @@ const topicItems: Record<string, string[]> = {
     "The Best — Tina Turner",
     "The Winner Takes It All — ABBA",
     "Three Little Birds — Bob Marley",
-    "Time to Say Goodbye — Andrea Bocelli",
+    "Time to Say Goodbye — Andrea Bocelli & Sarah Brightman",
     "Tiny Dancer — Elton John",
     "Unchained Melody — The Righteous Brothers",
     "Under the Bridge — All Saints",

@@ -602,7 +602,10 @@ export const SCENES: HeroScene[] = [
     context: "Sponsored dog walk",
     // The About and the reveal are the founder's, verbatim (2026-08-31).
     blurb:
-      "5 miles for our local hospice. Pledge your favourite biscuit and every penny goes to St Mark’s.",
+      // "every penny" → "every pledge" (founder, 2026-10-15): the retired
+      // completeness claim, even in a fictional organiser's mouth, sits on
+      // favpoll's own landing page.
+      "5 miles for our local hospice. Pledge your favourite biscuit and every pledge goes to St Mark’s.",
     // BISCUIT, THE THERAPY DOG. A faceless cause has no avatar on the real
     // page unless it uploads one; this one has the thing itself — a beagle
     // mid-walk — which says "sponsored dog walk" before a word is read and
