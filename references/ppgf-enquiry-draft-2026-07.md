@@ -935,3 +935,99 @@ GiveSendGo built their own 501(c)(3) too. **THE BIG PLAYERS START ON PPGF AND
 END UP OWNING AN INTERMEDIARY** — arrived at independently, twice. That is the
 second fork of legal-brief-the-fork-2026-10.md, and it is where scale leads.
 Which argues for PPGF now and the fork later, rather than either/or.
+
+---
+
+## 2026-10-14 — WHAT THE COMPETITION PUBLISHES. Read before paying anyone.
+
+Founder: *"the more info we have ahead of a scoping meeting with Pippa, the
+less she can charge us for."* Correct, and the public documents turn out to
+answer most of it.
+
+### 1. GOFUNDME'S TERMS ANSWER QUESTION A IN WRITING
+
+> "**PayPal Giving Fund receives Donations from Users as the NPO of record**
+> and then, in accordance with its policies, grants Funds to the NPO selected
+> by the Organizer."
+>
+> "GoFundMe itself **does not hold any funds** raised on our Platform, nor does
+> it handle the actual processing of payments."
+>
+> "Tips are fully optional, and Donors may decline to tip GoFundMe by moving
+> the tip slider to 0%. **Tips go directly to GoFundMe.**"
+
+So: DONATION → PPGF AS NPO OF RECORD. TIP → THE PLATFORM. One donor-facing
+flow, and the platform holds nothing.
+
+**Why that is the attractive branch for favpoll:** no holding, no float, no
+trust account, agent-vs-principal largely DISSOLVES for pledges (no turnover,
+no VAT exposure), and Gift Aid becomes PPGF's to claim as the charity of
+record. The tip is a clean, separate payment to favpoll.
+
+**ONE GENUINE PUZZLE, do not copy it blind:** GoFundMe's terms contain NO
+reference to Gift Aid, the Charities Act 1992, commercial participator status,
+professional fundraiser status, solicitation statements, or trust. Possible
+readings: that with PPGF as NPO of record they argue the donor gives directly
+to a charity so GoFundMe is not representing that ITS contributions benefit a
+charity; that UK compliance lives in a separate document; or that they are
+exposed. We cannot tell, and must not assume the first. FOR PIPPA.
+
+### 2. JUSTGIVING'S TERMS ARE THE OTHER MODEL, ALSO IN WRITING
+
+> Donations are paid into a "**Charity Trust Funds Account**" and are "held on
+> trust for the Charity and **do not belong to JustGiving**" — *other than the
+> interest accruing on such monies*.
+
+Collect-and-remit done properly in the UK: a trust account, funds on trust for
+the charity, **THE INTEREST EXPRESSLY CARVED OUT so JustGiving keeps the
+float**, and JustGiving acting as each charity's **GIFT AID AGENT under an
+agreement with each charity**.
+
+That answers the float question ("whose is the interest?" — theirs, by express
+term) and shows the agency drafting, in the published terms of the platform
+favpoll says it mirrors.
+
+### 3. WORK FOR GOOD SHOWS HOW TO DELIVER THE s.59 AGREEMENT
+
+Businesses fundraising through them **are commercial participators** under the
+1992 Act — they say so plainly. And they **INCORPORATE THE COMMERCIAL
+PARTICIPATION AGREEMENT INTO THE T&Cs BOTH PARTIES ACCEPT ON REGISTRATION**,
+with a solicitation statement at the point of sale naming the charity.
+
+**So favpoll may not need 42 signed documents.** The agreement can live in
+terms accepted at onboarding — close to what the consent gate already does.
+This is the single biggest cost saving available on the legal track.
+
+### 4. THE TEMPLATE IS FREE — AND IT IS PUBLISHED BY BATES WELLS
+
+**"Charities Act 1992 – Standard Form Agreement", Institute of Fundraising in
+partnership with BATES WELLS.** Free to use. Saved in this repo as
+`references/iof-bates-wells-standard-form-agreement-charities-act-1992.pdf`.
+
+Covers: definitions and interpretation; the terms of the commercial
+participation arrangement; identifying the charitable beneficiary; charity
+accounts and financial arrangements; insurance and liability; termination;
+dispute resolution. It addresses the s.60 solicitation statement.
+
+**Hannah's own firm publishes the drafting template her £5,000 opinion
+excluded.** Not a criticism of the quote — an opinion is not a template, and a
+template is not advice on our facts. But it changes what we are buying.
+
+### WHAT THE SCOPING CALL SHOULD NOW ASK
+
+Not "advise us on Part II". Instead, four narrow things, three of which have a
+document attached:
+
+1. **Which architecture applies to us** — PPGF as NPO of record (GoFundMe) or
+   trust account plus per-charity agency (JustGiving)? Both are published; we
+   are not asking her to invent one.
+2. **Adapt the IoF/Bates Wells standard form** for a platform naming up to
+   three charities per favpoll, with equal splits. Drafting from a free
+   template, not from scratch.
+3. **Can the agreement be incorporated into terms accepted at onboarding**, as
+   Work for Good does, rather than signed per charity?
+4. The two nobody else can answer: **does a favpoll pledge qualify for Gift Aid
+   at all** (the pick weights the standings, a personal note may follow), and
+   **is a pre-selected optional contribution compliant under the DMCC Act**.
+
+That is a scopable, fixed-fee brief instead of an open opinion.
