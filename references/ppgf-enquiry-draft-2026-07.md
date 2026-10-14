@@ -1390,3 +1390,44 @@ data", which overlaps our register mirror. The mirror still earns its keep —
 it carries activities, objects, classification and areas for the topic and
 profile work, which a fundability API would not — but for FUNDABILITY the
 authoritative source becomes theirs, not ours.
+
+### PPGF UK'S OWN SOLICITORS ARE BATES WELLS (2026-10-15)
+
+The founder asked whether GoFundMe's or Thrift+'s law firm could be found — a
+firm that has already advised a PPGF partner on Part II would have the answer
+on a shelf. Neither is public. But PPGF UK's filed annual report names its
+professional advisers, and they are:
+
+- **Solicitors: BATES WELLS**, 10 Queen Street Place, London EC4R 1BE
+- Auditor: Sayer Vincent
+
+(Named in their filed accounts, so "named in the report" rather than
+"currently acting"; and being named as solicitors does not prove they advised
+on the PARTNER PROGRAMME specifically.)
+
+**1. IT PROBABLY ANSWERS HIS QUESTION OF 2026-10-13.** He asked "why would
+Hannah recommend somebody with the same compliance risk as her?", and I
+answered about risk appetite. The likelier explanation is a **CONFLICT**: a firm
+acting for PPGF cannot comfortably advise a prospective PPGF partner on its
+position relative to PPGF. The referral to Pippa Garland at Russell Cooke is
+what a conflicts check produces, not a brush-off. Worth knowing, because it
+means the referral was professional rather than evasive.
+
+**2. IT MAKES PPGF'S MANDATED WORDING MORE TRUSTWORTHY.** "Gifts made
+voluntarily to PayPal Giving Fund … for the benefit of a charity chosen by the
+donor", and "Suggested Charity", were drafted with a leading UK charity-law firm
+advising the charity. The architecture favpoll is about to adopt has had proper
+attention — not ours, but proper. That is the strongest evidence yet that the
+PPGF-as-counterparty reading is sound, and it is better than the inference from
+two partners' silence.
+
+**3. IT MAKES PIPPA'S JOB SMALLER AND THE BRIEF SHARPER.** The ask becomes:
+*"PPGF's partner terms were drafted with Bates Wells advising PPGF. Does that
+architecture make PPGF our s.59 counterparty?"* Reading a document drafted by a
+specialist firm for a charity client is far less work than reasoning from first
+principles, and naming it will get her attention.
+
+**DO NOT APPROACH BATES WELLS FOR THIS.** The conflict runs both ways, and
+asking Hannah to advise on PPGF now would read badly. (It also puts the £5,000
+quote in a different light: an opinion that excluded drafting may have been the
+most she could scope without touching the client relationship.)
