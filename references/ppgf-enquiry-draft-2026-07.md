@@ -1270,3 +1270,80 @@ The chase stops being "will you consider us" and becomes **"we would like to
 be a partner — may we have a call?"** with a volume story attached. And the
 single question to put to Pippa afterwards is the partner agreement plus their
 mandated wording, which is one document and one question instead of an opinion.
+
+### THE MANDATED WORDING, FOUND IN THE WILD (2026-10-15)
+
+Joe said PPGF "are strict on how you present the donation and wording etc in
+your TS and C's and on the donation page". So we read a UK partner's terms. The
+founder's idea; it paid.
+
+**THRIFT+'S OWN TERMS (thrift.plus/terms-of-service) — the closest precedent we
+have, because Thrift+ is a UK company where GoFundMe's UK arm has a US parent:**
+
+> "In both scenarios, **we make a donation on your behalf to PayPal Giving Fund
+> (registered charity No. 1110538)**" — which then "makes a grant to your
+> **Suggested Charity**."
+>
+> Users select from charities "**enrolled with PayPal Giving Fund**". If a
+> preferred charity is not available, Thrift+ recommends contacting them about
+> enrolment.
+>
+> "There is no additional fee to you or your Suggested Charity for processing
+> this donation."
+
+**PPGF UK'S OWN FRAMING:**
+
+> "All donations through PayPal Giving Fund programmes are **gifts made
+> voluntarily to PayPal Giving Fund**, a registered charity in England and
+> Wales (No. 1110538), **for the benefit of a charity chosen by the donor**."
+>
+> "PayPal Giving Fund has **legal control over all donations**."
+>
+> Grants monthly, typically 15-45 days after receipt; where funds cannot be
+> delivered, PPGF reassigns them.
+
+**"SUGGESTED CHARITY" IS THE GIVEAWAY.** The vocabulary carries the legal
+architecture: the donor SUGGESTS, PPGF GRANTS, PPGF holds LEGAL CONTROL. That is
+what makes PPGF the recipient, and so arguably the s.59 counterparty. The
+discretion clause the founder already ruled on is the same sentence seen from
+the other side.
+
+**SO WE KNOW THE SHAPE OF OUR `/terms` CHANGE WITHOUT PAYING FOR IT.** Today:
+"A pledge is a gift to the favpoll's chosen registered charity — never to the
+organiser, and never to favpoll." Under PPGF's framing it becomes closer to:
+a gift to PayPal Giving Fund, for the benefit of the charity you suggest. The
+word "pledge" survives; "chosen" becomes "suggested"; the recipient changes.
+NOT TO BE WRITTEN until a partnership exists, but no longer unknown.
+
+### THE PATTERN IN WHAT IS ABSENT
+
+Thrift+'s terms mention NO Gift Aid, NO Charities Act 1992, NO commercial
+participator or professional fundraiser status, NO solicitation statement.
+Exactly as GoFundMe's do not.
+
+Two UK-operating PPGF partners, the same silence — and Thrift+ is the weightier
+case: a UK company selling goods and donating a share while naming charities is
+close to the PARADIGM commercial participator. Its silence either strongly
+supports the PPGF-as-counterparty reading or is two partners making the same
+omission. PIPPA DECIDES WHICH, but it is a far better-evidenced question than
+it was this morning, and the evidence is free.
+
+(Also: no Gift Aid anywhere in their terms, which confirms the earlier
+reasoning that Gift Aid never applied to Thrift+ — their donation is resale
+proceeds, not a cash gift from taxed income.)
+
+### A NEW CONSTRAINT: THE PICKER MAY BE THE ENROLLED SET, NOT THE REGISTER
+
+Thrift+ offered only charities "enrolled with PayPal Giving Fund", and told
+users to ask an unenrolled charity to enrol. That matches their published
+"6.8K+ charities" — the ENROLLED set, not the register's 171,886.
+
+So even though PPGF can CHEQUE an unenrolled charity (their own policy, above),
+a partner's SELECTION LIST may be limited to the enrolled. Those are consistent:
+the picker uses the enrolled list; the cheque route covers donations made
+elsewhere, such as GoFundMe's auto-created nonprofit pages.
+
+**THIS SHARPENS THE COVERAGE QUESTION INTO ITS FINAL FORM, FOR PPGF:** can our
+picker offer ANY registered charity, or only your enrolled list? Thousands
+either way, and vastly more than 42 — but favpoll's core case is the small
+local hospice, and that is exactly the kind most likely to be unenrolled.
