@@ -591,3 +591,106 @@ nothing comes back to them.
 
 If the answer is "nothing", the file model's total cost is simply Stripe —
 exactly what favpoll pays today, with no new fee anywhere in the chain.
+
+---
+
+## 2026-10-14 — GIVESENDGO, and why its regulatory model is not available to us
+
+Founder: *"why don't we use givesendgo's regulatory model? Their organisers
+can specify a charity themselves but are you saying that is just for display?
+it is the organiser who gets paid and it is their responsibility to disburse?"*
+
+He read the mechanics correctly. But GiveSendGo runs TWO models, and the one
+that touches charitable money is the one we are already pursuing.
+
+**givesendgo.com — the for-profit platform.** "Allocated funds are transferred
+directly to the campaign owner or the identified beneficiary, depending on the
+campaign's nature." They "cannot guarantee or be held responsible for the
+campaign owner's actions or decisions after grant disbursement" and do not
+"warrant that funds will be used for a particular purpose."
+
+**givesendgo.org — "GiveSendGo Charities", EIN 88-3776392.** A SEPARATE
+REGISTERED CHARITY running a DONOR-ADVISED FUND, a direct funding programme, a
+DAF agreement and published grant policies.
+
+**SO THEY DID NOT ESCAPE THE CHARITABLE-INTERMEDIARY PROBLEM. THEY BUILT ONE.**
+That is the PPGF architecture with the intermediary owned in house. Pay-the-
+organiser is what they use for PERSONAL fundraising, where there is no charity
+and no tax deduction on offer. It is not an alternative regulatory model for
+charitable giving; it is what you do when the recipient is a person.
+
+### And the saving would be illusory, which is what actually settles it
+
+**PART II ATTACHES TO THE REPRESENTATION, NOT THE MONEY FLOW.** A commercial
+participator under s.58 is someone carrying on a commercial venture who
+REPRESENTS that contributions will benefit a charitable institution. While
+favpoll's pages say the money goes to Marie Curie, that representation exists
+whoever holds the cash. Routing payouts through the organiser would take every
+cost below and still leave the s.59 agreement to draft.
+
+### The costs are the product itself
+
+- `/terms` says a pledge is "a gift to the favpoll's chosen registered charity
+  — never to the organiser, and never to favpoll". That sentence IS the trust
+  proposition.
+- At a FUNERAL, telling guests the money lands in the bereaved family's
+  account and they will pass it on is the opposite of what favpoll is for.
+- It is the model that generates "crowdfunder kept the money" news stories.
+  favpoll's differentiator is that this CANNOT happen.
+- GIFT AID DIES OUTRIGHT — a gift to an individual is not a charitable
+  donation, on any rail.
+- It makes a grieving organiser the fundraiser, carrying the responsibility.
+- Charities would not endorse it. The consent gate exists because they must
+  agree, and none agrees to money reaching a stranger's personal account first.
+- Payouts to individuals are MORE compliance, not less: per-organiser identity
+  verification instead of one company's.
+
+### One thing worth taking: a model agency clause
+
+GiveSendGo's terms assert that "a giver's donation to a GiveSendGo fundraiser
+fulfills the giver's obligation to the recipient, and the recipient agrees that
+GiveSendGo's receipt of funds on their behalf constitutes receipt by them."
+
+That is an AGENCY CLAUSE, contractually stated: the platform receives ON THE
+RECIPIENT'S BEHALF, and that receipt counts as the recipient's. It is exactly
+the position favpoll wants for the agent answer, and it is drafting precedent
+to put IN FRONT of Pippa rather than describe to her in the abstract. Add it
+to the fork brief's agent-structure section.
+
+### Their revenue model, for the record (it is ours, plus two lines)
+
+0% platform fee; processing 2.7% + $0.30 deducted from the GROSS donation so
+the recipient bears it; a donor tip defaulting to 10%, donor-paid and
+removable; **a fundraiser-contributed percentage of up to 10%, elected by the
+organiser**; and **interest on funds they hold, retained as a "treasury
+management fee"**.
+
+The last two are not ours. The organiser contribution is straightforwardly
+transferable — it never touches a guest's pledge — and is a product decision.
+THE FLOAT IS NOT: under the file model favpoll holds donations between close
+and upload, and whether the interest is favpoll's or the charity's IS THE
+AGENT-VS-PRINCIPAL QUESTION WITH A NUMBER ON IT. Agent: the money is the
+charity's and arguably so is the interest. Principal: it is favpoll's, but then
+pledges are turnover. For Pippa.
+
+### THE GOFUNDME WARNING, which is live and is about our own UI
+
+GoFundMe's tip defaults are reported at 13.5-17.5%; state attorneys general
+have called them deceptive; and a CLASS ACTION WAS FILED ON 6 AUGUST 2026
+alleging preselected tips added without clear disclosure or affirmative
+consent. The named faults: default settings, an unobvious opt-out, small type,
+and not clearly identifying the charge as optional.
+
+favpoll's tip UI (`components/pledge-card/utils.ts`, `pledge-dialog/
+step-pay.tsx`) stands up well against all of that: "None" is ALWAYS the first
+chip at every tier; the amounts are FLAT, never percentages; the preselected
+middle is ~10%, below GoFundMe's; the tip is a line item in the itemised
+breakdown before paying; and `suggestTip: false` defaults MEMORIALS to None,
+so there is no preselection where it would be worst.
+
+Two things still worth his eye:
+1. It IS preselected outside memorials — the one element shared with the
+   conduct being litigated. The mitigations are strong; the fact remains.
+2. The VISIBLE label reads "Tip for favpoll". The word "optional" appears only
+   in the `aria-label`, so a sighted guest never reads it. Adding it to the
+   visible label answers the exact criticism in one word. HIS COPY, HIS CALL.
