@@ -1347,3 +1347,46 @@ elsewhere, such as GoFundMe's auto-created nonprofit pages.
 picker offer ANY registered charity, or only your enrolled list? Thousands
 either way, and vastly more than 42 — but favpoll's core case is the small
 local hospice, and that is exactly the kind most likely to be unenrolled.
+
+### CORRECTION, SAME HOUR: THE PICKER IS NOT LIMITED TO THE ENROLLED
+
+The founder: *"gofundme offer more than the enrolled charities, don't they?"*
+They do, and the constraint I had just introduced was wrong.
+
+**PAYPAL'S OWN PARTNER PAGE:** the Charity Search API provides access to "a
+global directory of **over a million vetted charities**" and "quickly updates
+the list of **eligible** charities with **registration and status data**".
+
+**GOFUNDME'S OWN SUPPORT:** "If you're enrolled with PPGF, you can receive
+funds directly to your business PayPal account, and **if you aren't enrolled,
+funds will be disbursed via a check in the mail.**"
+
+So ELIGIBILITY IS DRIVEN BY REGISTRATION, NOT ENROLMENT. Thrift+'s
+enrolled-only picker was **Thrift+'s own choice**, not a PPGF limitation —
+plausibly operational, since 90-day cheques across thousands of tiny resale
+donations would be miserable to run.
+
+Which restores the conclusion reached two days ago from PPGF's help pages and
+then talked out of an hour later: **ENROLMENT IS LATENCY, NOT REACH.**
+
+**MY OWN PATTERN, WORTH NAMING SO IT STOPS.** Twice in this thread I narrowed
+the picture on partial evidence and the founder pushed back, and both times the
+published facts were MORE favourable than my reading: first "PPGF's reach stops
+at the enrolled 8,000" (wrong — unenrolled charities get a cheque), then "a
+partner's picker may be limited to the enrolled set" (wrong — the API's universe
+is the register). The error was the same both times: reading ONE partner's
+implementation as the platform's constraint. Read the platform's own
+documentation for what is POSSIBLE, and a partner's terms only for what is
+PRACTISED.
+
+**SO THE COVERAGE QUESTION IS LARGELY ANSWERED, AND FAVOURABLY.** It stays on
+the list for PPGF to confirm in writing, but the expected answer is now: the
+picker can offer the register, and enrolment decides whether a charity is paid
+by monthly transfer or by cheque within 90 days. That is the answer favpoll's
+model needs — the small local hospice is reachable.
+
+One residual: PPGF's API does its own vetting with "registration and status
+data", which overlaps our register mirror. The mirror still earns its keep —
+it carries activities, objects, classification and areas for the topic and
+profile work, which a fundability API would not — but for FUNDABILITY the
+authoritative source becomes theirs, not ours.
