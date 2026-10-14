@@ -874,3 +874,64 @@ Changing who receives the money does not touch that.
 NOT TO PURSUE NOW. But it is the first time the second fork has had a working
 proof at scale behind it, which changes the question for Pippa from "could we?"
 to "GiveSendGo does — what would it take here?"
+
+---
+
+## 2026-10-14 — GOFUNDME IS THE PROOF POINT. (The founder meant GoFundMe, not GiveSendGo.)
+
+He asked whether "they" use PPGF to disburse plus a tip model, meaning
+GoFundMe. They do, and it answers in practice the question this document has
+been circling since July.
+
+**From GoFundMe's own support pages:**
+- "GoFundMe partners with PayPal Giving Fund to send funds raised for certified
+  nonprofit fundraisers."
+- Nonprofit fundraisers run in the **US, UK, Ireland, Canada and Australia** —
+  so the arrangement exists IN OUR MARKET, with PPGF UK as the registered
+  charity intermediary.
+- ENROLLED nonprofits receive funds to their PayPal account; UNENROLLED receive
+  a cheque in the mail — consistent with PPGF's own published policy.
+- MONTHLY payout: donations through the 15th go out that month, after the 15th
+  the following month.
+- "The fundraiser organizer will not set up bank transfers or handle the funds
+  raised."
+
+So a platform at enormous scale collects donations on ITS OWN PAGES, runs a TIP
+MODEL as its revenue, and uses PPGF to disburse, in the UK. That is favpoll's
+intended shape, already operating.
+
+### RETRACTION: the tip is not a structural objection
+
+I wrote that a PPGF route forces TWO PAYMENTS per guest (~18p and a broken
+flow) and called it "structural rather than negotiable". **GoFundMe takes a tip
+alongside a PPGF-destined donation in what the donor experiences as ONE
+PAYMENT.** The thing I said could not be done is done at scale in our market.
+That is the third movement in this analysis; the earlier costing of the
+"checkout model" assumed a split that GoFundMe does not appear to make.
+
+### Question A gets much easier to ask
+
+Not "do you support model (a) or (b)?" but **"we want the GoFundMe
+arrangement — what does that take?"** Naming a live partner beats describing an
+abstraction, and it also sidesteps the risk of them answering the wrong
+question.
+
+### STILL OPEN: the legal mechanics underneath
+
+GoFundMe describes tips as "a separate transaction between the donor and the
+platform", yet a user reported the tip being DEDUCTED FROM THEIR GIVING-FUND
+BALANCE — so even their own framing is ambiguous. Whether the donation is made
+TO PPGF with the platform as its agent, or the platform COLLECTS AND GRANTS
+ONWARD, is still what decides agent-vs-principal, who holds the float, and who
+claims Gift Aid. GoFundMe proves it is ACHIEVABLE. It does not tell us ON WHAT
+TERMS, and it cannot: they are orders of magnitude over the $10m threshold.
+
+### A pattern worth noticing
+
+GoFundMe has since launched its own "GoFundMe Giving Fund" (carefully not
+calling it a DAF: 13.5% default tip, $5 minimum to charities, 2.9% + $0.30
+processing) and offers GoFundMe Pay so US nonprofits can bypass PPGF entirely.
+GiveSendGo built their own 501(c)(3) too. **THE BIG PLAYERS START ON PPGF AND
+END UP OWNING AN INTERMEDIARY** — arrived at independently, twice. That is the
+second fork of legal-brief-the-fork-2026-10.md, and it is where scale leads.
+Which argues for PPGF now and the fork later, rather than either/or.
