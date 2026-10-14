@@ -132,6 +132,43 @@ Dog breed · Guide Dogs); a wedding cake (Cake has no subsets at all);
 a wedding reading (Love poem covers it; a "Wedding reading" would be
 sharper). Each is your call — a new subset is curation, not code.
 
+### SETTLED 2026-10-13 — all four gaps are closed
+
+**Working dog breed: BUILT.** The one that was right.
+
+**Funeral flower: NO, and do not re-propose it.** Founder, 2026-10-13:
+*"who has a favourite funeral flower? can you imagine a favpoll where it
+is an appropriate topic?"* No — and the ten proposed members are the
+argument. Carnation, Chrysanthemum, Forget-me-not, Freesia, Gladiolus,
+Iris, Lily, Lily of the valley, Orchid, Rose: half are ordinary
+favourites that are nobody's favourite *funeral* flower, and the rest
+(carnation, chrysanthemum, gladiolus) are on the list only because the
+funeral trade buys them in bulk. Worse, the cut EXCLUDES the answers a
+real memorial favpoll gets — "Mum loved sunflowers", "Nan's garden was
+full of sweet peas" — because Sunflower, Sweet pea, Peony, Daffodil and
+Tulip are all on the parent's 52 and none is florist stock. A subset that
+narrows away the true answers is worse than no subset.
+
+The parallel with Funeral song is false. A funeral song is CHOSEN FOR THE
+FUNERAL by the family, and the category has real favourites: Co-op
+Funeralcare's chart across ~93,000 services a year proves it, and
+"We'll Meet Again" is a funeral song, not merely a song someone liked. A
+funeral flower is chosen by the FLORIST; the family's contribution is
+"she loved X", where X is just a flower.
+
+So the MEMORIAL row keeps `t("Flower", true)` — the parent, starred,
+which is what it already does. The precedent is in the same block: Saying
+was cut from MEMORIAL because "guests at a wake have no favourite saying
+to pick" (founder, 2026-09-25). Same test, same answer.
+
+It is `status = 'rejected'` on prod and dev. Leave it there.
+
+**Wedding cake: NO** — "wedding cake" is a FORMAT (tiered, iced), not a
+kind, so it cuts across Cake's 29 flavour items instead of carving them.
+
+**Wedding reading: NO** — it would contain Love poem whole (ruling 7).
+Do not re-propose either without changing the parent lists first.
+
 ---
 
 ## What happens after the ticks
