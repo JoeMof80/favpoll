@@ -1122,3 +1122,59 @@ BRING them something rather than to ask a favour.
 of that register-scale work becomes outreach TOOLING rather than product
 surface — still useful for verification, prioritisation and the removal check,
 but a different job.
+
+---
+
+## FOUNDER'S STANDING RULING, 2026-10-15: GET IN GOFUNDME'S SLIPSTREAM
+
+> *"i don't want to be held up so lets get in the gofundme slipstream. as a
+> matter of course, use their practices as a guide for our own, subject to a
+> partnership with PPGF"*
+
+**So GoFundMe's published practices are the DEFAULT GUIDE for favpoll's
+charitable-fundraising practices, conditional on a PPGF partnership.** Where
+they have published a practice, follow it rather than inventing a position.
+
+### THREE CARVE-OUTS — the instruction needs a boundary, not just a direction
+
+1. **NOT their tip UI.** They pre-select 13.5-17.5%, are being sued over it
+   (Donovan, N.D. Ill., filed 6 Aug 2026; Munoz, N.D. Cal.) and state attorneys
+   general have called it deceptive. favpoll is already better: "None" first at
+   every tier, FLAT amounts never percentages, ~10% at the preselected middle,
+   and the tip itemised before payment. Following GoFundMe here would move
+   BACKWARDS into the conduct in litigation. OUR TIP PRACTICE STAYS OURS.
+2. **NOT their auto-created nonprofit pages.** They generate pages for
+   charities that never signed up, and advisers publicly tell charities to
+   object. "Charities need not agree first" and "charities get no say" are
+   DIFFERENT THINGS, and the second is what causes the friction. Keep a removal
+   path on request — Code 9.1.1 expects it anyway.
+3. **WHERE THEY ARE SILENT WE ARE ON OUR OWN.** Their terms say nothing about
+   UK Part II, commercial participator status or solicitation statements.
+   Copying a gap is copying nothing; that is what Pippa is for.
+
+### WHAT THE RULING CHANGES
+
+- **Disbursement build: probably NONE.** If PPGF is NPO of record and receives
+  the donation, there is no export, no import and no payouts to build. PR #1026
+  (bank details) CLOSES rather than unparks.
+- **`/terms`:** the money paragraph is rewritten so PPGF receives as charity of
+  record and grants onward. DRAFT NOW, SHIP ONLY WHEN THE PARTNERSHIP IS REAL —
+  saying it before it is true would be false, and the current wording ("a gift
+  to the favpoll's chosen registered charity") is what creates the per-charity
+  s.59 reading.
+- **Consent gate:** becomes a lever to flip when the partnership lands AND
+  Pippa confirms. Not before.
+- **Charity pages:** the 171,886 profiles and per-number pages become product
+  surface, as they were built to be.
+- **Outreach copy:** inverts to an OFFER. Still parked, but now parked on a
+  known shape.
+- **THE ONE OPEN ENGINEERING RISK:** if PPGF must be charity of record, the
+  pledge has to REACH PPGF — which may mean not using Stripe for pledges.
+  "No disbursement build" may therefore trade for "a payment-integration
+  build", and nobody has told us which. This is the mechanism question (A).
+
+### WHAT IS NO LONGER WORTH DOING
+
+Designing the file-model export/import pair. It was built on one sentence of
+Joe's that PPGF's own policies do not support, and under this ruling it is not
+the architecture anyway.
