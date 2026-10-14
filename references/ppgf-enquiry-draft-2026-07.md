@@ -768,3 +768,51 @@ cheap addition to her list:
 And one thing that helps under any answer: the VISIBLE label reads "Tip for
 favpoll", with "optional" only in the `aria-label`, so a sighted guest never
 reads it. One word. HIS COPY, HIS CALL.
+
+### PPGF's REACH DOES NOT STOP AT THE ENROLLED 8,000 — CORRECTING THE FRAME
+
+Founder: *"why would PPGF's reach stop at the 8000? who else would they hand
+out cheques to?"* He was right to push. From PPGF's own UK help pages:
+
+- **Enrolled** → electronic payment, promptly.
+- **Not enrolled** → PPGF invites them to enrol, for up to 90 days, and a
+  charity that never enrols **RECEIVES A CHEQUE WITHIN 90 DAYS OF THE
+  DONATION, posted to its CHARITY COMMISSION ADDRESS.**
+- **INELIGIBLE** — lost Charity Commission registration, or breached PPGF's
+  Charity Certification Policy → *then* the donor is asked to nominate an
+  alternative.
+
+**So enrolment governs PAYMENT METHOD AND SPEED, not whether money arrives.**
+The 8,000-vs-171,886 gap is a latency gap, not a fundability gap.
+
+**THIS SHRINKS THE DISCRETION WORRY SHARPLY.** The clause that money could be
+granted elsewhere applies to INELIGIBLE charities, not merely unenrolled ones —
+a far narrower set. And favpoll ALREADY CATCHES THE MAIN CASE:
+`register_account_removals()` and `scripts/register/check-removals.ts` refuse
+approval on a removed number, loudly, with the money at stake attached.
+
+**SO I OVERSTATED THE GIVESENDGO PARALLEL.** I wrote that the coverage answer
+"decides which half of the fork brief we are living in". It does not. Their
+wall was BENEFICIARIES WHO ARE NOT CHARITIES — individuals, missionaries,
+legal-defence funds — and every favpoll recipient is a registered charity by
+design. A small local hospice that has never heard of PPGF still gets paid.
+
+### The two residual issues, both narrower and both actionable
+
+1. **NINETY DAYS.** A cheque within 90 days *of the donation*. A favpoll may
+   itself run up to 90 days, then close, then disburse. For a MEMORIAL the
+   family could be six months from knowing the money landed. That is a
+   COMMUNICATION problem, not a money problem — and it is exactly why the
+   notification question is the one to push hardest on PPGF.
+2. **THE CHEQUE GOES TO THE REGISTER ADDRESS.** A stale address sends the
+   cheque to the wrong place. But favpoll HOLDS that address in the mirror, and
+   it is on screen in admin as `register_place` since #1033 — so it is
+   checkable before a charity is ever named, which is a better position than
+   most platforms are in.
+
+### Henry's question sharpens accordingly
+
+It stops being "does the lookup API cover the register" and becomes **"does the
+lookup tell us whether this SPECIFIC charity is enrolled?"** Enrolled-vs-not is
+the difference between prompt electronic payment and a 90-day cheque — worth
+knowing at the moment an organiser picks, and possibly worth telling them.
