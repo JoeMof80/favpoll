@@ -406,3 +406,57 @@ favpoll HOLDS other people's donations between a favpoll closing and the file
 going up. That is the heart of the Part II / agent-vs-principal question and
 belongs in the brief for Pippa Garland, not in a technical conversation with
 Henry. See references/legal-brief-the-fork-2026-10.md.
+
+### THE TIP SETTLES THE MODEL CHOICE (founder, 2026-10-14)
+
+He asked whether PPGF replaces Stripe, and if so what happens to the tips,
+since PPGF cannot process those. The premise needs flipping, and the question
+turns out to decide between the two models rather than threaten one.
+
+**PPGF DOES NOT REPLACE STRIPE in the model Joe described.** Thrift+ collected
+the money themselves and granted it onward, so PPGF sits DOWNSTREAM OF
+SETTLEMENT, receiving a lump bank transfer. Stripe stays, the single
+PaymentIntent stays (`app/api/stripe/payment-intent/route.ts` carries pledge +
+tip + top-up in ONE charge, each stamped in metadata and verified server-side
+at save, `fee_amount: "0"`), and the tip never enters the PPGF path. Only the
+pledge portion goes in the file.
+
+**THE TIP DOES BREAK MODEL (a), THOUGH — the PPGF checkout.** There PPGF
+really would replace Stripe, and:
+
+- PPGF cannot take the tip. Their checkout exists to receive charitable
+  donations into a donor-advised fund; favpoll's optional contribution is
+  COMMERCIAL REVENUE, not a donation, and has no business in that fund.
+- So every guest needs TWO payments — PPGF for the pledge, Stripe for the tip.
+  Two card entries, or a redirect and a return: exactly the checkout creep the
+  founder retired the 100% claim to eliminate (`lib/card-fee.ts`, 2026-09-06).
+- The pick and guest-book flow would break across a redirect to a third
+  party's surface.
+- And the tip would be asked for AFTER the donation had gone — the worst
+  moment to ask.
+
+So the tip is one of the strongest arguments FOR the file model, and unusually
+it is structural rather than negotiable.
+
+**A POSSIBLE FEE UPSIDE — A QUESTION, NOT A FINDING.** The 1.4% + 20p
+disclosed on Thrift+'s donation screen is a CARD-processing fee on PPGF's own
+checkout. In the file model the money arrives as one BANK TRANSFER with no
+card involved, so that fee may not attach at all — which would make the file
+model cheaper than the "roughly fee-neutral" comparison recorded above. They
+may levy something else on inbound grants instead. ASK HENRY. (Two earlier
+fee claims in this document were wrong: that PPGF charges nothing, and that a
+PPGF model would restore the 100% line. Do not add a third.)
+
+**THE COUNTERWEIGHT, so the choice is not made on one leg: GIFT AID MAY CUT
+THE OTHER WAY.** Gift Aid needs a gift from an INDIVIDUAL to a charity, plus
+that individual's declaration. If favpoll collects AS AGENT for the charity,
+the donor's gift is to the charity and Gift Aid survives. If favpoll collects
+AS PRINCIPAL and grants onward, the gift into PPGF is FAVPOLL'S, not the
+donor's, and the declaration may be worthless — which would cost the charity
+25% on every pledge that carried one.
+
+That is the agent-vs-principal question, it is PIPPA'S and not PPGF's, and it
+means: tips push hard toward the file model, Gift Aid might push back toward
+the checkout, and THE LEGAL ANSWER DECIDES IT RATHER THAN THE ENGINEERING.
+See references/legal-brief-the-fork-2026-10.md, which already asks every
+question twice — once per structure. This is why.
