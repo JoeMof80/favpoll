@@ -682,15 +682,49 @@ consent. The named faults: default settings, an unobvious opt-out, small type,
 and not clearly identifying the charge as optional.
 
 favpoll's tip UI (`components/pledge-card/utils.ts`, `pledge-dialog/
-step-pay.tsx`) stands up well against all of that: "None" is ALWAYS the first
+step-pay.tsx`) compares well against GoFundMe's: "None" is ALWAYS the first
 chip at every tier; the amounts are FLAT, never percentages; the preselected
-middle is ~10%, below GoFundMe's; the tip is a line item in the itemised
-breakdown before paying; and `suggestTip: false` defaults MEMORIALS to None,
-so there is no preselection where it would be worst.
+middle is ~10%, well below GoFundMe's 13.5-17.5%; and the tip is a line item
+in the itemised breakdown before paying.
 
-Two things still worth his eye:
-1. It IS preselected outside memorials — the one element shared with the
-   conduct being litigated. The mitigations are strong; the fact remains.
-2. The VISIBLE label reads "Tip for favpoll". The word "optional" appears only
-   in the `aria-label`, so a sighted guest never reads it. Adding it to the
-   visible label answers the exact criticism in one word. HIS COPY, HIS CALL.
+**CORRECTION (same day): MEMORIALS ARE NOT EXEMPT ON THE MAIN FLOW.** I said
+`suggestTip: false` spared them. It does not — `favpoll-content/index.tsx`
+carries the note that the memorial override was DROPPED 2026-07-31 on celebrant
+feedback ("a None default simply stays None; nobody read the ask as
+insensitive"). Only `favpoll-list-card.tsx` still passes it. So preselection is
+UNIVERSAL on the primary surface, deliberately, and for a MEASURED reason.
+
+### THE REAL EXPOSURE IS NOT THE US LAWSUIT — IT IS ALREADY UK LAW
+
+The class actions (Donovan v. GoFundMe, N.D. Ill. 1:26-cv-09423, filed 6 Aug
+2026; Munoz v. GoFundMe, N.D. Cal. 3:26-cv-01217, further along) cannot reach
+Josmo Services Ltd, and US consumer class actions typically run 2-4 years and
+settle. They are a signal, not a risk.
+
+**The DMCC Act 2024 is the risk, and it is in force.** CMA direct enforcement
+powers since 6 April 2025, fines up to 10% OF GLOBAL TURNOVER. The rule that
+bites: optional extras need not sit in the headline price BUT MUST BE GENUINELY
+OPTIONAL AND NOT PRE-SELECTED — pre-ticked add-ons included unless the consumer
+actively deselects them are named as problematic. On 18 November 2025 the CMA
+opened its first investigations under the regime, explicitly targeting unfair
+online choice architecture including AUTOMATICALLY BUNDLED OPTIONAL SERVICES.
+
+Where favpoll stands: CLEAN on drip pricing — the tip is a visible itemised
+line before payment and nothing is revealed late. EXPOSED on the separate
+pre-selection point, universally, on the primary surface.
+
+**DO NOT CHANGE THIS ON MY READING OF A SEARCH RESULT.** The obvious fix —
+default to None — is one the founder already tested and found fatal to the only
+revenue line. It is consumer law, Pippa is being engaged anyway, and it is a
+cheap addition to her list:
+
+- Is a PRE-SELECTED optional contribution, itemised in full before payment,
+  compliant under the DMCCA's choice-architecture provisions?
+- If not, does an ACTIVE CHOICE satisfy it — no pre-selection, but no skipping
+  either, so the guest must pick a contribution (including zero) to continue?
+  That is the option worth her view, because it answers "not pre-selected"
+  WITHOUT defaulting to the outcome that was measured as nothing.
+
+And one thing that helps under any answer: the VISIBLE label reads "Tip for
+favpoll", with "optional" only in the `aria-label`, so a sighted guest never
+reads it. One word. HIS COPY, HIS CALL.
