@@ -103,6 +103,49 @@ also answers another. The data layer permits duplicate labels across topics by
 design, and the reveal→item linter does not police cross-topic overlap. Nothing
 here is enforced by a checker; it is a curation standard.
 
+### Versions of the same work (founder, 13 October 2026)
+
+> "multiple versions because of cover versions"
+
+**Two recordings of one song may both be items.** This is not a new rule so
+much as the completion of one the catalogue already followed: Song is the only
+topic of 4,162 items whose labels carry an artist (`Title — Artist`, all 40 of
+them), so for songs the catalogue has never identified a _composition_ — it
+identifies a **recording**. And it already prefers the famous cover to the
+original: _Fields of Gold — Eva Cassidy_ is Sting's song, _Under the Bridge —
+All Saints_ is the Red Hot Chili Peppers'. "The version people mean" has beaten
+"who wrote it" since the first seed.
+
+**The bar:** both recordings must have independent standing with the people
+picking. _Over the Rainbow_ clears it — Judy Garland's is the original and a
+favourite in its own right, Eva Cassidy's is the funeral recording Co-op's
+chart names at number three — so both are items. _You Raise Me Up_ does not:
+Westlife's is the UK number one and the chart's entry, and Josh Groban's is the
+American hit, so a second item would only split the pick the list exists to
+capture. A version earns a slot; it is not entitled to one.
+
+**One version per favpoll.** The split is the whole cost, and it is worst on an
+**enacted** favpoll: if both versions are on the list, the song the room wanted
+can lose on a technicality and the wrong record gets played, which cannot be
+undone on the day. The all-time record on `/record` fragments the same way. But
+note _when_ the cost lands — only when both versions appear on the SAME favpoll,
+which is the organiser's or admin's list-building choice, not a consequence of
+both existing. So the catalogue may hold both; a favpoll should show one. A
+subset is a shelf, not a favpoll, and may hold both.
+
+Unbuilt, and not to be built before a real favpoll hits it: a wizard warning
+when a list holds two versions of one title (cheap), or a version relationship
+that aggregates in standings while letting a guest pick a specific recording
+(expensive).
+
+**A credit is a fact, not a style choice.** `— traditional` means nobody owns
+it — right for _Abide With Me_ (Lyte, 1847) and _Amazing Grace_, wrong for
+_You'll Never Walk Alone_, which is a 1945 Rodgers and Hammerstein show tune
+from Carousel. Getting it wrong is a defect to fix, not a version to add. But
+once an item has been PICKED its label is a record of what somebody chose:
+correct it only while its history is empty, and otherwise add the right credit
+as a second item.
+
 ## D. Enacted favpolls (founder's rulings, 2 October 2026 — revised the same day)
 
 There is ONE shape of favpoll. Some favpolls carry an **outcome**: the

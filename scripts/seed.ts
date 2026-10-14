@@ -6485,6 +6485,7 @@ const topicItems: Record<string, string[]> = {
     "Let It Be — The Beatles",
     "Mr Brightside — The Killers",
     "My Way — Frank Sinatra",
+    "Over the Rainbow — Eva Cassidy",
     "Over the Rainbow — Judy Garland",
     "Perfect — Ed Sheeran",
     "Somewhere Only We Know — Keane",
@@ -6506,7 +6507,7 @@ const topicItems: Record<string, string[]> = {
     "Wonderwall — Oasis",
     "Yesterday — The Beatles",
     "You Raise Me Up — Westlife",
-    "You\'ll Never Walk Alone — traditional",
+    "You\'ll Never Walk Alone — Gerry and The Pacemakers",
   ],
   "Sport to play": [
     "Badminton",
