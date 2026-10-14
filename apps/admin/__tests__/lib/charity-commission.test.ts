@@ -190,6 +190,30 @@ describe("titleCaseCharityName", () => {
     );
   });
 
+  // FIXED 2026-10-15, found by measuring the outreach preview's casing flag
+  // against production: "Médecins Sans Frontières" came back as "MéDecins
+  // Sans FrontièRes". The [a-z] character classes failed three ways at once —
+  // the word matcher split "frontières" into "fronti" and "res", the first
+  // ASCII letter AFTER an accent took the capital, and an accented first
+  // letter never took one at all. The register publishes unaccented names,
+  // but our own stored names and the other-names table do not.
+  it("handles accented letters", () => {
+    expect(titleCaseCharityName("MÉDECINS SANS FRONTIÈRES")).toBe(
+      "Médecins Sans Frontières",
+    );
+    // Already correctly cased: unchanged, not re-broken.
+    expect(titleCaseCharityName("Médecins Sans Frontières")).toBe(
+      "Médecins Sans Frontières",
+    );
+    // An accented FIRST letter must take the capital.
+    expect(titleCaseCharityName("école française")).toBe("École Française");
+    expect(titleCaseCharityName("ÅLAND TRUST")).toBe("Åland Trust");
+    expect(titleCaseCharityName("naïve hope")).toBe("Naïve Hope");
+    // Diacritics are folded before the vowel test, or a Welsh place-name
+    // with only accented vowels reads as an acronym and shouts.
+    expect(titleCaseCharityName("YNYS MÔN TRUST")).toBe("Ynys Môn Trust");
+  });
+
   it("keeps a listed acronym upper-case", () => {
     expect(titleCaseCharityName("AGE UK")).toBe("Age UK");
     expect(titleCaseCharityName("ACLE ACADEMY PTA")).toBe("Acle Academy PTA");

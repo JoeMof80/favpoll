@@ -210,11 +210,14 @@ const VOWELLESS_WORDS = new Set([
  *  A denylist of every short word in the language was never going to close;
  *  an allowlist of real acronyms is finite. */
 function readsAsAcronym(word: string): boolean {
-  const letters = word.replace(/[^a-z]/g, "");
+  const letters = word.replace(/[^\p{L}]/gu, "");
   if (letters.length < 2) return false; // an initial, or a stray "'s"
   if (ACRONYMS.has(word)) return true;
   if (VOWELLESS_WORDS.has(word)) return false;
-  return !/[aeiou]/.test(letters); // NSPCC, RSPB, BHF and friends
+  // Diacritics are stripped before the vowel test, or "Ynys Môn"
+  // reads as vowel-less and comes back shouting "MÔN".
+  const plain = letters.normalize("NFD").replace(/\p{M}/gu, "");
+  return !/[aeiou]/.test(plain); // NSPCC, RSPB, BHF and friends
 }
 
 /** Connecting words that stay lower-case INSIDE a name — "Friends of the
@@ -255,16 +258,24 @@ const ORDINAL_SUFFIXES = new Set(["st", "nd", "rd", "th"]);
  *  open with a quote ("'CHESTNUTS' PRE-SCHOOL"), and the token the matcher
  *  hands back is "'chestnuts" — uppercasing character 0 uppercased the
  *  apostrophe and left the name lower-case. A lone letter after an
- *  apostrophe is a possessive, not an initial, so "60'S" stays "60's". */
+ *  apostrophe is a possessive, not an initial, so "60'S" stays "60's".
+ *
+ *  LETTER MEANS \p{L}, NOT [a-z] (fixed 2026-10-15). With the ASCII class
+ *  an accented name was mangled three ways at once: the word matcher split
+ *  "frontières" into "fronti" and "res", the first ASCII letter AFTER an
+ *  accent took the capital, and an accented first letter never took one at
+ *  all. "Médecins Sans Frontières" came back "MéDecins Sans FrontièRes",
+ *  "Åland Trust" as "åLand Trust". Found while measuring the outreach
+ *  preview's casing flag against production. */
 function capitaliseWord(word: string): string {
-  const letters = word.replace(/[^a-z]/g, "");
+  const letters = word.replace(/[^\p{L}]/gu, "");
   if (letters.length === 1 && word.startsWith("'")) return word;
-  return word.replace(/[a-z]/, (c) => c.toUpperCase());
+  return word.replace(/\p{L}/u, (c) => c.toUpperCase());
 }
 
 export function titleCaseCharityName(name: string): string {
   const lower = name.toLowerCase();
-  const words = [...lower.matchAll(/[a-z']+/g)];
+  const words = [...lower.matchAll(/[\p{L}']+/gu)];
   const firstAt = words[0]?.index;
   const lastAt = words[words.length - 1]?.index;
   /** A connecting word is only "inside" the name between two other words:
@@ -274,10 +285,10 @@ export function titleCaseCharityName(name: string): string {
     offset !== firstAt &&
     offset !== lastAt &&
     !/[.:;!?\-\u2013\u2014(\[/|&]\s*$/.test(lower.slice(0, offset));
-  return lower.replace(/[a-z']+/g, (w, offset: number) => {
+  return lower.replace(/[\p{L}']+/gu, (w, offset: number) => {
     // Both lookups go through the letters, so a quoted "'the" is still the
     // connecting word "the" and "'nspcc" is still the acronym.
-    const letters = w.replace(/[^a-z]/g, "");
+    const letters = w.replace(/[^\p{L}]/gu, "");
     if (
       ORDINAL_SUFFIXES.has(letters) &&
       /[0-9]/.test(lower.charAt(offset - 1))
