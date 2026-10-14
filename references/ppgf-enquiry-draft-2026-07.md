@@ -460,3 +460,80 @@ means: tips push hard toward the file model, Gift Aid might push back toward
 the checkout, and THE LEGAL ANSWER DECIDES IT RATHER THAN THE ENGINEERING.
 See references/legal-brief-the-fork-2026-10.md, which already asks every
 question twice — once per structure. This is why.
+
+### WHO GETS WHICH QUESTION (2026-10-14)
+
+The questions had scattered across this document and it was no longer clear
+who each was for. Four audiences, and the split matters because three of them
+are cheap and slow and one is on the critical path.
+
+**JOE METCALFE — commercial memory of the relationship. Nobody else can
+answer these.**
+- How established was Thrift+ when you first approached PPGF, what volume?
+  THE ONE WORTH MOST: it is the only way to know whether the survey's "$10m+
+  per year" is a gate or an aspiration.
+- How long from first contact to moving money?
+- Did Gift Aid ever apply to you at all? (See below — probably not, and a
+  "no" is still worth having.)
+- May I speak to Henry?
+
+**HENRY McINTOSH — pure plumbing. A paragraph from him, weeks from PPGF.**
+- The file's format and its IDENTIFIERS: registered charity number, or a PPGF
+  id we must resolve first? If theirs, the lookup API is a PREREQUISITE.
+- What comes back after an upload — per-row results, or silence unless
+  something fails? This decides whether we can ever tell a family where their
+  money went.
+- The lookup API's coverage: the ~8,000 enrolled, or the register?
+
+**PPGF — only they can answer, and only formally.**
+- What makes a charity unfundable, and the rate in the LONG TAIL.
+- Can the platform be notified when they re-grant elsewhere?
+- Gift Aid in a GRANT-IN model (not their checkout).
+- Does the 1.4% + 20p apply to a batch BANK TRANSFER, or only to their card
+  checkout?
+- Eligibility at pre-launch volume.
+
+**PIPPA GARLAND — legal, and ON THE CRITICAL PATH because the Gift Aid answer
+decides the model.**
+- Agent or principal?
+- Commercial participator or professional fundraiser under Part II, and the
+  agreement that follows either way.
+- Does holding donations between close and upload require anything?
+- Does Gift Aid survive under each structure?
+
+### THRIFT+ ALMOST CERTAINLY DID NOT DO GIFT AID — so the reference has a limit
+
+Their model: you send clothes, Thrift+ resells them, and up to ~40% of each
+sale goes to your chosen charity. The donation is therefore the PROCEEDS OF
+SELLING YOUR OWN GOODS, not a cash gift from taxed income.
+
+Gift Aid on goods does exist — the retail Gift Aid scheme — but it needs the
+CHARITY to act as the donor's agent in selling, under a specific agency
+agreement. Thrift+ is a commercial reseller, not a charity shop, so that
+scheme does not obviously reach them.
+
+**THE CONSEQUENCE FOR US: Joe's reference is clean on support,
+responsiveness and the file mechanics, and SILENT ON GIFT AID.** Thrift+ used
+PPGF to disburse resale proceeds, not to claim Gift Aid on cash gifts. Do not
+let a good reference bleed into territory it never covered — nobody in our
+evidence base has tested PPGF on Gift Aid.
+
+### PRO BONO AT RUSSELL-COOKE: THEY DO IT, WE DO NOT QUALIFY
+
+They run a free 15-minute telephone advice helpline with Voluntary Action
+Islington and Kingston Voluntary Action — for MEMBER CHARITIES and
+social-purpose organisations. favpoll is Josmo Services Limited, a commercial
+company, so it does not qualify. Routing the question through a charity's
+membership is not an option either: that would be using someone else's
+entitlement for our benefit.
+
+So the founder's instinct in September — that asking Hannah for pro bono felt
+"slightly embarrassing" — was STRUCTURALLY CORRECT, not just shy.
+Charity-sector pro bono is aimed at charities, and a for-profit platform
+asking for free charity-law advice is knocking on the wrong door.
+
+What IS reasonable to expect: a free scoping call, then a FIXED FEE for a
+narrow question. The real lever is the one already pulled — Hannah's £5,000
+bought a broad opinion that excluded drafting, where a single structured
+question (agent or principal, and what follows) is a fraction of it. The fork
+brief is already written to be answered that way.
