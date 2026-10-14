@@ -42,7 +42,8 @@ assuming.
 > A pledge is a gift to the favpoll's chosen registered charity — never to the
 > organiser, and never to favpoll.
 
-**Proposed:**
+**Proposed** (the terms are the place to be exact, so PPGF leads here even
+though the donation page need not):
 
 > A pledge is a gift to PayPal Giving Fund, a registered charity in England and
 > Wales (no. 1110538), for the benefit of the charity this favpoll names. It is
@@ -59,20 +60,45 @@ The second paragraph is ours, not theirs, and we would like to keep it: the
 discretion clause is the single thing a bereaved family would most want
 explained, and burying it would be the wrong instinct.
 
-## 2. The donation page — a disclosure that does not exist yet
+## 2. The donation page — and what GoFundMe actually does
 
-There is currently no sentence at the point of pledging that says who receives
-the money; the itemised total shows a line reading **"To &lt;charity&gt;"** and
-nothing more. Under PPGF's framing that line is itself a representation, and
-an unqualified one.
+**GoFundMe keeps the charity front of house and puts PPGF on the receipt.**
+Their fundraiser page shows the charity with a "Tax deductible" badge and a
+verified tick; there is no prominent "your donation goes to PayPal Giving Fund"
+at the point of giving. The disclosure lands afterwards:
 
-**Proposed, beneath the itemised total:**
+> "When PayPal Giving Fund receives your donation, it will grant the donation
+> to the NPO of your choice, but **PayPal Giving Fund will provide your tax
+> receipt**" — and the charity's name appears on that receipt as a note
+> ("directed to: [Charity Name]") rather than as the formal recipient.
 
-> Your pledge goes to PayPal Giving Fund, a registered charity, which grants it
-> to **&lt;charity&gt;**. favpoll takes nothing from it.
+So PPGF's strictness is plausibly about the TERMS and the RECEIPT, not about
+putting "a gift to PayPal Giving Fund" beside the pledge button. The market
+leader does not, and presumably does so with PPGF's blessing.
 
-And the breakdown line changes from `To <charity>` to `For <charity>` — one
-word, and the only one that is accurate once PPGF is the recipient.
+**We should still say something, and earlier than they do.** A memorial is more
+sensitive than a generic fundraiser, and a bereaved family learning at the
+receipt that their money went to "PayPal Giving Fund, directed to: St Richard's
+Hospice" could read it as a bait-and-switch. Worse than having been told.
+Being straight about money is also the one thing favpoll has been consistent
+about — the 100% claim was retired rather than defended, the contribution is
+itemised before payment.
+
+**THE LEVER IS THE SUBJECT OF THE SENTENCE.** Lead with PPGF and the charity
+becomes a destination; lead with the charity and PPGF becomes plumbing. Both
+disclose the same fact.
+
+**Proposed, one quiet line beneath the itemised total:**
+
+> Your pledge reaches **&lt;charity&gt;** through PayPal Giving Fund, the
+> charity that handles donations for favpoll. favpoll takes nothing from it.
+
+Warmer than leading with PPGF, more forthcoming than GoFundMe, and the charity
+is still what the sentence is about.
+
+The breakdown line stays **`To <charity>`** on this reading — it describes where
+the pledge is going, which remains true, and the line above explains how. (If
+PPGF require otherwise, `For <charity>` is the one-word change.)
 
 ## 3. What stays exactly as it is
 
@@ -116,9 +142,11 @@ written around. It is a thing we are choosing.
    charity, rather than only those we have personally onboarded. The small local
    hospice becomes reachable — and the small local hospice is the whole case.
 
-**What we should not do** is hide the change in small print to keep the warmer
-sentence. If the wording is the price of the rail, it goes where a guest will
-read it.
+**What we should not do** is leave a guest to discover it from a receipt. That
+is GoFundMe's placement and it is defensible for a generic fundraiser; at a
+funeral it is the one place favpoll should be braver than the market leader.
+The cost of saying it early is a cooler sentence. The cost of saying it late is
+a family feeling misled at the worst possible moment.
 
 ---
 
