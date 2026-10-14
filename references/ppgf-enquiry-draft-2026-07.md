@@ -1078,3 +1078,47 @@ launching and waiting on outreach.
 the PPGF-as-NPO-of-record architecture, is our s.59 counterparty PPGF or each
 named charity? And if PPGF, does the consent gate remain a choice rather than a
 requirement?
+
+### THE FOUNDER'S POSITION, STATED PLAINLY (2026-10-14)
+
+I offered a "two tier" framing — onboarded charities, plus a long tail favpoll
+could name "without having met them". He rejected the framing:
+
+> *"i don't want to meet any charities to be able to fundraise for them. i want
+> to do it because it is useful, not because it is necessary."*
+
+**So the position is: FUNDRAISING FOR A CHARITY SHOULD REQUIRE NOTHING FROM
+THAT CHARITY. Onboarding exists because it GIVES them something — their own
+favpolls, appeals, a profile — not because it buys permission.** A value
+exchange, not a gate. Which is a better business: you approach a charity to
+BRING them something rather than to ask a favour.
+
+**WHAT FOLLOWS, and it reorders everything:**
+
+1. **The s.59 counterparty question is no longer a rail detail. It is the
+   question the business model rests on.** If the answer is "each named
+   charity", this model is not expensive — it is UNAVAILABLE. If it is PPGF, it
+   works.
+2. **So the architecture choice was never about the 18p or the tip.** It is
+   about whether favpoll can name a charity it has never contacted. GOFUNDME'S
+   MODEL PERMITS EXACTLY THAT — their auto-created nonprofit pages ARE this
+   model, operating in the UK today. JUSTGIVING'S DOES NOT: charity membership
+   first, every time. That is a far better basis for choosing than fees.
+3. **Outreach inverts.** The unwritten cold invite was going to ask permission
+   (the existing draft "claims an organiser has already picked them"). Under
+   this model the email says *money has been raised for you*, or *here is what
+   you could run yourself*. Much easier to send, much easier to answer — and
+   the reason parking the copy was right.
+4. **The consent gate is a lever, not a feature** — which is already how it was
+   built (posture env, inert-by-default, "legal opinion sets the flip"). Nothing
+   to unbuild.
+5. **HE ALREADY BUILT FOR THIS.** 171,886 charity profiles and a page for every
+   registered number make no sense for a catalogue of 42 approved charities. The
+   charity-profiles work was built AT REGISTER SCALE, which is this model rather
+   than the consent-gated one. The instinct has been consistent since September
+   even while the legal framing wobbled.
+
+**THE HONEST RISK, as the mirror image:** if the answer is "each charity", much
+of that register-scale work becomes outreach TOOLING rather than product
+surface — still useful for verification, prioritisation and the removal check,
+but a different job.
