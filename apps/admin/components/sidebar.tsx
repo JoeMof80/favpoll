@@ -11,6 +11,7 @@ import {
   Users,
   Sparkles,
   Layers,
+  Send,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +20,7 @@ const NAV_ITEMS = [
   { href: "/placeholders", label: "Placeholders", icon: FileText },
   { href: "/contributions", label: "Contributions", icon: Gift },
   { href: "/charities", label: "Charities", icon: Heart },
+  { href: "/outreach", label: "Outreach", icon: Send },
   { href: "/generated-drafts", label: "Generated Drafts", icon: Sparkles },
   { href: "/subsets", label: "Subsets", icon: Layers },
   { href: "/favpolls", label: "Favpolls", icon: CalendarDays },

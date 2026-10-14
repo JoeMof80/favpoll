@@ -1156,3 +1156,116 @@ export async function setCharityConsent(
   revalidatePath("/charities");
   return { error: null };
 }
+
+/** A charity as the OUTREACH PREVIEW needs it: everything the two emails
+ *  interpolate, plus what decides whether sending one is a good idea. */
+export type OutreachPreviewRow = {
+  id: string;
+  name: string;
+  registered_number: string | null;
+  registered_email: string | null;
+  consent_status: string;
+  is_active: boolean;
+  invite_drafted_at: string | null;
+  favpoll_count: number;
+  signature_events: SignatureEvent[] | null;
+  website_read_at: string | null;
+  perfect_topic_title: string | null;
+  perfect_subset_title: string | null;
+  perfect_topic_reason: string | null;
+  register_verdict: RegisterRemoval["verdict"] | null;
+};
+
+/** EVERY charity, for the outreach preview — not the consent queue's
+ *  narrower set.
+ *
+ *  getConsentQueue() lists only PENDING charities already in use on a
+ *  favpoll, which is the right list to WORK and the wrong list to CHECK: on
+ *  production that set is currently empty, so the queue would show nothing
+ *  while 42 accounts sit waiting to be written to. The preview is about the
+ *  email rather than the queue, so it takes the lot and reports what is
+ *  missing. (Founder, 2026-10-07: "cycle though what the email looks like for
+ *  every charity so we can preview any issues.")
+ */
+export async function getOutreachPreviewRows(): Promise<{
+  data: OutreachPreviewRow[] | null;
+  error: string | null;
+}> {
+  const supabase = createAdminClient();
+
+  const [{ data, error }, { data: links }, removals] = await Promise.all([
+    supabase
+      .from("charities")
+      .select(
+        "id, name, registered_number, consent_status, is_active, invite_drafted_at, perfect_topic:topics!charities_perfect_topic_id_fkey(title), perfect_subset:topic_subsets!charities_perfect_subset_id_fkey(title)",
+      )
+      .order("name", { ascending: true }),
+    supabase.from("favpoll_charities").select("charity_id"),
+    removalsById(),
+  ]);
+  if (error) return { data: null, error: error.message };
+
+  const counts = new Map<string, number>();
+  for (const l of (links ?? []) as { charity_id: string }[]) {
+    counts.set(l.charity_id, (counts.get(l.charity_id) ?? 0) + 1);
+  }
+
+  const numbers = (data ?? []).map(
+    (c) => (c as { registered_number: string | null }).registered_number,
+  );
+  const [suggestions, register] = await Promise.all([
+    suggestionsByKey(numbers),
+    registerByKey(numbers),
+  ]);
+  const titles = await suggestionTitles(suggestions);
+
+  const rows: OutreachPreviewRow[] = (data ?? []).map((c) => {
+    const row = c as {
+      id: string;
+      name: string;
+      registered_number: string | null;
+      consent_status: string;
+      is_active: boolean;
+      invite_drafted_at: string | null;
+      perfect_topic?: { title: string } | { title: string }[] | null;
+      perfect_subset?: { title: string } | { title: string }[] | null;
+    };
+    const pt = Array.isArray(row.perfect_topic)
+      ? row.perfect_topic[0]
+      : row.perfect_topic;
+    const ps = Array.isArray(row.perfect_subset)
+      ? row.perfect_subset[0]
+      : row.perfect_subset;
+    const key = profileKey(row.registered_number);
+    const profile = key ? suggestions.get(key) : undefined;
+    const onRegister = register.get(
+      (row.registered_number ?? "").replace(/\D/g, ""),
+    );
+    // A SUGGESTED title counts here: the welcome's topic sentence renders
+    // from whichever title the queue would show, confirmed or not.
+    const suggestedTopic = profile?.perfect_topic_suggested_id
+      ? titles.topics.get(profile.perfect_topic_suggested_id)
+      : undefined;
+    const suggestedSubset = profile?.perfect_subset_suggested_id
+      ? titles.subsets.get(profile.perfect_subset_suggested_id)
+      : undefined;
+    return {
+      id: row.id,
+      name: row.name,
+      registered_number: row.registered_number,
+      registered_email: onRegister?.email ?? null,
+      consent_status: row.consent_status,
+      is_active: row.is_active,
+      invite_drafted_at: row.invite_drafted_at,
+      favpoll_count: counts.get(row.id) ?? 0,
+      signature_events: profile?.signature_events ?? null,
+      website_read_at: profile?.website_read_at ?? null,
+      perfect_topic_title: pt?.title ?? suggestedTopic ?? null,
+      perfect_subset_title: ps?.title ?? suggestedSubset ?? null,
+      perfect_topic_reason: profile?.perfect_topic_reason ?? null,
+      register_verdict: removals.get(row.id)?.verdict ?? null,
+    };
+  });
+
+  return { data: rows, error: null };
+}
