@@ -486,8 +486,12 @@ export function FavpollSheet({
           footer bleeds across the shell's gutters (page-layout's
           shellGutter, md:pl-16 md:pr-8) and pads its content back in, so
           the lock card's shadow passing beneath is covered to the column's
-          edges, not just to its content box. */}
-      <div className="sticky bottom-0 z-10 mt-8 hidden border-t border-border bg-background pt-5 pb-[var(--shell-inset)] md:-mr-8 md:-ml-16 md:block md:pr-8 md:pl-16">
+          edges, not just to its content box. z-30, above the sticky poll
+          heading (z-20): on a short column the heading's natural position
+          met the pinned footer and painted over it (founder, 2026-10-15:
+          "Topic shouldn't be on top of charity"); the footer is the floor
+          and everything in the column passes beneath it. */}
+      <div className="sticky bottom-0 z-30 mt-8 hidden border-t border-border bg-background pt-5 pb-[var(--shell-inset)] md:-mr-8 md:-ml-16 md:block md:pr-8 md:pl-16">
         {appeal && (
           <p className="mb-2 truncate border-b border-border pb-2 text-xs text-muted-foreground">
             Part of{" "}
