@@ -578,13 +578,16 @@ describe("RotatingRegisterHero", () => {
 
   it("next and back move it by hand, wrapping both ways", () => {
     render(<RotatingRegisterHero />)
-    // Each button names the register it leads to, not a direction alone.
     fireEvent.click(
-      screen.getByRole("button", { name: "Previous: Fundraiser" })
+      screen.getByRole("button", { name: "Previous kind of favpoll" })
     )
     expect(live().map((s) => s.dataset.register)).toEqual(["fundraiser"])
-    fireEvent.click(screen.getByRole("button", { name: "Next: Memorial" }))
-    fireEvent.click(screen.getByRole("button", { name: "Next: Celebration" }))
+    fireEvent.click(
+      screen.getByRole("button", { name: "Next kind of favpoll" })
+    )
+    fireEvent.click(
+      screen.getByRole("button", { name: "Next kind of favpoll" })
+    )
     expect(live().map((s) => s.dataset.register)).toEqual(["celebration"])
   })
 
@@ -593,7 +596,9 @@ describe("RotatingRegisterHero", () => {
     act(() => {
       vi.advanceTimersByTime(DWELL_MS - 1000)
     })
-    fireEvent.click(screen.getByRole("button", { name: /^Next:/ }))
+    fireEvent.click(
+      screen.getByRole("button", { name: "Next kind of favpoll" })
+    )
     expect(live().map((s) => s.dataset.register)).toEqual(["celebration"])
     // The old tick (1s away) must not fire; the new slide gets its full dwell.
     act(() => {
@@ -610,7 +615,9 @@ describe("RotatingRegisterHero", () => {
     const { unmount } = render(<RotatingRegisterHero />)
     // jsdom has no IntersectionObserver: the hero counts as in view.
     expect(getHeroRegister()).toBe("memorial")
-    fireEvent.click(screen.getByRole("button", { name: /^Next:/ }))
+    fireEvent.click(
+      screen.getByRole("button", { name: "Next kind of favpoll" })
+    )
     expect(getHeroRegister()).toBe("celebration")
     unmount()
     expect(getHeroRegister()).toBeUndefined()
