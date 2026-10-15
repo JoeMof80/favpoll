@@ -86,7 +86,12 @@ export function HeroLayout({
         "--hero-stuck-bottom",
         // headerInset = 56 (the h-14 header) when the document scrolls,
         // 0 inside the shell's scroller, whose box starts below it.
-        `${Math.round(headerInset + inset + BAND_PB)}px`
+        // A STATIC band (every hero since the stacked header, 2026-10-15)
+        // pins nothing, so what pins beneath it pins at the scroller's own
+        // top: headerInset alone.
+        animate
+          ? `${Math.round(headerInset + inset + BAND_PB)}px`
+          : `${headerInset}px`
       )
     }
     set()
@@ -109,10 +114,6 @@ export function HeroLayout({
   // classes until mount.
   const textRef = useRef<HTMLDivElement>(null)
   const settledRef = useRef<HTMLDivElement>(null)
-  const [avatarCfg, setAvatarCfg] = useState({ rest: 132, settled: 84 })
-  // Style binding waits for mount: SSR + first client paint use the CSS
-  // size classes, so server and client markup can't disagree.
-  const [avatarMounted, setAvatarMounted] = useState(false)
   // useLayoutEffect, not useEffect: the cover height and avatar
   // endpoints are PAINT values — measured post-paint, the first frame
   // wore the 999 fallback (caught at w390 in the breakpoint sweep),
@@ -143,7 +144,6 @@ export function HeroLayout({
       )
       const settled = Math.min(settledEl.offsetHeight, rest)
       if (rest > 0 && settled > 0) {
-        setAvatarCfg({ rest, settled })
         // THE COLLAPSE, published (founder, 2026-09-29: "a strange
         // shuddering when scrolling the left column"): the band settles
         // by this much of REAL layout in the first 24px of scroll. In the
@@ -170,7 +170,6 @@ export function HeroLayout({
       }
     }
     set()
-    setAvatarMounted(true)
     const ro = new ResizeObserver(set)
     ro.observe(text)
     ro.observe(settledEl)
@@ -198,16 +197,6 @@ export function HeroLayout({
   // (a group favpoll's photo swallowed its name there). Tablets now get
   // the phone layout, which already works; this flag keeps step with the
   // lg: classes below, as it did with lg:.
-  // EXPERIMENT SWITCH (founder, 2026-10-15: "lets see" — A, the band,
-  // against C, the photo at the right of the eyebrow row). `?header=c` on
-  // the favpoll's URL shows C below lg; anything else shows A. Removed once
-  // he has chosen — never ship a URL-driven layout.
-  const [stacked, setStacked] = useState<"a" | "c">("a")
-  useEffect(() => {
-    if (new URLSearchParams(window.location.search).get("header") === "c")
-      setStacked("c")
-  }, [])
-
   const [isMobile, setIsMobile] = useState(false)
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 1023px)")
@@ -258,10 +247,6 @@ export function HeroLayout({
     t,
     isMobile ? [subtitleRest, subtitleRest] : [subtitleRest, 0]
   )
-  const avatarSize = useTransform(scrollY, t, [
-    avatarCfg.rest,
-    isMobile ? avatarCfg.rest : avatarCfg.settled,
-  ])
 
   return (
     <>
@@ -304,7 +289,7 @@ export function HeroLayout({
         // purpose — it exists for the moment iOS Safari drops the
         // header's sticky, and a see-through patch in that failure is
         // the bug it was added to fix.
-        className={`bg-background pb-4 lg:pt-16 ${avatar && stacked === "a" ? "pt-0" : "pt-6"} ${
+        className={`bg-background pb-4 ${avatar ? "pt-0" : "pt-6 lg:pt-16"} ${
           animate
             ? `lg:sticky lg:z-30 lg:before:absolute lg:before:inset-x-0 lg:before:-top-14 lg:before:h-14 lg:before:bg-background lg:supports-backdrop-filter:bg-background/85 lg:supports-backdrop-filter:backdrop-blur-md ${
                 // The scrollport already starts below the header in shell
@@ -320,48 +305,34 @@ export function HeroLayout({
             than person heroes, whose shrunken avatar outgrows the
             eyebrow+name block (founder: cause ribbon "too high" next to
             a person page, on-device 2026-07-30). */}
-        {/* THE STACKED HEADER, below lg (founder, 2026-10-15, after the
-            shell moved to lg and the phone layout read "too stretched" on
-            a tablet: "redesigning the header so the text can fill the
-            width and therefore less likely to wrap", his reference a
-            LinkedIn profile; variant A of three mocked at /dev/header,
-            "try A"). A register-tinted band bleeding across the column's
-            gutters, the square photo overlapping its bottom edge, and
-            then the text stack at the FULL width of the column — so the
-            name's line length is the column, not the column minus a
-            photo, and the photo can never squeeze it. The side-by-side
-            row below keeps its avatar from lg, where the settle mechanic
-            lives; here the row's avatar cell is hidden and the text runs
-            full width. No avatar (a cause without a photo): no band, the
-            text starts at the old pt-6. */}
-        {avatar && stacked === "a" && (
-          <div className="lg:hidden">
-            <div className="-mx-6 h-24 bg-muted" aria-hidden="true" />
+        {/* THE STACKED HEADER (founder, 2026-10-15; a LinkedIn profile header
+            was the reference, variant A of three mocked at /dev/header, and
+            "aren't we doing the band at all sizes?" made it every width). A
+            register-tinted band bleeding across the column's gutters, the
+            square photo overlapping its bottom edge, then the eyebrow, name
+            and context at the FULL width of the column — the name's line
+            length is the column, not the column minus a photo, and the
+            photo can never squeeze it (the feedback loop fixed earlier the
+            same day). It retires the side-by-side row's settle: the hero is
+            static everywhere now, as it already was in the room, and the
+            name scrolls away on a desktop as it does on a phone — the poll
+            heading and the charity footer still pin. No avatar (a cause
+            without a photo): no band, the text starts at the old padding. */}
+        {avatar && (
+          <div>
+            <div
+              className="-mx-6 h-24 bg-muted lg:-mr-8 lg:-ml-16"
+              aria-hidden="true"
+            />
             <div className="-mt-12 mb-4 size-24 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm">
               {avatar}
             </div>
           </div>
         )}
         <div className="relative flex min-h-18 items-start gap-4 lg:min-h-21 lg:gap-6">
-          {/* C: the photo at the right of the eyebrow row, 80px, the name
-              beneath at full width (the eyebrow row grows to the photo's
-              height and centres the eyebrow against it). lg hides it. */}
-          {avatar && stacked === "c" && (
-            <div className="absolute top-0 right-0 size-20 overflow-hidden rounded-xl border border-border lg:hidden">
-              {avatar}
-            </div>
-          )}
           <div ref={textRef} className="min-w-0 flex-1">
             <div ref={settledRef}>
-              <div
-                className={
-                  avatar && stacked === "c"
-                    ? "max-lg:flex max-lg:min-h-20 max-lg:items-center max-lg:pr-24"
-                    : undefined
-                }
-              >
-                {eyebrowText}
-              </div>
+              {eyebrowText}
               {title}
             </div>
             {subtitle && !animate && <div className="w-full">{subtitle}</div>}
@@ -394,18 +365,6 @@ export function HeroLayout({
               </motion.div>
             )}
           </div>
-          {avatar && (
-            <motion.div
-              className="hidden h-26 w-26 shrink-0 lg:block lg:h-33 lg:w-33"
-              style={
-                animate && avatarMounted
-                  ? { width: avatarSize, height: avatarSize }
-                  : undefined
-              }
-            >
-              {avatar}
-            </motion.div>
-          )}
         </div>
       </div>
 

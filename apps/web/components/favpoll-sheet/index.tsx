@@ -397,7 +397,7 @@ export function FavpollSheet({
           favpoll={favpoll}
           mentions={aboutMentions}
           compact={guestBookExpanded}
-          animate={!room}
+          animate={false}
         />
       ) : (
         <FavpollHero
@@ -405,10 +405,12 @@ export function FavpollSheet({
           protagonist={favpoll.protagonists!}
           mentions={aboutMentions}
           compact={guestBookExpanded}
-          animate={!room}
+          animate={false}
         />
       )}
 
+      {/* STATIC HERO EVERYWHERE since the stacked header (2026-10-15): the
+          settle it animated is retired; the room was already static. */}
       {pollWithItems ? (
         <>
           <PollSection
