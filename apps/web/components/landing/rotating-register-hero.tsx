@@ -221,14 +221,14 @@ export function RotatingRegisterHero() {
                   centred with every section beneath — the founder's call,
                   twice (a left-anchored column at every width was built and
                   rejected: "it's only at lower resolution that we need the
-                  content to line up with the wordmark"). Below sm the right
-                  side keeps 24: at 320px the 215px phone needs 218 and a
-                  symmetric 30 left 212 (the overflow E2E caught the
-                  earlier version). */}
+                  content to line up with the wordmark"). NOT ON PHONES:
+                  below sm the band adds nothing and the rail is the
+                  container's own 24 — the 54px version was built and
+                  reverted the same day ("it wastes too much space"). */}
               <LandingHero
                 {...slide.hero}
                 ctaAfterMedia
-                bandClassName="bg-primary pr-6 pl-[30px] text-primary-foreground sm:px-[30px]"
+                bandClassName="bg-primary text-primary-foreground sm:px-[30px]"
               />
             </div>
           )
@@ -246,11 +246,13 @@ export function RotatingRegisterHero() {
           stroke begins at 24 — where the header's mark begins — and the
           box ends at 49, inside the 54px rail. Mirrored on the right. AT
           EVERY WIDTH: a row of both under the phone was built for phones
-          and reverted the same hour ("move the chevrons back!!!!"). */}
+          and reverted the same hour ("move the chevrons back!!!!"). Below
+          sm the rail is 24, so the boxes sit at the edge and the stroke
+          (15–25) lives in the gutter. */}
       {(
         [
-          ["Previous kind of favpoll", -1, ChevronLeft, "left-[9px]"],
-          ["Next kind of favpoll", 1, ChevronRight, "right-[9px]"],
+          ["Previous kind of favpoll", -1, ChevronLeft, "left-0 sm:left-[9px]"],
+          ["Next kind of favpoll", 1, ChevronRight, "right-0 sm:right-[9px]"],
         ] as const
       ).map(([label, by, Icon, side]) => (
         <div
