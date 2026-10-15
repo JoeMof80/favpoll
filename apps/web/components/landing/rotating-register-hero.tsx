@@ -217,10 +217,12 @@ export function RotatingRegisterHero() {
                   page's 1320px column meets the edge; above it the column
                   is centred with every section beneath, as he chose. The
                   departure from "exactly as they are" is 32px on this page
-                  alone. */}
+                  alone. Below sm the band keeps px-6: at 320px a 56px rail
+                  each side left 208px for the 215px phone and the page
+                  scrolled 7px sideways (the overflow E2E caught it). */}
               <LandingHero
                 {...slide.hero}
-                bandClassName="bg-primary px-8 text-primary-foreground"
+                bandClassName="bg-primary px-6 text-primary-foreground sm:px-8"
               />
             </div>
           )
@@ -236,11 +238,12 @@ export function RotatingRegisterHero() {
           LOGO'S LINE (founder, same night): 24px in, where the header's
           mark sits — a 28px circle ending at 52, inside the 56px rail the
           band's px-8 reserves (see bandClassName above), so a headline at
-          the same height never touches it. */}
+          the same height never touches it; below sm, 16px in, inside the
+          48px rail there. */}
       {(
         [
-          ["Previous kind of favpoll", -1, ChevronLeft, "left-6"],
-          ["Next kind of favpoll", 1, ChevronRight, "right-6"],
+          ["Previous kind of favpoll", -1, ChevronLeft, "left-4 sm:left-6"],
+          ["Next kind of favpoll", 1, ChevronRight, "right-4 sm:right-6"],
         ] as const
       ).map(([label, by, Icon, side]) => (
         <div
