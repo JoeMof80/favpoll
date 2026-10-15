@@ -473,8 +473,8 @@ describe("DemoCard — cause (faceless) vs fundraiser (has a runner)", () => {
 // ── RotatingRegisterHero ──────────────────────────────────────────────────────
 // The home hero since 2026-10-15: the three register heroes, unchanged, in
 // one grid cell, crossfaded. These pin the contract, not the look: every
-// slide is laid out, exactly one is live, a pill is a decision, and the
-// rotation never starts under reduced motion.
+// slide is laid out, exactly one is live, back/next move it by hand and
+// restart the dwell, and the rotation never starts under reduced motion.
 describe("RotatingRegisterHero", () => {
   const slides = () =>
     Array.from(
@@ -546,14 +546,35 @@ describe("RotatingRegisterHero", () => {
     expect(live().map((s) => s.dataset.register)).toEqual(["memorial"])
   })
 
-  it("a pill is a decision: it jumps to that register and ends the rotation", () => {
+  it("next and back move it by hand, wrapping both ways", () => {
     render(<RotatingRegisterHero />)
-    const pill = screen.getByRole("button", { name: "Fundraiser" })
-    fireEvent.click(pill)
+    const back = screen.getByRole("button", {
+      name: "Previous kind of favpoll",
+    })
+    const next = screen.getByRole("button", { name: "Next kind of favpoll" })
+    fireEvent.click(back)
     expect(live().map((s) => s.dataset.register)).toEqual(["fundraiser"])
-    expect(pill).toHaveAttribute("aria-pressed", "true")
+    fireEvent.click(next)
+    fireEvent.click(next)
+    expect(live().map((s) => s.dataset.register)).toEqual(["celebration"])
+  })
+
+  it("a manual move restarts the dwell from that slide, and the rotation goes on", () => {
+    render(<RotatingRegisterHero />)
     act(() => {
-      vi.advanceTimersByTime(DWELL_MS * 3)
+      vi.advanceTimersByTime(DWELL_MS - 1000)
+    })
+    fireEvent.click(
+      screen.getByRole("button", { name: "Next kind of favpoll" })
+    )
+    expect(live().map((s) => s.dataset.register)).toEqual(["celebration"])
+    // The old tick (1s away) must not fire; the new slide gets its full dwell.
+    act(() => {
+      vi.advanceTimersByTime(DWELL_MS - 1000)
+    })
+    expect(live().map((s) => s.dataset.register)).toEqual(["celebration"])
+    act(() => {
+      vi.advanceTimersByTime(1000)
     })
     expect(live().map((s) => s.dataset.register)).toEqual(["fundraiser"])
   })

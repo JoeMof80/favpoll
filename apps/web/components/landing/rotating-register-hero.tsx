@@ -16,7 +16,7 @@
 // subheader, CTA pair, one still phone — and this component renders those
 // three configurations, unchanged, stacked in one grid cell, and crossfades
 // between them. Nothing here is a new idiom: the slides are the register
-// pages' own heroes, and the pills are the kind nav the looping demo had.
+// pages' own heroes, and back/next wear the hero's own outline idiom.
 //
 // The mechanics that matter:
 // - EACH SLIDE IS ITS OWN REGISTER. `data-register={palette}` (the element-
@@ -29,12 +29,15 @@
 //   the tallest at every width and nothing reflows when the slide changes.
 //   Only opacity moves. Inactive slides are `inert` and `aria-hidden`, so the
 //   tab order and the accessibility tree see one hero, not three.
-// - IT STOPS THE MOMENT SOMEONE TOUCHES IT. A pill click ends the rotation
-//   for good; hover or focus pauses it; a hidden tab skips the tick; reduced
-//   motion never starts it. Auto-advance exists so a visitor who does nothing
-//   still reads all three scenarios — the thing Gary needed — not to take the
-//   choice away from one who does.
+// - IT KEEPS TURNING. Back and next move it by hand and restart the dwell
+//   from that slide, so the one you asked for gets its full read; a hidden
+//   tab skips the tick; reduced motion never starts it. NO HOVER PAUSE: the
+//   band fills the viewport, so on a desktop the pointer is almost always
+//   over it, and "pause on hover" meant "never rotate" (founder saw exactly
+//   that on the first preview, 2026-10-15). Auto-advance exists so a visitor
+//   who does nothing still reads all three scenarios — the thing Gary needed.
 import { useEffect, useState, useSyncExternalStore } from "react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { LandingHero } from "@/components/landing/hero"
 import {
   FUNDRAISER_SCENE,
@@ -126,10 +129,9 @@ function readReducedMotion() {
 
 export function RotatingRegisterHero() {
   const [index, setIndex] = useState(0)
-  // A click is a decision, and the rotation respects it permanently; hover
-  // and focus are attention, and only hold it while they last.
-  const [stopped, setStopped] = useState(false)
-  const [held, setHeld] = useState(false)
+  // Bumped by every manual move: the interval effect re-runs on it, which
+  // is what restarts the dwell from the slide the visitor chose.
+  const [epoch, setEpoch] = useState(0)
   const prefersReducedMotion = useSyncExternalStore(
     subscribeReducedMotion,
     readReducedMotion,
@@ -137,7 +139,7 @@ export function RotatingRegisterHero() {
   )
 
   useEffect(() => {
-    if (stopped || held || prefersReducedMotion) return
+    if (prefersReducedMotion) return
     const id = window.setInterval(() => {
       // A background tab does not read; let it come back to the slide it
       // left rather than three registers further on.
@@ -145,26 +147,23 @@ export function RotatingRegisterHero() {
       setIndex((i) => (i + 1) % SLIDES.length)
     }, DWELL_MS)
     return () => window.clearInterval(id)
-  }, [stopped, held, prefersReducedMotion])
+  }, [epoch, prefersReducedMotion])
 
   const active = SLIDES[index]
+  const step = (by: 1 | -1) => {
+    setIndex((i) => (i + by + SLIDES.length) % SLIDES.length)
+    setEpoch((e) => e + 1)
+  }
 
   return (
     <div
       // The ACTIVE register's palette for everything that is not a slide —
-      // the pills' ink and hover wash — so the controls match the band they
+      // the buttons' ink and hover wash — so the controls match the band they
       // sit on, and follow it when it changes.
       data-register={active.palette}
       className="relative"
       aria-roledescription="carousel"
       aria-label="A favpoll for each kind of occasion"
-      onMouseEnter={() => setHeld(true)}
-      onMouseLeave={() => setHeld(false)}
-      onFocus={() => setHeld(true)}
-      onBlur={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget as Node | null))
-          setHeld(false)
-      }}
     >
       <div className="grid">
         {SLIDES.map((slide, i) => {
@@ -183,10 +182,10 @@ export function RotatingRegisterHero() {
                 isActive ? "opacity-100" : "pointer-events-none opacity-0"
               )}
             >
-              {/* pb-16 under the register's own band classes: the pills
+              {/* pb-16 under the register's own band classes: the buttons
                   overlay the band's bottom edge, and on a short phone the
                   hero's content reaches it. The padding reserves that strip
-                  so nothing ever sits under a pill. */}
+                  so nothing ever sits under a button. */}
               <LandingHero
                 {...slide.hero}
                 bandClassName="bg-primary pb-16 text-primary-foreground"
@@ -196,41 +195,46 @@ export function RotatingRegisterHero() {
         })}
       </div>
 
-      {/* The kind nav, as it was on the looping demo (same Button variants,
-          same pill): on the hero's own left rail, over the bottom of the
-          band. pointer-events are off on the overlay and back on for the
-          pills, so the band under the empty part of the strip stays
-          clickable through to nothing — it is band. */}
+      {/* Back and next (founder, 2026-10-15, replacing register pills): two
+          round ghost buttons in the hero's own outline idiom, on the hero's
+          left rail, over the bottom of the band. pointer-events are off on
+          the overlay and back on for the buttons, so the empty part of the
+          strip is just band. */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0">
         <div className="mx-auto w-full px-6 pb-6 md:max-w-330">
           <div
             role="group"
-            aria-label="Pick a kind of favpoll"
-            className="pointer-events-auto flex flex-wrap gap-2"
+            aria-label="Kinds of favpoll"
+            className="pointer-events-auto flex items-center gap-2"
           >
-            {SLIDES.map((slide, i) => {
-              const isActive = i === index
-              return (
-                <Button
-                  key={slide.palette}
-                  type="button"
-                  size="sm"
-                  variant={isActive ? "secondary" : "ghost"}
-                  aria-pressed={isActive}
-                  onClick={() => {
-                    setIndex(i)
-                    setStopped(true)
-                  }}
-                  className={cn(
-                    "rounded-full",
-                    !isActive &&
-                      "border border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-                  )}
-                >
-                  {slide.label}
-                </Button>
-              )
-            })}
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              aria-label="Previous kind of favpoll"
+              onClick={() => step(-1)}
+              className="rounded-full border border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+            >
+              <ChevronLeft aria-hidden="true" />
+            </Button>
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              aria-label="Next kind of favpoll"
+              onClick={() => step(1)}
+              className="rounded-full border border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+            >
+              <ChevronRight aria-hidden="true" />
+            </Button>
+            {/* Where you are, in band ink; the sentence a screen reader
+                already gets from the slide's label. */}
+            <span
+              aria-hidden="true"
+              className="ml-2 text-xs font-medium tracking-widest uppercase opacity-80"
+            >
+              {active.label}
+            </span>
           </div>
         </div>
       </div>
