@@ -34,8 +34,14 @@ type Props = {
  * after the hero said it, it was redundant, and the bar is chrome —
  * it must stay quieter and shorter than the topic header it sits
  * over. Strip (py-0.5), name, a 32px photo: ~65px against the old
- * one-row bar's 51.
+ * one-row bar's 51. SINCE 2026-10-16 the bar is the hero's band: the
+ * register tint, the name, and a 56px photo hanging 24px below it at
+ * the right (the hero's own geometry, scaled); the published height
+ * includes the hang so the topic header pins clear of the photo.
  */
+/** How far the photo hangs below the bar, in px (bottom-6). */
+const HANG = 24
+
 export function StickyIdentityBar({
   name,
   photoUrl,
@@ -74,8 +80,10 @@ export function StickyIdentityBar({
       root.style.removeProperty("--identity-bar-h")
       return
     }
+    // + HANG: the photo hangs below the bar's box, and what pins beneath
+    // (the topic header, the pledge pill) must clear it.
     const set = () =>
-      root.style.setProperty("--identity-bar-h", `${el.offsetHeight}px`)
+      root.style.setProperty("--identity-bar-h", `${el.offsetHeight + HANG}px`)
     set()
     const ro = new ResizeObserver(set)
     ro.observe(el)
@@ -90,7 +98,12 @@ export function StickyIdentityBar({
   return (
     <div
       ref={barRef}
-      className={`fixed top-14 right-0 left-0 z-30 border-b border-border bg-background transition-transform duration-200 ease-out lg:hidden ${
+      // THE BAR IS THE BAND (founder, 2026-10-16: "update the sliding header
+      // so it borrows the band colour and has a larger image that hangs
+      // down"): the hero's register tint, and the photo hanging off its
+      // bottom edge at the right, as it hangs off the hero's band. No
+      // bottom border — a band, not a bar.
+      className={`fixed top-14 right-0 left-0 z-30 bg-muted transition-transform duration-200 ease-out lg:hidden ${
         entered ? "translate-y-0" : "-translate-y-full"
       }`}
     >
@@ -105,25 +118,27 @@ export function StickyIdentityBar({
           )}
         </div>
       )}
-      <div className="flex items-center gap-2.5 px-6 py-1.5">
-        <p className="min-w-0 flex-1 truncate text-lg leading-tight font-medium text-foreground">
+      <div className="relative px-6 py-2 pr-24">
+        <p className="min-w-0 truncate text-lg leading-tight font-medium text-foreground">
           {name}
         </p>
-        {photoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={photoUrl}
-            alt=""
-            className="size-8 shrink-0 rounded-lg object-cover"
-          />
-        ) : (
-          <div
-            className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-sm font-medium text-primary"
-            aria-hidden="true"
-          >
-            {name.charAt(0)}
-          </div>
-        )}
+        {/* 56px, hanging 24 below the band at the right, keylined like the
+            hero's; the size inline as well as by class (the hero's lesson). */}
+        <div
+          className="absolute right-6 -bottom-6 size-14 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm"
+          style={{ width: 56, height: 56 }}
+        >
+          {photoUrl ? (
+            <img src={photoUrl} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <div
+              className="flex h-full w-full items-center justify-center bg-primary/10 text-base font-medium text-primary"
+              aria-hidden="true"
+            >
+              {name.charAt(0)}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
