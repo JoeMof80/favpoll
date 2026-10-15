@@ -44,8 +44,8 @@ type HeroLayoutProps = {
 //   photo    a zero-height sticky holder at the strip's bottom, the photo
 //             hanging 64px above it: it rides up with the eyebrow and parks
 //             straddling the band's bottom edge, at the right (sticky
-//             top-20, z-30) — at the same scroll the name pins (32px: the
-//             instant the eyebrow's text is covered)
+//             top-22, z-30) — at the same scroll the name pins (24px: the
+//             instant the eyebrow's lettering is covered)
 //   name     sticky at the eyebrow's line (band + strip), z-30, own
 //             background, FULL WIDTH — the photo is up in the band by then
 //
@@ -142,13 +142,14 @@ export function HeroLayout({
           and then make it sticky"). A zero-height holder sits in flow at the
           strip's bottom (BAND + STRIP from the top); the photo is absolute
           inside it, hanging 16 units above the holder so its bottom is level
-          with the eyebrow's text at rest. The holder is sticky at 20 units:
-          the photo's own 16-unit hang plus 4, so it stops with its top 16px
+          with the eyebrow's text at rest. The holder is sticky at 22 units:
+          the photo's own 16-unit hang plus 6, so it stops with its top 24px
           into the band — straddling the band's bottom edge, at the same
-          32px of scroll at which the name pins: the instant the eyebrow's
-          text is covered (founder, 2026-10-15: "as soon as the opening
-          line text is obscured") — parked at the band's right end (z-30,
-          over the band's wrapper). With the photo parked up there,
+          24px of scroll at which the name pins: the instant the eyebrow's
+          LETTERING is covered (founder, 2026-10-15, twice: "as soon as the
+          opening line text is obscured" — the glyphs sit centred in their
+          32px row, so they are under the strip ~10px before the row is) —
+          parked at the band's right end (z-30, over the band's wrapper). With the photo parked up there,
           the pinned NAME beneath has nothing beside it: full width, always
           (founder, same message: "extend the name the full width so it
           doesn't wrap before reaching the photo"). */}
@@ -157,7 +158,7 @@ export function HeroLayout({
           className={["relative h-0", pins ? "lg:sticky lg:z-30" : ""].join(
             " "
           )}
-          style={pins ? { top: px(20) } : undefined}
+          style={pins ? { top: px(22) } : undefined}
         >
           <div className="absolute -top-16 right-0 size-24 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm">
             {avatar}
@@ -167,17 +168,18 @@ export function HeroLayout({
 
       {/* The eyebrow row: in flow, pr-28 clear of the hanging photo. It
           scrolls up under the band; the name takes its place. */}
-      {/* -mb-2 cancels the eyebrow's own mb-2: the gap moves into the name
-          box as pt-2, so the box's top IS the eyebrow's text bottom and the
-          name pins the instant that text is covered. */}
+      {/* -mb-2 cancels the eyebrow's own mb-2; the name box then reaches
+          16px up into the eyebrow row (-mt-4) and carries the difference as
+          pt-6, so the name's text sits where it did at rest while the box's
+          top is where the eyebrow's lettering ends — and the name pins the
+          instant that lettering is covered. */}
       <div className={avatar ? "-mb-2 pr-28" : "-mb-2"}>{eyebrowText}</div>
 
-      {/* The name: pins at the strip's bottom, full width. Its pt-2 is the
-          eyebrow's old trailing margin, so the text sits where it did. */}
+      {/* The name: pins at the strip's bottom, full width. */}
       <div
         ref={nameRef}
         className={[
-          "bg-background pt-2 pb-4",
+          "-mt-4 bg-background pt-6 pb-4",
           pins ? "lg:sticky lg:z-30" : "",
         ].join(" ")}
         style={pins ? { top: `${headerInset + nameTop}px` } : undefined}
