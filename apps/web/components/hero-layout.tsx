@@ -87,6 +87,13 @@ export function HeroLayout({
     return () => mq.removeEventListener("change", h)
   }, [])
 
+  // THE INSET: where the scroller's top is. In the shell (lg+) the column
+  // is its own scroller starting below the header, so 0; on the phone the
+  // DOCUMENT scrolls under the fixed h-14 header, so 56 — the hook reports
+  // the shell's 0 there too, which pinned everything 56px too high on
+  // the first phone test (2026-10-16).
+  const inset = isPhone ? 56 : headerInset
+
   // --hero-stuck-bottom: the pinned header's bottom, for what pins beneath
   // (the poll heading, the lock card). From lg: the name's row bottom (its
   // pinned top plus its box). On the phone: the eyebrow row's bottom —
@@ -97,10 +104,10 @@ export function HeroLayout({
     const name = nameRef.current
     const set = () => {
       const bottom = !pins
-        ? headerInset
+        ? inset
         : isPhone
-          ? headerInset + NAME_TOP
-          : headerInset + NAME_TOP + (name?.offsetHeight ?? 0)
+          ? inset + NAME_TOP
+          : inset + NAME_TOP + (name?.offsetHeight ?? 0)
       document.documentElement.style.setProperty(
         "--hero-stuck-bottom",
         `${Math.round(bottom)}px`
@@ -119,7 +126,7 @@ export function HeroLayout({
       document.documentElement.style.removeProperty("--hero-collapse")
       document.documentElement.style.removeProperty("--hero-settle")
     }
-  }, [pins, headerInset, isPhone])
+  }, [pins, inset, isPhone])
 
   // THE PHONE'S SHRINK (founder, 2026-10-16: "only on mobile, where we have
   // less space, have the Name scroll up on top of the band and reduce in
@@ -137,13 +144,13 @@ export function HeroLayout({
     if (!name || !pins || !isPhone) return
     const measure = () => {
       const rest = name.getBoundingClientRect().top + window.scrollY
-      setPinScroll(Math.max(0, rest - (headerInset + PHONE_NAME_TOP)))
+      setPinScroll(Math.max(0, rest - (inset + PHONE_NAME_TOP)))
     }
     measure()
     const ro = new ResizeObserver(measure)
     ro.observe(document.body)
     return () => ro.disconnect()
-  }, [pins, isPhone, headerInset])
+  }, [pins, isPhone, inset])
   const nameScale = useTransform(
     scrollY,
     [pinScroll - PHONE_RAMP, pinScroll],
@@ -158,10 +165,12 @@ export function HeroLayout({
           bottom level with the eyebrow's text). A cause without a photo:
           24px of top padding and nothing to hang. */}
       <div
-        className={["relative bg-background", pins ? "sticky z-20" : ""].join(
+        // z-30: above the opening line (z-20), which pins beneath it from lg
+        // and had been painting over the hanging photo.
+        className={["relative bg-background", pins ? "sticky z-30" : ""].join(
           " "
         )}
-        style={pins ? { top: `${headerInset}px` } : undefined}
+        style={pins ? { top: `${inset}px` } : undefined}
       >
         {avatar ? (
           <>
@@ -193,7 +202,7 @@ export function HeroLayout({
           avatar ? "pr-28" : "",
           pins ? "lg:sticky lg:z-20" : "",
         ].join(" ")}
-        style={pins ? { top: `${headerInset + BAND + STRIP}px` } : undefined}
+        style={pins ? { top: `${inset + BAND + STRIP}px` } : undefined}
       >
         {eyebrowText}
       </div>
@@ -207,13 +216,14 @@ export function HeroLayout({
         ref={nameRef}
         className={[
           "origin-top-left pb-4 lg:bg-background",
-          pins ? "sticky z-30" : "",
+          // z-40: above the band on the phone, where it pins inside it.
+          pins ? "sticky z-40" : "",
         ].join(" ")}
         style={{
           scale: nameScale,
           ...(pins
             ? {
-                top: `${headerInset + (isPhone ? PHONE_NAME_TOP : NAME_TOP)}px`,
+                top: `${inset + (isPhone ? PHONE_NAME_TOP : NAME_TOP)}px`,
               }
             : {}),
         }}
