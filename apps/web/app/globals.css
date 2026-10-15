@@ -265,6 +265,19 @@ select:not(:disabled) {
   background-color: transparent;
 }
 
+/* THE HEADER FOLLOWS THE HOME HERO (founder, 2026-10-15): while a rotating
+   hero is mounted, the header's colours — and those of what it holds that
+   wears the primary token: the mark, the Sign up button — cross-fade at the
+   hero's own 700ms, so band and header change as one object rather than the
+   chrome flipping every eight seconds. Unlayered, so it outranks the
+   utilities' 150ms. See lib/hero-register-store.ts. */
+header[data-site-chrome][data-hero-fade],
+header[data-site-chrome][data-hero-fade]
+  :is(.text-primary, .bg-primary, [data-slot="button"]) {
+  transition-property: color, background-color, border-color, fill;
+  transition-duration: 700ms;
+}
+
 /* The desktop shell's column scrollers scroll without a visible bar
    (founder, 2026-09-29): the columns read as the page, not as boxes. */
 @utility scrollbar-hide {

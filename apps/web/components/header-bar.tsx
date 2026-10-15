@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { Menu } from "lucide-react"
 import { FavpollLogo } from "@/components/favpoll-logo"
+import type { HeroRegister } from "@/lib/hero-register-store"
 
 // The header's SHELL — the bar, its height, its border and the logo.
 //
@@ -22,6 +23,7 @@ export function HeaderBar({
   staticMenu = false,
   section,
   nav,
+  heroRegister,
 }: {
   children?: React.ReactNode
   /**
@@ -42,6 +44,15 @@ export function HeaderBar({
    * below md, where `section` stands in.
    */
   nav?: React.ReactNode
+  /**
+   * THE HEADER FOLLOWS THE HOME HERO (founder, 2026-10-15). A palette: wear
+   * it, element-scoped (`data-register` on the header alone — never the
+   * page). null: the hero is scrolled past — back to the default. undefined:
+   * no hero on this page; the header is whatever the page's own scope makes
+   * it. While a hero is mounted at all, `data-hero-fade` slows the colour
+   * transitions to the hero's own 700ms so header and band change as one.
+   */
+  heroRegister?: HeroRegister
 }) {
   if (staticMenu) {
     return (
@@ -75,6 +86,8 @@ export function HeaderBar({
         // on-device, 2026-08-02 & 2026-09-12). Fixed is bulletproof. The
         // h-14 spacer below reserves the header's space in the flow.
         data-site-chrome
+        data-register={heroRegister ?? undefined}
+        data-hero-fade={heroRegister !== undefined ? "" : undefined}
         className="fixed inset-x-0 top-0 z-50 border-b border-border bg-background"
       >
         <div className="mx-auto flex h-14 items-center justify-between px-6">

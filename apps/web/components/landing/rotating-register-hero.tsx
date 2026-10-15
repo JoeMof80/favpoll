@@ -36,7 +36,7 @@
 //   over it, and "pause on hover" meant "never rotate" (founder saw exactly
 //   that on the first preview, 2026-10-15). Auto-advance exists so a visitor
 //   who does nothing still reads all three scenarios — the thing Gary needed.
-import { useEffect, useState, useSyncExternalStore } from "react"
+import { useEffect, useRef, useState, useSyncExternalStore } from "react"
 import { Balloon, Flower2, Medal, type LucideIcon } from "lucide-react"
 import { LandingHero } from "@/components/landing/hero"
 import {
@@ -46,6 +46,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { t } from "@/lib/i18n"
+import { setHeroRegister } from "@/lib/hero-register-store"
 
 /** How long each register holds before the next fades in. Long enough to
  *  read a two-sentence headline and glance at the phone; the loop's own
@@ -156,6 +157,30 @@ export function RotatingRegisterHero() {
   }, [epoch, prefersReducedMotion])
 
   const active = SLIDES[index]
+
+  // THE HEADER FOLLOWS (founder, 2026-10-15): publish the register on show
+  // while at least a third of the band is in view; null once it is mostly
+  // scrolled past, so the header fades back to blue — a third, not the
+  // band's last pixel, which would flicker as a reader scrolls around it.
+  // Unmount withdraws it entirely (undefined): the next page's header is
+  // its own.
+  const root = useRef<HTMLDivElement>(null)
+  const [inView, setInView] = useState(true)
+  useEffect(() => {
+    const el = root.current
+    if (!el || typeof IntersectionObserver === "undefined") return
+    const io = new IntersectionObserver(
+      ([entry]) => setInView(entry.intersectionRatio >= 0.33),
+      { threshold: [0, 0.33] }
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+  useEffect(() => {
+    setHeroRegister(inView ? active.palette : null)
+  }, [inView, active.palette])
+  useEffect(() => () => setHeroRegister(undefined), [])
+
   const at = (by: 1 | -1) => (index + by + SLIDES.length) % SLIDES.length
   const step = (by: 1 | -1) => {
     setIndex(at(by))
@@ -164,6 +189,7 @@ export function RotatingRegisterHero() {
 
   return (
     <div
+      ref={root}
       // The ACTIVE register's palette for everything that is not a slide —
       // the buttons' ink and hover wash — so the controls match the band they
       // sit on, and follow it when it changes.
