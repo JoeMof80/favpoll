@@ -120,15 +120,6 @@ type Props = {
    * poster. Only meaningful with `still`.
    */
   compact?: boolean
-  /**
-   * ON THE WORDMARK'S RAIL (founder, 2026-10-15, the home carousel): the
-   * content column sits against the band's left padding instead of
-   * centring in the page's 1320px column, so its left edge meets the
-   * header's wordmark at every width, not only where the column meets the
-   * edge. Home only; the register pages keep the centred column with the
-   * sections beneath them.
-   */
-  align?: "center" | "wordmark"
   /** Extra pitch-column content, under the subheader. */
   children?: React.ReactNode
 }
@@ -255,7 +246,6 @@ export function LandingHero({
   router = false,
   still = false,
   compact = false,
-  align = "center",
   children,
 }: Props) {
   const scenes = useMemo(
@@ -320,8 +310,7 @@ export function LandingHero({
           // capped at 400, so the router cards stretch to the full padded
           // width. That is what every other band does there, and md brings the
           // two-column layout in at 768 regardless.
-          "relative grid w-full gap-8 px-6 py-10 md:max-w-330",
-          align === "wordmark" ? "mx-0" : "mx-auto",
+          "relative mx-auto grid w-full gap-8 px-6 py-10 md:max-w-330",
           router
             ? // ROW (founder, 2026-08-05): statement on top, three doors
               // across the bottom. The cards don't change size doing this —

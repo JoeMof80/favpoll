@@ -213,17 +213,19 @@ export function RotatingRegisterHero() {
                   content rail is 56px: 24 (the header's own padding) + the
                   24px mark + its 8px gap = where the WORDMARK starts
                   (founder, 2026-10-15: "set the margin to the brand text so
-                  the content lines up too"), and `align="wordmark"` holds
-                  the column against it at EVERY width rather than centring
-                  it in the page's 1320px column (founder, same day: "make
-                  the hero content align with the wordmark"). The departure
-                  from "exactly as they are" is this page's alone. Below sm
-                  the band keeps px-6: at 320px a 56px rail
+                  the content lines up too"). That holds below ~1400px,
+                  where the page's 1320px column meets the edge; above it
+                  the column is centred with every section beneath — the
+                  founder's call, twice (a left-anchored column at every
+                  width was built and rejected: "it's only at lower
+                  resolution that we need the content to line up with the
+                  wordmark"). The departure from "exactly as they are" is
+                  this page's alone. Below sm the band keeps px-6: at 320px
+                  a 56px rail
                   each side left 208px for the 215px phone and the page
                   scrolled 7px sideways (the overflow E2E caught it). */}
               <LandingHero
                 {...slide.hero}
-                align="wordmark"
                 bandClassName="bg-primary px-6 text-primary-foreground sm:px-8"
               />
             </div>
