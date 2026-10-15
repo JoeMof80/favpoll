@@ -67,3 +67,121 @@
     cursor: pointer;
   }
 }
+
+/* THE LIBRARY's reading column (/library/[slug]): the reference notes are
+   markdown written to be read, and they were only legible in an editor. One
+   measure, a type scale, tables and quotes styled — no typography plugin. */
+.reading {
+  max-width: 68ch;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+.reading h1 {
+  font-size: 1.75rem;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 1rem;
+  text-wrap: balance;
+}
+.reading h2 {
+  font-size: 1.25rem;
+  line-height: 1.3;
+  font-weight: 600;
+  margin: 2.25rem 0 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+.reading h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 1.75rem 0 0.5rem;
+}
+.reading h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 1.25rem 0 0.4rem;
+}
+.reading p {
+  margin: 0 0 1rem;
+}
+.reading ul,
+.reading ol {
+  margin: 0 0 1rem;
+  padding-left: 1.4rem;
+}
+.reading li {
+  margin: 0.25rem 0;
+}
+.reading li > ul,
+.reading li > ol {
+  margin-bottom: 0.25rem;
+}
+.reading a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.reading strong {
+  font-weight: 600;
+}
+.reading blockquote {
+  margin: 0 0 1rem;
+  padding: 0.25rem 0 0.25rem 1rem;
+  border-left: 3px solid var(--border);
+  color: var(--muted-foreground);
+}
+.reading blockquote p:last-child {
+  margin-bottom: 0;
+}
+.reading code {
+  font-size: 0.875em;
+  background: var(--muted);
+  border-radius: 0.25rem;
+  padding: 0.1em 0.35em;
+}
+.reading pre {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  overflow-x: auto;
+  background: var(--muted);
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+.reading pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+}
+.reading hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 2rem 0;
+}
+.reading table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: 0 0 1.25rem;
+  font-size: 0.9rem;
+}
+.reading th,
+.reading td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.4rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+.reading th {
+  font-weight: 600;
+  color: var(--muted-foreground);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.reading img {
+  max-width: 100%;
+  border-radius: 0.5rem;
+}
