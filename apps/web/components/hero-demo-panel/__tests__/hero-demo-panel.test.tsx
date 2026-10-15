@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
-import { render, screen, fireEvent } from "@testing-library/react"
+import { render, screen, fireEvent, act } from "@testing-library/react"
 import type { Phase } from "../scenes"
 
 // ── Framer-motion stub ────────────────────────────────────────────────────────
@@ -63,6 +63,10 @@ vi.mock("@/components/pledge-dialog/step-amount", () => ({
 
 import { DemoCard } from "../demo-card"
 import { LandingHero } from "@/components/landing/hero"
+import {
+  RotatingRegisterHero,
+  DWELL_MS,
+} from "@/components/landing/rotating-register-hero"
 import { SCENES } from "../scenes"
 import { DECOY_WIDTHS } from "@/lib/decoys"
 
@@ -419,52 +423,6 @@ describe("LandingHero — reduced motion", () => {
   })
 })
 
-// ── Stills: the product three ways on home (founder's trial, 2026-10-15) ─────
-describe("LandingHero — stills", () => {
-  it("shows the three register stills, each a door to its register", () => {
-    render(<LandingHero liveCount={6} totalLive={0} stills />)
-    const nav = screen.getByRole("navigation", {
-      name: "See a favpoll for each kind of occasion",
-    })
-    const links = Array.from(nav.querySelectorAll("a")).map((a) => [
-      a.getAttribute("href"),
-      a.getAttribute("data-register"),
-    ])
-    expect(links).toEqual([
-      ["/memorial", "memorial"],
-      ["/celebration", "celebration"],
-      ["/fundraiser", "fundraiser"],
-    ])
-    // The register pages' own scenes, by person: Belinda, Alex & Jordan,
-    // Marcus — the same three a visitor meets on those pages.
-    expect(screen.getByText("Belinda Hartley")).toBeInTheDocument()
-    expect(screen.getByText("Alex & Jordan")).toBeInTheDocument()
-    expect(screen.getByText("Marcus Bell")).toBeInTheDocument()
-  })
-
-  it("does not show the router cards or the kind nav in stills mode", () => {
-    render(<LandingHero liveCount={6} totalLive={0} stills />)
-    expect(
-      screen.queryByRole("navigation", { name: "Explore favpoll by occasion" })
-    ).toBeNull()
-    expect(screen.queryByRole("button", { name: "Fundraiser" })).toBeNull()
-  })
-
-  it("carries the invariant on its own line when given one", () => {
-    render(
-      <LandingHero
-        liveCount={6}
-        totalLive={0}
-        stills
-        invariant="Whatever wins, every pledge goes to the charity."
-      />
-    )
-    expect(
-      screen.getByText("Whatever wins, every pledge goes to the charity.")
-    ).toBeInTheDocument()
-  })
-})
-
 // ── Cause (faceless, no protagonist) vs fundraiser (a person's challenge) ──────
 
 describe("DemoCard — cause (faceless) vs fundraiser (has a runner)", () => {
@@ -509,5 +467,103 @@ describe("DemoCard — cause (faceless) vs fundraiser (has a runner)", () => {
     renderScene(fundraiserScene, "arriving")
     expect(screen.getByTestId("protagonist-avatar")).toBeInTheDocument()
     expect(screen.getByText("Pledge your favourite")).toBeInTheDocument()
+  })
+})
+
+// ── RotatingRegisterHero ──────────────────────────────────────────────────────
+// The home hero since 2026-10-15: the three register heroes, unchanged, in
+// one grid cell, crossfaded. These pin the contract, not the look: every
+// slide is laid out, exactly one is live, a pill is a decision, and the
+// rotation never starts under reduced motion.
+describe("RotatingRegisterHero", () => {
+  const slides = () =>
+    Array.from(
+      document.querySelectorAll<HTMLElement>('[aria-roledescription="slide"]')
+    )
+  const live = () =>
+    slides().filter((s) => s.getAttribute("aria-hidden") !== "true")
+
+  function stubMotion(reduced: boolean) {
+    Object.defineProperty(window, "matchMedia", {
+      writable: true,
+      value: vi.fn().mockImplementation((query: string) => ({
+        matches: reduced && query.includes("reduce"),
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    })
+  }
+
+  beforeEach(() => {
+    vi.useFakeTimers()
+    stubMotion(false)
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+    vi.restoreAllMocks()
+  })
+
+  it("lays out all three register heroes and keeps exactly one live", () => {
+    render(<RotatingRegisterHero />)
+    const all = slides()
+    expect(all).toHaveLength(3)
+    expect(all.map((s) => s.dataset.register)).toEqual([
+      "memorial",
+      "celebration",
+      "fundraiser",
+    ])
+    // Each slide carries its register's own headline, as the register page does.
+    expect(all[0].textContent).toContain(
+      "Honour them by sharing what they loved"
+    )
+    expect(all[1].textContent).toContain(
+      "Celebrate them by sharing what they love"
+    )
+    expect(all[2].textContent).toContain(
+      "Fundraise by sharing what we all love"
+    )
+    expect(live().map((s) => s.dataset.register)).toEqual(["memorial"])
+    expect(all[0].hasAttribute("inert")).toBe(false)
+    expect(all[1].hasAttribute("inert")).toBe(true)
+  })
+
+  it("advances on its own after the dwell", () => {
+    render(<RotatingRegisterHero />)
+    act(() => {
+      vi.advanceTimersByTime(DWELL_MS)
+    })
+    expect(live().map((s) => s.dataset.register)).toEqual(["celebration"])
+    act(() => {
+      vi.advanceTimersByTime(DWELL_MS * 2)
+    })
+    // Wraps: fundraiser, then back to memorial.
+    expect(live().map((s) => s.dataset.register)).toEqual(["memorial"])
+  })
+
+  it("a pill is a decision: it jumps to that register and ends the rotation", () => {
+    render(<RotatingRegisterHero />)
+    const pill = screen.getByRole("button", { name: "Fundraiser" })
+    fireEvent.click(pill)
+    expect(live().map((s) => s.dataset.register)).toEqual(["fundraiser"])
+    expect(pill).toHaveAttribute("aria-pressed", "true")
+    act(() => {
+      vi.advanceTimersByTime(DWELL_MS * 3)
+    })
+    expect(live().map((s) => s.dataset.register)).toEqual(["fundraiser"])
+  })
+
+  it("never starts under prefers-reduced-motion", () => {
+    stubMotion(true)
+    render(<RotatingRegisterHero />)
+    act(() => {
+      vi.advanceTimersByTime(DWELL_MS * 3)
+    })
+    expect(live().map((s) => s.dataset.register)).toEqual(["memorial"])
   })
 })
