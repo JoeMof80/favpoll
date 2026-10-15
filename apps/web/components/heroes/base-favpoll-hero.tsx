@@ -20,7 +20,7 @@ type BaseFavpollHeroProps = {
    *  narrowed column keeps them on their lines (founder, 2026-09-29). */
   compact?: boolean
   /** Off for the screen in the room: a static band (HeroLayout). */
-  animate?: boolean
+  pins?: boolean
 }
 
 export function BaseFavpollHero({
@@ -30,7 +30,7 @@ export function BaseFavpollHero({
   aboutPlaceholder,
   mentions,
   compact,
-  animate,
+  pins,
 }: BaseFavpollHeroProps) {
   const headline = getFavpollHeadline({
     occasionType: favpoll.occasion_type ?? null,
@@ -107,7 +107,7 @@ export function BaseFavpollHero({
       subtitle={subtitle}
       avatar={avatar}
       about={about}
-      animate={animate}
+      pins={pins}
     />
   )
 }

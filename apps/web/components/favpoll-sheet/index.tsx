@@ -397,7 +397,7 @@ export function FavpollSheet({
           favpoll={favpoll}
           mentions={aboutMentions}
           compact={guestBookExpanded}
-          animate={false}
+          pins={!room}
         />
       ) : (
         <FavpollHero
@@ -405,12 +405,13 @@ export function FavpollSheet({
           protagonist={favpoll.protagonists!}
           mentions={aboutMentions}
           compact={guestBookExpanded}
-          animate={false}
+          pins={!room}
         />
       )}
 
-      {/* STATIC HERO EVERYWHERE since the stacked header (2026-10-15): the
-          settle it animated is retired; the room was already static. */}
+      {/* THE HEADER PINS from lg on the guest page (2026-10-15: the band and
+          photo at the top, the name on the eyebrow's line); the room's is
+          static, as it has been since 2026-09-30. */}
       {pollWithItems ? (
         <>
           <PollSection

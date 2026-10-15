@@ -17,7 +17,7 @@ type Props = {
    *  narrowed column keeps them on their lines (founder, 2026-09-29). */
   compact?: boolean
   /** Off for the screen in the room: a static band (HeroLayout). */
-  animate?: boolean
+  pins?: boolean
 }
 
 // Hero for subject='cause' — no protagonist row, so the optional image and
@@ -26,7 +26,7 @@ type Props = {
 // padding, sticky header, and scroll-shrink behaviour can never drift
 // between the two (they did: this component used to hand-roll its layout
 // and sat ~72px higher than person pages, found 2026-07-13).
-export function CauseHero({ favpoll, mentions, compact, animate }: Props) {
+export function CauseHero({ favpoll, mentions, compact, pins }: Props) {
   const headline = getFavpollHeadline({
     occasionType: favpoll.occasion_type,
     openingLine: favpoll.opening_line,
@@ -91,7 +91,7 @@ export function CauseHero({ favpoll, mentions, compact, animate }: Props) {
       subtitle={subtitle}
       avatar={avatar}
       about={about}
-      animate={animate}
+      pins={pins}
     />
   )
 }
