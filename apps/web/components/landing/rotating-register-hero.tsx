@@ -209,24 +209,25 @@ export function RotatingRegisterHero() {
                 isActive ? "opacity-100" : "pointer-events-none opacity-0"
               )}
             >
-              {/* px-8 on top of the register's own band classes, so the
-                  content rail is 56px: 24 (the header's own padding) + the
-                  24px mark + its 8px gap = where the WORDMARK starts
-                  (founder, 2026-10-15: "set the margin to the brand text so
-                  the content lines up too"). That holds below ~1400px,
-                  where the page's 1320px column meets the edge; above it
-                  the column is centred with every section beneath — the
-                  founder's call, twice (a left-anchored column at every
-                  width was built and rejected: "it's only at lower
-                  resolution that we need the content to line up with the
-                  wordmark"). The departure from "exactly as they are" is
-                  this page's alone. Below sm the band keeps px-6: at 320px
-                  a 56px rail
-                  each side left 208px for the 215px phone and the page
-                  scrolled 7px sideways (the overflow E2E caught it). */}
+              {/* THE RAIL MEETS THE WORDMARK'S INK (founder, 2026-10-15:
+                  "set the margin to the brand text so the content lines up
+                  too"). Measured, not computed: the box maths said 56px
+                  (24 header padding + 24 mark + 8 gap) but the founder's
+                  screenshots at 2x put the wordmark's first stroke at 54,
+                  and the hero's eyebrow sits on its rail with no bearing of
+                  its own — so the band carries 30px on top of the
+                  container's 24. Holds below ~1400px, where the page's
+                  1320px column meets the edge; above it the column is
+                  centred with every section beneath — the founder's call,
+                  twice (a left-anchored column at every width was built and
+                  rejected: "it's only at lower resolution that we need the
+                  content to line up with the wordmark"). Below sm the right
+                  side keeps 24: at 320px the 215px phone needs 218 and a
+                  symmetric 30 left 212 (the overflow E2E caught the
+                  earlier version). */}
               <LandingHero
                 {...slide.hero}
-                bandClassName="bg-primary px-6 text-primary-foreground sm:px-8"
+                bandClassName="bg-primary pr-6 pl-[30px] text-primary-foreground sm:px-[30px]"
               />
             </div>
           )
