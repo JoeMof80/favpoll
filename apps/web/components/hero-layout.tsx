@@ -324,7 +324,10 @@ export function HeroLayout({
               className="-mx-6 h-24 bg-muted lg:-mr-8 lg:-ml-16"
               aria-hidden="true"
             />
-            <div className="-mt-12 mb-4 size-24 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm">
+            {/* At the RIGHT (founder, 2026-10-15: "lets align the photo to
+                the right"): where the side-by-side hero kept it, and the
+                name's left edge then starts clean on the rail. */}
+            <div className="-mt-12 mb-4 ml-auto size-24 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm">
               {avatar}
             </div>
           </div>
