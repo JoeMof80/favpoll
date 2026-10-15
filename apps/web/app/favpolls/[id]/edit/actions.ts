@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import { favpollLocks, readLockInputs } from "@/lib/favpoll-locks"
 import type { CanvasSubmitData } from "@favpoll/types"
 import { insertSubsetMembers } from "@/app/favpolls/new/actions"
+import { asResult } from "@/lib/action-result"
 
 type PollInput = CanvasSubmitData["poll"]
 
@@ -191,7 +192,7 @@ async function upsertPollForFavpoll(
   }
 }
 
-export async function updateClosesAt(favpollId: string, closesAt: string) {
+async function updateClosesAtInner(favpollId: string, closesAt: string) {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
 
@@ -225,10 +226,16 @@ export async function updateClosesAt(favpollId: string, closesAt: string) {
   const currentClosesAt = new Date(favpoll.closes_at)
   const isExtension = new Date(newClosesAt) > currentClosesAt
 
+  // IN THE FUTURE, WHICHEVER WAY IT MOVES (founder, 2026-10-15). The check
+  // sat inside the extension branch, so SHORTENING to a time already gone
+  // was accepted — and a close date in the past IS a close: the favpoll
+  // read as closed at once, every row locked, no way back. He did it by
+  // accident on a preview, picking today's date with the old time.
+  if (new Date(newClosesAt) <= new Date()) {
+    throw new Error("Closing date must be in the future")
+  }
+
   if (isExtension) {
-    if (new Date(newClosesAt) <= new Date()) {
-      throw new Error("Closing date must be in the future")
-    }
     if ((favpoll.extension_count ?? 0) >= 2) {
       throw new Error(
         "Maximum extensions reached. Please contact us to request a further extension."
@@ -453,4 +460,11 @@ export async function updateFavpoll(
 
   // Upsert the single favpoll poll
   await upsertPollForFavpoll(supabase, favpollId, userId, input.poll)
+}
+
+// A RESULT, NOT A THROW (lib/action-result, 2026-10-15): the manage page's
+// Close date row shows this action's sentence, and a thrown one never
+// reaches the organiser in production.
+export async function updateClosesAt(favpollId: string, closesAt: string) {
+  return asResult(() => updateClosesAtInner(favpollId, closesAt))
 }

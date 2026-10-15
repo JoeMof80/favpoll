@@ -13,7 +13,7 @@ vi.mock("@/lib/supabase/admin", () => ({
   createAdminClient: () => mock.supabase,
 }))
 
-import { updateFavpoll } from "@/app/favpolls/[id]/edit/actions"
+import { updateFavpoll, updateClosesAt } from "@/app/favpolls/[id]/edit/actions"
 import type { CanvasSubmitData } from "@favpoll/types"
 
 function makeInput(
@@ -328,5 +328,45 @@ describe("updateFavpoll — DB writes", () => {
       .callsFor("favpoll_charities")
       .filter((c) => c.method === "insert")
     expect(charityInserts).toHaveLength(0)
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────────────────
+// updateClosesAt — the manage page's Close date row (a result, not a throw)
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("updateClosesAt", () => {
+  const soon = new Date(Date.now() + 7 * 86_400_000).toISOString()
+
+  it("refuses a close in the past even when it SHORTENS (a past close is a close)", async () => {
+    mock.queue(makeFavpollRow({ closes_at: soon, closed_at: null }))
+    const yesterday = new Date(Date.now() - 86_400_000).toISOString()
+    expect(await updateClosesAt("favpoll-1", yesterday)).toEqual({
+      ok: false,
+      error: "Closing date must be in the future",
+    })
+  })
+
+  it("accepts a shorter close that is still ahead, without spending an extension", async () => {
+    mock.queue(
+      makeFavpollRow({ closes_at: soon, closed_at: null, extension_count: 2 })
+    )
+    mock.queue(null) // favpolls update
+    const tomorrow = new Date(Date.now() + 86_400_000).toISOString()
+    expect(await updateClosesAt("favpoll-1", tomorrow)).toEqual({
+      ok: true,
+      value: undefined,
+    })
+  })
+
+  it("says why when the extensions are spent", async () => {
+    mock.queue(
+      makeFavpollRow({ closes_at: soon, closed_at: null, extension_count: 2 })
+    )
+    const later = new Date(Date.now() + 14 * 86_400_000).toISOString()
+    expect(await updateClosesAt("favpoll-1", later)).toMatchObject({
+      ok: false,
+      error: expect.stringContaining("Maximum extensions reached"),
+    })
   })
 })

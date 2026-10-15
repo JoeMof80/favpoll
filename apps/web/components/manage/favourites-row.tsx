@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { TopicStep } from "@/components/favpoll-flow/topic-step"
 import { setFavpollTopic } from "@/app/favpolls/[id]/manage/actions"
+import { unwrap } from "@/lib/action-result"
 import { hasFinePointer } from "@/lib/pointer"
 import { WizardTopicCard } from "@/components/new-favpoll-wizard/wizard-topic-card"
 import { TopicItemsDialog } from "@/components/favpoll-flow/topic-items-dialog"
@@ -107,10 +108,12 @@ export function FavouritesGroup({
       return
     setSwitching(true)
     try {
-      await setFavpollTopic(favpollId, {
-        topicId: next.topicId,
-        subsetId: next.subsetId ?? null,
-      })
+      unwrap(
+        await setFavpollTopic(favpollId, {
+          topicId: next.topicId,
+          subsetId: next.subsetId ?? null,
+        })
+      )
       onChanged()
     } catch (e) {
       toast.error(
