@@ -300,10 +300,11 @@ export function PollSection({
             </>
           ) : (
             /* No pledges yet — skeleton with a quiet card on top.
-               Only the organiser sees this (guests see the lock card). */
+               Only the organiser sees this (guests see the lock card).
+               Skeleton from md only, as below. */
             <div className="grid">
               <div
-                className="pointer-events-none [grid-area:1/1]"
+                className="pointer-events-none hidden [grid-area:1/1] md:block"
                 aria-hidden="true"
               >
                 <StandingsSkeleton rows={6} />
@@ -325,8 +326,15 @@ export function PollSection({
            trick stays: WebKit ignores sticky inside absolutely-positioned
            ancestors, so the card pins correctly as an in-flow sibling. */
         <div className="grid">
+          {/* FROM md ONLY (founder, 2026-10-15: "i don't think we need the
+              skeletons on the favpolls page or mobile. it isn't visible
+              enough and therefore looks messy"). On a phone the lock card
+              covers nearly the whole block and the skeleton showed as
+              slivers around it; on a desktop there is room above and below
+              for it to read as the standings-to-come. Below md the cell is
+              the lock card's own height. */}
           <div
-            className="pointer-events-none [grid-area:1/1]"
+            className="pointer-events-none hidden [grid-area:1/1] md:block"
             aria-hidden="true"
           >
             {hasNote && <NoteSkeleton />}
