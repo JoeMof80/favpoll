@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { MenuButton, AppearanceButton } from "@favpoll/ui"
 import { HeaderBar } from "@/components/header-bar"
+import { useHeroRegister } from "@/lib/hero-register-store"
 import type { RegisterPalette } from "@/lib/register-palette"
 import {
   REGISTER_LINK_ACTIVE,
@@ -60,6 +61,8 @@ const MOBILE_LINK =
 export function Header() {
   const pathname = usePathname()
   const section = REGISTER_LINKS.find((r) => r.href === pathname)?.section
+  // The home hero's register while it is in view (see hero-register-store).
+  const heroRegister = useHeroRegister()
   const [menuOpen, setMenuOpen] = useState(false)
   const close = () => setMenuOpen(false)
   const clerk = useClerk()
@@ -83,6 +86,7 @@ export function Header() {
   return (
     <HeaderBar
       section={section}
+      heroRegister={heroRegister}
       nav={REGISTER_LINKS.map((r) => {
         const active = pathname === r.href
         return (

@@ -31,4 +31,28 @@ describe("HeaderBar", () => {
     expect(screen.queryByRole("navigation")).toBeNull()
     expect(screen.getByText("For memorials")).not.toHaveClass("md:hidden")
   })
+
+  // THE HEADER FOLLOWS THE HOME HERO (2026-10-15): element-scoped, header
+  // only. A palette is worn; null (scrolled past) wears none but keeps the
+  // slow fade; undefined (no hero on the page) leaves the header alone.
+  it("wears the hero's register on itself, element-scoped, with the slow fade", () => {
+    const { container } = render(<HeaderBar heroRegister="celebration" />)
+    const header = container.querySelector("header")!
+    expect(header).toHaveAttribute("data-register", "celebration")
+    expect(header).toHaveAttribute("data-hero-fade")
+  })
+
+  it("returns to the default once the hero is scrolled past, fade kept", () => {
+    const { container } = render(<HeaderBar heroRegister={null} />)
+    const header = container.querySelector("header")!
+    expect(header).not.toHaveAttribute("data-register")
+    expect(header).toHaveAttribute("data-hero-fade")
+  })
+
+  it("is untouched on a page with no hero", () => {
+    const { container } = render(<HeaderBar />)
+    const header = container.querySelector("header")!
+    expect(header).not.toHaveAttribute("data-register")
+    expect(header).not.toHaveAttribute("data-hero-fade")
+  })
 })

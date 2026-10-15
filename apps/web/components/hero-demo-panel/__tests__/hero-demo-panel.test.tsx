@@ -67,6 +67,7 @@ import {
   RotatingRegisterHero,
   DWELL_MS,
 } from "@/components/landing/rotating-register-hero"
+import { getHeroRegister } from "@/lib/hero-register-store"
 import { SCENES } from "../scenes"
 import { DECOY_WIDTHS } from "@/lib/decoys"
 
@@ -603,6 +604,16 @@ describe("RotatingRegisterHero", () => {
       vi.advanceTimersByTime(1000)
     })
     expect(live().map((s) => s.dataset.register)).toEqual(["fundraiser"])
+  })
+
+  it("publishes the register on show to the header, and withdraws it on unmount", () => {
+    const { unmount } = render(<RotatingRegisterHero />)
+    // jsdom has no IntersectionObserver: the hero counts as in view.
+    expect(getHeroRegister()).toBe("memorial")
+    fireEvent.click(screen.getByRole("button", { name: /^Next:/ }))
+    expect(getHeroRegister()).toBe("celebration")
+    unmount()
+    expect(getHeroRegister()).toBeUndefined()
   })
 
   it("never starts under prefers-reduced-motion", () => {
