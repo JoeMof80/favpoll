@@ -121,11 +121,14 @@ describe("DemoCard — locked phases", () => {
     }
   )
 
-  it("the reveal is blurred and aria-hidden when locked", () => {
+  it("the note and standings are skeletons, aria-hidden, when locked (#911 parity, 2026-10-15)", () => {
     const { container } = renderCard("arriving")
-    const blurred = container.querySelector(".blur-xs")
-    expect(blurred).toBeInTheDocument()
-    expect(blurred).toHaveAttribute("aria-hidden", "true")
+    const note = screen.getByTestId("note-skeleton")
+    const standings = screen.getByTestId("standings-skeleton")
+    expect(note.closest("[aria-hidden='true']")).not.toBeNull()
+    expect(standings.closest("[aria-hidden='true']")).not.toBeNull()
+    // No blurred decoy anywhere — the product stopped drawing one.
+    expect(container.querySelector(".blur-xs")).toBeNull()
   })
 
   it("About text is present via reserve copy in a locked phase", () => {
@@ -197,13 +200,14 @@ describe("DemoCard — topic pill", () => {
 // ── Decoy vs real bar widths ──────────────────────────────────────────────────
 
 describe("DemoCard — bar widths", () => {
-  it("renders bars at decoy widths when locked", () => {
+  it("renders no ranking bars when locked — a skeleton row per favourite instead", () => {
     const { container } = renderCard("arriving", DECOY_WIDTHS)
-    const barFills = container.querySelectorAll(
-      'ol[aria-label="Current rankings"] [role="presentation"] > div'
+    expect(
+      container.querySelector('ol[aria-label="Current rankings"]')
+    ).toBeNull()
+    expect(screen.getByTestId("standings-skeleton").children).toHaveLength(
+      scene.results.length
     )
-    expect(barFills[0]).toHaveStyle({ width: "85%" })
-    expect(barFills[1]).toHaveStyle({ width: "62%" })
   })
 
   it("renders bars at real widths when unlocked", () => {
