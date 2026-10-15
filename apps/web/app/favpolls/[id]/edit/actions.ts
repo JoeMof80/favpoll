@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import { favpollLocks, readLockInputs } from "@/lib/favpoll-locks"
 import type { CanvasSubmitData } from "@favpoll/types"
 import { insertSubsetMembers } from "@/app/favpolls/new/actions"
+import { asResult } from "@/lib/action-result"
 
 type PollInput = CanvasSubmitData["poll"]
 
@@ -191,7 +192,7 @@ async function upsertPollForFavpoll(
   }
 }
 
-export async function updateClosesAt(favpollId: string, closesAt: string) {
+async function updateClosesAtInner(favpollId: string, closesAt: string) {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
 
@@ -453,4 +454,11 @@ export async function updateFavpoll(
 
   // Upsert the single favpoll poll
   await upsertPollForFavpoll(supabase, favpollId, userId, input.poll)
+}
+
+// A RESULT, NOT A THROW (lib/action-result, 2026-10-15): the manage page's
+// Close date row shows this action's sentence, and a thrown one never
+// reaches the organiser in production.
+export async function updateClosesAt(favpollId: string, closesAt: string) {
+  return asResult(() => updateClosesAtInner(favpollId, closesAt))
 }

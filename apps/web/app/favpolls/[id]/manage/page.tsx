@@ -56,7 +56,7 @@ export default async function ManageFavpollPage({
       is_private,
       show_guest_amounts,
       appeal_id,
-      appeals ( name, charity_id ),
+      appeals ( name, charity_id, closes_at ),
       protagonists!favpolls_protagonist_id_fkey ( name, context, about, photo_url ),
       favpoll_charities ( charities ( id, name, logo_url, registered_number, description, created_at, consent_status ) ),
       favpoll_polls (
@@ -87,7 +87,11 @@ export default async function ManageFavpollPage({
     photo_url: string | null
     is_private: boolean | null
     appeal_id: string | null
-    appeals: { name: string; charity_id: string } | null
+    appeals: {
+      name: string
+      charity_id: string
+      closes_at: string | null
+    } | null
     protagonists: {
       name: string
       context: string | null
@@ -266,6 +270,10 @@ export default async function ManageFavpollPage({
       ? lockReason(locks, "charity")
       : null
   const topicLockReason = locks.topic ? lockReason(locks, "topic") : null
+  // An inherited end date is not the member's to move (the same guard
+  // updateClosesAt carries); the row says so instead of offering a picker.
+  const closeLockReason =
+    appealName && ev.appeals?.closes_at ? `Set by ${appealName}.` : null
 
   // THE TOPIC PICKER's catalogue (step 4, 2026-09-30) — the wizard's own
   // list, loaded only while the topic can still change.
@@ -315,6 +323,7 @@ export default async function ManageFavpollPage({
     topicId: ev.favpoll_polls?.topic_id ?? null,
     subsetId: ev.favpoll_polls?.subset_id ?? null,
     charityLockReason,
+    closeLockReason,
     topicLockReason,
   }
 

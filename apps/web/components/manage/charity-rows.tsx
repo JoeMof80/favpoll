@@ -12,6 +12,7 @@ import {
 import { WizardCharityCard } from "@/components/new-favpoll-wizard/wizard-charity-card"
 import { findOrCreateRegisterCharity } from "@/app/favpolls/new/actions"
 import { setFavpollCharities } from "@/app/favpolls/[id]/manage/actions"
+import { unwrap } from "@/lib/action-result"
 import { hasFinePointer } from "@/lib/pointer"
 import { TOAST_ERROR_STYLE } from "@/lib/toast-styles"
 import type { Charity } from "@favpoll/types"
@@ -73,7 +74,7 @@ export function CharityRows({
   async function commit(next: string[]) {
     setBusy(true)
     try {
-      await setFavpollCharities(favpollId, next)
+      unwrap(await setFavpollCharities(favpollId, next))
       onChanged()
     } catch (e) {
       toast.error(

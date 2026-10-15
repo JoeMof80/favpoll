@@ -68,6 +68,7 @@ import {
 } from "@/components/manage/favourites-row"
 import type { Charity } from "@favpoll/types"
 import { updateClosesAt } from "@/app/favpolls/[id]/edit/actions"
+import { unwrap } from "@/lib/action-result"
 import type { MentionTarget } from "@/lib/mentions"
 import {
   FIELD_HINTS,
@@ -112,6 +113,8 @@ export type ManageFavpoll = OrganizerFavpoll & {
   subsetId: string | null
   /** Why the charity set can't change (an appeal, other people's money), or null. */
   charityLockReason: string | null
+  /** Why the close date can't change (an appeal sets it), or null. */
+  closeLockReason: string | null
   /** Why the topic can't change (guests have pledged), or null. */
   topicLockReason: string | null
 }
@@ -309,7 +312,7 @@ export function ManageClient({
     setSuspendAt(value ? new Date().toISOString() : null)
     setSuspendPending(true)
     try {
-      setSuspendAt(await setPicksSuspended(favpoll.id, value))
+      setSuspendAt(unwrap(await setPicksSuspended(favpoll.id, value)))
       router.refresh()
     } catch (e) {
       setSuspendAt(before)
@@ -409,11 +412,11 @@ export function ManageClient({
   // refreshed so every other surface of the page agrees.
   const saveField =
     (field: StoryField) => async (value: string | number | null) => {
-      await updateStoryField(favpoll.id, field, value)
+      unwrap(await updateStoryField(favpoll.id, field, value))
       router.refresh()
     }
   const saveClosesAt = async (d: Date) => {
-    await updateClosesAt(favpoll.id, d.toISOString())
+    unwrap(await updateClosesAt(favpoll.id, d.toISOString()))
     router.refresh()
   }
 
@@ -713,6 +716,16 @@ export function ManageClient({
         />
         {isClosed ? (
           <SettingsRow label="Closed">{closesLabel}</SettingsRow>
+        ) : favpoll.closeLockReason ? (
+          /* An appeal member's close date is the appeal's (appeals concept,
+             2026-09-05) — the same lock the charity row wears. It showed
+             an editable row and threw on save (founder, 2026-10-15). */
+          <SettingsRow
+            label={FIELD_LABELS.closeDate}
+            description={favpoll.closeLockReason}
+          >
+            {closesLabel}
+          </SettingsRow>
         ) : (
           <EditableDateRow
             label={FIELD_LABELS.closeDate}

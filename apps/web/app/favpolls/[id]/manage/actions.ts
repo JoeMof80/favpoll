@@ -12,6 +12,7 @@ import { createAdminClient } from "@/lib/supabase/admin"
 
 import { favpollLocks, readLockInputs, lockReason } from "@/lib/favpoll-locks"
 import { insertSubsetMembers } from "@/app/favpolls/new/actions"
+import { asResult } from "@/lib/action-result"
 
 export type StoryField =
   | "opening_line"
@@ -51,7 +52,7 @@ async function ownedOpenFavpoll(favpollId: string) {
   return { supabase, favpoll }
 }
 
-export async function updateStoryField(
+async function updateStoryFieldInner(
   favpollId: string,
   field: StoryField,
   value: string | number | null
@@ -134,7 +135,7 @@ export async function updateStoryField(
 // single-select picker in an overlay on the Charities section; this
 // carries the whole-favpoll update's guards for the set — the lock
 // once anyone else's money is in, and an appeal's fixed charity.
-export async function setFavpollCharities(
+async function setFavpollCharitiesInner(
   favpollId: string,
   charityIds: string[]
 ) {
@@ -193,7 +194,7 @@ export async function setFavpollCharities(
 // topic and subset, the organiser-curated list replaced by the new
 // topic's (a subset's members; an open-ended topic's whole list; a
 // finite topic reads its catalogue and keeps no rows).
-export async function setFavpollTopic(
+async function setFavpollTopicInner(
   favpollId: string,
   pick: { topicId: string; subsetId: string | null }
 ) {
@@ -262,7 +263,7 @@ export async function setFavpollTopic(
 // tap: suspend stamps the server's now, resume clears it. No schedule —
 // "if there is a moment at which the guests are ready to act, that is
 // the moment to suspend" — and nothing moves on a closed favpoll.
-export async function setPicksSuspended(favpollId: string, suspend: boolean) {
+async function setPicksSuspendedInner(favpollId: string, suspend: boolean) {
   const { supabase } = await ownedOpenFavpoll(favpollId)
   const value = suspend ? new Date().toISOString() : null
   const { error } = await supabase
@@ -285,4 +286,33 @@ export async function setPicksSuspended(favpollId: string, suspend: boolean) {
     if (openError) throw new Error(openError.message)
   }
   return value
+}
+
+// THE EXPORTS RETURN RESULTS, NOT THROWS (lib/action-result, 2026-10-15):
+// a thrown message never reaches the organiser in production. The bodies
+// above keep their throws; these wrap them.
+export async function updateStoryField(
+  favpollId: string,
+  field: StoryField,
+  value: string | number | null
+) {
+  return asResult(() => updateStoryFieldInner(favpollId, field, value))
+}
+
+export async function setFavpollCharities(
+  favpollId: string,
+  charityIds: string[]
+) {
+  return asResult(() => setFavpollCharitiesInner(favpollId, charityIds))
+}
+
+export async function setFavpollTopic(
+  favpollId: string,
+  pick: { topicId: string; subsetId: string | null }
+) {
+  return asResult(() => setFavpollTopicInner(favpollId, pick))
+}
+
+export async function setPicksSuspended(favpollId: string, suspend: boolean) {
+  return asResult(() => setPicksSuspendedInner(favpollId, suspend))
 }

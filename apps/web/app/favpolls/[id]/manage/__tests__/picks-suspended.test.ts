@@ -13,6 +13,7 @@ vi.mock("@/lib/supabase/admin", () => ({
 }))
 
 import { setPicksSuspended } from "@/app/favpolls/[id]/manage/actions"
+import { unwrap } from "@/lib/action-result"
 
 const open = {
   created_by: "user-1",
@@ -41,12 +42,18 @@ beforeEach(() => {
 describe("setPicksSuspended", () => {
   it("refuses a stranger", async () => {
     mock.queue({ ...open, created_by: "someone-else" })
-    await expect(setPicksSuspended("f-1", true)).rejects.toThrow("Unauthorized")
+    expect(await setPicksSuspended("f-1", true)).toEqual({
+      ok: false,
+      error: "Unauthorized",
+    })
   })
 
   it("refuses a closed favpoll", async () => {
     mock.queue({ ...open, closed_at: "2026-01-01T00:00:00Z" })
-    await expect(setPicksSuspended("f-1", true)).rejects.toThrow("closed")
+    expect(await setPicksSuspended("f-1", true)).toMatchObject({
+      ok: false,
+      error: expect.stringContaining("closed"),
+    })
     expect(lastUpdate()).toBeUndefined()
   })
 
@@ -54,7 +61,7 @@ describe("setPicksSuspended", () => {
     mock.queue(open)
     mock.queue(null)
     const before = Date.now()
-    const value = await setPicksSuspended("f-1", true)
+    const value = unwrap(await setPicksSuspended("f-1", true))
     expect(value).not.toBeNull()
     expect(new Date(value!).getTime()).toBeGreaterThanOrEqual(before)
     expect(lastUpdate()).toEqual({ picks_suspended_at: value })
@@ -63,7 +70,7 @@ describe("setPicksSuspended", () => {
   it("resumes with null", async () => {
     mock.queue(open)
     mock.queue(null)
-    expect(await setPicksSuspended("f-1", false)).toBeNull()
+    expect(unwrap(await setPicksSuspended("f-1", false))).toBeNull()
     expect(lastUpdate()).toEqual({ picks_suspended_at: null })
   })
 })
@@ -76,7 +83,7 @@ describe("setPicksSuspended stamping the first suspension", () => {
     mock.queue(open)
     mock.queue(null)
     mock.queue(null)
-    const value = await setPicksSuspended("f-1", true)
+    const value = unwrap(await setPicksSuspended("f-1", true))
     expect(updates()).toEqual([
       { picks_suspended_at: value },
       { picks_first_suspended_at: value },
@@ -92,7 +99,7 @@ describe("setPicksSuspended stamping the first suspension", () => {
   it("writes nothing about the standings on a resume", async () => {
     mock.queue(open)
     mock.queue(null)
-    await setPicksSuspended("f-1", false)
+    unwrap(await setPicksSuspended("f-1", false))
     expect(updates()).toEqual([{ picks_suspended_at: null }])
   })
 })
