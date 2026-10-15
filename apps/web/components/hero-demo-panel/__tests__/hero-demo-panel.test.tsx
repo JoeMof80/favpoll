@@ -419,6 +419,52 @@ describe("LandingHero — reduced motion", () => {
   })
 })
 
+// ── Stills: the product three ways on home (founder's trial, 2026-10-15) ─────
+describe("LandingHero — stills", () => {
+  it("shows the three register stills, each a door to its register", () => {
+    render(<LandingHero liveCount={6} totalLive={0} stills />)
+    const nav = screen.getByRole("navigation", {
+      name: "See a favpoll for each kind of occasion",
+    })
+    const links = Array.from(nav.querySelectorAll("a")).map((a) => [
+      a.getAttribute("href"),
+      a.getAttribute("data-register"),
+    ])
+    expect(links).toEqual([
+      ["/memorial", "memorial"],
+      ["/celebration", "celebration"],
+      ["/fundraiser", "fundraiser"],
+    ])
+    // The register pages' own scenes, by person: Belinda, Alex & Jordan,
+    // Marcus — the same three a visitor meets on those pages.
+    expect(screen.getByText("Belinda Hartley")).toBeInTheDocument()
+    expect(screen.getByText("Alex & Jordan")).toBeInTheDocument()
+    expect(screen.getByText("Marcus Bell")).toBeInTheDocument()
+  })
+
+  it("does not show the router cards or the kind nav in stills mode", () => {
+    render(<LandingHero liveCount={6} totalLive={0} stills />)
+    expect(
+      screen.queryByRole("navigation", { name: "Explore favpoll by occasion" })
+    ).toBeNull()
+    expect(screen.queryByRole("button", { name: "Fundraiser" })).toBeNull()
+  })
+
+  it("carries the invariant on its own line when given one", () => {
+    render(
+      <LandingHero
+        liveCount={6}
+        totalLive={0}
+        stills
+        invariant="Whatever wins, every pledge goes to the charity."
+      />
+    )
+    expect(
+      screen.getByText("Whatever wins, every pledge goes to the charity.")
+    ).toBeInTheDocument()
+  })
+})
+
 // ── Cause (faceless, no protagonist) vs fundraiser (a person's challenge) ──────
 
 describe("DemoCard — cause (faceless) vs fundraiser (has a runner)", () => {

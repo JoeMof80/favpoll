@@ -122,10 +122,4 @@ describe("t", () => {
       "Whatever wins, every pledge goes to the charity."
     )
   })
-
-  it("makes each router card a scenario that names its person", () => {
-    expect(t("home.router.memorials.body")).toMatch(/^Belinda/)
-    expect(t("home.router.celebrations.body")).toMatch(/^Alex & Jordan/)
-    expect(t("home.router.fundraisers.body")).toMatch(/^Marcus/)
-  })
 })

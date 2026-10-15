@@ -35,7 +35,7 @@ export default async function HomePage() {
         liveCount={normalised.length}
         totalLive={totalLive}
         invariant={t("landing.invariant")}
-        router
+        stills
       />
 
       <ProcessOverview />

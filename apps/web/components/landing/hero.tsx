@@ -96,6 +96,16 @@ type Props = {
    */
   router?: boolean
   /**
+   * THE PRODUCT, THREE WAYS (founder, 2026-10-15, trial): the three register
+   * pages' still phones — Belinda, Alex & Jordan, Marcus — in the router's
+   * row, each a door to its register. Replaces the router cards on home,
+   * which were a third idiom: neither the product nor the register page.
+   * Gary's "Got it" came from three scenarios read in SEQUENCE, so all three
+   * are visible where there is room and a swipe row where there is not.
+   * Nothing cycles; the loop is left running and ignored.
+   */
+  stills?: boolean
+  /**
    * Show the scene as a STILL PHONE instead of the looping browser demo.
    *
    * /memorials is a forwarding artefact — a celebrant sends it to a family
@@ -217,6 +227,29 @@ const ROUTER_CARDS = [
   },
 ] as const
 
+/** The register pages' stills, in the order the registers are listed: the
+ *  same three scenes /memorial, /celebration and /fundraiser open on. */
+const STILLS = [
+  {
+    kind: "memorial" as const,
+    href: "/memorial",
+    title: t("home.router.memorials.title"),
+    scene: MEMORIAL_SCENE,
+  },
+  {
+    kind: "celebration" as const,
+    href: "/celebration",
+    title: t("home.router.celebrations.title"),
+    scene: WEDDING_SCENE,
+  },
+  {
+    kind: "fundraiser" as const,
+    href: "/fundraiser",
+    title: t("home.router.fundraisers.title"),
+    scene: FUNDRAISER_SCENE,
+  },
+] as const
+
 export function LandingHero({
   liveCount = 0,
   totalLive = 0,
@@ -232,6 +265,7 @@ export function LandingHero({
   ctaSecondaryLabel,
   bandClassName,
   router = false,
+  stills = false,
   still = false,
   children,
 }: Props) {
@@ -295,7 +329,7 @@ export function LandingHero({
           // width. That is what every other band does there, and md brings the
           // two-column layout in at 768 regardless.
           "relative mx-auto grid w-full gap-8 px-6 py-10 md:max-w-330",
-          router
+          router || stills
             ? // ROW (founder, 2026-08-05): statement on top, three doors
               // across the bottom. The cards don't change size doing this —
               // each was already a third of the container — so this is purely
@@ -335,7 +369,7 @@ export function LandingHero({
         <div
           className={cn(
             "min-w-0",
-            !router && !still && "md:col-start-1 md:row-start-1"
+            !router && !stills && !still && "md:col-start-1 md:row-start-1"
           )}
         >
           {/* Single, register-agnostic headline — names the three-beat
@@ -372,7 +406,7 @@ export function LandingHero({
               // where the widest beat (892) does not reach three and the
               // narrowest (595) does not stay on one.
               sceneKind ? "max-w-xl" : "max-w-3xl",
-              router && "2xl:text-6xl"
+              (router || stills) && "2xl:text-6xl"
             )}
           >
             {/* REGISTER HEADLINES DIM AFTER THE FIRST SENTENCE (founder,
@@ -398,7 +432,11 @@ export function LandingHero({
               invariant ? "mb-3" : "mb-8",
               "text-lg leading-relaxed opacity-80",
               // The subheader must not be WIDER than the headline above it.
-              sceneKind ? "max-w-xl" : router ? "max-w-2xl" : "max-w-md"
+              sceneKind
+                ? "max-w-xl"
+                : router || stills
+                  ? "max-w-2xl"
+                  : "max-w-md"
             )}
           >
             {subheader ?? t("landing.subheader")}
@@ -410,7 +448,11 @@ export function LandingHero({
             <p
               className={cn(
                 "mb-8 text-base leading-relaxed font-medium",
-                sceneKind ? "max-w-xl" : router ? "max-w-2xl" : "max-w-md"
+                sceneKind
+                  ? "max-w-xl"
+                  : router || stills
+                    ? "max-w-2xl"
+                    : "max-w-md"
               )}
             >
               {invariant}
@@ -491,7 +533,7 @@ export function LandingHero({
                 here until hover, so it only rendered the wash lopsided, 24
                 left against 8 right. Same variant, same property, declared
                 after, so it wins. */}
-            {(router || ctaSecondaryLabel) && (
+            {(router || stills || ctaSecondaryLabel) && (
               <Button
                 asChild
                 size="lg"
@@ -533,10 +575,64 @@ export function LandingHero({
             to. */}
         <div
           className={cn(
-            !router && !still && "md:col-start-2 md:row-span-2 md:row-start-1"
+            !router &&
+              !stills &&
+              !still &&
+              "md:col-start-2 md:row-span-2 md:row-start-1"
           )}
         >
-          {still ? (
+          {stills ? (
+            /* THREE STILL PHONES — the register pages' own, so home shows
+               the product rather than a picture of it. Below md the row
+               SWIPES: three stacked handsets would be ~1,350px of hero, so
+               a scroll-snap row with the next phone peeking at the edge is
+               the carousel, and only there. The row bleeds to the band's
+               edges (-mx-6/px-6 against the container's px-6) so the first
+               phone sits on the text's left edge and the last can be
+               scrolled fully into view. The page body never scrolls
+               sideways: overflow lives on this row alone. On md+ it is the
+               router's three-column grid; a 215/290/311px phone fits the
+               218/304/389px tracks at md/lg/xl (max-w-330 at the top). */
+            <nav
+              aria-label="See a favpoll for each kind of occasion"
+              className="-mx-6 scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-2 md:mx-0 md:grid md:grid-cols-3 md:justify-items-center md:gap-8 md:overflow-visible md:px-0 md:pb-0"
+            >
+              {STILLS.map(({ kind, href, title, scene }) => (
+                <Link
+                  key={kind}
+                  href={href}
+                  data-register={kind}
+                  aria-label={`${title} — ${scene.protagonist?.name ?? scene.heading ?? title}`}
+                  className="group flex shrink-0 snap-center flex-col items-start gap-3 md:shrink"
+                >
+                  {/* The register, as a quiet label over its phone — band
+                      ink, no dot (the dot belonged to the cards' palette). */}
+                  <span className="text-xs leading-5 font-medium tracking-widest uppercase opacity-80 transition-opacity group-hover:opacity-100">
+                    {title}
+                  </span>
+                  <div className={cn(PHONE_SCALED_BOX)}>
+                    <div
+                      className={cn(
+                        "origin-top-left transition-transform motion-safe:group-hover:-translate-y-1",
+                        PHONE_SCALE
+                      )}
+                    >
+                      <PhoneFrame>
+                        <DemoCard
+                          scene={scene}
+                          phase="note"
+                          barWidths={scene.results.map((r) => r.widthPercent)}
+                          prefersReducedMotion
+                          device="phone"
+                          className="rounded-none border-0"
+                        />
+                      </PhoneFrame>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </nav>
+          ) : still ? (
             /* mx-auto below md: stacked under the pitch the phone sat on
                the left edge — centre it (founder, 2026-09-13). On md+ it
                keeps its place in the media column. */
@@ -860,7 +956,9 @@ export function LandingHero({
           <dl
             className={cn(
               "gap-y-6 border-t border-primary-foreground/20 pt-8",
-              router ? "grid grid-cols-3 gap-x-8" : "flex flex-wrap gap-x-14"
+              router || stills
+                ? "grid grid-cols-3 gap-x-8"
+                : "flex flex-wrap gap-x-14"
             )}
           >
             <div>
