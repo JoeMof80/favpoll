@@ -40,11 +40,12 @@ type HeroLayoutProps = {
 // spare height against). Sticky elements keep their height, so the loop
 // cannot start, and the shell's reservation is now zero. Two sticky boxes:
 //
-//   wrapper  (band · 16px strip · eyebrow row, the photo hanging at the
-//             right)  sticky top-0, z-20
-//   name     sticky at the eyebrow's line (wrapper height − eyebrow row),
-//             z-30, own background — so as the page scrolls the name
-//             rises over the eyebrow and takes its place beside the photo
+//   band     (band · 16px strip)  sticky top-0, z-20
+//   photo    a zero-height sticky holder at the strip's bottom, the photo
+//             hanging 64px above it: it rides up with the eyebrow and parks
+//             inside the band, top-0, at the right (sticky top-16, z-30)
+//   name     sticky at the eyebrow's line (band + strip), z-30, own
+//             background, FULL WIDTH — the photo is up in the band by then
 //
 // What pins beneath (the poll heading, the lock card) reads the pinned
 // header's bottom from --hero-stuck-bottom, measured here: the name box's
@@ -104,48 +105,71 @@ export function HeroLayout({
     }
   }, [pins, headerInset, nameTop])
 
-  const wrapperTop = headerInset === 0 ? "lg:top-0" : "lg:top-14"
+  const px = (units: number) => `${headerInset + units * 4}px`
 
   return (
     <>
-      {/* The pinned wrapper: band, strip, eyebrow row; the photo hanging
-          at the right, its bottom level with the eyebrow's text. */}
-      <div
-        className={[
-          "relative bg-background",
-          avatar ? "" : "pt-6",
-          pins ? `lg:sticky lg:z-20 ${wrapperTop}` : "",
-        ].join(" ")}
-      >
-        {avatar && (
-          <>
-            <div
-              className="-mx-6 h-24 bg-muted lg:-mr-8 lg:-ml-16"
-              aria-hidden="true"
-            />
-            <div className="h-4" aria-hidden="true" />
-            {/* bottom-2: the eyebrow row is h-8 + mb-2, so 8px above the
-                wrapper's bottom is the eyebrow's own bottom edge. */}
-            <div className="absolute right-0 bottom-2 size-24 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm">
-              {avatar}
-            </div>
-          </>
-        )}
-        {/* pr-28 keeps a long opening line clear of the hanging photo. */}
-        <div className={avatar ? "pr-28" : undefined}>{eyebrowText}</div>
-      </div>
+      {/* The band and its strip: pin at the scroller's top. The eyebrow row
+          is NOT inside — it scrolls away beneath this (z-20 over it). */}
+      {avatar ? (
+        <div
+          className={["bg-background", pins ? "lg:sticky lg:z-20" : ""].join(
+            " "
+          )}
+          style={pins ? { top: px(0) } : undefined}
+        >
+          <div
+            className="-mx-6 h-24 bg-muted lg:-mr-8 lg:-ml-16"
+            aria-hidden="true"
+          />
+          <div className="h-4" aria-hidden="true" />
+        </div>
+      ) : (
+        <div
+          className={["bg-background", pins ? "lg:sticky lg:z-20" : ""].join(
+            " "
+          )}
+          style={pins ? { top: px(0) } : undefined}
+        >
+          <div className="h-6" aria-hidden="true" />
+        </div>
+      )}
 
-      {/* The name: pins at the eyebrow's line and covers it. pr-28 from lg
-          only when pinning beside a photo — at rest the name starts clear
-          of the photo's bottom, but pinned it sits beside the photo, and
-          the photo lives in the wrapper beneath it. */}
+      {/* THE PHOTO RIDES UP WITH THE OPENING LINE, THEN PARKS IN THE BAND
+          (founder, 2026-10-15: "scroll the photo up with the opening line
+          and then make it sticky"). A zero-height holder sits in flow at the
+          strip's bottom (BAND + STRIP from the top); the photo is absolute
+          inside it, hanging 16 units above the holder so its bottom is level
+          with the eyebrow's text at rest. The holder is sticky at 16 units
+          — the photo's own hang — so the photo stops with its top at the
+          band's top, 96 tall in a 96 band, parked at the band's right end
+          (z-30, over the band's wrapper). With the photo parked up there,
+          the pinned NAME beneath has nothing beside it: full width, always
+          (founder, same message: "extend the name the full width so it
+          doesn't wrap before reaching the photo"). */}
+      {avatar && (
+        <div
+          className={["relative h-0", pins ? "lg:sticky lg:z-30" : ""].join(
+            " "
+          )}
+          style={pins ? { top: px(16) } : undefined}
+        >
+          <div className="absolute -top-16 right-0 size-24 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm">
+            {avatar}
+          </div>
+        </div>
+      )}
+
+      {/* The eyebrow row: in flow, pr-28 clear of the hanging photo. It
+          scrolls up under the band; the name takes its place. */}
+      <div className={avatar ? "pr-28" : undefined}>{eyebrowText}</div>
+
+      {/* The name: pins at the eyebrow's line, full width. */}
       <div
         ref={nameRef}
-        className={[
-          "bg-background pb-4",
-          pins ? "lg:sticky lg:z-30" : "",
-          pins && avatar ? "lg:pr-28" : "",
-        ].join(" ")}
+        className={["bg-background pb-4", pins ? "lg:sticky lg:z-30" : ""].join(
+          " "
+        )}
         style={pins ? { top: `${headerInset + nameTop}px` } : undefined}
       >
         {title}
