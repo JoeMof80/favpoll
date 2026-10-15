@@ -244,12 +244,9 @@ export function RotatingRegisterHero() {
           the brandmark either. they should"): lucide's chevron stroke
           starts 15px into its 40px box, so the box sits 9px in and the
           stroke begins at 24 — where the header's mark begins — and the
-          box ends at 49, inside the 54px rail. Mirrored on the right.
-          FROM md ONLY: below it the hero stacks pitch over handset and the
-          band's vertical centre lands beside the phone, so the pair moves
-          to ONE ROW UNDER THE PHONE (founder, same day: "the buttons
-          should be below the iphone… would it be better if they shared a
-          row?") — see below the slides. */}
+          box ends at 49, inside the 54px rail. Mirrored on the right. AT
+          EVERY WIDTH: a row of both under the phone was built for phones
+          and reverted the same hour ("move the chevrons back!!!!"). */}
       {(
         [
           ["Previous kind of favpoll", -1, ChevronLeft, "left-[9px]"],
@@ -258,10 +255,7 @@ export function RotatingRegisterHero() {
       ).map(([label, by, Icon, side]) => (
         <div
           key={label}
-          className={cn(
-            "absolute inset-y-0 z-10 hidden items-center md:flex",
-            side
-          )}
+          className={cn("absolute inset-y-0 z-10 flex items-center", side)}
         >
           <Button
             type="button"
@@ -275,36 +269,6 @@ export function RotatingRegisterHero() {
           </Button>
         </div>
       ))}
-
-      {/* THE PHONE ROW (below md): both chevrons together under the
-          handset, in the band, their first stroke on the 54px rail (the
-          box's 15px lead subtracted). The band is the slides' own; this
-          row paints the same primary beneath them so the band simply runs
-          on. */}
-      <div
-        className="flex items-center gap-1 bg-primary pb-8 pl-[39px] text-primary-foreground md:hidden"
-        role="group"
-        aria-label="Kinds of favpoll"
-      >
-        {(
-          [
-            ["Previous kind of favpoll", -1, ChevronLeft],
-            ["Next kind of favpoll", 1, ChevronRight],
-          ] as const
-        ).map(([label, by, Icon]) => (
-          <Button
-            key={label}
-            type="button"
-            size="icon"
-            variant="ghost"
-            aria-label={label}
-            onClick={() => step(by)}
-            className="size-10 rounded-md p-0 text-primary-foreground/70 hover:bg-transparent hover:text-primary-foreground"
-          >
-            <Icon aria-hidden="true" className="size-10" strokeWidth={1.5} />
-          </Button>
-        ))}
-      </div>
     </div>
   )
 }
