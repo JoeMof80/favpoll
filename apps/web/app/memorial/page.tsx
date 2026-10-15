@@ -147,6 +147,7 @@ export default async function MemorialsPage() {
           sentence. ── */}
         <LandingHero
           sceneKind="memorial"
+          compact
           still
           eyebrow={t("memorials.eyebrow")}
           headline={t("memorials.headline")}

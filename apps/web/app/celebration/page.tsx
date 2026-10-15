@@ -189,6 +189,7 @@ export default async function CelebrationsPage() {
           so nothing is tinted by hand any more (2026-08-30). ── */}
         <LandingHero
           sceneKind="celebration"
+          compact
           scene={WEDDING_SCENE}
           still
           eyebrow={t("celebrations.eyebrow")}

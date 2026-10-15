@@ -56,6 +56,17 @@ export const PHONE_SCALE = "scale-[0.52] lg:scale-[0.70] xl:scale-[0.75]"
 export const PHONE_SCALED_BOX =
   "h-[451px] w-[215px] lg:h-[608px] lg:w-[290px] xl:h-[651px] xl:w-[311px]"
 
+/**
+ * THE ONE DELIBERATE EXCEPTION to "one scale" (founder, 2026-10-15): the
+ * register pages' COMPACT hero holds the phone at the md step on every
+ * breakpoint. The phone governs that band's height, and at 0.70/0.75 the
+ * band ran to ~840px on a laptop with how-it-works entirely below the fold.
+ * Same handset, same chassis, one step smaller — not a new size so much as
+ * the small one kept. Home's rotating hero still uses PHONE_SCALE.
+ */
+export const PHONE_SCALE_COMPACT = "scale-[0.52]"
+export const PHONE_SCALED_BOX_COMPACT = "h-[451px] w-[215px]"
+
 export const PHONE_CHASSIS_WIDTH = PHONE_SCREEN_WIDTH + BEZEL * 2
 export const PHONE_CHASSIS_HEIGHT = PHONE_SCREEN_HEIGHT + BEZEL * 2
 

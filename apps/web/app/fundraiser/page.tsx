@@ -194,6 +194,7 @@ export default async function FundraisersPage() {
           and the handset wears its scene's — green, both (2026-08-30). ── */}
         <LandingHero
           sceneKind="fundraiser"
+          compact
           scene={FUNDRAISER_SCENE}
           still
           eyebrow={t("fundraisers.eyebrow")}
