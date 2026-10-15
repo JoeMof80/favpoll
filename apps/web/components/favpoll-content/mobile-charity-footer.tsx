@@ -79,7 +79,7 @@ export function MobileCharityFooter({
   return (
     <div
       ref={ref}
-      className={`fixed right-0 bottom-0 left-0 z-20 border-t border-border bg-background px-4 py-3 transition-transform duration-300 md:hidden ${
+      className={`fixed right-0 bottom-0 left-0 z-20 border-t border-border bg-background px-4 py-3 transition-transform duration-300 lg:hidden ${
         hidden ? "translate-y-full" : "translate-y-0"
       }`}
       style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}

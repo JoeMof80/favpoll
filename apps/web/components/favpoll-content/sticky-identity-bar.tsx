@@ -17,7 +17,7 @@ type Props = {
 /**
  * Mobile-only identity bar. Shows when scrolled past 93px (roughly
  * the hero height). Uses a plain scroll listener — no
- * IntersectionObserver. md:hidden keeps desktop untouched.
+ * IntersectionObserver. lg:hidden keeps desktop untouched.
  *
  * Its HEIGHT is published as --identity-bar-h while it shows
  * (2026-09-29): the poll section's topic header and pledge pill pin
@@ -90,7 +90,7 @@ export function StickyIdentityBar({
   return (
     <div
       ref={barRef}
-      className={`fixed top-14 right-0 left-0 z-30 border-b border-border bg-background transition-transform duration-200 ease-out md:hidden ${
+      className={`fixed top-14 right-0 left-0 z-30 border-b border-border bg-background transition-transform duration-200 ease-out lg:hidden ${
         entered ? "translate-y-0" : "-translate-y-full"
       }`}
     >

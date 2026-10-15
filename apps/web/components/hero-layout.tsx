@@ -191,10 +191,16 @@ export function HeroLayout({
   // way around": both gaps at the ribbon's 40) minus the band's pb 16.
   // The whole composition settles in the first 24px of scroll — brisk,
   // but every law holds (contact at settle, slope -1).
-  // Mobile: no animation (hero scrolls away). Desktop: settle.
+  // Mobile: no animation (hero scrolls away). Desktop: settle. 1023, not
+  // 767: THE SHELL STARTS AT lg (founder, 2026-10-15). At 768–900 the
+  // two-pane shell gave the sheet ~300px of content — narrower than a
+  // phone — and every component in the column was being asked to fit it
+  // (a group favpoll's photo swallowed its name there). Tablets now get
+  // the phone layout, which already works; this flag keeps step with the
+  // lg: classes below, as it did with lg:.
   const [isMobile, setIsMobile] = useState(false)
   useEffect(() => {
-    const mq = window.matchMedia("(max-width: 767px)")
+    const mq = window.matchMedia("(max-width: 1023px)")
     setIsMobile(mq.matches)
     const h = (e: MediaQueryListEvent) => setIsMobile(e.matches)
     mq.addEventListener("change", h)
@@ -288,13 +294,13 @@ export function HeroLayout({
         // purpose — it exists for the moment iOS Safari drops the
         // header's sticky, and a see-through patch in that failure is
         // the bug it was added to fix.
-        className={`bg-background pt-6 pb-4 md:pt-16 ${
+        className={`bg-background pt-6 pb-4 lg:pt-16 ${
           animate
-            ? `md:sticky md:z-30 md:before:absolute md:before:inset-x-0 md:before:-top-14 md:before:h-14 md:before:bg-background md:supports-backdrop-filter:bg-background/85 md:supports-backdrop-filter:backdrop-blur-md ${
+            ? `lg:sticky lg:z-30 lg:before:absolute lg:before:inset-x-0 lg:before:-top-14 lg:before:h-14 lg:before:bg-background lg:supports-backdrop-filter:bg-background/85 lg:supports-backdrop-filter:backdrop-blur-md ${
                 // The scrollport already starts below the header in shell
-                // mode; md:top-14 there pins the band 56px too low, which
+                // mode; lg:top-14 there pins the band 56px too low, which
                 // is what was eating the about line.
-                headerInset === 0 ? "md:top-0" : "md:top-14"
+                headerInset === 0 ? "lg:top-0" : "lg:top-14"
               }`
             : ""
         }`}
@@ -304,7 +310,7 @@ export function HeroLayout({
             than person heroes, whose shrunken avatar outgrows the
             eyebrow+name block (founder: cause ribbon "too high" next to
             a person page, on-device 2026-07-30). */}
-        <div className="relative flex min-h-18 items-start gap-4 md:min-h-21 md:gap-6">
+        <div className="relative flex min-h-18 items-start gap-4 lg:min-h-21 lg:gap-6">
           <div ref={textRef} className="min-w-0 flex-1">
             <div ref={settledRef}>
               {eyebrowText}
@@ -342,7 +348,7 @@ export function HeroLayout({
           </div>
           {avatar && (
             <motion.div
-              className="h-26 w-26 shrink-0 md:h-33 md:w-33"
+              className="h-26 w-26 shrink-0 lg:h-33 lg:w-33"
               style={
                 animate && avatarMounted
                   ? { width: avatarSize, height: avatarSize }
@@ -378,7 +384,7 @@ export function HeroLayout({
         // with it.
         // Mobile: tighter gaps (no settle animation, hero scrolls away).
         // Desktop: the settle gap (SETTLE_SCROLL) + mb-6.
-        className="mb-3 md:mb-6"
+        className="mb-3 lg:mb-6"
         style={{ marginTop: isMobile ? 8 : SETTLE_SCROLL }}
       >
         {about}
