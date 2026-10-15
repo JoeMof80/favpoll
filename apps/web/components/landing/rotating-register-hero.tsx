@@ -211,17 +211,19 @@ export function RotatingRegisterHero() {
             >
               {/* px-8 on top of the register's own band classes, so the
                   content rail is 56px: 24 (the header's own padding) + the
-                  24px mark + its 8px gap = where the brand TEXT starts
+                  24px mark + its 8px gap = where the WORDMARK starts
                   (founder, 2026-10-15: "set the margin to the brand text so
-                  the content lines up too"). Holds below ~1400px, where the
-                  page's 1320px column meets the edge; above it the column
-                  is centred with every section beneath, as he chose. The
-                  departure from "exactly as they are" is 32px on this page
-                  alone. Below sm the band keeps px-6: at 320px a 56px rail
+                  the content lines up too"), and `align="wordmark"` holds
+                  the column against it at EVERY width rather than centring
+                  it in the page's 1320px column (founder, same day: "make
+                  the hero content align with the wordmark"). The departure
+                  from "exactly as they are" is this page's alone. Below sm
+                  the band keeps px-6: at 320px a 56px rail
                   each side left 208px for the 215px phone and the page
                   scrolled 7px sideways (the overflow E2E caught it). */}
               <LandingHero
                 {...slide.hero}
+                align="wordmark"
                 bandClassName="bg-primary px-6 text-primary-foreground sm:px-8"
               />
             </div>
@@ -230,16 +232,14 @@ export function RotatingRegisterHero() {
       </div>
 
       {/* Back and next AT THE SIDES (founder, 2026-10-15: "where they
-          belong"): one at each edge of the band, vertically centred, in the
-          hero's outline idiom. CHEVRONS, SMALL, NO LABEL — the register
-          glyphs with a name opening on hover were tried the same night and
-          the founder preferred plain arrows: the slide itself says which
-          register it is, and the buttons should only say "next". ON THE
-          LOGO'S LINE (founder, same night): 24px in, where the header's
-          mark sits — a 28px circle ending at 52, inside the 56px rail the
-          band's px-8 reserves (see bandClassName above), so a headline at
-          the same height never touches it; below sm, 16px in, inside the
-          48px rail there. */}
+          belong"): one at each edge of the band, vertically centred. BARE
+          CHEVRONS, LARGE, NO CIRCLE, NO LABEL (founder, 2026-10-15, after
+          outline circles and register glyphs were both tried): a 40px
+          arrow in band ink, dimmed until hovered. ON THE LOGO'S LINE: the
+          button's box starts 24px in, where the header's mark sits; the
+          arrow's own stroke sits in the middle of that box, well inside
+          the 56px rail the band's px-8 reserves (see bandClassName above);
+          below sm, 16px in. */}
       {(
         [
           ["Previous kind of favpoll", -1, ChevronLeft, "left-4 sm:left-6"],
@@ -256,9 +256,9 @@ export function RotatingRegisterHero() {
             variant="ghost"
             aria-label={label}
             onClick={() => step(by)}
-            className="size-7 rounded-full border border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+            className="size-10 rounded-md p-0 text-primary-foreground/70 hover:bg-transparent hover:text-primary-foreground"
           >
-            <Icon aria-hidden="true" className="size-4" />
+            <Icon aria-hidden="true" className="size-10" strokeWidth={1.5} />
           </Button>
         </div>
       ))}
