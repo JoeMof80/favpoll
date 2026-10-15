@@ -15,6 +15,10 @@ import { Button } from "@/components/ui/button"
 import { RankingBar } from "@/components/ui/ranking-bar"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { PollNote } from "@/components/favpoll-card/poll-note"
+import {
+  NoteSkeleton,
+  StandingsSkeleton,
+} from "@/components/standings-skeleton"
 import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
 import {
   getFavpollHeadline,
@@ -215,7 +219,8 @@ export function DemoCard({
   const isPhone = device === "phone"
   const sheetOpen = pickerOpen || amountOpen || confirmedInDialog
 
-  // Locked = pre-pledge (blurred reveal + lock card, blurred decoy bars).
+  // Locked = pre-pledge (note skeleton + skeleton bars behind the lock card,
+  // exactly as poll-section draws it since #911 — the blurred decoy is gone).
   // Unlocked = disclosure: the dialog has closed; the reveal types out and the
   // ranking bars climb from zero.
   const unlocked =
@@ -473,12 +478,13 @@ export function DemoCard({
         <div className="grid">
           <div className="space-y-4 [grid-area:1/1]">
             {locked ? (
-              <div className="blur-xs" aria-hidden="true">
-                <PollNote
-                  personalNote={noteText}
-                  protagonistFirstName={firstName ?? undefined}
-                />
-              </div>
+              /* The real page renders NoteSkeleton only when a note exists;
+                 every scene has one, but the guard keeps the two in step. */
+              noteText ? (
+                <div aria-hidden="true">
+                  <NoteSkeleton />
+                </div>
+              ) : null
             ) : (
               <div className="relative">
                 {/* Reserve final height so typing doesn't push results down */}
@@ -501,15 +507,13 @@ export function DemoCard({
               </div>
             )}
 
-            {/* ── Results — blurred decoy while locked; real bars climb from 0
-              on disclosure. (Charity row is pinned to the card bottom.) ── */}
+            {/* ── Results — skeleton bars while locked (one row per
+              favourite the reveal will show, so the card's height barely
+              moves at disclosure); real bars climb from 0 on disclosure.
+              (Charity row is pinned to the card bottom.) ── */}
             {locked ? (
-              <div
-                key="decoy-results"
-                className="space-y-3 blur-xs"
-                aria-hidden="true"
-              >
-                {renderRankings(false)}
+              <div key="skeleton-results" aria-hidden="true">
+                <StandingsSkeleton rows={results.length} />
               </div>
             ) : (
               <div key="real-results" className="space-y-3">
@@ -518,7 +522,7 @@ export function DemoCard({
             )}
           </div>
 
-          {/* Lock card — same cell as the blurred block, top-aligned. */}
+          {/* Lock card — same cell as the skeleton block, top-aligned. */}
           <AnimatePresence>
             {locked && (
               <motion.div

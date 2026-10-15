@@ -25,7 +25,7 @@ import type {
   FavpollPollWithItems,
   FavpollSubject,
 } from "@favpoll/types"
-import { decoyWidth } from "@/lib/decoys"
+import { StandingsSkeleton } from "@/components/standings-skeleton"
 import { addGuestItem } from "@/app/favpolls/[id]/actions"
 import { paletteForFavpoll } from "@/lib/register-palette"
 import { buildMechanicSteps } from "@/lib/mechanic-steps"
@@ -111,14 +111,11 @@ export function FavpollListCard({
   const isClosed = !!favpoll.closed_at
   const entitled = hasPledged || isClosed
 
-  const decoyResults: CardResultItem[] = [...topicItems]
-    .sort((a, b) => a.label.localeCompare(b.label))
-    .slice(0, 4)
-    .map((item, i) => ({
-      label: item.label,
-      amountPence: 0,
-      widthPercent: decoyWidth(i),
-    }))
+  // Behind the lock: a skeleton row per favourite, capped at the four the
+  // blurred decoy used to draw — the SAME placeholder the guest page shows
+  // behind its lock card since #911 (brought in line 2026-10-15; the shelf
+  // had kept the blurred decoy with alphabetical labels and "—" amounts).
+  const skeletonRows = Math.min(4, topicItems.length)
 
   // Arm the list's return target the moment a pledge begins (founder's
   // debug panel, 2026-09-06: an in-card pledge showed a FRESH MOUNT
@@ -433,11 +430,11 @@ export function FavpollListCard({
                        the old min-h went with the content-sized card. */
                     <div className="relative min-h-0 flex-1 px-3 py-2">
                       <div
-                        className="pointer-events-none blur-xs select-none"
+                        className="pointer-events-none select-none"
                         aria-hidden="true"
-                        data-testid="list-card-decoy"
+                        data-testid="list-card-locked"
                       >
-                        <FavpollListCardResults results={decoyResults} />
+                        <StandingsSkeleton rows={skeletonRows} />
                       </div>
                       {/* Full-area unlock, the poll section's idiom — the
                         page's own teaching card (lock-card-content,
