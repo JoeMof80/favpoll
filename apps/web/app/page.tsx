@@ -31,7 +31,12 @@ export default async function HomePage() {
   return (
     <main className="flex flex-col">
       {/* ── Purple hero band with the live demo ── */}
-      <LandingHero liveCount={normalised.length} totalLive={totalLive} router />
+      <LandingHero
+        liveCount={normalised.length}
+        totalLive={totalLive}
+        invariant={t("landing.invariant")}
+        router
+      />
 
       <ProcessOverview />
 

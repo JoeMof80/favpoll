@@ -111,4 +111,21 @@ describe("t", () => {
   it("returns the primary CTA", () => {
     expect(t("landing.cta.primary")).toBe("Create a favpoll")
   })
+
+  // GARY (2026-09-23): the home page got "what is the vote poll thing
+  // about?", an explanation produced the allocative misread, and three
+  // scenarios each naming a person or a room got "Got it". So the router
+  // cards are scenarios, and the header carries the one invariant that
+  // kills the misread: the pick does not direct the money.
+  it("states the invariant the header lacked", () => {
+    expect(t("landing.invariant")).toBe(
+      "Whatever wins, every pledge goes to the charity."
+    )
+  })
+
+  it("makes each router card a scenario that names its person", () => {
+    expect(t("home.router.memorials.body")).toMatch(/^Belinda/)
+    expect(t("home.router.celebrations.body")).toMatch(/^Alex & Jordan/)
+    expect(t("home.router.fundraisers.body")).toMatch(/^Marcus/)
+  })
 })
