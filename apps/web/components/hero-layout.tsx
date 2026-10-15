@@ -38,6 +38,11 @@ type HeroLayoutProps = {
 // The var settles early (avatar by 48px, text by 120px of scroll) — before the ribbon
 // or pledge pill reach their pin positions — so pinned pieces still hold
 // one position in practice.
+/** The photo's ceiling at every breakpoint: 1.4× the md fallback (132),
+ *  which a three-line name stack reaches and nothing taller should — see
+ *  the measurement for the runaway it stops. */
+const AVATAR_MAX = 184
+
 export function HeroLayout({
   eyebrowText,
   title,
@@ -117,8 +122,18 @@ export function HeroLayout({
     const settledEl = settledRef.current
     if (!text || !settledEl) return
     const set = () => {
-      const rest = text.offsetHeight
-      const settled = settledEl.offsetHeight
+      // CAPPED (founder, 2026-10-15, a group favpoll at ~800px wide: the
+      // photo filled the column and the name was gone). The row is a flex
+      // row — name block `min-w-0 flex-1`, photo sized from the name
+      // block's HEIGHT — so at a narrow column a long name wraps, the
+      // stack grows, the photo grows, the text column shrinks, the name
+      // wraps more, and this observer re-measures at every step until
+      // the text has no width at all. AVATAR_MAX is the most a
+      // three-line stack reaches, so a two-line name still settles a
+      // taller image and the runaway cannot start. The settled size is a
+      // subset of the rest stack and never exceeds it.
+      const rest = Math.min(text.offsetHeight, AVATAR_MAX)
+      const settled = Math.min(settledEl.offsetHeight, rest)
       if (rest > 0 && settled > 0) {
         setAvatarCfg({ rest, settled })
         // THE COLLAPSE, published (founder, 2026-09-29: "a strange
