@@ -1,0 +1,32 @@
+[
+ {
+  "id": "16dbbaf7-622e-40b1-a912-c4ae4cfa4373",
+  "name": "Nicola Thorne",
+  "subject": "someone",
+  "register": "remembering",
+  "occasion": "Memorial",
+  "topic": "Song",
+  "charity": "Alzheimer's Society",
+  "family": "end_of_life",
+  "pronoun": "she",
+  "grouping": "individual",
+  "context": "1940 – 2024",
+  "about": "Nicola loved to sing along to the radio while she pottered in the kitchen. She filled her evenings with old records, always ready with the next one to play. Alzheimer's Society supported her through her illness, and she wanted them remembered here. Pledge to Alzheimer's Society, pick your favourite Song, and Nicola's will be revealed.",
+  "note": "Nicola's was Supermarket Flowers — Ed Sheeran. She kept a vase of supermarket flowers on her kitchen windowsill, changed every week.",
+  "edges": {
+   "e1": {
+    "star": false,
+    "text": "A favourite song suits a memorial; that needs no saying in the about."
+   },
+   "e2": {
+    "star": true,
+    "text": "Alzheimer's Society works for end-of-life care and dementia: a favourite song is at the heart of what they do."
+   },
+   "e3": {
+    "star": true,
+    "text": "Alzheimer's Society belongs at a memorial: a charity that cares for people at the end of life belongs at a memorial — whoever cared for them."
+   },
+   "count": 3
+  }
+ }
+]
