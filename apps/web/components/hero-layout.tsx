@@ -32,36 +32,22 @@ type HeroLayoutProps = {
 // the photo can never squeeze it (the feedback loop fixed earlier the same
 // day, when the photo was sized from the name block's height).
 //
-// PINNING, from lg, is PURE STICKY — no transforms, nothing changes size.
-// This retires the settle (2026-09-05 → 2026-10-15: the avatar shrinking
-// into the name block, --hero-collapse, the subtitle clip): that mechanic
-// collapsed the band as you scrolled, which in the shell's own scroller
-// removed its own overflow and oscillated (the shudder #965 reserved
-// spare height against). Sticky elements keep their height, so the loop
-// cannot start, and the shell's reservation is now zero. Two sticky boxes:
-//
-//   band     (band · 16px strip)  sticky top-0, z-20
-//   photo    a zero-height sticky holder at the strip's bottom, the photo
-//             hanging 64px above it: it rides up with the eyebrow and parks
-//             straddling the band's bottom edge, at the right (sticky
-//             top-22, z-30) — at the same scroll the name pins (24px: the
-//             instant the eyebrow's lettering is covered)
-//   name     sticky at the eyebrow's line (band + strip), z-30, own
-//             background, FULL WIDTH — the photo is up in the band by then
+// PINNING, from lg, is PURE STICKY — one block (band, photo, eyebrow,
+// name) at the scroller's top, nothing changing size. This retires the
+// settle (2026-09-05 → 2026-10-15: the avatar shrinking into the name
+// block, --hero-collapse, the subtitle clip): that mechanic collapsed the
+// band as you scrolled, which in the shell's own scroller removed its own
+// overflow and oscillated (the shudder #965 reserved spare height
+// against). A sticky block keeps its height, so the loop cannot start, and
+// the shell's reservation is now zero. (A version where the eyebrow and
+// photo scrolled up first and the name pinned on the eyebrow's line was
+// built and dropped the next morning: "it only saves a few pixels".)
 //
 // What pins beneath (the poll heading, the lock card) reads the pinned
 // header's bottom from --hero-stuck-bottom, measured here: the name box's
 // pinned top plus its height. A STATIC hero (the room) publishes the
 // scroller's top alone.
 //
-// Geometry, in Tailwind's 4px units. The eyebrow is the hero's own
-// SectionEyebrow: h-8 with mb-2, a 40px row.
-const BAND = 20 // h-20 (founder, 2026-10-16: was 24; the photo's gap above
-// now equals the shell's 32px gap at its right)
-const STRIP = 4 // h-4 — the air between the band and the eyebrow
-// (the eyebrow row, h-8 + mb-2 = 10 units, is the wrapper's own last child
-// and needs no constant)
-const NO_BAND_TOP = 6 // pt-6 — a cause without a photo
 
 export function HeroLayout({
   eyebrowText,
@@ -74,28 +60,25 @@ export function HeroLayout({
   // headerInset = 56 (the h-14 header) when the document scrolls, 0 inside
   // the shell's scroller, whose box starts below it.
   const { headerInset } = useScrollRoot()
-  const nameRef = useRef<HTMLDivElement>(null)
+  const pinnedRef = useRef<HTMLDivElement>(null)
 
-  // Where the pinned name box's TOP sits, in px: the eyebrow's line.
-  const nameTop = (avatar ? BAND + STRIP : NO_BAND_TOP) * 4
-
-  // --hero-stuck-bottom: the pinned header's bottom, for what pins beneath.
-  // Measured on layout changes only (name wrap, breakpoint), never during
-  // scroll — the value is scroll-invariant by construction.
+  // --hero-stuck-bottom: the pinned block's bottom, for what pins beneath
+  // (the poll heading, the lock card). Measured on layout changes only
+  // (name wrap, breakpoint), never during scroll — nothing here changes
+  // size with scroll. A static hero (the room) publishes the scroller's
+  // top alone.
   useEffect(() => {
-    const name = nameRef.current
+    const el = pinnedRef.current
     const set = () => {
-      const bottom = pins
-        ? headerInset + nameTop + (name?.offsetHeight ?? 0)
-        : headerInset
+      const bottom = pins ? headerInset + (el?.offsetHeight ?? 0) : headerInset
       document.documentElement.style.setProperty(
         "--hero-stuck-bottom",
         `${Math.round(bottom)}px`
       )
     }
     set()
-    const ro = name ? new ResizeObserver(set) : null
-    if (name) ro!.observe(name)
+    const ro = el ? new ResizeObserver(set) : null
+    if (el) ro!.observe(el)
     // The settle's reservation, kept at zero for page-layout's calc until
     // that calc is retired with it.
     document.documentElement.style.setProperty("--hero-collapse", "0px")
@@ -106,95 +89,42 @@ export function HeroLayout({
       document.documentElement.style.removeProperty("--hero-collapse")
       document.documentElement.style.removeProperty("--hero-settle")
     }
-  }, [pins, headerInset, nameTop])
-
-  // GEOMETRY, in px. The eyebrow is a 32px row of uppercase lettering that
-  // ends ~22px in, so the row's last 10px are empty. The pin follows the
-  // GLYPHS (founder, 2026-10-15/16: "as soon as the opening line text is
-  // obscured"): the name's sticky box starts at the glyph line — 10px up
-  // into the row's empty tail, which it may paint over, there being no
-  // descenders — and carries 18px of lead (that 10 + the eyebrow's old 8px
-  // trailing margin) so the name's text sits where it always did. Pinned,
-  // the box's top meets the band's strip with no slit, and the lead is
-  // where the parked photo's bottom overlaps (the photo stacks above).
-  const PIN = avatar ? BAND * 4 + STRIP * 4 : NO_BAND_TOP * 4 // 112 | 24
-  const GLYPH_TAIL = 10
-  const LEAD = GLYPH_TAIL + 8
-  const PHOTO_REST_TOP = PIN + 32 - 96 // hanging: a 96px photo whose bottom is level with the 32px eyebrow row's bottom
-  const PHOTO_HANG = PIN - PHOTO_REST_TOP // the holder sits at PIN
-  const PIN_SCROLL = 32 - GLYPH_TAIL // 22: the glyphs reach the strip
-  const at = (y: number) => `${headerInset + y}px`
+  }, [pins, headerInset])
 
   return (
     <>
-      {/* The band and its 16px strip (a cause without a photo: 24px of
-          top padding instead), pinned at the scroller's top. */}
+      {/* ONE PINNED BLOCK (founder, 2026-10-16: "scrolling the opening line
+          and photo feels pointless. it only saves a few pixels. don't
+          bother"): the band, the photo hanging off it at the right, the
+          eyebrow and the name stick together from the first pixel of
+          scroll; only the context and the About pass beneath. The photo's
+          top sits 32px into the 80px band — the same 32 as the shell's gap
+          at its right — and its bottom is level with the eyebrow row's
+          bottom. The block's bottom padding is painted air for what pins
+          beneath it. */}
       <div
-        className={["bg-background", pins ? "lg:sticky lg:z-20" : ""].join(" ")}
-        style={pins ? { top: at(0) } : undefined}
+        ref={pinnedRef}
+        className={[
+          "relative bg-background pb-4",
+          avatar ? "" : "pt-6",
+          pins ? "lg:sticky lg:z-30" : "",
+        ].join(" ")}
+        style={pins ? { top: `${headerInset}px` } : undefined}
       >
-        {avatar ? (
+        {avatar && (
           <>
             <div
               className="-mx-6 h-20 bg-muted lg:-mr-8 lg:-ml-16"
               aria-hidden="true"
             />
             <div className="h-4" aria-hidden="true" />
+            <div className="absolute top-8 right-0 size-24 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm">
+              {avatar}
+            </div>
           </>
-        ) : (
-          <div className="h-6" aria-hidden="true" />
         )}
-      </div>
-
-      {/* THE PHOTO RIDES UP WITH THE OPENING LINE, THEN PARKS IN THE BAND
-          (founder, 2026-10-15: "scroll the photo up with the opening line
-          and then make it sticky"). A zero-height holder in flow at the
-          strip's bottom; the photo is absolute inside it, hanging so its
-          bottom is level with the eyebrow row's bottom at rest. The holder
-          is sticky where the photo's top lands at the pin scroll, so photo
-          and name stop together, the photo straddling the band's bottom
-          edge at the right. z-40: above the name's box, whose painted
-          lead overlaps the photo's bottom at rest. With the photo up
-          there, the pinned NAME beneath has nothing beside it: full
-          width, always. */}
-      {avatar && (
-        <div
-          className={["relative h-0", pins ? "lg:sticky lg:z-40" : ""].join(
-            " "
-          )}
-          style={
-            pins
-              ? { top: at(PHOTO_HANG + PHOTO_REST_TOP - PIN_SCROLL) }
-              : undefined
-          }
-        >
-          <div
-            className="absolute right-0 size-24 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm"
-            style={{ top: -PHOTO_HANG }}
-          >
-            {avatar}
-          </div>
-        </div>
-      )}
-
-      {/* The eyebrow row; pr-28 keeps it clear of the hanging photo. It
-          scrolls up under the band; the name takes its place. -mb-2
-          cancels its own trailing margin — the name's lead carries it. */}
-      <div className={avatar ? "-mb-2 pr-28" : "-mb-2"}>{eyebrowText}</div>
-
-      {/* The name: its box starts at the eyebrow's glyph line and pins at
-          the strip's bottom, full width. */}
-      <div
-        ref={nameRef}
-        className={["bg-background pb-4", pins ? "lg:sticky lg:z-30" : ""].join(
-          " "
-        )}
-        style={{
-          marginTop: -GLYPH_TAIL,
-          paddingTop: LEAD,
-          ...(pins ? { top: at(PIN) } : {}),
-        }}
-      >
+        {/* pr-28 keeps a long opening line clear of the photo. */}
+        <div className={avatar ? "pr-28" : undefined}>{eyebrowText}</div>
         {title}
       </div>
 
