@@ -1,5 +1,4 @@
 import Link from "next/link"
-import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import {
   PickHint,
   PledgeHint,
@@ -88,14 +87,19 @@ export function HowItWorksSteps({
 }) {
   return (
     <section id="how" className="w-full scroll-mt-20">
-      <div className="mx-auto w-full max-w-330 px-6 py-16">
-        {/* as="h2" matches the home page's How It Works exactly: the same
-            SectionEyebrow rendered as a heading rather than its default
-            paragraph, and the right element for a section title the page
-            outline should carry. */}
-        <SectionEyebrow as="h2" className="mb-10">
-          {title}
-        </SectionEyebrow>
+      {/* pt-10 against the page's usual py-16 (founder, 2026-10-15): with
+          the compact hero above, this section is the fold, and the gap it
+          carried — 64 of padding, a 20px eyebrow, 40 under it — read as
+          dead space before the thing the reader came for. */}
+      <div className="mx-auto w-full max-w-330 px-6 pt-10 pb-16">
+        {/* THE TITLE IS FOR THE OUTLINE ONLY (founder, 2026-10-15). It was
+            the eyebrow "HOW IT WORKS" in the same uppercase style as the
+            three step labels right beneath it, which do the work — two rows
+            of the same label, the second one carrying the sense. The ↓
+            button that scrolls here already says "See how it works". The h2
+            stays for the page outline and the screen reader that lands on
+            #how; it is just not drawn. */}
+        <h2 className="sr-only">{title}</h2>
         <ol className="grid gap-10 lg:grid-cols-3 lg:gap-x-16">
           {steps.map((step, i) => (
             /* A SECOND COLUMN PER BEAT (founder, 2026-08-27): the words

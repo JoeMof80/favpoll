@@ -15,7 +15,9 @@ import { DemoFrame } from "@/components/hero-demo-panel/demo-frame"
 import {
   PhoneFrame,
   PHONE_SCALE,
+  PHONE_SCALE_COMPACT,
   PHONE_SCALED_BOX,
+  PHONE_SCALED_BOX_COMPACT,
 } from "@/components/hero-demo-panel/phone-frame"
 import { NAV_TABS, SCENES } from "@/components/hero-demo-panel/scenes"
 import type { HeroScene, SceneKind } from "@/components/hero-demo-panel/scenes"
@@ -108,6 +110,16 @@ type Props = {
    * the homepage's guest arc are the same size.
    */
   still?: boolean
+  /**
+   * COMPACT (founder, 2026-10-15): the band takes its height from its
+   * content instead of the viewport, and the still phone holds the md
+   * scale on every breakpoint, so how-it-works' heading sits in the fold
+   * on a laptop. For the REGISTER PAGES, now that home carries the
+   * full-screen poster (the rotating register hero): /memorial is a
+   * document a celebrant forwards, and on it "what do I do here" beats the
+   * poster. Only meaningful with `still`.
+   */
+  compact?: boolean
   /** Extra pitch-column content, under the subheader. */
   children?: React.ReactNode
 }
@@ -233,6 +245,7 @@ export function LandingHero({
   bandClassName,
   router = false,
   still = false,
+  compact = false,
   children,
 }: Props) {
   const scenes = useMemo(
@@ -260,7 +273,10 @@ export function LandingHero({
         // unscaled 868px (see PHONE_SCALED_BOX). Fix the box and min-h does
         // what it does on the home page, with items-center holding the
         // content in the middle of it.
-        "relative flex min-h-[calc(100vh-3.5rem)] items-center",
+        "relative flex items-center",
+        // Compact: no viewport floor — the band is as tall as the pitch
+        // and the (smaller) phone, and the page's next section shows.
+        !compact && "min-h-[calc(100vh-3.5rem)]",
         bandClassName ?? "bg-primary text-primary-foreground"
       )}
     >
@@ -540,8 +556,18 @@ export function LandingHero({
             /* mx-auto below md: stacked under the pitch the phone sat on
                the left edge — centre it (founder, 2026-09-13). On md+ it
                keeps its place in the media column. */
-            <div className={cn(PHONE_SCALED_BOX, "mx-auto md:mx-0")}>
-              <div className={cn("origin-top-left", PHONE_SCALE)}>
+            <div
+              className={cn(
+                compact ? PHONE_SCALED_BOX_COMPACT : PHONE_SCALED_BOX,
+                "mx-auto md:mx-0"
+              )}
+            >
+              <div
+                className={cn(
+                  "origin-top-left",
+                  compact ? PHONE_SCALE_COMPACT : PHONE_SCALE
+                )}
+              >
                 <PhoneFrame>
                   <DemoCard
                     scene={scene}

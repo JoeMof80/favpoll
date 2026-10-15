@@ -1,4 +1,5 @@
 import { RegisterScope } from "@/components/register-scope"
+import { Fold } from "@/components/landing/fold"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { LandingHero } from "@/components/landing/hero"
@@ -187,24 +188,27 @@ export default async function CelebrationsPage() {
           The page wears the celebration palette (RegisterScope), and the
           handset inside the hero wears its scene's — both magenta here —
           so nothing is tinted by hand any more (2026-08-30). ── */}
-        <LandingHero
-          sceneKind="celebration"
-          scene={WEDDING_SCENE}
-          still
-          eyebrow={t("celebrations.eyebrow")}
-          headline={t("celebrations.headline")}
-          subheader={t("celebrations.subheader")}
-          ctaLabel={t("celebrations.cta.primary")}
-          ctaHref="/favpolls/new?category=celebration"
-          ctaSecondaryLabel={t("celebrations.cta.secondary")}
-          hideStats
-        />
+        <Fold>
+          <LandingHero
+            sceneKind="celebration"
+            compact
+            scene={WEDDING_SCENE}
+            still
+            eyebrow={t("celebrations.eyebrow")}
+            headline={t("celebrations.headline")}
+            subheader={t("celebrations.subheader")}
+            ctaLabel={t("celebrations.cta.primary")}
+            ctaHref="/favpolls/new?category=celebration"
+            ctaSecondaryLabel={t("celebrations.cta.secondary")}
+            hideStats
+          />
 
-        {/* ── How it works, in the celebration register ── */}
-        <HowItWorksSteps
-          title={t("celebrations.how.title")}
-          steps={STEPS.map((step, i) => ({ ...step, media: STEP_MEDIA[i] }))}
-        />
+          {/* ── How it works, in the celebration register ── */}
+          <HowItWorksSteps
+            title={t("celebrations.how.title")}
+            steps={STEPS.map((step, i) => ({ ...step, media: STEP_MEDIA[i] }))}
+          />
+        </Fold>
 
         <IdeasSection title={t("celebrations.artefacts.title")} ideas={IDEAS} />
 

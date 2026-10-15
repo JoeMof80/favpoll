@@ -470,6 +470,31 @@ describe("DemoCard — cause (faceless) vs fundraiser (has a runner)", () => {
   })
 })
 
+describe("LandingHero — compact (the register pages)", () => {
+  // The founder's call of 2026-10-15: with home carrying the full-screen
+  // poster, a register page's band takes its height from its content and
+  // the phone holds the md scale, so how-it-works reaches the fold.
+  it("drops the viewport floor and holds the phone at the small step", () => {
+    const { container } = render(
+      <LandingHero sceneKind="memorial" still compact hideStats />
+    )
+    const band = container.querySelector("section")
+    expect(band?.className).not.toContain("min-h-[calc(100vh-3.5rem)]")
+    expect(container.querySelector(".h-\\[451px\\]")).not.toBeNull()
+    expect(container.querySelector(".lg\\:h-\\[608px\\]")).toBeNull()
+  })
+
+  it("keeps the viewport floor and the full phone ramp without it", () => {
+    const { container } = render(
+      <LandingHero sceneKind="memorial" still hideStats />
+    )
+    expect(container.querySelector("section")?.className).toContain(
+      "min-h-[calc(100vh-3.5rem)]"
+    )
+    expect(container.querySelector(".lg\\:h-\\[608px\\]")).not.toBeNull()
+  })
+})
+
 // ── RotatingRegisterHero ──────────────────────────────────────────────────────
 // The home hero since 2026-10-15: the three register heroes, unchanged, in
 // one grid cell, crossfaded. These pin the contract, not the look: every
