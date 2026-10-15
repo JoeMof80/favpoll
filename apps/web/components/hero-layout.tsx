@@ -198,7 +198,12 @@ export function HeroLayout({
         {title}
       </div>
 
-      {subtitle && <div className="w-full">{subtitle}</div>}
+      {/* -mt-4 takes back the name box's pb-4: that padding is PAINTED air
+          for the pinned state (the heading sits against it with no slit),
+          not spacing — the context keeps its own mt-4 as the one gap
+          (founder, 2026-10-16: "the space between the name and context is
+          too wide now"). */}
+      {subtitle && <div className="-mt-4 w-full">{subtitle}</div>}
 
       {/* About — ordinary flow; it passes beneath the pinned name. */}
       <div className="mt-2 mb-3 lg:mt-6 lg:mb-6">{about}</div>
