@@ -238,15 +238,16 @@ export function RotatingRegisterHero() {
           belong"): one at each edge of the band, vertically centred. BARE
           CHEVRONS, LARGE, NO CIRCLE, NO LABEL (founder, 2026-10-15, after
           outline circles and register glyphs were both tried): a 40px
-          arrow in band ink, dimmed until hovered. ON THE LOGO'S LINE: the
-          button's box starts 24px in, where the header's mark sits; the
-          arrow's own stroke sits in the middle of that box, well inside
-          the 56px rail the band's px-8 reserves (see bandClassName above);
-          below sm, 16px in. */}
+          arrow in band ink, dimmed until hovered. ON THE MARK'S LINE, INK
+          TO INK (founder, same day: "the chevrons don't quite align with
+          the brandmark either. they should"): lucide's chevron stroke
+          starts 15px into its 40px box, so the box sits 9px in and the
+          stroke begins at 24 — where the header's mark begins — and the
+          box ends at 49, inside the 54px rail. Mirrored on the right. */}
       {(
         [
-          ["Previous kind of favpoll", -1, ChevronLeft, "left-4 sm:left-6"],
-          ["Next kind of favpoll", 1, ChevronRight, "right-4 sm:right-6"],
+          ["Previous kind of favpoll", -1, ChevronLeft, "left-[9px]"],
+          ["Next kind of favpoll", 1, ChevronRight, "right-[9px]"],
         ] as const
       ).map(([label, by, Icon, side]) => (
         <div
