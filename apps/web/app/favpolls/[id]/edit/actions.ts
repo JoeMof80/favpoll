@@ -226,10 +226,16 @@ async function updateClosesAtInner(favpollId: string, closesAt: string) {
   const currentClosesAt = new Date(favpoll.closes_at)
   const isExtension = new Date(newClosesAt) > currentClosesAt
 
+  // IN THE FUTURE, WHICHEVER WAY IT MOVES (founder, 2026-10-15). The check
+  // sat inside the extension branch, so SHORTENING to a time already gone
+  // was accepted — and a close date in the past IS a close: the favpoll
+  // read as closed at once, every row locked, no way back. He did it by
+  // accident on a preview, picking today's date with the old time.
+  if (new Date(newClosesAt) <= new Date()) {
+    throw new Error("Closing date must be in the future")
+  }
+
   if (isExtension) {
-    if (new Date(newClosesAt) <= new Date()) {
-      throw new Error("Closing date must be in the future")
-    }
     if ((favpoll.extension_count ?? 0) >= 2) {
       throw new Error(
         "Maximum extensions reached. Please contact us to request a further extension."

@@ -209,6 +209,9 @@ export function EditableTextRow({
   )
 }
 
+/** How long the date row waits for the other half of an edit. */
+export const DATE_SAVE_DELAY_MS = 1200
+
 export function EditableDateRow({
   label,
   description,
@@ -230,18 +233,42 @@ export function EditableDateRow({
     setCurrent(value)
   }
 
-  async function change(next: Date) {
-    if (next.getTime() === current.getTime()) return
-    const before = current
+  // ONE SAVE PER EDIT (founder, 2026-10-15). The picker reports the date
+  // and the time as two changes, and each was its own save — so picking
+  // today, then a time, wrote the half-edited value first (today at the
+  // OLD time, already gone: the favpoll closed on the spot) and spent an
+  // extension on each half ("Maximum extensions reached" on the second).
+  // The row still updates at once; the save waits DATE_SAVE_DELAY_MS for
+  // the other half, and the last value wins. `committed` is what the
+  // server last accepted, for the revert.
+  const committed = useRef(value)
+  const pending = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(
+    () => () => {
+      if (pending.current) clearTimeout(pending.current)
+    },
+    []
+  )
+
+  function change(next: Date) {
     setCurrent(next)
-    flash({ kind: "saving" })
-    try {
-      await onSave(next)
-      flash({ kind: "saved" })
-    } catch (e) {
-      setCurrent(before)
-      flash({ kind: "error", message: errorText(e) })
+    if (pending.current) clearTimeout(pending.current)
+    if (next.getTime() === committed.current.getTime()) {
+      flash({ kind: "idle" })
+      return
     }
+    flash({ kind: "saving" })
+    pending.current = setTimeout(async () => {
+      pending.current = null
+      try {
+        await onSave(next)
+        committed.current = next
+        flash({ kind: "saved" })
+      } catch (e) {
+        setCurrent(committed.current)
+        flash({ kind: "error", message: errorText(e) })
+      }
+    }, DATE_SAVE_DELAY_MS)
   }
 
   return (
