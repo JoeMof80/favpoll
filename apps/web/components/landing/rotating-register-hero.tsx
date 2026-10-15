@@ -182,62 +182,47 @@ export function RotatingRegisterHero() {
                 isActive ? "opacity-100" : "pointer-events-none opacity-0"
               )}
             >
-              {/* pb-16 under the register's own band classes: the buttons
-                  overlay the band's bottom edge, and on a short phone the
-                  hero's content reaches it. The padding reserves that strip
-                  so nothing ever sits under a button. */}
+              {/* px-6 on top of the register's own band classes: room for
+                  the side buttons. The hero's content rail becomes 48px on
+                  home against 24px on the register pages — the one visible
+                  departure from "exactly as they are". */}
               <LandingHero
                 {...slide.hero}
-                bandClassName="bg-primary pb-16 text-primary-foreground"
+                bandClassName="bg-primary px-6 text-primary-foreground"
               />
             </div>
           )
         })}
       </div>
 
-      {/* Back and next (founder, 2026-10-15, replacing register pills): two
-          round ghost buttons in the hero's own outline idiom, on the hero's
-          left rail, over the bottom of the band. pointer-events are off on
-          the overlay and back on for the buttons, so the empty part of the
-          strip is just band. */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0">
-        <div className="mx-auto w-full px-6 pb-6 md:max-w-330">
-          <div
-            role="group"
-            aria-label="Kinds of favpoll"
-            className="pointer-events-auto flex items-center gap-2"
+      {/* Back and next AT THE SIDES (founder, 2026-10-15: "where they
+          belong"): one at each edge of the band, vertically centred, in the
+          hero's outline idiom. They overlay the band, not the content — the
+          section carries px-6 (see bandClassName above) so the hero's own
+          rail steps in to 48px and a 40px button at 8px from the edge never
+          touches a headline or the phone. */}
+      {(
+        [
+          ["Previous kind of favpoll", -1, ChevronLeft, "left-2"],
+          ["Next kind of favpoll", 1, ChevronRight, "right-2"],
+        ] as const
+      ).map(([label, by, Icon, side]) => (
+        <div
+          key={label}
+          className={cn("absolute inset-y-0 flex items-center", side)}
+        >
+          <Button
+            type="button"
+            size="icon"
+            variant="ghost"
+            aria-label={label}
+            onClick={() => step(by)}
+            className="size-10 rounded-full border border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
           >
-            <Button
-              type="button"
-              size="icon"
-              variant="ghost"
-              aria-label="Previous kind of favpoll"
-              onClick={() => step(-1)}
-              className="rounded-full border border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-            >
-              <ChevronLeft aria-hidden="true" />
-            </Button>
-            <Button
-              type="button"
-              size="icon"
-              variant="ghost"
-              aria-label="Next kind of favpoll"
-              onClick={() => step(1)}
-              className="rounded-full border border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-            >
-              <ChevronRight aria-hidden="true" />
-            </Button>
-            {/* Where you are, in band ink; the sentence a screen reader
-                already gets from the slide's label. */}
-            <span
-              aria-hidden="true"
-              className="ml-2 text-xs font-medium tracking-widest uppercase opacity-80"
-            >
-              {active.label}
-            </span>
-          </div>
+            <Icon aria-hidden="true" />
+          </Button>
         </div>
-      </div>
+      ))}
     </div>
   )
 }
