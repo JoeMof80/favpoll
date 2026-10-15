@@ -6,6 +6,9 @@ const refresh = vi.fn()
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn(), refresh }),
 }))
+vi.mock("@/components/landing/hero-texture", () => ({
+  HeroTexture: () => null,
+}))
 vi.mock("@/components/branded-qr", () => ({
   BrandedQR: (props: { "aria-label"?: string }) => (
     <div data-testid="branded-qr" aria-label={props["aria-label"]} />
@@ -44,6 +47,7 @@ vi.mock("@/components/favpoll-sheet", () => ({
   ),
 }))
 import { RoomShell } from "@/components/room-shell"
+import { HOLD_MS } from "@/components/room-shell/podium"
 
 const FAVPOLL = {
   id: "favpoll-1",
@@ -157,6 +161,61 @@ describe("RoomShell — the sheet on the screen in the room", () => {
         vi.advanceTimersByTime(11_000)
       })
       expect(refresh).not.toHaveBeenCalled()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it("the podium takes the screen at the close, then gives way to the typed note", () => {
+    vi.useFakeTimers()
+    try {
+      renderShell({
+        favpoll: {
+          ...FAVPOLL,
+          closes_at: new Date(Date.now() + 2_000).toISOString(),
+        },
+        pollWithItems: {
+          ...POLL,
+          topics: {
+            title: "Marathon hat",
+            favourites: [
+              {
+                id: "a",
+                label: "Sombrero",
+                all_time_pledged: 240,
+                all_time_count: 3,
+              },
+              {
+                id: "b",
+                label: "Fez",
+                all_time_pledged: 150,
+                all_time_count: 2,
+              },
+              {
+                id: "c",
+                label: "Tokyo",
+                all_time_pledged: 0,
+                all_time_count: 0,
+              },
+            ],
+          },
+        } as unknown as FavpollPollWithItems,
+      })
+      expect(screen.queryByTestId("podium")).not.toBeInTheDocument()
+      act(() => {
+        vi.advanceTimersByTime(2_100)
+      })
+      // Closed, podium up, the note NOT yet typing beneath it.
+      expect(screen.getByTestId("sheet").dataset.closed).toBe("true")
+      expect(screen.getByTestId("podium")).toBeInTheDocument()
+      expect(screen.getByTestId("sheet").dataset.reveal).toBe("false")
+      // Two pledged favourites: a two-step podium.
+      expect(document.querySelectorAll("[data-rank]")).toHaveLength(2)
+      act(() => {
+        vi.advanceTimersByTime(HOLD_MS + 100)
+      })
+      expect(screen.queryByTestId("podium")).not.toBeInTheDocument()
+      expect(screen.getByTestId("sheet").dataset.reveal).toBe("true")
     } finally {
       vi.useRealTimers()
     }

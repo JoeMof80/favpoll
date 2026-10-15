@@ -1,11 +1,12 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { BrandedQR } from "@/components/branded-qr"
 import { FavpollLogo } from "@/components/favpoll-logo"
 import { DisplayChrome } from "./display-chrome"
 import { FavpollSheet } from "@/components/favpoll-sheet"
+import { Podium, podiumSteps } from "./podium"
 import type { WallEntry } from "@/components/guest-book"
 import { DISPLAY_ROOM } from "@/lib/display"
 import type { FavpollWithDetails, FavpollPollWithItems } from "@favpoll/types"
@@ -126,6 +127,20 @@ export function RoomShell({
   }, [live, closesAt, isClosed])
   const effectiveClosed = isClosed || localClosed
 
+  // THE PODIUM before the finale (founder, 2026-10-15): the room witnessed
+  // the close, so the top three take the screen first — bronze, silver,
+  // gold — and only once the podium has given way does the sheet get
+  // `reveal` and type the note. A favpoll with no pledged favourite has
+  // no podium and goes straight to the note, as before.
+  const finale = localClosed && wasOpenAtMount
+  const steps = useMemo(
+    () => podiumSteps(pollWithItems?.topics.favourites ?? []),
+    [pollWithItems]
+  )
+  const [podiumDone, setPodiumDone] = useState(false)
+  const endPodium = useCallback(() => setPodiumDone(true), [])
+  const podiumShowing = finale && steps.length > 0 && !podiumDone
+
   return (
     <>
       {/* The presenter's chrome: the app header is suppressed on this
@@ -192,6 +207,14 @@ export function RoomShell({
           </div>
         ))}
 
+      {podiumShowing && (
+        <Podium
+          steps={steps}
+          topicTitle={pollWithItems?.topics.title ?? ""}
+          onDone={endPodium}
+        />
+      )}
+
       <FavpollSheet
         favpoll={favpoll}
         pollWithItems={pollWithItems}
@@ -204,7 +227,7 @@ export function RoomShell({
         organiser={organiser}
         presentation="room"
         heroVariant={variant}
-        reveal={localClosed && wasOpenAtMount}
+        reveal={finale && !podiumShowing}
         // The whole screen: no header above the sheet on this surface.
         shellHeight={still ? `${DISPLAY_ROOM.h}px` : "100vh"}
       />
