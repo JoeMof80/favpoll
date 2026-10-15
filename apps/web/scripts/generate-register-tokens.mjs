@@ -10,10 +10,22 @@
 // followed by `pnpm tokens`, never a hand-edit of app/register-tokens.css.
 //
 // WHAT THE RECIPE ENCODES. In light, the brand colour is --primary and the
-// surfaces are pale tints of it; in dark, the brand colour IS the page and
-// --primary flips to near-white so the logo reads. Purple's 0.44 lightness
-// does both jobs; the others need a lighter primary (white button text) and
-// a deeper page (near-white page ink), which is why pL and dL are separate.
+// surfaces are pale tints of it. Dark has TWO ramps (DARK_STYLE below):
+//
+// - "charcoal" (the site since 2026-10-15; founder: "the admin site's dark
+//   mode looks great. Can we use that for the main site?"): the admin's
+//   dark — a near-black page with a breath of the hue (L 0.15, c 0.02),
+//   cards a step lighter, translucent white borders — and the register
+//   carried by --primary as a LIGHT tint of the hue (L 0.75), so links,
+//   totals and the wordmark read on charcoal and a button is tint under
+//   charcoal text. The hero band becomes that tint too: a pale register
+//   band on a dark page, which is nearer the brand than the near-white
+//   band the brand ramp drew.
+// - "brand" (2026-08-30 → 2026-10-15, kept, not deleted): the brand colour
+//   IS the page and --primary flips to near-white so the logo reads.
+//   Purple's 0.44 lightness does both jobs; the others need a lighter
+//   primary (white button text) and a deeper page (near-white page ink),
+//   which is why pL and dL are separate. dL is only read by this ramp.
 //
 // One --primary is both a fill under white text and text on white (links,
 // totals, the wordmark), so a primary must sit at L ≲ 0.55. That is the
@@ -33,6 +45,9 @@
 import { writeFileSync, readFileSync } from "node:fs"
 import { dirname, join } from "node:path"
 import { fileURLToPath } from "node:url"
+
+/** Which dark ramp the site wears: "charcoal" or "brand". See the header. */
+export const DARK_STYLE = "charcoal"
 
 export const PALETTES = {
   default: { h: 252, c: 0.15, pL: 0.46, dL: 0.43, label: "Default — blue" },
@@ -136,7 +151,7 @@ export function ramp({ h, c, pL, dL }) {
     "--sidebar-ring": ok(0.62, 0.14),
     "--band-tint": tint(oklchToLinear(1, 0, 0), oklchToLinear(pL, c, h)),
   }
-  const dark = {
+  const darkBrand = {
     "--background": ok(dL, 0.18),
     "--foreground": ok(0.97, 0.01),
     "--card": ok(dL + 0.06, 0.17),
@@ -173,6 +188,55 @@ export function ramp({ h, c, pL, dL }) {
       oklchToLinear(0.97, 0.01 * f, h)
     ),
   }
+  // CHARCOAL — the admin's dark, per register. The admin's own numbers for
+  // the page, card, ink, muted, accent and borders (apps/admin/app/
+  // globals.css, h 278 there; the hue is the only thing that varies), then
+  // the site's extra tokens pitched to the same field: eyebrows and the
+  // ring a step under the primary tint, chart bars a ramp of the hue from
+  // the tint down to the page, the QR at the decoder's floor as before.
+  // Borders are translucent white, as the admin's: a 0.91 border (light's,
+  // which the brand ramp inherits) would glare on charcoal.
+  const darkCharcoal = {
+    "--background": ok(0.15, 0.02),
+    "--foreground": ok(0.97, 0.01),
+    "--card": ok(0.2, 0.02),
+    "--card-foreground": ok(0.97, 0.01),
+    "--popover": ok(0.2, 0.02),
+    "--popover-foreground": ok(0.97, 0.01),
+    "--primary": ok(0.75, 0.1),
+    "--primary-foreground": ok(0.15, 0.02),
+    "--secondary": ok(0.25, 0.03),
+    "--secondary-foreground": ok(0.97, 0.01),
+    "--muted": ok(0.25, 0.03),
+    "--muted-foreground": ok(0.7, 0.05),
+    "--accent": ok(0.28, 0.04),
+    "--accent-foreground": ok(0.97, 0.01),
+    "--border": "oklch(1 0 0 / 12%)",
+    "--border-strong": "oklch(1 0 0 / 28%)",
+    "--input": "oklch(1 0 0 / 10%)",
+    "--primary-muted": ok(0.7, 0.08),
+    "--reveal-foreground": ok(0.9, 0.04),
+    "--qr": ok(0.92, 0.05),
+    "--ring": ok(0.75, 0.1),
+    "--chart-1": ok(0.75, 0.1),
+    "--chart-2": ok(0.65, 0.1),
+    "--chart-3": ok(0.55, 0.09),
+    "--chart-4": ok(0.42, 0.07),
+    "--chart-5": ok(0.3, 0.04),
+    "--sidebar": ok(0.2, 0.02),
+    "--sidebar-foreground": ok(0.97, 0.01),
+    "--sidebar-primary": ok(0.75, 0.1),
+    "--sidebar-primary-foreground": ok(0.15, 0.02),
+    "--sidebar-accent": ok(0.25, 0.03),
+    "--sidebar-accent-foreground": ok(0.97, 0.01),
+    "--sidebar-border": "oklch(1 0 0 / 12%)",
+    "--sidebar-ring": ok(0.75, 0.1),
+    "--band-tint": tint(
+      oklchToLinear(0.15, 0.02 * f, h),
+      oklchToLinear(0.75, 0.1 * f, h)
+    ),
+  }
+  const dark = DARK_STYLE === "charcoal" ? darkCharcoal : darkBrand
   // PAPER — anything printed, or shown as a sheet on screen (the pack, the
   // keepsake): the palette's LIGHT values pinned regardless of the .dark
   // ancestor, because the sheet forces white and dark ink on it went
@@ -204,7 +268,7 @@ export function ramp({ h, c, pL, dL }) {
   // A sheet shown on screen keeps the app's border weight — the print
   // border reads as a hard outline drawn around every row at card size.
   const paperScreen = { "--border": ok(0.91, 0.02) }
-  return { light, dark, paper, paperScreen }
+  return { light, dark, darkBrand, darkCharcoal, paper, paperScreen }
 }
 
 // ── Contrast pairs worth knowing (WCAG: 4.5 text, 3 non-text) ───────────────
@@ -222,14 +286,45 @@ export function measure({ h, c, pL, dL }) {
       ["reveal ink on secondary", lin(0.29, 0.1), lin(0.96, 0.03), 4.5],
       ["border-strong on page (non-text)", lin(0.75, 0.1), white, 3],
     ],
-    dark: [
-      ["body ink on page", lin(0.97, 0.01), lin(dL, 0.18), 4.5],
-      ["muted text on page", lin(0.82, 0.07), lin(dL, 0.18), 4.5],
-      ["button text on primary", lin(dL, 0.18), lin(0.97, 0.01), 4.5],
-      ["eyebrow (primary-muted) on page", lin(0.82, 0.08), lin(dL, 0.18), 4.5],
-      ["ink on card", lin(0.97, 0.01), lin(dL + 0.06, 0.17), 4.5],
-      ["reveal ink on secondary", lin(0.95, 0.03), lin(dL + 0.08, 0.15), 4.5],
-    ],
+    dark:
+      DARK_STYLE === "charcoal"
+        ? [
+            ["body ink on page", lin(0.97, 0.01), lin(0.15, 0.02), 4.5],
+            ["muted text on page", lin(0.7, 0.05), lin(0.15, 0.02), 4.5],
+            ["button text on primary", lin(0.15, 0.02), lin(0.75, 0.1), 4.5],
+            [
+              "brand text / links on page",
+              lin(0.75, 0.1),
+              lin(0.15, 0.02),
+              4.5,
+            ],
+            [
+              "eyebrow (primary-muted) on page",
+              lin(0.7, 0.08),
+              lin(0.15, 0.02),
+              4.5,
+            ],
+            ["ink on card", lin(0.97, 0.01), lin(0.2, 0.02), 4.5],
+            ["reveal ink on secondary", lin(0.9, 0.04), lin(0.25, 0.03), 4.5],
+          ]
+        : [
+            ["body ink on page", lin(0.97, 0.01), lin(dL, 0.18), 4.5],
+            ["muted text on page", lin(0.82, 0.07), lin(dL, 0.18), 4.5],
+            ["button text on primary", lin(dL, 0.18), lin(0.97, 0.01), 4.5],
+            [
+              "eyebrow (primary-muted) on page",
+              lin(0.82, 0.08),
+              lin(dL, 0.18),
+              4.5,
+            ],
+            ["ink on card", lin(0.97, 0.01), lin(dL + 0.06, 0.17), 4.5],
+            [
+              "reveal ink on secondary",
+              lin(0.95, 0.03),
+              lin(dL + 0.08, 0.15),
+              4.5,
+            ],
+          ],
   }
   const out = {}
   for (const theme of ["light", "dark"]) {
@@ -260,7 +355,7 @@ export function renderCss() {
 `
   for (const [key, p] of Object.entries(PALETTES)) {
     const { light, dark } = ramp(p)
-    css += `\n/* ${p.label} — h ${p.h}, c ${p.c}, primary L ${p.pL}, dark page L ${p.dL} */\n`
+    css += `\n/* ${p.label} — h ${p.h}, c ${p.c}, primary L ${p.pL}, dark ${DARK_STYLE}${DARK_STYLE === "brand" ? ` page L ${p.dL}` : ""} */\n`
     if (key === "default") {
       css += `:root {\n${block(light)}\n}\n.dark {\n${block(dark)}\n}\n`
     } else {
