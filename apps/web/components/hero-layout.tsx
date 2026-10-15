@@ -49,6 +49,9 @@ type HeroLayoutProps = {
 // scroller's top alone.
 //
 
+/** How far the photo hangs below the band, in px. */
+const HANG = 32
+
 export function HeroLayout({
   eyebrowText,
   title,
@@ -70,7 +73,9 @@ export function HeroLayout({
   useEffect(() => {
     const el = pinnedRef.current
     const set = () => {
-      const bottom = pins ? headerInset + (el?.offsetHeight ?? 0) : headerInset
+      const bottom = pins
+        ? headerInset + (el?.offsetHeight ?? 0) + (avatar ? HANG : 0)
+        : headerInset
       document.documentElement.style.setProperty(
         "--hero-stuck-bottom",
         `${Math.round(bottom)}px`
@@ -89,24 +94,23 @@ export function HeroLayout({
       document.documentElement.style.removeProperty("--hero-collapse")
       document.documentElement.style.removeProperty("--hero-settle")
     }
-  }, [pins, headerInset])
+  }, [pins, headerInset, avatar])
 
   return (
     <>
-      {/* ONE PINNED BLOCK (founder, 2026-10-16: "scrolling the opening line
-          and photo feels pointless. it only saves a few pixels. don't
-          bother"): the band, the photo hanging off it at the right, the
-          eyebrow and the name stick together from the first pixel of
-          scroll; only the context and the About pass beneath. The photo's
-          top sits 32px into the 80px band — the same 32 as the shell's gap
-          at its right — and its bottom is level with the eyebrow row's
-          bottom. The block's bottom padding is painted air for what pins
-          beneath it. */}
+      {/* THE TEXT ON THE BAND (founder, 2026-10-16: "I was thinking it would
+          look the same as the slide in header, with the text on top of the
+          band"). One block, the same at rest and pinned, so nothing changes
+          size: the register-tinted band bleeding across the column's
+          gutters carries the opening line and the name; the photo hangs
+          off the band's bottom edge at the right; the context and the
+          About sit on the page beneath and pass under the block as it
+          pins. The block's published bottom includes the photo's hang, so
+          what pins beneath clears the photo. */}
       <div
         ref={pinnedRef}
         className={[
-          "relative bg-background pb-4",
-          avatar ? "" : "pt-6",
+          "relative",
           // EXPERIMENT (founder, 2026-10-16: "instead of sliding the header
           // in on mobile, should we achieve the effect by making the band
           // and image and name sticky?" — "try it"): sticky at EVERY width,
@@ -117,36 +121,29 @@ export function HeroLayout({
         ].join(" ")}
         style={pins ? { top: `${headerInset}px` } : undefined}
       >
+        <div
+          className={[
+            "-mx-6 bg-muted px-6 pt-5 pb-4 lg:-mr-8 lg:-ml-16 lg:pr-8 lg:pl-16",
+            avatar ? "pr-28 lg:pr-32" : "",
+          ].join(" ")}
+        >
+          {eyebrowText}
+          {title}
+        </div>
         {avatar && (
-          <>
-            <div
-              className="-mx-6 h-20 bg-muted lg:-mr-8 lg:-ml-16"
-              aria-hidden="true"
-            />
-            <div className="h-4" aria-hidden="true" />
-            {/* The size is inline as well as the class: the photo is the one
-                thing here that becomes a full-width image if the sizing is
-                ever missed (a stale stylesheet on iOS showed exactly that,
-                2026-10-16), and the img inside is h-full w-full. */}
-            <div
-              className="absolute top-8 right-0 size-24 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm"
-              style={{ width: 96, height: 96 }}
-            >
-              {avatar}
-            </div>
-          </>
+          /* 96px, hanging HANG below the band at the right; the size inline
+             as well as by class (a stale stylesheet once drew it full
+             width). */
+          <div
+            className="absolute right-0 size-24 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm"
+            style={{ width: 96, height: 96, bottom: -HANG }}
+          >
+            {avatar}
+          </div>
         )}
-        {/* pr-28 keeps a long opening line clear of the photo. */}
-        <div className={avatar ? "pr-28" : undefined}>{eyebrowText}</div>
-        {title}
       </div>
 
-      {/* -mt-4 takes back the name box's pb-4: that padding is PAINTED air
-          for the pinned state (the heading sits against it with no slit),
-          not spacing — the context keeps its own mt-4 as the one gap
-          (founder, 2026-10-16: "the space between the name and context is
-          too wide now"). */}
-      {subtitle && <div className="-mt-4 w-full">{subtitle}</div>}
+      {subtitle && <div className="w-full">{subtitle}</div>}
 
       {/* About — ordinary flow; it passes beneath the pinned name. */}
       <div className="mt-2 mb-3 lg:mt-6 lg:mb-6">{about}</div>
