@@ -118,7 +118,14 @@ export function HeroLayout({
               aria-hidden="true"
             />
             <div className="h-4" aria-hidden="true" />
-            <div className="absolute top-8 right-0 size-24 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm">
+            {/* The size is inline as well as the class: the photo is the one
+                thing here that becomes a full-width image if the sizing is
+                ever missed (a stale stylesheet on iOS showed exactly that,
+                2026-10-16), and the img inside is h-full w-full. */}
+            <div
+              className="absolute top-8 right-0 size-24 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm"
+              style={{ width: 96, height: 96 }}
+            >
               {avatar}
             </div>
           </>
