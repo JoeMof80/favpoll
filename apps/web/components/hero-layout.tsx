@@ -198,6 +198,16 @@ export function HeroLayout({
   // (a group favpoll's photo swallowed its name there). Tablets now get
   // the phone layout, which already works; this flag keeps step with the
   // lg: classes below, as it did with lg:.
+  // EXPERIMENT SWITCH (founder, 2026-10-15: "lets see" — A, the band,
+  // against C, the photo at the right of the eyebrow row). `?header=c` on
+  // the favpoll's URL shows C below lg; anything else shows A. Removed once
+  // he has chosen — never ship a URL-driven layout.
+  const [stacked, setStacked] = useState<"a" | "c">("a")
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("header") === "c")
+      setStacked("c")
+  }, [])
+
   const [isMobile, setIsMobile] = useState(false)
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 1023px)")
@@ -294,7 +304,7 @@ export function HeroLayout({
         // purpose — it exists for the moment iOS Safari drops the
         // header's sticky, and a see-through patch in that failure is
         // the bug it was added to fix.
-        className={`bg-background pb-4 lg:pt-16 ${avatar ? "pt-0" : "pt-6"} ${
+        className={`bg-background pb-4 lg:pt-16 ${avatar && stacked === "a" ? "pt-0" : "pt-6"} ${
           animate
             ? `lg:sticky lg:z-30 lg:before:absolute lg:before:inset-x-0 lg:before:-top-14 lg:before:h-14 lg:before:bg-background lg:supports-backdrop-filter:bg-background/85 lg:supports-backdrop-filter:backdrop-blur-md ${
                 // The scrollport already starts below the header in shell
@@ -324,7 +334,7 @@ export function HeroLayout({
             lives; here the row's avatar cell is hidden and the text runs
             full width. No avatar (a cause without a photo): no band, the
             text starts at the old pt-6. */}
-        {avatar && (
+        {avatar && stacked === "a" && (
           <div className="lg:hidden">
             <div className="-mx-6 h-24 bg-muted" aria-hidden="true" />
             <div className="-mt-12 mb-4 size-24 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm">
@@ -333,9 +343,25 @@ export function HeroLayout({
           </div>
         )}
         <div className="relative flex min-h-18 items-start gap-4 lg:min-h-21 lg:gap-6">
+          {/* C: the photo at the right of the eyebrow row, 80px, the name
+              beneath at full width (the eyebrow row grows to the photo's
+              height and centres the eyebrow against it). lg hides it. */}
+          {avatar && stacked === "c" && (
+            <div className="absolute top-0 right-0 size-20 overflow-hidden rounded-xl border border-border lg:hidden">
+              {avatar}
+            </div>
+          )}
           <div ref={textRef} className="min-w-0 flex-1">
             <div ref={settledRef}>
-              {eyebrowText}
+              <div
+                className={
+                  avatar && stacked === "c"
+                    ? "max-lg:flex max-lg:min-h-20 max-lg:items-center max-lg:pr-24"
+                    : undefined
+                }
+              >
+                {eyebrowText}
+              </div>
               {title}
             </div>
             {subtitle && !animate && <div className="w-full">{subtitle}</div>}
