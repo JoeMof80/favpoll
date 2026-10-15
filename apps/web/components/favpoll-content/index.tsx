@@ -13,6 +13,8 @@ import type {
 import { useFavpollContent } from "./use-favpoll-content"
 import { MobileCharityFooter } from "./mobile-charity-footer"
 import { StickyIdentityBar } from "./sticky-identity-bar"
+
+const SLIDE_IN_BAR = false
 import { FavpollSheet, type SheetViewer } from "@/components/favpoll-sheet"
 
 // THE GUEST LAYER (2026-09-30): the favpoll page in a guest's hand. The
@@ -190,18 +192,23 @@ export function FavpollContent({
       viewer={viewer}
       afterPoll={pledgeDialog}
     >
-      <StickyIdentityBar
-        name={
-          favpoll.subject === "cause"
-            ? (favpoll.cause_label ?? "")
-            : (favpoll.protagonists?.name ?? "")
-        }
-        photoUrl={favpoll.protagonists?.photo_url}
-        closesAt={isClosed ? null : favpoll.closes_at}
-        closedLabel={
-          isClosed ? `Poll closed${closedAt ? ` · ${closedAt}` : ""}` : null
-        }
-      />
+      {/* EXPERIMENT (2026-10-16): the hero block pins at every width now
+          (hero-layout), so the slide-in bar is off. Flip SLIDE_IN_BAR to
+          restore it. */}
+      {SLIDE_IN_BAR && (
+        <StickyIdentityBar
+          name={
+            favpoll.subject === "cause"
+              ? (favpoll.cause_label ?? "")
+              : (favpoll.protagonists?.name ?? "")
+          }
+          photoUrl={favpoll.protagonists?.photo_url}
+          closesAt={isClosed ? null : favpoll.closes_at}
+          closedLabel={
+            isClosed ? `Poll closed${closedAt ? ` · ${closedAt}` : ""}` : null
+          }
+        />
+      )}
       <MobileCharityFooter
         charities={favpoll.favpoll_charities.map((ec) => ec.charities)}
         totalRaised={totalRaised}

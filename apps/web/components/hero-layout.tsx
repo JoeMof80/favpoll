@@ -107,7 +107,13 @@ export function HeroLayout({
         className={[
           "relative bg-background pb-4",
           avatar ? "" : "pt-6",
-          pins ? "lg:sticky lg:z-30" : "",
+          // EXPERIMENT (founder, 2026-10-16: "instead of sliding the header
+          // in on mobile, should we achieve the effect by making the band
+          // and image and name sticky?" — "try it"): sticky at EVERY width,
+          // the slide-in identity bar switched off (favpoll-content). Was
+          // lg:sticky lg:z-30; revert both if the height or iOS's sticky
+          // bothers him.
+          pins ? "sticky z-30" : "",
         ].join(" ")}
         style={pins ? { top: `${headerInset}px` } : undefined}
       >
