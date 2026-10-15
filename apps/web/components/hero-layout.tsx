@@ -319,15 +319,18 @@ export function HeroLayout({
             heading and the charity footer still pin. No avatar (a cause
             without a photo): no band, the text starts at the old padding. */}
         {avatar && (
-          <div>
+          /* THE PHOTO HANGS OFF THE BAND, at the right, taking no height of
+             its own (founder, 2026-10-15: "move the hero up so the opening
+             line lines up with the bottom of the photo"). The band is 96
+             tall, the photo 96 with 48 below the band; the text starts 16
+             below the band, so the eyebrow's 32px row ends exactly at the
+             photo's bottom edge and the name begins just clear of it. */
+          <div className="relative mb-4">
             <div
               className="-mx-6 h-24 bg-muted lg:-mr-8 lg:-ml-16"
               aria-hidden="true"
             />
-            {/* At the RIGHT (founder, 2026-10-15: "lets align the photo to
-                the right"): where the side-by-side hero kept it, and the
-                name's left edge then starts clean on the rail. */}
-            <div className="-mt-12 mb-4 ml-auto size-24 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm">
+            <div className="absolute right-0 -bottom-12 size-24 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm">
               {avatar}
             </div>
           </div>
@@ -335,7 +338,8 @@ export function HeroLayout({
         <div className="relative flex min-h-18 items-start gap-4 lg:min-h-21 lg:gap-6">
           <div ref={textRef} className="min-w-0 flex-1">
             <div ref={settledRef}>
-              {eyebrowText}
+              {/* Clear of the photo hanging at the right. */}
+              <div className={avatar ? "pr-28" : undefined}>{eyebrowText}</div>
               {title}
             </div>
             {subtitle && !animate && <div className="w-full">{subtitle}</div>}
