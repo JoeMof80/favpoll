@@ -9,12 +9,7 @@ export default function LibraryPage() {
     section,
     entries: entriesIn(section).map((e) => ({
       ...e,
-      href:
-        e.kind === "reference"
-          ? `/library/${slugFor(e)}`
-          : e.kind === "pdf"
-            ? `/library/file/${e.source}`
-            : e.source,
+      href: e.kind === "reference" ? `/library/${slugFor(e)}` : e.source,
     })),
   }));
   const latest = [...LIBRARY].sort((a, b) => b.date.localeCompare(a.date))[0];

@@ -9,12 +9,14 @@
 // PR, so the library cannot drift from the work.
 //
 // A `reference` entry is rendered in-page by /library/[slug] (a reading
-// column); a `pdf` is served by /library/file/[name]; `artifact` and `doc`
-// open on claude.ai in a new tab (they need the founder's login; nothing to
-// embed). Only files named here can be read — the reader checks the registry
-// before touching the disk.
+// column); `artifact` and `doc` open on claude.ai in a new tab (they need
+// the founder's login; nothing to embed); `external` is any other link. No
+// PDF kind: references/*.pdf is gitignored, so the files are not in the
+// checkout Vercel builds from — the IoF template links to its publisher.
+// Only files named here can be read — the reader checks the registry before
+// touching the disk.
 
-export type LibraryKind = "reference" | "pdf" | "artifact" | "doc";
+export type LibraryKind = "reference" | "artifact" | "doc" | "external";
 
 export type LibraryEntry = {
   /** Shown as the title; the registry's own words, not the file's heading. */
@@ -22,7 +24,7 @@ export type LibraryEntry = {
   /** One line: what it is and why you would open it. */
   summary: string;
   kind: LibraryKind;
-  /** reference/pdf: the filename under references/. artifact/doc: the URL. */
+  /** reference: the filename under references/. Otherwise: the URL. */
   source: string;
   /** ISO date of the document's last substantive revision. */
   date: string;
@@ -96,9 +98,10 @@ export const LIBRARY: LibraryEntry[] = [
   {
     title: "IoF / Bates Wells standard-form agreement (Charities Act 1992)",
     summary:
-      "The free drafting template a commercial participator agreement starts from. Published by PPGF's own solicitors.",
-    kind: "pdf",
-    source: "iof-bates-wells-standard-form-agreement-charities-act-1992.pdf",
+      "The free drafting template a commercial participator agreement starts from, with the IoF's guidance notes. Published by PPGF's own solicitors; a copy sits in references/ (gitignored).",
+    kind: "external",
+    source:
+      "https://www.dsc.org.uk/wp-content/uploads/2016/11/StandardFormofAgreementGuidanceNotes.doIoF-c.pdf",
     date: "2026-10-14",
     section: "The rail & the law",
   },
@@ -369,13 +372,11 @@ export const LIBRARY: LibraryEntry[] = [
 
 /** The slug a reference reads at: its filename without the extension. */
 export function slugFor(entry: LibraryEntry): string {
-  return entry.source.replace(/\.(md|pdf)$/i, "");
+  return entry.source.replace(/\.md$/i, "");
 }
 
 export function findBySlug(slug: string): LibraryEntry | undefined {
-  return LIBRARY.find(
-    (e) => (e.kind === "reference" || e.kind === "pdf") && slugFor(e) === slug,
-  );
+  return LIBRARY.find((e) => e.kind === "reference" && slugFor(e) === slug);
 }
 
 export function entriesIn(section: LibrarySection): LibraryEntry[] {

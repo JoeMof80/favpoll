@@ -24,12 +24,3 @@ export async function readReference(
   );
   return { entry, markdown };
 }
-
-export async function readPdf(
-  name: string,
-): Promise<{ entry: LibraryEntry; bytes: Buffer } | null> {
-  const entry = findBySlug(name.replace(/\.pdf$/i, ""));
-  if (!entry || entry.kind !== "pdf") return null;
-  const bytes = await readFile(path.join(REFERENCES_DIR, entry.source));
-  return { entry, bytes };
-}

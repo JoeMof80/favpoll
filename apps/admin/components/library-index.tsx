@@ -2,29 +2,23 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import {
-  ExternalLink,
-  FileText,
-  FileDown,
-  BookOpen,
-  Search,
-} from "lucide-react";
+import { ExternalLink, FileText, BookOpen, Search, Link2 } from "lucide-react";
 import type { LibraryEntry, LibrarySection } from "@/lib/library";
 
 type Row = LibraryEntry & { href: string };
 
 const KIND_LABEL: Record<LibraryEntry["kind"], string> = {
   reference: "Note",
-  pdf: "PDF",
   artifact: "Claude artifact",
   doc: "Claude doc",
+  external: "Link",
 };
 
 const KIND_ICON = {
   reference: FileText,
-  pdf: FileDown,
   artifact: ExternalLink,
   doc: BookOpen,
+  external: Link2,
 } as const;
 
 export function LibraryIndex({
@@ -72,7 +66,7 @@ export function LibraryIndex({
             <ul className="divide-y divide-border rounded-lg border border-border bg-card">
               {shown.map((e) => {
                 const Icon = KIND_ICON[e.kind];
-                const external = e.kind === "artifact" || e.kind === "doc";
+                const external = e.kind !== "reference";
                 const inner = (
                   <>
                     <Icon

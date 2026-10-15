@@ -8,13 +8,13 @@ const REFERENCES = path.resolve(__dirname, "../../../../references");
 describe("the library registry", () => {
   it("names only files that exist, and URLs that are claude.ai's", () => {
     for (const e of LIBRARY) {
-      if (e.kind === "reference" || e.kind === "pdf") {
+      if (e.kind === "reference") {
         expect(existsSync(path.join(REFERENCES, e.source)), e.source).toBe(
           true,
         );
-        expect(e.source, e.source).toMatch(
-          e.kind === "pdf" ? /\.pdf$/ : /\.md$/,
-        );
+        expect(e.source, e.source).toMatch(/\.md$/);
+      } else if (e.kind === "external") {
+        expect(e.source, e.title).toMatch(/^https:\/\//);
       } else {
         expect(e.source, e.title).toMatch(/^https:\/\/claude\.ai\//);
       }
@@ -27,9 +27,7 @@ describe("the library registry", () => {
   it("has one entry per source and one slug per file", () => {
     const sources = LIBRARY.map((e) => e.source);
     expect(new Set(sources).size).toBe(sources.length);
-    const slugs = LIBRARY.filter(
-      (e) => e.kind !== "artifact" && e.kind !== "doc",
-    ).map(slugFor);
+    const slugs = LIBRARY.filter((e) => e.kind === "reference").map(slugFor);
     expect(new Set(slugs).size).toBe(slugs.length);
   });
 
