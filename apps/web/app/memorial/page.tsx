@@ -1,4 +1,5 @@
 import { RegisterScope } from "@/components/register-scope"
+import { Fold } from "@/components/landing/fold"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { LandingHero } from "@/components/landing/hero"
@@ -145,20 +146,21 @@ export default async function MemorialsPage() {
           volume. The wake HEADING is gone but not lost; its body opens "The
           service isn't the moment — the wake is", which is the heading in a
           sentence. ── */}
-        <LandingHero
-          sceneKind="memorial"
-          compact
-          still
-          eyebrow={t("memorials.eyebrow")}
-          headline={t("memorials.headline")}
-          subheader={t("memorials.subheader")}
-          ctaLabel={t("memorials.cta.primary")}
-          ctaHref="/favpolls/new?category=memorial"
-          ctaSecondaryLabel={t("memorials.cta.secondary")}
-          hideStats
-        />
+        <Fold>
+          <LandingHero
+            sceneKind="memorial"
+            compact
+            still
+            eyebrow={t("memorials.eyebrow")}
+            headline={t("memorials.headline")}
+            subheader={t("memorials.subheader")}
+            ctaLabel={t("memorials.cta.primary")}
+            ctaHref="/favpolls/new?category=memorial"
+            ctaSecondaryLabel={t("memorials.cta.secondary")}
+            hideStats
+          />
 
-        {/* ── How it works ─────────────────────────────────────────────────
+          {/* ── How it works ─────────────────────────────────────────────────
           DIRECTLY BELOW THE HERO (founder, 2026-08-26), which is where
           /celebrations and /fundraisers already had it. Memorials became the
           outlier earlier today when the tailoring band was inserted above it.
@@ -169,7 +171,8 @@ export default async function MemorialsPage() {
           the hero's second CTA says "See how it works" and targets #how, so
           with a band in between it skipped the largest section on the page
           and landed the reader two sections down. ── */}
-        <HowItWorksSteps title={t("memorials.how.title")} steps={STEPS} />
+          <HowItWorksSteps title={t("memorials.how.title")} steps={STEPS} />
+        </Fold>
 
         {/* ── How to tailor it to a memorial ─────────────────────────────────
           NOT a gallery of objects (founder, 2026-08-26). These four say how

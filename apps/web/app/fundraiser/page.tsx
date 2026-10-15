@@ -1,4 +1,5 @@
 import { RegisterScope } from "@/components/register-scope"
+import { Fold } from "@/components/landing/fold"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { LandingHero } from "@/components/landing/hero"
@@ -192,25 +193,27 @@ export default async function FundraisersPage() {
           the same shape as the other two (see /celebrations for the `still`
           reasoning). The page wears the fundraiser palette (RegisterScope)
           and the handset wears its scene's — green, both (2026-08-30). ── */}
-        <LandingHero
-          sceneKind="fundraiser"
-          compact
-          scene={FUNDRAISER_SCENE}
-          still
-          eyebrow={t("fundraisers.eyebrow")}
-          headline={t("fundraisers.headline")}
-          subheader={t("fundraisers.subheader")}
-          ctaLabel={t("fundraisers.cta.primary")}
-          ctaHref="/favpolls/new?category=fundraiser"
-          ctaSecondaryLabel={t("fundraisers.cta.secondary")}
-          hideStats
-        />
+        <Fold>
+          <LandingHero
+            sceneKind="fundraiser"
+            compact
+            scene={FUNDRAISER_SCENE}
+            still
+            eyebrow={t("fundraisers.eyebrow")}
+            headline={t("fundraisers.headline")}
+            subheader={t("fundraisers.subheader")}
+            ctaLabel={t("fundraisers.cta.primary")}
+            ctaHref="/favpolls/new?category=fundraiser"
+            ctaSecondaryLabel={t("fundraisers.cta.secondary")}
+            hideStats
+          />
 
-        {/* ── How it works, in the rally register ── */}
-        <HowItWorksSteps
-          title={t("fundraisers.how.title")}
-          steps={STEPS.map((step, i) => ({ ...step, media: STEP_MEDIA[i] }))}
-        />
+          {/* ── How it works, in the rally register ── */}
+          <HowItWorksSteps
+            title={t("fundraisers.how.title")}
+            steps={STEPS.map((step, i) => ({ ...step, media: STEP_MEDIA[i] }))}
+          />
+        </Fold>
 
         <IdeasSection title={t("fundraisers.artefacts.title")} ideas={IDEAS} />
 
