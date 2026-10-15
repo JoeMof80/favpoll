@@ -16,7 +16,7 @@
 // subheader, CTA pair, one still phone — and this component renders those
 // three configurations, unchanged, stacked in one grid cell, and crossfades
 // between them. Nothing here is a new idiom: the slides are the register
-// pages' own heroes, and back/next wear the hero's own outline idiom.
+// pages' own heroes, and back/next are chevrons in the hero's outline idiom.
 //
 // The mechanics that matter:
 // - EACH SLIDE IS ITS OWN REGISTER. `data-register={palette}` (the element-
@@ -37,7 +37,7 @@
 //   that on the first preview, 2026-10-15). Auto-advance exists so a visitor
 //   who does nothing still reads all three scenarios — the thing Gary needed.
 import { useEffect, useRef, useState, useSyncExternalStore } from "react"
-import { Balloon, Flower2, Medal, type LucideIcon } from "lucide-react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { LandingHero } from "@/components/landing/hero"
 import {
   FUNDRAISER_SCENE,
@@ -61,15 +61,11 @@ type Palette = "memorial" | "celebration" | "fundraiser"
 const SLIDES: ReadonlyArray<{
   palette: Palette
   label: string
-  /** The wizard's own register glyphs (event-step.tsx), so the hero's
-   *  buttons and the Event step agree on what a register looks like. */
-  icon: LucideIcon
   hero: React.ComponentProps<typeof LandingHero>
 }> = [
   {
     palette: "memorial",
     label: t("home.router.memorials.title"),
-    icon: Flower2,
     hero: {
       sceneKind: "memorial",
       still: true,
@@ -85,7 +81,6 @@ const SLIDES: ReadonlyArray<{
   {
     palette: "celebration",
     label: t("home.router.celebrations.title"),
-    icon: Balloon,
     hero: {
       sceneKind: "celebration",
       scene: WEDDING_SCENE,
@@ -102,7 +97,6 @@ const SLIDES: ReadonlyArray<{
   {
     palette: "fundraiser",
     label: t("home.router.fundraisers.title"),
-    icon: Medal,
     hero: {
       sceneKind: "fundraiser",
       scene: FUNDRAISER_SCENE,
@@ -230,61 +224,34 @@ export function RotatingRegisterHero() {
 
       {/* Back and next AT THE SIDES (founder, 2026-10-15: "where they
           belong"): one at each edge of the band, vertically centred, in the
-          hero's outline idiom. Each wears the glyph of the register it LEADS
-          TO rather than a chevron — so the button is a door, not an arrow:
-          you can see which register is behind it before you press. On hover
-          or keyboard focus the circle widens into a pill and the register's
-          NAME opens inside it (founder, same day: inside the button, not a
-          tooltip), each growing INTO the band — label after the glyph on the
-          left, before it on the right. Touch has no hover, so there it stays
-          a glyph; the aria-label carries direction and name for everyone.
-          48px circle, 24px glyph: at the Button default of 16 the glyphs
-          read as dots (founder).
-          The buttons overlay the band, not the content — the section carries
-          px-6 (see bandClassName above) so the hero's own rail steps in to
-          48px and a 40px button at 8px from the edge never touches a
-          headline or the phone. */}
+          hero's outline idiom. CHEVRONS, SMALL, NO LABEL — the register
+          glyphs with a name opening on hover were tried the same night and
+          the founder preferred plain arrows: the slide itself says which
+          register it is, and the buttons should only say "next". 40px
+          circle, 20px chevron, 4px from the edge, so they end inside the
+          48px rail the band's px-6 reserves (see bandClassName above). */}
       {(
         [
-          ["Previous", -1, "left-2"],
-          ["Next", 1, "right-2"],
+          ["Previous kind of favpoll", -1, ChevronLeft, "left-1"],
+          ["Next kind of favpoll", 1, ChevronRight, "right-1"],
         ] as const
-      ).map(([direction, by, side]) => {
-        const target = SLIDES[at(by)]
-        const Icon = target.icon
-        const label = (
-          <span
-            aria-hidden="true"
-            className={cn(
-              "max-w-0 overflow-hidden text-sm font-medium whitespace-nowrap opacity-0 transition-all duration-300",
-              "group-hover/button:max-w-40 group-hover/button:opacity-100 group-focus-visible/button:max-w-40 group-focus-visible/button:opacity-100",
-              by === 1
-                ? "group-hover/button:mr-2 group-focus-visible/button:mr-2"
-                : "group-hover/button:ml-2 group-focus-visible/button:ml-2"
-            )}
+      ).map(([label, by, Icon, side]) => (
+        <div
+          key={label}
+          className={cn("absolute inset-y-0 z-10 flex items-center", side)}
+        >
+          <Button
+            type="button"
+            size="icon"
+            variant="ghost"
+            aria-label={label}
+            onClick={() => step(by)}
+            className="size-10 rounded-full border border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
           >
-            {target.label}
-          </span>
-        )
-        return (
-          <div
-            key={direction}
-            className={cn("absolute inset-y-0 z-10 flex items-center", side)}
-          >
-            <Button
-              type="button"
-              variant="ghost"
-              aria-label={`${direction}: ${target.label}`}
-              onClick={() => step(by)}
-              className="h-12 gap-0 rounded-full border border-primary-foreground/30 px-3 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-            >
-              {by === 1 && label}
-              <Icon aria-hidden="true" className="size-6" />
-              {by === -1 && label}
-            </Button>
-          </div>
-        )
-      })}
+            <Icon aria-hidden="true" className="size-5" />
+          </Button>
+        </div>
+      ))}
     </div>
   )
 }
