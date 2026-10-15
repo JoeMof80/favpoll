@@ -56,7 +56,8 @@ type HeroLayoutProps = {
 //
 // Geometry, in Tailwind's 4px units. The eyebrow is the hero's own
 // SectionEyebrow: h-8 with mb-2, a 40px row.
-const BAND = 24 // h-24
+const BAND = 20 // h-20 (founder, 2026-10-16: was 24; the photo's gap above
+// now equals the shell's 32px gap at its right)
 const STRIP = 4 // h-4 — the air between the band and the eyebrow
 // (the eyebrow row, h-8 + mb-2 = 10 units, is the wrapper's own last child
 // and needs no constant)
@@ -119,7 +120,7 @@ export function HeroLayout({
   const PIN = avatar ? BAND * 4 + STRIP * 4 : NO_BAND_TOP * 4 // 112 | 24
   const GLYPH_TAIL = 10
   const LEAD = GLYPH_TAIL + 8
-  const PHOTO_REST_TOP = 48 // hanging: bottom level with the eyebrow row's bottom
+  const PHOTO_REST_TOP = PIN + 32 - 96 // hanging: a 96px photo whose bottom is level with the 32px eyebrow row's bottom
   const PHOTO_HANG = PIN - PHOTO_REST_TOP // the holder sits at PIN
   const PIN_SCROLL = 32 - GLYPH_TAIL // 22: the glyphs reach the strip
   const at = (y: number) => `${headerInset + y}px`
@@ -135,7 +136,7 @@ export function HeroLayout({
         {avatar ? (
           <>
             <div
-              className="-mx-6 h-24 bg-muted lg:-mr-8 lg:-ml-16"
+              className="-mx-6 h-20 bg-muted lg:-mr-8 lg:-ml-16"
               aria-hidden="true"
             />
             <div className="h-4" aria-hidden="true" />
