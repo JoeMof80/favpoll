@@ -44,7 +44,6 @@ import {
   WEDDING_SCENE,
 } from "@/components/landing/demo-fixture"
 import { Button } from "@/components/ui/button"
-import { Tooltip, TooltipProvider } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 import { t } from "@/lib/i18n"
 
@@ -206,44 +205,60 @@ export function RotatingRegisterHero() {
       {/* Back and next AT THE SIDES (founder, 2026-10-15: "where they
           belong"): one at each edge of the band, vertically centred, in the
           hero's outline idiom. Each wears the glyph of the register it LEADS
-          TO rather than a chevron, and names it on hover (founder, same
-          day) — so the button is a door, not an arrow: you can see which
-          register is behind it before you press. The tooltip is hover-only
-          by nature; the aria-label carries both the direction and the name.
+          TO rather than a chevron — so the button is a door, not an arrow:
+          you can see which register is behind it before you press. On hover
+          or keyboard focus the circle widens into a pill and the register's
+          NAME opens inside it (founder, same day: inside the button, not a
+          tooltip), each growing INTO the band — label after the glyph on the
+          left, before it on the right. Touch has no hover, so there it stays
+          a glyph; the aria-label carries direction and name for everyone.
+          48px circle, 24px glyph: at the Button default of 16 the glyphs
+          read as dots (founder).
           The buttons overlay the band, not the content — the section carries
           px-6 (see bandClassName above) so the hero's own rail steps in to
           48px and a 40px button at 8px from the edge never touches a
           headline or the phone. */}
-      <TooltipProvider>
-        {(
-          [
-            ["Previous", -1, "left-2", "right"],
-            ["Next", 1, "right-2", "left"],
-          ] as const
-        ).map(([direction, by, side, tipSide]) => {
-          const target = SLIDES[at(by)]
-          const Icon = target.icon
-          return (
-            <div
-              key={direction}
-              className={cn("absolute inset-y-0 flex items-center", side)}
+      {(
+        [
+          ["Previous", -1, "left-2"],
+          ["Next", 1, "right-2"],
+        ] as const
+      ).map(([direction, by, side]) => {
+        const target = SLIDES[at(by)]
+        const Icon = target.icon
+        const label = (
+          <span
+            aria-hidden="true"
+            className={cn(
+              "max-w-0 overflow-hidden text-sm font-medium whitespace-nowrap opacity-0 transition-all duration-300",
+              "group-hover/button:max-w-40 group-hover/button:opacity-100 group-focus-visible/button:max-w-40 group-focus-visible/button:opacity-100",
+              by === 1
+                ? "group-hover/button:mr-2 group-focus-visible/button:mr-2"
+                : "group-hover/button:ml-2 group-focus-visible/button:ml-2"
+            )}
+          >
+            {target.label}
+          </span>
+        )
+        return (
+          <div
+            key={direction}
+            className={cn("absolute inset-y-0 z-10 flex items-center", side)}
+          >
+            <Button
+              type="button"
+              variant="ghost"
+              aria-label={`${direction}: ${target.label}`}
+              onClick={() => step(by)}
+              className="h-12 gap-0 rounded-full border border-primary-foreground/30 px-3 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
             >
-              <Tooltip content={target.label} side={tipSide}>
-                <Button
-                  type="button"
-                  size="icon"
-                  variant="ghost"
-                  aria-label={`${direction}: ${target.label}`}
-                  onClick={() => step(by)}
-                  className="size-10 rounded-full border border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-                >
-                  <Icon aria-hidden="true" />
-                </Button>
-              </Tooltip>
-            </div>
-          )
-        })}
-      </TooltipProvider>
+              {by === 1 && label}
+              <Icon aria-hidden="true" className="size-6" />
+              {by === -1 && label}
+            </Button>
+          </div>
+        )
+      })}
     </div>
   )
 }
