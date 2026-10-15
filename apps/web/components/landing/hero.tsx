@@ -71,6 +71,13 @@ type Props = {
    *  call site). Defaults = the home landing's keys. */
   headline?: string
   subheader?: string
+  /** THE ONE INVARIANT (Gary, 2026-09-23). The cold reader's third wrong
+   *  category was participatory budgeting — pick X, give £100, the plain
+   *  inference is that £100 funds X — and "Give what it's worth" invites it.
+   *  The founder's own six-word correction, "all the money goes to the
+   *  hospice", is what the header lacked. Its own line, so the subheader
+   *  (pinned by tests and reused in an email) is untouched. */
+  invariant?: string
   ctaLabel?: string
   /** Primary CTA destination — a register page passes the wizard URL
    *  with its ?category= preselect so the Event step arrives answered
@@ -231,6 +238,7 @@ export function LandingHero({
   scene: sceneOverride,
   headline,
   subheader,
+  invariant,
   ctaLabel,
   ctaHref,
   ctaSecondaryLabel,
@@ -403,13 +411,27 @@ export function LandingHero({
           </h1>
           <p
             className={cn(
-              "mb-8 text-lg leading-relaxed opacity-80",
+              invariant ? "mb-3" : "mb-8",
+              "text-lg leading-relaxed opacity-80",
               // The subheader must not be WIDER than the headline above it.
               sceneKind ? "max-w-xl" : router ? "max-w-2xl" : "max-w-md"
             )}
           >
             {subheader ?? t("landing.subheader")}
           </p>
+          {invariant && (
+            /* A fact, not soul: full ink and a touch of weight, so it is
+               the one sentence that cannot be skimmed past. Same width
+               rule as the subheader. */
+            <p
+              className={cn(
+                "mb-8 text-base leading-relaxed font-medium",
+                sceneKind ? "max-w-xl" : router ? "max-w-2xl" : "max-w-md"
+              )}
+            >
+              {invariant}
+            </p>
+          )}
           {children}
           <div className="flex flex-wrap items-center gap-x-5 gap-y-3.5">
             {/* The hero's only conversion action under a display headline —

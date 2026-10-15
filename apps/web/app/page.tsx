@@ -4,7 +4,7 @@ import Link from "next/link"
 import { fetchLiveFavpolls } from "@/lib/live-favpolls"
 import { Button } from "@/components/ui/button"
 import { withQuietTail } from "@/components/landing/quiet-tail"
-import { LandingHero } from "@/components/landing/hero"
+import { RotatingRegisterHero } from "@/components/landing/rotating-register-hero"
 import { OpenRightNow } from "@/components/landing/open-right-now"
 import { HeroTexture } from "@/components/landing/hero-texture"
 import { RecordFlow } from "@/components/landing/record-flow"
@@ -26,12 +26,14 @@ export default async function HomePage() {
   // moved.
   const normalised = await fetchLiveFavpolls()
 
-  const totalLive = normalised.reduce((sum, f) => sum + f.total_raised, 0)
-
   return (
     <main className="flex flex-col">
-      {/* ── Purple hero band with the live demo ── */}
-      <LandingHero liveCount={normalised.length} totalLive={totalLive} router />
+      {/* ── The hero: the three register heroes, rotated. The home-only
+          router cards and live stats left the band on 2026-10-15 (founder):
+          the register heroes say what a favpoll IS by being specific; the
+          home copy was vague because it covered everything. The open count
+          and raised total still show on the shelf below. ── */}
+      <RotatingRegisterHero />
 
       <ProcessOverview />
 

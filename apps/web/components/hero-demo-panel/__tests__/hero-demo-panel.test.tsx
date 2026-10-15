@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
-import { render, screen, fireEvent } from "@testing-library/react"
+import { render, screen, fireEvent, act } from "@testing-library/react"
 import type { Phase } from "../scenes"
 
 // ── Framer-motion stub ────────────────────────────────────────────────────────
@@ -63,6 +63,10 @@ vi.mock("@/components/pledge-dialog/step-amount", () => ({
 
 import { DemoCard } from "../demo-card"
 import { LandingHero } from "@/components/landing/hero"
+import {
+  RotatingRegisterHero,
+  DWELL_MS,
+} from "@/components/landing/rotating-register-hero"
 import { SCENES } from "../scenes"
 import { DECOY_WIDTHS } from "@/lib/decoys"
 
@@ -488,5 +492,121 @@ describe("LandingHero — compact (the register pages)", () => {
       "min-h-[calc(100vh-3.5rem)]"
     )
     expect(container.querySelector(".lg\\:h-\\[608px\\]")).not.toBeNull()
+  })
+})
+
+// ── RotatingRegisterHero ──────────────────────────────────────────────────────
+// The home hero since 2026-10-15: the three register heroes, unchanged, in
+// one grid cell, crossfaded. These pin the contract, not the look: every
+// slide is laid out, exactly one is live, back/next move it by hand and
+// restart the dwell, and the rotation never starts under reduced motion.
+describe("RotatingRegisterHero", () => {
+  const slides = () =>
+    Array.from(
+      document.querySelectorAll<HTMLElement>('[aria-roledescription="slide"]')
+    )
+  const live = () =>
+    slides().filter((s) => s.getAttribute("aria-hidden") !== "true")
+
+  function stubMotion(reduced: boolean) {
+    Object.defineProperty(window, "matchMedia", {
+      writable: true,
+      value: vi.fn().mockImplementation((query: string) => ({
+        matches: reduced && query.includes("reduce"),
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    })
+  }
+
+  beforeEach(() => {
+    vi.useFakeTimers()
+    stubMotion(false)
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+    vi.restoreAllMocks()
+  })
+
+  it("lays out all three register heroes and keeps exactly one live", () => {
+    render(<RotatingRegisterHero />)
+    const all = slides()
+    expect(all).toHaveLength(3)
+    expect(all.map((s) => s.dataset.register)).toEqual([
+      "memorial",
+      "celebration",
+      "fundraiser",
+    ])
+    // Each slide carries its register's own headline, as the register page does.
+    expect(all[0].textContent).toContain(
+      "Honour them by sharing what they loved"
+    )
+    expect(all[1].textContent).toContain(
+      "Celebrate them by sharing what they love"
+    )
+    expect(all[2].textContent).toContain(
+      "Fundraise by sharing what we all love"
+    )
+    expect(live().map((s) => s.dataset.register)).toEqual(["memorial"])
+    expect(all[0].hasAttribute("inert")).toBe(false)
+    expect(all[1].hasAttribute("inert")).toBe(true)
+  })
+
+  it("advances on its own after the dwell", () => {
+    render(<RotatingRegisterHero />)
+    act(() => {
+      vi.advanceTimersByTime(DWELL_MS)
+    })
+    expect(live().map((s) => s.dataset.register)).toEqual(["celebration"])
+    act(() => {
+      vi.advanceTimersByTime(DWELL_MS * 2)
+    })
+    // Wraps: fundraiser, then back to memorial.
+    expect(live().map((s) => s.dataset.register)).toEqual(["memorial"])
+  })
+
+  it("next and back move it by hand, wrapping both ways", () => {
+    render(<RotatingRegisterHero />)
+    // Each button names the register it leads to, not a direction alone.
+    fireEvent.click(
+      screen.getByRole("button", { name: "Previous: Fundraiser" })
+    )
+    expect(live().map((s) => s.dataset.register)).toEqual(["fundraiser"])
+    fireEvent.click(screen.getByRole("button", { name: "Next: Memorial" }))
+    fireEvent.click(screen.getByRole("button", { name: "Next: Celebration" }))
+    expect(live().map((s) => s.dataset.register)).toEqual(["celebration"])
+  })
+
+  it("a manual move restarts the dwell from that slide, and the rotation goes on", () => {
+    render(<RotatingRegisterHero />)
+    act(() => {
+      vi.advanceTimersByTime(DWELL_MS - 1000)
+    })
+    fireEvent.click(screen.getByRole("button", { name: /^Next:/ }))
+    expect(live().map((s) => s.dataset.register)).toEqual(["celebration"])
+    // The old tick (1s away) must not fire; the new slide gets its full dwell.
+    act(() => {
+      vi.advanceTimersByTime(DWELL_MS - 1000)
+    })
+    expect(live().map((s) => s.dataset.register)).toEqual(["celebration"])
+    act(() => {
+      vi.advanceTimersByTime(1000)
+    })
+    expect(live().map((s) => s.dataset.register)).toEqual(["fundraiser"])
+  })
+
+  it("never starts under prefers-reduced-motion", () => {
+    stubMotion(true)
+    render(<RotatingRegisterHero />)
+    act(() => {
+      vi.advanceTimersByTime(DWELL_MS * 3)
+    })
+    expect(live().map((s) => s.dataset.register)).toEqual(["memorial"])
   })
 })
