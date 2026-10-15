@@ -37,13 +37,14 @@
 //   that on the first preview, 2026-10-15). Auto-advance exists so a visitor
 //   who does nothing still reads all three scenarios — the thing Gary needed.
 import { useEffect, useState, useSyncExternalStore } from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { Balloon, Flower2, Medal, type LucideIcon } from "lucide-react"
 import { LandingHero } from "@/components/landing/hero"
 import {
   FUNDRAISER_SCENE,
   WEDDING_SCENE,
 } from "@/components/landing/demo-fixture"
 import { Button } from "@/components/ui/button"
+import { Tooltip, TooltipProvider } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 import { t } from "@/lib/i18n"
 
@@ -60,11 +61,15 @@ type Palette = "memorial" | "celebration" | "fundraiser"
 const SLIDES: ReadonlyArray<{
   palette: Palette
   label: string
+  /** The wizard's own register glyphs (event-step.tsx), so the hero's
+   *  buttons and the Event step agree on what a register looks like. */
+  icon: LucideIcon
   hero: React.ComponentProps<typeof LandingHero>
 }> = [
   {
     palette: "memorial",
     label: t("home.router.memorials.title"),
+    icon: Flower2,
     hero: {
       sceneKind: "memorial",
       still: true,
@@ -80,6 +85,7 @@ const SLIDES: ReadonlyArray<{
   {
     palette: "celebration",
     label: t("home.router.celebrations.title"),
+    icon: Balloon,
     hero: {
       sceneKind: "celebration",
       scene: WEDDING_SCENE,
@@ -96,6 +102,7 @@ const SLIDES: ReadonlyArray<{
   {
     palette: "fundraiser",
     label: t("home.router.fundraisers.title"),
+    icon: Medal,
     hero: {
       sceneKind: "fundraiser",
       scene: FUNDRAISER_SCENE,
@@ -150,8 +157,9 @@ export function RotatingRegisterHero() {
   }, [epoch, prefersReducedMotion])
 
   const active = SLIDES[index]
+  const at = (by: 1 | -1) => (index + by + SLIDES.length) % SLIDES.length
   const step = (by: 1 | -1) => {
-    setIndex((i) => (i + by + SLIDES.length) % SLIDES.length)
+    setIndex(at(by))
     setEpoch((e) => e + 1)
   }
 
@@ -197,32 +205,45 @@ export function RotatingRegisterHero() {
 
       {/* Back and next AT THE SIDES (founder, 2026-10-15: "where they
           belong"): one at each edge of the band, vertically centred, in the
-          hero's outline idiom. They overlay the band, not the content — the
-          section carries px-6 (see bandClassName above) so the hero's own
-          rail steps in to 48px and a 40px button at 8px from the edge never
-          touches a headline or the phone. */}
-      {(
-        [
-          ["Previous kind of favpoll", -1, ChevronLeft, "left-2"],
-          ["Next kind of favpoll", 1, ChevronRight, "right-2"],
-        ] as const
-      ).map(([label, by, Icon, side]) => (
-        <div
-          key={label}
-          className={cn("absolute inset-y-0 flex items-center", side)}
-        >
-          <Button
-            type="button"
-            size="icon"
-            variant="ghost"
-            aria-label={label}
-            onClick={() => step(by)}
-            className="size-10 rounded-full border border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-          >
-            <Icon aria-hidden="true" />
-          </Button>
-        </div>
-      ))}
+          hero's outline idiom. Each wears the glyph of the register it LEADS
+          TO rather than a chevron, and names it on hover (founder, same
+          day) — so the button is a door, not an arrow: you can see which
+          register is behind it before you press. The tooltip is hover-only
+          by nature; the aria-label carries both the direction and the name.
+          The buttons overlay the band, not the content — the section carries
+          px-6 (see bandClassName above) so the hero's own rail steps in to
+          48px and a 40px button at 8px from the edge never touches a
+          headline or the phone. */}
+      <TooltipProvider>
+        {(
+          [
+            ["Previous", -1, "left-2", "right"],
+            ["Next", 1, "right-2", "left"],
+          ] as const
+        ).map(([direction, by, side, tipSide]) => {
+          const target = SLIDES[at(by)]
+          const Icon = target.icon
+          return (
+            <div
+              key={direction}
+              className={cn("absolute inset-y-0 flex items-center", side)}
+            >
+              <Tooltip content={target.label} side={tipSide}>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  aria-label={`${direction}: ${target.label}`}
+                  onClick={() => step(by)}
+                  className="size-10 rounded-full border border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                >
+                  <Icon aria-hidden="true" />
+                </Button>
+              </Tooltip>
+            </div>
+          )
+        })}
+      </TooltipProvider>
     </div>
   )
 }

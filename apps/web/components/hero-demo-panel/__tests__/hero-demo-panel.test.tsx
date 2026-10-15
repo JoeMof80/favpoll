@@ -548,14 +548,13 @@ describe("RotatingRegisterHero", () => {
 
   it("next and back move it by hand, wrapping both ways", () => {
     render(<RotatingRegisterHero />)
-    const back = screen.getByRole("button", {
-      name: "Previous kind of favpoll",
-    })
-    const next = screen.getByRole("button", { name: "Next kind of favpoll" })
-    fireEvent.click(back)
+    // Each button names the register it leads to, not a direction alone.
+    fireEvent.click(
+      screen.getByRole("button", { name: "Previous: Fundraiser" })
+    )
     expect(live().map((s) => s.dataset.register)).toEqual(["fundraiser"])
-    fireEvent.click(next)
-    fireEvent.click(next)
+    fireEvent.click(screen.getByRole("button", { name: "Next: Memorial" }))
+    fireEvent.click(screen.getByRole("button", { name: "Next: Celebration" }))
     expect(live().map((s) => s.dataset.register)).toEqual(["celebration"])
   })
 
@@ -564,9 +563,7 @@ describe("RotatingRegisterHero", () => {
     act(() => {
       vi.advanceTimersByTime(DWELL_MS - 1000)
     })
-    fireEvent.click(
-      screen.getByRole("button", { name: "Next kind of favpoll" })
-    )
+    fireEvent.click(screen.getByRole("button", { name: /^Next:/ }))
     expect(live().map((s) => s.dataset.register)).toEqual(["celebration"])
     // The old tick (1s away) must not fire; the new slide gets its full dwell.
     act(() => {
