@@ -209,13 +209,20 @@ export function RotatingRegisterHero() {
                 isActive ? "opacity-100" : "pointer-events-none opacity-0"
               )}
             >
-              {/* px-6 on top of the register's own band classes: room for
-                  the side buttons. The hero's content rail becomes 48px on
-                  home against 24px on the register pages — the one visible
-                  departure from "exactly as they are". */}
+              {/* px-8 on top of the register's own band classes, so the
+                  content rail is 56px: 24 (the header's own padding) + the
+                  24px mark + its 8px gap = where the brand TEXT starts
+                  (founder, 2026-10-15: "set the margin to the brand text so
+                  the content lines up too"). Holds below ~1400px, where the
+                  page's 1320px column meets the edge; above it the column
+                  is centred with every section beneath, as he chose. The
+                  departure from "exactly as they are" is 32px on this page
+                  alone. Below sm the band keeps px-6: at 320px a 56px rail
+                  each side left 208px for the 215px phone and the page
+                  scrolled 7px sideways (the overflow E2E caught it). */}
               <LandingHero
                 {...slide.hero}
-                bandClassName="bg-primary px-6 text-primary-foreground"
+                bandClassName="bg-primary px-6 text-primary-foreground sm:px-8"
               />
             </div>
           )
@@ -227,13 +234,16 @@ export function RotatingRegisterHero() {
           hero's outline idiom. CHEVRONS, SMALL, NO LABEL — the register
           glyphs with a name opening on hover were tried the same night and
           the founder preferred plain arrows: the slide itself says which
-          register it is, and the buttons should only say "next". 40px
-          circle, 20px chevron, 4px from the edge, so they end inside the
-          48px rail the band's px-6 reserves (see bandClassName above). */}
+          register it is, and the buttons should only say "next". ON THE
+          LOGO'S LINE (founder, same night): 24px in, where the header's
+          mark sits — a 28px circle ending at 52, inside the 56px rail the
+          band's px-8 reserves (see bandClassName above), so a headline at
+          the same height never touches it; below sm, 16px in, inside the
+          48px rail there. */}
       {(
         [
-          ["Previous kind of favpoll", -1, ChevronLeft, "left-1"],
-          ["Next kind of favpoll", 1, ChevronRight, "right-1"],
+          ["Previous kind of favpoll", -1, ChevronLeft, "left-4 sm:left-6"],
+          ["Next kind of favpoll", 1, ChevronRight, "right-4 sm:right-6"],
         ] as const
       ).map(([label, by, Icon, side]) => (
         <div
@@ -246,9 +256,9 @@ export function RotatingRegisterHero() {
             variant="ghost"
             aria-label={label}
             onClick={() => step(by)}
-            className="size-10 rounded-full border border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+            className="size-7 rounded-full border border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
           >
-            <Icon aria-hidden="true" className="size-5" />
+            <Icon aria-hidden="true" className="size-4" />
           </Button>
         </div>
       ))}
