@@ -481,7 +481,13 @@ export function FavpollSheet({
           sits the sheet's inset above the bottom — the same margin the
           top of the page keeps — with the sheet's white beneath. */}
       <div className="hidden md:block md:flex-1" aria-hidden="true" />
-      <div className="sticky bottom-0 z-10 mt-8 hidden border-t border-border bg-background pt-5 pb-[var(--shell-inset)] md:block">
+      {/* EDGE TO EDGE (founder, 2026-10-15: "extend the width of the charity
+          block so the card shadow isn't visible when scrolling past"): the
+          footer bleeds across the shell's gutters (page-layout's
+          shellGutter, md:pl-16 md:pr-8) and pads its content back in, so
+          the lock card's shadow passing beneath is covered to the column's
+          edges, not just to its content box. */}
+      <div className="sticky bottom-0 z-10 mt-8 hidden border-t border-border bg-background pt-5 pb-[var(--shell-inset)] md:-mr-8 md:-ml-16 md:block md:pr-8 md:pl-16">
         {appeal && (
           <p className="mb-2 truncate border-b border-border pb-2 text-xs text-muted-foreground">
             Part of{" "}

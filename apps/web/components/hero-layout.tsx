@@ -131,8 +131,16 @@ export function HeroLayout({
       // the text has no width at all. AVATAR_MAX is the most a
       // three-line stack reaches, so a two-line name still settles a
       // taller image and the runaway cannot start. The settled size is a
-      // subset of the rest stack and never exceeds it.
-      const rest = Math.min(text.offsetHeight, AVATAR_MAX)
+      // subset of the rest stack and never exceeds it. AND NEVER MORE
+      // THAN 40% OF THE ROW (founder, same day, the tablet shell: a 184px
+      // photo in a 345px column left the name 138px and three lines):
+      // the text keeps the majority of the row at every width.
+      const row = text.parentElement?.offsetWidth ?? Infinity
+      const rest = Math.min(
+        text.offsetHeight,
+        AVATAR_MAX,
+        Math.round(row * 0.4)
+      )
       const settled = Math.min(settledEl.offsetHeight, rest)
       if (rest > 0 && settled > 0) {
         setAvatarCfg({ rest, settled })

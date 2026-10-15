@@ -56,7 +56,11 @@ export function BaseFavpollHero({
     <h1
       // The size transition keeps step with the rail's expand (page-layout,
       // 300ms) so the compact step is one motion, not a jump.
-      className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground transition-[font-size] duration-300 ease-out motion-reduce:transition-none ${heroNameSizeClass(headline.name, compact)}`}
+      // NO CLAMP (founder, 2026-10-15: "The Ravensc…" at the tablet shell's
+      // 345px column). The hero is the canonical full-name surface and never
+      // truncates (ruling of 2026-10-01); a long name in a narrow column
+      // takes the lines it needs and the band is taller for it.
+      className={`leading-tight font-medium tracking-tight wrap-break-word text-foreground transition-[font-size] duration-300 ease-out motion-reduce:transition-none ${heroNameSizeClass(headline.name, compact)}`}
     >
       {favpoll.subject === "cause" ? favpoll.cause_label : protagonist.name}
     </h1>
