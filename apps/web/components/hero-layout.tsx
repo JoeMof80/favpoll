@@ -294,7 +294,7 @@ export function HeroLayout({
         // purpose — it exists for the moment iOS Safari drops the
         // header's sticky, and a see-through patch in that failure is
         // the bug it was added to fix.
-        className={`bg-background pt-6 pb-4 lg:pt-16 ${
+        className={`bg-background pb-4 lg:pt-16 ${avatar ? "pt-0" : "pt-6"} ${
           animate
             ? `lg:sticky lg:z-30 lg:before:absolute lg:before:inset-x-0 lg:before:-top-14 lg:before:h-14 lg:before:bg-background lg:supports-backdrop-filter:bg-background/85 lg:supports-backdrop-filter:backdrop-blur-md ${
                 // The scrollport already starts below the header in shell
@@ -310,6 +310,28 @@ export function HeroLayout({
             than person heroes, whose shrunken avatar outgrows the
             eyebrow+name block (founder: cause ribbon "too high" next to
             a person page, on-device 2026-07-30). */}
+        {/* THE STACKED HEADER, below lg (founder, 2026-10-15, after the
+            shell moved to lg and the phone layout read "too stretched" on
+            a tablet: "redesigning the header so the text can fill the
+            width and therefore less likely to wrap", his reference a
+            LinkedIn profile; variant A of three mocked at /dev/header,
+            "try A"). A register-tinted band bleeding across the column's
+            gutters, the square photo overlapping its bottom edge, and
+            then the text stack at the FULL width of the column — so the
+            name's line length is the column, not the column minus a
+            photo, and the photo can never squeeze it. The side-by-side
+            row below keeps its avatar from lg, where the settle mechanic
+            lives; here the row's avatar cell is hidden and the text runs
+            full width. No avatar (a cause without a photo): no band, the
+            text starts at the old pt-6. */}
+        {avatar && (
+          <div className="lg:hidden">
+            <div className="-mx-6 h-24 bg-muted" aria-hidden="true" />
+            <div className="-mt-12 mb-4 size-24 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm">
+              {avatar}
+            </div>
+          </div>
+        )}
         <div className="relative flex min-h-18 items-start gap-4 lg:min-h-21 lg:gap-6">
           <div ref={textRef} className="min-w-0 flex-1">
             <div ref={settledRef}>
@@ -348,7 +370,7 @@ export function HeroLayout({
           </div>
           {avatar && (
             <motion.div
-              className="h-26 w-26 shrink-0 lg:h-33 lg:w-33"
+              className="hidden h-26 w-26 shrink-0 lg:block lg:h-33 lg:w-33"
               style={
                 animate && avatarMounted
                   ? { width: avatarSize, height: avatarSize }

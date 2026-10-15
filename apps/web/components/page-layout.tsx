@@ -158,7 +158,10 @@ export function PageLayout({
             // scroll-linked children (the hero) read THIS element rather
             // than the window, which never scrolls in shell mode.
             <ShellScroller
-              className={`min-w-0 ${shellGutter} ${mobilePadBottom} lg:scrollbar-hide lg:min-h-0 lg:overflow-y-auto lg:pb-0 lg:[overflow-anchor:none]`}
+              // A READING COLUMN BELOW lg (founder, 2026-10-15: the phone layout on a
+              // tablet read "too stretched"): the single column caps at max-w-2xl
+              // and centres, so the About's lines stay a paragraph's length.
+              className={`min-w-0 max-lg:mx-auto max-lg:w-full max-lg:max-w-2xl ${shellGutter} ${mobilePadBottom} lg:scrollbar-hide lg:min-h-0 lg:overflow-y-auto lg:pb-0 lg:[overflow-anchor:none]`}
             >
               {/* Spare room past the shell's height (100vh - the header)
                   of the hero's collapse plus its settle window
