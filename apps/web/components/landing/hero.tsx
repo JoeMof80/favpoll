@@ -120,6 +120,9 @@ type Props = {
    * poster. Only meaningful with `still`.
    */
   compact?: boolean
+  /** Below md, render the CTA pair after the phone rather than before it
+   *  (founder, 2026-10-15, the home carousel): text, handset, buttons. */
+  ctaAfterMedia?: boolean
   /** Extra pitch-column content, under the subheader. */
   children?: React.ReactNode
 }
@@ -246,6 +249,7 @@ export function LandingHero({
   router = false,
   still = false,
   compact = false,
+  ctaAfterMedia = false,
   children,
 }: Props) {
   const scenes = useMemo(
@@ -260,6 +264,115 @@ export function LandingHero({
   const { scene, phase, barWidths, fading, prefersReducedMotion, goToScene } =
     useDemoLoop(scenes)
   const beat = beatForPhase(phase)
+
+  const ctas = (
+    <div className="flex flex-wrap items-center gap-x-5 gap-y-3.5">
+      {/* The hero's only conversion action under a display headline —
+          poster-scale, not form-scale (founder call, 2026-07-28) */}
+      <Button
+        asChild
+        size="lg"
+        variant="secondary"
+        // THE FREE PROMISE IS OUT OF THE HERO ENTIRELY (founder,
+        // 2026-09-18, in two steps the same day: the quiet tail
+        // "— always free" left the button — "maybe it just
+        // elongates the button" — then the "Free to create"
+        // caption went too, with its grouping wrapper). The hero
+        // states no fee fact; the page still does — the trust grid
+        // and the close-band tails carry it (landing.cta.primaryFree
+        // and the *.close.cta strings keep "— always free", so
+        // withQuietTail stays for labels that pass one).
+        //
+        // w-full sm:w-auto: on a phone the pair stack as two
+        // full-width rows (founder, 2026-09-18) — wrapping classes
+        // kept for the tail-carrying labels custom pages may pass.
+        className="h-auto min-h-11 w-full shrink flex-wrap px-6 py-2 text-base whitespace-normal sm:w-auto"
+      >
+        <Link href={ctaHref ?? "/favpolls/new"}>
+          {withQuietTail(ctaLabel ?? t("landing.cta.primary"))}
+        </Link>
+      </Button>
+      {/* A SECOND PATH, HOME ONLY (founder, 2026-08-17). "Create a
+          favpoll" names an invented noun, so on home it asks a
+          first-time visitor to make a thing nothing has yet defined —
+          unlike "Start fundraising", which names a goal the visitor
+          already arrived with. ProcessOverview directly below does
+          define it, and the page was relying on visitors scrolling to
+          find that out. This makes the other path an offer rather than
+          a hope.
+
+          RESTORED ON THE REGISTER PAGES, 2026-08-26. This comment used
+          to say they "already carry their own cta.secondary" — they
+          carried the STRING and rendered nothing, so the only action in
+          a register hero was "Create a memorial favpoll". Nobody four
+          days into a bereavement clicks create before they have looked,
+          and the register pages are where a cold visitor most often
+          lands: a celebrant or a hospice forwards the link. They now
+          pass their own label.
+          Ghost in BAND ink — a wash and ring of the band's own
+          foreground, the router cards' idiom — so it reads as the
+          quieter of the two without vanishing when the theme flips.
+          THE BORDER IS BACK (founder, 2026-09-18: "I'm tempted to make
+          See how it works an outline for visibility") — a KNOWING
+          reversal of his own 2026-08-18 "no border or ring" call
+          (1px and a 0.5px hairline were auditioned then and stripped).
+          What changed: the primary shed its quiet tail the same day,
+          and stacked full-width on mobile a borderless ghost read as a
+          stray text line. This puts the pair back on the style guide's
+          tiers (bordered ghost = secondary).
+          h-11 keeps both CTAs on one baseline.
+
+          PADDING MATCHES THE PRIMARY'S so the two LABELS start at the
+          same x (founder, 2026-08-18: "their text doesn't line up
+          because of the different margin"). Stacked, both boxes begin at
+          the column edge, so padding alone decides where each label
+          lands — at px-3 against the primary's px-6 they sat 12px apart.
+          An earlier pass pulled this the other way with -ml-3, putting
+          the words on the column RAIL: level with the headline, but 24px
+          left of the label directly above them. Wrong reading. Two
+          buttons stacked read as a pair, and a pair lines up with itself
+          before it lines up with the paragraph above.
+
+          pr-6 IS AN OVERRIDE, not a repetition of px-6. Button's lg size
+          carries has-data-[icon=inline-end]:pr-2, which trims the
+          trailing side when a button ends in an icon — fair for a SOLID
+          button, where the eye reads the filled edge. There is no edge
+          here until hover, so it only rendered the wash lopsided, 24
+          left against 8 right. Same variant, same property, declared
+          after, so it wins. */}
+      {(router || ctaSecondaryLabel) && (
+        <Button
+          asChild
+          size="lg"
+          variant="ghost"
+          className="h-11 w-full border border-primary-foreground/40 px-6 text-base text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground has-data-[icon=inline-end]:pr-6 sm:w-auto"
+        >
+          {/* The arrow says WHERE it goes (founder, 2026-08-17): every
+              other button on this page navigates, and this one scrolls
+              the reader down the same page — which is a different
+              promise, and the only one a visitor can be disappointed by
+              if they expect a new page. */}
+          <Link
+            href="#how"
+            // Explicit scroll on EVERY click (founder bug report,
+            // 2026-09-03): with a bare hash link, the second click
+            // is a no-op — the URL already ends #how, so nothing
+            // changes and the browser won't re-scroll. The href
+            // stays for semantics and no-JS.
+            onClick={(e) => {
+              e.preventDefault()
+              document
+                .getElementById("how")
+                ?.scrollIntoView({ behavior: "smooth" })
+            }}
+          >
+            {ctaSecondaryLabel ?? t("landing.cta.secondary")}
+            <ArrowDown data-icon="inline-end" aria-hidden="true" />
+          </Link>
+        </Button>
+      )}
+    </div>
+  )
 
   return (
     <section
@@ -433,112 +546,10 @@ export function LandingHero({
             </p>
           )}
           {children}
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-3.5">
-            {/* The hero's only conversion action under a display headline —
-                poster-scale, not form-scale (founder call, 2026-07-28) */}
-            <Button
-              asChild
-              size="lg"
-              variant="secondary"
-              // THE FREE PROMISE IS OUT OF THE HERO ENTIRELY (founder,
-              // 2026-09-18, in two steps the same day: the quiet tail
-              // "— always free" left the button — "maybe it just
-              // elongates the button" — then the "Free to create"
-              // caption went too, with its grouping wrapper). The hero
-              // states no fee fact; the page still does — the trust grid
-              // and the close-band tails carry it (landing.cta.primaryFree
-              // and the *.close.cta strings keep "— always free", so
-              // withQuietTail stays for labels that pass one).
-              //
-              // w-full sm:w-auto: on a phone the pair stack as two
-              // full-width rows (founder, 2026-09-18) — wrapping classes
-              // kept for the tail-carrying labels custom pages may pass.
-              className="h-auto min-h-11 w-full shrink flex-wrap px-6 py-2 text-base whitespace-normal sm:w-auto"
-            >
-              <Link href={ctaHref ?? "/favpolls/new"}>
-                {withQuietTail(ctaLabel ?? t("landing.cta.primary"))}
-              </Link>
-            </Button>
-            {/* A SECOND PATH, HOME ONLY (founder, 2026-08-17). "Create a
-                favpoll" names an invented noun, so on home it asks a
-                first-time visitor to make a thing nothing has yet defined —
-                unlike "Start fundraising", which names a goal the visitor
-                already arrived with. ProcessOverview directly below does
-                define it, and the page was relying on visitors scrolling to
-                find that out. This makes the other path an offer rather than
-                a hope.
-
-                RESTORED ON THE REGISTER PAGES, 2026-08-26. This comment used
-                to say they "already carry their own cta.secondary" — they
-                carried the STRING and rendered nothing, so the only action in
-                a register hero was "Create a memorial favpoll". Nobody four
-                days into a bereavement clicks create before they have looked,
-                and the register pages are where a cold visitor most often
-                lands: a celebrant or a hospice forwards the link. They now
-                pass their own label.
-                Ghost in BAND ink — a wash and ring of the band's own
-                foreground, the router cards' idiom — so it reads as the
-                quieter of the two without vanishing when the theme flips.
-                THE BORDER IS BACK (founder, 2026-09-18: "I'm tempted to make
-                See how it works an outline for visibility") — a KNOWING
-                reversal of his own 2026-08-18 "no border or ring" call
-                (1px and a 0.5px hairline were auditioned then and stripped).
-                What changed: the primary shed its quiet tail the same day,
-                and stacked full-width on mobile a borderless ghost read as a
-                stray text line. This puts the pair back on the style guide's
-                tiers (bordered ghost = secondary).
-                h-11 keeps both CTAs on one baseline.
-
-                PADDING MATCHES THE PRIMARY'S so the two LABELS start at the
-                same x (founder, 2026-08-18: "their text doesn't line up
-                because of the different margin"). Stacked, both boxes begin at
-                the column edge, so padding alone decides where each label
-                lands — at px-3 against the primary's px-6 they sat 12px apart.
-                An earlier pass pulled this the other way with -ml-3, putting
-                the words on the column RAIL: level with the headline, but 24px
-                left of the label directly above them. Wrong reading. Two
-                buttons stacked read as a pair, and a pair lines up with itself
-                before it lines up with the paragraph above.
-
-                pr-6 IS AN OVERRIDE, not a repetition of px-6. Button's lg size
-                carries has-data-[icon=inline-end]:pr-2, which trims the
-                trailing side when a button ends in an icon — fair for a SOLID
-                button, where the eye reads the filled edge. There is no edge
-                here until hover, so it only rendered the wash lopsided, 24
-                left against 8 right. Same variant, same property, declared
-                after, so it wins. */}
-            {(router || ctaSecondaryLabel) && (
-              <Button
-                asChild
-                size="lg"
-                variant="ghost"
-                className="h-11 w-full border border-primary-foreground/40 px-6 text-base text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground has-data-[icon=inline-end]:pr-6 sm:w-auto"
-              >
-                {/* The arrow says WHERE it goes (founder, 2026-08-17): every
-                    other button on this page navigates, and this one scrolls
-                    the reader down the same page — which is a different
-                    promise, and the only one a visitor can be disappointed by
-                    if they expect a new page. */}
-                <Link
-                  href="#how"
-                  // Explicit scroll on EVERY click (founder bug report,
-                  // 2026-09-03): with a bare hash link, the second click
-                  // is a no-op — the URL already ends #how, so nothing
-                  // changes and the browser won't re-scroll. The href
-                  // stays for semantics and no-JS.
-                  onClick={(e) => {
-                    e.preventDefault()
-                    document
-                      .getElementById("how")
-                      ?.scrollIntoView({ behavior: "smooth" })
-                  }}
-                >
-                  {ctaSecondaryLabel ?? t("landing.cta.secondary")}
-                  <ArrowDown data-icon="inline-end" aria-hidden="true" />
-                </Link>
-              </Button>
-            )}
-          </div>
+          {/* The CTA pair — or, with ctaAfterMedia, only from md up; below
+              it the pair renders again after the phone (see the media
+              cell), so a phone reads text, handset, buttons. */}
+          <div className={cn(ctaAfterMedia && "hidden md:block")}>{ctas}</div>
         </div>
 
         {/* Right — live demo in a browser-style frame. Rendered at full
@@ -877,6 +888,17 @@ export function LandingHero({
             </>
           )}
         </div>
+
+        {/* THE BUTTONS UNDER THE PHONE (founder, 2026-10-15, on the home
+            carousel at phone width: "the buttons should be below the
+            iphone"): below md the hero stacks pitch over handset, and the
+            CTA pair had sat between them — the thing to tap above the thing
+            that shows what you'd be making. With ctaAfterMedia the pair
+            renders here instead, after the phone; from md up it stays in
+            the pitch column (hidden md:block above). They keep the settled
+            full-width stack (#904): "Create a celebration favpoll" and "See
+            how it works" do not share a 390px row without shrinking. */}
+        {ctaAfterMedia && <div className="md:hidden">{ctas}</div>}
 
         {/* In row mode the stats take the cards' own three columns and gutter
             (founder, 2026-08-05), so each figure sits under a card instead of

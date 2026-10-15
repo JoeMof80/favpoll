@@ -227,6 +227,7 @@ export function RotatingRegisterHero() {
                   earlier version). */}
               <LandingHero
                 {...slide.hero}
+                ctaAfterMedia
                 bandClassName="bg-primary pr-6 pl-[30px] text-primary-foreground sm:px-[30px]"
               />
             </div>
