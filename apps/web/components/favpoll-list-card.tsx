@@ -25,7 +25,6 @@ import type {
   FavpollPollWithItems,
   FavpollSubject,
 } from "@favpoll/types"
-import { StandingsSkeleton } from "@/components/standings-skeleton"
 import { addGuestItem } from "@/app/favpolls/[id]/actions"
 import { paletteForFavpoll } from "@/lib/register-palette"
 import { buildMechanicSteps } from "@/lib/mechanic-steps"
@@ -110,12 +109,6 @@ export function FavpollListCard({
 
   const isClosed = !!favpoll.closed_at
   const entitled = hasPledged || isClosed
-
-  // Behind the lock: a skeleton row per favourite, capped at the four the
-  // blurred decoy used to draw — the SAME placeholder the guest page shows
-  // behind its lock card since #911 (brought in line 2026-10-15; the shelf
-  // had kept the blurred decoy with alphabetical labels and "—" amounts).
-  const skeletonRows = Math.min(4, topicItems.length)
 
   // Arm the list's return target the moment a pledge begins (founder's
   // debug panel, 2026-09-06: an in-card pledge showed a FRESH MOUNT
@@ -429,13 +422,13 @@ export function FavpollListCard({
                     /* flex-1 fills the fixed body above the step row —
                        the old min-h went with the content-sized card. */
                     <div className="relative min-h-0 flex-1 px-3 py-2">
-                      <div
-                        className="pointer-events-none select-none"
-                        aria-hidden="true"
-                        data-testid="list-card-locked"
-                      >
-                        <StandingsSkeleton rows={skeletonRows} />
-                      </div>
+                      {/* NOTHING BEHIND THE LOCK (founder, 2026-10-15). The
+                        blurred decoy gave way to the guest page's skeleton
+                        earlier the same day, and the founder cut that too:
+                        the body is 208px and the lock card covers most of
+                        it, so the skeleton only ever showed as slivers —
+                        "it isn't visible enough and therefore looks messy".
+                        The lock card alone on the body. */}
                       {/* Full-area unlock, the poll section's idiom — the
                         page's own teaching card (lock-card-content,
                         compact), so the shelf and the favpoll page speak
