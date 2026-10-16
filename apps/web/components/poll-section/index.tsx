@@ -303,7 +303,7 @@ export function PollSection({
                Only the organiser sees this (guests see the lock card). */
             <div className="grid">
               <div
-                className="pointer-events-none [grid-area:1/1]"
+                className="pointer-events-none hidden [grid-area:1/1] lg:block"
                 aria-hidden="true"
               >
                 <StandingsSkeleton rows={6} />
@@ -319,6 +319,13 @@ export function PollSection({
           )}
         </>
       ) : (
+        /* SKELETON FROM lg ONLY (founder, 2026-10-15/16: "skeletons seem
+           pointless here because they are obscured by the pledge card"): in
+           the single column the lock card covers nearly the whole block and
+           the skeleton showed as slivers around it; in the shell there is room
+           above and below for it to read as the standings-to-come. Below lg
+           the cell is the lock card's own height; the organiser's zero-pledges
+           skeleton above follows the same rule. */
         /* Pre-pledge: skeleton bars with the lock-card overlay on top.
            Replaces the old blurred decoy (founder, 2026-09-21: "I quite
            like the skeleton — replace the decoy with it"). The grid cell
@@ -326,7 +333,7 @@ export function PollSection({
            ancestors, so the card pins correctly as an in-flow sibling. */
         <div className="grid">
           <div
-            className="pointer-events-none [grid-area:1/1]"
+            className="pointer-events-none hidden [grid-area:1/1] lg:block"
             aria-hidden="true"
           >
             {hasNote && <NoteSkeleton />}
