@@ -9,8 +9,10 @@ import { Header } from "@/components/header"
 // NO SITE HEADER on the favpoll page either (founder, 2026-10-16: "the
 // live page doesn't have a header because it isn't necessary … Why does
 // the favpoll page need a header?"): the hero's band is the page's own
-// 56px top row, with the mark on it and a ⋮ menu at the right
-// (favpoll-page-menu). Manage, keepsake, edit and the rest keep the header.
+// 56px top row, with the mark on it — the page's only chrome (a ⋮ menu
+// was tried and dropped the same day: a guest needs nothing from it that
+// the mark and the organiser's manage button don't give). Manage,
+// keepsake, edit and the rest keep the header.
 const EXCLUDED = [/^\/live\/[^/]+$/, /^\/favpolls\/[^/]+$/]
 
 export function HeaderMount() {
