@@ -297,7 +297,7 @@ export default function AboutPage() {
             <FadeIn delay={0.16}>
               <p className="text-base leading-relaxed text-muted-foreground">
                 Reveals written this way speak in the first person — &ldquo;Mine
-                was purple. I wore it whenever there was a special
+                was purple. I wore purple whenever there was a special
                 occasion.&rdquo; A last word, kept exactly as it was given.
               </p>
             </FadeIn>
