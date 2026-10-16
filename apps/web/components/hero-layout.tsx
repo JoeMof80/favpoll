@@ -17,6 +17,11 @@ type HeroLayoutProps = {
    *  for the screen in the room, which nobody scrolls (founder,
    *  2026-09-30). */
   pins?: boolean
+  /** The band's own line on the phone — the countdown or the closed date,
+   *  as the old slide-in bar carried it: at the band's top, with the name
+   *  pinning in its lower half beneath. Hidden from lg (the rail has the
+   *  countdown there). */
+  strip?: React.ReactNode
 }
 
 // THE STACKED HEADER (founder, 2026-10-15/16). A LinkedIn profile header
@@ -60,13 +65,18 @@ type HeroLayoutProps = {
 // 8px trailing margin; the 96px photo hangs so its bottom is level with
 // the opening line's text (128 from the top).
 const BAND = 80
+/** The phone's band: the 80px photo straddles its edge 40/40, and 24 above
+ *  the photo's top is the phone's own gutter (founder, 2026-10-16: "the
+ *  image top padding matches the right padding"). */
+const PHONE_BAND = 64
 const STRIP = 16
 const EYEBROW_ROW = 40
 const NAME_TOP = BAND + STRIP + EYEBROW_ROW // 136: the name's own row
 /** The phone: the fixed header the document scrolls under. */
 const PHONE_HEADER = 56
-/** …where the shrunken name pins inside the band: its lower half. */
-const PHONE_NAME_TOP = 46
+/** …where the shrunken name pins inside the band: its lower half, under
+ *  the strip's line. */
+const PHONE_NAME_TOP = 34
 /** …at this scale (text-3xl → the old bar's text-lg: 18/30). */
 const PHONE_NAME_SCALE = 0.6
 
@@ -77,6 +87,7 @@ export function HeroLayout({
   avatar,
   about,
   pins = false,
+  strip,
 }: HeroLayoutProps) {
   // headerInset = 56 (the h-14 header) when the document scrolls, 0 inside
   // the shell's scroller, whose box starts below it. Pinning is lg-only
@@ -108,7 +119,7 @@ export function HeroLayout({
       const bottom = !pins
         ? inset
         : isPhone
-          ? inset + BAND
+          ? inset + PHONE_BAND
           : inset + NAME_TOP + (name?.offsetHeight ?? 0)
       document.documentElement.style.setProperty(
         "--hero-stuck-bottom",
@@ -176,10 +187,13 @@ export function HeroLayout({
       >
         {avatar ? (
           <>
-            <div
-              className="-mx-6 h-20 bg-muted lg:-mr-8 lg:-ml-16"
-              aria-hidden="true"
-            />
+            <div className="relative -mx-6 h-16 bg-muted lg:-mr-8 lg:-ml-16 lg:h-20">
+              {strip && (
+                <div className="px-6 py-1 text-xs text-muted-foreground lg:hidden">
+                  {strip}
+                </div>
+              )}
+            </div>
             <div className="h-4" aria-hidden="true" />
             {/* The size inline as well as by class: a stale stylesheet once
                 drew this full width over the name (iOS, 2026-10-16). */}

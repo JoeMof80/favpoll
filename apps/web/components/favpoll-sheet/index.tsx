@@ -187,6 +187,17 @@ export function FavpollSheet({
     pledgeJustConfirmed: roomReveal,
   }
 
+  // The band's line on the phone (hero-layout `strip`): the countdown, or
+  // the closed date — what the old slide-in identity bar carried.
+  const bandStrip = isClosed ? (
+    <p className="truncate">
+      Poll closed
+      {favpoll.closed_at ? ` · ${closedAtLabel(favpoll.closed_at)}` : ""}
+    </p>
+  ) : (
+    <Countdown closesAt={favpoll.closes_at} variant="bar" />
+  )
+
   const closedAt = favpoll.closed_at
     ? new Date(favpoll.closed_at).toLocaleDateString("en-GB", {
         day: "numeric",
@@ -398,6 +409,7 @@ export function FavpollSheet({
           mentions={aboutMentions}
           compact={guestBookExpanded}
           pins={!room}
+          strip={bandStrip}
         />
       ) : (
         <FavpollHero
@@ -406,6 +418,7 @@ export function FavpollSheet({
           mentions={aboutMentions}
           compact={guestBookExpanded}
           pins={!room}
+          strip={bandStrip}
         />
       )}
 
@@ -602,4 +615,12 @@ export function FavpollSheet({
       {children}
     </PageLayout>
   )
+}
+
+function closedAtLabel(iso: string) {
+  return new Date(iso).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  })
 }
