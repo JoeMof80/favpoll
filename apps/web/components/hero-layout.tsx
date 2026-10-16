@@ -125,9 +125,15 @@ export function HeroLayout({
             <div className="h-4" aria-hidden="true" />
             {/* The size inline as well as by class: a stale stylesheet once
                 drew this full width over the name (iOS, 2026-10-16). */}
+            {/* 80px below lg, 96 from it (founder, 2026-10-16: "is the photo
+                slightly too big on mobile?" — yes: a quarter of a phone's
+                column). Either way its bottom is level with the opening
+                line's text, 128 from the top, so the smaller one starts 16
+                lower. The size and position are inline as well as by
+                class: iOS once drew it full width at the left. */}
             <div
-              className="absolute top-8 right-0 size-24 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm"
-              style={{ width: 96, height: 96, top: 32, right: 0 }}
+              className="absolute right-0 size-20 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm lg:size-24"
+              style={{ right: 0, bottom: -(128 - BAND - STRIP) }}
             >
               {avatar}
             </div>
