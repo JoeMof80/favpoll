@@ -121,7 +121,7 @@ export const SCENES: HeroScene[] = [
     poll: {
       id: "demo-poll-0",
       personal_note:
-        "My favourite colour was purple. I wore it to every occasion that mattered.",
+        "My favourite colour was purple. I wore it whenever there was a special occasion.",
       topic: {
         title: "Colour",
         favourites: [
