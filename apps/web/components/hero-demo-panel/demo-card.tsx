@@ -421,7 +421,9 @@ export function DemoCard({
                 photoUrl={
                   protagonist ? protagonist.photo_url : scene.photo_url!
                 }
-                className="h-full w-full"
+                // Every breakpoint: the component's own md:h-33 is the old row
+                // hero's size and would crop inside this wrapper.
+                className="h-full w-full md:h-full md:w-full lg:h-full lg:w-full"
               />
             </div>
           )}
