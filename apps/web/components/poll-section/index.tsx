@@ -300,10 +300,14 @@ export function PollSection({
             </>
           ) : (
             /* No pledges yet — skeleton with a quiet card on top.
-               Only the organiser sees this (guests see the lock card). */
+               Only the organiser sees this (guests see the lock card).
+               The skeleton shows at EVERY width here, unlike the lock card's
+               below: the quiet card is one line, so the skeleton reads around it
+               (founder, 2026-10-16: "we need skeletons here since they aren't
+               obscured by the note"). */
             <div className="grid">
               <div
-                className="pointer-events-none hidden [grid-area:1/1] lg:block"
+                className="pointer-events-none [grid-area:1/1]"
                 aria-hidden="true"
               >
                 <StandingsSkeleton rows={6} />
