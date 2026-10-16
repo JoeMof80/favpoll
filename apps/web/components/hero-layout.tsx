@@ -167,7 +167,23 @@ export function HeroLayout({
           beneath. A cause without a photo: the band alone. */}
       <div
         ref={bandRef}
-        className={["relative", pins ? "sticky z-30" : ""].join(" ")}
+        className={[
+          "relative",
+          // FIXED BELOW lg, sticky from lg. iOS rubber-bands past the
+          // document's end and sticky elements ride along with the
+          // overscrolled content while fixed ones stay (founder's iPhone,
+          // 2026-10-16, read off the ?debug=hero panel: visualViewport
+          // 194px past the layout viewport, band at -194, the fixed mark
+          // still in place) — the reason the old identity bar was fixed
+          // (#850). Fixed, the box takes the reading column's own width
+          // and padding, so the -mx-6 band inside still bleeds to the
+          // edges and the photo sits at the content's right; a spacer of
+          // the box's measured height holds its place in flow. From lg
+          // the shell's scroller never overscrolls and sticky stands.
+          pins
+            ? "z-30 max-lg:fixed max-lg:top-0 max-lg:left-1/2 max-lg:w-full max-lg:max-w-2xl max-lg:-translate-x-1/2 max-lg:px-6 lg:sticky"
+            : "",
+        ].join(" ")}
         style={pins ? { top: `${inset}px` } : undefined}
       >
         {banner && (
@@ -178,27 +194,33 @@ export function HeroLayout({
             {banner}
           </div>
         )}
-        <div
-          className="relative -mx-6 h-14 bg-muted lg:-mr-8 lg:-ml-16"
-          aria-hidden={avatar ? undefined : true}
-        />
-        {avatar && (
-          /* 80px at every width, its top on the mark's line (16 into the
+        {/* The band and its photo in one positioned block INSIDE the
+            box's padding, so the photo's right-0 is the content's edge
+            at every width (a fixed box's padding does not inset an
+            absolute child). */}
+        <div className="relative">
+          <div
+            className="relative -mx-6 h-14 bg-muted lg:-mr-8 lg:-ml-16"
+            aria-hidden={avatar ? undefined : true}
+          />
+          {avatar && (
+            /* 80px at every width, its top on the mark's line (16 into the
              56 row). Size and position inline as well as by class: a stale
              stylesheet once drew it full width over the name (iOS,
              2026-10-16). */
-          <div
-            className="absolute right-0 size-20 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm"
-            style={{
-              width: PHOTO,
-              height: PHOTO,
-              right: 0,
-              top: bannerHeight + PHOTO_TOP,
-            }}
-          >
-            {avatar}
-          </div>
-        )}
+            <div
+              className="absolute right-0 size-20 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm"
+              style={{
+                width: PHOTO,
+                height: PHOTO,
+                right: 0,
+                top: PHOTO_TOP,
+              }}
+            >
+              {avatar}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* THE MARK, on the band at the header's own spot (fixed, the h-14
@@ -207,6 +229,15 @@ export function HeroLayout({
           was tried and dropped the same day — a guest needs nothing from
           it, and the organiser has the manage button; light and dark live
           in the poll heading's own menu. */}
+      {/* The fixed box's place in flow, below lg. */}
+      {pins && (
+        <div
+          className="lg:hidden"
+          style={{ height: boxHeight }}
+          aria-hidden="true"
+        />
+      )}
+
       {pins &&
         mounted &&
         createPortal(
