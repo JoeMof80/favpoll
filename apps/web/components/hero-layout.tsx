@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import Link from "next/link"
 import { useScrollRoot } from "@/components/shell-scroller"
@@ -76,8 +76,6 @@ const STRIP = 16
  *  own tone, so the header stays one colour (founder, 2026-10-16: "I
  *  don't like how the countdown makes the header two tone"). */
 const BANNER = 28
-/** The phone: the document scrolls from the very top — no site header. */
-const PHONE_HEADER = 0
 
 export function HeroLayout({
   eyebrowText,
@@ -89,28 +87,39 @@ export function HeroLayout({
   banner,
 }: HeroLayoutProps) {
   // headerInset = 56 (the h-14 header) when the document scrolls, 0 inside
-  // the shell's scroller, whose box starts below it. The favpoll page has
-  // no header at any width now, so in practice 0 everywhere.
+  // the shell's scroller (one provider at every width). The favpoll page
+  // has no header at any width now, so in practice 0.
   const { headerInset } = useScrollRoot()
+  const inset = headerInset
 
-  // Below lg the document scrolls (the hook reports the shell's 0 there)
-  // and the banner, when passed, takes its row above the band.
-  const [isPhone, setIsPhone] = useState(false)
+  // THE PINNED BOX'S HEIGHT, read from the box itself: the band, plus the
+  // banner's row when the stylesheet shows it. ONE SOURCE OF TRUTH — a
+  // separate matchMedia "is this the phone?" check counted the banner's
+  // 28px while `lg:hidden` hid it (the stylesheet's breakpoint is 64rem,
+  // the query said 1023px; they part company whenever the root font size
+  // is not 16px) and pinned the poll heading 28px under the band, with
+  // the note showing through the gap (founder, 2026-10-16: "the note
+  // shouldn't be visible behind the sticky topic header"). This cannot
+  // feed back: nothing laid out from the number changes the box's size.
+  const bandRef = useRef<HTMLDivElement>(null)
+  const [boxHeight, setBoxHeight] = useState(BAND)
   useEffect(() => {
-    const mq = window.matchMedia("(max-width: 1023px)")
-    setIsPhone(mq.matches)
-    const h = (e: MediaQueryListEvent) => setIsPhone(e.matches)
-    mq.addEventListener("change", h)
-    return () => mq.removeEventListener("change", h)
+    const el = bandRef.current
+    if (!el) return
+    const read = () => setBoxHeight(el.offsetHeight)
+    read()
+    const ro = new ResizeObserver(read)
+    ro.observe(el)
+    return () => ro.disconnect()
   }, [])
-  const inset = isPhone ? PHONE_HEADER : headerInset
-  const bannerHeight = isPhone && banner ? BANNER : 0
+  /** The banner's row as actually shown: 0 from lg, or when none. */
+  const bannerHeight = boxHeight - BAND
 
   // --hero-stuck-bottom: the pinned box's bottom — the band's edge — for
-  // what pins beneath (the poll heading, the lock card). Constants, never
-  // a measurement. A static hero (the room) publishes the scroller's top.
+  // what pins beneath (the poll heading, the lock card). A static hero
+  // (the room) publishes the scroller's top.
   useEffect(() => {
-    const bottom = pins ? inset + bannerHeight + BAND : inset
+    const bottom = pins ? inset + boxHeight : inset
     document.documentElement.style.setProperty(
       "--hero-stuck-bottom",
       `${bottom}px`
@@ -124,7 +133,7 @@ export function HeroLayout({
       document.documentElement.style.removeProperty("--hero-collapse")
       document.documentElement.style.removeProperty("--hero-settle")
     }
-  }, [pins, inset, bannerHeight])
+  }, [pins, inset, boxHeight])
 
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
@@ -137,6 +146,7 @@ export function HeroLayout({
           at the right. z-30: above the poll heading (z-20), which pins
           beneath. A cause without a photo: the band alone. */}
       <div
+        ref={bandRef}
         className={["relative", pins ? "sticky z-30" : ""].join(" ")}
         style={pins ? { top: `${inset}px` } : undefined}
       >
