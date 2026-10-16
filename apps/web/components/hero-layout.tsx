@@ -163,9 +163,15 @@ export function HeroLayout({
           photo. A cause without a photo: 24px of top padding and nothing
           to hang. */}
       <div
-        className={["relative bg-background", pins ? "sticky z-30" : ""].join(
-          " "
-        )}
+        className={[
+          // lg:bg-background, not bg-background: the strip under the band only
+          // needs paint on desktop, where the opening line pins beneath it.
+          // On the phone it painted the page colour over the context as it
+          // passed, so the text looked cut off 16px short of the band
+          // (founder, 2026-10-16).
+          "relative lg:bg-background",
+          pins ? "sticky z-30" : "",
+        ].join(" ")}
         style={pins ? { top: `${inset}px` } : undefined}
       >
         {avatar ? (
