@@ -56,8 +56,10 @@ const BAND = 80
 const STRIP = 16
 const EYEBROW_ROW = 40
 const NAME_TOP = BAND + STRIP + EYEBROW_ROW // 136: the name's own row
-/** On the phone the name pins INSIDE the band, this far from its top. */
-const PHONE_NAME_TOP = 14
+/** On the phone the name pins INSIDE the band, this far from its top: low
+ *  in the band, level with the photo's top, as the founder's mock of
+ *  2026-10-16 has it. */
+const PHONE_NAME_TOP = 40
 /** …at this scale (text-3xl → the bar's text-lg: 18/30). */
 const PHONE_NAME_SCALE = 0.6
 /** The scroll over which it shrinks, ending as it arrives on the band. */
@@ -96,17 +98,18 @@ export function HeroLayout({
 
   // --hero-stuck-bottom: the pinned header's bottom, for what pins beneath
   // (the poll heading, the lock card). From lg: the name's row bottom (its
-  // pinned top plus its box). On the phone: the eyebrow row's bottom —
-  // the band and strip plus the photo's hang — since the name is up on
-  // the band. Measured on layout changes only, never during scroll. A
-  // static hero (the room) publishes the scroller's top alone.
+  // pinned top plus its box). On the phone: the BAND's bottom alone — the
+  // name is up on the band, the context and About scroll straight up
+  // beneath it, and the photo hangs over whatever passes (the founder's
+  // mock, 2026-10-16). Measured on layout changes only, never during
+  // scroll. A static hero (the room) publishes the scroller's top alone.
   useEffect(() => {
     const name = nameRef.current
     const set = () => {
       const bottom = !pins
         ? inset
         : isPhone
-          ? inset + NAME_TOP
+          ? inset + BAND
           : inset + NAME_TOP + (name?.offsetHeight ?? 0)
       document.documentElement.style.setProperty(
         "--hero-stuck-bottom",
