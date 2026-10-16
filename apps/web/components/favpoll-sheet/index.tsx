@@ -1,7 +1,7 @@
 "use client"
 
 import type { MentionTarget } from "@/lib/mentions"
-import { useState } from "react"
+import { useCallback, useState, useSyncExternalStore } from "react"
 import { Countdown } from "@/components/countdown"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { GuestBook, type WallEntry } from "@/components/guest-book"
@@ -40,6 +40,10 @@ import { GoalProgress } from "@/components/goal-progress"
 
 /** Who is looking: a guest on their own phone, or the room's screen. */
 export type SheetPresentation = "guest" | "room"
+
+/** The micro banner's window: the last week (founder, 2026-10-16 — a
+ *  memorial favpoll that runs three weeks has its push in the last one). */
+const CLOSING_SOON_MS = 7 * 24 * 60 * 60 * 1000
 
 /** The viewer's own standing on this favpoll — the guest layer's state,
  *  threaded into the standings. Absent on the room's screen, which has
@@ -187,16 +191,16 @@ export function FavpollSheet({
     pledgeJustConfirmed: roomReveal,
   }
 
-  // The band's line on the phone (hero-layout `strip`): the countdown, or
-  // the closed date — what the old slide-in identity bar carried.
-  const bandStrip = isClosed ? (
-    <p className="truncate">
-      Poll closed
-      {favpoll.closed_at ? ` · ${closedAtLabel(favpoll.closed_at)}` : ""}
-    </p>
-  ) : (
-    <Countdown closesAt={favpoll.closes_at} variant="bar" />
-  )
+  // THE MICRO BANNER (founder, 2026-10-16: "a micro banner at the very
+  // top that is only visible as the favpoll approaches its deadline"):
+  // the phone's countdown, passed to the hero only inside the last
+  // CLOSING_SOON_MS. Beyond that a countdown is furniture; inside it, a
+  // signal. Nothing once closed — the lock card says so, and when. The
+  // desktop keeps the rail's countdown.
+  const closingSoon = useClosingSoon(isClosed ? null : favpoll.closes_at)
+  const closingBanner = closingSoon ? (
+    <Countdown closesAt={favpoll.closes_at!} variant="banner" />
+  ) : undefined
 
   const closedAt = favpoll.closed_at
     ? new Date(favpoll.closed_at).toLocaleDateString("en-GB", {
@@ -409,7 +413,7 @@ export function FavpollSheet({
           mentions={aboutMentions}
           compact={guestBookExpanded}
           pins={!room}
-          strip={bandStrip}
+          banner={closingBanner}
         />
       ) : (
         <FavpollHero
@@ -418,7 +422,7 @@ export function FavpollSheet({
           mentions={aboutMentions}
           compact={guestBookExpanded}
           pins={!room}
-          strip={bandStrip}
+          banner={closingBanner}
         />
       )}
 
@@ -626,10 +630,19 @@ export function FavpollSheet({
   )
 }
 
-function closedAtLabel(iso: string) {
-  return new Date(iso).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  })
+/** Whether the close is inside the banner's window — read from the clock
+ *  as an external store (a minute's tick), so render stays pure and the
+ *  server's answer matches the client's except in the minute the
+ *  threshold passes. Null = no close, or closed: never soon. */
+function useClosingSoon(closesAt: string | null | undefined) {
+  const subscribe = useCallback((onChange: () => void) => {
+    const id = setInterval(onChange, 60_000)
+    return () => clearInterval(id)
+  }, [])
+  const read = useCallback(
+    () =>
+      !!closesAt && new Date(closesAt).getTime() - Date.now() < CLOSING_SOON_MS,
+    [closesAt]
+  )
+  return useSyncExternalStore(subscribe, read, read)
 }

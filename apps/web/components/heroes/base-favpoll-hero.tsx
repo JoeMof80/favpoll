@@ -21,9 +21,9 @@ type BaseFavpollHeroProps = {
   compact?: boolean
   /** Off for the screen in the room: a static band (HeroLayout). */
   pins?: boolean
-  /** The band\'s own line on the phone — the countdown or the closed date,
-   *  as the old slide-in bar carried it (founder, 2026-10-16). */
-  strip?: React.ReactNode
+  /** The micro banner above the band on the phone, passed only as the
+   *  close approaches (HeroLayout). */
+  banner?: React.ReactNode
 }
 
 export function BaseFavpollHero({
@@ -34,7 +34,7 @@ export function BaseFavpollHero({
   mentions,
   compact,
   pins,
-  strip,
+  banner,
 }: BaseFavpollHeroProps) {
   const headline = getFavpollHeadline({
     occasionType: favpoll.occasion_type ?? null,
@@ -112,7 +112,7 @@ export function BaseFavpollHero({
       avatar={avatar}
       about={about}
       pins={pins}
-      strip={strip}
+      banner={banner}
     />
   )
 }

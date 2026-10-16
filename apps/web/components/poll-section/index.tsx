@@ -19,7 +19,10 @@ import {
   EllipsisVertical,
   Share2,
   FileHeart,
+  Sun,
+  Moon,
 } from "lucide-react"
+import { useTheme } from "@favpoll/ui"
 import { toast } from "sonner"
 import {
   DropdownMenu,
@@ -103,6 +106,7 @@ export function PollSection({
   picksSuspended = false,
   room = false,
 }: Props) {
+  const { resolvedTheme, setTheme } = useTheme()
   const { rankingView, setRankingView } = usePollSection({
     pollId: poll.id,
     hasPledged,
@@ -147,9 +151,9 @@ export function PollSection({
       className="space-y-4"
     >
       {/* Merged header: "Favourite {topic}" — button pre-pledge, static post-pledge.
-          Mobile pins under the identity bar's MEASURED height
-          (--identity-bar-h, published while it shows; 51px was the
-          one-row bar the old 6.6875rem was tuned to, 2026-09-29). */}
+          At every width it pins under the hero's band and strip
+          (--hero-stuck-bottom, constants in hero-layout since 2026-10-16:
+          the identity bar and the docking name are gone). */}
       <div
         className={
           room
@@ -161,7 +165,11 @@ export function PollSection({
               // falling back to a literal 13.75rem and pinning the heading
               // 220px down the screen the moment that column scrolled.
               "bg-background"
-            : "sticky top-(--hero-stuck-bottom,13.75rem) z-20 bg-background"
+            : // pt-6: the hero's photo hangs 24px below the pinned strip
+              // (hero-layout STRIP); the padding is inside the sticky box,
+              // painted, so the row's ⋮ clears the photo and nothing shows
+              // through. The lock card's offset below counts it.
+              "sticky top-(--hero-stuck-bottom,13.75rem) z-20 bg-background pt-6"
         }
       >
         {/* ONE heading row for all breakpoints — PollHeading left,
@@ -180,7 +188,12 @@ export function PollSection({
               Picks suspended
             </Badge>
           )}
-          {entitled && (
+          {/* THE MENU IS EVERYONE'S (founder, 2026-10-16: "a new user
+              might want to adjust at least the theme without moving away
+              from the page" — the ⋮ next to the topic). The standings
+              views are the entitled reader's; share and the theme are
+              anyone's; the keepsake is the closed favpoll's. */}
+          {!room && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -194,22 +207,26 @@ export function PollSection({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onSelect={() => setRankingView("amount")}>
-                  Amount
-                  {rankingView === "amount" && (
-                    <Check className="ml-auto size-4" aria-hidden="true" />
-                  )}
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setRankingView("count")}>
-                  Pledges
-                  {rankingView === "count" && (
-                    <Check className="ml-auto size-4" aria-hidden="true" />
-                  )}
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
+                {entitled && (
+                  <>
+                    <DropdownMenuItem onSelect={() => setRankingView("amount")}>
+                      Amount
+                      {rankingView === "amount" && (
+                        <Check className="ml-auto size-4" aria-hidden="true" />
+                      )}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => setRankingView("count")}>
+                      Pledges
+                      {rankingView === "count" && (
+                        <Check className="ml-auto size-4" aria-hidden="true" />
+                      )}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
                 {/* The keepsake's door on a closed favpoll (founder,
                     2026-09-30: not a button on the rail's state card). */}
-                {onOpenStory && (
+                {entitled && onOpenStory && (
                   <DropdownMenuItem
                     onSelect={onOpenStory}
                     className="lg:hidden"
@@ -258,6 +275,19 @@ export function PollSection({
                 >
                   Share
                   <Share2 className="ml-auto size-4" aria-hidden="true" />
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onSelect={() =>
+                    setTheme(resolvedTheme === "dark" ? "light" : "dark")
+                  }
+                >
+                  {resolvedTheme === "dark" ? "Light mode" : "Dark mode"}
+                  {resolvedTheme === "dark" ? (
+                    <Sun className="ml-auto size-4" aria-hidden="true" />
+                  ) : (
+                    <Moon className="ml-auto size-4" aria-hidden="true" />
+                  )}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -351,7 +381,7 @@ export function PollSection({
                wrapper passes events through; the card hovers with the
                list cards' lift idiom. */
             <div className="pointer-events-none z-10 flex flex-col items-center pt-4 [grid-area:1/1]">
-              <span className="sticky top-[calc(var(--hero-stuck-bottom,13.75rem)+4.25rem)] flex w-full flex-col items-center">
+              <span className="sticky top-[calc(var(--hero-stuck-bottom,13.75rem)+5.75rem)] flex w-full flex-col items-center">
                 <Button
                   type="button"
                   variant="ghost"
@@ -376,7 +406,7 @@ export function PollSection({
                sticky geometry as the lock card so it sits where guests
                expect the way in to be. */
             <div className="pointer-events-none z-10 flex flex-col items-center pt-4 [grid-area:1/1]">
-              <span className="sticky top-[calc(var(--hero-stuck-bottom,13.75rem)+4.25rem)] flex w-full flex-col items-center">
+              <span className="sticky top-[calc(var(--hero-stuck-bottom,13.75rem)+5.75rem)] flex w-full flex-col items-center">
                 <div className="pointer-events-auto w-full max-w-sm rounded-xl bg-background/95 px-5 py-4 text-center shadow-xl ring-1 ring-border">
                   <p className="text-sm text-muted-foreground">
                     {pledgesGatedNotice}
