@@ -49,16 +49,16 @@ type HeroLayoutProps = {
 // the subtitle clip), and the shell's reservation is now zero.
 //
 // BELOW lg (founder, 2026-10-16, replacing the slide-in identity bar, then
-// revised the same night: "fix the name underneath the banner and wrap it
-// if necessary. put the countdown above it inside the band"): the band and
-// photo pin under the fixed header; the countdown is the band's first
-// line; the opening line and the FULL name scroll under the band; and a
-// COMPACT copy of the name — the bar's size, laid out small so it wraps
-// properly and keeps clear of the photo — is pinned directly under the
-// band, fading in with the countdown as the full name goes under. A copy
-// rather than a shrinking transform: a scaled name wraps at its full
-// width and then shrinks, which orphaned "Whitf" on a long name. The
-// fade is the one scroll-linked value, and it moves no layout.
+// settled across several passes: "the name text should animate. the
+// countdown should be lower"): the band and photo pin under the fixed
+// header; the countdown sits low in the band; the opening line scrolls
+// under the band; and the NAME TRAVELS — sticky, it shrinks from the first
+// pixel of scroll and docks directly under the band at the old bar's
+// size, its background shrinking with it so the About passes beneath and
+// the poll heading pins right under. The scale and the box height are
+// the scroll-linked values; the height is proportional to the scale, so
+// the page beneath drifts up by a few px over the whole travel and never
+// jumps.
 //
 // What pins beneath (the poll heading, the lock card) reads the pinned
 // block's bottom from --hero-stuck-bottom, measured here.
@@ -77,8 +77,10 @@ const EYEBROW_ROW = 40
 const NAME_TOP = BAND + STRIP + EYEBROW_ROW // 136: the name's own row
 /** The phone: the fixed header the document scrolls under. */
 const PHONE_HEADER = 56
-/** The compact name docks over this much scroll once the full name's top
- *  has gone under the band (a fade, with the countdown). */
+/** The phone's name shrinks to this on its way to the band (text-3xl →
+ *  the old bar's text-lg: 18/30). */
+const PHONE_NAME_SCALE = 0.6
+/** The countdown fades in over this much scroll as the name docks. */
 const PHONE_DOCK = 24
 
 export function HeroLayout({
@@ -95,7 +97,6 @@ export function HeroLayout({
   // and lg is the shell, so in practice 0.
   const { headerInset } = useScrollRoot()
   const nameRef = useRef<HTMLDivElement>(null)
-  const compactRef = useRef<HTMLDivElement>(null)
 
   // Below lg the document scrolls under the fixed header (the hook reports
   // the shell's 0 there), and the name shrinks onto the band.
@@ -112,17 +113,16 @@ export function HeroLayout({
   // --hero-stuck-bottom: the pinned block's bottom, for what pins beneath
   // (the poll heading, the lock card). From lg: the name's row bottom —
   // its pinned top plus its box. On the phone: the band plus the docked
-  // compact name's row.
+  // name's row at its shrunken height.
   // Measured on layout changes only, never during scroll. A static hero
   // (the room) publishes the scroller's top alone.
   useEffect(() => {
     const name = nameRef.current
-    const compact = compactRef.current
     const set = () => {
       const bottom = !pins
         ? inset
         : isPhone
-          ? inset + PHONE_BAND + (compact?.offsetHeight ?? 0)
+          ? inset + PHONE_BAND + (name?.scrollHeight ?? 0) * PHONE_NAME_SCALE
           : inset + NAME_TOP + (name?.offsetHeight ?? 0)
       document.documentElement.style.setProperty(
         "--hero-stuck-bottom",
@@ -132,7 +132,6 @@ export function HeroLayout({
     set()
     const ro = new ResizeObserver(set)
     if (name) ro.observe(name)
-    if (compact) ro.observe(compact)
     // The settle's reservation, kept at zero for page-layout's calc until
     // that calc is retired with it.
     document.documentElement.style.setProperty("--hero-collapse", "0px")
@@ -145,28 +144,41 @@ export function HeroLayout({
     }
   }, [pins, inset, isPhone])
 
-  // THE DOCK: the scroll at which the full name's top goes under the band,
+  // THE DOCK: the scroll at which the name's row reaches the band's bottom,
   // measured from its rest position on layout changes, never during
-  // scroll. The compact name and the countdown fade in over the next
-  // PHONE_DOCK px.
+  // scroll. The name shrinks over [0, dock]; its box height follows the
+  // scale; the countdown fades in over the last PHONE_DOCK px.
   const { scrollY } = useScroll()
   const [dockScroll, setDockScroll] = useState(1e6)
+  const [nameRest, setNameRest] = useState(0)
   useLayoutEffect(() => {
     const name = nameRef.current
     if (!name || !pins || !isPhone) return
     const measure = () => {
-      const rest = name.getBoundingClientRect().top + window.scrollY
-      setDockScroll(Math.max(1, rest - (inset + PHONE_BAND)))
+      const rect = name.getBoundingClientRect()
+      setDockScroll(
+        Math.max(1, rect.top + window.scrollY - (inset + PHONE_BAND))
+      )
+      setNameRest(name.scrollHeight)
     }
     measure()
     const ro = new ResizeObserver(measure)
     ro.observe(document.body)
     return () => ro.disconnect()
   }, [pins, isPhone, inset])
+  const phone = isPhone && pins
+  const nameScale = useTransform(
+    scrollY,
+    [0, dockScroll],
+    phone ? [1, PHONE_NAME_SCALE] : [1, 1]
+  )
+  const nameHeight = useTransform(nameScale, (k) =>
+    phone && nameRest ? nameRest * k : "auto"
+  )
   const dockOpacity = useTransform(
     scrollY,
-    [dockScroll, dockScroll + PHONE_DOCK],
-    isPhone && pins ? [0, 1] : [1, 1]
+    [Math.max(0, dockScroll - PHONE_DOCK), dockScroll],
+    phone ? [0, 1] : [1, 1]
   )
 
   return (
@@ -194,7 +206,7 @@ export function HeroLayout({
             <div className="relative -mx-6 h-16 bg-muted lg:-mr-8 lg:-ml-16 lg:h-20">
               {strip && (
                 <motion.div
-                  className="px-6 py-1 text-xs text-muted-foreground lg:hidden"
+                  className="absolute inset-x-0 bottom-1.5 px-6 text-xs text-muted-foreground lg:hidden"
                   style={{ opacity: dockOpacity }}
                 >
                   {strip}
@@ -249,39 +261,29 @@ export function HeroLayout({
         {eyebrowText}
       </div>
 
-      {/* The name: its own row, pinned under the opening line from lg, on
+      {/* The name. From lg: its own row, pinned under the opening line, on
           the page's background with painted air beneath (pb-4 — the
           context takes it back below, so the one gap is its own mt-4). On
-          the phone it scrolls under the band like everything else. */}
-      <div
+          the phone: sticky too, docking directly under the band, shrinking
+          on the way with its box (overflow visible: the scaled text is
+          smaller than the box it lays out in, and the box follows). */}
+      <motion.div
         ref={nameRef}
-        className={["bg-background pb-4", pins ? "lg:sticky lg:z-40" : ""].join(
-          " "
-        )}
-        style={pins ? { top: `${headerInset + NAME_TOP}px` } : undefined}
+        className={[
+          "origin-top-left bg-background pb-4",
+          pins ? "sticky z-40" : "",
+        ].join(" ")}
+        style={{
+          height: nameHeight,
+          ...(pins
+            ? { top: `${inset + (isPhone ? PHONE_BAND : NAME_TOP)}px` }
+            : {}),
+        }}
       >
-        {title}
-      </div>
-
-      {/* THE DOCKED NAME (phone only): a compact copy pinned directly under
-          the band, the bar's text size, wrapping as it needs to and clear
-          of the photo hanging at the right; invisible until the full name
-          has gone under the band. A copy, so it lays out small — a scaled
-          transform wraps at the full width first. aria-hidden: the real
-          h1 is above. */}
-      {pins && (
-        <motion.div
-          ref={compactRef}
-          aria-hidden="true"
-          className="pointer-events-none sticky z-20 -mt-4 bg-background px-0 pt-2 pr-24 pb-2 lg:hidden [&_h1]:text-lg [&_h1]:leading-snug"
-          style={{
-            top: `${PHONE_HEADER + PHONE_BAND}px`,
-            opacity: dockOpacity,
-          }}
-        >
+        <motion.div className="origin-top-left" style={{ scale: nameScale }}>
           {title}
         </motion.div>
-      )}
+      </motion.div>
 
       {subtitle && <div className="-mt-4 w-full">{subtitle}</div>}
 
