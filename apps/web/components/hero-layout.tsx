@@ -5,7 +5,6 @@ import { createPortal } from "react-dom"
 import Link from "next/link"
 import { useScrollRoot } from "@/components/shell-scroller"
 import { FavpollLogo } from "@/components/favpoll-logo"
-import { HeroDebug } from "@/components/hero-debug"
 
 type HeroLayoutProps = {
   eyebrowText: React.ReactNode
@@ -159,7 +158,6 @@ export function HeroLayout({
 
   return (
     <>
-      {pins && <HeroDebug band={bandRef} />}
       {/* THE BAND, pinned at the scroller's top at every width: the banner
           (phone, when passed) and the tint bleeding across the column's
           gutters, one tone; the photo hanging off the band's bottom edge
@@ -172,9 +170,9 @@ export function HeroLayout({
           // FIXED BELOW lg, sticky from lg. iOS rubber-bands past the
           // document's end and sticky elements ride along with the
           // overscrolled content while fixed ones stay (founder's iPhone,
-          // 2026-10-16, read off the ?debug=hero panel: visualViewport
-          // 194px past the layout viewport, band at -194, the fixed mark
-          // still in place) — the reason the old identity bar was fixed
+          // 2026-10-16, read off an on-device readout since removed:
+          // visualViewport 194px past the layout viewport, band at -194,
+          // the fixed mark still in place) — the reason the old bar was fixed
           // (#850). Fixed, the box takes the reading column's own width
           // and padding, so the -mx-6 band inside still bleeds to the
           // edges and the photo sits at the content's right; a spacer of
