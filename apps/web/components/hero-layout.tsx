@@ -132,14 +132,16 @@ export function HeroLayout({
                 lower. The size and position are inline as well as by
                 class: iOS once drew it full width at the left. */}
             <div
-              className="absolute right-0 size-20 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm lg:size-24"
+              className="absolute right-0 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm [--photo:80px] lg:[--photo:96px]"
               style={{
+                // The size through a variable the classes set per
+                // breakpoint, with the PHONE size as the inline fallback:
+                // a stale stylesheet (the tunnel on his phone, twice on
+                // 2026-10-16) then draws 80, never the image's natural size.
+                width: "var(--photo, 80px)",
+                height: "var(--photo, 80px)",
                 right: 0,
                 bottom: -(128 - BAND - STRIP),
-                // The worst case if the size class is ever missed is 96,
-                // never the image's natural size.
-                maxWidth: 96,
-                maxHeight: 96,
               }}
             >
               {avatar}
