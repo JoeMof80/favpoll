@@ -209,7 +209,7 @@ describe("PollSection — decoy region accessibility", () => {
 // ─── TypedNote integration ──────────────────────────────────────────────────
 
 const REVEAL_TEXT =
-  "Yusuf said: My favourite colour was blue. I wore it whenever there was a special occasion."
+  "Yusuf said: My favourite colour was blue. I wore purple whenever there was a special occasion."
 
 describe("PollSection — reveal on first in-session unlock (pledgeJustConfirmed=true)", () => {
   beforeEach(() => {
