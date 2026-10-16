@@ -108,8 +108,8 @@ export function StickyIdentityBar({
       }`}
     >
       {(closedLabel || closesAt) && (
-        {/* SINGLE TONE (founder, 2026-10-16): no tint or rule of its own —
-            the strip and the identity row are one band. */}
+        // SINGLE TONE (founder, 2026-10-16): no tint or rule of its own —
+        // the strip and the identity row are one band.
         <div className="px-6 py-0.5">
           {closedLabel ? (
             <p className="truncate text-xs text-muted-foreground">
