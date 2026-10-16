@@ -75,7 +75,7 @@ export function CauseHero({ favpoll, mentions, compact, pins, strip }: Props) {
     <ProtagonistAvatar
       name={favpoll.cause_label ?? ""}
       photoUrl={favpoll.photo_url}
-      className="h-full w-full lg:h-full lg:w-full"
+      className="h-full w-full md:h-full md:w-full lg:h-full lg:w-full"
     />
   ) : undefined
 

@@ -374,8 +374,43 @@ export function DemoCard({
           above the hero, with the rule under it. Full-bleed past the card's
           p-5, and the real HeaderBar rather than a lookalike — the version
           Header itself renders, minus the Clerk-aware hamburger. */}
-      <div className={cn("-mx-5 mb-4 shrink-0", isPhone ? "" : "-mt-5")}>
+      <div className={cn("-mx-5 shrink-0", isPhone ? "" : "-mt-5")}>
         <HeaderBar staticMenu />
+      </div>
+
+      {/* THE BAND, outside the content box below — that box is
+          overflow-hidden for the typewriter, and clipped the band's bleed
+          at the padding edge (founder, 2026-10-16: "the band should extend
+          the full width"). Full-bleed like the header bar above it; the
+          photo hangs off its right end, straddling its edge 50/50, at the
+          content's right edge (the card's p-5 = 20). Size and position
+          inline as well as by class — the hero's lesson. */}
+      <div className="relative -mx-5 shrink-0">
+        <div
+          className={cn("bg-muted", isPhone ? "h-16" : "h-20")}
+          aria-hidden="true"
+        />
+        {/* A protagonist's photo, or a faceless cause's own (the product
+            renders favpolls.photo_url in the same slot — CauseHero). */}
+        {(protagonist || scene.photo_url) && (
+          <div
+            className={cn(
+              "absolute overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm",
+              isPhone ? "top-6 size-20" : "top-8 size-24"
+            )}
+            style={
+              isPhone
+                ? { width: 80, height: 80, top: 24, right: 20 }
+                : { width: 96, height: 96, top: 32, right: 20 }
+            }
+          >
+            <ProtagonistAvatar
+              name={protagonist ? protagonist.name : title}
+              photoUrl={protagonist ? protagonist.photo_url : scene.photo_url!}
+              className="h-full w-full md:h-full md:w-full lg:h-full lg:w-full"
+            />
+          </div>
+        )}
       </div>
 
       {/* Hidden measurer — same width as where the dialog renders. */}
@@ -392,44 +427,50 @@ export function DemoCard({
       {/* ── Hero + poll heading. No per-element entrance — the whole card
           cross-fades on scene change so nothing pops in first. ── */}
       <div className="flex-1 space-y-4 overflow-hidden">
-        {/* Hero */}
-        <div className="relative">
-          {/* pr-28, not pr-24 (2026-08-26). The avatar is 132px at md: and
-              is scaled 0.8, so it occupies 105.6px — the 96px pr-24 reserved
-              was never enough and it sat on the name by ten pixels, on EVERY
-              device, not just the phone. Short names hid it: "Poppy Chen"
-              clears the gutter and "Belinda Hartley" does not, so it only
-              surfaced when a memorial scene reached a card. */}
-          <div className={protagonist || scene.photo_url ? "pr-28" : ""}>
+        {/* Hero — THE STACKED HEADER, as the favpoll page draws it since
+            2026-10-16 (#1056): the register-tinted band bleeding past the
+            card's p-5 and meeting the header's rule; the square photo
+            hanging off the band's right end, straddling its bottom edge
+            50/50; then the opening line (clear of the photo), the name at
+            the full width, the context, the About. The phone frame takes
+            the phone's geometry (band 64, photo 80), the browser frame the
+            desktop's (80, 96). No clamp on the name: the page never
+            truncates it. */}
+        <div className="relative pt-4">
+          <div
+            className={
+              protagonist || scene.photo_url
+                ? isPhone
+                  ? "pr-24"
+                  : "pr-28"
+                : ""
+            }
+          >
             <SectionEyebrow
               variant="muted"
               className="flex h-8 items-center truncate wrap-break-word"
             >
               {cardPrefix}
             </SectionEyebrow>
-            {/* The app's own ramp is heroNameSizeClass = "text-3xl
-                sm:text-4xl" (lib/display.ts): a real phone gets text-3xl.
-                This card hardcoded text-4xl, and because it renders at a
-                fixed 390px inside whatever window the page has, sm: matched
-                and it never stepped down — so "Belinda Hartley" broke across
-                two lines on a handset that would have held it on one.
-                DisplayScreen already does exactly this: keep the
-                small-screen half of the shared ramp, swap only the upper
-                step (2026-08-26). */}
-            <h1
-              className={cn(
-                "line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground",
-                device === "phone" ? heroNameMobileSizeClass(title) : "text-4xl"
-              )}
-            >
-              {title}
-            </h1>
-            {cardSuffix && (
-              <p className="mt-2 truncate text-xl font-normal whitespace-normal text-primary">
-                {cardSuffix}
-              </p>
-            )}
           </div>
+          {/* The app's own ramp is heroNameSizeClass = "text-3xl
+              sm:text-4xl" (lib/display.ts): a real phone gets text-3xl.
+              This card renders at a fixed 390px inside whatever window the
+              page has, so it keeps the small-screen half of the shared ramp
+              and swaps only the upper step (2026-08-26). */}
+          <h1
+            className={cn(
+              "leading-tight font-medium tracking-tight wrap-break-word text-foreground",
+              device === "phone" ? heroNameMobileSizeClass(title) : "text-4xl"
+            )}
+          >
+            {title}
+          </h1>
+          {cardSuffix && (
+            <p className="mt-2 truncate text-xl font-normal whitespace-normal text-primary">
+              {cardSuffix}
+            </p>
+          )}
           {aboutText && (
             <div className="relative mt-2">
               {/* Reserve full height so the typewriter doesn't shift the layout */}
@@ -442,18 +483,6 @@ export function DemoCard({
               <p className="absolute inset-0 line-clamp-4 text-base leading-relaxed wrap-break-word text-muted-foreground">
                 {aboutShown || "\u00A0"}
               </p>
-            </div>
-          )}
-          {/* A protagonist's photo, or a faceless cause's own (the product
-              renders favpolls.photo_url in the same slot — CauseHero). */}
-          {(protagonist || scene.photo_url) && (
-            <div className="absolute top-0 right-0 origin-top-right scale-[0.8]">
-              <ProtagonistAvatar
-                name={protagonist ? protagonist.name : title}
-                photoUrl={
-                  protagonist ? protagonist.photo_url : scene.photo_url!
-                }
-              />
             </div>
           )}
         </div>
