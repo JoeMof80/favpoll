@@ -16,7 +16,12 @@ export function HeroDebug({
   const [on, setOn] = useState(false)
   const [text, setText] = useState("")
   useEffect(() => {
-    setOn(new URLSearchParams(window.location.search).get("debug") === "hero")
+    // `?debug=hero` or `#debug=hero` — Safari's address bar can drop a
+    // query string when a URL is edited by hand; a hash survives.
+    setOn(
+      new URLSearchParams(window.location.search).get("debug") === "hero" ||
+        window.location.hash === "#debug=hero"
+    )
   }, [])
   useEffect(() => {
     if (!on) return
