@@ -209,20 +209,26 @@ export function RotatingRegisterHero() {
                 isActive ? "opacity-100" : "pointer-events-none opacity-0"
               )}
             >
-              {/* px-8 on top of the register's own band classes, so the
-                  content rail is 56px: 24 (the header's own padding) + the
-                  24px mark + its 8px gap = where the brand TEXT starts
-                  (founder, 2026-10-15: "set the margin to the brand text so
-                  the content lines up too"). Holds below ~1400px, where the
-                  page's 1320px column meets the edge; above it the column
-                  is centred with every section beneath, as he chose. The
-                  departure from "exactly as they are" is 32px on this page
-                  alone. Below sm the band keeps px-6: at 320px a 56px rail
-                  each side left 208px for the 215px phone and the page
-                  scrolled 7px sideways (the overflow E2E caught it). */}
+              {/* THE RAIL MEETS THE WORDMARK'S INK (founder, 2026-10-15:
+                  "set the margin to the brand text so the content lines up
+                  too"). Measured, not computed: the box maths said 56px
+                  (24 header padding + 24 mark + 8 gap) but the founder's
+                  screenshots at 2x put the wordmark's first stroke at 54,
+                  and the hero's eyebrow sits on its rail with no bearing of
+                  its own — so the band carries 30px on top of the
+                  container's 24. Holds below ~1400px, where the page's
+                  1320px column meets the edge; above it the column is
+                  centred with every section beneath — the founder's call,
+                  twice (a left-anchored column at every width was built and
+                  rejected: "it's only at lower resolution that we need the
+                  content to line up with the wordmark"). NOT ON PHONES:
+                  below sm the band adds nothing and the rail is the
+                  container's own 24 — the 54px version was built and
+                  reverted the same day ("it wastes too much space"). */}
               <LandingHero
                 {...slide.hero}
-                bandClassName="bg-primary px-6 text-primary-foreground sm:px-8"
+                ctaAfterMedia
+                bandClassName="bg-primary text-primary-foreground sm:px-[30px]"
               />
             </div>
           )
@@ -230,20 +236,23 @@ export function RotatingRegisterHero() {
       </div>
 
       {/* Back and next AT THE SIDES (founder, 2026-10-15: "where they
-          belong"): one at each edge of the band, vertically centred, in the
-          hero's outline idiom. CHEVRONS, SMALL, NO LABEL — the register
-          glyphs with a name opening on hover were tried the same night and
-          the founder preferred plain arrows: the slide itself says which
-          register it is, and the buttons should only say "next". ON THE
-          LOGO'S LINE (founder, same night): 24px in, where the header's
-          mark sits — a 28px circle ending at 52, inside the 56px rail the
-          band's px-8 reserves (see bandClassName above), so a headline at
-          the same height never touches it; below sm, 16px in, inside the
-          48px rail there. */}
+          belong"): one at each edge of the band, vertically centred. BARE
+          CHEVRONS, LARGE, NO CIRCLE, NO LABEL (founder, 2026-10-15, after
+          outline circles and register glyphs were both tried): a 40px
+          arrow in band ink, dimmed until hovered. ON THE MARK'S LINE, INK
+          TO INK (founder, same day: "the chevrons don't quite align with
+          the brandmark either. they should"): lucide's chevron stroke
+          starts 15px into its 40px box, so the box sits 9px in and the
+          stroke begins at 24 — where the header's mark begins — and the
+          box ends at 49, inside the 54px rail. Mirrored on the right. AT
+          EVERY WIDTH: a row of both under the phone was built for phones
+          and reverted the same hour ("move the chevrons back!!!!"). Below
+          sm the rail is 24, so the boxes sit at the edge and the stroke
+          (15–25) lives in the gutter. */}
       {(
         [
-          ["Previous kind of favpoll", -1, ChevronLeft, "left-4 sm:left-6"],
-          ["Next kind of favpoll", 1, ChevronRight, "right-4 sm:right-6"],
+          ["Previous kind of favpoll", -1, ChevronLeft, "left-0 sm:left-[9px]"],
+          ["Next kind of favpoll", 1, ChevronRight, "right-0 sm:right-[9px]"],
         ] as const
       ).map(([label, by, Icon, side]) => (
         <div
@@ -256,9 +265,9 @@ export function RotatingRegisterHero() {
             variant="ghost"
             aria-label={label}
             onClick={() => step(by)}
-            className="size-7 rounded-full border border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+            className="size-10 rounded-md p-0 text-primary-foreground/70 hover:bg-transparent hover:text-primary-foreground"
           >
-            <Icon aria-hidden="true" className="size-4" />
+            <Icon aria-hidden="true" className="size-10" strokeWidth={1.5} />
           </Button>
         </div>
       ))}
