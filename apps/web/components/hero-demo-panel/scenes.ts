@@ -331,7 +331,7 @@ export const SCENES: HeroScene[] = [
       // it is about whether Chengdu turns out to be the favourite, which is
       // the honest answer to the question actually asked.
       personal_note:
-        "Ours will hopefully be Chengdu. We're planning to visit the pandas on our honeymoon.",
+        "We hope ours will be Chengdu after visiting the pandas on our honeymoon.",
       topic: {
         title: "Holiday destination",
         favourites: [
@@ -501,7 +501,7 @@ export const SCENES: HeroScene[] = [
       // future edit gives Marcus a favourite back, that capability goes
       // undemonstrated again — see lib/mechanic-steps.ts.
       personal_note:
-        "Thank you for your pledge. If we reach the goal, I'll eat the hat as well! (Only kidding)",
+        "Thanks for your pledge. If we reach the goal, I'll eat the hat! (Only kidding)",
       topic: {
         title: "Marathon hat",
         // EIGHT, where Colour has twelve and Holiday destination
