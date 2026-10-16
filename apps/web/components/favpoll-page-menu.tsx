@@ -8,6 +8,8 @@
 // own (hero-layout draws it, so on the phone it can give way to the
 // countdown as the name docks). Same geometry as the room's chrome
 // (display-chrome): the h-14 row, px-6.
+import { useEffect, useState } from "react"
+import { createPortal } from "react-dom"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Show, SignInButton, SignUpButton, useClerk } from "@clerk/nextjs"
@@ -42,8 +44,17 @@ export function FavpollPageMenu({
   const router = useRouter()
   const { resolvedTheme, setTheme } = useTheme()
   const { signOut } = useClerk()
+  // PORTALLED to the body (founder, 2026-10-16: "move the brandmark and
+  // dots to the left and right, like the live page"): the sheet's
+  // container carries a drop-shadow filter, and a filter makes an ancestor
+  // the containing block for anything fixed inside it — so this sat at
+  // the column's edge, not the viewport's. The room's chrome is rendered
+  // outside the sheet; this is the same thing from inside it.
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+  if (!mounted) return null
 
-  return (
+  return createPortal(
     <div className="pointer-events-none fixed top-0 right-0 z-40 flex h-14 items-center px-6">
       <div className="pointer-events-auto">
         <DropdownMenu>
@@ -121,6 +132,7 @@ export function FavpollPageMenu({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
