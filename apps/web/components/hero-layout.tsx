@@ -127,10 +127,9 @@ export function HeroLayout({
                 drew this full width over the name (iOS, 2026-10-16). */}
             {/* 80px below lg, 96 from it (founder, 2026-10-16: "is the photo
                 slightly too big on mobile?" — yes: a quarter of a phone's
-                column). Either way its bottom is level with the opening
-                line's text, 128 from the top, so the smaller one starts 16
-                lower. The size and position are inline as well as by
-                class: iOS once drew it full width at the left. */}
+                column). Either way it straddles the band's bottom edge
+                equally. Size and position are inline as well as by class:
+                iOS once drew it full width at the left. */}
             <div
               className="absolute right-0 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm [--photo:80px] lg:[--photo:96px]"
               style={{
@@ -141,7 +140,12 @@ export function HeroLayout({
                 width: "var(--photo, 80px)",
                 height: "var(--photo, 80px)",
                 right: 0,
-                bottom: -(128 - BAND - STRIP),
+                // Centred on the band's bottom edge, half above and half
+                // below (founder, 2026-10-16: "it should be divided by the
+                // bottom of the band"): its bottom sits half its height
+                // below the band, i.e. half its height minus the strip below
+                // this wrapper.
+                bottom: `calc(var(--photo, 80px) / -2 + ${STRIP}px)`,
               }}
             >
               {avatar}
