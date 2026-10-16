@@ -12,7 +12,6 @@ import type {
 } from "@favpoll/types"
 import { useFavpollContent } from "./use-favpoll-content"
 import { MobileCharityFooter } from "./mobile-charity-footer"
-import { FavpollPageMenu } from "@/components/favpoll-page-menu"
 import { FavpollSheet, type SheetViewer } from "@/components/favpoll-sheet"
 
 // THE GUEST LAYER (2026-09-30): the favpoll page in a guest's hand. The
@@ -185,7 +184,6 @@ export function FavpollContent({
       viewer={viewer}
       afterPoll={pledgeDialog}
     >
-      <FavpollPageMenu favpollId={favpoll.id} isOrganiser={isOrganiser} />
       <MobileCharityFooter
         charities={favpoll.favpoll_charities.map((ec) => ec.charities)}
         totalRaised={totalRaised}

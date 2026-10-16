@@ -73,12 +73,12 @@ type HeroLayoutProps = {
 const BAND = 56 // h-14: THE HEADER'S HEIGHT (founder, 2026-10-16) — the band
 // is the page's top row now that the site header is gone from this page
 const PHONE_BAND = BAND
-/** The photo: 80 at every width. Its top sits where the header's mark sat
- *  (16 into the 56 row) on desktop, 8 lower on the phone to clear the ⋮
- *  at the band's top right. */
+/** The photo: 80 at every width, its top where the header's mark sits
+ *  (16 into the 56 row) — a ⋮ at the band's right was tried and dropped
+ *  (founder, 2026-10-16: a guest needs nothing from it that the mark and
+ *  the organiser's own button don't already give). */
 const PHOTO = 80
 const PHOTO_TOP = 16
-const PHONE_PHOTO_TOP = 24
 const STRIP = 16
 const EYEBROW_ROW = 40
 const NAME_TOP = BAND + STRIP + EYEBROW_ROW // 136: the name's own row
@@ -237,7 +237,7 @@ export function HeroLayout({
             </div>
             <div className="h-4" aria-hidden="true" />
             {/* 80px at every width, its top on the mark's line (16 into the
-                56 row; 24 on the phone, under the ⋮). Size and position
+                56 row). Size and position
                 inline as well as by class: a stale stylesheet once drew it
                 full width over the name (iOS, 2026-10-16). */}
             <div
@@ -246,7 +246,7 @@ export function HeroLayout({
                 width: PHOTO,
                 height: PHOTO,
                 right: 0,
-                top: isPhone ? PHONE_PHOTO_TOP : PHOTO_TOP,
+                top: PHOTO_TOP,
               }}
             >
               {avatar}
@@ -268,13 +268,15 @@ export function HeroLayout({
           row, px-6 — the room's chrome geometry). On the phone it gives way
           to the countdown as the name docks: 56px holds one line at a time,
           and a reader mid-page needs the countdown more than the logo; it
-          is back at the top. The ⋮ at the right is favpoll-page-menu. */}
+          is back at the top. It is the page's only chrome: a ⋮ menu at the
+          right was tried and dropped the same day — a guest needs nothing
+          from it, and the organiser has the manage button. */}
       {pins &&
         mounted &&
         createPortal(
-          /* Portalled to the body, as the ⋮ is (favpoll-page-menu): the
-             sheet's drop-shadow filter would otherwise pin this to the
-             column's edge rather than the viewport's. */
+          /* Portalled to the body: the sheet's drop-shadow filter would
+             otherwise pin this to the column's edge rather than the
+             viewport's. */
           <motion.div
             className="pointer-events-none fixed top-0 left-0 z-40 flex h-14 items-center px-6"
             style={{ opacity: markOpacity }}

@@ -36,10 +36,6 @@ vi.mock("@/components/pledge-card", () => ({
 vi.mock("@/components/charity-banner", () => ({
   CharityBanner: () => null,
 }))
-// The page's own ⋮ menu wants Clerk's provider; it is chrome, not content.
-vi.mock("@/components/favpoll-page-menu", () => ({
-  FavpollPageMenu: () => <div data-testid="favpoll-page-menu" />,
-}))
 vi.mock("@/components/countdown", () => ({
   Countdown: () => null,
 }))
