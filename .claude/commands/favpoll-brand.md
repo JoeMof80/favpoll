@@ -254,7 +254,7 @@ The reveal is shown after pledging. The voice depends on who wrote it:
   ✓ "Margaret's was autumn. She said it always felt like coming home."
 
 - **Written by the protagonist in advance** — first person, a final act of self-expression:
-  ✓ "Mine was purple. I wore it to every occasion that mattered."
+  ✓ "Mine was purple. I wore it whenever there was a special occasion."
   ✓ "Autumn, always. It felt like the world was making itself beautiful one last time."
 
 - **Written by an executor following will instructions** — either voice, depending on what was left
@@ -310,7 +310,7 @@ Way to spend Sunday:
 ```
 Colour:
   framing: "e.g. I had a colour I came back to all my life — what's yours?"
-  reveal:  "e.g. Mine was purple. I wore it to every occasion that mattered."
+  reveal:  "e.g. Mine was purple. I wore it whenever there was a special occasion."
 
 Season:
   framing: "e.g. There was a season I always loved most — which is yours?"

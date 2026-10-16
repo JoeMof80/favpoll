@@ -23,7 +23,7 @@ Use them as anchors when generating new copy.
   her own eulogy and used it as the framing. First person feels right here.
 
 **Framing:** "Belinda had a colour she always wore — do you?"
-**Reveal:** "Mine was purple. I wore it to every occasion that mattered."
+**Reveal:** "Mine was purple. I wore it whenever there was a special occasion."
 
 **Why this works:** First person suits the memorial register. The detail
 ("every occasion that mattered") is specific without being overwrought.

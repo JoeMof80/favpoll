@@ -19,7 +19,8 @@ type Story = StoryObj<typeof meta>
 
 export const WithReveal: Story = {
   args: {
-    personalNote: "Mine was purple. I wore it to every occasion that mattered.",
+    personalNote:
+      "Mine was purple. I wore it whenever there was a special occasion.",
     protagonistFirstName: "Belinda",
     role: "status",
     "aria-live": "polite",
