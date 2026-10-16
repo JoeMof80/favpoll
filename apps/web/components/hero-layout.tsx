@@ -164,6 +164,14 @@ export function HeroLayout({
     [0, pinScroll],
     isPhone && pins ? [1, PHONE_NAME_SCALE] : [1, 1]
   )
+  // The strip fades in over the last 24px of the name's travel, so it is
+  // there once the name is in place and not before (founder, 2026-10-16:
+  // "dont show the countdown until the name is in place").
+  const stripOpacity = useTransform(
+    scrollY,
+    [Math.max(0, pinScroll - 24), pinScroll],
+    isPhone && pins ? [0, 1] : [1, 1]
+  )
 
   return (
     <>
@@ -189,9 +197,12 @@ export function HeroLayout({
           <>
             <div className="relative -mx-6 h-16 bg-muted lg:-mr-8 lg:-ml-16 lg:h-20">
               {strip && (
-                <div className="px-6 py-1 text-xs text-muted-foreground lg:hidden">
+                <motion.div
+                  className="px-6 py-1 text-xs text-muted-foreground lg:hidden"
+                  style={{ opacity: stripOpacity }}
+                >
                   {strip}
-                </div>
+                </motion.div>
               )}
             </div>
             <div className="h-4" aria-hidden="true" />
