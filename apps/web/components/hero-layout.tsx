@@ -77,9 +77,11 @@ const EYEBROW_ROW = 40
 const NAME_TOP = BAND + STRIP + EYEBROW_ROW // 136: the name's own row
 /** The phone: the fixed header the document scrolls under. */
 const PHONE_HEADER = 56
-/** The phone's name shrinks to this on its way to the band (text-3xl →
- *  the old bar's text-lg: 18/30). */
-const PHONE_NAME_SCALE = 0.6
+/** The phone's name shrinks to this on its way to the band (text-3xl at
+ *  30 → ~22; the old bar's 18 read too small — founder, 2026-10-16). */
+const PHONE_NAME_SCALE = 0.75
+/** …and docks this far under the band's edge ("fixed slightly too high"). */
+const PHONE_DOCK_GAP = 8
 /** The countdown fades in over this much scroll as the name docks. */
 const PHONE_DOCK = 24
 
@@ -122,7 +124,10 @@ export function HeroLayout({
       const bottom = !pins
         ? inset
         : isPhone
-          ? inset + PHONE_BAND + (name?.scrollHeight ?? 0) * PHONE_NAME_SCALE
+          ? inset +
+            PHONE_BAND +
+            PHONE_DOCK_GAP +
+            (name?.scrollHeight ?? 0) * PHONE_NAME_SCALE
           : inset + NAME_TOP + (name?.offsetHeight ?? 0)
       document.documentElement.style.setProperty(
         "--hero-stuck-bottom",
@@ -157,7 +162,10 @@ export function HeroLayout({
     const measure = () => {
       const rect = name.getBoundingClientRect()
       setDockScroll(
-        Math.max(1, rect.top + window.scrollY - (inset + PHONE_BAND))
+        Math.max(
+          1,
+          rect.top + window.scrollY - (inset + PHONE_BAND + PHONE_DOCK_GAP)
+        )
       )
       setNameRest(name.scrollHeight)
     }
@@ -271,12 +279,18 @@ export function HeroLayout({
         ref={nameRef}
         className={[
           "origin-top-left bg-background pb-4",
-          pins ? "sticky z-40" : "",
+          // z-20 on the phone: BELOW the band's wrapper (z-30), so the photo
+          // hanging off the band paints over the docked name's white box
+          // rather than being cut by it ("white bar obscuring image"); z-40
+          // from lg, above the pinned opening line.
+          pins ? "sticky z-20 lg:z-40" : "",
         ].join(" ")}
         style={{
           height: nameHeight,
           ...(pins
-            ? { top: `${inset + (isPhone ? PHONE_BAND : NAME_TOP)}px` }
+            ? {
+                top: `${inset + (isPhone ? PHONE_BAND + PHONE_DOCK_GAP : NAME_TOP)}px`,
+              }
             : {}),
         }}
       >
