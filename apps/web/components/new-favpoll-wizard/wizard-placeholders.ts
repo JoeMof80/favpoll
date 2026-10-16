@@ -46,7 +46,7 @@ const GHOSTS_BY_CATEGORY: Record<string, FieldGhosts> = {
     context: "e.g. London Marathon run",
     about:
       "e.g. Running his first marathon for Mind. Whichever hat is leading on the day, he'll wear for all 26.2 miles.",
-    note: "e.g. Thank you for your pledge — if we reach the goal, I'll eat the hat as well.",
+    note: "e.g. Thanks for your pledge — if we reach the goal, I'll eat the hat.",
   },
 }
 
