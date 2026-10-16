@@ -5,6 +5,7 @@ import { createPortal } from "react-dom"
 import Link from "next/link"
 import { useScrollRoot } from "@/components/shell-scroller"
 import { FavpollLogo } from "@/components/favpoll-logo"
+import { HeroDebug } from "@/components/hero-debug"
 
 type HeroLayoutProps = {
   eyebrowText: React.ReactNode
@@ -158,6 +159,7 @@ export function HeroLayout({
 
   return (
     <>
+      {pins && <HeroDebug band={bandRef} />}
       {/* THE BAND, pinned at the scroller's top at every width: the banner
           (phone, when passed) and the tint bleeding across the column's
           gutters, one tone; the photo hanging off the band's bottom edge
