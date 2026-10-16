@@ -550,13 +550,13 @@ describe("RotatingRegisterHero", () => {
     ])
     // Each slide carries its register's own headline, as the register page does.
     expect(all[0].textContent).toContain(
-      "Honour them by sharing what they loved"
+      "Honour them by sharing your favourite"
     )
     expect(all[1].textContent).toContain(
-      "Celebrate them by sharing what they love"
+      "Celebrate them by sharing your favourite"
     )
     expect(all[2].textContent).toContain(
-      "Fundraise by sharing what we all love"
+      "Fundraise by sharing your favourite"
     )
     expect(live().map((s) => s.dataset.register)).toEqual(["memorial"])
     expect(all[0].hasAttribute("inert")).toBe(false)
