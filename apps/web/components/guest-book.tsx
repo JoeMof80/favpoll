@@ -1,5 +1,7 @@
 "use client"
 
+import { cn } from "@/lib/utils"
+
 import { useState, useSyncExternalStore } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
@@ -219,6 +221,7 @@ export function GuestBook({
   expanded = false,
   onToggleExpand,
   pinned,
+  pinnedTop = "pt-13",
   count,
 }: {
   entries: WallEntry[]
@@ -259,6 +262,9 @@ export function GuestBook({
    *  so it stays in view as a long book scrolls beneath — one sticky
    *  group, no measuring of what sits above. Divided like the rail. */
   pinned?: React.ReactNode
+  /** The pinned group's top padding — the rail's top, set per surface so
+   *  the rail's first eyebrow lands on the hero's line (see the group). */
+  pinnedTop?: string
   /** The whole book's count when the entries given are fewer: the
    *  button's label pre-pledge (entries withheld), the card's eyebrow
    *  when it previews the latest. Defaults to the entries given. */
@@ -428,16 +434,25 @@ export function GuestBook({
       >
         {variant === "flat" && pinned ? (
           // The rail's pinned group: the rail's top padding lives here
-          // with a background, so rows scroll under it. pt-13, not the
-          // hero's 16: the hero's eyebrow sits 8px into its h-8 box and
-          // the rail's first row adds py-5, so 52 + 20 lands the two
-          // eyebrows on one line (measured 128 = 128, founder
-          // 2026-09-30: "the eyebrows in the two columns should line up"). Sticky at the
+          // with a background, so rows scroll under it. The padding is
+          // `pinnedTop`, set by the surface: the hero's eyebrow sits 8px
+          // into its h-8 box and the rail's first row adds py-5, so the
+          // padding is the eyebrow box's top minus 20 — pt-13 against the
+          // old pt-16 hero (measured 128 = 128, founder 2026-09-30: "the
+          // eyebrows in the two columns should line up"), pt-21 against
+          // the stacked header's band + strip (96 − 20 + 8; founder,
+          // 2026-10-16: "lower the right column content so the Poll
+          // Closed eyebrow lines up with the Celebrating eyebrow"). Sticky at the
           // RAIL's own top (the shell's scroller box; see
           // shell-scroller.tsx — never top-14 inside the shell). The
           // header's pt-4 is the panel's old py-4; its pb-3 the list's
           // old mt-3, so nothing moves at rest.
-          <div className="sticky top-0 z-10 divide-y divide-border bg-background pt-13">
+          <div
+            className={cn(
+              "sticky top-0 z-10 divide-y divide-border bg-background",
+              pinnedTop
+            )}
+          >
             {pinned}
             <div className="flex items-start justify-between gap-2 pt-4 pb-3">
               {header}
