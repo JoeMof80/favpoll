@@ -133,7 +133,14 @@ export function HeroLayout({
                 class: iOS once drew it full width at the left. */}
             <div
               className="absolute right-0 size-20 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm lg:size-24"
-              style={{ right: 0, bottom: -(128 - BAND - STRIP) }}
+              style={{
+                right: 0,
+                bottom: -(128 - BAND - STRIP),
+                // The worst case if the size class is ever missed is 96,
+                // never the image's natural size.
+                maxWidth: 96,
+                maxHeight: 96,
+              }}
             >
               {avatar}
             </div>
