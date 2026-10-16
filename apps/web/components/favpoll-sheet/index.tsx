@@ -506,8 +506,11 @@ export function FavpollSheet({
           heading (z-20): on a short column the heading's natural position
           met the pinned footer and painted over it (founder, 2026-10-15:
           "Topic shouldn't be on top of charity"); the footer is the floor
-          and everything in the column passes beneath it. */}
-      <div className="sticky bottom-0 z-30 mt-8 hidden border-t border-border bg-background pt-5 pb-[var(--shell-inset)] lg:-mr-8 lg:-ml-16 lg:block lg:pr-8 lg:pl-16">
+          and everything in the column passes beneath it. MUTED, NO BORDER
+          (founder, 2026-10-16: "match the footer background color to the
+          header"): the band's tone, so the page's chrome is one surface top
+          and bottom; the tone step is the edge. */}
+      <div className="sticky bottom-0 z-30 mt-8 hidden bg-muted pt-5 pb-[var(--shell-inset)] lg:-mr-8 lg:-ml-16 lg:block lg:pr-8 lg:pl-16">
         {appeal && (
           <p className="mb-2 truncate border-b border-border pb-2 text-xs text-muted-foreground">
             Part of{" "}
