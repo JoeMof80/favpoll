@@ -415,6 +415,15 @@ export function DemoCard({
                 "absolute right-0 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm",
                 isPhone ? "top-6 size-20" : "top-8 size-24"
               )}
+              // Size and position inline as well as by class — the hero's
+              // lesson: a stylesheet without the new utilities (the dev
+              // server through the tunnel, 2026-10-16) drew the photo at
+              // natural size over the name.
+              style={
+                isPhone
+                  ? { width: 80, height: 80, top: 24, right: 0 }
+                  : { width: 96, height: 96, top: 32, right: 0 }
+              }
             >
               <ProtagonistAvatar
                 name={protagonist ? protagonist.name : title}
