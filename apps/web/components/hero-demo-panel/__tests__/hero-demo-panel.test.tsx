@@ -555,9 +555,7 @@ describe("RotatingRegisterHero", () => {
     expect(all[1].textContent).toContain(
       "Celebrate them by sharing your favourite"
     )
-    expect(all[2].textContent).toContain(
-      "Fundraise by sharing your favourite"
-    )
+    expect(all[2].textContent).toContain("Fundraise by sharing your favourite")
     expect(live().map((s) => s.dataset.register)).toEqual(["memorial"])
     expect(all[0].hasAttribute("inert")).toBe(false)
     expect(all[1].hasAttribute("inert")).toBe(true)
