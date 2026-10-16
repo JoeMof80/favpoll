@@ -16,6 +16,15 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* THE SHELL BREAKPOINT: where the favpoll page (and every PageLayout)
+     becomes two panes — sheet beside rail. Named so it moves in ONE line:
+     it went md → lg on 2026-10-16 (#1056, the old hero squeezed beside
+     its photo) and back to md the same day once the stacked header put
+     the name on its own full-width row (founder: "it was only too narrow
+     because of the hero, which is now redesigned"). `shell:` and
+     `max-shell:` everywhere the layout is about the panes; `lg:` stays
+     for things that are about width alone (the rail's 376 from lg). */
+  --breakpoint-shell: 48rem;
   --font-heading: var(--font-sans);
   --font-sans: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);

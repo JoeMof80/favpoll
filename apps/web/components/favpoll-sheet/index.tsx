@@ -324,10 +324,10 @@ export function FavpollSheet({
           on the left. No About: the room is not reading. Tribute keeps
           the full hero. */}
       {heroFundraiser ? (
-        // lg:pt-[72px], not the band's pt-16: the rail's pinned countdown
+        // shell:pt-[72px], not the band's pt-16: the rail's pinned countdown
         // eyebrow sits at y=72 in the room, and this strip's eyebrow is
         // its mirror (measured 64 vs 72 at pt-16).
-        <div className="mb-6 pt-6 lg:pt-[72px]">
+        <div className="mb-6 pt-6 shell:pt-[72px]">
           <FundraiserStrip fundraiser={heroFundraiser} />
           {/* THE BAR IS THE HAIRLINE (founder, 2026-09-30: "replace the
               light border with the pledge goal bar"): where the rail draws
@@ -398,7 +398,7 @@ export function FavpollSheet({
               <ProtagonistAvatar
                 name={personName}
                 photoUrl={personPhoto}
-                className="h-8 w-8 rounded border-0 lg:h-8 lg:w-8"
+                className="h-8 w-8 rounded border-0 shell:h-8 shell:w-8"
               />
             ) : (
               <div className="flex size-8 shrink-0 items-center justify-center rounded bg-primary/10 text-xs font-medium text-primary">
@@ -426,7 +426,7 @@ export function FavpollSheet({
         />
       )}
 
-      {/* THE HEADER PINS from lg on the guest page (2026-10-15: the band and
+      {/* THE HEADER PINS from the shell breakpoint on the guest page (2026-10-15: the band and
           photo at the top, the name on the eyebrow's line); the room's is
           static, as it has been since 2026-09-30. */}
       {pollWithItems ? (
@@ -493,18 +493,18 @@ export function FavpollSheet({
           stacks only the guest book button; a closed one keeps its state
           card for the keepsake route back. mt-6, not the sections' 8:
           the book is the standings' tail, not a section of its own. */}
-      <div className="mt-6 space-y-4 lg:hidden">{guestBookMobile}</div>
+      <div className="mt-6 space-y-4 shell:hidden">{guestBookMobile}</div>
 
       {/* THE FOOTER IS THE COLUMN'S FLOOR (founder, 2026-10-01): pushed
           to the bottom when the standings are short (the spacer takes
           the slack), sticky over them when long, and its charity row
           sits the sheet's inset above the bottom — the same margin the
           top of the page keeps — with the sheet's white beneath. */}
-      <div className="hidden lg:block lg:flex-1" aria-hidden="true" />
+      <div className="hidden shell:block shell:flex-1" aria-hidden="true" />
       {/* EDGE TO EDGE (founder, 2026-10-15: "extend the width of the charity
           block so the card shadow isn't visible when scrolling past"): the
           footer bleeds across the shell's gutters (page-layout's
-          shellGutter, lg:pl-16 lg:pr-8) and pads its content back in, so
+          shellGutter, shell:pl-16 shell:pr-8) and pads its content back in, so
           the lock card's shadow passing beneath is covered to the column's
           edges, not just to its content box. z-30, above the sticky poll
           heading (z-20): on a short column the heading's natural position
@@ -515,7 +515,7 @@ export function FavpollSheet({
           day and reverted here — the phone's footer keeps it): the band is a
           56px strip and this is three times that, so matching tones read as
           a strip above and a slab below, not a frame. */}
-      <div className="sticky bottom-0 z-30 mt-8 hidden border-t border-border bg-background pt-5 pb-[var(--shell-inset)] lg:-mr-8 lg:-ml-16 lg:block lg:pr-8 lg:pl-16">
+      <div className="sticky bottom-0 z-30 mt-8 hidden border-t border-border bg-background pt-5 pb-[var(--shell-inset)] shell:-mr-8 shell:-ml-16 shell:block shell:pr-8 shell:pl-16">
         {appeal && (
           <p className="mb-2 truncate border-b border-border pb-2 text-xs text-muted-foreground">
             Part of{" "}
@@ -622,7 +622,7 @@ export function FavpollSheet({
       railExpanded={guestBookExpanded}
       shellHeight={shellHeight}
       // The bottom inset mirrors the top: 72px in the room (the goal
-      // card's line), 64px on the page (the hero's lg:pt-16).
+      // card's line), 64px on the page (the hero's shell:pt-16).
       shellInset={room ? "72px" : "64px"}
     >
       {children}
