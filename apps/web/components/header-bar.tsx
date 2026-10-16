@@ -12,10 +12,13 @@ import type { HeroRegister } from "@/lib/hero-register-store"
 // third hand-copy of a real component in that file — the charity row is
 // already one, and its comment still points at a path that moved.
 //
-// Header passes its nav and account controls as children. The demo passes
-// nothing and gets `staticMenu`, because the real hamburger is a Clerk-aware
-// client component with menu state, a scroll lock and an Escape handler —
-// none of which belongs in a picture of a page.
+// Header passes its nav and account controls as children. `staticMenu` was
+// the demo's variant — nothing passed, a drawn hamburger, because the real
+// one is a Clerk-aware client component with menu state, a scroll lock and
+// an Escape handler. Since #1061 the favpoll page has no site header (its
+// band is the top row, mark on it) and the demo card draws that instead, so
+// `staticMenu` has no caller but its own test; it stays for the next
+// picture of a page that needs a header.
 
 export function HeaderBar({
   children,

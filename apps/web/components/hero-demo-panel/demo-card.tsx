@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { Check } from "lucide-react"
 import { LockCardContent } from "@/components/lock-card-content"
-import { HeaderBar } from "@/components/header-bar"
+import { FavpollLogo } from "@/components/favpoll-logo"
 import { PHONE_SAFE_AREA_TOP } from "./phone-frame"
 import { CharityRow } from "@/components/charity-row"
 import { GoalProgress } from "@/components/goal-progress"
@@ -362,47 +362,38 @@ export function DemoCard({
         className
       )}
     >
+      {/* The safe area wears the band's tone (founder, 2026-10-16: "the
+          top should be muted too"): the band is the page's top row, so
+          it runs up behind the island as it would on the device. */}
       {isPhone && (
         <div
-          className="-mx-5 -mt-5 shrink-0"
+          className="-mx-5 -mt-5 shrink-0 bg-muted"
           style={{ height: PHONE_SAFE_AREA_TOP }}
           aria-hidden="true"
         />
       )}
 
-      {/* The app header, as a guest actually meets the page: logo and menu
-          above the hero, with the rule under it. Full-bleed past the card's
-          p-5, and the real HeaderBar rather than a lookalike — the version
-          Header itself renders, minus the Clerk-aware hamburger. */}
-      <div className={cn("-mx-5 shrink-0", isPhone ? "" : "-mt-5")}>
-        <HeaderBar staticMenu />
-      </div>
-
-      {/* THE BAND, outside the content box below — that box is
-          overflow-hidden for the typewriter, and clipped the band's bleed
-          at the padding edge (founder, 2026-10-16: "the band should extend
-          the full width"). Full-bleed like the header bar above it; the
-          photo hangs off its right end, straddling its edge 50/50, at the
-          content's right edge (the card's p-5 = 20). Size and position
-          inline as well as by class — the hero's lesson. */}
-      <div className="relative -mx-5 shrink-0">
-        <div
-          className={cn("bg-muted", isPhone ? "h-16" : "h-20")}
-          aria-hidden="true"
-        />
+      {/* THE BAND IS THE PAGE'S TOP ROW (#1061, founder 2026-10-16: the
+          favpoll page has no site header; its band is the header's 56px,
+          with the mark on it). So no site header here any more: the band
+          opens the card, the mark at its left where the header's sat, and
+          the photo hangs off its right end, straddling its edge 40/40, at
+          the content's right edge (the card's p-5 = 20). Outside the
+          content box below — that box is overflow-hidden for the typewriter
+          and clipped the band's bleed (founder: "the band should extend the
+          full width"). Size and position inline as well as by class — the
+          hero's lesson. */}
+      <div className={cn("relative -mx-5 shrink-0", isPhone ? "" : "-mt-5")}>
+        <div className="h-14 bg-muted" aria-hidden="true" />
+        <div className="absolute inset-y-0 left-0 flex items-center px-5">
+          <FavpollLogo />
+        </div>
         {/* A protagonist's photo, or a faceless cause's own (the product
             renders favpolls.photo_url in the same slot — CauseHero). */}
         {(protagonist || scene.photo_url) && (
           <div
-            className={cn(
-              "absolute overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm",
-              isPhone ? "top-6 size-20" : "top-8 size-24"
-            )}
-            style={
-              isPhone
-                ? { width: 80, height: 80, top: 24, right: 20 }
-                : { width: 96, height: 96, top: 32, right: 20 }
-            }
+            className="absolute top-4 size-20 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm"
+            style={{ width: 80, height: 80, top: 16, right: 20 }}
           >
             <ProtagonistAvatar
               name={protagonist ? protagonist.name : title}
@@ -429,23 +420,14 @@ export function DemoCard({
       <div className="flex-1 space-y-4 overflow-hidden">
         {/* Hero — THE STACKED HEADER, as the favpoll page draws it since
             2026-10-16 (#1056): the register-tinted band bleeding past the
-            card's p-5 and meeting the header's rule; the square photo
-            hanging off the band's right end, straddling its bottom edge
-            50/50; then the opening line (clear of the photo), the name at
-            the full width, the context, the About. The phone frame takes
-            the phone's geometry (band 64, photo 80), the browser frame the
-            desktop's (80, 96). No clamp on the name: the page never
-            truncates it. */}
+            card's p-5 as the page's top row; the square photo hanging off
+            the band's right end, straddling its bottom edge 40/40; then
+            the opening line (clear of the photo), the name at the full
+            width, the context, the About. One geometry at both frames
+            since #1061 (band 56, photo 80), as the page has. No clamp on
+            the name: the page never truncates it. */}
         <div className="relative pt-4">
-          <div
-            className={
-              protagonist || scene.photo_url
-                ? isPhone
-                  ? "pr-24"
-                  : "pr-28"
-                : ""
-            }
-          >
+          <div className={protagonist || scene.photo_url ? "pr-24" : ""}>
             <SectionEyebrow
               variant="muted"
               className="flex h-8 items-center truncate wrap-break-word"
@@ -585,10 +567,20 @@ export function DemoCard({
           the point of it. Corrected 2026-08-07 against a photograph of the
           real thing; what the lock withholds is the standings, never who the
           money goes to. */}
-      {/* Same tint as the content block above — the charity total is
-          `text-primary` and would otherwise be the one line on a tinted
-          card still wearing the brand. */}
-      <div className="shrink-0 border-t border-border pt-3">
+      {/* THE PHONE'S FOOTER IS THE BAND'S PARTNER (#1061, founder
+          2026-10-16: "match the footer background color to the header"):
+          muted, no hairline, bleeding to the card's edges as the page's
+          fixed footer does. The browser frame keeps white with the rule —
+          at lg the rail footer is a slab beside a 56px strip, and the
+          matching tone was tried and reverted there the same day. */}
+      <div
+        className={cn(
+          "shrink-0",
+          isPhone
+            ? "-mx-5 -mb-5 bg-muted px-5 pt-3 pb-5"
+            : "border-t border-border pt-3"
+        )}
+      >
         {charityRow}
         {goal ? (
           <GoalProgress

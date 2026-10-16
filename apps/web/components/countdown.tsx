@@ -31,7 +31,7 @@ type Props = {
    * "1942 – 2025" ramp) — the live display's money block uses it so the
    * countdown sits where the hero's dates line sits.
    */
-  variant?: "stacked" | "inline" | "subtitle" | "bar"
+  variant?: "stacked" | "inline" | "subtitle" | "bar" | "banner"
   /** The countdown at rest, zeroed and muted: the rail's closed card
    *  keeps the shape of the open one (founder, 2026-09-30: "mirror the
    *  shape of the countdown but with something to indicate the
@@ -70,7 +70,8 @@ export function Countdown({
   }, [closesAt])
 
   // The bar has no placeholder: a favpoll without a close has no row.
-  if (variant === "bar" && (!closesAt || !timeLeft)) return null
+  if ((variant === "bar" || variant === "banner") && (!closesAt || !timeLeft))
+    return null
 
   if (ended) {
     const valueCls =
@@ -238,6 +239,27 @@ export function Countdown({
             { value: minutes, label: "min" },
             { value: seconds, label: "sec" },
           ]
+
+  if (variant === "banner") {
+    // THE MICRO BANNER's line (founder, 2026-10-16): one short sentence
+    // in the band's ink, at most three units as the subtitle rule has it,
+    // tightening to hours and minutes inside the last day.
+    return (
+      <p
+        aria-live="off"
+        aria-label={`${days} days ${hours} hours ${minutes} minutes remaining`}
+        className="truncate tabular-nums"
+      >
+        Closes in
+        {parts.map(({ value, label }) => (
+          <span key={label} className="ml-1.5 font-medium text-foreground">
+            {value}
+            <span className="font-normal text-muted-foreground"> {label}</span>
+          </span>
+        ))}
+      </p>
+    )
+  }
 
   if (variant === "bar") {
     // ONE SMALL LINE for the mobile identity bar's state strip (founder,
