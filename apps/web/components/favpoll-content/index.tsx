@@ -12,7 +12,6 @@ import type {
 } from "@favpoll/types"
 import { useFavpollContent } from "./use-favpoll-content"
 import { MobileCharityFooter } from "./mobile-charity-footer"
-import { StickyIdentityBar } from "./sticky-identity-bar"
 import { FavpollSheet, type SheetViewer } from "@/components/favpoll-sheet"
 
 // THE GUEST LAYER (2026-09-30): the favpoll page in a guest's hand. The
@@ -116,14 +115,6 @@ export function FavpollContent({
         }.`
       : undefined
 
-  const closedAt = favpoll.closed_at
-    ? new Date(favpoll.closed_at).toLocaleDateString("en-GB", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      })
-    : null
-
   const charityNames = favpoll.favpoll_charities.map((ec) => ec.charities.name)
   const impactStatements = favpoll.favpoll_charities
     .map((ec) => ec.charities.impact_statement)
@@ -190,18 +181,6 @@ export function FavpollContent({
       viewer={viewer}
       afterPoll={pledgeDialog}
     >
-      <StickyIdentityBar
-        name={
-          favpoll.subject === "cause"
-            ? (favpoll.cause_label ?? "")
-            : (favpoll.protagonists?.name ?? "")
-        }
-        photoUrl={favpoll.protagonists?.photo_url}
-        closesAt={isClosed ? null : favpoll.closes_at}
-        closedLabel={
-          isClosed ? `Poll closed${closedAt ? ` · ${closedAt}` : ""}` : null
-        }
-      />
       <MobileCharityFooter
         charities={favpoll.favpoll_charities.map((ec) => ec.charities)}
         totalRaised={totalRaised}

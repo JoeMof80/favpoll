@@ -17,7 +17,10 @@ type Props = {
    *  narrowed column keeps them on their lines (founder, 2026-09-29). */
   compact?: boolean
   /** Off for the screen in the room: a static band (HeroLayout). */
-  animate?: boolean
+  pins?: boolean
+  /** The band\'s own line on the phone — the countdown or the closed date,
+   *  as the old slide-in bar carried it (founder, 2026-10-16). */
+  strip?: React.ReactNode
 }
 
 // Hero for subject='cause' — no protagonist row, so the optional image and
@@ -26,7 +29,7 @@ type Props = {
 // padding, sticky header, and scroll-shrink behaviour can never drift
 // between the two (they did: this component used to hand-roll its layout
 // and sat ~72px higher than person pages, found 2026-07-13).
-export function CauseHero({ favpoll, mentions, compact, animate }: Props) {
+export function CauseHero({ favpoll, mentions, compact, pins, strip }: Props) {
   const headline = getFavpollHeadline({
     occasionType: favpoll.occasion_type,
     openingLine: favpoll.opening_line,
@@ -48,7 +51,11 @@ export function CauseHero({ favpoll, mentions, compact, animate }: Props) {
     <h1
       // The size transition keeps step with the rail's expand (page-layout,
       // 300ms) so the compact step is one motion, not a jump.
-      className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground transition-[font-size] duration-300 ease-out motion-reduce:transition-none ${heroNameSizeClass(headline.name, compact)}`}
+      // NO CLAMP (founder, 2026-10-15: "The Ravensc…" at the tablet shell's
+      // 345px column). The hero is the canonical full-name surface and never
+      // truncates (ruling of 2026-10-01); a long name in a narrow column
+      // takes the lines it needs and the band is taller for it.
+      className={`leading-tight font-medium tracking-tight wrap-break-word text-foreground transition-[font-size] duration-300 ease-out motion-reduce:transition-none ${heroNameSizeClass(headline.name, compact)}`}
     >
       {favpoll.cause_label}
     </h1>
@@ -56,7 +63,7 @@ export function CauseHero({ favpoll, mentions, compact, animate }: Props) {
 
   const subtitle = headline.suffix ? (
     <p
-      className={`mt-4 truncate text-xl font-normal whitespace-normal text-primary transition-[font-size] duration-300 ease-out motion-reduce:transition-none ${compact ? "" : "md:text-2xl"}`}
+      className={`mt-4 truncate text-xl font-normal whitespace-normal text-primary transition-[font-size] duration-300 ease-out motion-reduce:transition-none ${compact ? "" : "lg:text-2xl"}`}
     >
       {headline.suffix}
     </p>
@@ -68,13 +75,13 @@ export function CauseHero({ favpoll, mentions, compact, animate }: Props) {
     <ProtagonistAvatar
       name={favpoll.cause_label ?? ""}
       photoUrl={favpoll.photo_url}
-      className="h-full w-full md:h-full md:w-full"
+      className="h-full w-full lg:h-full lg:w-full"
     />
   ) : undefined
 
   const about = favpoll.description ? (
     <p
-      className={`text-sm leading-relaxed wrap-break-word text-muted-foreground/80 md:text-base`}
+      className={`text-sm leading-relaxed wrap-break-word text-muted-foreground/80 lg:text-base`}
     >
       <MentionText text={favpoll.description} mentions={mentions} />
     </p>
@@ -87,7 +94,8 @@ export function CauseHero({ favpoll, mentions, compact, animate }: Props) {
       subtitle={subtitle}
       avatar={avatar}
       about={about}
-      animate={animate}
+      pins={pins}
+      strip={strip}
     />
   )
 }

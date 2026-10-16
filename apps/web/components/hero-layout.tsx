@@ -10,356 +10,308 @@ type HeroLayoutProps = {
   subtitle?: React.ReactNode
   avatar?: React.ReactNode
   about?: React.ReactNode
-  /** The band's scroll-linked life — sticky, the avatar settling, the
-   *  subtitle sliding under the name. Off for the screen in the room,
-   *  which nobody scrolls (founder, 2026-09-30): the band is ordinary
-   *  flow and every slot sits at rest. */
-  animate?: boolean
+  /** The header PINS from lg (founder, 2026-10-15): the band with its
+   *  photo, the opening line and the name stick at the scroller's top as
+   *  one block; the context and the About pass beneath. Below lg the band
+   *  and photo pin and the NAME SHRINKS onto the band as you scroll. Off
+   *  for the screen in the room, which nobody scrolls (founder,
+   *  2026-09-30). */
+  pins?: boolean
+  /** The band's own line on the phone — the countdown or the closed date,
+   *  as the old slide-in bar carried it: at the band's top, with the name
+   *  pinning in its lower half beneath. Hidden from lg (the rail has the
+   *  countdown there). */
+  strip?: React.ReactNode
 }
 
-// Rebuilt after the #423 revert (founder direction, 2026-07-29). The name
-// does not animate at all. Two animations survive, each deliberately
-// single-channel so nothing can desync:
-//   - subtitle (context) fades via opacity AND collapses its height —
-//     the reserved space of an invisible line was still holding the
-//     stuck band ~30px open (founder screenshot #2, 2026-07-29). The
-//     max-height is real layout, measured below; if either channel
-//     fails the line merely stays visible or keeps its space and the
-//     ribbon pins lower — nothing can overlap
-//   - avatar shrinks via PURE LAYOUT (width/height, one animated value) —
-//     never the #395 transform + compensating-margin pair, where two
-//     channels had to agree and visibly didn't on the founder's devices.
-//     The ResizeObserver below measures the avatar's REAL box, so the
-//     pinned ribbon tracks truth: if the animation fails the band merely
-//     stays open (ribbon pins lower), it can never pin into the photo.
-// The avatar shrink is what lets the stuck ribbon rise level with the
-// right rail's charity card on md+ (founder screenshot, 2026-07-29): the
-// unshrunk 132px box was holding the band open with 48px of dead air.
-// The var settles early (avatar by 48px, text by 120px of scroll) — before the ribbon
-// or pledge pill reach their pin positions — so pinned pieces still hold
-// one position in practice.
+// THE STACKED HEADER (founder, 2026-10-15/16). A LinkedIn profile header
+// was the reference, variant A of three mocked at /dev/header, then "aren't
+// we doing the band at all sizes?", "lets align the photo to the right",
+// "move the hero up so the opening line lines up with the bottom of the
+// photo", "make the band and photo sticky, make the name sticky too", and —
+// after a version where the opening line and photo scrolled up first —
+// "it only saves a few pixels. don't bother".
+//
+// A register-tinted band bleeding across the column's gutters; the square
+// photo hanging off its right end, taking no height of its own, its top 32
+// into the 80px band (the shell's own gap at its right) and its bottom
+// level with the opening line's text; then the opening line, and the name
+// and the context at the FULL width of the column — the name's line
+// length is the column, not the column minus a photo, and the photo can
+// never squeeze it (the feedback loop fixed earlier the same day, when the
+// photo was sized from the name block's height).
+//
+// PINNING, from lg, is PURE STICKY — three sticky boxes (band with the
+// photo; opening line; name) that keep their height and pin as one block,
+// so the settle's overflow loop (#965's shudder, in the shell's own
+// scroller) cannot start. This retires the settle (2026-09-05 →
+// 2026-10-15: the avatar shrinking into the name block, --hero-collapse,
+// the subtitle clip), and the shell's reservation is now zero.
+//
+// BELOW lg (founder, 2026-10-16, replacing the slide-in identity bar, then
+// settled across several passes: "the name text should animate. the
+// countdown should be lower"): the band and photo pin under the fixed
+// header; the countdown sits low in the band; the opening line scrolls
+// under the band; and the NAME TRAVELS — sticky, it shrinks from the first
+// pixel of scroll and docks directly under the band at the old bar's
+// size, its background shrinking with it so the About passes beneath and
+// the poll heading pins right under. The scale and the box height are
+// the scroll-linked values; the height is proportional to the scale, so
+// the page beneath drifts up by a few px over the whole travel and never
+// jumps.
+//
+// What pins beneath (the poll heading, the lock card) reads the pinned
+// block's bottom from --hero-stuck-bottom, measured here.
+
+// GEOMETRY, px. The band is 80 (the photo's gap above it equals the shell's
+// 32 at its right); a 16px strip; the opening line is a 32px row with an
+// 8px trailing margin; the 96px photo hangs so its bottom is level with
+// the opening line's text (128 from the top).
+const BAND = 80
+/** The phone's band: the 80px photo straddles its edge 40/40, and 24 above
+ *  the photo's top is the phone's own gutter (founder, 2026-10-16: "the
+ *  image top padding matches the right padding"). */
+const PHONE_BAND = 64
+const STRIP = 16
+const EYEBROW_ROW = 40
+const NAME_TOP = BAND + STRIP + EYEBROW_ROW // 136: the name's own row
+/** The phone: the fixed header the document scrolls under. */
+const PHONE_HEADER = 56
+/** The phone's name shrinks to this on its way to the band (text-3xl at
+ *  30 → ~22; the old bar's 18 read too small — founder, 2026-10-16). */
+const PHONE_NAME_SCALE = 0.75
+/** …and docks this far under the band's edge ("fixed slightly too high"). */
+const PHONE_DOCK_GAP = 8
+/** The countdown fades in over this much scroll as the name docks. */
+const PHONE_DOCK = 24
+
 export function HeroLayout({
   eyebrowText,
   title,
   subtitle,
   avatar,
   about,
-  animate = true,
+  pins = false,
+  strip,
 }: HeroLayoutProps) {
-  // THE SCROLL ROOT (2026-09-22): on the favpoll page's desktop app
-  // shell the left COLUMN scrolls, not the document, so window scroll
-  // never fires and every channel below froze at rest (founder: the
-  // hero "doesn't animate as we scroll"). Below md the column is not a
-  // scroller, so scrollY simply stays 0 — which is already what mobile
-  // wants (every transform below is identity when isMobile).
-  const { ref: scrollRef, headerInset } = useScrollRoot()
-  const { scrollY } = useScroll(scrollRef ? { container: scrollRef } : {})
+  // headerInset = 56 (the h-14 header) when the document scrolls, 0 inside
+  // the shell's scroller, whose box starts below it. Pinning is lg-only
+  // and lg is the shell, so in practice 0.
+  const { headerInset } = useScrollRoot()
+  const nameRef = useRef<HTMLDivElement>(null)
+  // The name's CONTENT — measured for the box's height, so the box's own
+  // height and padding can never feed back into it.
+  const nameInnerRef = useRef<HTMLDivElement>(null)
 
-  // The var is the SETTLED band bottom, derived from geometry that is
-  // scroll-invariant (the name block's offset within the pinned band):
-  // never mutated during scroll — restored fully, 2026-09-05, after the
-  // about-clip's collapse made whole-band measurement rewrite the var
-  // every frame and everything pinned to it stuttered (founder: "i'm
-  // seeing glitching"). Rects, not offsetTop (the relative row is the
-  // offsetParent). Content changes (name wrap, breakpoint) still
-  // re-measure via the RO; scroll recomputes the same value.
-  // The scroll over which the band settles (see the transforms below).
-  const SETTLE_SCROLL = 24
-  const boxRef = useRef<HTMLDivElement>(null)
+  // Below lg the document scrolls under the fixed header (the hook reports
+  // the shell's 0 there), and the name shrinks onto the band.
+  const [isPhone, setIsPhone] = useState(false)
   useEffect(() => {
-    const el = boxRef.current
-    if (!el) return
-    // pb-4 — the founder-tuned air under the name (2026-07-29).
-    const BAND_PB = 16
+    const mq = window.matchMedia("(max-width: 1023px)")
+    setIsPhone(mq.matches)
+    const h = (e: MediaQueryListEvent) => setIsPhone(e.matches)
+    mq.addEventListener("change", h)
+    return () => mq.removeEventListener("change", h)
+  }, [])
+  const inset = isPhone ? PHONE_HEADER : headerInset
+
+  // --hero-stuck-bottom: the pinned block's bottom, for what pins beneath
+  // (the poll heading, the lock card). From lg: the name's row bottom —
+  // its pinned top plus its box. On the phone: the band plus the docked
+  // name's row at its shrunken height.
+  // Measured on layout changes only, never during scroll. A static hero
+  // (the room) publishes the scroller's top alone.
+  useEffect(() => {
+    const name = nameRef.current
     const set = () => {
-      const settledEl = settledRef.current
-      if (!settledEl) return
-      const inset =
-        settledEl.getBoundingClientRect().bottom -
-        el.getBoundingClientRect().top
+      const bottom = !pins
+        ? inset
+        : isPhone
+          ? inset +
+            PHONE_BAND +
+            PHONE_DOCK_GAP +
+            (nameInnerRef.current?.offsetHeight ?? 0) * PHONE_NAME_SCALE
+          : inset + NAME_TOP + (name?.offsetHeight ?? 0)
       document.documentElement.style.setProperty(
         "--hero-stuck-bottom",
-        // headerInset = 56 (the h-14 header) when the document scrolls,
-        // 0 inside the shell's scroller, whose box starts below it.
-        `${Math.round(headerInset + inset + BAND_PB)}px`
+        `${Math.round(bottom)}px`
       )
     }
     set()
     const ro = new ResizeObserver(set)
-    ro.observe(el)
+    if (name) ro.observe(name)
+    // The settle's reservation, kept at zero for page-layout's calc until
+    // that calc is retired with it.
+    document.documentElement.style.setProperty("--hero-collapse", "0px")
+    document.documentElement.style.setProperty("--hero-settle", "0px")
     return () => {
       ro.disconnect()
       document.documentElement.style.removeProperty("--hero-stuck-bottom")
-    }
-  }, [headerInset])
-
-  // THE REDESIGN'S CORE (founder, 2026-09-05): the avatar's endpoints
-  // are MEASURED, not stamped. Rest = the full text stack (eyebrow +
-  // name + context), so the photo's bottom sits level with the context
-  // line at any name length; settled = eyebrow + name alone, so a
-  // two-line name settles a taller image. Both read by ResizeObserver
-  // on LAYOUT changes only — never during scroll — the same
-  // measure-the-real-box philosophy as --hero-stuck-bottom. The old
-  // constants (104/132, founder-tuned 2026-07-30) are the SSR fallback
-  // classes until mount.
-  const textRef = useRef<HTMLDivElement>(null)
-  const settledRef = useRef<HTMLDivElement>(null)
-  const [avatarCfg, setAvatarCfg] = useState({ rest: 132, settled: 84 })
-  // Style binding waits for mount: SSR + first client paint use the CSS
-  // size classes, so server and client markup can't disagree.
-  const [avatarMounted, setAvatarMounted] = useState(false)
-  // useLayoutEffect, not useEffect: the cover height and avatar
-  // endpoints are PAINT values — measured post-paint, the first frame
-  // wore the 999 fallback (caught at w390 in the breakpoint sweep),
-  // and a Fast-Refreshed tab kept a stale height until some resize.
-  useLayoutEffect(() => {
-    const text = textRef.current
-    const settledEl = settledRef.current
-    if (!text || !settledEl) return
-    const set = () => {
-      const rest = text.offsetHeight
-      const settled = settledEl.offsetHeight
-      if (rest > 0 && settled > 0) {
-        setAvatarCfg({ rest, settled })
-        // THE COLLAPSE, published (founder, 2026-09-29: "a strange
-        // shuddering when scrolling the left column"): the band settles
-        // by this much of REAL layout in the first 24px of scroll. In the
-        // shell the column is its own scroller, so when it overflows by
-        // less than this, scrolling removes its own overflow, the browser
-        // clamps the scroll back, the band re-expands, and it oscillates
-        // (Quora's collapsing header). The shell scroller reserves this
-        // much spare room (page-layout) so the loop cannot start.
-        // A STATIC band collapses by nothing, so it reserves nothing:
-        // with the collapse published, the room's column overflowed by
-        // exactly this spare and a nudge scrolled the hero off the top
-        // with nothing to settle (founder, 2026-10-01: "the hero
-        // shouldn't scroll to the top").
-        document.documentElement.style.setProperty(
-          "--hero-collapse",
-          `${animate ? Math.max(0, rest - settled) : 0}px`
-        )
-        // …and the settle window the scroller reserves with it (the 24px
-        // of scroll the band settles across) — zero for a static band.
-        document.documentElement.style.setProperty(
-          "--hero-settle",
-          `${animate ? SETTLE_SCROLL : 0}px`
-        )
-      }
-    }
-    set()
-    setAvatarMounted(true)
-    const ro = new ResizeObserver(set)
-    ro.observe(text)
-    ro.observe(settledEl)
-    return () => {
-      ro.disconnect()
       document.documentElement.style.removeProperty("--hero-collapse")
       document.documentElement.style.removeProperty("--hero-settle")
     }
-  }, [animate])
+  }, [pins, inset, isPhone])
 
-  // ONE SETTLE CONSTANT (founder, 2026-09-05: the 120px rest gap under
-  // the context was "way too low" for the about). Every channel —
-  // context fade/ride, avatar shrink, and the about's rest gap — shares
-  // this window, so the composition settles exactly as the about
-  // arrives and the rest gap IS this number. The avatar simply shrinks
-  // its measured delta a little faster. The founder's tuning knob.
-  // 24 = the 40px rest gap the founder chose (2026-09-05, "the other
-  // way around": both gaps at the ribbon's 40) minus the band's pb 16.
-  // The whole composition settles in the first 24px of scroll — brisk,
-  // but every law holds (contact at settle, slope -1).
-  // Mobile: no animation (hero scrolls away). Desktop: settle.
-  const [isMobile, setIsMobile] = useState(false)
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 767px)")
-    setIsMobile(mq.matches)
-    const h = (e: MediaQueryListEvent) => setIsMobile(e.matches)
-    mq.addEventListener("change", h)
-    return () => mq.removeEventListener("change", h)
-  }, [])
-
-  const subtitleRef = useRef<HTMLDivElement>(null)
-  const [subtitleRest, setSubtitleRest] = useState(48)
+  // THE DOCK: the scroll at which the name's row reaches the band's bottom,
+  // measured from its rest position on layout changes, never during
+  // scroll. The name shrinks over [0, dock]; its box height follows the
+  // scale; the countdown fades in over the last PHONE_DOCK px.
+  const { scrollY } = useScroll()
+  const [dockScroll, setDockScroll] = useState(1e6)
+  const [nameRest, setNameRest] = useState(0)
   useLayoutEffect(() => {
-    const el = subtitleRef.current
-    if (!el) return
-    const set = () => {
-      const h = el.offsetHeight
-      if (h > 0) setSubtitleRest(h)
+    const name = nameRef.current
+    if (!name || !pins || !isPhone) return
+    const measure = () => {
+      const rect = name.getBoundingClientRect()
+      setDockScroll(
+        Math.max(1, rect.top + window.scrollY - (inset + PHONE_BAND))
+      )
+      setNameRest(nameInnerRef.current?.offsetHeight ?? 0)
     }
-    set()
-    const ro = new ResizeObserver(set)
-    ro.observe(el)
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(document.body)
     return () => ro.disconnect()
-  }, [])
-
-  const t = [0, SETTLE_SCROLL]
-  const subtitleOpacity = useTransform(scrollY, t, isMobile ? [1, 1] : [1, 0])
-  // The line rides the SCROLL, 1:1 (founder, 2026-09-05: "move the
-  // Context at the same pace as the About so the space between them
-  // remains constant") — the collapse alone moved it at maxHeight's
-  // rate (0.4x), so the about visibly gained on it. A transform inside
-  // the clip, so layout never depends on it: if it fails the line
-  // merely sits still and clips as before.
-  const subtitleY = useTransform(
+  }, [pins, isPhone, inset])
+  const phone = isPhone && pins
+  const nameScale = useTransform(
     scrollY,
-    t,
-    isMobile ? [0, 0] : [0, -SETTLE_SCROLL]
+    [0, dockScroll],
+    phone ? [1, PHONE_NAME_SCALE] : [1, 1]
   )
-  // Collapses to 0 (the old design kept a 12px sliver of air; that job
-  // is now done by the band's static pb-3). The rest value is the line's
-  // MEASURED height, not a constant (founder, 2026-09-29: the context
-  // "breaks" with the guest book expanded — the narrowed column wrapped
-  // it to two lines, and a fixed 48px clip, bottom-anchored, cut the
-  // first line off behind the name). Read on layout changes only, like
-  // the avatar's endpoints; 48 (one line at text-2xl plus mt-4) is the
-  // SSR fallback. Still one animated value.
-  const subtitleMaxHeight = useTransform(
+  // The box's height follows the scale, plus the dock gap it carries as
+  // padding — so the box runs from the band's edge and nothing passing
+  // beneath shows in a slit (founder, 2026-10-16: "scroll text visible
+  // behind name").
+  const nameHeight = useTransform(nameScale, (k) =>
+    phone && nameRest ? nameRest * k + PHONE_DOCK_GAP : "auto"
+  )
+  const dockOpacity = useTransform(
     scrollY,
-    t,
-    isMobile ? [subtitleRest, subtitleRest] : [subtitleRest, 0]
+    [Math.max(0, dockScroll - PHONE_DOCK), dockScroll],
+    phone ? [0, 1] : [1, 1]
   )
-  const avatarSize = useTransform(scrollY, t, [
-    avatarCfg.rest,
-    isMobile ? avatarCfg.rest : avatarCfg.settled,
-  ])
 
   return (
     <>
-      {/* pb-4 is load-bearing twice over: the poll ribbon's opaque
-          backdrop reaches 12px above its own top (-top-3) to seal the
-          slit between the two sticky boxes — that overlap must land on
-          padding, or it paints over the subtitle's descenders. The other
-          4px is the founder-tuned air between the name and the stuck
-          ribbon (bisected on-device: pb-3 high, pb-6 low, pb-4.5 barely
-          low; 2026-07-29). */}
+      {/* THE BAND, pinned at the scroller's top at every width: the tint bleeding
+          across the column's gutters, a 16px strip, and the photo hanging
+          off the band's bottom edge at the right. z-30: above the opening
+          line (z-20), which pins beneath it and had once painted over the
+          photo. A cause without a photo: 24px of top padding and nothing
+          to hang. */}
       <div
-        ref={boxRef}
-        // z-30: above the poll ribbon (z-20) and the lock card's sticky
-        // overlay (z-10), which otherwise painted over the hero name when
-        // scrolling (founder-caught, 2026-08-02)
-        // The before-cover seals the 56px header zone above the band:
-        // iOS Safari intermittently drops the app header's sticky,
-        // letting the about scroll visibly over that gap (founder-caught
-        // on-device, 2026-08-02). Under a working header (z-50) the
-        // cover is invisible.
-        // FULLY OPAQUE AGAIN (2026-09-05, ending the transparent-zone
-        // experiment): a see-through lower band could not tell the
-        // about from the reveal, decoy and standings streaming after it
-        // — everything ghosted through (founder screenshots ×2). The
-        // about now lives INSIDE the band as a third collapsing clip
-        // (below), so the band hides poll content at its bottom exactly
-        // as the original design did.
-        //
-        // FROSTED 2026-10-03, which is not a reversal of that: the 2026
-        // experiment was transparency WITHOUT BLUR, and a tint leaves
-        // the text behind it legible, which is the whole of what
-        // ghosted. A backdrop blur destroys that legibility and keeps
-        // only colour and movement. X's own numbers, read off the
-        // stylesheet their server renders: blur(12px) at 0.85 alpha.
-        //
-        // Scoped to the STICKY case and to md, because frosting only
-        // means anything where something passes behind: the room's
-        // static hero and the phone (where the identity bar does this
-        // job) keep the solid band. The before-cover stays opaque on
-        // purpose — it exists for the moment iOS Safari drops the
-        // header's sticky, and a see-through patch in that failure is
-        // the bug it was added to fix.
-        className={`bg-background pt-6 pb-4 md:pt-16 ${
-          animate
-            ? `md:sticky md:z-30 md:before:absolute md:before:inset-x-0 md:before:-top-14 md:before:h-14 md:before:bg-background md:supports-backdrop-filter:bg-background/85 md:supports-backdrop-filter:backdrop-blur-md ${
-                // The scrollport already starts below the header in shell
-                // mode; md:top-14 there pins the band 56px too low, which
-                // is what was eating the about line.
-                headerInset === 0 ? "md:top-0" : "md:top-14"
-              }`
-            : ""
-        }`}
+        className={[
+          // lg:bg-background, not bg-background: the strip under the band only
+          // needs paint on desktop, where the opening line pins beneath it.
+          // On the phone it painted the page colour over the context as it
+          // passed, so the text looked cut off 16px short of the band
+          // (founder, 2026-10-16).
+          "relative lg:bg-background",
+          pins ? "sticky z-30" : "",
+        ].join(" ")}
+        style={pins ? { top: `${inset}px` } : undefined}
       >
-        {/* min-h = the settled avatar size (0.9×80 / 0.635×132): heroes
-            WITHOUT an avatar (causes) otherwise settle a few px higher
-            than person heroes, whose shrunken avatar outgrows the
-            eyebrow+name block (founder: cause ribbon "too high" next to
-            a person page, on-device 2026-07-30). */}
-        <div className="relative flex min-h-18 items-start gap-4 md:min-h-21 md:gap-6">
-          <div ref={textRef} className="min-w-0 flex-1">
-            <div ref={settledRef}>
-              {eyebrowText}
-              {title}
-            </div>
-            {subtitle && !animate && <div className="w-full">{subtitle}</div>}
-            {subtitle && animate && (
-              /* items-end (founder, 2026-09-05): top-anchored text in a
-                 bottom-up clip lost its LOWER half first, so mid-scroll
-                 the about read as covering the context. Bottom-anchored,
-                 the shrinking box clips the TOP first and the line slides
-                 up behind the name instead. Still one animated value —
-                 anchoring is static layout, the doctrine holds. */
-              <motion.div
-                className="flex items-end overflow-hidden"
-                style={{
-                  opacity: subtitleOpacity,
-                  maxHeight: subtitleMaxHeight,
-                }}
-              >
-                {/* w-full: a flex item sizes to its content, which a text
-                    subtitle never notices (a block clamps to the column
-                    either way) but the fundraiser hero's progress bar
-                    does — it wants the column, not the width of
-                    "of £1,000" (2026-09-30). */}
+        {avatar ? (
+          <>
+            <div className="relative -mx-6 h-16 bg-muted lg:-mr-8 lg:-ml-16 lg:h-20">
+              {strip && (
                 <motion.div
-                  ref={subtitleRef}
-                  className="w-full"
-                  style={{ y: subtitleY }}
+                  className="absolute inset-x-0 bottom-1.5 px-6 text-xs text-muted-foreground lg:hidden"
+                  style={{ opacity: dockOpacity }}
                 >
-                  {subtitle}
+                  {strip}
                 </motion.div>
-              </motion.div>
-            )}
-          </div>
-          {avatar && (
-            <motion.div
-              className="h-26 w-26 shrink-0 md:h-33 md:w-33"
-              style={
-                animate && avatarMounted
-                  ? { width: avatarSize, height: avatarSize }
-                  : undefined
-              }
+              )}
+            </div>
+            <div className="h-4" aria-hidden="true" />
+            {/* The size inline as well as by class: a stale stylesheet once
+                drew this full width over the name (iOS, 2026-10-16). */}
+            {/* 80px below lg, 96 from it (founder, 2026-10-16: "is the photo
+                slightly too big on mobile?" — yes: a quarter of a phone's
+                column). Either way it straddles the band's bottom edge
+                equally. Size and position are inline as well as by class:
+                iOS once drew it full width at the left. */}
+            <div
+              className="absolute right-0 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm [--photo:80px] lg:[--photo:96px]"
+              style={{
+                // The size through a variable the classes set per
+                // breakpoint, with the PHONE size as the inline fallback:
+                // a stale stylesheet (the tunnel on his phone, twice on
+                // 2026-10-16) then draws 80, never the image's natural size.
+                width: "var(--photo, 80px)",
+                height: "var(--photo, 80px)",
+                right: 0,
+                // Centred on the band's bottom edge, half above and half
+                // below (founder, 2026-10-16: "it should be divided by the
+                // bottom of the band"): its bottom sits half its height
+                // below the band, i.e. half its height minus the strip below
+                // this wrapper.
+                bottom: `calc(var(--photo, 80px) / -2 + ${STRIP}px)`,
+              }}
             >
               {avatar}
-            </motion.div>
-          )}
-        </div>
+            </div>
+          </>
+        ) : (
+          <div className="h-6" aria-hidden="true" />
+        )}
       </div>
 
-      {/* About — ORDINARY FLOW, on purpose (2026-09-05, ending the
-          third-clip experiment): collapsing the band 1:1 with the about
-          made everything below approach at 2x, and the ribbon dived
-          under the band's opaque bottom before its pin (founder
-          screenshot). With the avatar settling to the name-block height,
-          the band's bottom IS the name edge — so plain flow content
-          vanishes exactly there, no animation needed.
-
-          THE REST GAP IS THE SHRINK DELTA (founder, 2026-09-05: "the
-          About is disappearing too low again" — caught mid-shrink). The
-          cancellation law: the about approaches the band bottom at
-          exactly 1x regardless of shrink, so it arrives after gap0 px of
-          scroll. gap0 = delta means it CANNOT reach the vanish line
-          before the avatar has settled — the spec's "scrolls all the way
-          to this new height before disappearing", and the large rest gap
-          the founder's mock drew between context and about. Layout from
-          a measured value, set on measure, never on scroll. */}
+      {/* The opening line, pinned under the strip from lg, so the block is
+          band · photo · opening line · name. pr-28 keeps it clear of the
+          hanging photo. */}
       <div
-        // mb-10 = the upper gap's 40px (SETTLE_SCROLL 24 + pb 16), so
-        // the about sits equidistant. If SETTLE_SCROLL moves, move this
-        // with it.
-        // Mobile: tighter gaps (no settle animation, hero scrolls away).
-        // Desktop: the settle gap (SETTLE_SCROLL) + mb-6.
-        className="mb-3 md:mb-6"
-        style={{ marginTop: isMobile ? 8 : SETTLE_SCROLL }}
+        className={[
+          "bg-background",
+          avatar ? "pr-28" : "",
+          pins ? "lg:sticky lg:z-20" : "",
+        ].join(" ")}
+        style={pins ? { top: `${inset + BAND + STRIP}px` } : undefined}
       >
-        {about}
+        {eyebrowText}
       </div>
+
+      {/* The name. From lg: its own row, pinned under the opening line, on
+          the page's background with painted air beneath (pb-4 — the
+          context takes it back below, so the one gap is its own mt-4). On
+          the phone: sticky too, docking directly under the band, shrinking
+          on the way with its box (overflow visible: the scaled text is
+          smaller than the box it lays out in, and the box follows). */}
+      <motion.div
+        ref={nameRef}
+        className={[
+          "origin-top-left bg-background",
+          // z-20 on the phone: BELOW the band's wrapper (z-30), so the photo
+          // hanging off the band paints over the docked name's white box
+          // rather than being cut by it ("white bar obscuring image"); z-40
+          // from lg, above the pinned opening line.
+          pins ? "sticky z-20 lg:z-40" : "",
+        ].join(" ")}
+        style={{
+          height: nameHeight,
+          paddingTop: phone ? PHONE_DOCK_GAP : undefined,
+          ...(pins
+            ? {
+                top: `${inset + (isPhone ? PHONE_BAND : NAME_TOP)}px`,
+              }
+            : {}),
+        }}
+      >
+        <motion.div
+          ref={nameInnerRef}
+          className="origin-top-left pb-4"
+          style={{ scale: nameScale }}
+        >
+          {title}
+        </motion.div>
+      </motion.div>
+
+      {subtitle && <div className="-mt-4 w-full">{subtitle}</div>}
+
+      {/* About — ordinary flow; it passes beneath the pinned block. */}
+      <div className="mt-2 mb-3 lg:mt-6 lg:mb-6">{about}</div>
     </>
   )
 }
