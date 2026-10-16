@@ -177,7 +177,17 @@ export function PageLayout({
                   footer) can take mt-auto and sit on the floor when the
                   standings are short — the footer pinned on desktop as it
                   is on the phone (founder, 2026-10-01). */}
-              <div className="lg:flex lg:min-h-[calc(var(--shell-h)+var(--hero-collapse,0px)+var(--hero-settle,0px))] lg:flex-col">
+              {/* max-lg:contents — BELOW lg THIS BOX MUST NOT EXIST: it is
+                  the hero's sticky band's containing block, and it ends
+                  where the content ends, while the column runs on to the
+                  document's end (its footer padding; the grid stretches
+                  it to the shell's height). iOS rubber-bands past the
+                  bottom and the band left with its box (founder,
+                  2026-10-16: "scrolling up too far on iphone safari can
+                  cause the band and photo to disappear"). With the column
+                  as the containing block the band stays until the whole
+                  column has passed. */}
+              <div className="max-lg:contents lg:flex lg:min-h-[calc(var(--shell-h)+var(--hero-collapse,0px)+var(--hero-settle,0px))] lg:flex-col">
                 {left}
               </div>
             </ShellScroller>

@@ -20,7 +20,7 @@ type Props = {
   pins?: boolean
   /** The band\'s own line on the phone — the countdown or the closed date,
    *  as the old slide-in bar carried it (founder, 2026-10-16). */
-  strip?: React.ReactNode
+  banner?: React.ReactNode
 }
 
 // Hero for subject='cause' — no protagonist row, so the optional image and
@@ -29,7 +29,7 @@ type Props = {
 // padding, sticky header, and scroll-shrink behaviour can never drift
 // between the two (they did: this component used to hand-roll its layout
 // and sat ~72px higher than person pages, found 2026-07-13).
-export function CauseHero({ favpoll, mentions, compact, pins, strip }: Props) {
+export function CauseHero({ favpoll, mentions, compact, pins, banner }: Props) {
   const headline = getFavpollHeadline({
     occasionType: favpoll.occasion_type,
     openingLine: favpoll.opening_line,
@@ -95,7 +95,7 @@ export function CauseHero({ favpoll, mentions, compact, pins, strip }: Props) {
       avatar={avatar}
       about={about}
       pins={pins}
-      strip={strip}
+      banner={banner}
     />
   )
 }

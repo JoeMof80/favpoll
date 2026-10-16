@@ -165,6 +165,9 @@ export function FavpollContent({
 
   return (
     <FavpollSheet
+      // No site header on this page (header-mount): the shell is the
+      // whole screen, as it is in the room.
+      shellHeight="100vh"
       favpoll={favpoll}
       appeal={appeal}
       pollWithItems={pollWithItems}

@@ -1,7 +1,7 @@
 "use client"
 
 import type { MentionTarget } from "@/lib/mentions"
-import { useState } from "react"
+import { useCallback, useState, useSyncExternalStore } from "react"
 import { Countdown } from "@/components/countdown"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { GuestBook, type WallEntry } from "@/components/guest-book"
@@ -40,6 +40,10 @@ import { GoalProgress } from "@/components/goal-progress"
 
 /** Who is looking: a guest on their own phone, or the room's screen. */
 export type SheetPresentation = "guest" | "room"
+
+/** The micro banner's window: the last week (founder, 2026-10-16 — a
+ *  memorial favpoll that runs three weeks has its push in the last one). */
+const CLOSING_SOON_MS = 7 * 24 * 60 * 60 * 1000
 
 /** The viewer's own standing on this favpoll — the guest layer's state,
  *  threaded into the standings. Absent on the room's screen, which has
@@ -187,16 +191,16 @@ export function FavpollSheet({
     pledgeJustConfirmed: roomReveal,
   }
 
-  // The band's line on the phone (hero-layout `strip`): the countdown, or
-  // the closed date — what the old slide-in identity bar carried.
-  const bandStrip = isClosed ? (
-    <p className="truncate">
-      Poll closed
-      {favpoll.closed_at ? ` · ${closedAtLabel(favpoll.closed_at)}` : ""}
-    </p>
-  ) : (
-    <Countdown closesAt={favpoll.closes_at} variant="bar" />
-  )
+  // THE MICRO BANNER (founder, 2026-10-16: "a micro banner at the very
+  // top that is only visible as the favpoll approaches its deadline"):
+  // the phone's countdown, passed to the hero only inside the last
+  // CLOSING_SOON_MS. Beyond that a countdown is furniture; inside it, a
+  // signal. Nothing once closed — the lock card says so, and when. The
+  // desktop keeps the rail's countdown.
+  const closingSoon = useClosingSoon(isClosed ? null : favpoll.closes_at)
+  const closingBanner = closingSoon ? (
+    <Countdown closesAt={favpoll.closes_at!} variant="banner" />
+  ) : undefined
 
   const closedAt = favpoll.closed_at
     ? new Date(favpoll.closed_at).toLocaleDateString("en-GB", {
@@ -409,7 +413,7 @@ export function FavpollSheet({
           mentions={aboutMentions}
           compact={guestBookExpanded}
           pins={!room}
-          strip={bandStrip}
+          banner={closingBanner}
         />
       ) : (
         <FavpollHero
@@ -418,7 +422,7 @@ export function FavpollSheet({
           mentions={aboutMentions}
           compact={guestBookExpanded}
           pins={!room}
-          strip={bandStrip}
+          banner={closingBanner}
         />
       )}
 
@@ -506,7 +510,11 @@ export function FavpollSheet({
           heading (z-20): on a short column the heading's natural position
           met the pinned footer and painted over it (founder, 2026-10-15:
           "Topic shouldn't be on top of charity"); the footer is the floor
-          and everything in the column passes beneath it. */}
+          and everything in the column passes beneath it. WHITE WITH A
+          HAIRLINE, not the band's muted (founder, 2026-10-16: tried the same
+          day and reverted here — the phone's footer keeps it): the band is a
+          56px strip and this is three times that, so matching tones read as
+          a strip above and a slab below, not a frame. */}
       <div className="sticky bottom-0 z-30 mt-8 hidden border-t border-border bg-background pt-5 pb-[var(--shell-inset)] lg:-mr-8 lg:-ml-16 lg:block lg:pr-8 lg:pl-16">
         {appeal && (
           <p className="mb-2 truncate border-b border-border pb-2 text-xs text-muted-foreground">
@@ -586,11 +594,11 @@ export function FavpollSheet({
     <GuestBook
       {...guestBookProps}
       variant="flat"
-      // The rail's top: on the hero's eyebrow line (pt-21 — band 80 +
+      // The rail's top: on the hero's eyebrow line (pt-15 — band 56 +
       // strip 16, less the row's own 20, plus the eyebrow's 8). The
       // room's fundraiser dial keeps the old 72px line (pt-13): its goal
       // card was tuned to it (2026-10-01).
-      pinnedTop={heroFundraiser ? "pt-13" : "pt-21"}
+      pinnedTop={heroFundraiser ? "pt-13" : "pt-15"}
       expanded={guestBookExpanded}
       onToggleExpand={() => setGuestBookExpanded((v) => !v)}
       pinned={
@@ -622,10 +630,19 @@ export function FavpollSheet({
   )
 }
 
-function closedAtLabel(iso: string) {
-  return new Date(iso).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  })
+/** Whether the close is inside the banner's window — read from the clock
+ *  as an external store (a minute's tick), so render stays pure and the
+ *  server's answer matches the client's except in the minute the
+ *  threshold passes. Null = no close, or closed: never soon. */
+function useClosingSoon(closesAt: string | null | undefined) {
+  const subscribe = useCallback((onChange: () => void) => {
+    const id = setInterval(onChange, 60_000)
+    return () => clearInterval(id)
+  }, [])
+  const read = useCallback(
+    () =>
+      !!closesAt && new Date(closesAt).getTime() - Date.now() < CLOSING_SOON_MS,
+    [closesAt]
+  )
+  return useSyncExternalStore(subscribe, read, read)
 }
