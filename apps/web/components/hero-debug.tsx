@@ -20,7 +20,7 @@ export function HeroDebug({
   }, [])
   useEffect(() => {
     if (!on) return
-    const r = (el: Element | null) => {
+    const r = (el: Element | null | undefined) => {
       if (!el) return "none"
       const b = el.getBoundingClientRect()
       return `${Math.round(b.top)}..${Math.round(b.bottom)}`
