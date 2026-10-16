@@ -99,6 +99,9 @@ export function HeroLayout({
   // and lg is the shell, so in practice 0.
   const { headerInset } = useScrollRoot()
   const nameRef = useRef<HTMLDivElement>(null)
+  // The name's CONTENT — measured for the box's height, so the box's own
+  // height and padding can never feed back into it.
+  const nameInnerRef = useRef<HTMLDivElement>(null)
 
   // Below lg the document scrolls under the fixed header (the hook reports
   // the shell's 0 there), and the name shrinks onto the band.
@@ -127,7 +130,7 @@ export function HeroLayout({
           ? inset +
             PHONE_BAND +
             PHONE_DOCK_GAP +
-            (name?.scrollHeight ?? 0) * PHONE_NAME_SCALE
+            (nameInnerRef.current?.offsetHeight ?? 0) * PHONE_NAME_SCALE
           : inset + NAME_TOP + (name?.offsetHeight ?? 0)
       document.documentElement.style.setProperty(
         "--hero-stuck-bottom",
@@ -164,7 +167,7 @@ export function HeroLayout({
       setDockScroll(
         Math.max(1, rect.top + window.scrollY - (inset + PHONE_BAND))
       )
-      setNameRest(name.scrollHeight)
+      setNameRest(nameInnerRef.current?.offsetHeight ?? 0)
     }
     measure()
     const ro = new ResizeObserver(measure)
@@ -279,7 +282,7 @@ export function HeroLayout({
       <motion.div
         ref={nameRef}
         className={[
-          "origin-top-left bg-background pb-4",
+          "origin-top-left bg-background",
           // z-20 on the phone: BELOW the band's wrapper (z-30), so the photo
           // hanging off the band paints over the docked name's white box
           // rather than being cut by it ("white bar obscuring image"); z-40
@@ -296,7 +299,11 @@ export function HeroLayout({
             : {}),
         }}
       >
-        <motion.div className="origin-top-left" style={{ scale: nameScale }}>
+        <motion.div
+          ref={nameInnerRef}
+          className="origin-top-left pb-4"
+          style={{ scale: nameScale }}
+        >
           {title}
         </motion.div>
       </motion.div>
