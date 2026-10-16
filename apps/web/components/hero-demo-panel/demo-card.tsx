@@ -378,6 +378,41 @@ export function DemoCard({
         <HeaderBar staticMenu />
       </div>
 
+      {/* THE BAND, outside the content box below — that box is
+          overflow-hidden for the typewriter, and clipped the band's bleed
+          at the padding edge (founder, 2026-10-16: "the band should extend
+          the full width"). Full-bleed like the header bar above it; the
+          photo hangs off its right end, straddling its edge 50/50, at the
+          content's right edge (the card's p-5 = 20). Size and position
+          inline as well as by class — the hero's lesson. */}
+      <div className="relative -mx-5 shrink-0">
+        <div
+          className={cn("bg-muted", isPhone ? "h-16" : "h-20")}
+          aria-hidden="true"
+        />
+        {/* A protagonist's photo, or a faceless cause's own (the product
+            renders favpolls.photo_url in the same slot — CauseHero). */}
+        {(protagonist || scene.photo_url) && (
+          <div
+            className={cn(
+              "absolute overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm",
+              isPhone ? "top-6 size-20" : "top-8 size-24"
+            )}
+            style={
+              isPhone
+                ? { width: 80, height: 80, top: 24, right: 20 }
+                : { width: 96, height: 96, top: 32, right: 20 }
+            }
+          >
+            <ProtagonistAvatar
+              name={protagonist ? protagonist.name : title}
+              photoUrl={protagonist ? protagonist.photo_url : scene.photo_url!}
+              className="h-full w-full md:h-full md:w-full lg:h-full lg:w-full"
+            />
+          </div>
+        )}
+      </div>
+
       {/* Hidden measurer — same width as where the dialog renders. */}
       <div
         ref={measureRef}
@@ -401,41 +436,7 @@ export function DemoCard({
             the phone's geometry (band 64, photo 80), the browser frame the
             desktop's (80, 96). No clamp on the name: the page never
             truncates it. */}
-        <div className="relative">
-          <div
-            className={cn("-mx-5 bg-muted", isPhone ? "h-16" : "h-20")}
-            aria-hidden="true"
-          />
-          <div className="h-4" aria-hidden="true" />
-          {/* A protagonist's photo, or a faceless cause's own (the product
-              renders favpolls.photo_url in the same slot — CauseHero). */}
-          {(protagonist || scene.photo_url) && (
-            <div
-              className={cn(
-                "absolute right-0 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm",
-                isPhone ? "top-6 size-20" : "top-8 size-24"
-              )}
-              // Size and position inline as well as by class — the hero's
-              // lesson: a stylesheet without the new utilities (the dev
-              // server through the tunnel, 2026-10-16) drew the photo at
-              // natural size over the name.
-              style={
-                isPhone
-                  ? { width: 80, height: 80, top: 24, right: 0 }
-                  : { width: 96, height: 96, top: 32, right: 0 }
-              }
-            >
-              <ProtagonistAvatar
-                name={protagonist ? protagonist.name : title}
-                photoUrl={
-                  protagonist ? protagonist.photo_url : scene.photo_url!
-                }
-                // Every breakpoint: the component's own md:h-33 is the old row
-                // hero's size and would crop inside this wrapper.
-                className="h-full w-full md:h-full md:w-full lg:h-full lg:w-full"
-              />
-            </div>
-          )}
+        <div className="relative pt-4">
           <div
             className={
               protagonist || scene.photo_url
