@@ -127,7 +127,7 @@ export function HeroLayout({
                 drew this full width over the name (iOS, 2026-10-16). */}
             <div
               className="absolute top-8 right-0 size-24 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm"
-              style={{ width: 96, height: 96 }}
+              style={{ width: 96, height: 96, top: 32, right: 0 }}
             >
               {avatar}
             </div>

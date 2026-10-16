@@ -108,7 +108,9 @@ export function StickyIdentityBar({
       }`}
     >
       {(closedLabel || closesAt) && (
-        <div className="border-b border-border bg-primary/5 px-6 py-0.5">
+        {/* SINGLE TONE (founder, 2026-10-16): no tint or rule of its own —
+            the strip and the identity row are one band. */}
+        <div className="px-6 py-0.5">
           {closedLabel ? (
             <p className="truncate text-xs text-muted-foreground">
               {closedLabel}
@@ -124,9 +126,11 @@ export function StickyIdentityBar({
         </p>
         {/* 56px, hanging 24 below the band at the right, keylined like the
             hero's; the size inline as well as by class (the hero's lesson). */}
+        {/* Position inline too: on iOS Safari the class alone left the
+            photo at its static position, the left (2026-10-16). */}
         <div
           className="absolute right-6 -bottom-6 size-14 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm"
-          style={{ width: 56, height: 56 }}
+          style={{ width: 56, height: 56, right: 24, bottom: -HANG }}
         >
           {photoUrl ? (
             <img src={photoUrl} alt="" className="h-full w-full object-cover" />
