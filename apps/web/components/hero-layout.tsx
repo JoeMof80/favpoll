@@ -2,7 +2,9 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
+import Link from "next/link"
 import { useScrollRoot } from "@/components/shell-scroller"
+import { FavpollLogo } from "@/components/favpoll-logo"
 
 type HeroLayoutProps = {
   eyebrowText: React.ReactNode
@@ -67,16 +69,20 @@ type HeroLayoutProps = {
 // 32 at its right); a 16px strip; the opening line is a 32px row with an
 // 8px trailing margin; the 96px photo hangs so its bottom is level with
 // the opening line's text (128 from the top).
-const BAND = 80
-/** The phone's band: the 80px photo straddles its edge 40/40, and 24 above
- *  the photo's top is the phone's own gutter (founder, 2026-10-16: "the
- *  image top padding matches the right padding"). */
-const PHONE_BAND = 64
+const BAND = 56 // h-14: THE HEADER'S HEIGHT (founder, 2026-10-16) — the band
+// is the page's top row now that the site header is gone from this page
+const PHONE_BAND = BAND
+/** The photo: 80 at every width. Its top sits where the header's mark sat
+ *  (16 into the 56 row) on desktop, 8 lower on the phone to clear the ⋮
+ *  at the band's top right. */
+const PHOTO = 80
+const PHOTO_TOP = 16
+const PHONE_PHOTO_TOP = 24
 const STRIP = 16
 const EYEBROW_ROW = 40
 const NAME_TOP = BAND + STRIP + EYEBROW_ROW // 136: the name's own row
-/** The phone: the fixed header the document scrolls under. */
-const PHONE_HEADER = 56
+/** The phone: the document scrolls from the very top — no site header. */
+const PHONE_HEADER = 0
 /** The phone's name shrinks to this on its way to the band (text-3xl at
  *  30 → ~22; the old bar's 18 read too small — founder, 2026-10-16). */
 const PHONE_NAME_SCALE = 0.75
@@ -192,6 +198,7 @@ export function HeroLayout({
     [Math.max(0, dockScroll - PHONE_DOCK), dockScroll],
     phone ? [0, 1] : [1, 1]
   )
+  const markOpacity = useTransform(dockOpacity, (v) => (phone ? 1 - v : 1))
 
   return (
     <>
@@ -215,7 +222,7 @@ export function HeroLayout({
       >
         {avatar ? (
           <>
-            <div className="relative -mx-6 h-16 bg-muted lg:-mr-8 lg:-ml-16 lg:h-20">
+            <div className="relative -mx-6 h-14 bg-muted lg:-mr-8 lg:-ml-16">
               {strip && (
                 <motion.div
                   className="absolute inset-x-0 bottom-1.5 px-6 text-xs text-muted-foreground lg:hidden"
@@ -226,38 +233,53 @@ export function HeroLayout({
               )}
             </div>
             <div className="h-4" aria-hidden="true" />
-            {/* The size inline as well as by class: a stale stylesheet once
-                drew this full width over the name (iOS, 2026-10-16). */}
-            {/* 80px below lg, 96 from it (founder, 2026-10-16: "is the photo
-                slightly too big on mobile?" — yes: a quarter of a phone's
-                column). Either way it straddles the band's bottom edge
-                equally. Size and position are inline as well as by class:
-                iOS once drew it full width at the left. */}
+            {/* 80px at every width, its top on the mark's line (16 into the
+                56 row; 24 on the phone, under the ⋮). Size and position
+                inline as well as by class: a stale stylesheet once drew it
+                full width over the name (iOS, 2026-10-16). */}
             <div
-              className="absolute right-0 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm [--photo:80px] lg:[--photo:96px]"
+              className="absolute right-0 size-20 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm"
               style={{
-                // The size through a variable the classes set per
-                // breakpoint, with the PHONE size as the inline fallback:
-                // a stale stylesheet (the tunnel on his phone, twice on
-                // 2026-10-16) then draws 80, never the image's natural size.
-                width: "var(--photo, 80px)",
-                height: "var(--photo, 80px)",
+                width: PHOTO,
+                height: PHOTO,
                 right: 0,
-                // Centred on the band's bottom edge, half above and half
-                // below (founder, 2026-10-16: "it should be divided by the
-                // bottom of the band"): its bottom sits half its height
-                // below the band, i.e. half its height minus the strip below
-                // this wrapper.
-                bottom: `calc(var(--photo, 80px) / -2 + ${STRIP}px)`,
+                top: isPhone ? PHONE_PHOTO_TOP : PHOTO_TOP,
               }}
             >
               {avatar}
             </div>
           </>
         ) : (
-          <div className="h-6" aria-hidden="true" />
+          /* No photo: the band still is the page's top row, with the mark. */
+          <>
+            <div
+              className="relative -mx-6 h-14 bg-muted lg:-mr-8 lg:-ml-16"
+              aria-hidden="true"
+            />
+            <div className="h-4" aria-hidden="true" />
+          </>
         )}
       </div>
+
+      {/* THE MARK, on the band at the header's own spot (fixed, the h-14
+          row, px-6 — the room's chrome geometry). On the phone it gives way
+          to the countdown as the name docks: 56px holds one line at a time,
+          and a reader mid-page needs the countdown more than the logo; it
+          is back at the top. The ⋮ at the right is favpoll-page-menu. */}
+      {pins && (
+        <motion.div
+          className="pointer-events-none fixed top-0 left-0 z-40 flex h-14 items-center px-6"
+          style={{ opacity: markOpacity }}
+        >
+          <Link
+            href="/"
+            aria-label="favpoll home"
+            className="pointer-events-auto"
+          >
+            <FavpollLogo />
+          </Link>
+        </motion.div>
+      )}
 
       {/* The opening line, pinned under the strip from lg, so the block is
           band · photo · opening line · name. pr-28 keeps it clear of the

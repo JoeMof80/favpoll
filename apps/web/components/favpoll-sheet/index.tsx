@@ -586,11 +586,11 @@ export function FavpollSheet({
     <GuestBook
       {...guestBookProps}
       variant="flat"
-      // The rail's top: on the hero's eyebrow line (pt-21 — band 80 +
+      // The rail's top: on the hero's eyebrow line (pt-15 — band 56 +
       // strip 16, less the row's own 20, plus the eyebrow's 8). The
       // room's fundraiser dial keeps the old 72px line (pt-13): its goal
       // card was tuned to it (2026-10-01).
-      pinnedTop={heroFundraiser ? "pt-13" : "pt-21"}
+      pinnedTop={heroFundraiser ? "pt-13" : "pt-15"}
       expanded={guestBookExpanded}
       onToggleExpand={() => setGuestBookExpanded((v) => !v)}
       pinned={
