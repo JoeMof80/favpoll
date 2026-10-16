@@ -362,9 +362,12 @@ export function DemoCard({
         className
       )}
     >
+      {/* The safe area wears the band's tone (founder, 2026-10-16: "the
+          top should be muted too"): the band is the page's top row, so
+          it runs up behind the island as it would on the device. */}
       {isPhone && (
         <div
-          className="-mx-5 -mt-5 shrink-0"
+          className="-mx-5 -mt-5 shrink-0 bg-muted"
           style={{ height: PHONE_SAFE_AREA_TOP }}
           aria-hidden="true"
         />
