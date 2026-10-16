@@ -20,7 +20,10 @@ type BaseFavpollHeroProps = {
    *  narrowed column keeps them on their lines (founder, 2026-09-29). */
   compact?: boolean
   /** Off for the screen in the room: a static band (HeroLayout). */
-  animate?: boolean
+  pins?: boolean
+  /** The band\'s own line on the phone — the countdown or the closed date,
+   *  as the old slide-in bar carried it (founder, 2026-10-16). */
+  strip?: React.ReactNode
 }
 
 export function BaseFavpollHero({
@@ -30,7 +33,8 @@ export function BaseFavpollHero({
   aboutPlaceholder,
   mentions,
   compact,
-  animate,
+  pins,
+  strip,
 }: BaseFavpollHeroProps) {
   const headline = getFavpollHeadline({
     occasionType: favpoll.occasion_type ?? null,
@@ -56,7 +60,11 @@ export function BaseFavpollHero({
     <h1
       // The size transition keeps step with the rail's expand (page-layout,
       // 300ms) so the compact step is one motion, not a jump.
-      className={`line-clamp-2 leading-tight font-medium tracking-tight wrap-break-word text-foreground transition-[font-size] duration-300 ease-out motion-reduce:transition-none ${heroNameSizeClass(headline.name, compact)}`}
+      // NO CLAMP (founder, 2026-10-15: "The Ravensc…" at the tablet shell's
+      // 345px column). The hero is the canonical full-name surface and never
+      // truncates (ruling of 2026-10-01); a long name in a narrow column
+      // takes the lines it needs and the band is taller for it.
+      className={`leading-tight font-medium tracking-tight wrap-break-word text-foreground transition-[font-size] duration-300 ease-out motion-reduce:transition-none ${heroNameSizeClass(headline.name, compact)}`}
     >
       {favpoll.subject === "cause" ? favpoll.cause_label : protagonist.name}
     </h1>
@@ -64,7 +72,7 @@ export function BaseFavpollHero({
 
   const subtitle = headline.suffix ? (
     <p
-      className={`mt-4 truncate text-xl font-normal whitespace-normal text-primary transition-[font-size] duration-300 ease-out motion-reduce:transition-none ${compact ? "" : "md:text-2xl"}`}
+      className={`mt-4 truncate text-xl font-normal whitespace-normal text-primary transition-[font-size] duration-300 ease-out motion-reduce:transition-none ${compact ? "" : "lg:text-2xl"}`}
     >
       {headline.suffix}
     </p>
@@ -79,14 +87,14 @@ export function BaseFavpollHero({
       <ProtagonistAvatar
         name={protagonist.name}
         photoUrl={protagonist.photo_url}
-        className="h-full w-full md:h-full md:w-full"
+        className="h-full w-full lg:h-full lg:w-full"
       />
     ) : undefined
 
   const about =
     protagonist.about || aboutPlaceholder ? (
       <p
-        className={`text-sm leading-relaxed wrap-break-word text-muted-foreground/80 md:text-base`}
+        className={`text-sm leading-relaxed wrap-break-word text-muted-foreground/80 lg:text-base`}
       >
         {protagonist.about ? (
           <MentionText text={protagonist.about} mentions={mentions} />
@@ -103,7 +111,8 @@ export function BaseFavpollHero({
       subtitle={subtitle}
       avatar={avatar}
       about={about}
-      animate={animate}
+      pins={pins}
+      strip={strip}
     />
   )
 }

@@ -70,16 +70,12 @@ const REAL_RESULTS: CardResultItem[] = [
 // ─── Un-pledged live card ─────────────────────────────────────────────────────
 
 describe("FavpollListCard — un-pledged live card", () => {
-  it("locks with the skeleton the guest page uses, aria-hidden, no blur (2026-10-15)", () => {
+  it("locks with the lock card alone: no skeleton, no decoy, no blur (2026-10-15)", () => {
     const { container } = render(<FavpollListCard favpoll={BASE} />)
-    const locked = container.querySelector('[data-testid="list-card-locked"]')
-    expect(locked).toBeTruthy()
-    expect(locked).toHaveAttribute("aria-hidden", "true")
-    expect(locked?.className).not.toContain("blur-xs")
-    // One skeleton row per favourite (ITEMS has three), capped at four.
-    expect(
-      locked!.querySelector('[data-testid="standings-skeleton"]')!.children
-    ).toHaveLength(3)
+    expect(screen.queryByTestId("standings-skeleton")).toBeNull()
+    expect(screen.queryByTestId("list-card-decoy")).toBeNull()
+    expect(container.querySelector(".blur-xs")).toBeNull()
+    expect(screen.getByText("Pledge your favourite")).toBeInTheDocument()
   })
 
   it("shows lock hint copy", () => {
@@ -111,7 +107,7 @@ describe("FavpollListCard — un-pledged live card", () => {
 describe("FavpollListCard — pledged card", () => {
   it("renders real results with no skeleton", () => {
     render(<FavpollListCard favpoll={BASE} initialResults={REAL_RESULTS} />)
-    expect(screen.queryByTestId("list-card-locked")).toBeNull()
+    expect(screen.queryByText("Pledge your favourite")).toBeNull()
     expect(screen.queryByText("Pledge your favourite")).toBeNull()
     // formatCurrency(1000) → £10
     expect(screen.getByText("£10")).toBeInTheDocument()
@@ -124,7 +120,7 @@ describe("FavpollListCard — closed card", () => {
   it("no skeleton when closed_at is set (entitled via isClosed)", () => {
     const closed = { ...BASE, closed_at: "2024-01-01T00:00:00Z" }
     render(<FavpollListCard favpoll={closed} />)
-    expect(screen.queryByTestId("list-card-locked")).toBeNull()
+    expect(screen.queryByText("Pledge your favourite")).toBeNull()
     expect(screen.queryByText("Pledge your favourite")).toBeNull()
   })
 })
@@ -187,16 +183,12 @@ describe("FavpollListCard — value row", () => {
 // ─── Accessibility ────────────────────────────────────────────────────────────
 
 describe("FavpollListCard — accessibility", () => {
-  it("skeleton and lock hint are aria-hidden; pledge pill is the labelled trigger", () => {
+  it("the lock hint is aria-hidden; pledge pill is the labelled trigger", () => {
     const { container } = render(<FavpollListCard favpoll={BASE} />)
 
-    // Skeleton and its overlay are both aria-hidden
+    // The lock hint overlay is aria-hidden (the pill carries the name)
     const ariaHiddenNodes = container.querySelectorAll('[aria-hidden="true"]')
-    const locked = container.querySelector('[data-testid="list-card-locked"]')
-    expect(locked).toBeTruthy()
-    expect(locked).toHaveAttribute("aria-hidden", "true")
-    // At least 2 aria-hidden nodes (skeleton + lock hint overlay)
-    expect(ariaHiddenNodes.length).toBeGreaterThanOrEqual(2)
+    expect(ariaHiddenNodes.length).toBeGreaterThanOrEqual(1)
 
     // The pledge pill is the only interactive element and has an accessible name
     expect(

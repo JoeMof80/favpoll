@@ -161,7 +161,7 @@ export function PollSection({
               // falling back to a literal 13.75rem and pinning the heading
               // 220px down the screen the moment that column scrolled.
               "bg-background"
-            : "sticky top-[calc(3.5rem+var(--identity-bar-h,3.1875rem))] z-20 bg-background md:top-(--hero-stuck-bottom,13.75rem)"
+            : "sticky top-(--hero-stuck-bottom,13.75rem) z-20 bg-background"
         }
       >
         {/* ONE heading row for all breakpoints — PollHeading left,
@@ -212,7 +212,7 @@ export function PollSection({
                 {onOpenStory && (
                   <DropdownMenuItem
                     onSelect={onOpenStory}
-                    className="md:hidden"
+                    className="lg:hidden"
                   >
                     Standings history
                     <TrendingUpDown
@@ -303,7 +303,7 @@ export function PollSection({
                Only the organiser sees this (guests see the lock card). */
             <div className="grid">
               <div
-                className="pointer-events-none [grid-area:1/1]"
+                className="pointer-events-none hidden [grid-area:1/1] lg:block"
                 aria-hidden="true"
               >
                 <StandingsSkeleton rows={6} />
@@ -319,6 +319,13 @@ export function PollSection({
           )}
         </>
       ) : (
+        /* SKELETON FROM lg ONLY (founder, 2026-10-15/16: "skeletons seem
+           pointless here because they are obscured by the pledge card"): in
+           the single column the lock card covers nearly the whole block and
+           the skeleton showed as slivers around it; in the shell there is room
+           above and below for it to read as the standings-to-come. Below lg
+           the cell is the lock card's own height; the organiser's zero-pledges
+           skeleton above follows the same rule. */
         /* Pre-pledge: skeleton bars with the lock-card overlay on top.
            Replaces the old blurred decoy (founder, 2026-09-21: "I quite
            like the skeleton — replace the decoy with it"). The grid cell
@@ -326,7 +333,7 @@ export function PollSection({
            ancestors, so the card pins correctly as an in-flow sibling. */
         <div className="grid">
           <div
-            className="pointer-events-none [grid-area:1/1]"
+            className="pointer-events-none hidden [grid-area:1/1] lg:block"
             aria-hidden="true"
           >
             {hasNote && <NoteSkeleton />}
@@ -340,7 +347,7 @@ export function PollSection({
                wrapper passes events through; the card hovers with the
                list cards' lift idiom. */
             <div className="pointer-events-none z-10 flex flex-col items-center pt-4 [grid-area:1/1]">
-              <span className="sticky top-[calc(3.5rem+var(--identity-bar-h,3.1875rem)+0.8125rem+4.25rem)] flex w-full flex-col items-center md:top-[calc(var(--hero-stuck-bottom,13.75rem)+4.25rem)]">
+              <span className="sticky top-[calc(var(--hero-stuck-bottom,13.75rem)+4.25rem)] flex w-full flex-col items-center">
                 <Button
                   type="button"
                   variant="ghost"
@@ -365,7 +372,7 @@ export function PollSection({
                sticky geometry as the lock card so it sits where guests
                expect the way in to be. */
             <div className="pointer-events-none z-10 flex flex-col items-center pt-4 [grid-area:1/1]">
-              <span className="sticky top-[calc(3.5rem+var(--identity-bar-h,3.1875rem)+0.8125rem+4.25rem)] flex w-full flex-col items-center md:top-[calc(var(--hero-stuck-bottom,13.75rem)+4.25rem)]">
+              <span className="sticky top-[calc(var(--hero-stuck-bottom,13.75rem)+4.25rem)] flex w-full flex-col items-center">
                 <div className="pointer-events-auto w-full max-w-sm rounded-xl bg-background/95 px-5 py-4 text-center shadow-xl ring-1 ring-border">
                   <p className="text-sm text-muted-foreground">
                     {pledgesGatedNotice}

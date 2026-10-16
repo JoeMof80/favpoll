@@ -196,18 +196,18 @@ export function Countdown({
       <p
         aria-live="off"
         aria-label={`${days} days ${hours} hours ${minutes} minutes remaining`}
-        className="truncate text-xl font-normal whitespace-normal text-primary tabular-nums md:text-2xl"
+        className="truncate text-xl font-normal whitespace-normal text-primary tabular-nums lg:text-2xl"
       >
         {/* Figures keep the subtitle size; the prefix and unit labels
             step down (size + 70% ink) so the numbers carry the line —
             the inline variant's value/label hierarchy, in this type. */}
-        <span className="text-sm text-primary/70 md:text-base">Closes in</span>
+        <span className="text-sm text-primary/70 lg:text-base">Closes in</span>
         {/* ml-3 between components (wider than the intra-group space)
             so each figure+unit reads as one unit of time */}
         {subtitleParts.map(([value, label]) => (
           <span key={label} className="ml-3">
             {value}
-            <span className="text-sm text-primary/70 md:text-base">
+            <span className="text-sm text-primary/70 lg:text-base">
               {" "}
               {label}
             </span>
