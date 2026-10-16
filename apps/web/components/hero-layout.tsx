@@ -41,12 +41,13 @@ type HeroLayoutProps = {
 // can never squeeze it (the feedback loop fixed earlier the same day, when
 // the photo was sized from the name block's height).
 //
-// PINNING IS ONE STICKY BOX at every width: the band with its photo and the
-// 16px strip beneath. Pure sticky — nothing changes size — so the settle's
-// overflow loop (#965's shudder, in the shell's own scroller) cannot start.
-// The opening line, the name and the About all scroll beneath, and the
-// poll heading pins under the strip (founder, 2026-10-16: "if the photo is
-// fixed, do we need the name to stick anyway?" — no: the photo is the
+// PINNING IS ONE STICKY BOX at every width: the band with its photo (and
+// the banner above it, when there is one). Pure sticky — nothing changes
+// size — so the settle's overflow loop (#965's shudder, in the shell's own
+// scroller) cannot start. The opening line, the name and the About all
+// scroll beneath, and the poll heading pins directly under the band
+// (founder, 2026-10-16: "if the photo is fixed, do we need the name to
+// stick anyway?" — no: the photo is the
 // identity mid-page, and the docking name said it twice). This retires, in
 // order: the settle (2026-09-05 → 2026-10-15: the avatar shrinking into
 // the name block, --hero-collapse, the subtitle clip), the slide-in
@@ -65,12 +66,15 @@ const BAND = 56 // h-14: THE HEADER'S HEIGHT (founder, 2026-10-16)
  *  the organiser's own button don't already give). */
 const PHOTO = 80
 const PHOTO_TOP = 16
-/** Painted air under the band, inside the sticky box: the content passes
- *  under it, not through a slit (founder, 2026-10-16: "scroll text visible
- *  behind name"). The photo hangs 24 further; the poll heading's own top
- *  padding (poll-section) carries that, so its row clears the photo. */
+/** Air under the band, OUTSIDE the sticky box — a painted strip there
+ *  read as "a white band below the band" once scrolled (founder,
+ *  2026-10-16). The content scrolls up to the band's own edge; the poll
+ *  heading pins at it with its own top padding (poll-section) clearing
+ *  the photo, which hangs PHOTO/2 below. */
 const STRIP = 16
-/** The micro banner's row, above the band on the phone. */
+/** The micro banner's row, above the band on the phone — in the band's
+ *  own tone, so the header stays one colour (founder, 2026-10-16: "I
+ *  don't like how the countdown makes the header two tone"). */
 const BANNER = 28
 /** The phone: the document scrolls from the very top — no site header. */
 const PHONE_HEADER = 0
@@ -102,11 +106,11 @@ export function HeroLayout({
   const inset = isPhone ? PHONE_HEADER : headerInset
   const bannerHeight = isPhone && banner ? BANNER : 0
 
-  // --hero-stuck-bottom: the pinned box's bottom, for what pins beneath
-  // (the poll heading, the lock card). Constants, never a measurement. A
-  // static hero (the room) publishes the scroller's top alone.
+  // --hero-stuck-bottom: the pinned box's bottom — the band's edge — for
+  // what pins beneath (the poll heading, the lock card). Constants, never
+  // a measurement. A static hero (the room) publishes the scroller's top.
   useEffect(() => {
-    const bottom = pins ? inset + bannerHeight + BAND + STRIP : inset
+    const bottom = pins ? inset + bannerHeight + BAND : inset
     document.documentElement.style.setProperty(
       "--hero-stuck-bottom",
       `${bottom}px`
@@ -128,19 +132,17 @@ export function HeroLayout({
   return (
     <>
       {/* THE BAND, pinned at the scroller's top at every width: the banner
-          (phone, when passed), the tint bleeding across the column's
-          gutters, the painted strip, and the photo hanging off the band's
-          bottom edge at the right. z-30: above the poll heading (z-20),
-          which pins beneath. A cause without a photo: the band alone. */}
+          (phone, when passed) and the tint bleeding across the column's
+          gutters, one tone; the photo hanging off the band's bottom edge
+          at the right. z-30: above the poll heading (z-20), which pins
+          beneath. A cause without a photo: the band alone. */}
       <div
-        className={["relative bg-background", pins ? "sticky z-30" : ""].join(
-          " "
-        )}
+        className={["relative", pins ? "sticky z-30" : ""].join(" ")}
         style={pins ? { top: `${inset}px` } : undefined}
       >
         {banner && (
           <div
-            className="-mx-6 flex items-center justify-center bg-primary px-6 text-xs font-medium text-primary-foreground lg:hidden"
+            className="-mx-6 flex items-center justify-center bg-muted px-6 text-xs text-muted-foreground lg:hidden"
             style={{ height: BANNER }}
           >
             {banner}
@@ -150,7 +152,6 @@ export function HeroLayout({
           className="relative -mx-6 h-14 bg-muted lg:-mr-8 lg:-ml-16"
           aria-hidden={avatar ? undefined : true}
         />
-        <div className="h-4" aria-hidden="true" />
         {avatar && (
           /* 80px at every width, its top on the mark's line (16 into the
              56 row). Size and position inline as well as by class: a stale
@@ -196,6 +197,8 @@ export function HeroLayout({
           </div>,
           document.body
         )}
+
+      <div style={{ height: STRIP }} aria-hidden="true" />
 
       {/* The opening line, beside the hanging photo (pr-28 keeps it clear),
           its text level with the photo's bottom. */}

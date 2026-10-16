@@ -252,8 +252,9 @@ export function Countdown({
       >
         Closes in
         {parts.map(({ value, label }) => (
-          <span key={label} className="ml-1.5">
-            {value} {label}
+          <span key={label} className="ml-1.5 font-medium text-foreground">
+            {value}
+            <span className="font-normal text-muted-foreground"> {label}</span>
           </span>
         ))}
       </p>

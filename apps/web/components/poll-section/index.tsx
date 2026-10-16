@@ -151,7 +151,7 @@ export function PollSection({
       className="space-y-4"
     >
       {/* Merged header: "Favourite {topic}" — button pre-pledge, static post-pledge.
-          At every width it pins under the hero's band and strip
+          At every width it pins at the hero's band's edge
           (--hero-stuck-bottom, constants in hero-layout since 2026-10-16:
           the identity bar and the docking name are gone). */}
       <div
@@ -165,11 +165,11 @@ export function PollSection({
               // falling back to a literal 13.75rem and pinning the heading
               // 220px down the screen the moment that column scrolled.
               "bg-background"
-            : // pt-6: the hero's photo hangs 24px below the pinned strip
-              // (hero-layout STRIP); the padding is inside the sticky box,
+            : // pt-10: the hero's photo hangs 40px below the band's edge,
+              // where this pins; the padding is inside the sticky box,
               // painted, so the row's ⋮ clears the photo and nothing shows
               // through. The lock card's offset below counts it.
-              "sticky top-(--hero-stuck-bottom,13.75rem) z-20 bg-background pt-6"
+              "sticky top-(--hero-stuck-bottom,13.75rem) z-20 bg-background pt-10"
         }
       >
         {/* ONE heading row for all breakpoints — PollHeading left,
@@ -381,7 +381,7 @@ export function PollSection({
                wrapper passes events through; the card hovers with the
                list cards' lift idiom. */
             <div className="pointer-events-none z-10 flex flex-col items-center pt-4 [grid-area:1/1]">
-              <span className="sticky top-[calc(var(--hero-stuck-bottom,13.75rem)+5.75rem)] flex w-full flex-col items-center">
+              <span className="sticky top-[calc(var(--hero-stuck-bottom,13.75rem)+6.75rem)] flex w-full flex-col items-center">
                 <Button
                   type="button"
                   variant="ghost"
@@ -406,7 +406,7 @@ export function PollSection({
                sticky geometry as the lock card so it sits where guests
                expect the way in to be. */
             <div className="pointer-events-none z-10 flex flex-col items-center pt-4 [grid-area:1/1]">
-              <span className="sticky top-[calc(var(--hero-stuck-bottom,13.75rem)+5.75rem)] flex w-full flex-col items-center">
+              <span className="sticky top-[calc(var(--hero-stuck-bottom,13.75rem)+6.75rem)] flex w-full flex-col items-center">
                 <div className="pointer-events-auto w-full max-w-sm rounded-xl bg-background/95 px-5 py-4 text-center shadow-xl ring-1 ring-border">
                   <p className="text-sm text-muted-foreground">
                     {pledgesGatedNotice}
