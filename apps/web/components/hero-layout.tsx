@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 import { motion, useScroll, useTransform } from "framer-motion"
 import Link from "next/link"
 import { useScrollRoot } from "@/components/shell-scroller"
@@ -199,6 +200,8 @@ export function HeroLayout({
     phone ? [0, 1] : [1, 1]
   )
   const markOpacity = useTransform(dockOpacity, (v) => (phone ? 1 - v : 1))
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
 
   return (
     <>
@@ -266,20 +269,26 @@ export function HeroLayout({
           to the countdown as the name docks: 56px holds one line at a time,
           and a reader mid-page needs the countdown more than the logo; it
           is back at the top. The ⋮ at the right is favpoll-page-menu. */}
-      {pins && (
-        <motion.div
-          className="pointer-events-none fixed top-0 left-0 z-40 flex h-14 items-center px-6"
-          style={{ opacity: markOpacity }}
-        >
-          <Link
-            href="/"
-            aria-label="favpoll home"
-            className="pointer-events-auto"
+      {pins &&
+        mounted &&
+        createPortal(
+          /* Portalled to the body, as the ⋮ is (favpoll-page-menu): the
+             sheet's drop-shadow filter would otherwise pin this to the
+             column's edge rather than the viewport's. */
+          <motion.div
+            className="pointer-events-none fixed top-0 left-0 z-40 flex h-14 items-center px-6"
+            style={{ opacity: markOpacity }}
           >
-            <FavpollLogo />
-          </Link>
-        </motion.div>
-      )}
+            <Link
+              href="/"
+              aria-label="favpoll home"
+              className="pointer-events-auto"
+            >
+              <FavpollLogo />
+            </Link>
+          </motion.div>,
+          document.body
+        )}
 
       {/* The opening line, pinned under the strip from lg, so the block is
           band · photo · opening line · name. pr-28 keeps it clear of the
