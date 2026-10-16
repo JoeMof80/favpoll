@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useLayoutEffect, useRef, useState } from "react"
+import { motion, useScroll, useTransform } from "framer-motion"
 import { useScrollRoot } from "@/components/shell-scroller"
 
 type HeroLayoutProps = {
@@ -11,9 +12,10 @@ type HeroLayoutProps = {
   about?: React.ReactNode
   /** The header PINS from lg (founder, 2026-10-15): the band with its
    *  photo, the opening line and the name stick at the scroller's top as
-   *  one block; the context and the About pass beneath. Off for the
-   *  screen in the room, which nobody scrolls (founder, 2026-09-30), and
-   *  never below lg, where the slide-in identity bar does this job. */
+   *  one block; the context and the About pass beneath. Below lg the band
+   *  and photo pin and the NAME SHRINKS onto the band as you scroll. Off
+   *  for the screen in the room, which nobody scrolls (founder,
+   *  2026-09-30). */
   pins?: boolean
 }
 
@@ -39,10 +41,16 @@ type HeroLayoutProps = {
 // so the settle's overflow loop (#965's shudder, in the shell's own
 // scroller) cannot start. This retires the settle (2026-09-05 →
 // 2026-10-15: the avatar shrinking into the name block, --hero-collapse,
-// the subtitle clip), and the shell's reservation is now zero. Below lg
-// nothing pins: the slide-in identity bar does that job. (The name
-// shrinking onto a sticky band on the phone was built and tried on
-// 2026-10-16: "the sliding header was better".)
+// the subtitle clip), and the shell's reservation is now zero.
+//
+// BELOW lg (founder, 2026-10-16, replacing the slide-in identity bar:
+// "when scrolling, immediately begin to reduce the size of the Name until
+// it fixes in place in the bottom half of the band"): the band and photo
+// pin under the fixed header; the opening line scrolls under the band;
+// the name is sticky too, pinning INSIDE the band's lower half, and
+// scales down from the first pixel of scroll so it arrives at the bar's
+// size. The scale is a transform — the one scroll-linked value, on the
+// document's own scroll — so no layout moves with it.
 //
 // What pins beneath (the poll heading, the lock card) reads the pinned
 // block's bottom from --hero-stuck-bottom, measured here.
@@ -55,6 +63,12 @@ const BAND = 80
 const STRIP = 16
 const EYEBROW_ROW = 40
 const NAME_TOP = BAND + STRIP + EYEBROW_ROW // 136: the name's own row
+/** The phone: the fixed header the document scrolls under. */
+const PHONE_HEADER = 56
+/** …where the shrunken name pins inside the band: its lower half. */
+const PHONE_NAME_TOP = 46
+/** …at this scale (text-3xl → the old bar's text-lg: 18/30). */
+const PHONE_NAME_SCALE = 0.6
 
 export function HeroLayout({
   eyebrowText,
@@ -70,17 +84,32 @@ export function HeroLayout({
   const { headerInset } = useScrollRoot()
   const nameRef = useRef<HTMLDivElement>(null)
 
+  // Below lg the document scrolls under the fixed header (the hook reports
+  // the shell's 0 there), and the name shrinks onto the band.
+  const [isPhone, setIsPhone] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)")
+    setIsPhone(mq.matches)
+    const h = (e: MediaQueryListEvent) => setIsPhone(e.matches)
+    mq.addEventListener("change", h)
+    return () => mq.removeEventListener("change", h)
+  }, [])
+  const inset = isPhone ? PHONE_HEADER : headerInset
+
   // --hero-stuck-bottom: the pinned block's bottom, for what pins beneath
-  // (the poll heading, the lock card): the name's row bottom — its pinned
-  // top plus its box. Measured on layout changes only, never during
-  // scroll. A static hero (the room) publishes the scroller's top alone;
-  // the phone's offsets come from the identity bar, not from this.
+  // (the poll heading, the lock card). From lg: the name's row bottom —
+  // its pinned top plus its box. On the phone: the band's bottom — the
+  // name is up on the band, and the photo hangs over whatever passes.
+  // Measured on layout changes only, never during scroll. A static hero
+  // (the room) publishes the scroller's top alone.
   useEffect(() => {
     const name = nameRef.current
     const set = () => {
-      const bottom = pins
-        ? headerInset + NAME_TOP + (name?.offsetHeight ?? 0)
-        : headerInset
+      const bottom = !pins
+        ? inset
+        : isPhone
+          ? inset + BAND
+          : inset + NAME_TOP + (name?.offsetHeight ?? 0)
       document.documentElement.style.setProperty(
         "--hero-stuck-bottom",
         `${Math.round(bottom)}px`
@@ -99,22 +128,45 @@ export function HeroLayout({
       document.documentElement.style.removeProperty("--hero-collapse")
       document.documentElement.style.removeProperty("--hero-settle")
     }
-  }, [pins, headerInset])
+  }, [pins, inset, isPhone])
+
+  // THE PHONE'S SHRINK: sticky carries the name up and pins it inside the
+  // band; this scales it from 1 at rest to the bar's size as it arrives,
+  // starting with the first pixel of scroll. The pin scroll is measured
+  // from the name's rest position on layout changes, never during scroll.
+  const { scrollY } = useScroll()
+  const [pinScroll, setPinScroll] = useState(1e6)
+  useLayoutEffect(() => {
+    const name = nameRef.current
+    if (!name || !pins || !isPhone) return
+    const measure = () => {
+      const rest = name.getBoundingClientRect().top + window.scrollY
+      setPinScroll(Math.max(1, rest - (inset + PHONE_NAME_TOP)))
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(document.body)
+    return () => ro.disconnect()
+  }, [pins, isPhone, inset])
+  const nameScale = useTransform(
+    scrollY,
+    [0, pinScroll],
+    isPhone && pins ? [1, PHONE_NAME_SCALE] : [1, 1]
+  )
 
   return (
     <>
-      {/* THE BAND, pinned at the scroller's top from lg: the tint bleeding
+      {/* THE BAND, pinned at the scroller's top at every width: the tint bleeding
           across the column's gutters, a 16px strip, and the photo hanging
           off the band's bottom edge at the right. z-30: above the opening
           line (z-20), which pins beneath it and had once painted over the
           photo. A cause without a photo: 24px of top padding and nothing
           to hang. */}
       <div
-        className={[
-          "relative bg-background",
-          pins ? "lg:sticky lg:z-30" : "",
-        ].join(" ")}
-        style={pins ? { top: `${headerInset}px` } : undefined}
+        className={["relative bg-background", pins ? "sticky z-30" : ""].join(
+          " "
+        )}
+        style={pins ? { top: `${inset}px` } : undefined}
       >
         {avatar ? (
           <>
@@ -165,23 +217,31 @@ export function HeroLayout({
           avatar ? "pr-28" : "",
           pins ? "lg:sticky lg:z-20" : "",
         ].join(" ")}
-        style={pins ? { top: `${headerInset + BAND + STRIP}px` } : undefined}
+        style={pins ? { top: `${inset + BAND + STRIP}px` } : undefined}
       >
         {eyebrowText}
       </div>
 
-      {/* The name: its own row, pinned under the opening line from lg, on
+      {/* The name. From lg: its own row, pinned under the opening line, on
           the page's background with painted air beneath (pb-4 — the
-          context takes it back below, so the one gap is its own mt-4). */}
-      <div
+          context takes it back below, so the one gap is its own mt-4). On
+          the phone: pinned INSIDE the band's lower half, no background of
+          its own, shrinking on the way. */}
+      <motion.div
         ref={nameRef}
-        className={["bg-background pb-4", pins ? "lg:sticky lg:z-40" : ""].join(
-          " "
-        )}
-        style={pins ? { top: `${headerInset + NAME_TOP}px` } : undefined}
+        className={[
+          "origin-top-left pb-4 lg:bg-background",
+          pins ? "sticky z-40" : "",
+        ].join(" ")}
+        style={{
+          scale: nameScale,
+          ...(pins
+            ? { top: `${inset + (isPhone ? PHONE_NAME_TOP : NAME_TOP)}px` }
+            : {}),
+        }}
       >
         {title}
-      </div>
+      </motion.div>
 
       {subtitle && <div className="-mt-4 w-full">{subtitle}</div>}
 

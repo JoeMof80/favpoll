@@ -161,7 +161,7 @@ export function PollSection({
               // falling back to a literal 13.75rem and pinning the heading
               // 220px down the screen the moment that column scrolled.
               "bg-background"
-            : "sticky top-[calc(3.5rem+var(--identity-bar-h,3.1875rem))] z-20 bg-background lg:top-(--hero-stuck-bottom,13.75rem)"
+            : "sticky top-(--hero-stuck-bottom,13.75rem) z-20 bg-background"
         }
       >
         {/* ONE heading row for all breakpoints — PollHeading left,
@@ -340,7 +340,7 @@ export function PollSection({
                wrapper passes events through; the card hovers with the
                list cards' lift idiom. */
             <div className="pointer-events-none z-10 flex flex-col items-center pt-4 [grid-area:1/1]">
-              <span className="sticky top-[calc(3.5rem+var(--identity-bar-h,3.1875rem)+0.8125rem+4.25rem)] flex w-full flex-col items-center lg:top-[calc(var(--hero-stuck-bottom,13.75rem)+4.25rem)]">
+              <span className="sticky top-[calc(var(--hero-stuck-bottom,13.75rem)+4.25rem)] flex w-full flex-col items-center">
                 <Button
                   type="button"
                   variant="ghost"
@@ -365,7 +365,7 @@ export function PollSection({
                sticky geometry as the lock card so it sits where guests
                expect the way in to be. */
             <div className="pointer-events-none z-10 flex flex-col items-center pt-4 [grid-area:1/1]">
-              <span className="sticky top-[calc(3.5rem+var(--identity-bar-h,3.1875rem)+0.8125rem+4.25rem)] flex w-full flex-col items-center lg:top-[calc(var(--hero-stuck-bottom,13.75rem)+4.25rem)]">
+              <span className="sticky top-[calc(var(--hero-stuck-bottom,13.75rem)+4.25rem)] flex w-full flex-col items-center">
                 <div className="pointer-events-auto w-full max-w-sm rounded-xl bg-background/95 px-5 py-4 text-center shadow-xl ring-1 ring-border">
                   <p className="text-sm text-muted-foreground">
                     {pledgesGatedNotice}
