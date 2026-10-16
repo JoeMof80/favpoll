@@ -162,10 +162,7 @@ export function HeroLayout({
     const measure = () => {
       const rect = name.getBoundingClientRect()
       setDockScroll(
-        Math.max(
-          1,
-          rect.top + window.scrollY - (inset + PHONE_BAND + PHONE_DOCK_GAP)
-        )
+        Math.max(1, rect.top + window.scrollY - (inset + PHONE_BAND))
       )
       setNameRest(name.scrollHeight)
     }
@@ -180,8 +177,12 @@ export function HeroLayout({
     [0, dockScroll],
     phone ? [1, PHONE_NAME_SCALE] : [1, 1]
   )
+  // The box's height follows the scale, plus the dock gap it carries as
+  // padding — so the box runs from the band's edge and nothing passing
+  // beneath shows in a slit (founder, 2026-10-16: "scroll text visible
+  // behind name").
   const nameHeight = useTransform(nameScale, (k) =>
-    phone && nameRest ? nameRest * k : "auto"
+    phone && nameRest ? nameRest * k + PHONE_DOCK_GAP : "auto"
   )
   const dockOpacity = useTransform(
     scrollY,
@@ -287,9 +288,10 @@ export function HeroLayout({
         ].join(" ")}
         style={{
           height: nameHeight,
+          paddingTop: phone ? PHONE_DOCK_GAP : undefined,
           ...(pins
             ? {
-                top: `${inset + (isPhone ? PHONE_BAND + PHONE_DOCK_GAP : NAME_TOP)}px`,
+                top: `${inset + (isPhone ? PHONE_BAND : NAME_TOP)}px`,
               }
             : {}),
         }}
