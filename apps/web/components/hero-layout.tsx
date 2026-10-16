@@ -135,6 +135,24 @@ export function HeroLayout({
     }
   }, [pins, inset, boxHeight])
 
+  // THE OVERSCROLL (founder, 2026-10-16: "pulling the screen down can
+  // create this white space between the muted header and safe area"):
+  // iOS rubber-bands the document past its top and paints the ROOT's
+  // background there. So while a pinning hero is on the page the root
+  // wears the band's tone — the page's own white is the body's, and the
+  // phone's footer is muted too, so the bottom overscroll matches as
+  // well. (A screen's worth of muted painted above the sticky box was
+  // tried first; on iOS the band stopped pinning with it.)
+  useEffect(() => {
+    if (!pins) return
+    const root = document.documentElement
+    const prev = root.style.backgroundColor
+    root.style.backgroundColor = "var(--muted)"
+    return () => {
+      root.style.backgroundColor = prev
+    }
+  }, [pins])
+
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
 
@@ -150,16 +168,6 @@ export function HeroLayout({
         className={["relative", pins ? "sticky z-30" : ""].join(" ")}
         style={pins ? { top: `${inset}px` } : undefined}
       >
-        {/* THE OVERSCROLL (founder, 2026-10-16: "pulling the screen down
-            can create this white space between the muted header and safe
-            area"): iOS rubber-bands the document past its top and paints
-            the page's white there. A screen's worth of the band's tone
-            above the box rides with it and fills that gap. Phone only —
-            the shell's scroller clips it from lg. */}
-        <div
-          className="pointer-events-none absolute -inset-x-6 bottom-full h-screen bg-muted lg:hidden"
-          aria-hidden="true"
-        />
         {banner && (
           <div
             className="-mx-6 flex items-center justify-center bg-muted px-6 text-xs text-muted-foreground lg:hidden"
