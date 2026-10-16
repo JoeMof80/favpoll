@@ -128,7 +128,7 @@ rewrite at least one.
 the protagonist or adapted from something they left). Measured. No exclamation
 marks. Specific detail over general sentiment.
 
-> ✓ "Mine was purple. I wore purple whenever there was a special occasion."
+> ✓ "Mine was purple. I wore it to every occasion that mattered."
 > ✓ "Autumn, always. She never needed a reason."
 > ✗ "She loved autumn because it reminded her of the beauty of life."
 
@@ -166,7 +166,7 @@ true of this person.
 
 > ✓ "He kept a secret stash in his desk drawer and everyone knew."
 > ✓ "He said it was the reason he applied to study engineering."
-> ✓ "I wore purple whenever there was a special occasion."
+> ✓ "I wore it to every occasion that mattered."
 > ✗ "She loved it more than anything."
 > ✗ "It meant the world to him."
 

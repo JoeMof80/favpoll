@@ -121,7 +121,7 @@ export const SCENES: HeroScene[] = [
     poll: {
       id: "demo-poll-0",
       personal_note:
-        "My favourite colour was purple. I wore purple whenever there was a special occasion.",
+        "My favourite colour was purple. I wore it to every occasion that mattered.",
       topic: {
         title: "Colour",
         favourites: [
@@ -331,7 +331,7 @@ export const SCENES: HeroScene[] = [
       // it is about whether Chengdu turns out to be the favourite, which is
       // the honest answer to the question actually asked.
       personal_note:
-        "We're hoping ours will be Chengdu. We're visiting the pandas on our honeymoon.",
+        "We hope ours will be Chengdu after visiting the pandas on our honeymoon.",
       topic: {
         title: "Holiday destination",
         favourites: [
