@@ -25,7 +25,6 @@ import Link from "next/link"
 import { formatPounds } from "@/lib/i18n"
 import { FavpollListCardCharityCarousel } from "@/components/favpoll-list-card/favpoll-list-card-charity-carousel"
 import { GoalProgress } from "@/components/goal-progress"
-import { RadialGoal } from "@/components/radial-goal"
 
 // THE SHEET (2026-09-30): the favpoll as anyone sees it — hero, standings
 // and the rail (countdown, organiser, guest book) under PageLayout, with
@@ -555,45 +554,23 @@ export function FavpollSheet({
   // card's bottom edge, where the rail's divider runs, so the line
   // beneath this card is the bar; without a goal, the divider itself.
   const dialRail = heroFundraiser && (
-    /* THE RADIAL COUNTDOWN where the photo hangs on the hero (founder,
-       2026-10-17: "no need for countdown if we have radial countdown.
-       remove band but keep radial"): 80px, keylined, its top on the
-       photo's line (16 from the rail's top: this card starts at the
-       pinned group's pt-15, so -top-11). The ring is the countdown; the
-       digits card is gone. pt-5: the eyebrow's text on the hero's
-       eyebrow line (measured 76 vs 88 at pt-2), which also carries the
-       figures clear of the dial's bottom edge at 96. Only the eyebrow's
-       row runs under the dial, and "Pledge goal" is short. */
-    // paddingBottom 84 (founder, 2026-10-17: "increase vertical space to
-    // match the name hero"): the card's bottom on the hero's — measured,
-    // the hero's context ends at 194 and the topic heading starts at
-    // 218; this card ended at 154 with pb-5, so 64 more. The organiser
-    // row then begins where the topic heading begins. Inline: a fresh
-    // utility is invisible to a running dev server.
-    // pt-3: the group's pt-15 (60) plus 12 puts the card's eyebrow row at
-    // 72, the hero's own line (the figure then stands at 112, as the name
-    // does); pb-4 brings the organiser row to the topic heading's line.
-    // The dial's top is the photo's, 16 from the rail's top: the card's
-    // box starts at 60 (its pt-3 is inside it), so -top-11.
-    // pb-5, the rail's own rhythm (founder, 2026-10-17: "shorten the
-    // card" — the padding that held the countdown card on the topic
-    // heading's line read as empty space; the card ends under its
-    // figures and the countdown card rides up).
+    // pt-3: the card's h-8 eyebrow row at 72, the hero's eyebrow row, so
+    // the figures stand at 112, the name's line. pb-5: the rail's rhythm.
+    // A radial goal hung at the photo's spot here through 2026-10-17 and
+    // was replaced by the bar as the card's bottom edge.
     <div className="relative pt-3 pb-5">
-      {/* THE RADIAL GOAL at the right over the goal figure, the eyebrow
-          back at the left (founder, 2026-10-17: "reverse the radial and
-          the eyebrow back. Make the radial refer to the total rather
-          than the countdown"). */}
+      {/* THE BAR IS THE CARD'S BOTTOM EDGE (founder, 2026-10-17: "replace
+          the radial with line in place of the bottom border"): the goal's
+          bar lies over the rail's divider under this card — the track full
+          width, the fill along it, the pace tick where the run has got to.
+          The ring that hung at the photo's spot is gone. */}
       {heroFundraiser.goalAmount && (
-        <div
-          className="absolute -top-11 right-0 rounded-full border-4 border-background bg-background shadow-sm"
-          style={{ width: 80, height: 80 }}
-        >
-          <RadialGoal
+        <div className="absolute inset-x-0 bottom-0 z-[1] flex h-px items-center">
+          <GoalProgress
             totalRaised={totalRaised}
             goalAmount={heroFundraiser.goalAmount}
-            size={72}
             elapsed={elapsed}
+            className="h-1 w-full bg-primary/15"
           />
         </div>
       )}
@@ -612,9 +589,6 @@ export function FavpollSheet({
           clock and the time-to-go line): the quiet clock card follows
           this one, as on tribute. The ring says the goal; the notch says
           pace. */}
-      {/* No goal bar beneath (founder, 2026-10-17: "remove the countdown
-          line" — the bar; the ring carries the goal). The rail's own
-          divider closes the card. */}
     </div>
   )
 
