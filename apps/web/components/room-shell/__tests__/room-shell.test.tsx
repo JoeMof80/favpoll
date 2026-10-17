@@ -14,38 +14,40 @@ vi.mock("@/components/branded-qr", () => ({
     <div data-testid="branded-qr" aria-label={props["aria-label"]} />
   ),
 }))
-vi.mock("@/components/room-shell/display-chrome", () => ({
-  DisplayChrome: ({
-    variant,
-    onVariantChange,
-  }: {
-    variant?: string
-    onVariantChange?: (v: "fundraiser" | "tribute") => void
-  }) => (
-    <div data-testid="chrome" data-variant={variant}>
-      <button type="button" onClick={() => onVariantChange?.("tribute")}>
-        Tribute view
-      </button>
-    </div>
-  ),
-}))
-// The sheet, stubbed to report the room's inputs.
-vi.mock("@/components/favpoll-sheet", () => ({
-  FavpollSheet: (props: {
-    presentation?: string
-    heroVariant?: string
-    reveal?: boolean
-    isClosed: boolean
-  }) => (
-    <div
-      data-testid="sheet"
-      data-presentation={props.presentation}
-      data-hero={props.heroVariant}
-      data-reveal={String(!!props.reveal)}
-      data-closed={String(props.isClosed)}
-    />
-  ),
-}))
+// The sheet, stubbed to report the room's inputs — and to render the
+// presenter's items the room hands it for the poll heading's ⋮ (inside
+// an open menu, as poll-section would).
+vi.mock("@/components/favpoll-sheet", async () => {
+  const menu = await import("@/components/ui/dropdown-menu")
+  return {
+    FavpollSheet: (props: {
+      presentation?: string
+      heroVariant?: string
+      reveal?: boolean
+      isClosed: boolean
+      still?: boolean
+      menuExtras?: React.ReactNode
+    }) => (
+      <div
+        data-testid="sheet"
+        data-presentation={props.presentation}
+        data-hero={props.heroVariant}
+        data-reveal={String(!!props.reveal)}
+        data-closed={String(props.isClosed)}
+        data-still={String(!!props.still)}
+      >
+        {props.menuExtras && (
+          <menu.DropdownMenu open modal={false}>
+            <menu.DropdownMenuTrigger>menu</menu.DropdownMenuTrigger>
+            <menu.DropdownMenuContent>
+              {props.menuExtras}
+            </menu.DropdownMenuContent>
+          </menu.DropdownMenu>
+        )}
+      </div>
+    ),
+  }
+})
 import { RoomShell } from "@/components/room-shell"
 import { HOLD_MS } from "@/components/room-shell/podium"
 
@@ -106,7 +108,7 @@ describe("RoomShell — the sheet on the screen in the room", () => {
 
   it("remembers the dial per favpoll on this machine", () => {
     renderShell()
-    expect(screen.getByTestId("chrome").dataset.variant).toBe("fundraiser")
+    expect(screen.getByTestId("sheet").dataset.hero).toBe("fundraiser")
     act(() => {
       screen.getByText("Tribute view").click()
     })

@@ -101,6 +101,15 @@ export type FavpollSheetProps = {
   /** A STILL of the sheet (the landing page's screen-in-a-room): the
    *  screen's own height for the shell, instead of the viewport's. */
   shellHeight?: string
+  /** The still again: a static hero (no pinning, no portalled mark) for
+   *  a picture of a page. The ROOM pins as the guest page does
+   *  (founder, 2026-10-17: "band and photo aren't sticky on live. the
+   *  brandmark isn't clickable. So you obviously aren't using the same
+   *  components") — the hero's own mark is the room's mark now. */
+  still?: boolean
+  /** The room's presenter items for the poll heading's ⋮ (poll-section
+   *  menuExtras): one menu on both surfaces. */
+  menuExtras?: React.ReactNode
   /** Guest presentation only. */
   viewer?: SheetViewer
   /** Rendered in the left column straight after the standings — the
@@ -126,6 +135,8 @@ export function FavpollSheet({
   organiser,
   presentation = "guest",
   heroVariant = "tribute",
+  still = false,
+  menuExtras,
   reveal = false,
   shellHeight,
   viewer,
@@ -321,7 +332,7 @@ export function FavpollSheet({
           favpoll={favpoll}
           mentions={aboutMentions}
           compact={guestBookExpanded}
-          pins={!room}
+          pins={!still}
           banner={closingBanner}
         />
       ) : (
@@ -331,7 +342,7 @@ export function FavpollSheet({
           protagonist={favpoll.protagonists!}
           mentions={aboutMentions}
           compact={guestBookExpanded}
-          pins={!room}
+          pins={!still}
           banner={closingBanner}
         />
       )}
@@ -366,7 +377,7 @@ export function FavpollSheet({
             onOpenPledgeDialog={standing.onOpenPledgeDialog}
             pledgesGatedNotice={standing.pledgesGatedNotice}
             picksSuspended={picksSuspended}
-            room={room}
+            menuExtras={menuExtras}
           />
           {afterPoll}
         </>
@@ -605,9 +616,9 @@ export function FavpollSheet({
       appShell
       railExpanded={guestBookExpanded}
       shellHeight={shellHeight}
-      // The bottom inset mirrors the top: 72px in the room (the goal
-      // card's line), 64px on the page (the hero's shell:pt-16).
-      shellInset={room ? "72px" : "64px"}
+      // The bottom inset: 64px on both surfaces (the room's 72 was the
+      // first dial's line; gone with it, 2026-10-17).
+      shellInset="64px"
     >
       {children}
     </PageLayout>

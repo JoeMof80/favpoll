@@ -4,7 +4,15 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { BrandedQR } from "@/components/branded-qr"
 import { FavpollLogo } from "@/components/favpoll-logo"
-import { DisplayChrome } from "./display-chrome"
+import {
+  Check,
+  ExternalLink,
+  Flower2,
+  Maximize,
+  Minimize,
+  TrendingUp,
+} from "lucide-react"
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { FavpollSheet } from "@/components/favpoll-sheet"
 import { Podium, podiumSteps } from "./podium"
 import type { WallEntry } from "@/components/guest-book"
@@ -141,6 +149,58 @@ export function RoomShell({
   const endPodium = useCallback(() => setPodiumDone(true), [])
   const podiumShowing = finale && steps.length > 0 && !podiumDone
 
+  // THE PRESENTER'S ITEMS, for the poll heading's ⋮ (the sheet threads
+  // them to poll-section): the presence dial — fundraiser or tribute —
+  // the way back to the manage hub, and full screen. Theme and share are
+  // the menu's own, as on the guest page.
+  const [fullscreen, setFullscreen] = useState(false)
+  useEffect(() => {
+    const onChange = () => setFullscreen(!!document.fullscreenElement)
+    document.addEventListener("fullscreenchange", onChange)
+    return () => document.removeEventListener("fullscreenchange", onChange)
+  }, [])
+  async function toggleFullscreen() {
+    try {
+      if (document.fullscreenElement) await document.exitFullscreen()
+      else await document.documentElement.requestFullscreen()
+    } catch {
+      // Fullscreen may be blocked (e.g. iframe) — best-effort
+    }
+  }
+  const presenterItems = (
+    <>
+      {(
+        [
+          ["fundraiser", "Fundraiser view", TrendingUp],
+          ["tribute", "Tribute view", Flower2],
+        ] as const
+      ).map(([value, label, Icon]) => (
+        <DropdownMenuItem
+          key={value}
+          onSelect={() => handleVariantChange(value)}
+        >
+          <Icon aria-hidden="true" />
+          {label}
+          {variant === value && (
+            <Check className="ml-auto" aria-hidden="true" />
+          )}
+        </DropdownMenuItem>
+      ))}
+      <DropdownMenuItem onSelect={() => router.push(manageUrl)}>
+        <ExternalLink aria-hidden="true" />
+        Manage favpoll
+      </DropdownMenuItem>
+      <DropdownMenuItem onSelect={() => void toggleFullscreen()}>
+        {fullscreen ? (
+          <Minimize aria-hidden="true" />
+        ) : (
+          <Maximize aria-hidden="true" />
+        )}
+        {fullscreen ? "Exit full screen" : "Full screen"}
+      </DropdownMenuItem>
+    </>
+  )
+
   return (
     <>
       {/* The presenter's chrome: the app header is suppressed on this
@@ -152,13 +212,13 @@ export function RoomShell({
           from the top of the screen. A still keeps only the brand mark,
           at the chrome's own geometry (the h-14 row, items-center,
           px-6), anchored to its box. */}
-      {live ? (
-        <DisplayChrome
-          eventUrl={manageUrl}
-          variant={variant}
-          onVariantChange={handleVariantChange}
-        />
-      ) : (
+      {/* NO CHROME OF ITS OWN any more (founder, 2026-10-17: "render
+          exactly the favpoll components on the live page"): the hero's
+          band pins and its mark is the room's mark, clickable as on the
+          guest page; the presenter's items (view, manage, full screen)
+          sit in the poll heading's ⋮ with everyone's. A still keeps a
+          drawn mark at the chrome's geometry, anchored to its box. */}
+      {!live && (
         <div className="pointer-events-none absolute top-0 right-0 left-0 z-20 flex h-14 items-center px-6">
           <FavpollLogo />
         </div>
@@ -227,6 +287,8 @@ export function RoomShell({
         organiser={organiser}
         presentation="room"
         heroVariant={variant}
+        still={still}
+        menuExtras={live ? presenterItems : undefined}
         reveal={finale && !podiumShowing}
         // The whole screen: no header above the sheet on this surface.
         shellHeight={still ? `${DISPLAY_ROOM.h}px` : "100vh"}
