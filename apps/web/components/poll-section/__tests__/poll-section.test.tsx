@@ -511,12 +511,7 @@ describe("PollSection — the room is the page", () => {
 
   it("pins it in the room too, under the hero's band (2026-10-17)", () => {
     const { container } = render(
-      <PollSection
-        {...BASE_PROPS}
-        entitled
-        hasPledged
-        menuExtras={<div data-testid="presenter-items" />}
-      />
+      <PollSection {...BASE_PROPS} entitled hasPledged />
     )
     expect(headingRow(container)).toContain("sticky")
     expect(headingRow(container)).toContain("hero-stuck-bottom")
@@ -524,12 +519,7 @@ describe("PollSection — the room is the page", () => {
 
   it("renders the topic at the page's own size in both", () => {
     const { unmount } = render(
-      <PollSection
-        {...BASE_PROPS}
-        entitled
-        hasPledged
-        menuExtras={<div data-testid="presenter-items" />}
-      />
+      <PollSection {...BASE_PROPS} entitled hasPledged />
     )
     expect(screen.getByText("Colour").className).toContain("text-[17px]")
     unmount()

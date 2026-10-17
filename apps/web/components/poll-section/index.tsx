@@ -74,11 +74,6 @@ type Props = {
   /** The picks are in (lib/picks-suspended): the lock card teaches the
    *  pot's path and the standings say they are frozen. */
   picksSuspended?: boolean
-  /** The room's presenter items (view, manage, full screen), slotted at
-   *  the top of the heading's ⋮ — ONE menu on both surfaces (founder,
-   *  2026-10-17: "render exactly the favpoll components on the live
-   *  page"). */
-  menuExtras?: React.ReactNode
   /** Real item list — may be zeroed until entitled */
   initialItems: Favourite[]
   /** Called when the merged header-button is clicked pre-pledge */
@@ -107,7 +102,6 @@ export function PollSection({
   favpollId,
   onOpenStory,
   picksSuspended = false,
-  menuExtras,
 }: Props) {
   const { resolvedTheme, setTheme } = useTheme()
   const { rankingView, setRankingView } = usePollSection({
@@ -201,12 +195,6 @@ export function PollSection({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {menuExtras && (
-                  <>
-                    {menuExtras}
-                    <DropdownMenuSeparator />
-                  </>
-                )}
                 {entitled && (
                   <>
                     <DropdownMenuItem onSelect={() => setRankingView("amount")}>

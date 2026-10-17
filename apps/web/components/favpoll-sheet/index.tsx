@@ -107,9 +107,6 @@ export type FavpollSheetProps = {
    *  brandmark isn't clickable. So you obviously aren't using the same
    *  components") — the hero's own mark is the room's mark now. */
   still?: boolean
-  /** The room's presenter items for the poll heading's ⋮ (poll-section
-   *  menuExtras): one menu on both surfaces. */
-  menuExtras?: React.ReactNode
   /** Guest presentation only. */
   viewer?: SheetViewer
   /** Rendered in the left column straight after the standings — the
@@ -136,7 +133,6 @@ export function FavpollSheet({
   presentation = "guest",
   heroVariant = "tribute",
   still = false,
-  menuExtras,
   reveal = false,
   shellHeight,
   viewer,
@@ -377,7 +373,6 @@ export function FavpollSheet({
             onOpenPledgeDialog={standing.onOpenPledgeDialog}
             pledgesGatedNotice={standing.pledgesGatedNotice}
             picksSuspended={picksSuspended}
-            menuExtras={menuExtras}
           />
           {afterPoll}
         </>
