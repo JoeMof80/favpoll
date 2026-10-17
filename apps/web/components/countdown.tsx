@@ -155,15 +155,17 @@ export function Countdown({
                   i === PLACEHOLDER_PARTS.length - 1 ? "text-right" : ""
                 }`}
               >
-                <span
-                  className={`${inlineValueClass} font-medium text-muted-foreground`}
-                >
-                  --
-                </span>
-                <span
-                  className={`ml-1 ${inlineLabelClass} text-muted-foreground`}
-                >
-                  {label}
+                <span className={hero ? "flex flex-col" : ""}>
+                  <span
+                    className={`${inlineValueClass} font-medium text-muted-foreground`}
+                  >
+                    --
+                  </span>
+                  <span
+                    className={`${hero ? "mt-1" : "ml-1"} ${inlineLabelClass} text-muted-foreground`}
+                  >
+                    {label}
+                  </span>
                 </span>
               </span>
             ))}
@@ -375,17 +377,27 @@ export function Countdown({
                 i === inlineParts.length - 1 && inlineParts[i]?.half
                   ? "text-right"
                   : ""
+              } ${hero ? "flex justify-start" : ""} ${
+                hero && i === inlineParts.length - 1 && inlineParts[i]?.half
+                  ? "justify-end"
+                  : ""
               }`}
             >
-              <span
-                className={`${inlineValueClass} font-medium text-foreground`}
-              >
-                {String(value).padStart(2, "0")}
-              </span>
-              <span
-                className={`ml-1 ${inlineLabelClass} text-muted-foreground`}
-              >
-                {label}
+              {/* Hero scale: the unit BENEATH its figure (founder,
+                  2026-10-17: "place days, hrs, mins, sec labels below
+                  their figures"), so each column reads as one unit of
+                  time at the name's size; rail scale keeps them inline. */}
+              <span className={hero ? "flex flex-col" : ""}>
+                <span
+                  className={`${inlineValueClass} font-medium text-foreground`}
+                >
+                  {String(value).padStart(2, "0")}
+                </span>
+                <span
+                  className={`${hero ? "mt-1" : "ml-1"} ${inlineLabelClass} text-muted-foreground`}
+                >
+                  {label}
+                </span>
               </span>
             </span>
           ))}
