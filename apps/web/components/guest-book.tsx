@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils"
 
-import { useState, useSyncExternalStore } from "react"
+import { useEffect, useState, useSyncExternalStore } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { ChevronRight, Maximize2, Minimize2, User } from "lucide-react"
@@ -152,8 +152,23 @@ function GuestBookRow({ entry }: { entry: WallEntry }) {
   )
 }
 
+/** The rail's expand, in two stages (founder, 2026-10-17: "the text looks
+ *  stretched at times. maybe animate in stages. extend the content with
+ *  the column first and then animate the comments into view second").
+ *  This is the column's own 300ms (page-layout's grid transition). */
+const COLUMN_MS = 300
+
 // Full row for the expanded dialog — same layout, larger text + message.
-function GuestBookRowFull({ entry }: { entry: WallEntry }) {
+function GuestBookRowFull({
+  entry,
+  animated = false,
+  index = 0,
+}: {
+  entry: WallEntry
+  /** Stage two: the message opens into the widened column. */
+  animated?: boolean
+  index?: number
+}) {
   const pick = entry.labels.length > 0 ? entry.labels[0] : null
   const extra = entry.labels.length - 1
   const isSharedPot = !pick
@@ -201,9 +216,23 @@ function GuestBookRowFull({ entry }: { entry: WallEntry }) {
         </div>
       </div>
       {entry.message && (
-        <p className="mt-1.5 ml-11 border-l-2 border-border pl-3 text-base text-muted-foreground italic">
-          {entry.message}
-        </p>
+        // Height and opacity only — never a scale: a FLIP tween that
+        // resizes a box squashes the text inside it, which is what read
+        // as "stretched" while the column grew.
+        <motion.div
+          className="overflow-hidden"
+          initial={animated ? { height: 0, opacity: 0 } : false}
+          animate={{ height: "auto", opacity: 1 }}
+          transition={{
+            duration: 0.28,
+            ease: "easeOut",
+            delay: animated ? Math.min(index, 6) * 0.04 : 0,
+          }}
+        >
+          <p className="mt-1.5 ml-11 border-l-2 border-border pl-3 text-base text-muted-foreground italic">
+            {entry.message}
+          </p>
+        </motion.div>
       )}
     </div>
   )
@@ -279,6 +308,22 @@ export function GuestBook({
       }
     : undefined
   const animated = animate && !reduced
+
+  // STAGE TWO, a column's width behind stage one: `expanded` widens the
+  // rail at once (the sheet's grid), and only when it has finished do the
+  // rows take their full form and their messages open. Collapsing runs
+  // the other way — the messages go first, then the column narrows — so
+  // nothing long is ever reflowing inside a moving box. Unanimated (the
+  // dialog, reduced motion) both stages land together.
+  const [revealed, setRevealed] = useState(expanded)
+  useEffect(() => {
+    if (!animated || !expanded) {
+      setRevealed(expanded)
+      return
+    }
+    const id = setTimeout(() => setRevealed(true), COLUMN_MS)
+    return () => clearTimeout(id)
+  }, [animated, expanded])
 
   // The eyebrow's count is the whole book's, even when the card shows
   // only its latest (the manage dashboard's preview).
@@ -497,25 +542,32 @@ export function GuestBook({
                 // The flat rail panel flows in its column (the rail is
                 // the scroller, 2026-09-29); the card scrolls its own list.
                 expandable && variant !== "flat"
-                  ? `mt-3 flex-1 overflow-y-auto ${expanded ? "space-y-5" : "space-y-4"} ${pad}`
-                  : `${listTop} ${expanded ? "space-y-5" : "space-y-4"} ${pad} ${tail}`
+                  ? `mt-3 flex-1 overflow-y-auto ${revealed ? "space-y-5" : "space-y-4"} ${pad}`
+                  : `${listTop} ${revealed ? "space-y-5" : "space-y-4"} ${pad} ${tail}`
               }
               aria-label="Recent pledges"
               style={reserved}
             >
               <AnimatePresence initial={false}>
-                {shown.map((entry) => (
+                {shown.map((entry, i) => (
                   <motion.li
                     key={entry.id}
-                    layout={animated}
+                    // "position", not a full layout tween: a new pledge
+                    // slides its neighbours down without any box being
+                    // scaled, so no row's text is ever distorted.
+                    layout={animated ? "position" : false}
                     initial={
                       animated ? { opacity: 0, x: -12, scale: 0.97 } : false
                     }
                     animate={{ opacity: 1, x: 0, scale: 1 }}
                     transition={{ duration: 0.4, ease: "easeOut" }}
                   >
-                    {expanded ? (
-                      <GuestBookRowFull entry={entry} />
+                    {revealed ? (
+                      <GuestBookRowFull
+                        entry={entry}
+                        animated={animated}
+                        index={i}
+                      />
                     ) : (
                       <GuestBookRow entry={entry} />
                     )}
