@@ -12,8 +12,8 @@ type Part = { value?: number; label: string; half?: boolean }
 const PLACEHOLDER_PARTS: readonly Part[] = [
   { label: "days" },
   { label: "hrs" },
-  { label: "min" },
-  { label: "sec", half: true },
+  { label: "mins" },
+  { label: "secs", half: true },
 ]
 
 // The seconds unit gets HALF A COLUMN (founder, 2026-09-23). Every
@@ -39,8 +39,15 @@ type Props = {
    *  eyebrow says "Poll closed". */
   ended?: boolean
   /** Subtitle variant: the hero's context steps down with the rail's
-   *  expand (lg:text-2xl → text-xl); so does this line. */
+   *  expand (lg:text-2xl → text-xl); so does this line. Hero scale:
+   *  the figures step as the name does. */
   compact?: boolean
+  /** THE HERO'S OWN GRAMMAR for the inline card (founder, 2026-10-17:
+   *  "match the style of the countdown to the Opening Line and Name"):
+   *  the eyebrow in its h-8 row, the figures in the name's type and on
+   *  its ramp, the units a step up — the rail's countdown reading as the
+   *  hero's twin across the aisle, as the goal card does on the dial. */
+  scale?: "rail" | "hero"
 }
 
 function getTimeLeft(closesAt: string) {
@@ -61,7 +68,18 @@ export function Countdown({
   variant = "inline",
   ended = false,
   compact = false,
+  scale = "rail",
 }: Props) {
+  const hero = scale === "hero"
+  const eyebrowClass = hero
+    ? "mb-2 flex h-8 items-center truncate wrap-break-word"
+    : "mb-2 font-semibold"
+  // The figures at the CONTEXT line's weight, not the name's (founder,
+  // 2026-10-17: "i like the balance between the name and countdown but
+  // the countdown is far too dominant. it isn't that important"): the
+  // eyebrow still sits on the hero's eyebrow line and the figures on the
+  // name's line, but at text-xl → 2xl, stepping with the column.
+  const heroValueClass = `text-xl leading-tight font-medium transition-[font-size] duration-300 ease-out motion-reduce:transition-none ${compact ? "" : "shell:text-2xl"}`
   const [timeLeft, setTimeLeft] = useState<ReturnType<typeof getTimeLeft>>(null)
 
   useEffect(() => {
@@ -110,14 +128,24 @@ export function Countdown({
   }
 
   if (!closesAt) {
-    const inlineValueClass =
-      size === "lg" ? "text-3xl" : size === "md" ? "text-2xl" : "text-xl"
-    const inlineLabelClass =
-      size === "lg" ? "text-sm" : size === "md" ? "text-xs" : "text-[10px]"
+    const inlineValueClass = hero
+      ? heroValueClass
+      : size === "lg"
+        ? "text-3xl leading-none"
+        : size === "md"
+          ? "text-2xl leading-none"
+          : "text-xl leading-none"
+    const inlineLabelClass = hero
+      ? "text-xs"
+      : size === "lg"
+        ? "text-sm"
+        : size === "md"
+          ? "text-xs"
+          : "text-[10px]"
     if (variant === "inline") {
       return (
         <div>
-          <SectionEyebrow variant="muted" className="mb-2 font-semibold">
+          <SectionEyebrow variant="muted" className={eyebrowClass}>
             Poll closes in
           </SectionEyebrow>
           <div
@@ -131,15 +159,17 @@ export function Countdown({
                   i === PLACEHOLDER_PARTS.length - 1 ? "text-right" : ""
                 }`}
               >
-                <span
-                  className={`${inlineValueClass} leading-none font-medium text-muted-foreground`}
-                >
-                  --
-                </span>
-                <span
-                  className={`ml-1 ${inlineLabelClass} text-muted-foreground`}
-                >
-                  {label}
+                <span className={hero ? "flex flex-col items-center" : ""}>
+                  <span
+                    className={`${inlineValueClass} font-medium text-muted-foreground`}
+                  >
+                    --
+                  </span>
+                  <span
+                    className={`${hero ? "mt-1" : "ml-1"} ${inlineLabelClass} text-muted-foreground`}
+                  >
+                    {label}
+                  </span>
                 </span>
               </span>
             ))}
@@ -228,6 +258,10 @@ export function Countdown({
     )
   }
 
+  // EVERY UNIT PLURALISES THE SAME WAY — day/days, hr/hrs, min/mins,
+  // sec/secs, singular only at exactly one. "min" and "sec" had been
+  // written as invariant abbreviations beside a varying "hrs" (founder,
+  // 2026-10-17: "why are some labels plural and some not?").
   // AT MOST THREE UNITS, the subtitle variant's own rule (founder,
   // 2026-09-14: four segments wrapped at 3-digit days): seconds are
   // noise while days remain and return for the last-day drama once
@@ -237,17 +271,17 @@ export function Countdown({
       ? [
           { value: days, label: days === 1 ? "day" : "days" },
           { value: hours, label: hours === 1 ? "hr" : "hrs" },
-          { value: minutes, label: "min" },
+          { value: minutes, label: minutes === 1 ? "min" : "mins" },
         ]
       : hours > 0
         ? [
             { value: hours, label: hours === 1 ? "hr" : "hrs" },
-            { value: minutes, label: "min" },
-            { value: seconds, label: "sec" },
+            { value: minutes, label: minutes === 1 ? "min" : "mins" },
+            { value: seconds, label: seconds === 1 ? "sec" : "secs" },
           ]
         : [
-            { value: minutes, label: "min" },
-            { value: seconds, label: "sec" },
+            { value: minutes, label: minutes === 1 ? "min" : "mins" },
+            { value: seconds, label: seconds === 1 ? "sec" : "secs" },
           ]
 
   if (variant === "banner") {
@@ -279,7 +313,9 @@ export function Countdown({
     // stepped back, the card's own hierarchy). Seconds ride along as on
     // the card (founder: "no reason not to restore seconds").
     const barParts =
-      days > 0 ? [...parts, { value: seconds, label: "sec" }] : parts
+      days > 0
+        ? [...parts, { value: seconds, label: seconds === 1 ? "sec" : "secs" }]
+        : parts
     return (
       <p
         aria-live="off"
@@ -308,15 +344,32 @@ export function Countdown({
     // `parts` as a full unit, exactly as before.
     const inlineParts: Part[] =
       days > 0
-        ? [...parts, { value: seconds, label: "sec", half: true }]
+        ? [
+            ...parts,
+            {
+              value: seconds,
+              label: seconds === 1 ? "sec" : "secs",
+              half: true,
+            },
+          ]
         : parts
-    const inlineValueClass =
-      size === "lg" ? "text-3xl" : size === "md" ? "text-2xl" : "text-xl"
-    const inlineLabelClass =
-      size === "lg" ? "text-sm" : size === "md" ? "text-xs" : "text-[10px]"
+    const inlineValueClass = hero
+      ? heroValueClass
+      : size === "lg"
+        ? "text-3xl leading-none"
+        : size === "md"
+          ? "text-2xl leading-none"
+          : "text-xl leading-none"
+    const inlineLabelClass = hero
+      ? "text-xs"
+      : size === "lg"
+        ? "text-sm"
+        : size === "md"
+          ? "text-xs"
+          : "text-[10px]"
     return (
       <div aria-live="off">
-        <SectionEyebrow variant="muted" className="mb-2 font-semibold">
+        <SectionEyebrow variant="muted" className={eyebrowClass}>
           Poll closes in
         </SectionEyebrow>
         <div
@@ -341,17 +394,30 @@ export function Countdown({
                 i === inlineParts.length - 1 && inlineParts[i]?.half
                   ? "text-right"
                   : ""
+              } ${hero ? "flex justify-start" : ""} ${
+                hero && i === inlineParts.length - 1 && inlineParts[i]?.half
+                  ? "justify-end"
+                  : ""
               }`}
             >
-              <span
-                className={`${inlineValueClass} leading-none font-medium text-foreground`}
-              >
-                {String(value).padStart(2, "0")}
-              </span>
-              <span
-                className={`ml-1 ${inlineLabelClass} text-muted-foreground`}
-              >
-                {label}
+              {/* Hero scale: the unit BENEATH its figure (founder,
+                  2026-10-17: "place days, hrs, mins, sec labels below
+                  their figures"), so each column reads as one unit of
+                  time at the name's size; rail scale keeps them inline. */}
+              {/* items-center: the unit centred under ITS figure; the block
+                  shrink-wraps in its column, so the first stays on the left
+                  edge and the last on the right. */}
+              <span className={hero ? "flex flex-col items-center" : ""}>
+                <span
+                  className={`${inlineValueClass} font-medium text-foreground`}
+                >
+                  {String(value).padStart(2, "0")}
+                </span>
+                <span
+                  className={`${hero ? "mt-1" : "ml-1"} ${inlineLabelClass} text-muted-foreground`}
+                >
+                  {label}
+                </span>
               </span>
             </span>
           ))}

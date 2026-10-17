@@ -196,7 +196,7 @@ describe("FavpollSheet — the room's screen", () => {
 })
 
 describe("FavpollSheet — the room's fundraiser dial", () => {
-  it("renders the goal card with its ring in the rail, and the hero without its About (2026-10-17)", () => {
+  it("renders the goal card with its bar as its bottom edge, and the hero without its About (2026-10-17)", () => {
     render(
       <FavpollSheet
         favpoll={{ ...FAVPOLL, goal_amount: 1000 }}
@@ -213,11 +213,12 @@ describe("FavpollSheet — the room's fundraiser dial", () => {
     expect(screen.getByTestId("favpoll-hero")).toBeInTheDocument()
     expect(screen.getByText("Pledge goal")).toBeInTheDocument()
     expect(screen.getByText("£250")).toBeInTheDocument()
-    // The ring carries the goal's progress; no bar (founder, 2026-10-17).
-    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument()
-    expect(
-      screen.getByRole("img", { name: "25% of the goal raised" })
-    ).toBeInTheDocument()
+    // The bar is the card's bottom edge (founder, 2026-10-17: "replace the
+    // radial with line in place of the bottom border"); no ring.
+    expect(screen.getByRole("progressbar")).toHaveAttribute(
+      "aria-valuenow",
+      "250"
+    )
     // The hero (mocked here) carries the name; the dial no longer draws it.
     // The card does not name the charity (founder, 2026-10-17: "repeats
     // the charity") — the footer does, beside the total.
