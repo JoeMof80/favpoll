@@ -170,6 +170,10 @@ export function DisplayStill({
 
   return (
     <div
+      // data-shell="on": the two-pane layout at ANY viewport — this is a
+      // picture of a 1920-wide screen, and the `shell:` variant honours
+      // the attribute as well as the breakpoint (globals.css).
+      data-shell="on"
       className="relative overflow-hidden"
       style={{ width: DISPLAY_STILL_ROOM.w, height: DISPLAY_STILL_ROOM.h }}
     >

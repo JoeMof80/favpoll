@@ -20,8 +20,26 @@
    from the variable (the same globals through @tailwindcss/postcss
    standalone emits 44), while `@custom-variant` is read on every compile.
    48rem = md. See the note in the theme block. */
-@custom-variant shell (@media (width >= 48rem));
-@custom-variant max-shell (@media (width < 48rem));
+@custom-variant shell {
+  @media (width >= 48rem) {
+    @slot;
+  }
+  /* FORCED: a still of the display (components/landing/display-still)
+     depicts a 1920-wide screen whatever the viewport, so inside
+     [data-shell="on"] the two-pane layout applies at any width — it was
+     drawing the phone layout inside the TV on a narrow or zoomed window
+     (founder, 2026-10-17: "this is wrong on the homepage vignette"). */
+  [data-shell="on"] & {
+    @slot;
+  }
+}
+@custom-variant max-shell {
+  @media (width < 48rem) {
+    &:not([data-shell="on"] *) {
+      @slot;
+    }
+  }
+}
 
 @theme inline {
   /* THE SHELL BREAKPOINT: where the favpoll page (and every PageLayout)
