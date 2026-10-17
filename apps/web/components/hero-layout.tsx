@@ -273,11 +273,19 @@ export function HeroLayout({
       {/* About — ordinary flow. On the pinning page the poll heading's own
           top padding is the gap beneath; the room's heading has none, so
           the About keeps a margin there. */}
-      <div
-        className={pins ? "mt-2 shell:mt-6" : "mt-2 mb-3 shell:mt-6 shell:mb-6"}
-      >
-        {about}
-      </div>
+      {about ? (
+        <div
+          className={
+            pins ? "mt-2 shell:mt-6" : "mt-2 mb-3 shell:mt-6 shell:mb-6"
+          }
+        >
+          {about}
+        </div>
+      ) : (
+        /* No About (the room's fundraiser dial): the About's own bottom
+           margin, so the context does not sit on the poll heading. */
+        <div className="h-3 shell:h-6" aria-hidden="true" />
+      )}
     </>
   )
 }

@@ -24,6 +24,10 @@ type BaseFavpollHeroProps = {
   /** The micro banner above the band on the phone, passed only as the
    *  close approaches (HeroLayout). */
   banner?: React.ReactNode
+  /** The room's fundraiser dial keeps the hero but drops the About
+   *  (founder, 2026-10-17: "keep the left column the same as tribute
+   *  view, except remove the About"). */
+  hideAbout?: boolean
 }
 
 export function BaseFavpollHero({
@@ -35,6 +39,7 @@ export function BaseFavpollHero({
   compact,
   pins,
   banner,
+  hideAbout,
 }: BaseFavpollHeroProps) {
   const headline = getFavpollHeadline({
     occasionType: favpoll.occasion_type ?? null,
@@ -110,7 +115,7 @@ export function BaseFavpollHero({
       title={title}
       subtitle={subtitle}
       avatar={avatar}
-      about={about}
+      about={hideAbout ? undefined : about}
       pins={pins}
       banner={banner}
     />

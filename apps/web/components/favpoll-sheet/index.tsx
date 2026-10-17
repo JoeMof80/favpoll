@@ -13,8 +13,6 @@ import { FavpollHero } from "@/components/favpoll-hero"
 import { CauseHero } from "@/components/cause-hero"
 import { PollSection } from "@/components/poll-section"
 import { FundraiserStrip } from "@/components/heroes/fundraiser-slots"
-import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
-import { Ticker } from "@/components/ui/ticker"
 import type {
   Favourite,
   FavpollWithDetails,
@@ -26,6 +24,7 @@ import Link from "next/link"
 import { formatPounds } from "@/lib/i18n"
 import { FavpollListCardCharityCarousel } from "@/components/favpoll-list-card/favpoll-list-card-charity-carousel"
 import { GoalProgress } from "@/components/goal-progress"
+import { RadialGoal } from "@/components/radial-goal"
 
 // THE SHEET (2026-09-30): the favpoll as anyone sees it — hero, standings
 // and the rail (countdown, organiser, guest book) under PageLayout, with
@@ -164,19 +163,6 @@ export function FavpollSheet({
               : charityLine || null,
         }
       : undefined
-
-  // The person (or cause) for the fundraiser dial's row: the name, the
-  // context as the organiser row's quiet line ("Great North Run" is the
-  // one thing a room wants to know; founder, 2026-09-30), a small photo.
-  const personName = isCause
-    ? (favpoll.cause_label ?? "")
-    : (favpoll.protagonists?.name ?? "")
-  const personContext = isCause
-    ? (favpoll.context ?? null)
-    : (favpoll.protagonists?.context ?? null)
-  const personPhoto = isCause
-    ? (favpoll.photo_url ?? null)
-    : (favpoll.protagonists?.photo_url ?? null)
 
   // THE ROOM'S STANDING: the standings show, the reveal is withheld —
   // entitled to the list, never to the note — until the finale, when the
@@ -323,92 +309,15 @@ export function FavpollSheet({
           organiser block's grammar — the rail's pinned pair, mirrored
           on the left. No About: the room is not reading. Tribute keeps
           the full hero. */}
-      {heroFundraiser ? (
-        // shell:pt-[72px], not the band's pt-16: the rail's pinned countdown
-        // eyebrow sits at y=72 in the room, and this strip's eyebrow is
-        // its mirror (measured 64 vs 72 at pt-16).
-        <div className="mb-6 pt-6 shell:pt-[72px]">
-          <FundraiserStrip fundraiser={heroFundraiser} />
-          {/* THE BAR IS THE HAIRLINE (founder, 2026-09-30: "replace the
-              light border with the pledge goal bar"): where the rail draws
-              its hairline under the countdown card, this column draws the
-              goal's bar — the light track full width, the fill along it.
-              Without a goal, the hairline itself. */}
-          {/* A 1px slot, the hairline's own height, so the row beneath
-              sits where the organiser row sits either way; the bar
-              straddles the line rather than pushing the row down. */}
-          <div className="mt-5 flex h-px items-center">
-            {heroFundraiser.goalAmount && !isClosed ? (
-              <GoalProgress
-                totalRaised={totalRaised}
-                goalAmount={heroFundraiser.goalAmount}
-                className="h-1"
-              />
-            ) : (
-              <div
-                className="w-full border-t border-border"
-                aria-hidden="true"
-              />
-            )}
-          </div>
-          {/* The person's row, mirroring the organiser block: the rail's
-              py-5 rhythm and a hairline beneath. The name, larger than the
-              organiser's, the context beneath it, the photo at the right
-              edge. */}
-          {/* min-h-[76px] = the organiser row's box (two text lines + py-5
-              + its hairline), so this row's bottom border meets the
-              organiser's (measured 219 vs 222 without it). */}
-          <div className="flex min-h-[76px] items-center justify-between gap-3 border-b border-border py-5">
-            {/* ONE LINE in the hero's own grammar (founder, 2026-09-30):
-                the name in ink, the context in the register's ink after a
-                muted dot — "Jane Pound · Great North Run". The opening
-                line was tried as an inline eyebrow and dropped (founder,
-                2026-10-01: "better without"). Too wide, it runs as a TICKER (founder: "a ticker
-                is still the best option, wrapping is worse") — see
-                ui/ticker: still when it fits, a slow loop when it does
-                not, truncated under reduced motion. The trailing copy
-                renders the name as a span so the page keeps one h1. */}
-            {/* leading-normal, not none: the ticker's box clips to its line
-                box, and at leading-none a 20px line has no room for a
-                descender — "Mary" lost its y (founder, 2026-10-01). 30px
-                still sits inside the organiser row's 36px block. */}
-            <Ticker
-              className="text-xl leading-normal font-medium text-foreground"
-              shadow={
-                <>
-                  <span>{personName}</span>
-                  {personContext && (
-                    <span className="font-normal text-primary">
-                      <span className="text-muted-foreground"> ·&nbsp;</span>
-                      {personContext}
-                    </span>
-                  )}
-                </>
-              }
-            >
-              <h1 className="inline">{personName}</h1>
-              {personContext && (
-                <span className="font-normal text-primary">
-                  <span className="text-muted-foreground"> ·&nbsp;</span>
-                  {personContext}
-                </span>
-              )}
-            </Ticker>
-            {personPhoto ? (
-              <ProtagonistAvatar
-                name={personName}
-                photoUrl={personPhoto}
-                className="h-8 w-8 rounded border-0 shell:h-8 shell:w-8"
-              />
-            ) : (
-              <div className="flex size-8 shrink-0 items-center justify-center rounded bg-primary/10 text-xs font-medium text-primary">
-                {personName.charAt(0).toUpperCase()}
-              </div>
-            )}
-          </div>
-        </div>
-      ) : isCause ? (
+      {/* THE FUNDRAISER DIAL (mock, founder 2026-10-17, third cut: "keep
+          the left column the same as tribute view, except remove the
+          About. in the right column, add the telethon dial to the top"):
+          the hero as it is, band and photo and all, with no About — the
+          room is not reading — and the goal card at the rail's top, over
+          the countdown. Tribute keeps the About. */}
+      {isCause ? (
         <CauseHero
+          hideAbout={!!heroFundraiser}
           favpoll={favpoll}
           mentions={aboutMentions}
           compact={guestBookExpanded}
@@ -417,6 +326,7 @@ export function FavpollSheet({
         />
       ) : (
         <FavpollHero
+          hideAbout={!!heroFundraiser}
           favpoll={favpoll}
           protagonist={favpoll.protagonists!}
           mentions={aboutMentions}
@@ -590,22 +500,96 @@ export function FavpollSheet({
   // guest book's header pins with them (GuestBook's `pinned` slot; the
   // sticky group lives there — never top-14 inside the shell), so the
   // rail is that one panel.
+  // THE TELETHON DIAL AT THE RAIL'S TOP (mock, founder 2026-10-17): the
+  // goal card in the countdown card's grammar, exactly as the dial was
+  // first built (heroes/fundraiser-slots), over the countdown. THE BAR
+  // IS THE HAIRLINE (founder, 2026-09-30): the goal's bar straddles the
+  // card's bottom edge, where the rail's divider runs, so the line
+  // beneath this card is the bar; without a goal, the divider itself.
+  const dialRail = heroFundraiser && (
+    /* THE RADIAL COUNTDOWN where the photo hangs on the hero (founder,
+       2026-10-17: "no need for countdown if we have radial countdown.
+       remove band but keep radial"): 80px, keylined, its top on the
+       photo's line (16 from the rail's top: this card starts at the
+       pinned group's pt-15, so -top-11). The ring is the countdown; the
+       digits card is gone. pt-5: the eyebrow's text on the hero's
+       eyebrow line (measured 76 vs 88 at pt-2), which also carries the
+       figures clear of the dial's bottom edge at 96. Only the eyebrow's
+       row runs under the dial, and "Pledge goal" is short. */
+    // paddingBottom 84 (founder, 2026-10-17: "increase vertical space to
+    // match the name hero"): the card's bottom on the hero's — measured,
+    // the hero's context ends at 194 and the topic heading starts at
+    // 218; this card ended at 154 with pb-5, so 64 more. The organiser
+    // row then begins where the topic heading begins. Inline: a fresh
+    // utility is invisible to a running dev server.
+    // pt-3: the group's pt-15 (60) plus 12 puts the card's eyebrow row at
+    // 72, the hero's own line (the figure then stands at 112, as the name
+    // does); pb-4 brings the organiser row to the topic heading's line.
+    // The dial's top is the photo's, 16 from the rail's top: the card's
+    // box starts at 60 (its pt-3 is inside it), so -top-11.
+    // pb-5, the rail's own rhythm (founder, 2026-10-17: "shorten the
+    // card" — the padding that held the countdown card on the topic
+    // heading's line read as empty space; the card ends under its
+    // figures and the countdown card rides up).
+    <div className="relative pt-3 pb-5">
+      {/* THE RADIAL GOAL at the right over the goal figure, the eyebrow
+          back at the left (founder, 2026-10-17: "reverse the radial and
+          the eyebrow back. Make the radial refer to the total rather
+          than the countdown"). */}
+      {heroFundraiser.goalAmount && (
+        <div
+          className="absolute -top-11 right-0 rounded-full border-4 border-background bg-background shadow-sm"
+          style={{ width: 80, height: 80 }}
+        >
+          <RadialGoal
+            totalRaised={totalRaised}
+            goalAmount={heroFundraiser.goalAmount}
+            size={72}
+          />
+        </div>
+      )}
+      {/* THE RAIL'S OWN DIRECTION (founder, 2026-10-17: "text should be
+          smaller as the column is narrower"): the rail is 376 at rest
+          and half the sheet expanded, so this card is compact at REST
+          and full with the guest book expanded — the hero's opposite,
+          each following its own column. */}
+      <FundraiserStrip
+        fundraiser={heroFundraiser}
+        scale="hero"
+        compact={!guestBookExpanded}
+      />
+      {/* No context line: the rail's own countdown card follows this one
+          (founder, 2026-10-17: "replace the countdown with the normal
+          countdown block"). */}
+      {/* No goal bar beneath (founder, 2026-10-17: "remove the countdown
+          line" — the bar; the ring carries the goal). The rail's own
+          divider closes the card. */}
+    </div>
+  )
+
   const guestBookRail = (
     <GuestBook
       {...guestBookProps}
       variant="flat"
       // The rail's top: on the hero's eyebrow line (pt-15 — band 56 +
-      // strip 16, less the row's own 20, plus the eyebrow's 8). The
-      // room's fundraiser dial keeps the old 72px line (pt-13): its goal
-      // card was tuned to it (2026-10-01).
-      pinnedTop={heroFundraiser ? "pt-13" : "pt-15"}
+      // strip 16, less the row's own 20, plus the eyebrow's 8), in both
+      // modes: the dial's goal card takes the countdown's line.
+      pinnedTop="pt-15"
       expanded={guestBookExpanded}
       onToggleExpand={() => setGuestBookExpanded((v) => !v)}
       pinned={
-        <>
-          {stateCardRail}
-          {organiserCard}
-        </>
+        heroFundraiser ? (
+          <>
+            {dialRail}
+            {stateCardRail}
+            {organiserCard}
+          </>
+        ) : (
+          <>
+            {stateCardRail}
+            {organiserCard}
+          </>
+        )
       }
     />
   )

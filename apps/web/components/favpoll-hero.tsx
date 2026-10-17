@@ -16,6 +16,10 @@ type Props = {
   /** The band\'s own line on the phone — the countdown or the closed date,
    *  as the old slide-in bar carried it (founder, 2026-10-16). */
   banner?: React.ReactNode
+  /** The room's fundraiser dial keeps the hero but drops the About
+   *  (founder, 2026-10-17: "keep the left column the same as tribute
+   *  view, except remove the About"). */
+  hideAbout?: boolean
 }
 
 export function FavpollHero({
@@ -27,6 +31,7 @@ export function FavpollHero({
   compact,
   pins,
   banner,
+  hideAbout,
 }: Props) {
   return (
     <BaseFavpollHero
@@ -38,6 +43,7 @@ export function FavpollHero({
       compact={compact}
       pins={pins}
       banner={banner}
+      hideAbout={hideAbout}
     />
   )
 }
