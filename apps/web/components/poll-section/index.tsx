@@ -386,7 +386,7 @@ export function PollSection({
                   variant="ghost"
                   onClick={onOpenPledgeDialog}
                   aria-label={unlockAriaLabel}
-                  className="pointer-events-auto h-auto w-full max-w-sm flex-col items-stretch gap-0 overflow-hidden rounded-xl border-0 bg-background/95 p-0 text-left whitespace-normal shadow-xl ring-1 ring-border transition-all duration-300 hover:bg-background/95 hover:shadow-2xl motion-safe:hover:-translate-y-0.5"
+                  className="pointer-events-auto h-auto w-full max-w-sm flex-col items-stretch gap-0 overflow-hidden rounded-xl border-0 bg-background p-0 text-left whitespace-normal shadow-xl ring-1 ring-border transition-all duration-300 hover:bg-background hover:shadow-2xl motion-safe:hover:-translate-y-0.5 dark:hover:bg-background"
                 >
                   {/* Shared with the landing demo so the two cannot drift —
                       see components/lock-card-content.tsx. */}
@@ -406,7 +406,7 @@ export function PollSection({
                expect the way in to be. */
             <div className="pointer-events-none z-10 flex flex-col items-center pt-4 [grid-area:1/1]">
               <span className="sticky top-[calc(var(--hero-stuck-bottom,13.75rem)+6.75rem)] flex w-full flex-col items-center">
-                <div className="pointer-events-auto w-full max-w-sm rounded-xl bg-background/95 px-5 py-4 text-center shadow-xl ring-1 ring-border">
+                <div className="pointer-events-auto w-full max-w-sm rounded-xl bg-background px-5 py-4 text-center shadow-xl ring-1 ring-border">
                   <p className="text-sm text-muted-foreground">
                     {pledgesGatedNotice}
                   </p>

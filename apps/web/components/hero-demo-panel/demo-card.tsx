@@ -555,7 +555,7 @@ export function DemoCard({
                     simpler product than the one it links to. The wrapper
                     mirrors poll-section's Button chrome; the demo is inert, so
                     it is a div rather than a button. */}
-                <div className="w-full max-w-sm flex-col items-stretch overflow-hidden rounded-xl bg-background/95 text-left shadow-xl ring-1 ring-border">
+                <div className="w-full max-w-sm flex-col items-stretch overflow-hidden rounded-xl bg-background text-left shadow-xl ring-1 ring-border">
                   <LockCardContent steps={lockSteps} topicTitle={topicTitle} />
                 </div>
               </motion.div>

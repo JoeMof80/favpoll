@@ -443,7 +443,7 @@ export function FavpollListCard({
                         aria-label="Pledge your favourite"
                         className="absolute inset-0 z-10 h-auto w-full items-start justify-center rounded-none p-0 pt-1.5 whitespace-normal hover:bg-transparent"
                       >
-                        <span className="pointer-events-none flex w-full max-w-72 flex-col items-stretch overflow-hidden rounded-xl bg-background/95 text-left shadow-lg ring-1 ring-border">
+                        <span className="pointer-events-none flex w-full max-w-72 flex-col items-stretch overflow-hidden rounded-xl bg-background text-left shadow-lg ring-1 ring-border">
                           <LockCardContent
                             compact
                             steps={buildMechanicSteps({
