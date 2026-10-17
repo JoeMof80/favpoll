@@ -219,8 +219,11 @@ export function DemoCard({
   const isPhone = device === "phone"
   const sheetOpen = pickerOpen || amountOpen || confirmedInDialog
 
-  // Locked = pre-pledge (note skeleton + skeleton bars behind the lock card,
-  // exactly as poll-section draws it since #911 — the blurred decoy is gone).
+  // Locked = pre-pledge: the lock card, with skeleton note and bars behind
+  // it in the BROWSER frame only — as poll-section draws it from the shell
+  // breakpoint (#911, #1045), and not on a phone (#1055: "skeletons seem
+  // pointless on mobile", and founder 2026-10-16 on the phone vignette:
+  // "lets remove the skeletons"). The blurred decoy is gone everywhere.
   // Unlocked = disclosure: the dialog has closed; the reveal types out and the
   // ranking bars climb from zero.
   const unlocked =
@@ -491,7 +494,7 @@ export function DemoCard({
             {locked ? (
               /* The real page renders NoteSkeleton only when a note exists;
                  every scene has one, but the guard keeps the two in step. */
-              noteText ? (
+              noteText && !isPhone ? (
                 <div aria-hidden="true">
                   <NoteSkeleton />
                 </div>
@@ -523,9 +526,11 @@ export function DemoCard({
               moves at disclosure); real bars climb from 0 on disclosure.
               (Charity row is pinned to the card bottom.) ── */}
             {locked ? (
-              <div key="skeleton-results" aria-hidden="true">
-                <StandingsSkeleton rows={results.length} />
-              </div>
+              isPhone ? null : (
+                <div key="skeleton-results" aria-hidden="true">
+                  <StandingsSkeleton rows={results.length} />
+                </div>
+              )
             ) : (
               <div key="real-results" className="space-y-3">
                 {renderRankings(true)}
