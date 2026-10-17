@@ -86,7 +86,7 @@ export function PageLayout({
       // + fade, so the last entry clears the fade when scrolled to.
       // The pinned rows at the top are untouched — the mask is a gradient
       // at the bottom only.
-      "scrollbar-hide hidden min-h-0 flex-col divide-y divide-border overflow-y-auto border-l border-border pr-16 pb-[calc(var(--shell-inset)+3.5rem)] pl-8 [mask-image:linear-gradient(to_bottom,black_calc(100%-var(--shell-inset)-3.5rem),transparent_calc(100%-var(--shell-inset)))] shell:flex"
+      "scrollbar-hide hidden min-h-0 flex-col divide-y divide-border overflow-y-auto pr-16 pb-[calc(var(--shell-inset)+3.5rem)] pl-8 [mask-image:linear-gradient(to_bottom,black_calc(100%-var(--shell-inset)-3.5rem),transparent_calc(100%-var(--shell-inset)))] shell:flex"
     : rightSticky
       ? "sticky top-14 z-10 hidden max-h-[var(--shell-h)] flex-col space-y-4 self-start overflow-y-auto bg-background shell:flex shell:pt-16"
       : "hidden flex-col space-y-4 self-start shell:flex shell:pt-16"
@@ -167,7 +167,13 @@ export function PageLayout({
               // A READING COLUMN BELOW THE SHELL BREAKPOINT (founder, 2026-10-15: the phone layout on a
               // tablet read "too stretched"): the single column caps at max-w-2xl
               // and centres, so the About's lines stay a paragraph's length.
-              className={`min-w-0 max-shell:mx-auto max-shell:w-full max-shell:max-w-2xl ${shellGutter} ${mobilePadBottom} shell:scrollbar-hide shell:min-h-0 shell:overflow-y-auto shell:pb-0 shell:[overflow-anchor:none]`}
+              // THE COLUMN RULE is the LEFT column's right edge, not the rail's
+              // left: the rail's box is masked to dissolve the book into the
+              // inset line, and a border on that box faded with it
+              // (founder, 2026-10-17: "the border between columns shouldn't
+              // fade"). The left scroller is not masked, so its edge runs the
+              // full height.
+              className={`min-w-0 max-shell:mx-auto max-shell:w-full max-shell:max-w-2xl ${shellGutter} ${mobilePadBottom} shell:scrollbar-hide shell:min-h-0 shell:overflow-y-auto shell:border-r shell:border-border shell:pb-0 shell:[overflow-anchor:none]`}
             >
               {/* Spare room past the shell's height (100vh - the header)
                   of the hero's collapse plus its settle window
