@@ -3,7 +3,6 @@
 import type { MentionTarget } from "@/lib/mentions"
 import { useCallback, useState, useSyncExternalStore } from "react"
 import { Countdown } from "@/components/countdown"
-import { useTimeLeft } from "@/components/close-line"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { GuestBook, type WallEntry } from "@/components/guest-book"
 import { TrendingUpDown } from "lucide-react"
@@ -140,20 +139,6 @@ export function FavpollSheet({
   children,
 }: FavpollSheetProps) {
   const room = presentation === "room"
-  // PACE: how far the run has come, created_at → closes_at, for the goal
-  // bar's tick and the ring's notch; and the time to go for the dial's
-  // context line.
-  const timeLeft = useTimeLeft(isClosed ? null : favpoll.closes_at)
-  // Derived from the hook's clock, never Date.now() in render.
-  const runLength =
-    favpoll.closes_at && favpoll.created_at
-      ? new Date(favpoll.closes_at).getTime() -
-        new Date(favpoll.created_at).getTime()
-      : 0
-  const elapsed =
-    timeLeft !== null && runLength > 0
-      ? Math.min(1, Math.max(0, 1 - timeLeft / runLength))
-      : null
   // The desktop rail expands to an equal split instead of opening a
   // modal (founder, 2026-09-22): the standings stay on screen, and at
   // that width the guest book's comments become readable. Mobile has no
@@ -507,7 +492,6 @@ export function FavpollSheet({
           <GoalProgress
             totalRaised={totalRaised}
             goalAmount={favpoll.goal_amount}
-            elapsed={elapsed}
             // bg-primary/15: the track on the MUTED footer — bg-muted on
             // bg-muted was invisible, leaving the fill (and the pace tick)
             // floating on nothing. The ring's own track tone.
@@ -557,7 +541,9 @@ export function FavpollSheet({
     // pt-3: the card's h-8 eyebrow row at 72, the hero's eyebrow row, so
     // the figures stand at 112, the name's line. pb-5: the rail's rhythm.
     // A radial goal hung at the photo's spot here through 2026-10-17 and
-    // was replaced by the bar as the card's bottom edge.
+    // was replaced by the bar as the card's bottom edge; a pace marker on
+    // the bar went the same day ("what is the marker for and do we need
+    // it?" — no: unexplained, it read as a glitch).
     <div className="relative pt-3 pb-5">
       {/* THE BAR IS THE CARD'S BOTTOM EDGE (founder, 2026-10-17: "replace
           the radial with line in place of the bottom border"): the goal's
@@ -569,7 +555,6 @@ export function FavpollSheet({
           <GoalProgress
             totalRaised={totalRaised}
             goalAmount={heroFundraiser.goalAmount}
-            elapsed={elapsed}
             className="h-1 w-full bg-primary/15"
           />
         </div>

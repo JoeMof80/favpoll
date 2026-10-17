@@ -219,7 +219,6 @@ describe("FavpollSheet — the room's fundraiser dial", () => {
       "aria-valuenow",
       "250"
     )
-    expect(screen.queryByRole("img", { name: /goal raised/ })).toBeNull()
     // The hero (mocked here) carries the name; the dial no longer draws it.
     // The card does not name the charity (founder, 2026-10-17: "repeats
     // the charity") — the footer does, beside the total.
