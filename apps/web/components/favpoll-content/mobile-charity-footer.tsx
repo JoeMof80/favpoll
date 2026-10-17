@@ -84,7 +84,7 @@ export function MobileCharityFooter({
       // is — the page's two fixed surfaces in one tone, the content white
       // between them. The tone step hides the lock card's shadow passing
       // beneath better than a hairline did.
-      className={`fixed right-0 bottom-0 left-0 z-20 bg-muted px-4 py-3 transition-transform duration-300 lg:hidden ${
+      className={`fixed right-0 bottom-0 left-0 z-20 bg-muted px-4 py-3 transition-transform duration-300 shell:hidden ${
         hidden ? "translate-y-full" : "translate-y-0"
       }`}
       style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}

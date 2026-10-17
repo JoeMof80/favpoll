@@ -229,7 +229,7 @@ export function PollSection({
                 {entitled && onOpenStory && (
                   <DropdownMenuItem
                     onSelect={onOpenStory}
-                    className="lg:hidden"
+                    className="shell:hidden"
                   >
                     Standings history
                     <TrendingUpDown
@@ -357,7 +357,7 @@ export function PollSection({
            pointless here because they are obscured by the pledge card"): in
            the single column the lock card covers nearly the whole block and
            the skeleton showed as slivers around it; in the shell there is room
-           above and below for it to read as the standings-to-come. Below lg
+           above and below for it to read as the standings-to-come. Below the shell breakpoint
            the cell is the lock card's own height; the organiser's zero-pledges
            skeleton above follows the same rule. */
         /* Pre-pledge: skeleton bars with the lock-card overlay on top.
@@ -367,7 +367,7 @@ export function PollSection({
            ancestors, so the card pins correctly as an in-flow sibling. */
         <div className="grid">
           <div
-            className="pointer-events-none hidden [grid-area:1/1] lg:block"
+            className="pointer-events-none hidden [grid-area:1/1] shell:block"
             aria-hidden="true"
           >
             {hasNote && <NoteSkeleton />}

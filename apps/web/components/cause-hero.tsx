@@ -63,7 +63,7 @@ export function CauseHero({ favpoll, mentions, compact, pins, banner }: Props) {
 
   const subtitle = headline.suffix ? (
     <p
-      className={`mt-4 truncate text-xl font-normal whitespace-normal text-primary transition-[font-size] duration-300 ease-out motion-reduce:transition-none ${compact ? "" : "lg:text-2xl"}`}
+      className={`mt-4 truncate text-xl font-normal whitespace-normal text-primary transition-[font-size] duration-300 ease-out motion-reduce:transition-none ${compact ? "" : "shell:text-2xl"}`}
     >
       {headline.suffix}
     </p>
@@ -75,13 +75,13 @@ export function CauseHero({ favpoll, mentions, compact, pins, banner }: Props) {
     <ProtagonistAvatar
       name={favpoll.cause_label ?? ""}
       photoUrl={favpoll.photo_url}
-      className="h-full w-full md:h-full md:w-full lg:h-full lg:w-full"
+      className="h-full w-full md:h-full shell:h-full md:w-full shell:w-full"
     />
   ) : undefined
 
   const about = favpoll.description ? (
     <p
-      className={`text-sm leading-relaxed wrap-break-word text-muted-foreground/80 lg:text-base`}
+      className={`text-sm leading-relaxed wrap-break-word text-muted-foreground/80 shell:text-base`}
     >
       <MentionText text={favpoll.description} mentions={mentions} />
     </p>

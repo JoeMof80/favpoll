@@ -20,7 +20,7 @@ type HeroLayoutProps = {
   /** THE MICRO BANNER (founder, 2026-10-16): a line above the band, on the
    *  phone only, that the caller passes only as the favpoll approaches its
    *  close — "only visible as the favpoll approaches its deadline". Hidden
-   *  from lg, where the rail has the countdown. */
+   *  from the shell breakpoint, where the rail has the countdown. */
   banner?: React.ReactNode
 }
 
@@ -95,7 +95,7 @@ export function HeroLayout({
   // THE PINNED BOX'S HEIGHT, read from the box itself: the band, plus the
   // banner's row when the stylesheet shows it. ONE SOURCE OF TRUTH — a
   // separate matchMedia "is this the phone?" check counted the banner's
-  // 28px while `lg:hidden` hid it (the stylesheet's breakpoint is 64rem,
+  // 28px while `shell:hidden` hid it (the stylesheet's breakpoint is 64rem,
   // the query said 1023px; they part company whenever the root font size
   // is not 16px) and pinned the poll heading 28px under the band, with
   // the note showing through the gap (founder, 2026-10-16: "the note
@@ -112,7 +112,7 @@ export function HeroLayout({
     ro.observe(el)
     return () => ro.disconnect()
   }, [])
-  /** The banner's row as actually shown: 0 from lg, or when none. */
+  /** The banner's row as actually shown: 0 from the shell breakpoint, or when none. */
   const bannerHeight = boxHeight - BAND
 
   // --hero-stuck-bottom: the pinned box's bottom — the band's edge — for
@@ -167,7 +167,7 @@ export function HeroLayout({
         ref={bandRef}
         className={[
           "relative",
-          // FIXED BELOW lg, sticky from lg. iOS rubber-bands past the
+          // FIXED BELOW THE SHELL BREAKPOINT, sticky from the shell breakpoint. iOS rubber-bands past the
           // document's end and sticky elements ride along with the
           // overscrolled content while fixed ones stay (founder's iPhone,
           // 2026-10-16, read off an on-device readout since removed:
@@ -179,14 +179,14 @@ export function HeroLayout({
           // the box's measured height holds its place in flow. From lg
           // the shell's scroller never overscrolls and sticky stands.
           pins
-            ? "z-30 max-lg:fixed max-lg:top-0 max-lg:left-1/2 max-lg:w-full max-lg:max-w-2xl max-lg:-translate-x-1/2 max-lg:px-6 lg:sticky"
+            ? "z-30 max-shell:fixed max-shell:top-0 max-shell:left-1/2 max-shell:w-full max-shell:max-w-2xl max-shell:-translate-x-1/2 max-shell:px-6 shell:sticky"
             : "",
         ].join(" ")}
         style={pins ? { top: `${inset}px` } : undefined}
       >
         {banner && (
           <div
-            className="-mx-6 flex items-center justify-center bg-muted px-6 text-xs text-muted-foreground lg:hidden"
+            className="-mx-6 flex items-center justify-center bg-muted px-6 text-xs text-muted-foreground shell:hidden"
             style={{ height: BANNER }}
           >
             {banner}
@@ -198,7 +198,7 @@ export function HeroLayout({
             absolute child). */}
         <div className="relative">
           <div
-            className="relative -mx-6 h-14 bg-muted lg:-mr-8 lg:-ml-16"
+            className="relative -mx-6 h-14 bg-muted shell:-mr-8 shell:-ml-16"
             aria-hidden={avatar ? undefined : true}
           />
           {avatar && (
@@ -227,10 +227,10 @@ export function HeroLayout({
           was tried and dropped the same day — a guest needs nothing from
           it, and the organiser has the manage button; light and dark live
           in the poll heading's own menu. */}
-      {/* The fixed box's place in flow, below lg. */}
+      {/* The fixed box's place in flow, below the shell breakpoint. */}
       {pins && (
         <div
-          className="lg:hidden"
+          className="shell:hidden"
           style={{ height: boxHeight }}
           aria-hidden="true"
         />
@@ -273,7 +273,9 @@ export function HeroLayout({
       {/* About — ordinary flow. On the pinning page the poll heading's own
           top padding is the gap beneath; the room's heading has none, so
           the About keeps a margin there. */}
-      <div className={pins ? "mt-2 lg:mt-6" : "mt-2 mb-3 lg:mt-6 lg:mb-6"}>
+      <div
+        className={pins ? "mt-2 shell:mt-6" : "mt-2 mb-3 shell:mt-6 shell:mb-6"}
+      >
         {about}
       </div>
     </>
