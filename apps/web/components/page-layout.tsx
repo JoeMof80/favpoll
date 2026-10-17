@@ -44,7 +44,7 @@ type Props = {
 // the column was being asked to fit less than a phone screen, and each
 // fix uncovered the next (a group favpoll's photo swallowed its name at
 // 770). Tablets now get the single-column phone layout, which already
-// works; every lg: here was lg: until then, and hero-layout's isMobile
+// works; every shell: here was shell: until then, and hero-layout's isMobile
 // flag (1023) moved with it.
 export function PageLayout({
   left,
@@ -56,13 +56,13 @@ export function PageLayout({
   shellInset = "0px",
   children,
 }: Props) {
-  const gutter = "px-6 lg:px-16"
+  const gutter = "px-6 shell:px-16"
   // Shell mode: the sheet-edge gutter stays 64px, but the one facing the
   // rail divider drops to 32px so the widened rail costs the standings
   // nothing (founder, 2026-09-22). Explicit pl/pr rather than px-16 plus
   // an override — Tailwind orders generated CSS by property, so a later
   // class in the attribute is no guarantee of winning.
-  const shellGutter = "px-6 lg:pr-8 lg:pl-16"
+  const shellGutter = "px-6 shell:pr-8 shell:pl-16"
   const mobilePadBottom =
     "pb-[max(6rem,calc(var(--charity-footer-h,0px)+1.5rem))]"
 
@@ -86,10 +86,10 @@ export function PageLayout({
       // + fade, so the last entry clears the fade when scrolled to.
       // The pinned rows at the top are untouched — the mask is a gradient
       // at the bottom only.
-      "scrollbar-hide hidden min-h-0 flex-col divide-y divide-border overflow-y-auto border-l border-border pr-16 pb-[calc(var(--shell-inset)+3.5rem)] pl-8 [mask-image:linear-gradient(to_bottom,black_calc(100%-var(--shell-inset)-3.5rem),transparent_calc(100%-var(--shell-inset)))] lg:flex"
+      "scrollbar-hide hidden min-h-0 flex-col divide-y divide-border overflow-y-auto border-l border-border pr-16 pb-[calc(var(--shell-inset)+3.5rem)] pl-8 [mask-image:linear-gradient(to_bottom,black_calc(100%-var(--shell-inset)-3.5rem),transparent_calc(100%-var(--shell-inset)))] shell:flex"
     : rightSticky
-      ? "sticky top-14 z-10 hidden max-h-[var(--shell-h)] flex-col space-y-4 self-start overflow-y-auto bg-background lg:flex lg:pt-16"
-      : "hidden flex-col space-y-4 self-start lg:flex lg:pt-16"
+      ? "sticky top-14 z-10 hidden max-h-[var(--shell-h)] flex-col space-y-4 self-start overflow-y-auto bg-background shell:flex shell:pt-16"
+      : "hidden flex-col space-y-4 self-start shell:flex shell:pt-16"
 
   return (
     // [overflow-anchor:none] (2026-09-05): the hero band SHRINKS during
@@ -113,13 +113,13 @@ export function PageLayout({
         }
         className={[
           "mx-auto min-h-[var(--shell-h)] max-w-5xl bg-background",
-          "lg:drop-shadow-lg lg:[clip-path:inset(-1px_-24px_-24px_-24px)]",
+          "shell:drop-shadow-lg shell:[clip-path:inset(-1px_-24px_-24px_-24px)]",
           // In shell mode the gutter moves onto the left column, which is
           // the scroller — padding there keeps its scrollbar at the rail
           // divider instead of 4rem inside it.
           appShell
-            ? "lg:h-[var(--shell-h)] lg:min-h-0"
-            : `${gutter} ${mobilePadBottom} lg:pb-24`,
+            ? "shell:h-[var(--shell-h)] shell:min-h-0"
+            : `${gutter} ${mobilePadBottom} shell:pb-24`,
         ].join(" ")}
       >
         <div
@@ -135,12 +135,14 @@ export function PageLayout({
             `grid ${
               appShell
                 ? railExpanded
-                  ? "lg:grid-cols-[1fr_50%]"
-                  : "lg:grid-cols-[1fr_376px]"
-                : "lg:grid-cols-[1fr_300px]"
+                  ? "shell:grid-cols-[1fr_50%]"
+                  : // The rail: 320 at the shell breakpoint (768 leaves the
+                    // sheet ~380 of text, a phone's and a bit), 376 from the shell breakpoint.
+                    "shell:grid-cols-[1fr_320px] lg:grid-cols-[1fr_376px]"
+                : "shell:grid-cols-[1fr_300px]"
             }`,
             appShell
-              ? "lg:h-full lg:transition-[grid-template-columns] lg:duration-300 lg:ease-out motion-reduce:lg:transition-none"
+              ? "shell:h-full shell:transition-[grid-template-columns] shell:duration-300 shell:ease-out motion-reduce:shell:transition-none"
               : "gap-10",
           ].join(" ")}
         >
@@ -150,7 +152,7 @@ export function PageLayout({
               off-screen, right margin gone (found on iOS, 2026-07-26).
               Mobile bottom padding clears the fixed charity footer by
               1.5rem when one is mounted (it publishes --charity-footer-h),
-              and is the old 6rem otherwise. lg:pb-0 in shell mode: the
+              and is the old 6rem otherwise. shell:pb-0 in shell mode: the
               sticky charity footer is the scroller's last flow element
               and supplies its own end. */}
           {appShell ? (
@@ -158,10 +160,10 @@ export function PageLayout({
             // scroll-linked children (the hero) read THIS element rather
             // than the window, which never scrolls in shell mode.
             <ShellScroller
-              // A READING COLUMN BELOW lg (founder, 2026-10-15: the phone layout on a
+              // A READING COLUMN BELOW THE SHELL BREAKPOINT (founder, 2026-10-15: the phone layout on a
               // tablet read "too stretched"): the single column caps at max-w-2xl
               // and centres, so the About's lines stay a paragraph's length.
-              className={`min-w-0 max-lg:mx-auto max-lg:w-full max-lg:max-w-2xl ${shellGutter} ${mobilePadBottom} lg:scrollbar-hide lg:min-h-0 lg:overflow-y-auto lg:pb-0 lg:[overflow-anchor:none]`}
+              className={`min-w-0 max-shell:mx-auto max-shell:w-full max-shell:max-w-2xl ${shellGutter} ${mobilePadBottom} shell:scrollbar-hide shell:min-h-0 shell:overflow-y-auto shell:pb-0 shell:[overflow-anchor:none]`}
             >
               {/* Spare room past the shell's height (100vh - the header)
                   of the hero's collapse plus its settle window
@@ -173,11 +175,11 @@ export function PageLayout({
                   percentage minimum never resolves inside the scroller,
                   so the height is the shell's. Zero on pages with no
                   hero; no effect on a column that already overflows. */}
-              {/* lg:flex-col: the column's last item (the sheet's charity
+              {/* shell:flex-col: the column's last item (the sheet's charity
                   footer) can take mt-auto and sit on the floor when the
                   standings are short — the footer pinned on desktop as it
                   is on the phone (founder, 2026-10-01). */}
-              {/* max-lg:contents — BELOW lg THIS BOX MUST NOT EXIST: it is
+              {/* max-shell:contents — BELOW THE SHELL BREAKPOINT THIS BOX MUST NOT EXIST: it is
                   the hero's sticky band's containing block, and it ends
                   where the content ends, while the column runs on to the
                   document's end (its footer padding; the grid stretches
@@ -187,7 +189,7 @@ export function PageLayout({
                   cause the band and photo to disappear"). With the column
                   as the containing block the band stays until the whole
                   column has passed. */}
-              <div className="max-lg:contents lg:flex lg:min-h-[calc(var(--shell-h)+var(--hero-collapse,0px)+var(--hero-settle,0px))] lg:flex-col">
+              <div className="max-shell:contents shell:flex shell:min-h-[calc(var(--shell-h)+var(--hero-collapse,0px)+var(--hero-settle,0px))] shell:flex-col">
                 {left}
               </div>
             </ShellScroller>
