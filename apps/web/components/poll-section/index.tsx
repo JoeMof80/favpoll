@@ -74,6 +74,12 @@ type Props = {
   /** The picks are in (lib/picks-suspended): the lock card teaches the
    *  pot's path and the standings say they are frozen. */
   picksSuspended?: boolean
+  /** A PICTURE OF THE PAGE (the landing's screen-in-a-room): nothing
+   *  scrolls, so nothing sticks. Inside the still's scaled subtree
+   *  WebKit measures a sticky element's scrollport in the TRANSFORMED
+   *  size and applies the offset in local pixels, which lifted the
+   *  charity footer 500px up the column and over this heading. */
+  still?: boolean
   /** Real item list — may be zeroed until entitled */
   initialItems: Favourite[]
   /** Called when the merged header-button is clicked pre-pledge */
@@ -102,6 +108,7 @@ export function PollSection({
   favpollId,
   onOpenStory,
   picksSuspended = false,
+  still = false,
 }: Props) {
   const { resolvedTheme, setTheme } = useTheme()
   const { rankingView, setRankingView } = usePollSection({
@@ -158,7 +165,11 @@ export function PollSection({
         // the padding is inside the sticky box, painted, so the row's ⋮
         // clears the photo and nothing shows through. The lock card's
         // offset below counts it.
-        className="sticky top-(--hero-stuck-bottom,13.75rem) z-20 bg-background pt-10"
+        className={
+          still
+            ? "bg-background pt-10"
+            : "sticky top-(--hero-stuck-bottom,13.75rem) z-20 bg-background pt-10"
+        }
       >
         {/* ONE heading row for all breakpoints — PollHeading left,
             ... dropdown right. Same pattern mobile and desktop. */}

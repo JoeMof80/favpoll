@@ -373,6 +373,7 @@ export function FavpollSheet({
             onOpenPledgeDialog={standing.onOpenPledgeDialog}
             pledgesGatedNotice={standing.pledgesGatedNotice}
             picksSuspended={picksSuspended}
+            still={still}
           />
           {afterPoll}
         </>
@@ -431,7 +432,11 @@ export function FavpollSheet({
           day and reverted here — the phone's footer keeps it): the band is a
           56px strip and this is three times that, so matching tones read as
           a strip above and a slab below, not a frame. */}
-      <div className="sticky bottom-0 z-30 mt-8 hidden border-t border-border bg-background pt-5 pb-[var(--shell-inset)] shell:-mr-8 shell:-ml-16 shell:block shell:pr-8 shell:pl-16">
+      <div
+        className={`z-30 mt-8 hidden border-t border-border bg-background pt-5 pb-[var(--shell-inset)] shell:-mr-8 shell:-ml-16 shell:block shell:pr-8 shell:pl-16 ${
+          still ? "" : "sticky bottom-0"
+        }`}
+      >
         {appeal && (
           <p className="mb-2 truncate border-b border-border pb-2 text-xs text-muted-foreground">
             Part of{" "}
