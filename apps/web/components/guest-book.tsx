@@ -519,18 +519,28 @@ export function GuestBook({
                   className="size-8 shrink-0 rounded"
                   style={{ backgroundColor: "oklch(0.92 0 0)" }}
                 />
-                <div className="min-w-0 flex-1 space-y-1.5">
-                  <div
-                    className="h-3.5 rounded"
-                    style={{
-                      width: `${w * 100}%`,
-                      backgroundColor: "oklch(0.87 0 0)",
-                    }}
-                  />
-                  <div
-                    className="h-3 w-16 rounded"
-                    style={{ backgroundColor: "oklch(0.92 0 0)" }}
-                  />
+                {/* THE REAL ROW'S LINE BOXES (founder, 2026-10-17: "the
+                    guest card skeletons are slightly too compact compared
+                    to real guestbook items"): the name's text-sm line is
+                    20px and the label's text-xs line 16, so the block is
+                    36 — the bars sit centred in those, instead of
+                    stacking to 32 and leaving every row 4px short. */}
+                <div className="min-w-0 flex-1">
+                  <div className="flex h-5 items-center">
+                    <div
+                      className="h-3.5 rounded"
+                      style={{
+                        width: `${w * 100}%`,
+                        backgroundColor: "oklch(0.87 0 0)",
+                      }}
+                    />
+                  </div>
+                  <div className="flex h-4 items-center">
+                    <div
+                      className="h-3 w-16 rounded"
+                      style={{ backgroundColor: "oklch(0.92 0 0)" }}
+                    />
+                  </div>
                 </div>
               </div>
             ))}
