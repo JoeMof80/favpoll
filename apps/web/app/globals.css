@@ -15,6 +15,14 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* THE SHELL BREAKPOINT as explicit variants, not a --breakpoint-* theme
+   variable: Turbopack's Tailwind pass never emitted a single `shell:` rule
+   from the variable (the same globals through @tailwindcss/postcss
+   standalone emits 44), while `@custom-variant` is read on every compile.
+   48rem = md. See the note in the theme block. */
+@custom-variant shell (@media (width >= 48rem));
+@custom-variant max-shell (@media (width < 48rem));
+
 @theme inline {
   /* THE SHELL BREAKPOINT: where the favpoll page (and every PageLayout)
      becomes two panes — sheet beside rail. Named so it moves in ONE line:
@@ -24,7 +32,6 @@
      because of the hero, which is now redesigned"). `shell:` and
      `max-shell:` everywhere the layout is about the panes; `lg:` stays
      for things that are about width alone (the rail's 376 from lg). */
-  --breakpoint-shell: 48rem;
   --font-heading: var(--font-sans);
   --font-sans: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
