@@ -138,7 +138,11 @@ export function PageLayout({
                   ? "shell:grid-cols-[1fr_50%]"
                   : // The rail: 320 at the shell breakpoint (768 leaves the
                     // sheet ~380 of text, a phone's and a bit), 376 from the shell breakpoint.
-                    "lg:grid-cols-[1fr_376px] shell:grid-cols-[1fr_320px]"
+                    // Through a variable: `shell:` is a @custom-variant (#1065)
+                    // and its rules sort AFTER lg's, so a shell:grid-cols
+                    // beside an lg:grid-cols won at every width (the rail was
+                    // 320 on a 1440 screen). Base and lg: never fight.
+                    "[--rail:320px] lg:[--rail:376px] shell:grid-cols-[1fr_var(--rail)]"
                 : "shell:grid-cols-[1fr_300px]"
             }`,
             appShell
