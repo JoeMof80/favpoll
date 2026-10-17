@@ -179,7 +179,7 @@ export function HeroLayout({
           // the box's measured height holds its place in flow. From lg
           // the shell's scroller never overscrolls and sticky stands.
           pins
-            ? "z-30 max-shell:fixed max-shell:top-0 max-shell:left-1/2 max-shell:w-full max-shell:max-w-2xl max-shell:-translate-x-1/2 max-shell:px-6 shell:sticky"
+            ? "z-30 shell:sticky max-shell:fixed max-shell:top-0 max-shell:left-1/2 max-shell:w-full max-shell:max-w-2xl max-shell:-translate-x-1/2 max-shell:px-6"
             : "",
         ].join(" ")}
         style={pins ? { top: `${inset}px` } : undefined}
@@ -273,11 +273,19 @@ export function HeroLayout({
       {/* About — ordinary flow. On the pinning page the poll heading's own
           top padding is the gap beneath; the room's heading has none, so
           the About keeps a margin there. */}
-      <div
-        className={pins ? "mt-2 shell:mt-6" : "mt-2 mb-3 shell:mt-6 shell:mb-6"}
-      >
-        {about}
-      </div>
+      {about ? (
+        <div
+          className={
+            pins ? "mt-2 shell:mt-6" : "mt-2 mb-3 shell:mt-6 shell:mb-6"
+          }
+        >
+          {about}
+        </div>
+      ) : (
+        /* No About (the room's fundraiser dial): the About's own bottom
+           margin, so the context does not sit on the poll heading. */
+        <div className="h-3 shell:h-6" aria-hidden="true" />
+      )}
     </>
   )
 }

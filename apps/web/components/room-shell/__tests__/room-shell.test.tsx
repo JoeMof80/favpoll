@@ -36,6 +36,7 @@ vi.mock("@/components/favpoll-sheet", () => ({
     heroVariant?: string
     reveal?: boolean
     isClosed: boolean
+    still?: boolean
   }) => (
     <div
       data-testid="sheet"
@@ -43,6 +44,7 @@ vi.mock("@/components/favpoll-sheet", () => ({
       data-hero={props.heroVariant}
       data-reveal={String(!!props.reveal)}
       data-closed={String(props.isClosed)}
+      data-still={String(!!props.still)}
     />
   ),
 }))

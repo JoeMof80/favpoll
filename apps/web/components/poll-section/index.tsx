@@ -74,8 +74,12 @@ type Props = {
   /** The picks are in (lib/picks-suspended): the lock card teaches the
    *  pot's path and the standings say they are frozen. */
   picksSuspended?: boolean
-  /** The screen in the room: no sticky heading, nothing to pin under. */
-  room?: boolean
+  /** A PICTURE OF THE PAGE (the landing's screen-in-a-room): nothing
+   *  scrolls, so nothing sticks. Inside the still's scaled subtree
+   *  WebKit measures a sticky element's scrollport in the TRANSFORMED
+   *  size and applies the offset in local pixels, which lifted the
+   *  charity footer 500px up the column and over this heading. */
+  still?: boolean
   /** Real item list — may be zeroed until entitled */
   initialItems: Favourite[]
   /** Called when the merged header-button is clicked pre-pledge */
@@ -104,7 +108,7 @@ export function PollSection({
   favpollId,
   onOpenStory,
   picksSuspended = false,
-  room = false,
+  still = false,
 }: Props) {
   const { resolvedTheme, setTheme } = useTheme()
   const { rankingView, setRankingView } = usePollSection({
@@ -155,21 +159,16 @@ export function PollSection({
           (--hero-stuck-bottom, constants in hero-layout since 2026-10-16:
           the identity bar and the docking name are gone). */}
       <div
+        // Sticky on both surfaces — the hero's band pins in the room too
+        // now (2026-10-17), so there is something to pin under. pt-10: the
+        // hero's photo hangs 40px below the band's edge, where this pins;
+        // the padding is inside the sticky box, painted, so the row's ⋮
+        // clears the photo and nothing shows through. The lock card's
+        // offset below counts it.
         className={
-          room
-            ? // NOTHING TO PIN UNDER (founder, 2026-10-04: "the topic
-              // heading is sticky on the live page. why? we don't need the
-              // live page to be sticky"). The offsets below are the guest
-              // page's furniture — the identity bar on a phone, the settled
-              // hero on a desktop — and the room has neither, so it was
-              // falling back to a literal 13.75rem and pinning the heading
-              // 220px down the screen the moment that column scrolled.
-              "bg-background"
-            : // pt-10: the hero's photo hangs 40px below the band's edge,
-              // where this pins; the padding is inside the sticky box,
-              // painted, so the row's ⋮ clears the photo and nothing shows
-              // through. The lock card's offset below counts it.
-              "sticky top-(--hero-stuck-bottom,13.75rem) z-20 bg-background pt-10"
+          still
+            ? "bg-background pt-10"
+            : "sticky top-(--hero-stuck-bottom,13.75rem) z-20 bg-background pt-10"
         }
       >
         {/* ONE heading row for all breakpoints — PollHeading left,
@@ -193,7 +192,7 @@ export function PollSection({
               from the page" — the ⋮ next to the topic). The standings
               views are the entitled reader's; share and the theme are
               anyone's; the keepsake is the closed favpoll's. */}
-          {!room && (
+          {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -291,7 +290,7 @@ export function PollSection({
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          )}
+          }
         </div>
       </div>
 

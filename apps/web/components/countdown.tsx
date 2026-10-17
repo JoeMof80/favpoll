@@ -38,6 +38,9 @@ type Props = {
    *  countdown has ended"). Inline only; no heading — the caller's
    *  eyebrow says "Poll closed". */
   ended?: boolean
+  /** Subtitle variant: the hero's context steps down with the rail's
+   *  expand (lg:text-2xl → text-xl); so does this line. */
+  compact?: boolean
 }
 
 function getTimeLeft(closesAt: string) {
@@ -57,6 +60,7 @@ export function Countdown({
   size = "md",
   variant = "inline",
   ended = false,
+  compact = false,
 }: Props) {
   const [timeLeft, setTimeLeft] = useState<ReturnType<typeof getTimeLeft>>(null)
 
@@ -197,12 +201,14 @@ export function Countdown({
       <p
         aria-live="off"
         aria-label={`${days} days ${hours} hours ${minutes} minutes remaining`}
-        className="truncate text-xl font-normal whitespace-normal text-primary tabular-nums shell:text-2xl"
+        className={`truncate text-xl font-normal whitespace-normal text-primary tabular-nums transition-[font-size] duration-300 ease-out motion-reduce:transition-none ${compact ? "" : "shell:text-2xl"}`}
       >
         {/* Figures keep the subtitle size; the prefix and unit labels
             step down (size + 70% ink) so the numbers carry the line —
             the inline variant's value/label hierarchy, in this type. */}
-        <span className="text-sm text-primary/70 shell:text-base">
+        <span
+          className={`text-sm text-primary/70 ${compact ? "" : "shell:text-base"}`}
+        >
           Closes in
         </span>
         {/* ml-3 between components (wider than the intra-group space)
@@ -210,7 +216,9 @@ export function Countdown({
         {subtitleParts.map(([value, label]) => (
           <span key={label} className="ml-3">
             {value}
-            <span className="text-sm text-primary/70 shell:text-base">
+            <span
+              className={`text-sm text-primary/70 ${compact ? "" : "shell:text-base"}`}
+            >
               {" "}
               {label}
             </span>

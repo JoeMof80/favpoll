@@ -196,7 +196,7 @@ describe("FavpollSheet — the room's screen", () => {
 })
 
 describe("FavpollSheet — the room's fundraiser dial", () => {
-  it("renders the goal card, the bar as its hairline and the person's row — no hero band", () => {
+  it("renders the goal card with its ring in the rail, and the hero without its About (2026-10-17)", () => {
     render(
       <FavpollSheet
         favpoll={{ ...FAVPOLL, goal_amount: 1000 }}
@@ -210,26 +210,27 @@ describe("FavpollSheet — the room's fundraiser dial", () => {
         heroVariant="fundraiser"
       />
     )
-    expect(screen.queryByTestId("favpoll-hero")).not.toBeInTheDocument()
+    expect(screen.getByTestId("favpoll-hero")).toBeInTheDocument()
     expect(screen.getByText("Pledge goal")).toBeInTheDocument()
     expect(screen.getByText("£250")).toBeInTheDocument()
-    expect(screen.getByRole("progressbar")).toHaveAttribute(
-      "aria-valuenow",
-      "250"
-    )
-    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Alice")
-    // The card names the charity; the footer says the money no more.
-    expect(screen.getByText("raised for Ocean Trust")).toBeInTheDocument()
+    // The ring carries the goal's progress; no bar (founder, 2026-10-17).
+    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument()
+    expect(
+      screen.getByRole("img", { name: "25% of the goal raised" })
+    ).toBeInTheDocument()
+    // The hero (mocked here) carries the name; the dial no longer draws it.
+    // The card does not name the charity (founder, 2026-10-17: "repeats
+    // the charity") — the footer does, beside the total.
+    expect(screen.queryByText(/Ocean Trust/)).not.toBeInTheDocument()
     expect(screen.getByText("£1,000")).toBeInTheDocument()
     expect(screen.queryByText(/of the £1,000 goal/)).not.toBeInTheDocument()
-    expect(screen.getAllByRole("progressbar")).toHaveLength(1)
     // The footer keeps the total beside the charity; the goal is the card's.
     const footer = screen.getByTestId("charity-footer")
     expect(footer.dataset.amount).toBe("250")
     expect(footer.dataset.caption).toBe("no")
   })
 
-  it("counts the charities in the card's label when there are several", () => {
+  it("names no charity in the card however many there are", () => {
     render(
       <FavpollSheet
         favpoll={{
@@ -251,8 +252,8 @@ describe("FavpollSheet — the room's fundraiser dial", () => {
         heroVariant="fundraiser"
       />
     )
-    expect(screen.getByText("raised for 3 charities")).toBeInTheDocument()
-    expect(screen.queryByText(/for Ocean Trust/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/3 charities/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Ocean Trust/)).not.toBeInTheDocument()
   })
 
   it("keeps the full hero on the tribute dial", () => {

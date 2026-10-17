@@ -138,7 +138,11 @@ export function PageLayout({
                   ? "shell:grid-cols-[1fr_50%]"
                   : // The rail: 320 at the shell breakpoint (768 leaves the
                     // sheet ~380 of text, a phone's and a bit), 376 from the shell breakpoint.
-                    "shell:grid-cols-[1fr_320px] lg:grid-cols-[1fr_376px]"
+                    // Through a variable: `shell:` is a @custom-variant (#1065)
+                    // and its rules sort AFTER lg's, so a shell:grid-cols
+                    // beside an lg:grid-cols won at every width (the rail was
+                    // 320 on a 1440 screen). Base and lg: never fight.
+                    "[--rail:320px] lg:[--rail:376px] shell:grid-cols-[1fr_var(--rail)]"
                 : "shell:grid-cols-[1fr_300px]"
             }`,
             appShell
@@ -189,7 +193,7 @@ export function PageLayout({
                   cause the band and photo to disappear"). With the column
                   as the containing block the band stays until the whole
                   column has passed. */}
-              <div className="max-shell:contents shell:flex shell:min-h-[calc(var(--shell-h)+var(--hero-collapse,0px)+var(--hero-settle,0px))] shell:flex-col">
+              <div className="shell:flex shell:min-h-[calc(var(--shell-h)+var(--hero-collapse,0px)+var(--hero-settle,0px))] shell:flex-col max-shell:contents">
                 {left}
               </div>
             </ShellScroller>

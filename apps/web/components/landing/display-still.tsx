@@ -23,8 +23,24 @@ import type {
  *  renders at DISPLAY_STILL_ROOM. */
 export const DISPLAY_STILL_WIDTH = 1120
 
-/** The screen in the room: the display's own 1920×1080. */
+/** The screen in the room: the display's own 1920×1080. The caller's
+ *  frame math reads this, and the still's box is always exactly it. */
 export const DISPLAY_STILL_ROOM = DISPLAY_ROOM
+
+/** THE CONTENT AT 125% (founder, 2026-10-17: "can we scale up the content
+ *  on the live vignette to 125%? lets do it wherever the live vignette
+ *  appears"). The box stays DISPLAY_STILL_ROOM, so every caller's frame
+ *  math is untouched; the screen inside is rendered at a smaller logical
+ *  size and scaled up to fill it — a TV showing the page at a coarser
+ *  resolution, which is what a room actually wants: fewer rows, bigger
+ *  type, legible from the back. The gutter codes ride the same scale
+ *  (their `calc((100% - 64rem)/4 …)` resolves against the logical box),
+ *  so the still stays an exact picture of the display. */
+const STILL_SCALE = 1.25
+const STILL_LOGICAL = {
+  w: Math.round(DISPLAY_STILL_ROOM.w / STILL_SCALE),
+  h: Math.round(DISPLAY_STILL_ROOM.h / STILL_SCALE),
+}
 
 /** How many rankings the still shows. */
 const RANKS_SHOWN = 6
@@ -157,23 +173,33 @@ export function DisplayStill({
       className="relative overflow-hidden"
       style={{ width: DISPLAY_STILL_ROOM.w, height: DISPLAY_STILL_ROOM.h }}
     >
-      <RoomShell
-        still
-        favpoll={favpoll}
-        pollWithItems={pollWithItems}
-        totalRaised={total}
-        wallEntries={wall}
-        isClosed={false}
-        manageUrl="https://favpoll.com"
-        qrUrl={qrUrl}
-        // THE PRESENCE DIAL, derived rather than defaulted (founder,
-        // 2026-08-27: "the live display isn't in tribute mode"). The rule
-        // is the product's own, from /live/[slug]: register "remembering"
-        // takes tribute, everything else fundraiser. A memorial scene IS
-        // the remembering register, so the scene's kind decides it and
-        // the celebration and cause stills keep the louder variant.
-        defaultVariant={scene.kind === "memorial" ? "tribute" : "fundraiser"}
-      />
+      <div
+        className="relative origin-top-left"
+        style={{
+          width: STILL_LOGICAL.w,
+          height: STILL_LOGICAL.h,
+          transform: `scale(${STILL_SCALE})`,
+        }}
+      >
+        <RoomShell
+          still
+          stillHeight={STILL_LOGICAL.h}
+          favpoll={favpoll}
+          pollWithItems={pollWithItems}
+          totalRaised={total}
+          wallEntries={wall}
+          isClosed={false}
+          manageUrl="https://favpoll.com"
+          qrUrl={qrUrl}
+          // THE PRESENCE DIAL, derived rather than defaulted (founder,
+          // 2026-08-27: "the live display isn't in tribute mode"). The rule
+          // is the product's own, from /live/[slug]: register "remembering"
+          // takes tribute, everything else fundraiser. A memorial scene IS
+          // the remembering register, so the scene's kind decides it and
+          // the celebration and cause stills keep the louder variant.
+          defaultVariant={scene.kind === "memorial" ? "tribute" : "fundraiser"}
+        />
+      </div>
     </div>
   )
 }

@@ -60,6 +60,10 @@ type Props = {
    * loop, the finale timer, the remembered dial.
    */
   still?: boolean
+  /** The still's own height, when the caller renders the screen at a
+   *  logical size smaller than DISPLAY_ROOM and scales it up (the
+   *  vignette's 125%, display-still). Ignored when live. */
+  stillHeight?: number
 }
 
 export function RoomShell({
@@ -74,6 +78,7 @@ export function RoomShell({
   qrUrl,
   defaultVariant = "fundraiser",
   still = false,
+  stillHeight = DISPLAY_ROOM.h,
 }: Props) {
   const live = !still
   const [variant, setVariant] = useState<DisplayVariant>(defaultVariant)
@@ -152,13 +157,20 @@ export function RoomShell({
           from the top of the screen. A still keeps only the brand mark,
           at the chrome's own geometry (the h-14 row, items-center,
           px-6), anchored to its box. */}
-      {live ? (
+      {/* The hero's band pins and its mark is the room's mark, clickable
+          as on the guest page (founder, 2026-10-17: "render exactly the
+          favpoll components on the live page"). The presenter's dots stay
+          at the top right from the shell breakpoint — "it is meant for a
+          full screen" — and hide in the single column. A still keeps a
+          drawn mark at the chrome's geometry, anchored to its box. */}
+      {live && (
         <DisplayChrome
           eventUrl={manageUrl}
           variant={variant}
           onVariantChange={handleVariantChange}
         />
-      ) : (
+      )}
+      {!live && (
         <div className="pointer-events-none absolute top-0 right-0 left-0 z-20 flex h-14 items-center px-6">
           <FavpollLogo />
         </div>
@@ -227,9 +239,10 @@ export function RoomShell({
         organiser={organiser}
         presentation="room"
         heroVariant={variant}
+        still={still}
         reveal={finale && !podiumShowing}
         // The whole screen: no header above the sheet on this surface.
-        shellHeight={still ? `${DISPLAY_ROOM.h}px` : "100vh"}
+        shellHeight={still ? `${stillHeight}px` : "100vh"}
       />
     </>
   )

@@ -21,6 +21,10 @@ type Props = {
   /** The band\'s own line on the phone — the countdown or the closed date,
    *  as the old slide-in bar carried it (founder, 2026-10-16). */
   banner?: React.ReactNode
+  /** The room's fundraiser dial keeps the hero but drops the About
+   *  (founder, 2026-10-17: "keep the left column the same as tribute
+   *  view, except remove the About"). */
+  hideAbout?: boolean
 }
 
 // Hero for subject='cause' — no protagonist row, so the optional image and
@@ -29,7 +33,14 @@ type Props = {
 // padding, sticky header, and scroll-shrink behaviour can never drift
 // between the two (they did: this component used to hand-roll its layout
 // and sat ~72px higher than person pages, found 2026-07-13).
-export function CauseHero({ favpoll, mentions, compact, pins, banner }: Props) {
+export function CauseHero({
+  favpoll,
+  mentions,
+  compact,
+  pins,
+  banner,
+  hideAbout,
+}: Props) {
   const headline = getFavpollHeadline({
     occasionType: favpoll.occasion_type,
     openingLine: favpoll.opening_line,
@@ -75,7 +86,7 @@ export function CauseHero({ favpoll, mentions, compact, pins, banner }: Props) {
     <ProtagonistAvatar
       name={favpoll.cause_label ?? ""}
       photoUrl={favpoll.photo_url}
-      className="h-full w-full md:h-full shell:h-full md:w-full shell:w-full"
+      className="h-full w-full md:h-full md:w-full shell:h-full shell:w-full"
     />
   ) : undefined
 
@@ -93,7 +104,7 @@ export function CauseHero({ favpoll, mentions, compact, pins, banner }: Props) {
       title={title}
       subtitle={subtitle}
       avatar={avatar}
-      about={about}
+      about={hideAbout ? undefined : about}
       pins={pins}
       banner={banner}
     />

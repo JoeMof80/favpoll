@@ -22,14 +22,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { FavpollLogo } from "@/components/favpoll-logo"
 import type { DisplayVariant } from "./index"
 
-// The live display's own minimal chrome (the app header is suppressed on
-// this surface), pinned to the viewport's far corners over the frame's
-// tinted gutters so the live content pays no height: brand mark top-left,
-// and top-right a single dropdown of presenter controls — event page,
-// theme, fullscreen.
+// The presenter's dots (founder, 2026-10-17: "keep the dots on the live
+// page since it is meant for a full screen. hide them for single column
+// layout so they aren't in the way"): top-right over the frame's tinted
+// gutter, at the header's geometry, a single dropdown of presenter
+// controls — view, manage, theme, full screen. From the shell breakpoint
+// only; the mark is the hero's own, as on the guest page.
 //
 // NOTE: rendered OUTSIDE the framed card — its drop-shadow filter would
 // otherwise become the containing block for this fixed positioning.
@@ -75,14 +75,10 @@ export function DisplayChrome({ eventUrl, variant, onVariantChange }: Props) {
     }
   }
 
-  // Mirrors the app header's geometry (h-14 row, items-center, px-6,
-  // justify-between) so the mark and menu sit exactly where the header's
-  // would — pointer-events pass through the strip itself.
+  // The app header's geometry (h-14 row, items-center, px-6) so the dots
+  // sit where the header's would — pointer-events pass through the strip.
   return (
-    <div className="pointer-events-none fixed top-0 right-0 left-0 z-20 flex h-14 items-center justify-between px-6">
-      <div className="pointer-events-auto">
-        <FavpollLogo />
-      </div>
+    <div className="pointer-events-none fixed top-0 right-0 left-0 z-40 hidden h-14 items-center justify-end px-6 shell:flex">
       <div className="pointer-events-auto">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
