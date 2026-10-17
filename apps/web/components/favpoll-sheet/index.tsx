@@ -2,6 +2,7 @@
 
 import type { MentionTarget } from "@/lib/mentions"
 import { useCallback, useState, useSyncExternalStore } from "react"
+import { useScrollEdges } from "@/components/shell-scroller"
 import { Countdown } from "@/components/countdown"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { GuestBook, type WallEntry } from "@/components/guest-book"
@@ -432,7 +433,8 @@ export function FavpollSheet({
           day and reverted here — the phone's footer keeps it): the band is a
           56px strip and this is three times that, so matching tones read as
           a strip above and a slab below, not a frame. */}
-      <div
+      <CharityFooter
+        still={still}
         // THE BAND'S PARTNER, SECOND TRY (founder, 2026-10-17: "now we have
         // a muted band header, does it make sense to make the charity
         // block a muted footer?"). The first try read as a slab because
@@ -486,7 +488,7 @@ export function FavpollSheet({
             className="mt-4 h-1"
           />
         ) : null}
-      </div>
+      </CharityFooter>
     </>
   )
 
@@ -649,4 +651,31 @@ function useClosingSoon(closesAt: string | null | undefined) {
     [closesAt]
   )
   return useSyncExternalStore(subscribe, read, read)
+}
+
+/** The desktop charity footer, with its shadow read from INSIDE the
+ *  column: the sheet renders the scroll root, so a hook called from the
+ *  sheet itself sees only the window, which never scrolls from the shell
+ *  breakpoint. The shadow shows only while there is more below the fold
+ *  — never at rest on a short column, where it would read as a bevel. */
+function CharityFooter({
+  still,
+  className,
+  children,
+}: {
+  still: boolean
+  className: string
+  children: React.ReactNode
+}) {
+  const edges = useScrollEdges()
+  const shadow = !still && edges.bottom
+  return (
+    <div
+      className={`${className} transition-shadow duration-300 ${
+        shadow ? "shadow-[0_-6px_12px_-6px_rgb(0_0_0/0.18)]" : ""
+      }`}
+    >
+      {children}
+    </div>
+  )
 }

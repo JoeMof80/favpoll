@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import Link from "next/link"
-import { useScrollRoot } from "@/components/shell-scroller"
+import { useScrollEdges, useScrollRoot } from "@/components/shell-scroller"
 import { FavpollLogo } from "@/components/favpoll-logo"
 
 type HeroLayoutProps = {
@@ -102,6 +102,9 @@ export function HeroLayout({
   // shouldn't be visible behind the sticky topic header"). This cannot
   // feed back: nothing laid out from the number changes the box's size.
   const bandRef = useRef<HTMLDivElement>(null)
+  // The band's shadow, only while content is passing beneath it.
+  const edges = useScrollEdges()
+  const bandShadow = pins && edges.top
   const [boxHeight, setBoxHeight] = useState(BAND)
   useEffect(() => {
     const el = bandRef.current
@@ -198,7 +201,9 @@ export function HeroLayout({
             absolute child). */}
         <div className="relative">
           <div
-            className="relative -mx-6 h-14 bg-muted shell:-mr-8 shell:-ml-16"
+            className={`relative -mx-6 h-14 bg-muted transition-shadow duration-300 shell:-mr-8 shell:-ml-16 ${
+              bandShadow ? "shadow-[0_6px_12px_-6px_rgb(0_0_0/0.18)]" : ""
+            }`}
             aria-hidden={avatar ? undefined : true}
           />
           {avatar && (
