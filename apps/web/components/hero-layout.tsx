@@ -273,7 +273,13 @@ export function HeroLayout({
       {/* About — ordinary flow. On the pinning page the poll heading's own
           top padding is the gap beneath; the room's heading has none, so
           the About keeps a margin there. */}
-      {about ? (
+      {/* No About (the room's fundraiser dial): nothing in its place. The
+          poll heading brings its own 40px of top padding — it needs it to
+          clear the hanging photo when pinned — and with an About that
+          padding alone is the gap, so a spacer here doubled it (founder,
+          2026-10-17: "too much space between Context and Topic Header").
+          Measured 76 vs the guest page's 52; 52 both now. */}
+      {about && (
         <div
           className={
             pins ? "mt-2 shell:mt-6" : "mt-2 mb-3 shell:mt-6 shell:mb-6"
@@ -281,10 +287,6 @@ export function HeroLayout({
         >
           {about}
         </div>
-      ) : (
-        /* No About (the room's fundraiser dial): the About's own bottom
-           margin, so the context does not sit on the poll heading. */
-        <div className="h-3 shell:h-6" aria-hidden="true" />
       )}
     </>
   )
