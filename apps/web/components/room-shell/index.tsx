@@ -60,6 +60,10 @@ type Props = {
    * loop, the finale timer, the remembered dial.
    */
   still?: boolean
+  /** The still's own height, when the caller renders the screen at a
+   *  logical size smaller than DISPLAY_ROOM and scales it up (the
+   *  vignette's 125%, display-still). Ignored when live. */
+  stillHeight?: number
 }
 
 export function RoomShell({
@@ -74,6 +78,7 @@ export function RoomShell({
   qrUrl,
   defaultVariant = "fundraiser",
   still = false,
+  stillHeight = DISPLAY_ROOM.h,
 }: Props) {
   const live = !still
   const [variant, setVariant] = useState<DisplayVariant>(defaultVariant)
@@ -237,7 +242,7 @@ export function RoomShell({
         still={still}
         reveal={finale && !podiumShowing}
         // The whole screen: no header above the sheet on this surface.
-        shellHeight={still ? `${DISPLAY_ROOM.h}px` : "100vh"}
+        shellHeight={still ? `${stillHeight}px` : "100vh"}
       />
     </>
   )
