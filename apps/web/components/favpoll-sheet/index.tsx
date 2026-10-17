@@ -3,7 +3,7 @@
 import type { MentionTarget } from "@/lib/mentions"
 import { useCallback, useState, useSyncExternalStore } from "react"
 import { Countdown } from "@/components/countdown"
-import { CloseLine, timeToGo, useTimeLeft } from "@/components/close-line"
+import { timeToGo, useTimeLeft } from "@/components/close-line"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { GuestBook, type WallEntry } from "@/components/guest-book"
 import { TrendingUpDown } from "lucide-react"
@@ -258,9 +258,13 @@ export function FavpollSheet({
       <Countdown ended />
       {closedAt && <p className="text-xs text-muted-foreground">{closedAt}</p>}
     </div>
-  ) : favpoll.closes_at ? (
-    <CloseLine closesAt={favpoll.closes_at} compact={!guestBookExpanded} />
-  ) : null
+  ) : (
+    <Countdown
+      closesAt={favpoll.closes_at}
+      scale="hero"
+      compact={!guestBookExpanded}
+    />
+  )
 
   // The open card sits on the HERO'S lines (founder, 2026-10-17: "match
   // the style of the countdown to the Opening Line and Name"): pt-3 puts
@@ -587,6 +591,7 @@ export function FavpollSheet({
             goalAmount={heroFundraiser.goalAmount}
             size={72}
             elapsed={elapsed}
+            timeLeft={timeLeft}
           />
         </div>
       )}

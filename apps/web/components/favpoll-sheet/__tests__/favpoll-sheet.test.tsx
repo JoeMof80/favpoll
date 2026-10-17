@@ -215,8 +215,9 @@ describe("FavpollSheet — the room's fundraiser dial", () => {
     expect(screen.getByText("£250")).toBeInTheDocument()
     // The ring carries the goal's progress; no bar (founder, 2026-10-17).
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument()
+    // The ring says the goal and, with a close, the time to go.
     expect(
-      screen.getByRole("img", { name: "25% of the goal raised" })
+      screen.getByRole("img", { name: /^25% of the goal raised/ })
     ).toBeInTheDocument()
     // The hero (mocked here) carries the name; the dial no longer draws it.
     // The card does not name the charity (founder, 2026-10-17: "repeats

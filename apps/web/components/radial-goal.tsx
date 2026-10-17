@@ -1,3 +1,5 @@
+import { leadingUnit } from "@/components/close-line"
+
 // THE RADIAL GOAL (mock, founder 2026-10-17: "make the radial refer to
 // the total rather than the countdown"). An 80px dial where the photo
 // hangs on the hero, at the right over the goal figure: a ring in the
@@ -12,6 +14,12 @@ type Props = {
   /** PACE (founder, 2026-10-17): the run's elapsed fraction, 0–1, as a
    *  notch on the ring. Fill past the notch is ahead of pace. */
   elapsed?: number | null
+  /** THE CLOCK IN THE RING (founder, 2026-10-17: "we need a countdown
+   *  effect for Fundraising view at least because the deadline could be
+   *  part of the occasion"): with ms to go given, the centre shows the
+   *  leading unit of time left instead of the percentage — which the
+   *  figures beside the ring already say. */
+  timeLeft?: number | null
 }
 
 export function RadialGoal({
@@ -19,6 +27,7 @@ export function RadialGoal({
   goalAmount,
   size = 72,
   elapsed,
+  timeLeft,
 }: Props) {
   const fraction = Math.min(1, Math.max(0, totalRaised / goalAmount))
   const percent = Math.round(fraction * 100)
@@ -30,7 +39,11 @@ export function RadialGoal({
   return (
     <div
       role="img"
-      aria-label={`${percent}% of the goal raised`}
+      aria-label={`${percent}% of the goal raised${
+        timeLeft != null
+          ? `, ${leadingUnit(timeLeft).value} ${leadingUnit(timeLeft).label} to go`
+          : ""
+      }`}
       className="relative"
       style={{ width: size, height: size }}
     >
@@ -76,14 +89,29 @@ export function RadialGoal({
         )}
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center leading-none tabular-nums">
-        <span
-          className={`text-xl font-medium ${
-            reached ? "text-success" : "text-foreground"
-          }`}
-        >
-          {percent}%
-        </span>
-        <span className="mt-0.5 text-[10px] text-muted-foreground">raised</span>
+        {timeLeft != null ? (
+          <>
+            <span className="text-xl font-medium text-foreground">
+              {leadingUnit(timeLeft).value}
+            </span>
+            <span className="mt-0.5 text-[10px] text-muted-foreground">
+              {leadingUnit(timeLeft).label}
+            </span>
+          </>
+        ) : (
+          <>
+            <span
+              className={`text-xl font-medium ${
+                reached ? "text-success" : "text-foreground"
+              }`}
+            >
+              {percent}%
+            </span>
+            <span className="mt-0.5 text-[10px] text-muted-foreground">
+              raised
+            </span>
+          </>
+        )}
       </div>
     </div>
   )
