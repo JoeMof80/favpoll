@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import type { FavpollCardSize } from "@/components/favpoll-card/types"
-import { heroNameSizeClass } from "@/lib/display"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 // Four, matching the live maximum below. Keep this in step with the
@@ -75,7 +74,12 @@ export function Countdown({
   const eyebrowClass = hero
     ? "mb-2 flex h-8 items-center truncate wrap-break-word"
     : "mb-2 font-semibold"
-  const heroValueClass = `${heroNameSizeClass("00 00 00 00", compact)} leading-tight font-medium tracking-tight transition-[font-size] duration-300 ease-out motion-reduce:transition-none`
+  // The figures at the CONTEXT line's weight, not the name's (founder,
+  // 2026-10-17: "i like the balance between the name and countdown but
+  // the countdown is far too dominant. it isn't that important"): the
+  // eyebrow still sits on the hero's eyebrow line and the figures on the
+  // name's line, but at text-xl → 2xl, stepping with the column.
+  const heroValueClass = `text-xl leading-tight font-medium transition-[font-size] duration-300 ease-out motion-reduce:transition-none ${compact ? "" : "shell:text-2xl"}`
   const [timeLeft, setTimeLeft] = useState<ReturnType<typeof getTimeLeft>>(null)
 
   useEffect(() => {
@@ -132,7 +136,7 @@ export function Countdown({
           ? "text-2xl leading-none"
           : "text-xl leading-none"
     const inlineLabelClass = hero
-      ? "text-sm"
+      ? "text-xs"
       : size === "lg"
         ? "text-sm"
         : size === "md"
@@ -357,7 +361,7 @@ export function Countdown({
           ? "text-2xl leading-none"
           : "text-xl leading-none"
     const inlineLabelClass = hero
-      ? "text-sm"
+      ? "text-xs"
       : size === "lg"
         ? "text-sm"
         : size === "md"

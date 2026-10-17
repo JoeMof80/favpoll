@@ -509,7 +509,10 @@ export function FavpollSheet({
             totalRaised={totalRaised}
             goalAmount={favpoll.goal_amount}
             elapsed={elapsed}
-            className="mt-4 h-1"
+            // bg-primary/15: the track on the MUTED footer — bg-muted on
+            // bg-muted was invisible, leaving the fill (and the pace tick)
+            // floating on nothing. The ring's own track tone.
+            className="mt-4 h-1 bg-primary/15"
           />
         ) : null}
       </div>
