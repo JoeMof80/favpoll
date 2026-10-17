@@ -9,9 +9,17 @@ type Props = {
   totalRaised: number
   goalAmount: number
   size?: number
+  /** PACE (founder, 2026-10-17): the run's elapsed fraction, 0–1, as a
+   *  notch on the ring. Fill past the notch is ahead of pace. */
+  elapsed?: number | null
 }
 
-export function RadialGoal({ totalRaised, goalAmount, size = 72 }: Props) {
+export function RadialGoal({
+  totalRaised,
+  goalAmount,
+  size = 72,
+  elapsed,
+}: Props) {
   const fraction = Math.min(1, Math.max(0, totalRaised / goalAmount))
   const percent = Math.round(fraction * 100)
   const reached = totalRaised >= goalAmount
@@ -54,6 +62,18 @@ export function RadialGoal({ totalRaised, goalAmount, size = 72 }: Props) {
           strokeDasharray={c}
           strokeDashoffset={c * (1 - fraction)}
         />
+        {elapsed != null && (
+          <line
+            x1={size / 2 + r - 6}
+            y1={size / 2}
+            x2={size / 2 + r + 6}
+            y2={size / 2}
+            className="stroke-foreground"
+            strokeWidth={2}
+            strokeLinecap="round"
+            transform={`rotate(${Math.min(1, Math.max(0, elapsed)) * 360} ${size / 2} ${size / 2})`}
+          />
+        )}
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center leading-none tabular-nums">
         <span

@@ -3,6 +3,7 @@
 import type { MentionTarget } from "@/lib/mentions"
 import { useCallback, useState, useSyncExternalStore } from "react"
 import { Countdown } from "@/components/countdown"
+import { CloseLine, timeToGo, useTimeLeft } from "@/components/close-line"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { GuestBook, type WallEntry } from "@/components/guest-book"
 import { TrendingUpDown } from "lucide-react"
@@ -140,6 +141,20 @@ export function FavpollSheet({
   children,
 }: FavpollSheetProps) {
   const room = presentation === "room"
+  // PACE: how far the run has come, created_at → closes_at, for the goal
+  // bar's tick and the ring's notch; and the time to go for the dial's
+  // context line.
+  const timeLeft = useTimeLeft(isClosed ? null : favpoll.closes_at)
+  // Derived from the hook's clock, never Date.now() in render.
+  const runLength =
+    favpoll.closes_at && favpoll.created_at
+      ? new Date(favpoll.closes_at).getTime() -
+        new Date(favpoll.created_at).getTime()
+      : 0
+  const elapsed =
+    timeLeft !== null && runLength > 0
+      ? Math.min(1, Math.max(0, 1 - timeLeft / runLength))
+      : null
   // The desktop rail expands to an equal split instead of opening a
   // modal (founder, 2026-09-22): the standings stay on screen, and at
   // that width the guest book's comments become readable. Mobile has no
@@ -243,13 +258,9 @@ export function FavpollSheet({
       <Countdown ended />
       {closedAt && <p className="text-xs text-muted-foreground">{closedAt}</p>}
     </div>
-  ) : (
-    <Countdown
-      closesAt={favpoll.closes_at}
-      scale="hero"
-      compact={!guestBookExpanded}
-    />
-  )
+  ) : favpoll.closes_at ? (
+    <CloseLine closesAt={favpoll.closes_at} compact={!guestBookExpanded} />
+  ) : null
 
   // The open card sits on the HERO'S lines (founder, 2026-10-17: "match
   // the style of the countdown to the Opening Line and Name"): pt-3 puts
@@ -493,6 +504,7 @@ export function FavpollSheet({
           <GoalProgress
             totalRaised={totalRaised}
             goalAmount={favpoll.goal_amount}
+            elapsed={elapsed}
             className="mt-4 h-1"
           />
         ) : null}
@@ -574,6 +586,7 @@ export function FavpollSheet({
             totalRaised={totalRaised}
             goalAmount={heroFundraiser.goalAmount}
             size={72}
+            elapsed={elapsed}
           />
         </div>
       )}
@@ -587,9 +600,17 @@ export function FavpollSheet({
         scale="hero"
         compact={!guestBookExpanded}
       />
-      {/* No context line: the rail's own countdown card follows this one
-          (founder, 2026-10-17: "replace the countdown with the normal
-          countdown block"). */}
+      {/* THE TIME TO GO as the context line (founder, 2026-10-17, "try 1
+          and 2 together"): the goal card says money AND time — the ring
+          carries both as fill and notch, the line says it in words — and
+          the clock card beneath is gone. */}
+      {timeLeft !== null && (
+        <p
+          className={`mt-4 truncate text-xl font-normal text-primary tabular-nums transition-[font-size] duration-300 ease-out motion-reduce:transition-none ${guestBookExpanded ? "shell:text-2xl" : ""}`}
+        >
+          {timeToGo(timeLeft)}
+        </p>
+      )}
       {/* No goal bar beneath (founder, 2026-10-17: "remove the countdown
           line" — the bar; the ring carries the goal). The rail's own
           divider closes the card. */}
@@ -610,7 +631,6 @@ export function FavpollSheet({
         heroFundraiser ? (
           <>
             {dialRail}
-            {stateCardRail}
             {organiserCard}
           </>
         ) : (
