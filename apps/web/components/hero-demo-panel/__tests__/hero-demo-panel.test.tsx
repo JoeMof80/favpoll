@@ -132,6 +132,21 @@ describe("DemoCard — locked phases", () => {
     expect(container.querySelector(".blur-xs")).toBeNull()
   })
 
+  it("the phone frame draws no skeletons when locked — the lock card alone (founder, 2026-10-16)", () => {
+    render(
+      <DemoCard
+        scene={scene}
+        phase="arriving"
+        barWidths={DECOY_WIDTHS}
+        prefersReducedMotion={false}
+        device="phone"
+      />
+    )
+    expect(screen.queryByTestId("note-skeleton")).toBeNull()
+    expect(screen.queryByTestId("standings-skeleton")).toBeNull()
+    expect(screen.getByText(LOCK_CARD_COPY)).toBeInTheDocument()
+  })
+
   it("About text is present via reserve copy in a locked phase", () => {
     renderCard("arriving")
     // The reserve <p> always carries the full About text (the typed copy starts
