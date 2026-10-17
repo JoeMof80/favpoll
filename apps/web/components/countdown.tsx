@@ -156,8 +156,16 @@ export function Countdown({
             Poll closes in
           </SectionEyebrow>
           <div
-            className="grid items-baseline gap-x-3"
-            style={{ gridTemplateColumns: columns(PLACEHOLDER_PARTS) }}
+            className={
+              hero
+                ? "flex items-baseline justify-between gap-x-3"
+                : "grid items-baseline gap-x-3"
+            }
+            style={
+              hero
+                ? undefined
+                : { gridTemplateColumns: columns(PLACEHOLDER_PARTS) }
+            }
           >
             {PLACEHOLDER_PARTS.map(({ label }, i) => (
               <span
@@ -400,11 +408,19 @@ export function Countdown({
         <SectionEyebrow variant="muted" className={eyebrowClass}>
           Poll closes in
         </SectionEyebrow>
+        {/* Hero scale: the four columns SPREAD to the card's width, the
+            first on the left edge and the last on the right (founder,
+            2026-10-18: "spread the countdown components to fill the
+            width of the column"). Rail scale keeps its grid. */}
         <div
-          className="grid items-baseline gap-x-3"
-          style={{
-            gridTemplateColumns: columns(inlineParts),
-          }}
+          className={
+            hero
+              ? "flex items-baseline justify-between gap-x-3"
+              : "grid items-baseline gap-x-3"
+          }
+          style={
+            hero ? undefined : { gridTemplateColumns: columns(inlineParts) }
+          }
           // Seconds stay OUT of the label: aria-live is off, so this is
           // read on demand, and a value that changes every second makes
           // for a restless accessible name.
