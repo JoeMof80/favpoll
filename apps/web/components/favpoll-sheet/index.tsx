@@ -433,7 +433,15 @@ export function FavpollSheet({
           56px strip and this is three times that, so matching tones read as
           a strip above and a slab below, not a frame. */}
       <div
-        className={`z-30 mt-8 hidden border-t border-border bg-background pt-5 pb-[var(--shell-inset)] shell:-mr-8 shell:-ml-16 shell:block shell:pr-8 shell:pl-16 ${
+        // THE BAND'S PARTNER, SECOND TRY (founder, 2026-10-17: "now we have
+        // a muted band header, does it make sense to make the charity
+        // block a muted footer?"). The first try read as a slab because
+        // of its HEIGHT, not its tone: 64px of inset under the row made
+        // it well over twice the band's 56. The inset is 20 now — the
+        // row's own top padding mirrored — so the block sits near the
+        // band's weight, muted, no hairline: the tone step is the edge,
+        // as it is on the band and the phone's footer.
+        className={`z-30 mt-8 hidden bg-muted pt-5 pb-[var(--shell-inset)] shell:-mr-8 shell:-ml-16 shell:block shell:pr-8 shell:pl-16 ${
           still ? "" : "sticky bottom-0"
         }`}
       >
@@ -616,9 +624,10 @@ export function FavpollSheet({
       appShell
       railExpanded={guestBookExpanded}
       shellHeight={shellHeight}
-      // The bottom inset: 64px on both surfaces (the room's 72 was the
-      // first dial's line; gone with it, 2026-10-17).
-      shellInset="64px"
+      // The bottom inset, both surfaces: 20px — the footer row's own
+      // padding mirrored below it, and the line the rail's fade ends on
+      // (was 64, which made the muted footer a slab; 2026-10-17).
+      shellInset="20px"
     >
       {children}
     </PageLayout>
