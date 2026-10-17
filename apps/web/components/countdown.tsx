@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import type { FavpollCardSize } from "@/components/favpoll-card/types"
+import { heroNameSizeClass } from "@/lib/display"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 // Four, matching the live maximum below. Keep this in step with the
@@ -39,8 +40,15 @@ type Props = {
    *  eyebrow says "Poll closed". */
   ended?: boolean
   /** Subtitle variant: the hero's context steps down with the rail's
-   *  expand (lg:text-2xl → text-xl); so does this line. */
+   *  expand (lg:text-2xl → text-xl); so does this line. Hero scale:
+   *  the figures step as the name does. */
   compact?: boolean
+  /** THE HERO'S OWN GRAMMAR for the inline card (founder, 2026-10-17:
+   *  "match the style of the countdown to the Opening Line and Name"):
+   *  the eyebrow in its h-8 row, the figures in the name's type and on
+   *  its ramp, the units a step up — the rail's countdown reading as the
+   *  hero's twin across the aisle, as the goal card does on the dial. */
+  scale?: "rail" | "hero"
 }
 
 function getTimeLeft(closesAt: string) {
@@ -61,7 +69,13 @@ export function Countdown({
   variant = "inline",
   ended = false,
   compact = false,
+  scale = "rail",
 }: Props) {
+  const hero = scale === "hero"
+  const eyebrowClass = hero
+    ? "mb-2 flex h-8 items-center truncate wrap-break-word"
+    : "mb-2 font-semibold"
+  const heroValueClass = `${heroNameSizeClass("00 00 00 00", compact)} leading-tight font-medium tracking-tight transition-[font-size] duration-300 ease-out motion-reduce:transition-none`
   const [timeLeft, setTimeLeft] = useState<ReturnType<typeof getTimeLeft>>(null)
 
   useEffect(() => {
@@ -110,14 +124,24 @@ export function Countdown({
   }
 
   if (!closesAt) {
-    const inlineValueClass =
-      size === "lg" ? "text-3xl" : size === "md" ? "text-2xl" : "text-xl"
-    const inlineLabelClass =
-      size === "lg" ? "text-sm" : size === "md" ? "text-xs" : "text-[10px]"
+    const inlineValueClass = hero
+      ? heroValueClass
+      : size === "lg"
+        ? "text-3xl leading-none"
+        : size === "md"
+          ? "text-2xl leading-none"
+          : "text-xl leading-none"
+    const inlineLabelClass = hero
+      ? "text-sm"
+      : size === "lg"
+        ? "text-sm"
+        : size === "md"
+          ? "text-xs"
+          : "text-[10px]"
     if (variant === "inline") {
       return (
         <div>
-          <SectionEyebrow variant="muted" className="mb-2 font-semibold">
+          <SectionEyebrow variant="muted" className={eyebrowClass}>
             Poll closes in
           </SectionEyebrow>
           <div
@@ -132,7 +156,7 @@ export function Countdown({
                 }`}
               >
                 <span
-                  className={`${inlineValueClass} leading-none font-medium text-muted-foreground`}
+                  className={`${inlineValueClass} font-medium text-muted-foreground`}
                 >
                   --
                 </span>
@@ -310,13 +334,23 @@ export function Countdown({
       days > 0
         ? [...parts, { value: seconds, label: "sec", half: true }]
         : parts
-    const inlineValueClass =
-      size === "lg" ? "text-3xl" : size === "md" ? "text-2xl" : "text-xl"
-    const inlineLabelClass =
-      size === "lg" ? "text-sm" : size === "md" ? "text-xs" : "text-[10px]"
+    const inlineValueClass = hero
+      ? heroValueClass
+      : size === "lg"
+        ? "text-3xl leading-none"
+        : size === "md"
+          ? "text-2xl leading-none"
+          : "text-xl leading-none"
+    const inlineLabelClass = hero
+      ? "text-sm"
+      : size === "lg"
+        ? "text-sm"
+        : size === "md"
+          ? "text-xs"
+          : "text-[10px]"
     return (
       <div aria-live="off">
-        <SectionEyebrow variant="muted" className="mb-2 font-semibold">
+        <SectionEyebrow variant="muted" className={eyebrowClass}>
           Poll closes in
         </SectionEyebrow>
         <div
@@ -344,7 +378,7 @@ export function Countdown({
               }`}
             >
               <span
-                className={`${inlineValueClass} leading-none font-medium text-foreground`}
+                className={`${inlineValueClass} font-medium text-foreground`}
               >
                 {String(value).padStart(2, "0")}
               </span>

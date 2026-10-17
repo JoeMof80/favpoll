@@ -244,10 +244,20 @@ export function FavpollSheet({
       {closedAt && <p className="text-xs text-muted-foreground">{closedAt}</p>}
     </div>
   ) : (
-    <Countdown closesAt={favpoll.closes_at} />
+    <Countdown
+      closesAt={favpoll.closes_at}
+      scale="hero"
+      compact={!guestBookExpanded}
+    />
   )
 
-  const stateCardRail = <div className={railChrome}>{stateCardInner}</div>
+  // The open card sits on the HERO'S lines (founder, 2026-10-17: "match
+  // the style of the countdown to the Opening Line and Name"): pt-3 puts
+  // its h-8 eyebrow row at 72, the hero's eyebrow row, and the figures at
+  // 112, the name's; the closed card keeps the rail's py-5 rhythm.
+  const stateCardRail = (
+    <div className={isClosed ? railChrome : "pt-3 pb-5"}>{stateCardInner}</div>
+  )
 
   // Guest book: always visible in the rail (fills the space), but
   // entries are withheld pre-pledge — a teaser with skeleton rows
