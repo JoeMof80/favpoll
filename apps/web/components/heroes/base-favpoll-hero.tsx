@@ -92,7 +92,7 @@ export function BaseFavpollHero({
       <ProtagonistAvatar
         name={protagonist.name}
         photoUrl={protagonist.photo_url}
-        className="h-full w-full md:h-full shell:h-full md:w-full shell:w-full"
+        className="h-full w-full md:h-full md:w-full shell:h-full shell:w-full"
       />
     ) : undefined
 

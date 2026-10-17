@@ -179,7 +179,7 @@ export function HeroLayout({
           // the box's measured height holds its place in flow. From lg
           // the shell's scroller never overscrolls and sticky stands.
           pins
-            ? "z-30 max-shell:fixed max-shell:top-0 max-shell:left-1/2 max-shell:w-full max-shell:max-w-2xl max-shell:-translate-x-1/2 max-shell:px-6 shell:sticky"
+            ? "z-30 shell:sticky max-shell:fixed max-shell:top-0 max-shell:left-1/2 max-shell:w-full max-shell:max-w-2xl max-shell:-translate-x-1/2 max-shell:px-6"
             : "",
         ].join(" ")}
         style={pins ? { top: `${inset}px` } : undefined}
