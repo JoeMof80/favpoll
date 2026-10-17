@@ -7,7 +7,14 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 // Four, matching the live maximum below. Keep this in step with the
 // inline `parts` or the card reflows the moment the countdown mounts.
 // The trailing seconds takes half a column — see `columns` below.
-type Part = { value?: number; label: string; half?: boolean }
+type Part = {
+  value?: number
+  label: string
+  half?: boolean
+  /** Hero scale: a leading unit already at zero, kept in its column and
+   *  muted rather than dropped. */
+  spent?: boolean
+}
 
 const PLACEHOLDER_PARTS: readonly Part[] = [
   { label: "days" },
@@ -149,8 +156,16 @@ export function Countdown({
             Poll closes in
           </SectionEyebrow>
           <div
-            className="grid items-baseline gap-x-3"
-            style={{ gridTemplateColumns: columns(PLACEHOLDER_PARTS) }}
+            className={
+              hero
+                ? "flex items-baseline justify-between gap-x-3"
+                : "grid items-baseline gap-x-3"
+            }
+            style={
+              hero
+                ? undefined
+                : { gridTemplateColumns: columns(PLACEHOLDER_PARTS) }
+            }
           >
             {PLACEHOLDER_PARTS.map(({ label }, i) => (
               <span
@@ -342,8 +357,29 @@ export function Countdown({
     // Only this appended copy takes a half column. Once the days unit
     // drops away seconds become the last-day drama and arrive through
     // `parts` as a full unit, exactly as before.
-    const inlineParts: Part[] =
-      days > 0
+    // HERO SCALE: ALL FOUR UNITS, ALWAYS (founder, 2026-10-17: "i'm not
+    // sure i like the countdown without days or hours. Should we include
+    // them but muted?"). The card keeps its shape to the last second —
+    // it used to lose a column at the day and the hour and the rail
+    // jumped — and a unit already at zero stays in its column, muted:
+    // "00 days" reads as what it is. The leading zeros are muted; once a
+    // unit is live every unit after it is live.
+    const heroParts: Part[] = (() => {
+      const all: Part[] = [
+        { value: days, label: days === 1 ? "day" : "days" },
+        { value: hours, label: hours === 1 ? "hr" : "hrs" },
+        { value: minutes, label: minutes === 1 ? "min" : "mins" },
+        { value: seconds, label: seconds === 1 ? "sec" : "secs" },
+      ]
+      let live = false
+      return all.map((part) => {
+        if ((part.value ?? 0) > 0) live = true
+        return { ...part, spent: !live }
+      })
+    })()
+    const inlineParts: Part[] = hero
+      ? heroParts
+      : days > 0
         ? [
             ...parts,
             {
@@ -372,17 +408,25 @@ export function Countdown({
         <SectionEyebrow variant="muted" className={eyebrowClass}>
           Poll closes in
         </SectionEyebrow>
+        {/* Hero scale: the four columns SPREAD to the card's width, the
+            first on the left edge and the last on the right (founder,
+            2026-10-18: "spread the countdown components to fill the
+            width of the column"). Rail scale keeps its grid. */}
         <div
-          className="grid items-baseline gap-x-3"
-          style={{
-            gridTemplateColumns: columns(inlineParts),
-          }}
+          className={
+            hero
+              ? "flex items-baseline justify-between gap-x-3"
+              : "grid items-baseline gap-x-3"
+          }
+          style={
+            hero ? undefined : { gridTemplateColumns: columns(inlineParts) }
+          }
           // Seconds stay OUT of the label: aria-live is off, so this is
           // read on demand, and a value that changes every second makes
           // for a restless accessible name.
           aria-label={`${days} days ${hours} hours ${minutes} minutes remaining`}
         >
-          {inlineParts.map(({ value, label }, i) => (
+          {inlineParts.map(({ value, label, spent }, i) => (
             <span
               key={label}
               className={`tabular-nums ${
@@ -395,9 +439,7 @@ export function Countdown({
                   ? "text-right"
                   : ""
               } ${hero ? "flex justify-start" : ""} ${
-                hero && i === inlineParts.length - 1 && inlineParts[i]?.half
-                  ? "justify-end"
-                  : ""
+                hero && i === inlineParts.length - 1 ? "justify-end" : ""
               }`}
             >
               {/* Hero scale: the unit BENEATH its figure (founder,
@@ -409,12 +451,16 @@ export function Countdown({
                   edge and the last on the right. */}
               <span className={hero ? "flex flex-col items-center" : ""}>
                 <span
-                  className={`${inlineValueClass} font-medium text-foreground`}
+                  className={`${inlineValueClass} font-medium ${
+                    spent ? "text-muted-foreground/60" : "text-foreground"
+                  }`}
                 >
                   {String(value).padStart(2, "0")}
                 </span>
                 <span
-                  className={`${hero ? "mt-1" : "ml-1"} ${inlineLabelClass} text-muted-foreground`}
+                  className={`${hero ? "mt-1" : "ml-1"} ${inlineLabelClass} ${
+                    spent ? "text-muted-foreground/60" : "text-muted-foreground"
+                  }`}
                 >
                   {label}
                 </span>

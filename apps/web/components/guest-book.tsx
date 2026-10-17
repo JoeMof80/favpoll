@@ -249,6 +249,7 @@ export function GuestBook({
   className,
   expanded = false,
   onToggleExpand,
+  hideExpandControl = false,
   pinned,
   pinnedTop = "pt-13",
   count,
@@ -285,6 +286,9 @@ export function GuestBook({
    *  overlay is never rendered: the rail is desktop-only, and the mobile
    *  stack has its own instance that keeps the dialog. */
   onToggleExpand?: () => void
+  /** The surface draws the expand control itself (the rail's, at its
+   *  top-right): the header shows none. */
+  hideExpandControl?: boolean
   /** "flat" only: rows that pin at the top of the rail ABOVE the guest
    *  book's header (the countdown, the organiser). The header pins with
    *  them (founder, 2026-09-29: "can the guest book header be sticky?"),
@@ -358,23 +362,24 @@ export function GuestBook({
       : {}
 
   const ExpandIcon = expanded ? Minimize2 : Maximize2
-  const expandControl = !canExpand ? null : inPlace ? (
-    <button
-      type="button"
-      onClick={onToggleExpand}
-      aria-expanded={expanded}
-      aria-label={expanded ? "Collapse guest book" : "Expand guest book"}
-      // -m-1 p-1: a 24px target without moving the icon off the eyebrow.
-      className="-m-1 shrink-0 rounded p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-    >
-      <ExpandIcon className="size-4" aria-hidden="true" />
-    </button>
-  ) : (
-    <ExpandIcon
-      className="size-4 shrink-0 text-muted-foreground"
-      aria-hidden="true"
-    />
-  )
+  const expandControl =
+    !canExpand || hideExpandControl ? null : inPlace ? (
+      <button
+        type="button"
+        onClick={onToggleExpand}
+        aria-expanded={expanded}
+        aria-label={expanded ? "Collapse guest book" : "Expand guest book"}
+        // -m-1 p-1: a 24px target without moving the icon off the eyebrow.
+        className="-m-1 shrink-0 rounded p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+      >
+        <ExpandIcon className="size-4" aria-hidden="true" />
+      </button>
+    ) : (
+      <ExpandIcon
+        className="size-4 shrink-0 text-muted-foreground"
+        aria-hidden="true"
+      />
+    )
 
   // With the header pinned the list carries no top margin (the header's
   // own padding is the gap). The room before the column's edge (founder,
