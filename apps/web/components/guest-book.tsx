@@ -515,10 +515,7 @@ export function GuestBook({
           >
             {[0.9, 0.75, 0.6, 0.85, 0.5, 0.7].map((w, i) => (
               <div key={i} className="flex gap-3">
-                <div
-                  className="size-8 shrink-0 rounded"
-                  style={{ backgroundColor: "oklch(0.92 0 0)" }}
-                />
+                <div className="size-8 shrink-0 rounded bg-skeleton-soft" />
                 {/* THE REAL ROW'S LINE BOXES (founder, 2026-10-17: "the
                     guest card skeletons are slightly too compact compared
                     to real guestbook items"): the name's text-sm line is
@@ -528,18 +525,12 @@ export function GuestBook({
                 <div className="min-w-0 flex-1">
                   <div className="flex h-5 items-center">
                     <div
-                      className="h-3.5 rounded"
-                      style={{
-                        width: `${w * 100}%`,
-                        backgroundColor: "oklch(0.87 0 0)",
-                      }}
+                      className="h-3.5 rounded bg-skeleton"
+                      style={{ width: `${w * 100}%` }}
                     />
                   </div>
                   <div className="flex h-4 items-center">
-                    <div
-                      className="h-3 w-16 rounded"
-                      style={{ backgroundColor: "oklch(0.92 0 0)" }}
-                    />
+                    <div className="h-3 w-16 rounded bg-skeleton-soft" />
                   </div>
                 </div>
               </div>
