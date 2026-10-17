@@ -197,6 +197,26 @@ describe("GuestBook — in-place expansion (the desktop rail)", () => {
     ).toBeInTheDocument()
   })
 
+  it("the phone's sheet is the rail: the eyebrow with its count, and the six waiting rows when the book is withheld (2026-10-18)", async () => {
+    const user = userEvent.setup()
+    const { baseElement } = render(
+      <GuestBook
+        entries={[]}
+        teaseBacked
+        variant="button"
+        expandable
+        count={12}
+      />
+    )
+    await user.click(screen.getByRole("button", { name: /Guest book · 12/ }))
+    const sheet = await screen.findByRole("dialog")
+    expect(sheet.textContent).toMatch(/Guest book.*12 pledges/)
+    expect(sheet.querySelectorAll(".size-8.bg-skeleton-soft")).toHaveLength(6)
+    expect(
+      baseElement.querySelector('[role="dialog"] [aria-label="All pledges"]')
+    ).toBeNull()
+  })
+
   it("shows messages once expanded in place", () => {
     render(
       <GuestBook

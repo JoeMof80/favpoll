@@ -389,23 +389,66 @@ export function GuestBook({
   // stops on the charity footer's line; a tail here would push it off.
   const listTop = variant === "flat" && pinned ? "" : "mt-3"
   const tail = ""
+  // THE PLACEHOLDER ROWS, one source for the rail and the phone's sheet
+  // (founder, 2026-10-18: "style mobile guest book like desktop e.g. with
+  // skeletons"): a withheld book shows the same six waiting rows on both.
+  const placeholderRows = [0.9, 0.75, 0.6, 0.85, 0.5, 0.7].map((w, i) => (
+    <div key={i} className="flex gap-3">
+      <div className="size-8 shrink-0 rounded bg-skeleton-soft" />
+      {/* THE REAL ROW'S LINE BOXES (founder, 2026-10-17: "the
+                guest card skeletons are slightly too compact compared
+                to real guestbook items"): the name's text-sm line is
+                20px and the label's text-xs line 16, so the block is
+                36 — the bars sit centred in those, instead of
+                stacking to 32 and leaving every row 4px short. */}
+      <div className="min-w-0 flex-1">
+        <div className="flex h-5 items-center">
+          <div
+            className="h-3.5 rounded bg-skeleton"
+            style={{ width: `${w * 100}%` }}
+          />
+        </div>
+        <div className="flex h-4 items-center">
+          <div className="h-3 w-16 rounded bg-skeleton-soft" />
+        </div>
+      </div>
+    </div>
+  ))
+
   const overlay = (
     <ResponsiveOverlay
       open={allOpen}
       onOpenChange={setAllOpen}
       title="Guest book"
+      // The rail's own eyebrow as the sheet's header, count and all —
+      // the phone's guest book IS the desktop rail (founder, 2026-10-18:
+      // "style mobile guest book like desktop").
+      header={
+        <SectionEyebrow variant="muted" className="font-semibold">
+          Guest book
+          {countLabel && (
+            <span className="font-normal opacity-70">{countLabel}</span>
+          )}
+        </SectionEyebrow>
+      }
       dialogContentClassName="flex-1 overflow-y-auto px-5 pb-5"
       // The phone's guest book is the desktop rail: it comes in from the
       // right, where the rail lives, and where the row's chevron points.
       mobileSide="right"
     >
-      <ul className="space-y-5" aria-label="All pledges">
-        {entries.map((entry) => (
-          <li key={entry.id}>
-            <GuestBookRowFull entry={entry} />
-          </li>
-        ))}
-      </ul>
+      {entries.length === 0 ? (
+        <div className="space-y-4" aria-hidden="true">
+          {placeholderRows}
+        </div>
+      ) : (
+        <ul className="space-y-5" aria-label="All pledges">
+          {entries.map((entry) => (
+            <li key={entry.id}>
+              <GuestBookRowFull entry={entry} />
+            </li>
+          ))}
+        </ul>
+      )}
       {teaseBacked && (
         <p className="mt-3 text-xs text-muted-foreground">
           Pledge to see what everyone backed.
@@ -518,28 +561,7 @@ export function GuestBook({
             className={`${listTop} space-y-4 ${pad} ${tail}`}
             style={reserved}
           >
-            {[0.9, 0.75, 0.6, 0.85, 0.5, 0.7].map((w, i) => (
-              <div key={i} className="flex gap-3">
-                <div className="size-8 shrink-0 rounded bg-skeleton-soft" />
-                {/* THE REAL ROW'S LINE BOXES (founder, 2026-10-17: "the
-                    guest card skeletons are slightly too compact compared
-                    to real guestbook items"): the name's text-sm line is
-                    20px and the label's text-xs line 16, so the block is
-                    36 — the bars sit centred in those, instead of
-                    stacking to 32 and leaving every row 4px short. */}
-                <div className="min-w-0 flex-1">
-                  <div className="flex h-5 items-center">
-                    <div
-                      className="h-3.5 rounded bg-skeleton"
-                      style={{ width: `${w * 100}%` }}
-                    />
-                  </div>
-                  <div className="flex h-4 items-center">
-                    <div className="h-3 w-16 rounded bg-skeleton-soft" />
-                  </div>
-                </div>
-              </div>
-            ))}
+            {placeholderRows}
           </div>
         ) : (
           <>
