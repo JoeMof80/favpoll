@@ -13,8 +13,8 @@ type Part = { value?: number; label: string; half?: boolean }
 const PLACEHOLDER_PARTS: readonly Part[] = [
   { label: "days" },
   { label: "hrs" },
-  { label: "min" },
-  { label: "sec", half: true },
+  { label: "mins" },
+  { label: "secs", half: true },
 ]
 
 // The seconds unit gets HALF A COLUMN (founder, 2026-09-23). Every
@@ -155,7 +155,7 @@ export function Countdown({
                   i === PLACEHOLDER_PARTS.length - 1 ? "text-right" : ""
                 }`}
               >
-                <span className={hero ? "flex flex-col" : ""}>
+                <span className={hero ? "flex flex-col items-center" : ""}>
                   <span
                     className={`${inlineValueClass} font-medium text-muted-foreground`}
                   >
@@ -254,6 +254,10 @@ export function Countdown({
     )
   }
 
+  // EVERY UNIT PLURALISES THE SAME WAY — day/days, hr/hrs, min/mins,
+  // sec/secs, singular only at exactly one. "min" and "sec" had been
+  // written as invariant abbreviations beside a varying "hrs" (founder,
+  // 2026-10-17: "why are some labels plural and some not?").
   // AT MOST THREE UNITS, the subtitle variant's own rule (founder,
   // 2026-09-14: four segments wrapped at 3-digit days): seconds are
   // noise while days remain and return for the last-day drama once
@@ -263,17 +267,17 @@ export function Countdown({
       ? [
           { value: days, label: days === 1 ? "day" : "days" },
           { value: hours, label: hours === 1 ? "hr" : "hrs" },
-          { value: minutes, label: "min" },
+          { value: minutes, label: minutes === 1 ? "min" : "mins" },
         ]
       : hours > 0
         ? [
             { value: hours, label: hours === 1 ? "hr" : "hrs" },
-            { value: minutes, label: "min" },
-            { value: seconds, label: "sec" },
+            { value: minutes, label: minutes === 1 ? "min" : "mins" },
+            { value: seconds, label: seconds === 1 ? "sec" : "secs" },
           ]
         : [
-            { value: minutes, label: "min" },
-            { value: seconds, label: "sec" },
+            { value: minutes, label: minutes === 1 ? "min" : "mins" },
+            { value: seconds, label: seconds === 1 ? "sec" : "secs" },
           ]
 
   if (variant === "banner") {
@@ -305,7 +309,9 @@ export function Countdown({
     // stepped back, the card's own hierarchy). Seconds ride along as on
     // the card (founder: "no reason not to restore seconds").
     const barParts =
-      days > 0 ? [...parts, { value: seconds, label: "sec" }] : parts
+      days > 0
+        ? [...parts, { value: seconds, label: seconds === 1 ? "sec" : "secs" }]
+        : parts
     return (
       <p
         aria-live="off"
@@ -334,7 +340,14 @@ export function Countdown({
     // `parts` as a full unit, exactly as before.
     const inlineParts: Part[] =
       days > 0
-        ? [...parts, { value: seconds, label: "sec", half: true }]
+        ? [
+            ...parts,
+            {
+              value: seconds,
+              label: seconds === 1 ? "sec" : "secs",
+              half: true,
+            },
+          ]
         : parts
     const inlineValueClass = hero
       ? heroValueClass
@@ -387,7 +400,10 @@ export function Countdown({
                   2026-10-17: "place days, hrs, mins, sec labels below
                   their figures"), so each column reads as one unit of
                   time at the name's size; rail scale keeps them inline. */}
-              <span className={hero ? "flex flex-col" : ""}>
+              {/* items-center: the unit centred under ITS figure; the block
+                  shrink-wraps in its column, so the first stays on the left
+                  edge and the last on the right. */}
+              <span className={hero ? "flex flex-col items-center" : ""}>
                 <span
                   className={`${inlineValueClass} font-medium text-foreground`}
                 >
