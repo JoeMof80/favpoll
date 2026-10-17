@@ -63,6 +63,16 @@
      the translucent tint — stacked over the section's own, it composites to
      roughly double and shows a seam. color-mix keeps it exactly in step with
      both --primary and --background, so it tracks the theme flip for free. */
+  /* THE SKELETON'S NEUTRALS (founder, 2026-10-17: "make the skeletons
+     theme-aware"). Chroma 0 on purpose, which is the whole reason these
+     are their own tokens and not --muted: a placeholder must not take
+     the register's colour and turn pink on a celebration. They were
+     fixed light greys, chosen before the charcoal dark theme, and read
+     as glowing stripes on it; now they flip, and step the same distance
+     from the page each way — strong for the line that carries the shape,
+     soft for its track. */
+  --color-skeleton: var(--skeleton);
+  --color-skeleton-soft: var(--skeleton-soft);
   --color-band-tint: var(--band-tint);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
@@ -128,6 +138,9 @@
   --warning-strong: oklch(0.54 0.14 71);
   --success-strong: oklch(0.52 0.12 165);
   --radius: 0.5rem;
+  /* 0.87 ≈ zinc-300, 0.92 ≈ zinc-200, against a near-white page. */
+  --skeleton: oklch(0.87 0 0);
+  --skeleton-soft: oklch(0.92 0 0);
 }
 
 .dark {
@@ -148,6 +161,11 @@
   --border-strong: oklch(1 0 0 / 32%);
   --input: oklch(1 0 0 / 15%);
   --sidebar-border: oklch(1 0 0 / 18%);
+  /* The page sits near 0.15 and its cards near 0.2, so a placeholder
+     reads by stepping LIGHTER, the same distance the light pair steps
+     darker. */
+  --skeleton: oklch(0.3 0 0);
+  --skeleton-soft: oklch(0.24 0 0);
 }
 
 /* A register-scoped element whose ink is its OWN colour (2026-08-31) — the

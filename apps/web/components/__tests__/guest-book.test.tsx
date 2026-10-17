@@ -33,8 +33,10 @@ describe("GuestBook — teaser for un-entitled viewers", () => {
 
   it("shows skeleton teaser rows on an empty wall with teaseBacked", () => {
     const { container } = render(<GuestBook entries={[]} teaseBacked />)
-    // 6 skeleton rows (initial circle placeholders)
-    const skeletons = container.querySelectorAll("[style*='oklch']")
+    // 6 skeleton rows (initial circle placeholders). The neutrals are
+    // tokens since 2026-10-17 (bg-skeleton / bg-skeleton-soft), so the
+    // avatar placeholder is what counts the rows.
+    const skeletons = container.querySelectorAll(".size-8.bg-skeleton-soft")
     expect(skeletons.length).toBeGreaterThanOrEqual(6)
   })
 

@@ -364,8 +364,11 @@ describe("PollSection — favpolls without a reveal", () => {
       />
     )
     // The note skeleton renders a left-bordered placeholder block
-    // (replaces the old blurred decoy text, 2026-09-21)
-    expect(container.querySelector("[style*='border-left']")).not.toBeNull()
+    // (replaces the old blurred decoy text, 2026-09-21). Its border and
+    // bars take the theme-aware neutrals since 2026-10-17.
+    const note = container.querySelector('[data-testid="note-skeleton"]')
+    expect(note).not.toBeNull()
+    expect(note!.className).toContain("border-skeleton-soft")
   })
 })
 
