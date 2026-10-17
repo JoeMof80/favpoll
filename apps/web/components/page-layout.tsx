@@ -20,6 +20,11 @@ type Props = {
       surface (the guest book, showing comments) can be read in place
       rather than in a modal that hides the standings. */
   railExpanded?: boolean
+  /** THE SEAM'S CONTROL (founder, 2026-10-18: "place the button on the
+   *  border between the rails"): a handle drawn ON the column rule, on
+   *  the hero's eyebrow line, that follows the seam as the rail expands.
+   *  Shell mode only. */
+  railControl?: React.ReactNode
   /** Non-shell pages only: the rail pins below the header. Destination
       pages that use the rail as a header-row element (charity facts,
       appeal facts) opt out. */
@@ -51,6 +56,7 @@ export function PageLayout({
   right,
   appShell = false,
   railExpanded = false,
+  railControl,
   rightSticky = true,
   shellHeight = "calc(100vh - 3.5rem)",
   shellInset = "0px",
@@ -132,6 +138,7 @@ export function PageLayout({
             // frame; founder, 2026-09-29: "the rows animate but nothing
             // else on the page animates"). 50% of the sheet is the old
             // grid-cols-2 exactly.
+            "relative",
             `grid ${
               appShell
                 ? railExpanded
@@ -207,6 +214,21 @@ export function PageLayout({
             <div className="min-w-0">{left}</div>
           )}
           {right !== undefined && <div className={rail}>{right}</div>}
+          {appShell && railControl && (
+            // Centred on the seam: the rail's width from the right edge
+            // (its --rail at rest, half the sheet expanded), less half the
+            // handle. The rule itself passes behind. Eased with the grid.
+            <div
+              className="absolute top-[76px] z-20 hidden transition-[right] duration-300 ease-out motion-reduce:transition-none shell:block"
+              style={{
+                right: railExpanded
+                  ? "calc(50% - 12px)"
+                  : "calc(var(--rail) - 12px)",
+              }}
+            >
+              {railControl}
+            </div>
+          )}
         </div>
         {/* Full-width tail below the grid, spanning the whole sheet
             (charity/appeal member grids). In shell mode this sits outside

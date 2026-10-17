@@ -6,7 +6,11 @@ import { useScrollEdges } from "@/components/shell-scroller"
 import { Countdown } from "@/components/countdown"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { GuestBook, type WallEntry } from "@/components/guest-book"
-import { TrendingUpDown } from "lucide-react"
+import {
+  ChevronsLeftRight,
+  ChevronsRightLeft,
+  TrendingUpDown,
+} from "lucide-react"
 import { BumpChart } from "@/components/bump-chart"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import type { RankHistory } from "@/lib/rank-history"
@@ -222,6 +226,28 @@ export function FavpollSheet({
   // seat) — over the countdown at rest, zeroed, and the date (founder,
   // 2026-09-30). The settled figure and the Keepsake button are gone:
   // the footer carries the live total, the … menu the keepsake.
+  // THE RAIL'S HANDLE, on the seam between the columns (founder,
+  // 2026-10-18: the guest book's expand "isn't specific to the guestbook
+  // … place the button on the border between the rails … left-right
+  // arrows"): it widens the whole rail, so it sits on the rule the rail
+  // shares with the sheet, on the hero's eyebrow line, and follows the
+  // seam as the rail opens (page-layout railControl). A still has none.
+  const RailHandleIcon = guestBookExpanded
+    ? ChevronsRightLeft
+    : ChevronsLeftRight
+  const railHandle =
+    !still && wallEntries.length > 0 ? (
+      <button
+        type="button"
+        onClick={() => setGuestBookExpanded((v) => !v)}
+        aria-expanded={guestBookExpanded}
+        aria-label={guestBookExpanded ? "Narrow the rail" : "Widen the rail"}
+        className="flex size-6 items-center justify-center rounded-full bg-background text-muted-foreground shadow-sm ring-1 ring-border transition-colors hover:text-foreground"
+      >
+        <RailHandleIcon className="size-3.5" aria-hidden="true" />
+      </button>
+    ) : undefined
+
   const stateCardInner = isClosed ? (
     <div className="space-y-2">
       <div className="flex items-start justify-between gap-2">
@@ -589,6 +615,7 @@ export function FavpollSheet({
       pinnedTop="pt-15"
       expanded={guestBookExpanded}
       onToggleExpand={() => setGuestBookExpanded((v) => !v)}
+      hideExpandControl
       pinned={
         heroFundraiser ? (
           <>
@@ -616,6 +643,7 @@ export function FavpollSheet({
       right={right}
       appShell
       railExpanded={guestBookExpanded}
+      railControl={railHandle}
       shellHeight={shellHeight}
       // The bottom inset, both surfaces: 20px — the footer row's own
       // padding mirrored below it, and the line the rail's fade ends on
