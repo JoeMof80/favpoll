@@ -1,4 +1,5 @@
 import { RegisterScope } from "@/components/register-scope"
+import { compareLabels } from "@/lib/compare-labels"
 import { paletteForRegister } from "@/lib/register-palette"
 import { picksSuspended } from "@/lib/picks-suspended"
 import { notFound } from "next/navigation"
@@ -176,7 +177,7 @@ export default async function LiveDisplayPage({ params }: Props) {
     .sort((a, b) => {
       if (b.all_time_pledged !== a.all_time_pledged)
         return b.all_time_pledged - a.all_time_pledged
-      return a.label.localeCompare(b.label)
+      return compareLabels(a.label, b.label)
     })
   const unpledged = overlaid
     .filter((item) => item.all_time_count === 0)
@@ -186,7 +187,7 @@ export default async function LiveDisplayPage({ params }: Props) {
       if (da !== null && db !== null && da !== db) return da - db
       if (da !== null && db === null) return -1
       if (da === null && db !== null) return 1
-      return a.label.localeCompare(b.label)
+      return compareLabels(a.label, b.label)
     })
   const ROOM_ZERO_ROWS = 8
   const items = [
@@ -229,6 +230,7 @@ export default async function LiveDisplayPage({ params }: Props) {
         favpoll={favpoll as FavpollWithDetails}
         pollWithItems={pollWithItems}
         totalRaised={totalRaised}
+        pledgeCount={pledges.length}
         wallEntries={wallEntries}
         organiser={organiser}
         isClosed={isClosed}

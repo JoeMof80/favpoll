@@ -1,4 +1,5 @@
 import { pollTitle } from "@/lib/poll-title"
+import { compareLabels } from "@/lib/compare-labels"
 import { RegisterScope } from "@/components/register-scope"
 import { paletteForFavpoll } from "@/lib/register-palette"
 import type { Metadata } from "next"
@@ -249,7 +250,7 @@ export default async function FavpollPage({ params }: Props) {
           if (da !== null && db !== null) return da - db
           if (da !== null) return -1
           if (db !== null) return 1
-          return a.label.localeCompare(b.label)
+          return compareLabels(a.label, b.label)
         })
       }
       type EpiRow = {
@@ -282,7 +283,7 @@ export default async function FavpollPage({ params }: Props) {
         return overlayStandings(
           (catalogueItems ?? []) as Favourite[],
           standings
-        ).sort((a, b) => a.label.localeCompare(b.label))
+        ).sort((a, b) => compareLabels(a.label, b.label))
       }
 
       const allItems = overlayStandings(
@@ -296,7 +297,7 @@ export default async function FavpollPage({ params }: Props) {
       ).sort((a, b) => {
         if (b.all_time_pledged !== a.all_time_pledged)
           return b.all_time_pledged - a.all_time_pledged
-        return a.label.localeCompare(b.label)
+        return compareLabels(a.label, b.label)
       })
 
       // Organiser sees all items (including hidden); guests see only visible ones
@@ -487,6 +488,8 @@ export default async function FavpollPage({ params }: Props) {
           pot={pot ?? null}
           userPotAllocation={userPotAllocation}
           totalRaised={totalRaised}
+          // The whole book's count, not the 24 rows the wall loads.
+          pledgeCount={totalData.length}
           isClosed={isClosed}
           picksSuspended={suspended}
           wallEntries={wallEntries}

@@ -82,6 +82,10 @@ export type FavpollSheetProps = {
    *  anyone has pledged (founder, 2026-09-28). */
   pickerPoll?: FavpollPollWithItems | null
   totalRaised: number
+  /** The whole book's count. The wall carries only its latest 24 rows,
+   *  and the eyebrow and the phone's button said "24 pledges" on a poll
+   *  with 48 (the Christmas Tree Festival demo, 2026-10-18). */
+  pledgeCount?: number
   isClosed: boolean
   /** The picks are in (lib/picks-suspended): the lock card teaches the
    *  pot's path, the standings say they are frozen — guest and room. */
@@ -127,6 +131,7 @@ export function FavpollSheet({
   pollWithItems,
   pickerPoll,
   totalRaised,
+  pledgeCount,
   isClosed,
   picksSuspended = false,
   isOrganiser,
@@ -294,16 +299,14 @@ export function FavpollSheet({
     teaseBacked: !standing.entitled,
     animate: true,
     expandable: standing.entitled,
+    // The whole book's count on every surface — rail eyebrow, phone
+    // button, room — never the 24 rows the wall loads.
+    count: pledgeCount ?? wallEntries.length,
   }
   // On the phone the guest book is ONE BUTTON (founder, 2026-09-29): the
   // count is the social proof; the dialog behind it keeps the tease.
   const guestBookMobile = (
-    <GuestBook
-      {...guestBookProps}
-      variant="button"
-      expandable
-      count={wallEntries.length}
-    />
+    <GuestBook {...guestBookProps} variant="button" expandable />
   )
 
   // Pot card RETIRED (founder, 2026-09-22): the pledge dialog's step 2
