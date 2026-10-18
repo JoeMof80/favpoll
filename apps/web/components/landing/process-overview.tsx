@@ -528,7 +528,13 @@ export function ProcessOverview() {
               and runs off the right of the phone. That was the first bug of
               this whole run and it comes straight back the moment the media
               are in normal flow, which panning requires them to be. */}
-          <div className="min-w-0 pb-[24vh] md:col-span-3 md:pb-[30vh]">
+          {/* The 30vh tail is desktop's: it lets the last beat reach the
+              scroll line before the section ends. On the phone the last
+              step holds through its own block's trailing 12vh, so the
+              column needs no tail — with one the section ran on for a
+              screen of band-tint (founder, 2026-10-18: "too much empty
+              space at the bottom of the section"). */}
+          <div className="min-w-0 md:col-span-3 md:pb-[30vh]">
             {/* Pinned header (the Goodstack stills): solid backdrop so the
                 scrolling step texts vanish beneath it, not through it. */}
             {/* Backdrop follows the band: bg-band-tint, the measured opaque
