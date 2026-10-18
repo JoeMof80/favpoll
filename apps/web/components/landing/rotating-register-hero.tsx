@@ -227,6 +227,7 @@ export function RotatingRegisterHero() {
                   reverted the same day ("it wastes too much space"). */}
               <LandingHero
                 {...slide.hero}
+                stillActive={isActive}
                 ctaAfterMedia
                 bandClassName="bg-primary text-primary-foreground sm:px-[30px]"
               />

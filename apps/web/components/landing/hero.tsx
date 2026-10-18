@@ -8,7 +8,7 @@
 // to 80%. Register/occasion signals live in the kind nav + the demo content —
 // nothing in the pitch column cycles.
 import Link from "next/link"
-import { useMemo } from "react"
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react"
 import { ArrowDown } from "lucide-react"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
 import { DemoFrame } from "@/components/hero-demo-panel/demo-frame"
@@ -20,7 +20,11 @@ import {
   PHONE_SCALED_BOX_COMPACT,
 } from "@/components/hero-demo-panel/phone-frame"
 import { NAV_TABS, SCENES } from "@/components/hero-demo-panel/scenes"
-import type { HeroScene, SceneKind } from "@/components/hero-demo-panel/scenes"
+import type {
+  HeroScene,
+  Phase,
+  SceneKind,
+} from "@/components/hero-demo-panel/scenes"
 import { Button } from "@/components/ui/button"
 import { withQuietTail } from "@/components/landing/quiet-tail"
 import { RankingBar } from "@/components/ui/ranking-bar"
@@ -120,6 +124,10 @@ type Props = {
    * poster. Only meaningful with `still`.
    */
   compact?: boolean
+  /** A still inside a carousel: true while it is the live slide, false
+   *  while it waits its turn. Plays the before/after beat on arrival (see
+   *  useStillBeat). Leave undefined for a still that stands alone. */
+  stillActive?: boolean
   /** Below md, render the CTA pair after the phone rather than before it
    *  (founder, 2026-10-15, the home carousel): text, handset, buttons. */
   ctaAfterMedia?: boolean
@@ -232,6 +240,64 @@ const ROUTER_CARDS = [
   },
 ] as const
 
+// THE STILL'S BEAT (founder, 2026-10-18: "add animation to the homepage
+// hero vignettes, to express the states before and after pledges"). A still
+// phone froze at "note" — bars up, note typed — so the home hero showed what
+// a guest gets and never that they give to get it. When a still is the LIVE
+// slide of the carousel it now arrives LOCKED (the lock card, the About
+// typing), holds a beat, then the lock falls away, the bars climb from zero
+// and the note types: three existing phases, no new UI, ~6s inside the
+// carousel's 8s dwell. It replays each time the slide comes round (the
+// phase resets while the slide is inactive and invisible). Not the full
+// 15-phase demo — the founder retired that as the homepage's story told
+// twice; the mechanics are How It Works' job. Reduced motion, or a still
+// outside a carousel (the register pages), is the frozen "note" as before.
+const STILL_LOCKED_MS = 2600
+const STILL_CLIMB_MS = 1500
+const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)"
+function subscribeReducedMotion(onChange: () => void) {
+  const mq = window.matchMedia(REDUCED_MOTION_QUERY)
+  mq.addEventListener("change", onChange)
+  return () => mq.removeEventListener("change", onChange)
+}
+function useStillBeat(active: boolean | undefined, scene: HeroScene) {
+  const reduced = useSyncExternalStore(
+    subscribeReducedMotion,
+    () => window.matchMedia(REDUCED_MOTION_QUERY).matches,
+    () => false
+  )
+  const plays = active !== undefined && !reduced
+  const [phase, setPhase] = useState<Phase>(plays ? "arriving" : "note")
+  useEffect(() => {
+    if (!plays) {
+      setPhase("note")
+      return
+    }
+    if (!active) {
+      setPhase("arriving")
+      return
+    }
+    setPhase("arriving")
+    const t1 = window.setTimeout(() => setPhase("results"), STILL_LOCKED_MS)
+    const t2 = window.setTimeout(
+      () => setPhase("note"),
+      STILL_LOCKED_MS + STILL_CLIMB_MS
+    )
+    return () => {
+      window.clearTimeout(t1)
+      window.clearTimeout(t2)
+    }
+  }, [plays, active])
+  const final = scene.results.map((r) => r.widthPercent)
+  return {
+    phase,
+    barWidths: phase === "arriving" ? final.map(() => 0) : final,
+    // The register pages' stills never animate: typing and climbing bars
+    // stay off there exactly as before.
+    reduced: !plays,
+  }
+}
+
 export function LandingHero({
   liveCount = 0,
   totalLive = 0,
@@ -249,6 +315,7 @@ export function LandingHero({
   router = false,
   still = false,
   compact = false,
+  stillActive,
   ctaAfterMedia = false,
   children,
 }: Props) {
@@ -264,6 +331,8 @@ export function LandingHero({
   const { scene, phase, barWidths, fading, prefersReducedMotion, goToScene } =
     useDemoLoop(scenes)
   const beat = beatForPhase(phase)
+  // The still phone's own beat (unused by the animated demo above).
+  const stillBeat = useStillBeat(stillActive, scene)
 
   const ctas = (
     <div className="flex flex-wrap items-center gap-x-5 gap-y-3.5">
@@ -582,9 +651,9 @@ export function LandingHero({
                 <PhoneFrame>
                   <DemoCard
                     scene={scene}
-                    phase="note"
-                    barWidths={scene.results.map((r) => r.widthPercent)}
-                    prefersReducedMotion
+                    phase={stillBeat.phase}
+                    barWidths={stillBeat.barWidths}
+                    prefersReducedMotion={stillBeat.reduced}
                     device="phone"
                     className="rounded-none border-0"
                   />
