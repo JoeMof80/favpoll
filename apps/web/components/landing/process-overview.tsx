@@ -569,11 +569,15 @@ export function ProcessOverview() {
                 "scroll normally but pin each step text until it is replaced
                 by the next step text"): stacking sticky headings, the way
                 the letter headings behave in the iOS Contacts list. The
-                eyebrow pins under the site header (top-14, with 24px of
-                clearance — pinned flush, its glyphs read as tucked under
-                the header's edge on the founder's phone — then the 16px
-                line and 16px below: a 56px row to 112); each beat's text
-                is sticky inside ITS OWN block at 112px, so
+                eyebrow pins WHERE IT RESTS: the section's py-16 puts it
+                64px under the header when the section arrives, so it is
+                sticky at 120 (founder, on the 24px-clearance cut: "the
+                eyebrow and first step should stick here", pointing at the
+                resting position) — it never travels; its ::before of 64px
+                keeps the gap solid as the media scroll up. Its row is the
+                16px line and 24px below, to 160; each beat's text is
+                sticky inside ITS OWN block at 160 — step 1's resting
+                place too — so
                 it holds while its medium scrolls up beneath it and is pushed
                 off by the next beat's text when that block arrives. No
                 cross-fade, no measuring, no active state on the phone — the
@@ -583,7 +587,7 @@ export function ProcessOverview() {
                 beat text pins right under it with its own solid back. */}
             <div
               ref={pinnedRef}
-              className="sticky top-14 z-20 bg-band-tint before:absolute before:inset-x-0 before:bottom-full before:h-14 before:bg-band-tint max-md:pt-6 max-md:pb-4 md:top-28 md:z-10 md:pb-8 md:after:absolute md:after:inset-x-0 md:after:top-full md:after:h-36 md:after:bg-gradient-to-b md:after:from-band-tint md:after:via-band-tint/80 md:after:to-band-tint/1"
+              className="sticky top-14 z-20 bg-band-tint before:absolute before:inset-x-0 before:bottom-full before:h-14 before:bg-band-tint max-md:top-[120px] max-md:pb-6 max-md:before:h-16 md:top-28 md:z-10 md:pb-8 md:after:absolute md:after:inset-x-0 md:after:top-full md:after:h-36 md:after:bg-gradient-to-b md:after:from-band-tint md:after:via-band-tint/80 md:after:to-band-tint/1"
             >
               <SectionEyebrow as="h2">
                 {t("home.overview.eyebrow")}
@@ -611,11 +615,12 @@ export function ProcessOverview() {
                 )}
               >
                 {/* The step's words. Desktop: scrolling beside the pinned
-                    media. Phone: sticky at 112px (the site header's 56 + the
-                    eyebrow row's 56) with a solid back and a short fade, so
+                    media. Phone: sticky at 160px (the site header's 56 + the
+                    section's 64 + the eyebrow row's 40, which is where step
+                    1 rests) with a solid back and a short fade, so
                     the medium scrolls up under them and vanishes, until the
                     next step's block pushes them off. */}
-                <div className="max-md:sticky max-md:top-[112px] max-md:z-10 max-md:bg-band-tint max-md:pb-4 max-md:after:absolute max-md:after:inset-x-0 max-md:after:top-full max-md:after:h-10 max-md:after:bg-gradient-to-b max-md:after:from-band-tint max-md:after:via-band-tint/80 max-md:after:to-band-tint/1">
+                <div className="max-md:sticky max-md:top-[160px] max-md:z-10 max-md:bg-band-tint max-md:pb-4 max-md:after:absolute max-md:after:inset-x-0 max-md:after:top-full max-md:after:h-10 max-md:after:bg-gradient-to-b max-md:after:from-band-tint max-md:after:via-band-tint/80 max-md:after:to-band-tint/1">
                   <p className="mb-2 text-sm font-medium tracking-widest text-primary uppercase">
                     {i + 1}. {beat.label}
                   </p>
