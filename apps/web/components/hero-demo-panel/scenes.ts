@@ -317,7 +317,7 @@ export const SCENES: HeroScene[] = [
       // THE REVEAL RETRO-EXPLAINS THE CHARITY (founder, 2026-08-28), which is
       // the best thing about this exemplar. Reading down the card, WWF is
       // just a charity someone picked. Then the reveal says the panda and
-      // Chengdu, and you understand WHY — the charity was never arbitrary,
+      // China, and you understand WHY — the charity was never arbitrary,
       // you simply could not see the reason until you had unlocked it.
       //
       // That is the wizard's own charity guidance made visible: "pick one
@@ -331,10 +331,13 @@ export const SCENES: HeroScene[] = [
       // holds). Animal is a catalogue topic and WWF's confirmed perfect
       // topic, so the triad closes: wedding, Animal, WWF, each edge real.
       // The pick is the couple's own, the reveal is a fact only they could
-      // tell you, and Chengdu lives on in the note. The favourites are
-      // catalogue items, as the picker would show them.
+      // tell you. "China", not "Chengdu" (founder, 2026-10-19: "more
+      // accessible"). The favourites are catalogue items, as the picker
+      // would show them. THE GUEST DOES NOT PICK THE PANDA (founder, same
+      // day): the demo guest backs the elephant, so the guest's pick and
+      // the couple's reveal are two different things on the card.
       personal_note:
-        "Ours is the panda. We're off to Chengdu on our honeymoon to see them.",
+        "Ours is the panda. We're off to China on our honeymoon to see them.",
       topic: {
         title: "Animal",
         favourites: [
@@ -378,7 +381,7 @@ export const SCENES: HeroScene[] = [
       },
     ],
     goal_amount: null,
-    selectedIndex: 18,
+    selectedIndex: 7,
     pledgeAmount: "£20",
     // LUMPY ON PURPOSE (founder, 2026-08-28: "the rankings don't seem very
     // realistic"). The old set ran 210/175/130/95/60/35 — a near-arithmetic
