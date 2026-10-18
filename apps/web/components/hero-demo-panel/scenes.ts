@@ -337,7 +337,7 @@ export const SCENES: HeroScene[] = [
       // day): the demo guest backs the elephant, so the guest's pick and
       // the couple's reveal are two different things on the card.
       personal_note:
-        "Ours is the panda. We're off to China on our honeymoon to see them.",
+        "Ours is the panda. We're going to China to see some on our honeymoon.",
       topic: {
         title: "Animal",
         favourites: [
