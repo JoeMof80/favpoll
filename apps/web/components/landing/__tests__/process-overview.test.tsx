@@ -133,7 +133,9 @@ describe("ProcessOverview", () => {
     // replaced, and a silent regression to that doubles what a phone loads.
     stubViewport(true)
     const { container } = render(<ProcessOverview />)
-    const column = within(container.querySelector(".sticky")!.parentElement!)
+    // The media column, not the first .sticky — since 2026-10-18 the text
+    // column's header block pins at every width.
+    const column = within(container.querySelector(".md\\:col-span-2")!)
 
     expect(column.getAllByTestId("phone-frame")).toHaveLength(4)
     expect(column.getByTestId("pack-card")).toBeInTheDocument()
