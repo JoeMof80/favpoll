@@ -122,7 +122,14 @@ const sheetVariant = {
 const phoneSheetVariant = {
   initial: { y: "100%" },
   animate: { y: 0 },
-  exit: { y: "100%" },
+  // Leaves on an even curve: the quintic ease the sheet rises on puts
+  // nearly all its travel in the first 100ms, which on the way DOWN read
+  // as a cut (founder, 2026-10-18, twice: "the transition from the
+  // confirmation to the disclosure is still strange").
+  exit: {
+    y: "100%",
+    transition: { duration: 0.6, ease: "easeInOut" as const },
+  },
 }
 
 const scrimVariant = {
@@ -225,21 +232,21 @@ export function DemoCard({
   // pointless on mobile", and founder 2026-10-16 on the phone vignette:
   // "lets remove the skeletons"). The blurred decoy is gone everywhere.
   // Unlocked = disclosure: the dialog has closed; the reveal types out and the
-  // ranking bars climb from zero. THE ORDER (founder, 2026-10-18, two notes:
-  // "the transition from the confirmation to the disclosure doesn't feel
-  // right" then "when revealing the disclosure page, the lock card
-  // shouldn't be there"): at "clearing" the lock card is already gone — it
-  // leaves under the closing sheet — and the standings are not yet drawn,
-  // so the sheet opens onto a page with neither; at "results" the standings
-  // fade in with the bars climbing from zero and the note typing.
+  // ranking bars climb from zero. THE ORDER (founder, 2026-10-18, three
+  // notes on the home hero's beat): at "clearing" the lock card is already
+  // gone — it leaves in 0.25s under the sheet — and the page beneath is
+  // ALREADY ALIVE: the standings fade in with the bars climbing and the
+  // note typing while the sheet slides down to reveal them, as a real
+  // sheet reveals an updated page. A cut that held an empty page for a
+  // second before the standings arrived was built and felt worse.
   const unlocked =
     phase === "clearing" || phase === "results" || phase === "note"
   const locked = !unlocked
-  const disclosed = phase === "results" || phase === "note"
+  const disclosed = unlocked
 
   // About types on arrival; the reveal types at disclosure. They never overlap.
   const aboutShown = useTyped(aboutText, locked, prefersReducedMotion, 2200)
-  const revealActive = phase === "results"
+  const revealActive = phase === "clearing" || phase === "results"
   const revealShown = useTyped(
     noteText,
     revealActive,
@@ -507,16 +514,7 @@ export function DemoCard({
                 </div>
               ) : null
             ) : (
-              <div
-                className="relative"
-                // Fades in with the standings at disclosure, so the
-                // note's empty rule is not left standing behind the
-                // closing sheet.
-                style={{
-                  opacity: disclosed ? 1 : 0,
-                  transition: prefersReducedMotion ? "none" : "opacity 450ms",
-                }}
-              >
+              <div className="relative">
                 {/* Reserve final height so typing doesn't push results down */}
                 <div className="invisible" aria-hidden="true">
                   <PollNote
@@ -530,11 +528,7 @@ export function DemoCard({
                   aria-live="polite"
                 >
                   <PollNote
-                    // Blank until disclosure: useTyped shows the FULL text
-                    // whenever it is not typing, which at "clearing" flashed
-                    // the whole note behind the closing sheet, then retyped
-                    // it (2026-10-18).
-                    personalNote={(disclosed ? revealShown : "") || "\u00A0"}
+                    personalNote={revealShown || "\u00A0"}
                     protagonistFirstName={firstName ?? undefined}
                   />
                 </div>

@@ -265,8 +265,8 @@ const STILL_BEAT: { phase: Phase; at: number }[] = [
   { phase: "pledge-panel", at: 6600 }, // 3. the amount step
   { phase: "amount-picked", at: 7800 }, //    a preset chosen, £ updates
   { phase: "confirmed", at: 9800 }, // 4. the tick
-  { phase: "clearing", at: 11600 }, //    the sheet closes; no lock, no bars yet
-  { phase: "results", at: 12600 }, // 5. the standings fade in, bars climb, note types
+  { phase: "clearing", at: 11600 }, // 5. the sheet slides down onto the live page:
+  { phase: "results", at: 12600 }, //    bars climbing, note typing
   { phase: "note", at: 15400 }, //    the note stands typed
 ]
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)"
