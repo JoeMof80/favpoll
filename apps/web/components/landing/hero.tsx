@@ -245,15 +245,24 @@ const ROUTER_CARDS = [
 // phone froze at "note" — bars up, note typed — so the home hero showed what
 // a guest gets and never that they give to get it. When a still is the LIVE
 // slide of the carousel it now arrives LOCKED (the lock card, the About
-// typing), holds a beat, then the lock falls away, the bars climb from zero
-// and the note types: three existing phases, no new UI, ~6s inside the
-// carousel's 8s dwell. It replays each time the slide comes round (the
-// phase resets while the slide is inactive and invisible). Not the full
-// 15-phase demo — the founder retired that as the homepage's story told
-// twice; the mechanics are How It Works' job. Reduced motion, or a still
-// outside a carousel (the register pages), is the frozen "note" as before.
-const STILL_LOCKED_MS = 2600
-const STILL_CLIMB_MS = 1500
+// typing), holds a beat, then THE PLEDGE: the sheet appears already
+// confirmed — the tick, "Pledge confirmed", "£10 for Marie Curie" — and
+// closes (founder, same night: "do we need a middle step to represent the
+// pledge? otherwise, how do we get from locked screen to standings?");
+// then the lock is gone, the bars climb from zero and the note types.
+// Five existing phases, no new UI, ~7s inside the carousel's 8s dwell. It
+// replays each time the slide comes round (the phase resets while the
+// slide is inactive and invisible). Not the full 15-phase demo — the
+// founder retired that as the homepage's story told twice; picking and
+// amounts are How It Works' job. Reduced motion, or a still outside a
+// carousel (the register pages), is the frozen "note" as before.
+const STILL_BEAT: { phase: Phase; at: number }[] = [
+  { phase: "arriving", at: 0 }, // the lock card, the About typing
+  { phase: "confirmed", at: 2200 }, // the sheet, already confirmed
+  { phase: "clearing", at: 3600 }, // the sheet closes, the lock falls
+  { phase: "results", at: 4000 }, // the bars climb
+  { phase: "note", at: 5400 }, // the note types
+]
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)"
 function subscribeReducedMotion(onChange: () => void) {
   const mq = window.matchMedia(REDUCED_MOTION_QUERY)
@@ -278,20 +287,17 @@ function useStillBeat(active: boolean | undefined, scene: HeroScene) {
       return
     }
     setPhase("arriving")
-    const t1 = window.setTimeout(() => setPhase("results"), STILL_LOCKED_MS)
-    const t2 = window.setTimeout(
-      () => setPhase("note"),
-      STILL_LOCKED_MS + STILL_CLIMB_MS
+    const timers = STILL_BEAT.filter((step) => step.at > 0).map((step) =>
+      window.setTimeout(() => setPhase(step.phase), step.at)
     )
-    return () => {
-      window.clearTimeout(t1)
-      window.clearTimeout(t2)
-    }
+    return () => timers.forEach((t) => window.clearTimeout(t))
   }, [plays, active])
   const final = scene.results.map((r) => r.widthPercent)
+  // Zero until "results", so the bars climb from nothing at disclosure.
+  const climbed = phase === "results" || phase === "note"
   return {
     phase,
-    barWidths: phase === "arriving" ? final.map(() => 0) : final,
+    barWidths: climbed ? final : final.map(() => 0),
     // The register pages' stills never animate: typing and climbing bars
     // stay off there exactly as before.
     reduced: !plays,
