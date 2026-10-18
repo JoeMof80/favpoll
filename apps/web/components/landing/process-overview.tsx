@@ -565,46 +565,26 @@ export function ProcessOverview() {
                 on desktop too, since 2026-08. (/0 is no better: the
                 colour-mix behind the modifier drops the hue at 0%.) The
                 tint at 1% fades clean. */}
-            {/* STICKY ON THE PHONE TOO (founder, 2026-10-18: "make the How
-                It Works steps sticky, replicating the desktop behaviour but
-                more vertical" — then "it would be better for the text to be
-                sticky, not the vignette"): the eyebrow and the beat TEXT
-                pin under the site header (top-14), the six texts stacked
-                in one grid cell and cross-fading, while each beat's medium
-                scrolls beneath in its own block — the desktop arc stood on
-                end, with the roles kept: words pinned, pictures passing.
-                So the scrim is no longer md:-only: the media pass under
-                the block now. */}
+            {/* STICKY ON THE PHONE TOO (founder, 2026-10-18, third cut:
+                "scroll normally but pin each step text until it is replaced
+                by the next step text"): stacking sticky headings, the way
+                the letter headings behave in the iOS Contacts list. The
+                eyebrow pins under the site header (top-14, a 32px row);
+                each beat's text is sticky inside ITS OWN block at 88px, so
+                it holds while its medium scrolls up beneath it and is pushed
+                off by the next beat's text when that block arrives. No
+                cross-fade, no measuring, no active state on the phone — the
+                scroll does it. (The first two cuts, a pinned cross-fading
+                well and then a pinned cross-fading text, are both gone.)
+                The eyebrow's scrim is md: only again: on the phone the
+                beat text pins right under it with its own solid back. */}
             <div
               ref={pinnedRef}
-              className="sticky top-14 z-10 bg-band-tint pb-8 before:absolute before:inset-x-0 before:bottom-full before:h-14 before:bg-band-tint after:absolute after:inset-x-0 after:top-full after:h-24 after:bg-gradient-to-b after:from-band-tint after:via-band-tint/80 after:to-band-tint/1 md:top-28 md:after:h-36"
+              className="sticky top-14 z-20 bg-band-tint before:absolute before:inset-x-0 before:bottom-full before:h-14 before:bg-band-tint max-md:pb-4 md:top-28 md:z-10 md:pb-8 md:after:absolute md:after:inset-x-0 md:after:top-full md:after:h-36 md:after:bg-gradient-to-b md:after:from-band-tint md:after:via-band-tint/80 md:after:to-band-tint/1"
             >
               <SectionEyebrow as="h2">
                 {t("home.overview.eyebrow")}
               </SectionEyebrow>
-              {/* The text well: every beat's words in the same grid cell,
-                  so the block is as tall as the longest and never moves as
-                  the beats cross-fade. */}
-              <div className="mt-4 grid md:hidden" aria-hidden>
-                {BEATS.map((beat, i) => (
-                  <div
-                    key={beat.key}
-                    className={cn(
-                      "max-w-lg transition-opacity duration-500 [grid-area:1/1]",
-                      i === active
-                        ? "opacity-100"
-                        : "pointer-events-none opacity-0"
-                    )}
-                  >
-                    <p className="mb-2 text-sm font-medium tracking-widest text-primary uppercase">
-                      {i + 1}. {beat.label}
-                    </p>
-                    <p className="text-xl leading-relaxed text-muted-foreground">
-                      {linkifyTerms(beat.body)}
-                    </p>
-                  </div>
-                ))}
-              </div>
             </div>
             {BEATS.map((beat, i) => (
               <div
@@ -614,39 +594,39 @@ export function ProcessOverview() {
                   blockRefs.current[i] = node
                 }}
                 className={cn(
-                  "flex max-w-lg flex-col justify-center transition-opacity duration-300 md:min-h-[50vh]",
-                  // On the phone this block is the beat's MEDIUM, scrolling
-                  // under the pinned words; it holds 44vh so the pinned
-                  // block has travel, as a beat holds half a screen on
-                  // desktop. The first starts below the scrim (h-24) at
-                  // rest, or the gradient greys it out before a reader has
-                  // scrolled at all — the 2026-08-18 bug again.
-                  "max-md:mt-12 max-md:min-h-[44vh]",
-                  i === 0 && "max-md:mt-24",
+                  "max-w-lg transition-opacity duration-300 md:flex md:min-h-[50vh] md:flex-col md:justify-center",
+                  // On the phone each block is one step: its sticky text,
+                  // then its medium in flow. The block is what the text
+                  // pins within, so the medium's height is the text's dwell.
+                  "max-md:relative max-md:mt-6",
                   i === active ? "md:opacity-100" : "md:opacity-30"
                 )}
               >
-                {/* Desktop: the words scroll beside the pinned media. On the
-                    phone they show in the pinned block above (aria-hidden,
-                    a cross-fade), so this copy is screen-reader-only there:
-                    a reader meets each beat's words beside its medium, in
-                    order, once. */}
-                <p className="mb-2 text-sm font-medium tracking-widest text-primary uppercase max-md:sr-only">
-                  {i + 1}. {beat.label}
-                </p>
-                {/* Up from text-lg (founder, 2026-08-17). On desktop this
-                    column is sticky for the ~300vh the six beats take, so it
-                    is the longest-dwelt copy on the site; on mobile it is the
-                    only thing carrying the explanation. max-w-lg with it, or
-                    24px type in a 28rem column runs to ~30 characters a line
-                    and reads as a narrow ribbon. */}
-                <p className="text-xl leading-relaxed text-muted-foreground max-md:sr-only md:text-2xl">
-                  {linkifyTerms(beat.body)}
-                </p>
-                {/* PHONE: this beat's OWN medium, scrolling under the pinned
-                    words. Same six media the desktop column pins; mounted
-                    once. */}
-                <div className="md:hidden">
+                {/* The step's words. Desktop: scrolling beside the pinned
+                    media. Phone: sticky at 88px (the site header's 56 + the
+                    eyebrow row's 32) with a solid back and a short fade, so
+                    the medium scrolls up under them and vanishes, until the
+                    next step's block pushes them off. */}
+                <div className="max-md:sticky max-md:top-[88px] max-md:z-10 max-md:bg-band-tint max-md:pb-4 max-md:after:absolute max-md:after:inset-x-0 max-md:after:top-full max-md:after:h-10 max-md:after:bg-gradient-to-b max-md:after:from-band-tint max-md:after:via-band-tint/80 max-md:after:to-band-tint/1">
+                  <p className="mb-2 text-sm font-medium tracking-widest text-primary uppercase">
+                    {i + 1}. {beat.label}
+                  </p>
+                  {/* Up from text-lg (founder, 2026-08-17). On desktop this
+                      column is sticky for the ~300vh the six beats take, so
+                      it is the longest-dwelt copy on the site; on mobile it
+                      is the only thing carrying the explanation. max-w-lg
+                      with it, or 24px type in a 28rem column runs to ~30
+                      characters a line and reads as a narrow ribbon. */}
+                  <p className="text-xl leading-relaxed text-muted-foreground md:text-2xl">
+                    {linkifyTerms(beat.body)}
+                  </p>
+                </div>
+                {/* PHONE: this step's OWN medium, in flow beneath its pinned
+                    words. Same media the desktop column pins; mounted once.
+                    The trailing padding keeps the words pinned a beat after
+                    the medium has passed, so the next step's arrival reads
+                    as a replacement, not a race. */}
+                <div className="mt-6 pb-[12vh] md:hidden">
                   {mounted && !isDesktop && <MobileWell beat={beat} />}
                 </div>
               </div>
@@ -688,7 +668,7 @@ export function ProcessOverview() {
             </div>
           </div>
 
-          {/* No trailing mobile frame: each beat's medium scrolls under the pinned words. */}
+          {/* No trailing mobile frame: each step's medium sits in its block under its pinned words. */}
         </div>
       </div>
     </section>
