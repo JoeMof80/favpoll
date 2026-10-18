@@ -507,7 +507,16 @@ export function DemoCard({
                 </div>
               ) : null
             ) : (
-              <div className="relative">
+              <div
+                className="relative"
+                // Fades in with the standings at disclosure, so the
+                // note's empty rule is not left standing behind the
+                // closing sheet.
+                style={{
+                  opacity: disclosed ? 1 : 0,
+                  transition: prefersReducedMotion ? "none" : "opacity 450ms",
+                }}
+              >
                 {/* Reserve final height so typing doesn't push results down */}
                 <div className="invisible" aria-hidden="true">
                   <PollNote
@@ -521,7 +530,11 @@ export function DemoCard({
                   aria-live="polite"
                 >
                   <PollNote
-                    personalNote={revealShown || "\u00A0"}
+                    // Blank until disclosure: useTyped shows the FULL text
+                    // whenever it is not typing, which at "clearing" flashed
+                    // the whole note behind the closing sheet, then retyped
+                    // it (2026-10-18).
+                    personalNote={(disclosed ? revealShown : "") || "\u00A0"}
                     protagonistFirstName={firstName ?? undefined}
                   />
                 </div>
