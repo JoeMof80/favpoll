@@ -244,24 +244,28 @@ const ROUTER_CARDS = [
 // hero vignettes, to express the states before and after pledges"). A still
 // phone froze at "note" — bars up, note typed — so the home hero showed what
 // a guest gets and never that they give to get it. When a still is the LIVE
-// slide of the carousel it now arrives LOCKED (the lock card, the About
-// typing), holds a beat, then THE PLEDGE: the sheet appears already
-// confirmed — the tick, "Pledge confirmed", "£10 for Marie Curie" — and
-// closes (founder, same night: "do we need a middle step to represent the
-// pledge? otherwise, how do we get from locked screen to standings?");
-// then the lock is gone, the bars climb from zero and the note types.
-// Five existing phases, no new UI, ~7s inside the carousel's 8s dwell. It
+// slide of the carousel it plays FIVE STEPS (founder, same night, after a
+// two-step and a three-step cut: "Locked, Pick favourite, pledge amount,
+// confirmation, disclosure"): the lock card with the About typing; the
+// picker opening and a favourite chosen; the amount step and a preset
+// chosen; the sheet confirmed — tick, "Pledge confirmed", "£10 for Marie
+// Curie" — and closing; then the lock gone, the bars climbing from zero
+// and the note typing. Existing demo-card phases at roughly the demo
+// loop's own pacing (use-demo-loop.ts), a touch quicker: ~11s with the
+// note typed, inside the carousel's DWELL_MS, which grew to fit. It
 // replays each time the slide comes round (the phase resets while the
-// slide is inactive and invisible). Not the full 15-phase demo — the
-// founder retired that as the homepage's story told twice; picking and
-// amounts are How It Works' job. Reduced motion, or a still outside a
+// slide is inactive and invisible). Reduced motion, or a still outside a
 // carousel (the register pages), is the frozen "note" as before.
 const STILL_BEAT: { phase: Phase; at: number }[] = [
-  { phase: "arriving", at: 0 }, // the lock card, the About typing
-  { phase: "confirmed", at: 2200 }, // the sheet, already confirmed
-  { phase: "clearing", at: 3600 }, // the sheet closes, the lock falls
-  { phase: "results", at: 4000 }, // the bars climb
-  { phase: "note", at: 5400 }, // the note types
+  { phase: "arriving", at: 0 }, // 1. locked: the lock card, the About typing
+  { phase: "picking", at: 1800 }, // 2. the picker opens
+  { phase: "selected", at: 2800 }, //    a favourite is chosen
+  { phase: "pledge-panel", at: 3900 }, // 3. the amount step
+  { phase: "amount-picked", at: 4700 }, //    a preset chosen, £ updates
+  { phase: "confirmed", at: 5900 }, // 4. the tick
+  { phase: "clearing", at: 7100 }, //    the sheet closes, the lock falls
+  { phase: "results", at: 7500 }, // 5. the bars climb
+  { phase: "note", at: 8900 }, //    the note types
 ]
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)"
 function subscribeReducedMotion(onChange: () => void) {
