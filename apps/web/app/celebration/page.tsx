@@ -79,7 +79,7 @@ const STEPS = [
 // would give the reveal away two columns before the standings do.
 //
 // `picked` is Greece: a guest's pick, second in the standings, and not the
-// scene's selectedIndex, which points at Chengdu.
+// scene's selectedIndex, which points at the panda.
 const WEDDING_HINTS: HintScene = {
   scene: WEDDING_SCENE,
   shown: [

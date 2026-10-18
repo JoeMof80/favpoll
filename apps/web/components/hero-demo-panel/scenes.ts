@@ -316,55 +316,56 @@ export const SCENES: HeroScene[] = [
       // the brand guide calls the most powerful version.
       // THE REVEAL RETRO-EXPLAINS THE CHARITY (founder, 2026-08-28), which is
       // the best thing about this exemplar. Reading down the card, WWF is
-      // just a charity someone picked. Then the reveal says Chengdu and
-      // pandas, and you understand WHY — the charity was never arbitrary,
+      // just a charity someone picked. Then the reveal says the panda and
+      // Chengdu, and you understand WHY — the charity was never arbitrary,
       // you simply could not see the reason until you had unlocked it.
       //
       // That is the wizard's own charity guidance made visible: "pick one
       // that means something here." A demo where the charity is incidental
       // teaches the opposite.
       //
-      // "will hopefully be", not "is" (founder wording, 2026-08-28), and it
-      // solves the tense problem better than the "will be" it replaced. The
-      // topic asks for a favourite holiday destination; they have not been
-      // yet. The hope is not about whether they are GOING — that is booked —
-      // it is about whether Chengdu turns out to be the favourite, which is
-      // the honest answer to the question actually asked.
+      // ANIMAL, not "Holiday destination" (founder, 2026-10-19: "I don't
+      // like having more than one homemade topic in our homepage
+      // vignettes" — and the destination list was a fixture of mixed
+      // altitude, resorts beside countries, that no catalogue topic
+      // holds). Animal is a catalogue topic and WWF's confirmed perfect
+      // topic, so the triad closes: wedding, Animal, WWF, each edge real.
+      // The pick is the couple's own, the reveal is a fact only they could
+      // tell you, and Chengdu lives on in the note. The favourites are
+      // catalogue items, as the picker would show them.
       personal_note:
-        "We hope ours will be Chengdu after visiting the pandas on our honeymoon.",
+        "Ours is the panda. We're off to Chengdu on our honeymoon to see them.",
       topic: {
-        title: "Holiday destination",
+        title: "Animal",
         favourites: [
-          { id: "hd-amalfi", label: "Amalfi Coast" },
-          { id: "hd-amsterdam", label: "Amsterdam" },
-          { id: "hd-bali", label: "Bali" },
-          { id: "hd-barcelona", label: "Barcelona" },
-          { id: "hd-chengdu", label: "Chengdu" },
-          { id: "hd-cornwall", label: "Cornwall" },
-          { id: "hd-croatia", label: "Croatia" },
-          { id: "hd-cyprus", label: "Cyprus" },
-          { id: "hd-edinburgh", label: "Edinburgh" },
-          { id: "hd-greece", label: "Greece" },
-          { id: "hd-iceland", label: "Iceland" },
-          { id: "hd-ireland", label: "Ireland" },
-          { id: "hd-italy", label: "Italy" },
-          { id: "hd-japan", label: "Japan" },
-          { id: "hd-lakes", label: "Lake District" },
-          { id: "hd-lisbon", label: "Lisbon" },
-          { id: "hd-maldives", label: "Maldives" },
-          { id: "hd-morocco", label: "Morocco" },
-          { id: "hd-newyork", label: "New York" },
-          { id: "hd-norway", label: "Norway" },
-          { id: "hd-paris", label: "Paris" },
-          { id: "hd-portugal", label: "Portugal" },
-          { id: "hd-santorini", label: "Santorini" },
-          { id: "hd-scotland", label: "Scotland" },
-          { id: "hd-srilanka", label: "Sri Lanka" },
-          { id: "hd-thailand", label: "Thailand" },
-          { id: "hd-tuscany", label: "Tuscany" },
-          { id: "hd-venice", label: "Venice" },
-          { id: "hd-vietnam", label: "Vietnam" },
-          { id: "hd-yorkshire", label: "Yorkshire Dales" },
+          { id: "an-badger", label: "Badger" },
+          { id: "an-bear", label: "Bear" },
+          { id: "an-cat", label: "Cat" },
+          { id: "an-cheetah", label: "Cheetah" },
+          { id: "an-deer", label: "Deer" },
+          { id: "an-dog", label: "Dog" },
+          { id: "an-dolphin", label: "Dolphin" },
+          { id: "an-elephant", label: "Elephant" },
+          { id: "an-fox", label: "Fox" },
+          { id: "an-giraffe", label: "Giraffe" },
+          { id: "an-hare", label: "Hare" },
+          { id: "an-hedgehog", label: "Hedgehog" },
+          { id: "an-horse", label: "Horse" },
+          { id: "an-koala", label: "Koala" },
+          { id: "an-lion", label: "Lion" },
+          { id: "an-meerkat", label: "Meerkat" },
+          { id: "an-otter", label: "Otter" },
+          { id: "an-owl", label: "Owl" },
+          { id: "an-panda", label: "Panda" },
+          { id: "an-penguin", label: "Penguin" },
+          { id: "an-polarbear", label: "Polar bear" },
+          { id: "an-rabbit", label: "Rabbit" },
+          { id: "an-redsquirrel", label: "Red squirrel" },
+          { id: "an-sloth", label: "Sloth" },
+          { id: "an-tiger", label: "Tiger" },
+          { id: "an-tortoise", label: "Tortoise" },
+          { id: "an-wolf", label: "Wolf" },
+          { id: "an-zebra", label: "Zebra" },
         ],
       },
     },
@@ -377,7 +378,7 @@ export const SCENES: HeroScene[] = [
       },
     ],
     goal_amount: null,
-    selectedIndex: 4,
+    selectedIndex: 18,
     pledgeAmount: "£20",
     // LUMPY ON PURPOSE (founder, 2026-08-28: "the rankings don't seem very
     // realistic"). The old set ran 210/175/130/95/60/35 — a near-arithmetic
@@ -385,7 +386,7 @@ export const SCENES: HeroScene[] = [
     // and not what forty people pledging 5s, 10s and 20s look like. Real
     // standings are top-heavy and irregular.
     //
-    // Chengdu sits LAST, on £30. A couple of guests happened to name it —
+    // The panda sits LAST, on £30. A couple of guests happened to name it —
     // enough that it is on the board, nowhere near enough to be the room's
     // answer. That is truer than either extreme: absent, and the reveal has
     // nothing to land against; high, and it stops being a surprise.
@@ -395,12 +396,12 @@ export const SCENES: HeroScene[] = [
     // `total` said anything else would show one number on the phone and a
     // different one on the screen.
     results: [
-      { label: "Italy", amount: "£185", widthPercent: 100 },
-      { label: "Greece", amount: "£140", widthPercent: 76 },
-      { label: "Japan", amount: "£110", widthPercent: 59 },
-      { label: "New York", amount: "£75", widthPercent: 41 },
-      { label: "Cornwall", amount: "£55", widthPercent: 30 },
-      { label: "Chengdu", amount: "£30", widthPercent: 16 },
+      { label: "Dog", amount: "£185", widthPercent: 100 },
+      { label: "Cat", amount: "£140", widthPercent: 76 },
+      { label: "Elephant", amount: "£110", widthPercent: 59 },
+      { label: "Owl", amount: "£75", widthPercent: 41 },
+      { label: "Fox", amount: "£55", widthPercent: 30 },
+      { label: "Panda", amount: "£30", widthPercent: 16 },
     ],
     total: "£595",
   },
@@ -504,7 +505,7 @@ export const SCENES: HeroScene[] = [
         "Thanks for your pledge. If we reach the goal, I'll eat the hat! (Only kidding)",
       topic: {
         title: "Marathon hat",
-        // EIGHT, where Colour has twelve and Holiday destination
+        // EIGHT, where Colour has twelve and Animal
         // twenty-eight. A homemade list should look homemade: nobody sits
         // down and writes thirty of these, and the short list is itself a
         // signal that no catalogue supplied it.
