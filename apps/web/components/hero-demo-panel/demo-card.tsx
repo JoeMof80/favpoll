@@ -225,14 +225,17 @@ export function DemoCard({
   // pointless on mobile", and founder 2026-10-16 on the phone vignette:
   // "lets remove the skeletons"). The blurred decoy is gone everywhere.
   // Unlocked = disclosure: the dialog has closed; the reveal types out and the
-  // ranking bars climb from zero. "clearing" stays LOCKED (2026-10-18): the
-  // sheet closes over the page as it was, lock card and all, and only
-  // then, at "results", does the lock fall away as the bars climb — the
-  // founder felt the jump when the page behind the closing sheet had
-  // already changed ("the transition from the confirmation to the
-  // disclosure doesn't feel right").
-  const unlocked = phase === "results" || phase === "note"
+  // ranking bars climb from zero. THE ORDER (founder, 2026-10-18, two notes:
+  // "the transition from the confirmation to the disclosure doesn't feel
+  // right" then "when revealing the disclosure page, the lock card
+  // shouldn't be there"): at "clearing" the lock card is already gone — it
+  // leaves under the closing sheet — and the standings are not yet drawn,
+  // so the sheet opens onto a page with neither; at "results" the standings
+  // fade in with the bars climbing from zero and the note typing.
+  const unlocked =
+    phase === "clearing" || phase === "results" || phase === "note"
   const locked = !unlocked
+  const disclosed = phase === "results" || phase === "note"
 
   // About types on arrival; the reveal types at disclosure. They never overlap.
   const aboutShown = useTyped(aboutText, locked, prefersReducedMotion, 2200)
@@ -317,7 +320,7 @@ export function DemoCard({
           <RankingBar
             label={result.label}
             amount={result.amount}
-            widthPercent={barWidths[i] ?? 0}
+            widthPercent={disclosed ? (barWidths[i] ?? 0) : 0}
             barClassName={i === 0 ? "bg-primary" : "bg-chart-3"}
             barStyle={{
               transition:
@@ -536,9 +539,15 @@ export function DemoCard({
                 </div>
               )
             ) : (
-              <div key="real-results" className="space-y-3">
+              <motion.div
+                key="real-results"
+                className="space-y-3"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: disclosed ? 1 : 0 }}
+                transition={prefersReducedMotion ? FAST : { duration: 0.45 }}
+              >
                 {renderRankings(true)}
-              </div>
+              </motion.div>
             )}
           </div>
 
@@ -549,7 +558,9 @@ export function DemoCard({
                 key="lockcard"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
+                // Leaves quickly: it goes under the closing sheet, and must
+                // be gone before the sheet is.
+                exit={{ opacity: 0, transition: { duration: 0.25 } }}
                 transition={prefersReducedMotion ? FAST : { duration: 0.7 }}
                 className="z-[1] flex flex-col items-center pt-4 [grid-area:1/1]"
                 aria-hidden="true"

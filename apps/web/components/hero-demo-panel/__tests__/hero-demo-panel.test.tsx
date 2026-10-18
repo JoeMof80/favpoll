@@ -160,9 +160,7 @@ describe("DemoCard — locked phases", () => {
 
 // ── Unlocked phases ───────────────────────────────────────────────────────────
 
-// "clearing" stays locked since 2026-10-18: the sheet closes over the page
-// as it was, and the lock falls at "results".
-const UNLOCKED_PHASES: Phase[] = ["results", "note"]
+const UNLOCKED_PHASES: Phase[] = ["clearing", "results", "note"]
 
 describe("DemoCard — unlocked phases", () => {
   it.each(UNLOCKED_PHASES)("lock card is absent in '%s' phase", (phase) => {
