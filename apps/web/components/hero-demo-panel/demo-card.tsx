@@ -577,7 +577,19 @@ export function DemoCard({
                     simpler product than the one it links to. The wrapper
                     mirrors poll-section's Button chrome; the demo is inert, so
                     it is a div rather than a button. */}
-                <div className="w-full max-w-sm flex-col items-stretch overflow-hidden rounded-xl bg-background text-left shadow-xl ring-1 ring-border">
+                {/* Pressed at "triggering" (founder, 2026-10-18: "make it
+                    seem like the pledge card has been clicked"): the same
+                    press the trigger button wears — a touch smaller, a
+                    touch darker, its shadow pulled in — for the beat
+                    before the picker opens. */}
+                <div
+                  className={cn(
+                    "w-full max-w-sm flex-col items-stretch overflow-hidden rounded-xl bg-background text-left ring-1 ring-border transition-[transform,box-shadow,filter] duration-150",
+                    phase === "triggering"
+                      ? "scale-[0.98] shadow-md brightness-95"
+                      : "shadow-xl"
+                  )}
+                >
                   <LockCardContent steps={lockSteps} topicTitle={topicTitle} />
                 </div>
               </motion.div>

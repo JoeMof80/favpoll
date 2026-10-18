@@ -260,6 +260,7 @@ const STILL_BEAT: { phase: Phase; at: number }[] = [
   // Holds lengthened 2026-10-18 ("give the visitor more time to read"):
   // every screen stands for 1.2–2s after its motion settles.
   { phase: "arriving", at: 0 }, // 1. locked: the lock card, the About typing
+  { phase: "triggering", at: 2650 }, //    the lock card is pressed
   { phase: "picking", at: 3000 }, // 2. the picker opens
   { phase: "selected", at: 4800 }, //    a favourite is chosen
   { phase: "pledge-panel", at: 6600 }, // 3. the amount step
