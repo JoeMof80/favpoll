@@ -31,6 +31,8 @@ type Props = {
   favpoll: FavpollWithDetails
   pollWithItems: FavpollPollWithItems | null
   totalRaised: number
+  /** The whole book's count (the wall carries only its latest rows). */
+  pledgeCount?: number
   wallEntries: WallEntry[]
   organiser?: { name: string; avatarUrl: string | null } | null
   isClosed: boolean
@@ -70,6 +72,7 @@ export function RoomShell({
   favpoll,
   pollWithItems,
   totalRaised,
+  pledgeCount,
   wallEntries,
   organiser,
   isClosed,
@@ -231,6 +234,7 @@ export function RoomShell({
         favpoll={favpoll}
         pollWithItems={pollWithItems}
         totalRaised={totalRaised}
+        pledgeCount={pledgeCount}
         isClosed={effectiveClosed}
         picksSuspended={picksSuspended}
         isOrganiser={false}

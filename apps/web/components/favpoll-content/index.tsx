@@ -32,6 +32,8 @@ type Props = {
   pot: FavpollPot | null
   userPotAllocation: PotAllocation | null
   totalRaised: number
+  /** The whole book's count (the wall carries only its latest rows). */
+  pledgeCount?: number
   isClosed: boolean
   clerkUserId: string | null
   isOrganiser: boolean
@@ -62,6 +64,7 @@ export function FavpollContent({
   pot,
   userPotAllocation,
   totalRaised,
+  pledgeCount,
   isClosed,
   clerkUserId,
   isOrganiser,
@@ -173,6 +176,7 @@ export function FavpollContent({
       pollWithItems={pollWithItems}
       pickerPoll={pickerPoll}
       totalRaised={totalRaised}
+      pledgeCount={pledgeCount}
       isClosed={isClosed}
       picksSuspended={picksSuspended}
       isOrganiser={isOrganiser}

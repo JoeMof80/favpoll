@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
+import { compareLabels } from "@/lib/compare-labels"
 import { usePledge } from "@/components/pledge-card/use-pledge"
 import { computePledgeAllocations } from "@/lib/pledge-allocations"
 import type {
@@ -87,7 +88,7 @@ export function usePledgeDialog({
   }, [pollWithItems, addedItems])
 
   const sortedItems: Favourite[] = [...mergedPoll.topics.favourites].sort(
-    (a, b) => a.label.localeCompare(b.label)
+    (a, b) => compareLabels(a.label, b.label)
   )
   const lowerSearch = search.toLowerCase().trim()
   const filteredItems = lowerSearch
