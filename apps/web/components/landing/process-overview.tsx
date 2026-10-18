@@ -588,10 +588,15 @@ export function ProcessOverview() {
                 and the eyebrow's ::after is a 2px SOLID strip over the
                 text's top edge there, because the two pinned backs met at
                 a sub-pixel seam on the founder's iPhone and the TV's dark
-                bezel drew a line through it as it passed (2026-10-18). */}
+                bezel drew a line through it as it passed (2026-10-18).
+                Both pinned blocks BLEED to the viewport's edges on the
+                phone (-mx-6 px-6): the media's shadow haloes are wider
+                than the text column, and scrolled up past the backs in
+                the page's gutters ("the same problem on the left and
+                right"). */}
             <div
               ref={pinnedRef}
-              className="sticky top-14 z-20 bg-band-tint before:absolute before:inset-x-0 before:bottom-full before:h-14 before:bg-band-tint max-md:top-[120px] max-md:pb-6 max-md:before:h-16 max-md:after:absolute max-md:after:inset-x-0 max-md:after:top-full max-md:after:h-0.5 max-md:after:bg-band-tint md:top-28 md:z-10 md:pb-8 md:after:absolute md:after:inset-x-0 md:after:top-full md:after:h-36 md:after:bg-gradient-to-b md:after:from-band-tint md:after:via-band-tint/80 md:after:to-band-tint/1"
+              className="sticky top-14 z-20 bg-band-tint before:absolute before:inset-x-0 before:bottom-full before:h-14 before:bg-band-tint max-md:top-[120px] max-md:-mx-6 max-md:px-6 max-md:pb-6 max-md:before:h-16 max-md:after:absolute max-md:after:inset-x-0 max-md:after:top-full max-md:after:h-0.5 max-md:after:bg-band-tint md:top-28 md:z-10 md:pb-8 md:after:absolute md:after:inset-x-0 md:after:top-full md:after:h-36 md:after:bg-gradient-to-b md:after:from-band-tint md:after:via-band-tint/80 md:after:to-band-tint/1"
             >
               <SectionEyebrow as="h2">
                 {t("home.overview.eyebrow")}
@@ -624,7 +629,7 @@ export function ProcessOverview() {
                     1 rests) with a solid back and a short fade, so
                     the medium scrolls up under them and vanishes, until the
                     next step's block pushes them off. */}
-                <div className="max-md:sticky max-md:top-[160px] max-md:z-10 max-md:bg-band-tint max-md:pb-4 max-md:after:absolute max-md:after:inset-x-0 max-md:after:top-full max-md:after:h-10 max-md:after:bg-gradient-to-b max-md:after:from-band-tint max-md:after:via-band-tint/80 max-md:after:to-band-tint/1">
+                <div className="max-md:sticky max-md:top-[160px] max-md:z-10 max-md:-mx-6 max-md:bg-band-tint max-md:px-6 max-md:pb-4 max-md:after:absolute max-md:after:inset-x-0 max-md:after:top-full max-md:after:h-10 max-md:after:bg-gradient-to-b max-md:after:from-band-tint max-md:after:via-band-tint/80 max-md:after:to-band-tint/1">
                   <p className="mb-2 text-sm font-medium tracking-widest text-primary uppercase">
                     {i + 1}. {beat.label}
                   </p>
