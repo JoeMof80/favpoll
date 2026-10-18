@@ -251,21 +251,23 @@ const ROUTER_CARDS = [
 // chosen; the sheet confirmed — tick, "Pledge confirmed", "£10 for Marie
 // Curie" — and closing; then the lock gone, the bars climbing from zero
 // and the note typing. Existing demo-card phases at roughly the demo
-// loop's own pacing (use-demo-loop.ts), a touch quicker: ~11s with the
+// loop's own pacing (use-demo-loop.ts), then slowed: ~16s with the
 // note typed, inside the carousel's DWELL_MS, which grew to fit. It
 // replays each time the slide comes round (the phase resets while the
 // slide is inactive and invisible). Reduced motion, or a still outside a
 // carousel (the register pages), is the frozen "note" as before.
 const STILL_BEAT: { phase: Phase; at: number }[] = [
+  // Holds lengthened 2026-10-18 ("give the visitor more time to read"):
+  // every screen stands for 1.2–2s after its motion settles.
   { phase: "arriving", at: 0 }, // 1. locked: the lock card, the About typing
-  { phase: "picking", at: 1800 }, // 2. the picker opens
-  { phase: "selected", at: 2800 }, //    a favourite is chosen
-  { phase: "pledge-panel", at: 3900 }, // 3. the amount step
-  { phase: "amount-picked", at: 4700 }, //    a preset chosen, £ updates
-  { phase: "confirmed", at: 5900 }, // 4. the tick
-  { phase: "clearing", at: 7100 }, //    the sheet closes, the lock falls
-  { phase: "results", at: 7500 }, // 5. the bars climb
-  { phase: "note", at: 8900 }, //    the note types
+  { phase: "picking", at: 3000 }, // 2. the picker opens
+  { phase: "selected", at: 4800 }, //    a favourite is chosen
+  { phase: "pledge-panel", at: 6600 }, // 3. the amount step
+  { phase: "amount-picked", at: 7800 }, //    a preset chosen, £ updates
+  { phase: "confirmed", at: 9800 }, // 4. the tick
+  { phase: "clearing", at: 11600 }, //    the sheet closes, the lock falls
+  { phase: "results", at: 12400 }, // 5. the bars climb
+  { phase: "note", at: 14400 }, //    the note types
 ]
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)"
 function subscribeReducedMotion(onChange: () => void) {

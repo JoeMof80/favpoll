@@ -51,10 +51,10 @@ import { setHeroRegister } from "@/lib/hero-register-store"
 /** How long each register holds before the next fades in. Long enough to
  *  read a two-sentence headline and glance at the phone; the loop's own
  *  scenes ran ~9s each and nobody asked for faster. */
-// 13s since 2026-10-18: the still's five-step beat (hero.tsx STILL_BEAT)
-// runs ~11s with the note typed, and the slide should rest on the result
+// 19s since 2026-10-18: the still's five-step beat (hero.tsx STILL_BEAT)
+// runs ~16s with the note typed, and the slide should rest on the result
 // before it turns. Was 8s with frozen stills.
-export const DWELL_MS = 13000
+export const DWELL_MS = 19000
 
 type Palette = "memorial" | "celebration" | "fundraiser"
 

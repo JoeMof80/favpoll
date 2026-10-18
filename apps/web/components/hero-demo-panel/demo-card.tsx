@@ -546,7 +546,7 @@ export function DemoCard({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={prefersReducedMotion ? FAST : { duration: 0.4 }}
+                transition={prefersReducedMotion ? FAST : { duration: 0.7 }}
                 className="z-[1] flex flex-col items-center pt-4 [grid-area:1/1]"
                 aria-hidden="true"
               >
@@ -600,12 +600,17 @@ export function DemoCard({
           Scrim mirrors the real DialogOverlay (bg-black/50). It carries no
           radius of its own — the card's overflow-hidden clips it to the card
           shape (square top under the browser frame, rounded bottom). */}
+      {/* SLOWER AND SOFTER (founder, 2026-10-18, on the home hero's
+          still beat: "the transitions are too fast and harsh"): these
+          were dialog-speed cuts (0.18–0.4s). The sheet eases out over
+          0.6s, its panes crossfade over 0.45s, the lock card over 0.7s.
+          Reduced motion still snaps (FAST). */}
       <AnimatePresence>
         {sheetOpen && !isPhone && (
           <motion.div
             key="scrim"
             {...scrimVariant}
-            transition={prefersReducedMotion ? FAST : { duration: 0.25 }}
+            transition={prefersReducedMotion ? FAST : { duration: 0.5 }}
             className="absolute inset-0 z-10 bg-black/50"
             aria-hidden="true"
           />
@@ -618,7 +623,9 @@ export function DemoCard({
             key="sheet"
             {...(isPhone ? phoneSheetVariant : sheetVariant)}
             transition={
-              prefersReducedMotion ? FAST : { duration: 0.2, ease: "easeOut" }
+              prefersReducedMotion
+                ? FAST
+                : { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
             }
             style={
               isPhone
@@ -651,7 +658,7 @@ export function DemoCard({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.18 }}
+                    transition={{ duration: 0.45 }}
                     className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 p-6 text-center"
                   >
                     <div className="flex h-11 w-11 items-center justify-center rounded-full bg-success">
@@ -670,7 +677,7 @@ export function DemoCard({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.18 }}
+                    transition={{ duration: 0.45 }}
                     className="flex min-h-0 flex-1 flex-col"
                   >
                     {/* border-b: the step-1 separators hairline */}
@@ -709,7 +716,7 @@ export function DemoCard({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.18 }}
+                    transition={{ duration: 0.45 }}
                     className="flex min-h-0 flex-1 flex-col"
                   >
                     <div className="min-h-0 flex-1 overflow-y-auto">
