@@ -265,9 +265,9 @@ const STILL_BEAT: { phase: Phase; at: number }[] = [
   { phase: "pledge-panel", at: 6600 }, // 3. the amount step
   { phase: "amount-picked", at: 7800 }, //    a preset chosen, £ updates
   { phase: "confirmed", at: 9800 }, // 4. the tick
-  { phase: "clearing", at: 11600 }, //    the sheet closes, the lock falls
-  { phase: "results", at: 12400 }, // 5. the bars climb
-  { phase: "note", at: 14400 }, //    the note types
+  { phase: "clearing", at: 11600 }, //    the sheet closes over the locked page
+  { phase: "results", at: 12600 }, // 5. the lock falls, the bars climb
+  { phase: "note", at: 14600 }, //    the note types
 ]
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)"
 function subscribeReducedMotion(onChange: () => void) {
@@ -654,9 +654,15 @@ export function LandingHero({
                 "mx-auto md:mx-0"
               )}
             >
+              {/* text-foreground: the home carousel's band sets white
+                  text, and anything in the card without a colour of its
+                  own (Cancel, Back, the unchosen presets, the summary
+                  rows) inherited it — white on white (founder,
+                  2026-10-18: "some of the text isn't visible"). The
+                  animated branch below always reset it. */}
               <div
                 className={cn(
-                  "origin-top-left",
+                  "origin-top-left text-foreground",
                   compact ? PHONE_SCALE_COMPACT : PHONE_SCALE
                 )}
               >

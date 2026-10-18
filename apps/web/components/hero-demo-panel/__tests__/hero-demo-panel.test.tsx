@@ -160,7 +160,9 @@ describe("DemoCard — locked phases", () => {
 
 // ── Unlocked phases ───────────────────────────────────────────────────────────
 
-const UNLOCKED_PHASES: Phase[] = ["clearing", "results", "note"]
+// "clearing" stays locked since 2026-10-18: the sheet closes over the page
+// as it was, and the lock falls at "results".
+const UNLOCKED_PHASES: Phase[] = ["results", "note"]
 
 describe("DemoCard — unlocked phases", () => {
   it.each(UNLOCKED_PHASES)("lock card is absent in '%s' phase", (phase) => {
@@ -337,11 +339,16 @@ describe("DemoCard — dialog mimics", () => {
     ).toBeNull()
   })
 
-  it("shows confirmation tick and amount in confirmed phase", () => {
+  it("shows confirmation tick, the favourite backed and the amount in confirmed phase", () => {
     renderCard("confirmed")
     expect(screen.getByText("Pledge confirmed")).toBeInTheDocument()
     expect(
-      screen.getByText(`${scene.pledgeAmount} for ${scene.charities[0].name}`)
+      screen.getByText(
+        `You backed ${scene.poll.topic.favourites[scene.selectedIndex].label}`
+      )
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(`${scene.pledgeAmount} to ${scene.charities[0].name}`)
     ).toBeInTheDocument()
   })
 

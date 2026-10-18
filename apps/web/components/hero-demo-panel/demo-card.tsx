@@ -225,14 +225,18 @@ export function DemoCard({
   // pointless on mobile", and founder 2026-10-16 on the phone vignette:
   // "lets remove the skeletons"). The blurred decoy is gone everywhere.
   // Unlocked = disclosure: the dialog has closed; the reveal types out and the
-  // ranking bars climb from zero.
-  const unlocked =
-    phase === "clearing" || phase === "results" || phase === "note"
+  // ranking bars climb from zero. "clearing" stays LOCKED (2026-10-18): the
+  // sheet closes over the page as it was, lock card and all, and only
+  // then, at "results", does the lock fall away as the bars climb — the
+  // founder felt the jump when the page behind the closing sheet had
+  // already changed ("the transition from the confirmation to the
+  // disclosure doesn't feel right").
+  const unlocked = phase === "results" || phase === "note"
   const locked = !unlocked
 
   // About types on arrival; the reveal types at disclosure. They never overlap.
   const aboutShown = useTyped(aboutText, locked, prefersReducedMotion, 2200)
-  const revealActive = phase === "clearing" || phase === "results"
+  const revealActive = phase === "results"
   const revealShown = useTyped(
     noteText,
     revealActive,
@@ -667,8 +671,13 @@ export function DemoCard({
                     <p className="text-base font-medium text-foreground">
                       Pledge confirmed
                     </p>
+                    {/* Explicit (founder, 2026-10-18: "state the selected
+                        favourite"): what was backed, then the money. */}
+                    <p className="text-sm text-foreground">
+                      You backed {selected?.label}
+                    </p>
                     <p className="text-sm text-muted-foreground">
-                      {scene.pledgeAmount} for {charityName}
+                      {scene.pledgeAmount} to {charityName}
                     </p>
                   </motion.div>
                 ) : pickerOpen ? (
