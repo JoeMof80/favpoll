@@ -39,7 +39,7 @@ export const revalidate = 60
 export const metadata: Metadata = {
   title: "Fundraiser — favpoll",
   description:
-    "Fundraise by polling favourites. Give to charity in support of the cause. Supporters back their favourite and the room watches the total climb.",
+    "Pick a topic and poll favourites. Give to charity in support of the cause. Supporters back their favourite and the room watches the total climb.",
 }
 
 const STEPS = [
