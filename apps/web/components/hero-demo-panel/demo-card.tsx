@@ -434,7 +434,12 @@ export function DemoCard({
 
       {/* ── Hero + poll heading. No per-element entrance — the whole card
           cross-fades on scene change so nothing pops in first. ── */}
-      <div className="flex-1 space-y-4 overflow-hidden">
+      {/* -mx-5 px-5: this box clips, and it was exactly the lock card's
+          width, so the card's side shadow was cut off at its own edges
+          (founder, 2026-10-18: "i can't see left or right shadow"). Widened
+          by the card's own padding, it clips at the card's edge instead,
+          as the real page clips at the viewport's. */}
+      <div className="-mx-5 flex-1 space-y-4 overflow-hidden px-5">
         {/* Hero — THE STACKED HEADER, as the favpoll page draws it since
             2026-10-16 (#1056): the register-tinted band bleeding past the
             card's p-5 as the page's top row; the square photo hanging off
