@@ -584,10 +584,14 @@ export function ProcessOverview() {
                 scroll does it. (The first two cuts, a pinned cross-fading
                 well and then a pinned cross-fading text, are both gone.)
                 The eyebrow's scrim is md: only again: on the phone the
-                beat text pins right under it with its own solid back. */}
+                beat text pins right under it with its own solid back —
+                and the eyebrow's ::after is a 2px SOLID strip over the
+                text's top edge there, because the two pinned backs met at
+                a sub-pixel seam on the founder's iPhone and the TV's dark
+                bezel drew a line through it as it passed (2026-10-18). */}
             <div
               ref={pinnedRef}
-              className="sticky top-14 z-20 bg-band-tint before:absolute before:inset-x-0 before:bottom-full before:h-14 before:bg-band-tint max-md:top-[120px] max-md:pb-6 max-md:before:h-16 md:top-28 md:z-10 md:pb-8 md:after:absolute md:after:inset-x-0 md:after:top-full md:after:h-36 md:after:bg-gradient-to-b md:after:from-band-tint md:after:via-band-tint/80 md:after:to-band-tint/1"
+              className="sticky top-14 z-20 bg-band-tint before:absolute before:inset-x-0 before:bottom-full before:h-14 before:bg-band-tint max-md:top-[120px] max-md:pb-6 max-md:before:h-16 max-md:after:absolute max-md:after:inset-x-0 max-md:after:top-full max-md:after:h-0.5 max-md:after:bg-band-tint md:top-28 md:z-10 md:pb-8 md:after:absolute md:after:inset-x-0 md:after:top-full md:after:h-36 md:after:bg-gradient-to-b md:after:from-band-tint md:after:via-band-tint/80 md:after:to-band-tint/1"
             >
               <SectionEyebrow as="h2">
                 {t("home.overview.eyebrow")}
