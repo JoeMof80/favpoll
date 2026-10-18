@@ -95,8 +95,10 @@ describe("ProcessOverview", () => {
       t("landing.how.room.label"),
       t("landing.how.keepsake.label"),
     ]
+    // Two copies of each label since 2026-10-18: the phone's pinned text
+    // well and the desktop's scrolling column (each hidden off its width).
     labels.forEach((label, i) => {
-      expect(screen.getByText(`${i + 1}. ${label}`)).toBeInTheDocument()
+      expect(screen.getAllByText(`${i + 1}. ${label}`)).toHaveLength(2)
     })
   })
 
@@ -158,7 +160,7 @@ describe("ProcessOverview", () => {
     render(<ProcessOverview />)
 
     const section = screen
-      .getByText(`1. ${t("landing.how.card.label")}`)
+      .getAllByText(`1. ${t("landing.how.card.label")}`)[0]
       .closest("section")!
     // The page's own chrome lives outside this section, so any button found
     // here would be one this component put on a medium.

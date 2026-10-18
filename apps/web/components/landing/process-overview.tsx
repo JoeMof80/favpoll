@@ -234,12 +234,6 @@ const COLLAPSED_CAP: Partial<Record<Medium["kind"], number>> = {
 // Room for the drop shadows, taken off the column before anything is fitted.
 const SHADOW_ROOM = 14
 
-// THE PINNED WELL'S HEIGHT on a phone (2026-10-18): the well sits under the
-// site header and the eyebrow, and the beat texts have to read beneath it,
-// so no medium stands taller than this — the phone thumbnail, 451 at its
-// width cap, is the one it bites.
-const PINNED_WELL_MAX = 280
-
 // A4 AT 96dpi, which is what the keepsake page actually is: 794 x 1123
 // portrait, 1123 x 794 landscape. 1644 x 1123 was used here first and was
 // wrong — that is the FAN box the features vignette uses to hold TWO sheets
@@ -384,7 +378,7 @@ function BeatMedium({
 // NATURAL. It fills the column at any width, so the same code serves a 320px
 // phone and a 430px one with nothing to keep in sync — which is what the
 // hand-tuned constants that preceded it could not do, three bugs running.
-function MobileStickyWell({ active }: { active: number }) {
+function MobileWell({ beat }: { beat: Beat }) {
   const ref = useRef<HTMLDivElement | null>(null)
   const [columnWidth, setColumnWidth] = useState(0)
 
@@ -398,57 +392,45 @@ function MobileStickyWell({ active }: { active: number }) {
     return () => ro.disconnect()
   }, [])
 
-  // Each medium fitted to the column as before (SHADOW_ROOM off, the
-  // thumbnail caps on) AND to the well's height: the well is as tall as
-  // the tallest, so the pinned block never changes height as the beats
-  // cross-fade, and PINNED_WELL_MAX keeps it to a third of a phone's
-  // screen so the text beneath has room to be read.
-  const fitted = BEATS.map((beat) => {
-    const natural = NATURAL[beat.medium.kind]
-    const fit = columnWidth ? (columnWidth - SHADOW_ROOM * 2) / natural.w : 0
-    const cap = COLLAPSED_CAP[beat.medium.kind]
-    const scale = Math.min(
-      cap ? Math.min(fit, cap) : fit,
-      PINNED_WELL_MAX / natural.h
-    )
-    return { beat, scale, width: natural.w * scale, height: natural.h * scale }
-  })
-  const wellHeight = Math.max(0, ...fitted.map((f) => f.height))
+  const natural = NATURAL[beat.medium.kind]
+  // SHADOW_ROOM off the column before fitting, so the object sits ON the band
+  // rather than butting against its edges.
+  const fit = columnWidth ? (columnWidth - SHADOW_ROOM * 2) / natural.w : 0
+  const cap = COLLAPSED_CAP[beat.medium.kind]
+  const scale = cap ? Math.min(fit, cap) : fit
+  const width = natural.w * scale
+  const height = natural.h * scale
 
   return (
-    <div
-      ref={ref}
-      data-beat-well=""
-      className="relative w-full"
-      style={{ height: wellHeight || undefined }}
-    >
-      {fitted.map(({ beat, scale, width, height }, i) => (
+    <div ref={ref} data-beat-well="" className="relative w-full">
+      {/* NOT a clipping box. It was overflow-hidden while an expanded medium
+          could be wider than the column and needed to pan; with the toggle
+          gone nothing ever exceeds its box, and the clipping was only cutting
+          the drop-shadows off square — top and bottom especially, where the
+          reserved height is the medium's exact height and left no room at all.
+          The shadow is how these read as objects resting on the band rather
+          than pasted rectangles, so it is allowed out. */}
+      <div
+        data-beat-media=""
+        aria-hidden="true"
+        className="pointer-events-none mx-auto select-none"
+        style={{ width: width || undefined, height: height || undefined }}
+      >
+        {/* The natural width is set HERE, not left to the box. A scaled
+            element lays out first and scales after, so this has to be as wide
+            as the object really is or the object is laid out into the shrunken
+            box instead — which is what clipped the display's 900px screen
+            inside its own bezel and left a ~100px sliver of a TV. */}
         <div
-          key={beat.key}
-          data-beat-media=""
-          aria-hidden="true"
-          className={cn(
-            "pointer-events-none absolute inset-0 flex items-center justify-center transition-opacity duration-500 select-none",
-            i === active ? "opacity-100" : "opacity-0"
-          )}
+          className="origin-top-left"
+          style={{
+            width: natural.w,
+            transform: scale ? `scale(${scale})` : undefined,
+          }}
         >
-          <div
-            style={{ width: width || undefined, height: height || undefined }}
-          >
-            {/* The natural width is set HERE, not left to the box: a scaled
-                element lays out first and scales after. */}
-            <div
-              className="origin-top-left"
-              style={{
-                width: NATURAL[beat.medium.kind].w,
-                transform: scale ? `scale(${scale})` : undefined,
-              }}
-            >
-              <BeatMedium medium={beat.medium} bare />
-            </div>
-          </div>
+          <BeatMedium medium={beat.medium} bare />
         </div>
-      ))}
+      </div>
     </div>
   )
 }
@@ -585,11 +567,14 @@ export function ProcessOverview() {
                 tint at 1% fades clean. */}
             {/* STICKY ON THE PHONE TOO (founder, 2026-10-18: "make the How
                 It Works steps sticky, replicating the desktop behaviour but
-                more vertical"): the eyebrow and ONE cross-fading well pin
-                under the site header (top-14) and the beat texts scroll
-                beneath, the active one lit — the desktop arc stood on end.
-                So the scrim is no longer md:-only: texts do pass under the
-                block now. Each beat's own medium beneath its text is gone. */}
+                more vertical" — then "it would be better for the text to be
+                sticky, not the vignette"): the eyebrow and the beat TEXT
+                pin under the site header (top-14), the six texts stacked
+                in one grid cell and cross-fading, while each beat's medium
+                scrolls beneath in its own block — the desktop arc stood on
+                end, with the roles kept: words pinned, pictures passing.
+                So the scrim is no longer md:-only: the media pass under
+                the block now. */}
             <div
               ref={pinnedRef}
               className="sticky top-14 z-10 bg-band-tint pb-8 before:absolute before:inset-x-0 before:bottom-full before:h-14 before:bg-band-tint after:absolute after:inset-x-0 after:top-full after:h-24 after:bg-gradient-to-b after:from-band-tint after:via-band-tint/80 after:to-band-tint/1 md:top-28 md:after:h-36"
@@ -597,8 +582,28 @@ export function ProcessOverview() {
               <SectionEyebrow as="h2">
                 {t("home.overview.eyebrow")}
               </SectionEyebrow>
-              <div className="mt-6 md:hidden">
-                {mounted && !isDesktop && <MobileStickyWell active={active} />}
+              {/* The text well: every beat's words in the same grid cell,
+                  so the block is as tall as the longest and never moves as
+                  the beats cross-fade. */}
+              <div className="mt-4 grid md:hidden" aria-hidden>
+                {BEATS.map((beat, i) => (
+                  <div
+                    key={beat.key}
+                    className={cn(
+                      "max-w-lg transition-opacity duration-500 [grid-area:1/1]",
+                      i === active
+                        ? "opacity-100"
+                        : "pointer-events-none opacity-0"
+                    )}
+                  >
+                    <p className="mb-2 text-sm font-medium tracking-widest text-primary uppercase">
+                      {i + 1}. {beat.label}
+                    </p>
+                    <p className="text-xl leading-relaxed text-muted-foreground">
+                      {linkifyTerms(beat.body)}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
             {BEATS.map((beat, i) => (
@@ -610,18 +615,23 @@ export function ProcessOverview() {
                 }}
                 className={cn(
                   "flex max-w-lg flex-col justify-center transition-opacity duration-300 md:min-h-[50vh]",
-                  // Each beat holds the readable area beneath the pinned
-                  // block for a screen's worth of scroll, as it holds half a
-                  // screen on desktop — the arc needs the travel.
+                  // On the phone this block is the beat's MEDIUM, scrolling
+                  // under the pinned words; it holds 44vh so the pinned
+                  // block has travel, as a beat holds half a screen on
+                  // desktop. The first starts below the scrim (h-24) at
+                  // rest, or the gradient greys it out before a reader has
+                  // scrolled at all — the 2026-08-18 bug again.
                   "max-md:mt-12 max-md:min-h-[44vh]",
-                  // The first beat starts BELOW the scrim at rest (its h-24
-                  // on the phone), or the gradient greys it out before a
-                  // reader has scrolled at all — the 2026-08-18 bug again.
                   i === 0 && "max-md:mt-24",
-                  i === active ? "opacity-100" : "opacity-30"
+                  i === active ? "md:opacity-100" : "md:opacity-30"
                 )}
               >
-                <p className="mb-2 text-sm font-medium tracking-widest text-primary uppercase">
+                {/* Desktop: the words scroll beside the pinned media. On the
+                    phone they show in the pinned block above (aria-hidden,
+                    a cross-fade), so this copy is screen-reader-only there:
+                    a reader meets each beat's words beside its medium, in
+                    order, once. */}
+                <p className="mb-2 text-sm font-medium tracking-widest text-primary uppercase max-md:sr-only">
                   {i + 1}. {beat.label}
                 </p>
                 {/* Up from text-lg (founder, 2026-08-17). On desktop this
@@ -630,9 +640,15 @@ export function ProcessOverview() {
                     only thing carrying the explanation. max-w-lg with it, or
                     24px type in a 28rem column runs to ~30 characters a line
                     and reads as a narrow ribbon. */}
-                <p className="text-xl leading-relaxed text-muted-foreground md:text-2xl">
+                <p className="text-xl leading-relaxed text-muted-foreground max-md:sr-only md:text-2xl">
                   {linkifyTerms(beat.body)}
                 </p>
+                {/* PHONE: this beat's OWN medium, scrolling under the pinned
+                    words. Same six media the desktop column pins; mounted
+                    once. */}
+                <div className="md:hidden">
+                  {mounted && !isDesktop && <MobileWell beat={beat} />}
+                </div>
               </div>
             ))}
           </div>
@@ -672,7 +688,7 @@ export function ProcessOverview() {
             </div>
           </div>
 
-          {/* No trailing mobile frame: the phone's well pins above the texts. */}
+          {/* No trailing mobile frame: each beat's medium scrolls under the pinned words. */}
         </div>
       </div>
     </section>
