@@ -3,8 +3,13 @@
  * ---------------------------------------------------------------------------
  * Loads the Charity Commission's bulk extract into register_charities, the
  * register mirror (migration 20260927150000). Main charities only (linked
- * charities, the subsidiaries, are skipped); Registered and Removed both
- * kept, so a verification can see a removal.
+ * charities, the subsidiaries, are skipped). REGISTERED ONLY since
+ * 2026-10-19: the 186k Removed rows (126 MB) were deleted from prod and
+ * staging to stay inside the free plan's 500 MB, and a reload must not
+ * put them back. A missing row already reads as a removal everywhere
+ * that matters — register_account_removals() treats "not in the mirror"
+ * as gone, and verification falls back to the Commission API. Pass
+ * --include-removed to load them deliberately.
  *
  * Run from apps/web:
  *   pnpm exec tsx --env-file=.env.local ../../scripts/register/load-register.ts
@@ -12,7 +17,13 @@
  *                           use what is already in --dir)
  *     --dir=<path>          where the extracts live (default: ./register-extract)
  *     --dry-run             parse and count, write nothing
- *     --registered-only     skip Removed charities
+ *     --include-removed     also load Removed charities (default: skip
+ *                           them — see above). Their other names still
+ *                           land in register_charity_names on a reload;
+ *                           clear those with
+ *                           delete from register_charity_names n where not
+ *                           exists (select 1 from register_charities r
+ *                           where r.registered_number = n.registered_number);
  *     --skip=<n>            resume: skip the first n main charities (the
  *                           count a failed run last printed as written)
  *     --names-only          load ONLY charity_other_names (4MB) and stop:
@@ -50,7 +61,9 @@ const opt = (n: string, d: string) =>
 
 const DIR = resolve(opt("dir", "register-extract"));
 const DRY = flag("dry-run");
-const REGISTERED_ONLY = flag("registered-only");
+// Registered only by default since 2026-10-19 (see the header); the old
+// --registered-only flag is accepted and means the same as the default.
+const REGISTERED_ONLY = !flag("include-removed");
 const BATCH = 500;
 const SKIP = parseInt(opt("skip", "0"), 10) || 0;
 const NAMES_ONLY = flag("names-only");
