@@ -338,3 +338,10 @@ header[data-site-chrome][data-hero-fade]
     display: none;
   }
 }
+
+/* The skip link's target. <main tabindex="-1"> takes focus so the jump
+   lands keyboard focus, not just the scroll position; the ring that
+   would otherwise frame the whole page is not wanted (a11y, 2026-10-19). */
+main[tabindex="-1"]:focus {
+  outline: none;
+}

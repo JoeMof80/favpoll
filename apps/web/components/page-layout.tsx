@@ -107,6 +107,8 @@ export function PageLayout({
     <div className="overflow-x-clip bg-primary/5 [overflow-anchor:none]">
       <PageGround color={PRIMARY_WASH} />
       <main
+        id="main"
+        tabIndex={-1}
         // clip-path (#921) clips the drop shadow above the sheet, which
         // is otherwise visible on overscroll.
         // --shell-h: the sheet's height (see shellHeight) — every vh this

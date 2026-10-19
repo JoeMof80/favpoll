@@ -164,7 +164,7 @@ export const metadata: Metadata = {
 // (press/investor material).
 export default function AboutPage() {
   return (
-    <main className="flex flex-col">
+    <main id="main" tabIndex={-1} className="flex flex-col">
       {/* ── Top: the soul ── */}
       <section className="relative bg-primary text-primary-foreground">
         <HeroTexture />

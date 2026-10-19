@@ -219,7 +219,7 @@ export function NewFavpollWizard({
 
   return (
     <RegisterScope palette={palette}>
-      <main>
+      <main id="main" tabIndex={-1}>
         <div className="md:grid md:min-h-[calc(100vh-4rem)] md:grid-cols-[320px_1fr] md:items-stretch">
           <WizardStepRail
             currentStep={w.step}

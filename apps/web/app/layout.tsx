@@ -3,6 +3,7 @@ import { Geist_Mono, Plus_Jakarta_Sans } from "next/font/google"
 import "./globals.css"
 import { ClerkProvider } from "@/components/clerk-provider"
 import { ThemeProvider } from "@favpoll/ui"
+import { SkipLink } from "@/components/skip-link"
 import { HeaderMount } from "@/components/header-mount"
 import { SiteFooterMount } from "@/components/site-footer-mount"
 import { cn } from "@/lib/utils"
@@ -68,6 +69,7 @@ export default function RootLayout({
       >
         <body>
           <ThemeProvider>
+            <SkipLink />
             {/* Navigation feedback (founder, 2026-09-14): a quiet 2px
                 bar in the register colour — pairs with the native tap
                 highlight so a tap answers twice: at the finger, then

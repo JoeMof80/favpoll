@@ -162,7 +162,7 @@ export default function FeaturesPage() {
     // longer clips anything — so the page clips sideways bleed at the
     // viewport, where it is invisible anyway. clip, not hidden: no
     // scroll container, and the vertical glow survives.
-    <main className="flex flex-col overflow-x-clip">
+    <main id="main" tabIndex={-1} className="flex flex-col overflow-x-clip">
       {/* NO HERO (founder, 2026-08-09). It had a purple band, then a plain
           one, and the second was not the fix — the page does not want a hero
           at all. Most visitors arrive from a homepage capability card, which

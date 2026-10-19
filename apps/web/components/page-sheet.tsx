@@ -9,7 +9,11 @@ export function PageSheet({ children }: { children: React.ReactNode }) {
   return (
     <div className="overflow-x-clip bg-primary/5">
       <PageGround color={PRIMARY_WASH} />
-      <main className="mx-auto min-h-[calc(100vh-3.5rem)] w-full max-w-5xl bg-background px-6 pb-24 md:px-16 md:drop-shadow-lg">
+      <main
+        id="main"
+        tabIndex={-1}
+        className="mx-auto min-h-[calc(100vh-3.5rem)] w-full max-w-5xl bg-background px-6 pb-24 md:px-16 md:drop-shadow-lg"
+      >
         {children}
       </main>
     </div>

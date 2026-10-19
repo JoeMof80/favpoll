@@ -193,7 +193,11 @@ export function RankingsClient({ categories, topics }: Props) {
   )
 
   return (
-    <main className="min-h-[calc(100vh-3.5rem)] bg-muted">
+    <main
+      id="main"
+      tabIndex={-1}
+      className="min-h-[calc(100vh-3.5rem)] bg-muted"
+    >
       <PageGround color="var(--muted)" />
       {/* One sticky band: category rail + the list controls — everything
           that narrows the list lives together (header is h-14 = 3.5rem) */}
