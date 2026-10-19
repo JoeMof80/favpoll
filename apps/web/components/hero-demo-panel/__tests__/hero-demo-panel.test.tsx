@@ -337,16 +337,20 @@ describe("DemoCard — dialog mimics", () => {
     ).toBeNull()
   })
 
-  it("shows confirmation tick, the favourite backed and the amount in confirmed phase", () => {
+  it("the confirmation is a receipt: status, the favourite's chip, the charity row, the Reveal button", () => {
     renderCard("confirmed")
     expect(screen.getByText("Pledge confirmed")).toBeInTheDocument()
     expect(
-      screen.getByText(
-        `You backed ${scene.poll.topic.favourites[scene.selectedIndex].label}`
-      )
-    ).toBeInTheDocument()
+      screen.getAllByText(
+        scene.poll.topic.favourites[scene.selectedIndex].label
+      ).length
+    ).toBeGreaterThanOrEqual(1)
+    // The sheet pane is inert, so the button is outside the accessible
+    // tree: find it by its text.
     expect(
-      screen.getByText(`${scene.pledgeAmount} to ${scene.charities[0].name}`)
+      screen.getByText("Reveal where your favourite stands", {
+        selector: "button",
+      })
     ).toBeInTheDocument()
   })
 

@@ -265,7 +265,8 @@ const STILL_BEAT: { phase: Phase; at: number }[] = [
   { phase: "selected", at: 4800 }, //    a favourite is chosen
   { phase: "pledge-panel", at: 6600 }, // 3. the amount step
   { phase: "amount-picked", at: 7800 }, //    a preset chosen, £ updates
-  { phase: "confirmed", at: 9800 }, // 4. the tick
+  { phase: "confirmed", at: 9800 }, // 4. the receipt
+  { phase: "reveal-pressed", at: 11300 }, //    its Reveal button pressed
   { phase: "clearing", at: 11600 }, // 5. the sheet slides down onto the live page:
   { phase: "results", at: 12600 }, //    bars climbing, note typing
   { phase: "note", at: 15400 }, //    the note stands typed

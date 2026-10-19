@@ -1,9 +1,10 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Check } from "lucide-react"
 import { LockCardContent } from "@/components/lock-card-content"
 import { FavpollLogo } from "@/components/favpoll-logo"
+import { FavpollMarkGlyph } from "@/components/landing/hero-texture"
+import { Chip } from "@/components/ui/chip"
 import { PHONE_SAFE_AREA_TOP } from "./phone-frame"
 import { CharityRow } from "@/components/charity-row"
 import { GoalProgress } from "@/components/goal-progress"
@@ -222,7 +223,8 @@ export function DemoCard({
   const pledgeHover = phase === "pledge-hover"
   const pledgePressed = phase === "pledging"
 
-  const confirmedInDialog = phase === "confirmed"
+  const confirmedInDialog = phase === "confirmed" || phase === "reveal-pressed"
+  const revealPressed = phase === "reveal-pressed"
   const isPhone = device === "phone"
   const sheetOpen = pickerOpen || amountOpen || confirmedInDialog
 
@@ -698,22 +700,66 @@ export function DemoCard({
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.45 }}
-                    className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 p-6 text-center"
+                    className="flex min-h-0 flex-1 flex-col"
                   >
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-success">
-                      <Check className="h-5 w-5 text-success-foreground" />
+                    {/* A RECEIPT THAT LEADS INTO THE REVEAL (founder,
+                        2026-10-19: "it feels weak. Should we replace the
+                        tick with the favpoll brandmark?"). The mark in a
+                        register-ink circle — favpoll did this — with the
+                        status in words; the pledge as two REAL rows, the
+                        favourite as the picker's own chip and the charity
+                        as the real charity row with the amount; and the
+                        button that causes the next step, the lock card's
+                        own third line, pressed at "reveal-pressed" before
+                        the sheet slides down. */}
+                    <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-5 px-6 py-6 text-center">
+                      <div className="flex size-16 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                        <svg
+                          viewBox="0 0 10 9"
+                          className="size-8"
+                          aria-hidden="true"
+                        >
+                          <FavpollMarkGlyph />
+                        </svg>
+                      </div>
+                      <SectionEyebrow>Pledge confirmed</SectionEyebrow>
+                      <div className="w-full space-y-4 text-left">
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-sm text-muted-foreground">
+                            Your favourite
+                          </span>
+                          <Chip
+                            selected
+                            tabIndex={-1}
+                            className="pointer-events-none"
+                          >
+                            {selected?.label}
+                          </Chip>
+                        </div>
+                        <CharityRow
+                          charity={{
+                            ...charity,
+                            description: null,
+                            created_at: "2024-01-01T00:00:00Z",
+                          }}
+                          amountRaised={Number(
+                            scene.pledgeAmount.replace(/[^\d.]/g, "")
+                          )}
+                        />
+                      </div>
                     </div>
-                    <p className="text-base font-medium text-foreground">
-                      Pledge confirmed
-                    </p>
-                    {/* Explicit (founder, 2026-10-18: "state the selected
-                        favourite"): what was backed, then the money. */}
-                    <p className="text-sm text-foreground">
-                      You backed {selected?.label}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {scene.pledgeAmount} to {charityName}
-                    </p>
+                    <div className="shrink-0 px-4 py-3">
+                      <Button
+                        type="button"
+                        tabIndex={-1}
+                        className={cn(
+                          "pointer-events-none h-11 w-full text-base transition-all duration-150",
+                          revealPressed ? "scale-[0.98] brightness-95" : ""
+                        )}
+                      >
+                        Reveal where your favourite stands
+                      </Button>
+                    </div>
                   </motion.div>
                 ) : pickerOpen ? (
                   <motion.div

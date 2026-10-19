@@ -13,6 +13,7 @@ export type Phase =
   | "pledge-hover" // Pledge button hovered
   | "pledging" // Pledge button pressed
   | "confirmed" // confirmation shown inside the dialog
+  | "reveal-pressed" // the confirmation's "Reveal" button pressed
   | "clearing" // dialog closes
   | "results" // ranking bars climb, reveal skeleton holds
   | "note" // personal note types out last
