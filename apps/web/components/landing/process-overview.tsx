@@ -22,6 +22,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
+import { Button } from "@/components/ui/button"
 import {
   REGISTER_LINK_HOVER,
   REGISTER_LINK_INK,
@@ -52,12 +53,19 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { t } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 import type { Phase } from "@/components/hero-demo-panel/scenes"
+import {
+  WizardVignette,
+  WIZARD_VIGNETTE_H,
+  WIZARD_VIGNETTE_W,
+  type WizardPane,
+} from "@/components/landing/wizard-vignettes"
 
 type Medium =
   | { kind: "card" }
   | { kind: "phone"; phase: Phase }
   | { kind: "display" }
   | { kind: "keepsake" }
+  | { kind: "wizard"; pane: WizardPane }
 
 type Beat = {
   key: string
@@ -100,39 +108,45 @@ function linkifyTerms(body: string): React.ReactNode {
 }
 
 const BEATS: Beat[] = [
+  // THE ORGANISER'S PROCESS (prototype, founder 2026-10-19): the hero now
+  // shows the guest's journey, so this walks the MAKING of a favpoll in the
+  // wizard's own order, then what the organiser does with it. One actor
+  // throughout, as the 2026-08-27 reframing required — just the other one.
   {
-    key: "card",
-    label: t("landing.how.card.label"),
-    body: t("landing.how.card.body"),
+    key: "occasion",
+    label: t("landing.how.occasion.label"),
+    body: t("landing.how.occasion.body"),
+    medium: { kind: "wizard", pane: "event" },
+  },
+  {
+    key: "charity",
+    label: t("landing.how.charity.label"),
+    body: t("landing.how.charity.body"),
+    medium: { kind: "wizard", pane: "charity" },
+  },
+  {
+    key: "topic",
+    label: t("landing.how.topic.label"),
+    body: t("landing.how.topic.body"),
+    medium: { kind: "wizard", pane: "topic" },
+  },
+  {
+    key: "header",
+    label: t("landing.how.header.label"),
+    body: t("landing.how.header.body"),
+    medium: { kind: "wizard", pane: "info" },
+  },
+  {
+    key: "story",
+    label: t("landing.how.story.label"),
+    body: t("landing.how.story.body"),
+    medium: { kind: "wizard", pane: "story" },
+  },
+  {
+    key: "share",
+    label: t("landing.how.share.label"),
+    body: t("landing.how.share.body"),
     medium: { kind: "card" },
-  },
-  {
-    // The state a guest ARRIVES in (founder, 2026-08-06): "arriving" is a
-    // locked phase, so the card shows blurred decoy bars and the reveal lock —
-    // the withholding the rest of the arc then resolves. Without it the
-    // sequence opened mid-story, on a picker already in use.
-    key: "arriving",
-    label: t("landing.how.arrive.label"),
-    body: t("landing.how.arrive.body"),
-    medium: { kind: "phone", phase: "arriving" },
-  },
-  {
-    key: "selected",
-    label: t("landing.how.pick.label"),
-    body: t("landing.how.pick.body"),
-    medium: { kind: "phone", phase: "selected" },
-  },
-  {
-    key: "amount-picked",
-    label: t("landing.how.pledge.label"),
-    body: t("landing.how.pledge.body"),
-    medium: { kind: "phone", phase: "amount-picked" },
-  },
-  {
-    key: "reveal",
-    label: t("landing.how.reveal.label"),
-    body: t("landing.how.reveal.body"),
-    medium: { kind: "phone", phase: "note" },
   },
   {
     key: "room",
@@ -141,18 +155,6 @@ const BEATS: Beat[] = [
     medium: { kind: "display" },
   },
   {
-    // SEVENTH BEAT (founder, 2026-08-17). The arc ended at the event, leaving
-    // "and then what?" unanswered — the one question a walkthrough of a thing
-    // that CLOSES has to answer. It also returns the medium to PAPER, so the
-    // arc now runs paper → phone → room → paper and shuts where it opened.
-    //
-    // It strains the 2026-08-09 principle that every beat is something a
-    // GUEST does, since the sheet is the organiser's to print. Written
-    // passively for that reason — what the day BECOMES, not who prints it —
-    // so the reader stays the guest all seven beats. That is the whole
-    // section's rule (founder, 2026-08-17): "you" is the guest throughout,
-    // never the organiser, because a reader cannot be both and the beats
-    // before this one are unambiguously the guest's.
     key: "keepsake",
     label: t("landing.how.keepsake.label"),
     body: t("landing.how.keepsake.body"),
@@ -187,6 +189,10 @@ const CARD_SCALE = "scale-[0.75] lg:scale-100 xl:scale-[1.15]"
 // above (273 / 376 / 478) give these scales; the TV stands 1120 tall
 // unscaled, which at every stop sits inside the well the phone sets.
 const DISPLAY_SCALE = "scale-[0.139] lg:scale-[0.19] xl:scale-[0.243]"
+// The wizard panes (prototype, 2026-10-19): the wizard in a 768px window
+// in a browser frame, filling the column widths above (273 / 376 / 478) —
+// a quarter larger than a 960px window would draw, for legibility.
+const WIZARD_SCALE = "scale-[0.355] lg:scale-[0.49] xl:scale-[0.622]"
 
 // MOBILE IS MEASURED, NOT TUNED (2026-08-18).
 //
@@ -210,6 +216,7 @@ const DISPLAY_SCALE = "scale-[0.139] lg:scale-[0.19] xl:scale-[0.243]"
 //   keepsake — A4 landscape at 96dpi
 const NATURAL: Record<Medium["kind"], { w: number; h: number }> = {
   card: { w: 332, h: 215 },
+  wizard: { w: WIZARD_VIGNETTE_W, h: WIZARD_VIGNETTE_H },
   phone: { w: PHONE_CHASSIS_WIDTH, h: PHONE_CHASSIS_HEIGHT },
   display: { w: DISPLAY_STILL_ROOM.w + 40, h: DISPLAY_STILL_ROOM.h + 40 },
   keepsake: { w: 794, h: 1123 },
@@ -313,13 +320,33 @@ function BeatMedium({
       </div>
     )
   }
+  if (medium.kind === "wizard") {
+    return (
+      // NOT theme-light, unlike the phone and the TV (founder, 2026-10-19:
+      // "apply the light and dark theme to the browser vignette, including
+      // the frame"): a browser window is the visitor's own object and
+      // follows their theme; a handset and a screen are lit the same way
+      // whatever the page is. The register goes on the wizard inside the
+      // frame (the vignette's `palette`); the chrome stays neutral.
+      <div className={cn("shrink-0 drop-shadow-xl", !bare && WIZARD_SCALE)}>
+        <WizardVignette
+          pane={medium.pane}
+          scene={SCENE}
+          palette={paletteForSceneKind(SCENE.kind)}
+        />
+      </div>
+    )
+  }
   if (medium.kind === "display") {
     return (
       <div
         data-register={paletteForSceneKind(SCENE.kind)}
-        // theme-light: a screen in a TV keeps light mode whatever the page's
-        // theme (founder, 2026-08-31) — see register-tokens.css.
-        className={cn("theme-light shrink-0", !bare && DISPLAY_SCALE)}
+        // FOLLOWS THE THEME since 2026-10-19 (founder: "should we make the
+        // live display theme sensitive?"): the real room page is dark in
+        // dark mode — the tokens flip it, no dark: classes needed — so a
+        // screen that stayed lit would depict a page the product does not
+        // show. (It had been theme-light since 2026-08-31.)
+        className={cn("shrink-0", !bare && DISPLAY_SCALE)}
       >
         <TvFrame>
           {/* The screen itself, 16:9 — what the projector shows, not a cropped
@@ -659,6 +686,16 @@ export function ProcessOverview() {
                 </div>
               </div>
             ))}
+            {/* THE WALKTHROUGH'S EXIT (founder, 2026-10-19: "Should we add
+                another 'Create a favpoll' button at the bottom of the
+                section?"): a reader who has just watched the organiser's
+                process is primed to start one, and the only other CTAs
+                are a screen above. The header's own label and route. */}
+            <div className="mt-10 md:mt-16">
+              <Button asChild size="lg" className="h-11 px-6 text-base">
+                <Link href="/favpolls/new">{t("landing.cta.primary")}</Link>
+              </Button>
+            </div>
           </div>
 
           {/* Media column — pinned, bare, one frame per beat */}
