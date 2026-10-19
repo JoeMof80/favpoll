@@ -586,13 +586,13 @@ export function LandingHero({
               register headlines should hold one line, that is a COPY change
               (shorter first beats), not a layout one. */}
           {/* max-w-[33.75rem] (540px), not max-w-xl (founder, 2026-10-19):
-              the register headlines break as two lines each — "Pick their
-              topic and poll / favourites." then "Give to charity in their /
-              memory." — and the fundraiser's "Give to charity in support."
-              (542px rendered at 48px) fitted a 576px box on one line, so the
-              three slides stopped rhyming. 540 breaks it after "in" while the
-              longest first line, "Pick their topic and poll" (495px), still
-              holds — measured: four lines on all three slides. */}
+              the register headlines' charity line breaks in two — "Give to
+              charity in their / memory." — and the fundraiser's "Give to
+              charity in support." (542px rendered at 48px) fitted a 576px box
+              on one line, so the three slides stopped rhyming. 540 breaks it
+              after "in"; the hook's two short sentences ("Pick their topic."
+              "Poll favourites.", since 2026-10-19) take a line each —
+              measured: four lines on all three slides. */}
           <h1
             className={cn(
               "mb-6 text-4xl leading-[1.12] font-light tracking-tight md:text-5xl",
@@ -615,7 +615,14 @@ export function LandingHero({
               .map((sentence, i, all) => (
                 <span
                   key={sentence}
-                  className={cn("block", headline && i > 0 && "opacity-70")}
+                  // THE HOOK IS EVERYTHING BUT THE LAST SENTENCE (founder,
+                  // 2026-10-19: "Pick a topic. Poll favourites." — two
+                  // beats of hook, then the charity line steps back). For
+                  // a two-sentence headline this is what it always was.
+                  className={cn(
+                    "block",
+                    headline && i === all.length - 1 && i > 0 && "opacity-70"
+                  )}
                 >
                   {sentence}
                   {i < all.length - 1 ? "." : ""}
