@@ -332,6 +332,13 @@ export function LandingHero({
   ctaAfterMedia = false,
   children,
 }: Props) {
+  // IN THE HOME CAROUSEL the still phone takes How It Works' own column
+  // (founder, 2026-10-19: "move the iphone in the demo to line up with the
+  // 'How It Works' iphone vignette"): the same five-column grid with the
+  // same gap, the pitch on three, the phone centred on two — so the hero's
+  // handset and the pinned vignette below it share an axis. The register
+  // pages' stand-alone stills keep the [1fr_auto] row.
+  const inCarousel = stillActive !== undefined
   const scenes = useMemo(
     () =>
       sceneOverride
@@ -525,7 +532,9 @@ export function LandingHero({
                 // makes the two columns siblings, so they centre against
                 // each other. The media track is `auto`: the phone is a
                 // fixed chassis and must not be squeezed by a 1fr share.
-                "md:grid-cols-[1fr_auto] md:items-center md:gap-x-12 md:py-12"
+                inCarousel
+                ? "md:grid-cols-5 md:items-center md:gap-x-6 md:py-12"
+                : "md:grid-cols-[1fr_auto] md:items-center md:gap-x-12 md:py-12"
               : // COLUMN: the demo hero the register pages mount — the demo
                 // card is 400px, so the last-of-three column still holds it.
                 // minmax, NOT the bare third (2026-08-22). The demo card is a
@@ -546,6 +555,7 @@ export function LandingHero({
         <div
           className={cn(
             "min-w-0",
+            inCarousel && "md:col-span-3",
             !router && !still && "md:col-start-1 md:row-start-1"
           )}
         >
@@ -650,6 +660,7 @@ export function LandingHero({
             to. */}
         <div
           className={cn(
+            inCarousel && "md:col-span-2",
             !router && !still && "md:col-start-2 md:row-span-2 md:row-start-1"
           )}
         >
@@ -660,7 +671,7 @@ export function LandingHero({
             <div
               className={cn(
                 compact ? PHONE_SCALED_BOX_COMPACT : PHONE_SCALED_BOX,
-                "mx-auto md:mx-0"
+                inCarousel ? "mx-auto" : "mx-auto md:mx-0"
               )}
             >
               {/* text-foreground: the home carousel's band sets white
