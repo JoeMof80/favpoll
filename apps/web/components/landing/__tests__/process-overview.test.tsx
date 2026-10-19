@@ -175,3 +175,20 @@ describe("ProcessOverview", () => {
     expect(card.closest(".paper")).not.toBeNull()
   })
 })
+
+describe("ProcessOverview — the media are inert as well as aria-hidden", () => {
+  it("no focusable control inside a media wrapper is reachable (a11y audit, 2026-10-19)", () => {
+    const { container } = render(<ProcessOverview />)
+    const hidden = container.querySelectorAll(
+      '[aria-hidden="true"][data-beat-media], [aria-hidden="true"].md\\:col-span-2'
+    )
+    expect(hidden.length).toBeGreaterThan(0)
+    for (const el of hidden) expect(el).toHaveAttribute("inert")
+    for (const el of container.querySelectorAll(
+      "button, a[href], input, [tabindex]"
+    )) {
+      if (el.closest('[aria-hidden="true"]'))
+        expect(el.closest("[inert]")).not.toBeNull()
+    }
+  })
+})

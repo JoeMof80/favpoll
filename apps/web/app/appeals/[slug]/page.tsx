@@ -172,7 +172,7 @@ export default async function AppealPage({
         className="w-full"
       />
       <p className="text-xs leading-relaxed text-muted-foreground">
-        favpoll takes no platform fee — every pledge goes to {charityName}.
+        favpoll takes no platform fee. Pledges here are towards {charityName}.
       </p>
     </>
   )

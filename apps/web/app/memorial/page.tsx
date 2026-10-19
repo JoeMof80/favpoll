@@ -129,7 +129,7 @@ export default async function MemorialsPage() {
 
   return (
     <RegisterScope palette="memorial">
-      <main className="overflow-x-clip">
+      <main id="main" tabIndex={-1} className="overflow-x-clip">
         {/* ── The opening — the REAL landing hero, register-configured.
           Hand-rolling a band here lost the two things the component
           actually does: HeroTexture's monogram shimmer, and

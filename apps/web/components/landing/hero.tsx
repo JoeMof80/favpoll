@@ -952,10 +952,13 @@ export function LandingHero({
                   })}
                 </div>
               )}
+              {/* Not a live region: the demo loops for ever and is
+                  aria-hidden inside the phone, so announcing each
+                  cycle only talked over the page (a11y audit,
+                  2026-10-19). */}
               <div
                 className="transition-opacity duration-400"
                 style={{ opacity: fading ? 0 : 1 }}
-                aria-live="polite"
               >
                 {/* A THIRD STOP BELOW 360 (2026-08-22). The card is 500 wide
                     laid out and scaled to fit a fixed box — 0.62 gives 310,

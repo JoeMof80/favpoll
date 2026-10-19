@@ -62,7 +62,7 @@ export function buildMechanicSteps({
     : "Reveal where your favourite stands among the others"
   return [
     `Pick your favourite ${topic}`,
-    `Pledge what it's worth — all money will go to ${charityLine ?? "charity"}`,
+    `Pledge what it's worth towards ${charityLine ?? "charity"}`,
     step3,
   ]
 }

@@ -52,7 +52,7 @@ export function PickerHeader({
           onChange={(e) => onSearchChange(e.target.value)}
           autoFocus={hasFinePointer()}
           placeholder="Search…"
-          className="w-full bg-transparent text-lg outline-none placeholder:text-muted-foreground/50"
+          className="w-full bg-transparent text-lg outline-none placeholder:text-muted-foreground/50 focus-visible:ring-3 focus-visible:ring-ring/50"
         />
       </div>
     </div>
@@ -103,10 +103,14 @@ export function PickerPills({
             key={item.id}
             size="lg"
             selected={selectedIds.includes(item.id)}
-            onMouseDown={(e) => {
-              e.preventDefault()
-              onToggle(item.id)
-            }}
+            // mousedown is prevented so a pointer pick never steals focus
+            // from the search field (the combobox habit this picker grew
+            // from, #111). The pick itself happens on click, which the
+            // keyboard also fires — Enter and Space on a focused chip —
+            // where a mousedown-only handler left keyboard users with no
+            // way to pick at all (a11y audit, 2026-10-19).
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => onToggle(item.id)}
           >
             {item.label}
           </Chip>
@@ -120,10 +124,8 @@ export function PickerPills({
           <Chip
             size="lg"
             className="border-dashed bg-background text-primary"
-            onMouseDown={(e) => {
-              e.preventDefault()
-              onEnterAdd()
-            }}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={onEnterAdd}
           >
             + Add your own
           </Chip>
@@ -182,7 +184,7 @@ export function AddFavouriteView({
         // The guest CHOSE to add — the keyboard is wanted, every pointer
         autoFocus
         placeholder="Type a favourite…"
-        className="w-full bg-transparent text-lg outline-none placeholder:text-muted-foreground/50"
+        className="w-full bg-transparent text-lg outline-none placeholder:text-muted-foreground/50 focus-visible:ring-3 focus-visible:ring-ring/50"
       />
       <p className="mt-3 text-sm text-muted-foreground">
         Your favourite joins the poll for everyone to pick, and the organiser

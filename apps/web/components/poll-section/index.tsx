@@ -144,7 +144,8 @@ export function PollSection({
   })
 
   // "A note" covers favourite and message reveals alike (founder,
-  // 2026-09-17) — the old favourite/message fork is gone.
+  // 2026-09-17) — the old favourite/message fork is gone. Appended to the
+  // button's visible text as sr-only copy, not set as its aria-label.
   const unlockAriaLabel = !hasNote
     ? "Pledge your favourite to see the results"
     : "Pledge to see a personal note and the results"
@@ -385,7 +386,6 @@ export function PollSection({
                   type="button"
                   variant="ghost"
                   onClick={onOpenPledgeDialog}
-                  aria-label={unlockAriaLabel}
                   className="pointer-events-auto h-auto w-full max-w-sm flex-col items-stretch gap-0 overflow-hidden rounded-xl border-0 bg-background p-0 text-left whitespace-normal shadow-xl ring-1 ring-border transition-all duration-300 hover:bg-background hover:shadow-2xl motion-safe:hover:-translate-y-0.5 dark:hover:bg-background"
                 >
                   {/* Shared with the landing demo so the two cannot drift —
@@ -394,6 +394,11 @@ export function PollSection({
                     steps={lockSteps}
                     topicTitle={poll.topics.title}
                   />
+                  {/* The accessible name is the card's own visible text,
+                      so what a voice-control user says matches what they
+                      see (WCAG 2.5.3). The instruction that used to be the
+                      aria-label follows it, unseen (a11y audit, 2026-10-19). */}
+                  <span className="sr-only">{unlockAriaLabel}</span>
                 </Button>
               </span>
             </div>

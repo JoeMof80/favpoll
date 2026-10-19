@@ -222,7 +222,10 @@ export function LiveVignette({
 
   return (
     <Vignette>
-      <div ref={boxRef} aria-hidden="true" className="w-full">
+      {/* inert as well as aria-hidden: the room's own controls (the ⋮
+          options button) are real buttons, and aria-hidden alone left
+          them in the Tab order (a11y audit, 2026-10-19). */}
+      <div ref={boxRef} aria-hidden="true" inert className="w-full">
         {/* A transform does not change the layout box, so the scaled height is
             reserved explicitly — the class of bug that once put a 940px TV in
             a 184px well and spilled it over the beats either side. */}

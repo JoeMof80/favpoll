@@ -219,7 +219,7 @@ export function NewFavpollWizard({
 
   return (
     <RegisterScope palette={palette}>
-      <main>
+      <main id="main" tabIndex={-1}>
         <div className="md:grid md:min-h-[calc(100vh-4rem)] md:grid-cols-[320px_1fr] md:items-stretch">
           <WizardStepRail
             currentStep={w.step}
@@ -441,7 +441,7 @@ export function NewFavpollWizard({
                   placeholder="Search topics…"
                   value={topicSearch}
                   onChange={(e) => setTopicSearch(e.target.value)}
-                  className="flex-1 bg-transparent text-lg outline-none placeholder:text-muted-foreground/50"
+                  className="flex-1 bg-transparent text-lg outline-none placeholder:text-muted-foreground/50 focus-visible:ring-3 focus-visible:ring-ring/50"
                 />
               </div>
             </div>
@@ -514,7 +514,7 @@ export function NewFavpollWizard({
                   placeholder="Search charities…"
                   value={charitySearch}
                   onChange={(e) => setCharitySearch(e.target.value)}
-                  className="w-full bg-transparent text-lg outline-none placeholder:text-muted-foreground/50"
+                  className="w-full bg-transparent text-lg outline-none placeholder:text-muted-foreground/50 focus-visible:ring-3 focus-visible:ring-ring/50"
                 />
               </div>
             </div>
@@ -610,7 +610,7 @@ export function NewFavpollWizard({
                       ? "e.g. Party game"
                       : "e.g. Walking route"
               }
-              className="w-full bg-transparent text-lg outline-none placeholder:text-muted-foreground/50"
+              className="w-full bg-transparent text-lg outline-none placeholder:text-muted-foreground/50 focus-visible:ring-3 focus-visible:ring-ring/50"
             />
             <p className="mt-3 text-sm text-muted-foreground">
               Your topic is created with this favpoll — you’ll add its items

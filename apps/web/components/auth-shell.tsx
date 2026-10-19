@@ -13,7 +13,13 @@ import { HEADLINE_BEATS, SITE_DESCRIPTION } from "@/lib/og/site"
 // copy goes to die; this one can no longer drift.
 export function AuthShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid flex-1 bg-muted lg:grid-cols-2">
+    // <main>, so the sign-in and sign-up pages have a main landmark and
+    // the skip link's target (a11y audit, 2026-10-19).
+    <main
+      id="main"
+      tabIndex={-1}
+      className="grid flex-1 bg-muted lg:grid-cols-2"
+    >
       <div className="hidden flex-1 items-center justify-end p-10 lg:flex">
         <div className="max-w-sm space-y-6">
           <div>
@@ -34,6 +40,6 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
       <div className="flex flex-1 items-center justify-center p-6 md:p-10 lg:justify-start">
         {children}
       </div>
-    </div>
+    </main>
   )
 }

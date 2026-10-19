@@ -60,7 +60,7 @@ function Mail() {
 
 export default function TermsPage() {
   return (
-    <main className="mx-auto max-w-2xl px-6 py-16">
+    <main id="main" tabIndex={-1} className="mx-auto max-w-2xl px-6 py-16">
       <h1 className="text-[32px] font-medium tracking-tight text-foreground">
         Terms
       </h1>

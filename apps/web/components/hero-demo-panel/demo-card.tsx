@@ -531,11 +531,9 @@ export function DemoCard({
                     protagonistFirstName={firstName ?? undefined}
                   />
                 </div>
-                <div
-                  className="absolute inset-0"
-                  role="status"
-                  aria-live="polite"
-                >
+                {/* Plain div, not role="status": this is the looping
+                    demo's reveal, not the guest's (a11y audit, 2026-10-19). */}
+                <div className="absolute inset-0">
                   <PollNote
                     personalNote={revealShown || "\u00A0"}
                     protagonistFirstName={firstName ?? undefined}
