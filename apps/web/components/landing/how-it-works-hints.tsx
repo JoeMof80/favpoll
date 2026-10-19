@@ -87,9 +87,9 @@ const MEMORIAL_SHOWN = [
  *
  * `shown` because a contiguous slice will not do: it has to hold the labels
  * the rest of the band depends on, and it has to leave OUT the protagonist's
- * own answer. Alphabetically the wedding's first eight destinations include
- * the panda, which would give the reveal away two columns before the standings
- * do — the same trap the memorial avoids by omitting Purple.
+ * own answer. The wedding's animals, taken alphabetically, would reach
+ * the panda, which would give the reveal away two columns before the
+ * standings do — the same trap the memorial avoids by omitting Purple.
  *
  * `picked` is a GUEST's pick, never the protagonist's. Never
  * scene.selectedIndex, which points at exactly the answer that must stay

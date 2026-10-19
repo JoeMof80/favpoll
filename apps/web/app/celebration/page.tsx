@@ -73,29 +73,33 @@ const STEPS = [
 //
 // `shown` is eleven of the topic's twenty-eight, chosen not sliced
 // (eight until 2026-09-02 — another line to match the taller triad). Short
-// labels, because the hint column is 184px and long place names drop it to
-// one pill a row; and CHENGDU IS DELIBERATELY ABSENT, exactly as Purple is
-// on the memorial — it is the couple's own answer, and lighting it here
-// would give the reveal away two columns before the standings do.
+// labels, because the hint column is 184px and long labels drop it to one
+// pill a row; and THE PANDA IS DELIBERATELY ABSENT, exactly as Purple is on
+// the memorial — it is the couple's own answer, and lighting it here would
+// give the reveal away two columns before the standings do. (Animals since
+// 2026-10-19, when the scene's topic became Animal; the holiday labels
+// left here matched nothing, so the Pick hint rendered empty and the
+// Pledge bill still said "Greece" — founder: "why missing picks in how it
+// works?")
 //
-// `picked` is Greece: a guest's pick, second in the standings, and not the
+// `picked` is Cat: a guest's pick, second in the standings, and not the
 // scene's selectedIndex, which points at the panda.
 const WEDDING_HINTS: HintScene = {
   scene: WEDDING_SCENE,
   shown: [
-    "Bali",
-    "Cornwall",
-    "Croatia",
-    "Cyprus",
-    "Greece",
-    "Iceland",
-    "Italy",
-    "Japan",
-    "Lisbon",
-    "Norway",
-    "Venice",
+    "Badger",
+    "Bear",
+    "Cat",
+    "Deer",
+    "Dog",
+    "Elephant",
+    "Fox",
+    "Hare",
+    "Horse",
+    "Otter",
+    "Owl",
   ],
-  picked: "Greece",
+  picked: "Cat",
 }
 
 const STEP_MEDIA = [
