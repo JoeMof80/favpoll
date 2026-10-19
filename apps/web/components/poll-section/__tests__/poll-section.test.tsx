@@ -404,9 +404,7 @@ describe("PollSection — lock explainer", () => {
     )
     expect(screen.getByText("Pick your favourite colour")).toBeInTheDocument()
     expect(
-      screen.getByText(
-        "Pledge what it's worth — all money will go to Marie Curie & WWF"
-      )
+      screen.getByText("Pledge what it's worth towards Marie Curie & WWF")
     ).toBeInTheDocument()
     expect(
       screen.getByText(
@@ -427,7 +425,7 @@ describe("PollSection — lock explainer", () => {
         onOpenPledgeDialog={vi.fn()}
       />
     )
-    expect(screen.getByText(/all money will go to charity/)).toBeInTheDocument()
+    expect(screen.getByText(/worth towards charity/)).toBeInTheDocument()
   })
 })
 

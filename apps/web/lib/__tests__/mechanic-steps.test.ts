@@ -13,7 +13,7 @@ describe("buildMechanicSteps", () => {
       })
     ).toEqual([
       "Pick your favourite seaside town",
-      "Pledge what it's worth — all money will go to Samaritans",
+      "Pledge what it's worth towards Samaritans",
       "Reveal where your favourite stands among the others",
     ])
   })
@@ -23,7 +23,7 @@ describe("buildMechanicSteps", () => {
       topicTitle: "Colour",
       charityLine: null,
     })
-    expect(steps[1]).toContain("all money will go to charity")
+    expect(steps[1]).toContain("worth towards charity")
     expect(steps[2]).toBe("Reveal where your favourite stands among the others")
   })
 
