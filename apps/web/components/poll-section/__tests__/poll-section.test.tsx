@@ -167,6 +167,25 @@ describe("PollSection — unlock overlay interaction", () => {
     expect(btn).not.toHaveAttribute("tabindex", "-1")
   })
 
+  it("its accessible name begins with its visible text (WCAG 2.5.3)", () => {
+    render(
+      <PollSection
+        {...BASE_PROPS}
+        protagonistName="Belinda"
+        isCause={false}
+        onOpenPledgeDialog={vi.fn()}
+      />
+    )
+    const btn = screen.getByRole("button", {
+      name: /Pledge to see a personal note/i,
+    })
+    // No aria-label: the name is computed from the card's own text, so the
+    // visible CTA ("Pledge your favourite") leads and the instruction
+    // follows as sr-only copy.
+    expect(btn).not.toHaveAttribute("aria-label")
+    expect(btn).toHaveAccessibleName(/^Pledge your favourite/)
+  })
+
   it("hides the overlay once entitled (no blur, no overlay button)", () => {
     render(
       <PollSection
@@ -334,7 +353,7 @@ describe("PollSection — favpolls without a reveal", () => {
     )
     expect(
       screen.getByRole("button", {
-        name: "Pledge your favourite to see the results",
+        name: /Pledge your favourite to see the results/,
       })
     ).toBeInTheDocument()
     expect(screen.queryByText(/Pledge to reveal/i)).toBeNull()
