@@ -358,7 +358,11 @@ export default async function ManageFavpollPage({
       {/* The guest page's own ground (PageLayout's register wash), so
           manage and the favpoll it manages read as one place
           (founder, 2026-09-03). */}
-      <main className="min-h-[calc(100vh-3.5rem)] bg-primary/5">
+      <main
+        id="main"
+        tabIndex={-1}
+        className="min-h-[calc(100vh-3.5rem)] bg-primary/5"
+      >
         <PageGround color={PRIMARY_WASH} />
         <ManageClient
           favpoll={favpoll}

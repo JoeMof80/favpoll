@@ -341,7 +341,7 @@ export default async function FavpollsPage({
   )
 
   return (
-    <main className="bg-muted">
+    <main id="main" tabIndex={-1} className="bg-muted">
       <PageGround color="var(--muted)" />
       {showingExemplars && (
         <div className="sticky top-14 z-30 border-b border-border bg-muted">

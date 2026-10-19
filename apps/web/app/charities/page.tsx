@@ -46,7 +46,7 @@ export default async function CharitiesIndexPage() {
     })
 
   return (
-    <main className="mx-auto max-w-330 px-6 py-12">
+    <main id="main" tabIndex={-1} className="mx-auto max-w-330 px-6 py-12">
       <div className="mb-8">
         <h1 className="text-2xl font-medium text-foreground">Charities</h1>
         <p className="mt-1 max-w-2xl text-sm text-muted-foreground">

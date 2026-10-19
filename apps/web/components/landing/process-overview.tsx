@@ -440,6 +440,10 @@ function MobileWell({ beat }: { beat: Beat }) {
       <div
         data-beat-media=""
         aria-hidden="true"
+        // inert too: the media are real components (the room's ⋮ button
+        // is a real button) and aria-hidden alone left them in the Tab
+        // order (a11y audit, 2026-10-19).
+        inert
         className="pointer-events-none mx-auto select-none"
         style={{ width: width || undefined, height: height || undefined }}
       >
@@ -708,6 +712,7 @@ export function ProcessOverview() {
           <div
             className="relative z-20 hidden md:col-span-2 md:block"
             aria-hidden="true"
+            inert
           >
             <div className="sticky top-28">
               <div

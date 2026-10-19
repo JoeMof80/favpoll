@@ -104,7 +104,7 @@ export function StepAmountHeader({
                 ? "Amount your favourites are worth, in pounds"
                 : "Pledge amount in pounds"
             }
-            className="w-full min-w-0 border-0 bg-transparent text-3xl text-foreground outline-none placeholder:text-muted-foreground [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            className="w-full min-w-0 border-0 bg-transparent text-3xl text-foreground outline-none placeholder:text-muted-foreground focus-visible:ring-3 focus-visible:ring-ring/50 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           />
         </div>
         {twoUp && (
@@ -128,7 +128,7 @@ export function StepAmountHeader({
               // ink until the fund actually holds money (founder,
               // 2026-09-06).
               style={{ width: `${Math.max(1, fundAmount.length)}ch` }}
-              className={`border-0 bg-transparent text-right text-3xl outline-none placeholder:text-muted-foreground focus:text-foreground [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${
+              className={`border-0 bg-transparent text-right text-3xl outline-none placeholder:text-muted-foreground focus:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${
                 fundQuiet ? "text-muted-foreground" : "text-foreground"
               }`}
             />
@@ -230,6 +230,7 @@ export function StepAmount({
             disabled={total === 0}
             onValueChange={([v]) => onFavShare!(v)}
             aria-label="Pounds to your favourites"
+            aria-valuetext={`${formatPoundsExact(favShare)} to your favourites, ${formatPoundsExact(fundPart)} to the shared pot`}
             trackClassName="bg-chart-3/40"
             rangeClassName="bg-primary"
           />

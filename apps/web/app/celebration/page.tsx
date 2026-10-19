@@ -176,7 +176,7 @@ export default async function CelebrationsPage() {
 
   return (
     <RegisterScope palette="celebration">
-      <main className="overflow-x-clip">
+      <main id="main" tabIndex={-1} className="overflow-x-clip">
         {/* ── The opening — the REAL landing hero, register-configured, and
           now the same shape as /memorials (founder, 2026-08-28).
 

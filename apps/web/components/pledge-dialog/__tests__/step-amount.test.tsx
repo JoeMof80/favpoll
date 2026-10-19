@@ -87,6 +87,28 @@ describe("StepAmount — presets and calm", () => {
   })
 })
 
+describe("StepAmount — visible focus on the bare amount fields", () => {
+  it("both figures carry the focus-visible ring tokens", () => {
+    render(
+      <StepAmountHeader
+        pledgeAmount="18"
+        updatePledgeAmount={vi.fn()}
+        fundAmount="2"
+        onFundAmountChange={vi.fn()}
+        favouriteCount={2}
+      />
+    )
+    const favourites = screen.getByLabelText(
+      /favourites are worth|pledge amount in pounds/i
+    )
+    const pot = screen.getByLabelText(/shared pot amount/i)
+    for (const el of [favourites, pot]) {
+      expect(el.className).toMatch(/focus-visible:ring-3/)
+      expect(el.className).toMatch(/focus-visible:ring-ring\/50/)
+    }
+  })
+})
+
 describe("StepAmount — the rebalancing slider", () => {
   it("holds the favourites' share of the current sum", () => {
     render(<StepAmount {...BASE} {...SPLIT} />)
@@ -95,6 +117,19 @@ describe("StepAmount — the rebalancing slider", () => {
     expect(slider).toHaveAttribute("aria-valuemin", "0")
     // £18 favourites + £2 fund → the sum is the range
     expect(slider).toHaveAttribute("aria-valuemax", "20")
+  })
+
+  it("is named on the thumb and says where each pound goes", () => {
+    render(<StepAmount {...BASE} {...SPLIT} />)
+    // The thumb is the element with role="slider"; the name must be on it,
+    // not on the Radix root (axe aria-input-field-name, 2026-10-19).
+    const slider = screen.getByRole("slider", {
+      name: "Pounds to your favourites",
+    })
+    expect(slider).toHaveAttribute(
+      "aria-valuetext",
+      "£18.00 to your favourites, £2.00 to the shared pot"
+    )
   })
 
   it("names the favourites' share as the thumb moves", () => {

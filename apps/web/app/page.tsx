@@ -27,7 +27,7 @@ export default async function HomePage() {
   const normalised = await fetchLiveFavpolls()
 
   return (
-    <main className="flex flex-col">
+    <main id="main" tabIndex={-1} className="flex flex-col">
       {/* ── The hero: the three register heroes, rotated. The home-only
           router cards and live stats left the band on 2026-10-15 (founder):
           the register heroes say what a favpoll IS by being specific; the

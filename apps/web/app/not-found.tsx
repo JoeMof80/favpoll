@@ -5,7 +5,11 @@ import { Button } from "@/components/ui/button"
 // mistyping a memorial link must not meet a joke.
 export default function NotFound() {
   return (
-    <main className="flex min-h-[70vh] items-center justify-center bg-muted px-4">
+    <main
+      id="main"
+      tabIndex={-1}
+      className="flex min-h-[70vh] items-center justify-center bg-muted px-4"
+    >
       <div className="w-full max-w-md rounded-xl border border-border bg-background px-8 py-12 text-center shadow-sm">
         <p className="text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
           404

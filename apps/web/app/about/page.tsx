@@ -164,7 +164,7 @@ export const metadata: Metadata = {
 // (press/investor material).
 export default function AboutPage() {
   return (
-    <main className="flex flex-col">
+    <main id="main" tabIndex={-1} className="flex flex-col">
       {/* ── Top: the soul ── */}
       <section className="relative bg-primary text-primary-foreground">
         <HeroTexture />
@@ -256,10 +256,9 @@ export default function AboutPage() {
           <div className="flex max-w-2xl flex-col gap-5">
             <FadeIn delay={0.08}>
               <p className="text-base leading-relaxed text-muted-foreground">
-                favpoll takes no platform fee from donations — only card
-                processing costs apply. Payments are processed by Stripe, and
-                favpoll is supported by optional contributions — never by your
-                pledge.
+                favpoll takes no platform fee. Payments are processed by Stripe,
+                and favpoll is supported by optional contributions — never by
+                your pledge.
               </p>
             </FadeIn>
             <FadeIn delay={0.16}>

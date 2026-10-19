@@ -13,10 +13,18 @@ function Slider({
   value,
   min = 0,
   max = 100,
+  // The accessible name and value text belong on the THUMB — that is the
+  // element with role="slider". Left on the Root they name a plain div
+  // and the thumb is announced as an unlabelled slider (a11y audit,
+  // 2026-10-19).
+  "aria-label": ariaLabel,
+  "aria-labelledby": ariaLabelledby,
+  "aria-valuetext": ariaValuetext,
   ...props
 }: React.ComponentProps<typeof SliderPrimitive.Root> & {
   trackClassName?: string
   rangeClassName?: string
+  "aria-valuetext"?: string
 }) {
   const _values = React.useMemo(
     () =>
@@ -60,6 +68,9 @@ function Slider({
         <SliderPrimitive.Thumb
           data-slot="slider-thumb"
           key={index}
+          aria-label={ariaLabel}
+          aria-labelledby={ariaLabelledby}
+          aria-valuetext={ariaValuetext}
           className="block size-6 shrink-0 rounded-full border border-primary bg-background shadow-sm ring-ring/50 transition-[color,box-shadow] hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
         />
       ))}

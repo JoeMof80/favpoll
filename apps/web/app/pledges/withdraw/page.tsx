@@ -68,7 +68,11 @@ export default async function WithdrawPage({ searchParams }: Props) {
 
   if (isWithdrawn) {
     return (
-      <main className="mx-auto max-w-md px-6 pt-16 pb-16 text-center">
+      <main
+        id="main"
+        tabIndex={-1}
+        className="mx-auto max-w-md px-6 pt-16 pb-16 text-center"
+      >
         <h1 className="text-xl font-medium text-foreground">
           Pledge already withdrawn
         </h1>
@@ -82,7 +86,11 @@ export default async function WithdrawPage({ searchParams }: Props) {
 
   if (isClosed) {
     return (
-      <main className="mx-auto max-w-md px-6 pt-16 pb-16 text-center">
+      <main
+        id="main"
+        tabIndex={-1}
+        className="mx-auto max-w-md px-6 pt-16 pb-16 text-center"
+      >
         <h1 className="text-xl font-medium text-foreground">favpoll closed</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           This favpoll has closed and pledges can no longer be withdrawn.
@@ -92,7 +100,7 @@ export default async function WithdrawPage({ searchParams }: Props) {
   }
 
   return (
-    <main className="mx-auto max-w-md px-6 pt-16 pb-16">
+    <main id="main" tabIndex={-1} className="mx-auto max-w-md px-6 pt-16 pb-16">
       <h1 className="text-xl font-medium text-foreground">
         Withdraw your pledge?
       </h1>
