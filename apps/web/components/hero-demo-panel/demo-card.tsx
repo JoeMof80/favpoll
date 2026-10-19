@@ -310,6 +310,9 @@ export function DemoCard({
         tabIndex={-1}
         className={cn(
           "pointer-events-none h-11 flex-1 text-base transition-all duration-150",
+          // Held back until there is something to go on with, as the real
+          // button is disabled.
+          !enabled && "opacity-50",
           enabled && hover && !pressed
             ? "ring-2 ring-primary/30 brightness-105"
             : "",
@@ -776,14 +779,17 @@ export function DemoCard({
                         onEnterAdd={() => {}}
                       />
                     </div>
-                    {/* The real step-1 footer twins: the primary's label
-                        carries the selection state (#889) */}
+                    {/* The real step-1 footer's primary says "Give without
+                        picking" until a chip is chosen (#889). Not here
+                        (founder, 2026-10-19: "accurate but … adds noise in
+                        that context"): the demo has one idea on this screen,
+                        so the button is "Next", held back until the pick. */}
                     {renderPledgeFooter(
                       nextEnabled,
                       nextHover,
                       nextPressed,
                       "Cancel",
-                      chipSelected ? "Next" : "Give without picking"
+                      "Next"
                     )}
                   </motion.div>
                 ) : (
