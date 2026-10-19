@@ -62,7 +62,7 @@ const STEPS = [
 // Belinda's colours under its own headline.
 //
 // ALL EIGHT ARE SHOWN, where the memorial withholds Purple and the wedding
-// withholds Chengdu. Those two hold back the protagonist's own answer, so
+// withholds the panda. Those two hold back the protagonist's own answer, so
 // that lighting it in the hint column does not spend the reveal two columns
 // before the standings do. Marcus has no answer to protect — his reveal is a
 // remark — so the whole list can appear, and a homemade list is short enough

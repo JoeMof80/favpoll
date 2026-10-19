@@ -337,11 +337,16 @@ describe("DemoCard — dialog mimics", () => {
     ).toBeNull()
   })
 
-  it("shows confirmation tick and amount in confirmed phase", () => {
+  it("the confirmation is a receipt: status, the favourite's chip under the topic, the charity row", () => {
     renderCard("confirmed")
     expect(screen.getByText("Pledge confirmed")).toBeInTheDocument()
     expect(
-      screen.getByText(`${scene.pledgeAmount} for ${scene.charities[0].name}`)
+      screen.getAllByText(
+        scene.poll.topic.favourites[scene.selectedIndex].label
+      ).length
+    ).toBeGreaterThanOrEqual(1)
+    expect(
+      screen.getByText(`Your favourite ${scene.poll.topic.title.toLowerCase()}`)
     ).toBeInTheDocument()
   })
 
@@ -431,8 +436,9 @@ describe("LandingHero — reduced motion", () => {
     // Starts on the first scene (Belinda / remembering), not the cause scene.
     expect(screen.queryByRole("heading", { name: heading! })).toBeNull()
     fireEvent.click(screen.getByRole("button", { name: "Cause" }))
-    // By ROLE: a cause's heading is usually its charity's name too (St Mark's
-    // Hospice, in support of St Mark's Hospice), so the text appears twice.
+    // By ROLE: a cause's heading is usually its charity's name too (St Luke's
+    // Cheshire Hospice, in support of St Luke's Cheshire Hospice), so the
+    // text appears twice.
     expect(screen.getByRole("heading", { name: heading! })).toBeInTheDocument()
   })
 

@@ -106,6 +106,18 @@ export type HeroScene = {
 
 // ── Scene data ───────────────────────────────────────────────────────────────
 
+// CHARITY MARKS (founder, 2026-10-19: "lets use real logos for the
+// charities"): each charity's own published mark, taken from its site —
+// Marie Curie's daffodil (its favicon), WWF's panda (its logo), Mind's
+// squiggle, GOSH's child and St Luke's fountain (their touch icons) —
+// served from public/demo. STAGING AND DEV ONLY (founder, same day: "this
+// needs to be staging only"): they are the charities' trademarks and none
+// of them has agreed to anything with favpoll yet, so production (the
+// NEXT_PUBLIC_DEMO_MARKS flag next.config.mjs sets from VERCEL_ENV) shows
+// the initial tile instead.
+const DEMO_MARKS_ON = process.env.NEXT_PUBLIC_DEMO_MARKS !== "off"
+const mark = (path: string): string | null => (DEMO_MARKS_ON ? path : null)
+
 export const SCENES: HeroScene[] = [
   {
     kind: "memorial",
@@ -145,7 +157,7 @@ export const SCENES: HeroScene[] = [
       {
         id: "ch-mc",
         name: "Marie Curie",
-        logo_url: null,
+        logo_url: mark("/demo/logo-marie-curie.svg"),
         registered_number: "207994",
       },
     ],
@@ -219,7 +231,7 @@ export const SCENES: HeroScene[] = [
       {
         id: "ch-gosh",
         name: "Great Ormond Street Hospital",
-        logo_url: null,
+        logo_url: mark("/demo/logo-gosh.png"),
         registered_number: "235825",
       },
     ],
@@ -316,55 +328,59 @@ export const SCENES: HeroScene[] = [
       // the brand guide calls the most powerful version.
       // THE REVEAL RETRO-EXPLAINS THE CHARITY (founder, 2026-08-28), which is
       // the best thing about this exemplar. Reading down the card, WWF is
-      // just a charity someone picked. Then the reveal says Chengdu and
-      // pandas, and you understand WHY — the charity was never arbitrary,
+      // just a charity someone picked. Then the reveal says the panda and
+      // China, and you understand WHY — the charity was never arbitrary,
       // you simply could not see the reason until you had unlocked it.
       //
       // That is the wizard's own charity guidance made visible: "pick one
       // that means something here." A demo where the charity is incidental
       // teaches the opposite.
       //
-      // "will hopefully be", not "is" (founder wording, 2026-08-28), and it
-      // solves the tense problem better than the "will be" it replaced. The
-      // topic asks for a favourite holiday destination; they have not been
-      // yet. The hope is not about whether they are GOING — that is booked —
-      // it is about whether Chengdu turns out to be the favourite, which is
-      // the honest answer to the question actually asked.
+      // ANIMAL, not "Holiday destination" (founder, 2026-10-19: "I don't
+      // like having more than one homemade topic in our homepage
+      // vignettes" — and the destination list was a fixture of mixed
+      // altitude, resorts beside countries, that no catalogue topic
+      // holds). Animal is a catalogue topic and WWF's confirmed perfect
+      // topic, so the triad closes: wedding, Animal, WWF, each edge real.
+      // The pick is the couple's own, the reveal is a fact only they could
+      // tell you. "China", not "Chengdu" (founder, 2026-10-19: "more
+      // accessible"). The favourites are catalogue items, as the picker
+      // would show them. THE GUEST DOES NOT PICK THE PANDA (founder, same
+      // day): the demo guest backs the elephant, so the guest's pick and
+      // the couple's reveal are two different things on the card.
       personal_note:
-        "We hope ours will be Chengdu after visiting the pandas on our honeymoon.",
+        "Ours is the panda. We're going to China to see some on our honeymoon.",
       topic: {
-        title: "Holiday destination",
+        title: "Animal",
         favourites: [
-          { id: "hd-amalfi", label: "Amalfi Coast" },
-          { id: "hd-amsterdam", label: "Amsterdam" },
-          { id: "hd-bali", label: "Bali" },
-          { id: "hd-barcelona", label: "Barcelona" },
-          { id: "hd-chengdu", label: "Chengdu" },
-          { id: "hd-cornwall", label: "Cornwall" },
-          { id: "hd-croatia", label: "Croatia" },
-          { id: "hd-cyprus", label: "Cyprus" },
-          { id: "hd-edinburgh", label: "Edinburgh" },
-          { id: "hd-greece", label: "Greece" },
-          { id: "hd-iceland", label: "Iceland" },
-          { id: "hd-ireland", label: "Ireland" },
-          { id: "hd-italy", label: "Italy" },
-          { id: "hd-japan", label: "Japan" },
-          { id: "hd-lakes", label: "Lake District" },
-          { id: "hd-lisbon", label: "Lisbon" },
-          { id: "hd-maldives", label: "Maldives" },
-          { id: "hd-morocco", label: "Morocco" },
-          { id: "hd-newyork", label: "New York" },
-          { id: "hd-norway", label: "Norway" },
-          { id: "hd-paris", label: "Paris" },
-          { id: "hd-portugal", label: "Portugal" },
-          { id: "hd-santorini", label: "Santorini" },
-          { id: "hd-scotland", label: "Scotland" },
-          { id: "hd-srilanka", label: "Sri Lanka" },
-          { id: "hd-thailand", label: "Thailand" },
-          { id: "hd-tuscany", label: "Tuscany" },
-          { id: "hd-venice", label: "Venice" },
-          { id: "hd-vietnam", label: "Vietnam" },
-          { id: "hd-yorkshire", label: "Yorkshire Dales" },
+          { id: "an-badger", label: "Badger" },
+          { id: "an-bear", label: "Bear" },
+          { id: "an-cat", label: "Cat" },
+          { id: "an-cheetah", label: "Cheetah" },
+          { id: "an-deer", label: "Deer" },
+          { id: "an-dog", label: "Dog" },
+          { id: "an-dolphin", label: "Dolphin" },
+          { id: "an-elephant", label: "Elephant" },
+          { id: "an-fox", label: "Fox" },
+          { id: "an-giraffe", label: "Giraffe" },
+          { id: "an-hare", label: "Hare" },
+          { id: "an-hedgehog", label: "Hedgehog" },
+          { id: "an-horse", label: "Horse" },
+          { id: "an-koala", label: "Koala" },
+          { id: "an-lion", label: "Lion" },
+          { id: "an-meerkat", label: "Meerkat" },
+          { id: "an-otter", label: "Otter" },
+          { id: "an-owl", label: "Owl" },
+          { id: "an-panda", label: "Panda" },
+          { id: "an-penguin", label: "Penguin" },
+          { id: "an-polarbear", label: "Polar bear" },
+          { id: "an-rabbit", label: "Rabbit" },
+          { id: "an-redsquirrel", label: "Red squirrel" },
+          { id: "an-sloth", label: "Sloth" },
+          { id: "an-tiger", label: "Tiger" },
+          { id: "an-tortoise", label: "Tortoise" },
+          { id: "an-wolf", label: "Wolf" },
+          { id: "an-zebra", label: "Zebra" },
         ],
       },
     },
@@ -372,12 +388,12 @@ export const SCENES: HeroScene[] = [
       {
         id: "ch-wwf",
         name: "WWF-UK",
-        logo_url: null,
+        logo_url: mark("/demo/logo-wwf.svg"),
         registered_number: "1081247",
       },
     ],
     goal_amount: null,
-    selectedIndex: 4,
+    selectedIndex: 7,
     pledgeAmount: "£20",
     // LUMPY ON PURPOSE (founder, 2026-08-28: "the rankings don't seem very
     // realistic"). The old set ran 210/175/130/95/60/35 — a near-arithmetic
@@ -385,7 +401,7 @@ export const SCENES: HeroScene[] = [
     // and not what forty people pledging 5s, 10s and 20s look like. Real
     // standings are top-heavy and irregular.
     //
-    // Chengdu sits LAST, on £30. A couple of guests happened to name it —
+    // The panda sits LAST, on £30. A couple of guests happened to name it —
     // enough that it is on the board, nowhere near enough to be the room's
     // answer. That is truer than either extreme: absent, and the reveal has
     // nothing to land against; high, and it stops being a surprise.
@@ -395,12 +411,12 @@ export const SCENES: HeroScene[] = [
     // `total` said anything else would show one number on the phone and a
     // different one on the screen.
     results: [
-      { label: "Italy", amount: "£185", widthPercent: 100 },
-      { label: "Greece", amount: "£140", widthPercent: 76 },
-      { label: "Japan", amount: "£110", widthPercent: 59 },
-      { label: "New York", amount: "£75", widthPercent: 41 },
-      { label: "Cornwall", amount: "£55", widthPercent: 30 },
-      { label: "Chengdu", amount: "£30", widthPercent: 16 },
+      { label: "Dog", amount: "£185", widthPercent: 100 },
+      { label: "Cat", amount: "£140", widthPercent: 76 },
+      { label: "Elephant", amount: "£110", widthPercent: 59 },
+      { label: "Owl", amount: "£75", widthPercent: 41 },
+      { label: "Fox", amount: "£55", widthPercent: 30 },
+      { label: "Panda", amount: "£30", widthPercent: 16 },
     ],
     total: "£595",
   },
@@ -504,7 +520,7 @@ export const SCENES: HeroScene[] = [
         "Thanks for your pledge. If we reach the goal, I'll eat the hat! (Only kidding)",
       topic: {
         title: "Marathon hat",
-        // EIGHT, where Colour has twelve and Holiday destination
+        // EIGHT, where Colour has twelve and Animal
         // twenty-eight. A homemade list should look homemade: nobody sits
         // down and writes thirty of these, and the short list is itself a
         // signal that no catalogue supplied it.
@@ -537,7 +553,7 @@ export const SCENES: HeroScene[] = [
         // from memory.
         id: "ch-mind",
         name: "Mind",
-        logo_url: null,
+        logo_url: mark("/demo/logo-mind.png"),
         registered_number: "219830",
       },
     ],
@@ -572,7 +588,7 @@ export const SCENES: HeroScene[] = [
     //    charity (mirrors the live subject="cause" shape). ──
     kind: "cause",
     occasion_type: "Cause",
-    // "Walkies for St Mark's Hospice" (2026-08-31, founder asked for a better
+    // "Walkies for St Luke's" (2026-08-31, founder asked for a better
     // opening line than the register's "In support of"). The word every dog
     // in Britain knows, and it makes the card, the wallet card and the
     // keepsake all say what the event is before the context line does. The
@@ -595,7 +611,11 @@ export const SCENES: HeroScene[] = [
     // THE HEADING IS THE CAUSE, the context is the event. "Walking for St
     // Luke's" rendered as "In support of / Walking for St Luke's" — the
     // register prefix doubled the verb.
-    heading: "St Mark's Hospice",
+    // ST LUKE'S CHESHIRE HOSPICE, the founder's local hospice and a real
+    // prospect (2026-10-19: "Switch St Mark's to St Luke's"), replacing the
+    // fictional St Mark's. Registered 515595, so the card prints a real
+    // number; its mark is staging-only like the others.
+    heading: "St Luke's Cheshire Hospice",
     eyebrow: "A cause",
     // No distance (founder, 2026-08-31): "· 5 miles" wrapped the context
     // line on a phone and added nothing the walk needs.
@@ -605,7 +625,7 @@ export const SCENES: HeroScene[] = [
       // "every penny" → "every pledge" (founder, 2026-10-15): the retired
       // completeness claim, even in a fictional organiser's mouth, sits on
       // favpoll's own landing page.
-      "5 miles for our local hospice. Pledge your favourite biscuit and every pledge goes to St Mark’s.",
+      "5 miles for our local hospice. Pledge your favourite biscuit and every pledge goes to St Luke’s.",
     // BISCUIT, THE THERAPY DOG. A faceless cause has no avatar on the real
     // page unless it uploads one; this one has the thing itself — a beagle
     // mid-walk — which says "sponsored dog walk" before a word is read and
@@ -664,12 +684,10 @@ export const SCENES: HeroScene[] = [
     },
     charities: [
       {
-        // Fictional (see the scene note): no number, because the card prints
-        // it and a made-up charity number is worse than none.
-        id: "ch-stmarks",
-        name: "St Mark's Hospice",
-        logo_url: null,
-        registered_number: null,
+        id: "ch-stlukes",
+        name: "St Luke's Cheshire Hospice",
+        logo_url: mark("/demo/logo-st-lukes.png"),
+        registered_number: "515595",
       },
     ],
     // Hobnob — the runner-up in the standings, so the pick the demo makes is

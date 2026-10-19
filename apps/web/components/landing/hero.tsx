@@ -8,7 +8,7 @@
 // to 80%. Register/occasion signals live in the kind nav + the demo content —
 // nothing in the pitch column cycles.
 import Link from "next/link"
-import { useMemo } from "react"
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react"
 import { ArrowDown } from "lucide-react"
 import { DemoCard } from "@/components/hero-demo-panel/demo-card"
 import { DemoFrame } from "@/components/hero-demo-panel/demo-frame"
@@ -20,7 +20,11 @@ import {
   PHONE_SCALED_BOX_COMPACT,
 } from "@/components/hero-demo-panel/phone-frame"
 import { NAV_TABS, SCENES } from "@/components/hero-demo-panel/scenes"
-import type { HeroScene, SceneKind } from "@/components/hero-demo-panel/scenes"
+import type {
+  HeroScene,
+  Phase,
+  SceneKind,
+} from "@/components/hero-demo-panel/scenes"
 import { Button } from "@/components/ui/button"
 import { withQuietTail } from "@/components/landing/quiet-tail"
 import { RankingBar } from "@/components/ui/ranking-bar"
@@ -120,6 +124,10 @@ type Props = {
    * poster. Only meaningful with `still`.
    */
   compact?: boolean
+  /** A still inside a carousel: true while it is the live slide, false
+   *  while it waits its turn. Plays the before/after beat on arrival (see
+   *  useStillBeat). Leave undefined for a still that stands alone. */
+  stillActive?: boolean
   /** Below md, render the CTA pair after the phone rather than before it
    *  (founder, 2026-10-15, the home carousel): text, handset, buttons. */
   ctaAfterMedia?: boolean
@@ -232,6 +240,77 @@ const ROUTER_CARDS = [
   },
 ] as const
 
+// THE STILL'S BEAT (founder, 2026-10-18: "add animation to the homepage
+// hero vignettes, to express the states before and after pledges"). A still
+// phone froze at "note" — bars up, note typed — so the home hero showed what
+// a guest gets and never that they give to get it. When a still is the LIVE
+// slide of the carousel it plays FIVE STEPS (founder, same night, after a
+// two-step and a three-step cut: "Locked, Pick favourite, pledge amount,
+// confirmation, disclosure"): the lock card with the About typing; the
+// picker opening and a favourite chosen; the amount step and a preset
+// chosen; the sheet confirmed — tick, "Pledge confirmed", "£10 for Marie
+// Curie" — and closing; then the lock gone, the bars climbing from zero
+// and the note typing. Existing demo-card phases at roughly the demo
+// loop's own pacing (use-demo-loop.ts), then slowed: ~16s with the
+// note typed, inside the carousel's DWELL_MS, which grew to fit. It
+// replays each time the slide comes round (the phase resets while the
+// slide is inactive and invisible). Reduced motion, or a still outside a
+// carousel (the register pages), is the frozen "note" as before.
+const STILL_BEAT: { phase: Phase; at: number }[] = [
+  // Holds lengthened 2026-10-18 ("give the visitor more time to read"):
+  // every screen stands for 1.2–2s after its motion settles.
+  { phase: "arriving", at: 0 }, // 1. locked: the lock card, the About typing
+  { phase: "triggering", at: 2650 }, //    the lock card is pressed
+  { phase: "picking", at: 3000 }, // 2. the picker opens
+  { phase: "selected", at: 4800 }, //    a favourite is chosen
+  { phase: "pledge-panel", at: 6600 }, // 3. the amount step
+  { phase: "amount-picked", at: 7800 }, //    a preset chosen, £ updates
+  { phase: "confirmed", at: 9800 }, // 4. the receipt
+  { phase: "clearing", at: 11600 }, // 5. the sheet slides down onto the live page:
+  { phase: "results", at: 12600 }, //    bars climbing, note typing
+  { phase: "note", at: 15400 }, //    the note stands typed
+]
+const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)"
+function subscribeReducedMotion(onChange: () => void) {
+  const mq = window.matchMedia(REDUCED_MOTION_QUERY)
+  mq.addEventListener("change", onChange)
+  return () => mq.removeEventListener("change", onChange)
+}
+function useStillBeat(active: boolean | undefined, scene: HeroScene) {
+  const reduced = useSyncExternalStore(
+    subscribeReducedMotion,
+    () => window.matchMedia(REDUCED_MOTION_QUERY).matches,
+    () => false
+  )
+  const plays = active !== undefined && !reduced
+  const [phase, setPhase] = useState<Phase>(plays ? "arriving" : "note")
+  useEffect(() => {
+    if (!plays) {
+      setPhase("note")
+      return
+    }
+    if (!active) {
+      setPhase("arriving")
+      return
+    }
+    setPhase("arriving")
+    const timers = STILL_BEAT.filter((step) => step.at > 0).map((step) =>
+      window.setTimeout(() => setPhase(step.phase), step.at)
+    )
+    return () => timers.forEach((t) => window.clearTimeout(t))
+  }, [plays, active])
+  const final = scene.results.map((r) => r.widthPercent)
+  // Zero until "results", so the bars climb from nothing at disclosure.
+  const climbed = phase === "results" || phase === "note"
+  return {
+    phase,
+    barWidths: climbed ? final : final.map(() => 0),
+    // The register pages' stills never animate: typing and climbing bars
+    // stay off there exactly as before.
+    reduced: !plays,
+  }
+}
+
 export function LandingHero({
   liveCount = 0,
   totalLive = 0,
@@ -249,6 +328,7 @@ export function LandingHero({
   router = false,
   still = false,
   compact = false,
+  stillActive,
   ctaAfterMedia = false,
   children,
 }: Props) {
@@ -264,6 +344,8 @@ export function LandingHero({
   const { scene, phase, barWidths, fading, prefersReducedMotion, goToScene } =
     useDemoLoop(scenes)
   const beat = beatForPhase(phase)
+  // The still phone's own beat (unused by the animated demo above).
+  const stillBeat = useStillBeat(stillActive, scene)
 
   const ctas = (
     <div className="flex flex-wrap items-center gap-x-5 gap-y-3.5">
@@ -573,18 +655,24 @@ export function LandingHero({
                 "mx-auto md:mx-0"
               )}
             >
+              {/* text-foreground: the home carousel's band sets white
+                  text, and anything in the card without a colour of its
+                  own (Cancel, Back, the unchosen presets, the summary
+                  rows) inherited it — white on white (founder,
+                  2026-10-18: "some of the text isn't visible"). The
+                  animated branch below always reset it. */}
               <div
                 className={cn(
-                  "origin-top-left",
+                  "origin-top-left text-foreground",
                   compact ? PHONE_SCALE_COMPACT : PHONE_SCALE
                 )}
               >
                 <PhoneFrame>
                   <DemoCard
                     scene={scene}
-                    phase="note"
-                    barWidths={scene.results.map((r) => r.widthPercent)}
-                    prefersReducedMotion
+                    phase={stillBeat.phase}
+                    barWidths={stillBeat.barWidths}
+                    prefersReducedMotion={stillBeat.reduced}
                     device="phone"
                     className="rounded-none border-0"
                   />

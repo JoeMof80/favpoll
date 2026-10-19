@@ -1,9 +1,10 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Check } from "lucide-react"
 import { LockCardContent } from "@/components/lock-card-content"
 import { FavpollLogo } from "@/components/favpoll-logo"
+import { FavpollMarkGlyph } from "@/components/landing/hero-texture"
+import { Chip } from "@/components/ui/chip"
 import { PHONE_SAFE_AREA_TOP } from "./phone-frame"
 import { CharityRow } from "@/components/charity-row"
 import { GoalProgress } from "@/components/goal-progress"
@@ -122,7 +123,14 @@ const sheetVariant = {
 const phoneSheetVariant = {
   initial: { y: "100%" },
   animate: { y: 0 },
-  exit: { y: "100%" },
+  // Leaves on an even curve: the quintic ease the sheet rises on puts
+  // nearly all its travel in the first 100ms, which on the way DOWN read
+  // as a cut (founder, 2026-10-18, twice: "the transition from the
+  // confirmation to the disclosure is still strange").
+  exit: {
+    y: "100%",
+    transition: { duration: 0.6, ease: "easeInOut" as const },
+  },
 }
 
 const scrimVariant = {
@@ -225,10 +233,17 @@ export function DemoCard({
   // pointless on mobile", and founder 2026-10-16 on the phone vignette:
   // "lets remove the skeletons"). The blurred decoy is gone everywhere.
   // Unlocked = disclosure: the dialog has closed; the reveal types out and the
-  // ranking bars climb from zero.
+  // ranking bars climb from zero. THE ORDER (founder, 2026-10-18, three
+  // notes on the home hero's beat): at "clearing" the lock card is already
+  // gone — it leaves in 0.25s under the sheet — and the page beneath is
+  // ALREADY ALIVE: the standings fade in with the bars climbing and the
+  // note typing while the sheet slides down to reveal them, as a real
+  // sheet reveals an updated page. A cut that held an empty page for a
+  // second before the standings arrived was built and felt worse.
   const unlocked =
     phase === "clearing" || phase === "results" || phase === "note"
   const locked = !unlocked
+  const disclosed = unlocked
 
   // About types on arrival; the reveal types at disclosure. They never overlap.
   const aboutShown = useTyped(aboutText, locked, prefersReducedMotion, 2200)
@@ -313,7 +328,7 @@ export function DemoCard({
           <RankingBar
             label={result.label}
             amount={result.amount}
-            widthPercent={barWidths[i] ?? 0}
+            widthPercent={disclosed ? (barWidths[i] ?? 0) : 0}
             barClassName={i === 0 ? "bg-primary" : "bg-chart-3"}
             barStyle={{
               transition:
@@ -420,7 +435,12 @@ export function DemoCard({
 
       {/* ── Hero + poll heading. No per-element entrance — the whole card
           cross-fades on scene change so nothing pops in first. ── */}
-      <div className="flex-1 space-y-4 overflow-hidden">
+      {/* -mx-5 px-5: this box clips, and it was exactly the lock card's
+          width, so the card's side shadow was cut off at its own edges
+          (founder, 2026-10-18: "i can't see left or right shadow"). Widened
+          by the card's own padding, it clips at the card's edge instead,
+          as the real page clips at the viewport's. */}
+      <div className="-mx-5 flex-1 space-y-4 overflow-hidden px-5">
         {/* Hero — THE STACKED HEADER, as the favpoll page draws it since
             2026-10-16 (#1056): the register-tinted band bleeding past the
             card's p-5 as the page's top row; the square photo hanging off
@@ -532,9 +552,15 @@ export function DemoCard({
                 </div>
               )
             ) : (
-              <div key="real-results" className="space-y-3">
+              <motion.div
+                key="real-results"
+                className="space-y-3"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: disclosed ? 1 : 0 }}
+                transition={prefersReducedMotion ? FAST : { duration: 0.45 }}
+              >
                 {renderRankings(true)}
-              </div>
+              </motion.div>
             )}
           </div>
 
@@ -545,8 +571,10 @@ export function DemoCard({
                 key="lockcard"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={prefersReducedMotion ? FAST : { duration: 0.4 }}
+                // Leaves quickly: it goes under the closing sheet, and must
+                // be gone before the sheet is.
+                exit={{ opacity: 0, transition: { duration: 0.25 } }}
+                transition={prefersReducedMotion ? FAST : { duration: 0.7 }}
                 className="z-[1] flex flex-col items-center pt-4 [grid-area:1/1]"
                 aria-hidden="true"
               >
@@ -555,7 +583,19 @@ export function DemoCard({
                     simpler product than the one it links to. The wrapper
                     mirrors poll-section's Button chrome; the demo is inert, so
                     it is a div rather than a button. */}
-                <div className="w-full max-w-sm flex-col items-stretch overflow-hidden rounded-xl bg-background text-left shadow-xl ring-1 ring-border">
+                {/* Pressed at "triggering" (founder, 2026-10-18: "make it
+                    seem like the pledge card has been clicked"): the same
+                    press the trigger button wears — a touch smaller, a
+                    touch darker, its shadow pulled in — for the beat
+                    before the picker opens. */}
+                <div
+                  className={cn(
+                    "w-full max-w-sm flex-col items-stretch overflow-hidden rounded-xl bg-background text-left ring-1 ring-border transition-[transform,box-shadow,filter] duration-150",
+                    phase === "triggering"
+                      ? "scale-[0.98] shadow-md brightness-95"
+                      : "shadow-xl"
+                  )}
+                >
                   <LockCardContent steps={lockSteps} topicTitle={topicTitle} />
                 </div>
               </motion.div>
@@ -600,12 +640,17 @@ export function DemoCard({
           Scrim mirrors the real DialogOverlay (bg-black/50). It carries no
           radius of its own — the card's overflow-hidden clips it to the card
           shape (square top under the browser frame, rounded bottom). */}
+      {/* SLOWER AND SOFTER (founder, 2026-10-18, on the home hero's
+          still beat: "the transitions are too fast and harsh"): these
+          were dialog-speed cuts (0.18–0.4s). The sheet eases out over
+          0.6s, its panes crossfade over 0.45s, the lock card over 0.7s.
+          Reduced motion still snaps (FAST). */}
       <AnimatePresence>
         {sheetOpen && !isPhone && (
           <motion.div
             key="scrim"
             {...scrimVariant}
-            transition={prefersReducedMotion ? FAST : { duration: 0.25 }}
+            transition={prefersReducedMotion ? FAST : { duration: 0.5 }}
             className="absolute inset-0 z-10 bg-black/50"
             aria-hidden="true"
           />
@@ -618,7 +663,9 @@ export function DemoCard({
             key="sheet"
             {...(isPhone ? phoneSheetVariant : sheetVariant)}
             transition={
-              prefersReducedMotion ? FAST : { duration: 0.2, ease: "easeOut" }
+              prefersReducedMotion
+                ? FAST
+                : { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
             }
             style={
               isPhone
@@ -651,18 +698,54 @@ export function DemoCard({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.18 }}
-                    className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 p-6 text-center"
+                    transition={{ duration: 0.45 }}
+                    className="flex min-h-0 flex-1 flex-col"
                   >
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-success">
-                      <Check className="h-5 w-5 text-success-foreground" />
+                    {/* A RECEIPT THAT LEADS INTO THE REVEAL (founder,
+                        2026-10-19: "it feels weak. Should we replace the
+                        tick with the favpoll brandmark?"). The mark in a
+                        register-ink circle — favpoll did this — with the
+                        status in words; the pledge as two REAL rows, the
+                        favourite as the picker's own chip and the charity
+                        as the real charity row with the amount. No button
+                        (founder: "get rid of the button") — the sheet
+                        simply slides away onto the reveal. */}
+                    <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-5 px-6 py-6 text-center">
+                      <div className="flex size-16 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                        <svg
+                          viewBox="0 0 10 9"
+                          className="size-8"
+                          aria-hidden="true"
+                        >
+                          <FavpollMarkGlyph />
+                        </svg>
+                      </div>
+                      <SectionEyebrow>Pledge confirmed</SectionEyebrow>
+                      <div className="w-full space-y-4 text-left">
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-sm text-muted-foreground">
+                            Your favourite {topicTitle.toLowerCase()}
+                          </span>
+                          <Chip
+                            selected
+                            tabIndex={-1}
+                            className="pointer-events-none"
+                          >
+                            {selected?.label}
+                          </Chip>
+                        </div>
+                        <CharityRow
+                          charity={{
+                            ...charity,
+                            description: null,
+                            created_at: "2024-01-01T00:00:00Z",
+                          }}
+                          amountRaised={Number(
+                            scene.pledgeAmount.replace(/[^\d.]/g, "")
+                          )}
+                        />
+                      </div>
                     </div>
-                    <p className="text-base font-medium text-foreground">
-                      Pledge confirmed
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {scene.pledgeAmount} for {charityName}
-                    </p>
                   </motion.div>
                 ) : pickerOpen ? (
                   <motion.div
@@ -670,7 +753,7 @@ export function DemoCard({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.18 }}
+                    transition={{ duration: 0.45 }}
                     className="flex min-h-0 flex-1 flex-col"
                   >
                     {/* border-b: the step-1 separators hairline */}
@@ -709,7 +792,7 @@ export function DemoCard({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.18 }}
+                    transition={{ duration: 0.45 }}
                     className="flex min-h-0 flex-1 flex-col"
                   >
                     <div className="min-h-0 flex-1 overflow-y-auto">
