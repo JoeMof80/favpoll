@@ -341,9 +341,12 @@ function BeatMedium({
     return (
       <div
         data-register={paletteForSceneKind(SCENE.kind)}
-        // theme-light: a screen in a TV keeps light mode whatever the page's
-        // theme (founder, 2026-08-31) — see register-tokens.css.
-        className={cn("theme-light shrink-0", !bare && DISPLAY_SCALE)}
+        // FOLLOWS THE THEME since 2026-10-19 (founder: "should we make the
+        // live display theme sensitive?"): the real room page is dark in
+        // dark mode — the tokens flip it, no dark: classes needed — so a
+        // screen that stayed lit would depict a page the product does not
+        // show. (It had been theme-light since 2026-08-31.)
+        className={cn("shrink-0", !bare && DISPLAY_SCALE)}
       >
         <TvFrame>
           {/* The screen itself, 16:9 — what the projector shows, not a cropped
