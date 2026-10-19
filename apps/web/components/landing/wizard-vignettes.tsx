@@ -17,6 +17,72 @@
 // width and scaled, exactly as the room is the real display page scaled.
 // Inert throughout: a still of the step, not a working copy of it.
 //
+// THE RAIL, COMPACT (founder, 2026-10-19: "reduce the width of the rail and
+// omit the listed items underneath each step header"): the real rail's
+// stations — its icons, its filled/outline/ghost buttons, its spine, its
+// labels and done ticks — on a 200px rail with no answer slots beneath. The
+// real WizardStepRail reserves four lines per station, which is taller than
+// this frame, so the slots are the one thing not copied.
+function Rail({
+  current,
+  done,
+}: {
+  current: WizardStep
+  done: Record<WizardStep, boolean>
+}) {
+  return (
+    <div className="flex h-full flex-col bg-primary/10 p-5">
+      <div className="relative flex flex-1 flex-col justify-around">
+        {/* The spine, station centre to station centre: the 28px button's
+            half, inside the column. */}
+        <span
+          aria-hidden="true"
+          className="absolute top-[14px] bottom-[14px] left-[11.5px] w-px bg-primary"
+        />
+        {STEPS.map((s) => {
+          const Icon = STEP_ICONS[s]
+          const isActive = s === current
+          const reachable = done[s]
+          return (
+            <div key={s} className="flex items-center gap-1.5">
+              <span className="relative -ml-0.5 shrink-0">
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-0 rounded-full bg-background"
+                />
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-0 rounded-full bg-primary/10"
+                />
+                <Button
+                  type="button"
+                  tabIndex={-1}
+                  size="icon-sm"
+                  variant={
+                    isActive ? "default" : reachable ? "outline" : "ghost"
+                  }
+                  className={cn(
+                    "relative h-7 w-7 shrink-0 rounded-full",
+                    reachable && !isActive && "border-primary bg-transparent"
+                  )}
+                >
+                  <Icon
+                    className={cn("h-4 w-4", !isActive && "text-primary")}
+                  />
+                </Button>
+              </span>
+              <p className="text-sm font-medium tracking-widest text-primary uppercase">
+                {STEP_LABELS[s]}
+              </p>
+              {done[s] && <Check className="h-4 w-4 shrink-0 text-primary" />}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 // ONE FAVPOLL THROUGHOUT (founder: "you've used the memorial example when
 // the retained section is for St Luke's fundraiser"): every pane derives
 // from the SCENE the card, the room and the keepsake show, so the organiser
@@ -24,7 +90,10 @@
 
 import { DemoFrame } from "@/components/hero-demo-panel/demo-frame"
 import { EventStep } from "@/components/favpoll-flow/event-step"
-import { WizardStepRail } from "@/components/new-favpoll-wizard/wizard-step-rail"
+import { Check } from "lucide-react"
+import { STEP_ICONS } from "@/components/new-favpoll-wizard/wizard-step-rail"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 import { WizardStepShell } from "@/components/new-favpoll-wizard/wizard-step-shell"
 import { WizardCharityCard } from "@/components/new-favpoll-wizard/wizard-charity-card"
 import { WizardTopicCard } from "@/components/new-favpoll-wizard/wizard-topic-card"
@@ -38,16 +107,14 @@ import type { HeroScene } from "@/components/hero-demo-panel/scenes"
 
 export type WizardPane = "event" | "charity" | "topic" | "story"
 
-/** The pane's natural size — the wizard at a laptop width, scaled by the
- *  caller. 320px of rail plus the step at the wizard's own padding. */
-export const WIZARD_VIGNETTE_W = 960
-export const WIZARD_VIGNETTE_H = 540
-
-const CATEGORY_LABEL: Record<FavpollCategory, string> = {
-  memorial: "Memorial",
-  celebration: "Celebration",
-  fundraiser: "Fundraiser",
-}
+/** The pane's natural size — the wizard in a 768px window, which the
+ *  caller scales to the column at a quarter MORE than a 960px window would
+ *  get (founder, 2026-10-19: "the content is harder to read at this size.
+ *  Maybe we can zoom the content to e.g. 125%"). Laid out small and scaled
+ *  up rather than CSS-zoomed: zoom let the rail lay out taller than the
+ *  frame and clipped its last stations. 320px of rail, the step beside. */
+export const WIZARD_VIGNETTE_W = 768
+export const WIZARD_VIGNETTE_H = 512
 
 const categoryFor = (scene: HeroScene): FavpollCategory =>
   scene.kind === "memorial"
@@ -163,16 +230,6 @@ export function WizardVignette({
   const done = Object.fromEntries(
     STEPS.map((s) => [s, STEPS.indexOf(s) < idx])
   ) as Record<WizardStep, boolean>
-  // The rail's one-line answers for the steps already taken, as the wizard
-  // writes them.
-  const answers: Partial<Record<WizardStep, string[]>> = {
-    event: [CATEGORY_LABEL[categoryFor(scene)]],
-    charity: [scene.charities[0].name],
-    topic: [scene.poll.topic.title],
-  }
-  const summary = Object.fromEntries(
-    STEPS.map((s) => [s, done[s] ? (answers[s] ?? []) : []])
-  ) as Record<WizardStep, string[]>
 
   return (
     <div
@@ -183,18 +240,13 @@ export function WizardVignette({
       style={{ width: WIZARD_VIGNETTE_W, height: WIZARD_VIGNETTE_H }}
     >
       <DemoFrame className="h-full overflow-hidden bg-background">
-        {/* The wizard's own grid (index.tsx): 320px of rail, the step
-            beside it. The rail is `hidden md:flex` for the phone's
-            progress strip; inside this scaled box it is always the rail. */}
-        <div className="grid min-h-0 flex-1 grid-cols-[320px_1fr] overflow-hidden rounded-b-xl border border-t-0 border-border bg-background [&>div:first-child>div]:flex!">
+        {/* The wizard's own grid (index.tsx) with the rail at 200px rather
+            than 320: the step beside it. */}
+        <div className="grid min-h-0 flex-1 grid-cols-[200px_1fr] overflow-hidden rounded-b-xl border border-t-0 border-border bg-background">
           <div className="min-h-0">
-            <WizardStepRail
-              currentStep={current}
-              summary={summary}
-              done={done}
-            />
+            <Rail current={current} done={done} />
           </div>
-          <div className="min-h-0 overflow-hidden px-12 pt-6 pb-10">
+          <div className="min-h-0 overflow-hidden px-8 pt-3 pb-6">
             <div className="mx-auto w-full max-w-2xl">
               <Step pane={pane} scene={scene} />
               <WizardNav

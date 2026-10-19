@@ -182,9 +182,10 @@ const CARD_SCALE = "scale-[0.75] lg:scale-100 xl:scale-[1.15]"
 // above (273 / 376 / 478) give these scales; the TV stands 1120 tall
 // unscaled, which at every stop sits inside the well the phone sets.
 const DISPLAY_SCALE = "scale-[0.139] lg:scale-[0.19] xl:scale-[0.243]"
-// The wizard panes (prototype, 2026-10-19): the wizard at a 960px laptop
-// width in a browser frame, at the column widths above (273 / 376 / 478).
-const WIZARD_SCALE = "scale-[0.28] lg:scale-[0.39] xl:scale-[0.5]"
+// The wizard panes (prototype, 2026-10-19): the wizard in a 768px window
+// in a browser frame, filling the column widths above (273 / 376 / 478) —
+// a quarter larger than a 960px window would draw, for legibility.
+const WIZARD_SCALE = "scale-[0.355] lg:scale-[0.49] xl:scale-[0.622]"
 
 // MOBILE IS MEASURED, NOT TUNED (2026-08-18).
 //
