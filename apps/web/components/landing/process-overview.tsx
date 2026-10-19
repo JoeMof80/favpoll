@@ -52,12 +52,19 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { t } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 import type { Phase } from "@/components/hero-demo-panel/scenes"
+import {
+  WizardVignette,
+  WIZARD_VIGNETTE_H,
+  WIZARD_VIGNETTE_W,
+  type WizardPane,
+} from "@/components/landing/wizard-vignettes"
 
 type Medium =
   | { kind: "card" }
   | { kind: "phone"; phase: Phase }
   | { kind: "display" }
   | { kind: "keepsake" }
+  | { kind: "wizard"; pane: WizardPane }
 
 type Beat = {
   key: string
@@ -100,39 +107,39 @@ function linkifyTerms(body: string): React.ReactNode {
 }
 
 const BEATS: Beat[] = [
+  // THE ORGANISER'S PROCESS (prototype, founder 2026-10-19): the hero now
+  // shows the guest's journey, so this walks the MAKING of a favpoll in the
+  // wizard's own order, then what the organiser does with it. One actor
+  // throughout, as the 2026-08-27 reframing required — just the other one.
   {
-    key: "card",
-    label: t("landing.how.card.label"),
-    body: t("landing.how.card.body"),
+    key: "occasion",
+    label: t("landing.how.occasion.label"),
+    body: t("landing.how.occasion.body"),
+    medium: { kind: "wizard", pane: "event" },
+  },
+  {
+    key: "charity",
+    label: t("landing.how.charity.label"),
+    body: t("landing.how.charity.body"),
+    medium: { kind: "wizard", pane: "charity" },
+  },
+  {
+    key: "topic",
+    label: t("landing.how.topic.label"),
+    body: t("landing.how.topic.body"),
+    medium: { kind: "wizard", pane: "topic" },
+  },
+  {
+    key: "story",
+    label: t("landing.how.story.label"),
+    body: t("landing.how.story.body"),
+    medium: { kind: "wizard", pane: "story" },
+  },
+  {
+    key: "share",
+    label: t("landing.how.share.label"),
+    body: t("landing.how.share.body"),
     medium: { kind: "card" },
-  },
-  {
-    // The state a guest ARRIVES in (founder, 2026-08-06): "arriving" is a
-    // locked phase, so the card shows blurred decoy bars and the reveal lock —
-    // the withholding the rest of the arc then resolves. Without it the
-    // sequence opened mid-story, on a picker already in use.
-    key: "arriving",
-    label: t("landing.how.arrive.label"),
-    body: t("landing.how.arrive.body"),
-    medium: { kind: "phone", phase: "arriving" },
-  },
-  {
-    key: "selected",
-    label: t("landing.how.pick.label"),
-    body: t("landing.how.pick.body"),
-    medium: { kind: "phone", phase: "selected" },
-  },
-  {
-    key: "amount-picked",
-    label: t("landing.how.pledge.label"),
-    body: t("landing.how.pledge.body"),
-    medium: { kind: "phone", phase: "amount-picked" },
-  },
-  {
-    key: "reveal",
-    label: t("landing.how.reveal.label"),
-    body: t("landing.how.reveal.body"),
-    medium: { kind: "phone", phase: "note" },
   },
   {
     key: "room",
@@ -141,18 +148,6 @@ const BEATS: Beat[] = [
     medium: { kind: "display" },
   },
   {
-    // SEVENTH BEAT (founder, 2026-08-17). The arc ended at the event, leaving
-    // "and then what?" unanswered — the one question a walkthrough of a thing
-    // that CLOSES has to answer. It also returns the medium to PAPER, so the
-    // arc now runs paper → phone → room → paper and shuts where it opened.
-    //
-    // It strains the 2026-08-09 principle that every beat is something a
-    // GUEST does, since the sheet is the organiser's to print. Written
-    // passively for that reason — what the day BECOMES, not who prints it —
-    // so the reader stays the guest all seven beats. That is the whole
-    // section's rule (founder, 2026-08-17): "you" is the guest throughout,
-    // never the organiser, because a reader cannot be both and the beats
-    // before this one are unambiguously the guest's.
     key: "keepsake",
     label: t("landing.how.keepsake.label"),
     body: t("landing.how.keepsake.body"),
@@ -187,6 +182,9 @@ const CARD_SCALE = "scale-[0.75] lg:scale-100 xl:scale-[1.15]"
 // above (273 / 376 / 478) give these scales; the TV stands 1120 tall
 // unscaled, which at every stop sits inside the well the phone sets.
 const DISPLAY_SCALE = "scale-[0.139] lg:scale-[0.19] xl:scale-[0.243]"
+// The wizard panes (prototype, 2026-10-19): a 640-wide browser frame at the
+// column widths above (273 / 376 / 478).
+const WIZARD_SCALE = "scale-[0.42] lg:scale-[0.58] xl:scale-[0.74]"
 
 // MOBILE IS MEASURED, NOT TUNED (2026-08-18).
 //
@@ -210,6 +208,7 @@ const DISPLAY_SCALE = "scale-[0.139] lg:scale-[0.19] xl:scale-[0.243]"
 //   keepsake — A4 landscape at 96dpi
 const NATURAL: Record<Medium["kind"], { w: number; h: number }> = {
   card: { w: 332, h: 215 },
+  wizard: { w: WIZARD_VIGNETTE_W, h: WIZARD_VIGNETTE_H },
   phone: { w: PHONE_CHASSIS_WIDTH, h: PHONE_CHASSIS_HEIGHT },
   display: { w: DISPLAY_STILL_ROOM.w + 40, h: DISPLAY_STILL_ROOM.h + 40 },
   keepsake: { w: 794, h: 1123 },
@@ -310,6 +309,16 @@ function BeatMedium({
           orientation="portrait"
           className={cn(!bare && KEEPSAKE_SCALE)}
         />
+      </div>
+    )
+  }
+  if (medium.kind === "wizard") {
+    return (
+      <div
+        data-register={paletteForSceneKind(SCENE.kind)}
+        className={cn("shrink-0 drop-shadow-xl", !bare && WIZARD_SCALE)}
+      >
+        <WizardVignette pane={medium.pane} />
       </div>
     )
   }
