@@ -223,8 +223,7 @@ export function DemoCard({
   const pledgeHover = phase === "pledge-hover"
   const pledgePressed = phase === "pledging"
 
-  const confirmedInDialog = phase === "confirmed" || phase === "reveal-pressed"
-  const revealPressed = phase === "reveal-pressed"
+  const confirmedInDialog = phase === "confirmed"
   const isPhone = device === "phone"
   const sheetOpen = pickerOpen || amountOpen || confirmedInDialog
 
@@ -708,10 +707,9 @@ export function DemoCard({
                         register-ink circle — favpoll did this — with the
                         status in words; the pledge as two REAL rows, the
                         favourite as the picker's own chip and the charity
-                        as the real charity row with the amount; and the
-                        button that causes the next step, the lock card's
-                        own third line, pressed at "reveal-pressed" before
-                        the sheet slides down. */}
+                        as the real charity row with the amount. No button
+                        (founder: "get rid of the button") — the sheet
+                        simply slides away onto the reveal. */}
                     <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-5 px-6 py-6 text-center">
                       <div className="flex size-16 items-center justify-center rounded-full bg-primary text-primary-foreground">
                         <svg
@@ -726,7 +724,7 @@ export function DemoCard({
                       <div className="w-full space-y-4 text-left">
                         <div className="flex items-center justify-between gap-3">
                           <span className="text-sm text-muted-foreground">
-                            Your favourite
+                            Your favourite {topicTitle.toLowerCase()}
                           </span>
                           <Chip
                             selected
@@ -747,18 +745,6 @@ export function DemoCard({
                           )}
                         />
                       </div>
-                    </div>
-                    <div className="shrink-0 px-4 py-3">
-                      <Button
-                        type="button"
-                        tabIndex={-1}
-                        className={cn(
-                          "pointer-events-none h-11 w-full text-base transition-all duration-150",
-                          revealPressed ? "scale-[0.98] brightness-95" : ""
-                        )}
-                      >
-                        Reveal where your favourite stands
-                      </Button>
                     </div>
                   </motion.div>
                 ) : pickerOpen ? (

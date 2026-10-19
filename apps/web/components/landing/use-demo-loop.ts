@@ -169,8 +169,7 @@ export function beatForPhase(phase: Phase): 0 | 1 | 2 {
     phase === "amount-picked" ||
     phase === "pledge-hover" ||
     phase === "pledging" ||
-    phase === "confirmed" ||
-    phase === "reveal-pressed"
+    phase === "confirmed"
   )
     return 1
   return 2

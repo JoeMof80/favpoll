@@ -337,7 +337,7 @@ describe("DemoCard — dialog mimics", () => {
     ).toBeNull()
   })
 
-  it("the confirmation is a receipt: status, the favourite's chip, the charity row, the Reveal button", () => {
+  it("the confirmation is a receipt: status, the favourite's chip under the topic, the charity row", () => {
     renderCard("confirmed")
     expect(screen.getByText("Pledge confirmed")).toBeInTheDocument()
     expect(
@@ -345,12 +345,8 @@ describe("DemoCard — dialog mimics", () => {
         scene.poll.topic.favourites[scene.selectedIndex].label
       ).length
     ).toBeGreaterThanOrEqual(1)
-    // The sheet pane is inert, so the button is outside the accessible
-    // tree: find it by its text.
     expect(
-      screen.getByText("Reveal where your favourite stands", {
-        selector: "button",
-      })
+      screen.getByText(`Your favourite ${scene.poll.topic.title.toLowerCase()}`)
     ).toBeInTheDocument()
   })
 
