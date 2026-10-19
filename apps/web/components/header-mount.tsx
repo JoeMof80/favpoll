@@ -13,7 +13,10 @@ import { Header } from "@/components/header"
 // was tried and dropped the same day: a guest needs nothing from it that
 // the mark and the organiser's manage button don't give). Manage,
 // keepsake, edit and the rest keep the header.
-const EXCLUDED = [/^\/live\/[^/]+$/, /^\/favpolls\/[^/]+$/]
+// /favpolls/new is the WIZARD, not a favpoll page: it keeps the header
+// (founder, 2026-10-19: "why no header on the wizard?" — the favpoll-page
+// rule above had matched it since #1056).
+const EXCLUDED = [/^\/live\/[^/]+$/, /^\/favpolls\/(?!new$)[^/]+$/]
 
 export function HeaderMount() {
   const pathname = usePathname()
