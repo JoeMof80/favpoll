@@ -109,9 +109,15 @@ export type HeroScene = {
 // CHARITY MARKS (founder, 2026-10-19: "lets use real logos for the
 // charities"): each charity's own published mark, taken from its site —
 // Marie Curie's daffodil (its favicon), WWF's panda (its logo), Mind's
-// squiggle (its touch icon) — served from public/demo. They are the
-// charities' trademarks shown in a demo; none of the three has agreed to
-// anything with favpoll yet, which the founder weighs at merge.
+// squiggle, GOSH's child and St Luke's fountain (their touch icons) —
+// served from public/demo. STAGING AND DEV ONLY (founder, same day: "this
+// needs to be staging only"): they are the charities' trademarks and none
+// of them has agreed to anything with favpoll yet, so production (the
+// NEXT_PUBLIC_DEMO_MARKS flag next.config.mjs sets from VERCEL_ENV) shows
+// the initial tile instead.
+const DEMO_MARKS_ON = process.env.NEXT_PUBLIC_DEMO_MARKS !== "off"
+const mark = (path: string): string | null => (DEMO_MARKS_ON ? path : null)
+
 export const SCENES: HeroScene[] = [
   {
     kind: "memorial",
@@ -151,7 +157,7 @@ export const SCENES: HeroScene[] = [
       {
         id: "ch-mc",
         name: "Marie Curie",
-        logo_url: "/demo/logo-marie-curie.svg",
+        logo_url: mark("/demo/logo-marie-curie.svg"),
         registered_number: "207994",
       },
     ],
@@ -225,7 +231,7 @@ export const SCENES: HeroScene[] = [
       {
         id: "ch-gosh",
         name: "Great Ormond Street Hospital",
-        logo_url: null,
+        logo_url: mark("/demo/logo-gosh.png"),
         registered_number: "235825",
       },
     ],
@@ -382,7 +388,7 @@ export const SCENES: HeroScene[] = [
       {
         id: "ch-wwf",
         name: "WWF-UK",
-        logo_url: "/demo/logo-wwf.svg",
+        logo_url: mark("/demo/logo-wwf.svg"),
         registered_number: "1081247",
       },
     ],
@@ -547,7 +553,7 @@ export const SCENES: HeroScene[] = [
         // from memory.
         id: "ch-mind",
         name: "Mind",
-        logo_url: "/demo/logo-mind.png",
+        logo_url: mark("/demo/logo-mind.png"),
         registered_number: "219830",
       },
     ],
@@ -582,7 +588,7 @@ export const SCENES: HeroScene[] = [
     //    charity (mirrors the live subject="cause" shape). ──
     kind: "cause",
     occasion_type: "Cause",
-    // "Walkies for St Mark's Hospice" (2026-08-31, founder asked for a better
+    // "Walkies for St Luke's" (2026-08-31, founder asked for a better
     // opening line than the register's "In support of"). The word every dog
     // in Britain knows, and it makes the card, the wallet card and the
     // keepsake all say what the event is before the context line does. The
@@ -605,7 +611,11 @@ export const SCENES: HeroScene[] = [
     // THE HEADING IS THE CAUSE, the context is the event. "Walking for St
     // Luke's" rendered as "In support of / Walking for St Luke's" — the
     // register prefix doubled the verb.
-    heading: "St Mark's Hospice",
+    // ST LUKE'S CHESHIRE HOSPICE, the founder's local hospice and a real
+    // prospect (2026-10-19: "Switch St Mark's to St Luke's"), replacing the
+    // fictional St Mark's. Registered 515595, so the card prints a real
+    // number; its mark is staging-only like the others.
+    heading: "St Luke's Cheshire Hospice",
     eyebrow: "A cause",
     // No distance (founder, 2026-08-31): "· 5 miles" wrapped the context
     // line on a phone and added nothing the walk needs.
@@ -615,7 +625,7 @@ export const SCENES: HeroScene[] = [
       // "every penny" → "every pledge" (founder, 2026-10-15): the retired
       // completeness claim, even in a fictional organiser's mouth, sits on
       // favpoll's own landing page.
-      "5 miles for our local hospice. Pledge your favourite biscuit and every pledge goes to St Mark’s.",
+      "5 miles for our local hospice. Pledge your favourite biscuit and every pledge goes to St Luke’s.",
     // BISCUIT, THE THERAPY DOG. A faceless cause has no avatar on the real
     // page unless it uploads one; this one has the thing itself — a beagle
     // mid-walk — which says "sponsored dog walk" before a word is read and
@@ -674,12 +684,10 @@ export const SCENES: HeroScene[] = [
     },
     charities: [
       {
-        // Fictional (see the scene note): no number, because the card prints
-        // it and a made-up charity number is worse than none.
-        id: "ch-stmarks",
-        name: "St Mark's Hospice",
-        logo_url: null,
-        registered_number: null,
+        id: "ch-stlukes",
+        name: "St Luke's Cheshire Hospice",
+        logo_url: mark("/demo/logo-st-lukes.png"),
+        registered_number: "515595",
       },
     ],
     // Hobnob — the runner-up in the standings, so the pick the demo makes is

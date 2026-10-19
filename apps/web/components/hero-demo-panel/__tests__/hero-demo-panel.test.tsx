@@ -436,8 +436,9 @@ describe("LandingHero — reduced motion", () => {
     // Starts on the first scene (Belinda / remembering), not the cause scene.
     expect(screen.queryByRole("heading", { name: heading! })).toBeNull()
     fireEvent.click(screen.getByRole("button", { name: "Cause" }))
-    // By ROLE: a cause's heading is usually its charity's name too (St Mark's
-    // Hospice, in support of St Mark's Hospice), so the text appears twice.
+    // By ROLE: a cause's heading is usually its charity's name too (St Luke's
+    // Cheshire Hospice, in support of St Luke's Cheshire Hospice), so the
+    // text appears twice.
     expect(screen.getByRole("heading", { name: heading! })).toBeInTheDocument()
   })
 

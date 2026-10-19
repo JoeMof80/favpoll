@@ -23,7 +23,7 @@ import { getFavpollHeadline } from "@/lib/display"
 // keepsake beat still falls back to the quieter of its two tellings (nobody
 // to lead on); that is the cost, and it is the honest picture of a cause.
 //
-// The hospice is fictional for now (St Mark's); see the scene's note.
+// The hospice is real since 2026-10-19 (St Luke's Cheshire Hospice, 515595); see the scene's note.
 export const DEMO_SCENE = SCENES.find((s) => s.kind === "cause") ?? SCENES[0]
 
 // Derived rather than literal: `heading` and `eyebrow` exist ONLY on the
