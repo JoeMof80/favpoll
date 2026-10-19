@@ -26,7 +26,8 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { cn } from "@/lib/utils"
-import type { Charity } from "@favpoll/types"
+import type { Charity, FavpollCategory } from "@favpoll/types"
+import type { HeroScene } from "@/components/hero-demo-panel/scenes"
 
 export type WizardPane = "event" | "charity" | "topic" | "story"
 
@@ -90,15 +91,9 @@ function Rail({ pane }: { pane: WizardPane }) {
   )
 }
 
-const DEMO_CHARITIES: Charity[] = [
-  {
-    id: "wv-stlukes",
-    name: "St Luke's Cheshire Hospice",
-    registered_number: "515595",
-    logo_url: null,
-    description: null,
-    created_at: "2024-01-01T00:00:00Z",
-  } as Charity,
+// The rows beneath the organiser's own charity: two more results, as a
+// register search returns a handful.
+const OTHER_RESULTS: Charity[] = [
   {
     id: "wv-mariecurie",
     name: "Marie Curie",
@@ -117,15 +112,51 @@ const DEMO_CHARITIES: Charity[] = [
   } as Charity,
 ]
 
-const COLOURS = ["Purple", "Blue", "Red", "Green", "Pink", "Black", "Gold"]
+// ONE FAVPOLL THROUGHOUT (founder, 2026-10-19: "you've used the memorial
+// example when the retained section is for St Luke's fundraiser"): every
+// pane derives from the SCENE the card, the room and the keepsake show, so
+// the organiser is seen making exactly the favpoll the later beats hold.
+const categoryFor = (scene: HeroScene): FavpollCategory =>
+  scene.kind === "memorial"
+    ? "memorial"
+    : scene.kind === "celebration"
+      ? "celebration"
+      : "fundraiser"
 
-function Pane({ pane }: { pane: WizardPane }) {
+function Pane({ pane, scene }: { pane: WizardPane; scene: HeroScene }) {
+  const own = scene.charities[0]
+  const ownCharity = {
+    id: own.id,
+    name: own.name,
+    registered_number: own.registered_number,
+    logo_url: own.logo_url,
+    description: null,
+    created_at: "2024-01-01T00:00:00Z",
+  } as Charity
+  const charities = [
+    ownCharity,
+    ...OTHER_RESULTS.filter((c) => c.name !== own.name),
+  ]
+  // What an organiser would have typed to find it: the first two words,
+  // without a possessive ("st luke", not "st luke's").
+  const searchText = own.name
+    .toLowerCase()
+    .replace(/[’']s\b/g, "")
+    .split(" ")
+    .slice(0, 2)
+    .join(" ")
+  const isCause = !scene.protagonist
+  const storyName = scene.protagonist?.name ?? scene.heading ?? ""
+  const storyContext = scene.protagonist?.context ?? scene.context ?? ""
+  const storyAbout = scene.protagonist?.about ?? scene.blurb ?? ""
+  const favourites = scene.poll.topic.favourites.slice(0, 7)
+
   if (pane === "event") {
     return (
       <div className="flex h-full flex-col justify-center gap-5">
         <SectionEyebrow>What is the occasion?</SectionEyebrow>
         <div className="pointer-events-none">
-          <EventStep value="memorial" onChange={() => {}} disabled />
+          <EventStep value={categoryFor(scene)} onChange={() => {}} disabled />
         </div>
       </div>
     )
@@ -137,12 +168,12 @@ function Pane({ pane }: { pane: WizardPane }) {
         <Input
           readOnly
           tabIndex={-1}
-          value="st luke"
+          value={searchText}
           aria-label="Search the register"
           className="pointer-events-none"
         />
         <ul className="space-y-2">
-          {DEMO_CHARITIES.map((c, i) => (
+          {charities.map((c, i) => (
             <li
               key={c.id}
               className={cn(
@@ -168,24 +199,23 @@ function Pane({ pane }: { pane: WizardPane }) {
         <Input
           readOnly
           tabIndex={-1}
-          value="colour"
+          value={scene.poll.topic.title.toLowerCase()}
           aria-label="Search topics"
           className="pointer-events-none"
         />
         <div className="rounded-lg border border-primary bg-primary/5 px-3 py-3">
-          <p className="text-sm font-medium text-foreground">Colour</p>
-          <p className="text-xs text-muted-foreground">
-            The one they always reached for
+          <p className="text-sm font-medium text-foreground">
+            {scene.poll.topic.title}
           </p>
           <div className="mt-2 flex flex-wrap gap-1.5">
-            {COLOURS.map((c) => (
+            {favourites.map((f) => (
               <Chip
-                key={c}
+                key={f.id}
                 size="sm"
                 tabIndex={-1}
                 className="pointer-events-none"
               >
-                {c}
+                {f.label}
               </Chip>
             ))}
             <Chip
@@ -205,24 +235,28 @@ function Pane({ pane }: { pane: WizardPane }) {
   }
   return (
     <div className="flex h-full flex-col gap-3">
-      <SectionEyebrow>Their story</SectionEyebrow>
+      <SectionEyebrow>{isCause ? "The story" : "Their story"}</SectionEyebrow>
       <div className="grid grid-cols-[1fr_auto] gap-3">
         <div className="space-y-1">
-          <p className="text-xs text-muted-foreground">Name</p>
+          <p className="text-xs text-muted-foreground">
+            {isCause ? "Cause" : "Name"}
+          </p>
           <Input
             readOnly
             tabIndex={-1}
-            value="Belinda Hartley"
+            value={storyName}
             className="pointer-events-none"
           />
         </div>
         <div className="space-y-1">
-          <p className="text-xs text-muted-foreground">Dates</p>
+          <p className="text-xs text-muted-foreground">
+            {isCause ? "Event" : "Dates"}
+          </p>
           <Input
             readOnly
             tabIndex={-1}
-            value="1945 – 2024"
-            className="pointer-events-none w-32"
+            value={storyContext}
+            className="pointer-events-none w-44"
           />
         </div>
       </div>
@@ -232,7 +266,7 @@ function Pane({ pane }: { pane: WizardPane }) {
           readOnly
           tabIndex={-1}
           rows={2}
-          value="A headmistress for forty-one years with a gift for knowing every pupil's name. She had a signature colour that she loved."
+          value={storyAbout}
           className="pointer-events-none resize-none"
         />
       </div>
@@ -244,7 +278,7 @@ function Pane({ pane }: { pane: WizardPane }) {
           readOnly
           tabIndex={-1}
           rows={2}
-          value="My favourite colour was purple. I wore it to every occasion that mattered."
+          value={scene.poll.personal_note}
           className="pointer-events-none resize-none"
         />
       </div>
@@ -252,7 +286,13 @@ function Pane({ pane }: { pane: WizardPane }) {
   )
 }
 
-export function WizardVignette({ pane }: { pane: WizardPane }) {
+export function WizardVignette({
+  pane,
+  scene,
+}: {
+  pane: WizardPane
+  scene: HeroScene
+}) {
   return (
     <div
       data-testid="wizard-vignette"
@@ -264,7 +304,7 @@ export function WizardVignette({ pane }: { pane: WizardPane }) {
         <div className="flex min-h-0 flex-1 rounded-b-xl border border-t-0 border-border bg-background">
           <Rail pane={pane} />
           <div className="min-h-0 flex-1 overflow-hidden px-8 py-6">
-            <Pane pane={pane} />
+            <Pane pane={pane} scene={scene} />
           </div>
         </div>
       </DemoFrame>

@@ -318,7 +318,7 @@ function BeatMedium({
         data-register={paletteForSceneKind(SCENE.kind)}
         className={cn("shrink-0 drop-shadow-xl", !bare && WIZARD_SCALE)}
       >
-        <WizardVignette pane={medium.pane} />
+        <WizardVignette pane={medium.pane} scene={SCENE} />
       </div>
     )
   }
