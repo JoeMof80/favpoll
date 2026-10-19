@@ -173,6 +173,13 @@ describe("DemoCard — unlocked phases", () => {
     expect(container.querySelector(".blur-xs")).toBeNull()
   })
 
+  it("the demo's reveal is not a live region — it loops for ever (a11y audit, 2026-10-19)", () => {
+    renderCard("note", realWidths)
+    for (const reveal of screen.getAllByTestId("poll-reveal")) {
+      expect(reveal.closest('[aria-live], [role="status"]')).toBeNull()
+    }
+  })
+
   it.each(UNLOCKED_PHASES)(
     "reveal text accessible via reserve copy in '%s' phase",
     (phase) => {
