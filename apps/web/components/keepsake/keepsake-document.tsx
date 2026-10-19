@@ -259,11 +259,15 @@ export function KeepsakeDocument({
                     keepsake echoes what guests saw all day (founder,
                     2026-08-16 — supersedes the earlier 2xl heading). */}
                 {topicHeading}
-                {/* The quote's pl matches the list's text gutter below (7mm
-                  number column + 8px gap − 2px rule), so the quote's text
-                  and the list's labels share a left edge. */}
+                {/* ON THE LIST'S LEFT EDGE, with a tight gutter after its
+                  rule (founder, 2026-10-19: "keepsake note should be left
+                  aligned and reduce the gap between the left border and the
+                  note text"). It had been a shrink-to-fit block centred by
+                  the section, so its rule landed wherever the text happened
+                  to start, and its padding matched the list's wide number
+                  gutter. Now it takes the list's own 150mm column. */}
                 {data.reveal && (
-                  <p className="mt-[5mm] max-w-[150mm] border-l-2 border-primary-muted pl-[calc(7mm+8px-2px)] text-left text-lg leading-relaxed text-primary/80 italic">
+                  <p className="mx-auto mt-[5mm] w-[150mm] max-w-full border-l-2 border-primary-muted pl-3 text-left text-lg leading-relaxed text-primary/80 italic">
                     {data.reveal}
                   </p>
                 )}
@@ -277,8 +281,10 @@ export function KeepsakeDocument({
                       className="flex items-baseline gap-2"
                     >
                       {/* Left-aligned so the numeral sits flush with the box
-                        edge — and the quote's rule above it. */}
-                      <span className="w-[7mm] shrink-0 text-sm text-muted-foreground tabular-nums">
+                        edge — and the quote's rule above it. 5mm, not 7
+                        (founder, 2026-10-19: "also the numbered list"):
+                        the name sits closer to its number. */}
+                      <span className="w-[5mm] shrink-0 text-sm text-muted-foreground tabular-nums">
                         {i + 1}
                       </span>
                       <span
@@ -372,7 +378,7 @@ export function KeepsakeDocument({
               {!data.rankHistory && data.reveal && (
                 <section className="mx-auto w-full max-w-[150mm]">
                   {topicHeading}
-                  <p className="mt-[3mm] border-l-2 border-primary-muted pl-[calc(7mm+8px-2px)] text-base leading-relaxed text-primary/80 italic">
+                  <p className="mt-[3mm] border-l-2 border-primary-muted pl-3 text-base leading-relaxed text-primary/80 italic">
                     {data.reveal}
                   </p>
                 </section>
@@ -395,7 +401,7 @@ export function KeepsakeDocument({
                 >
                   {shown.map((s, i) => (
                     <li key={s.favouriteId} className="flex items-center gap-2">
-                      <span className="w-[7mm] shrink-0 text-muted-foreground tabular-nums">
+                      <span className="w-[5mm] shrink-0 text-muted-foreground tabular-nums">
                         {i + 1}
                       </span>
                       <span className="flex-1">
@@ -450,7 +456,7 @@ export function KeepsakeDocument({
                       reveal between the total and the race cost the exact
                       height that pushed row ten into the foot. */}
                   {data.reveal && (
-                    <p className="mt-[4mm] max-w-[110mm] border-l-2 border-primary-muted pl-4 text-base leading-relaxed text-primary/80 italic print:mt-[2mm] print:text-sm">
+                    <p className="mt-[4mm] max-w-[110mm] border-l-2 border-primary-muted pl-3 text-base leading-relaxed text-primary/80 italic print:mt-[2mm] print:text-sm">
                       {data.reveal}
                     </p>
                   )}
