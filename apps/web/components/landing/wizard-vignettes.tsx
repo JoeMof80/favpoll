@@ -285,10 +285,10 @@ export function WizardVignette({
             than 320: the step beside it. */}
         <div
           data-register={palette}
-          // theme-light on the SAME element as data-register: .theme-light
-          // resets the tokens and the register's light palette re-applies
-          // only on `.theme-light[data-register]`.
-          className="theme-light grid min-h-0 flex-1 grid-cols-[200px_1fr] overflow-hidden rounded-b-xl border border-t-0 border-border bg-background"
+          // The register alone: it has light and dark palettes of its own,
+          // and the vignette follows the visitor's theme like any browser
+          // window (founder, 2026-10-19).
+          className="grid min-h-0 flex-1 grid-cols-[200px_1fr] overflow-hidden rounded-b-xl border border-t-0 border-border bg-background"
         >
           <div className="min-h-0">
             <Rail current={current} done={done} />

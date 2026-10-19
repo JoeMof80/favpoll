@@ -22,6 +22,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
+import { Button } from "@/components/ui/button"
 import {
   REGISTER_LINK_HOVER,
   REGISTER_LINK_INK,
@@ -321,16 +322,13 @@ function BeatMedium({
   }
   if (medium.kind === "wizard") {
     return (
-      // theme-light here keeps the browser chrome in light mode and
-      // NEUTRAL; the register goes on the wizard inside the frame (the
-      // vignette's `palette`), as the TV's bezel stays unthemed around a
-      // themed screen (founder, 2026-10-19).
-      <div
-        className={cn(
-          "theme-light shrink-0 drop-shadow-xl",
-          !bare && WIZARD_SCALE
-        )}
-      >
+      // NOT theme-light, unlike the phone and the TV (founder, 2026-10-19:
+      // "apply the light and dark theme to the browser vignette, including
+      // the frame"): a browser window is the visitor's own object and
+      // follows their theme; a handset and a screen are lit the same way
+      // whatever the page is. The register goes on the wizard inside the
+      // frame (the vignette's `palette`); the chrome stays neutral.
+      <div className={cn("shrink-0 drop-shadow-xl", !bare && WIZARD_SCALE)}>
         <WizardVignette
           pane={medium.pane}
           scene={SCENE}
@@ -685,6 +683,16 @@ export function ProcessOverview() {
                 </div>
               </div>
             ))}
+            {/* THE WALKTHROUGH'S EXIT (founder, 2026-10-19: "Should we add
+                another 'Create a favpoll' button at the bottom of the
+                section?"): a reader who has just watched the organiser's
+                process is primed to start one, and the only other CTAs
+                are a screen above. The header's own label and route. */}
+            <div className="mt-10 md:mt-16">
+              <Button asChild size="lg" className="h-11 px-6 text-base">
+                <Link href="/favpolls/new">{t("landing.cta.primary")}</Link>
+              </Button>
+            </div>
           </div>
 
           {/* Media column — pinned, bare, one frame per beat */}
