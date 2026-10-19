@@ -230,6 +230,7 @@ export function StepAmount({
             disabled={total === 0}
             onValueChange={([v]) => onFavShare!(v)}
             aria-label="Pounds to your favourites"
+            aria-valuetext={`${formatPoundsExact(favShare)} to your favourites, ${formatPoundsExact(fundPart)} to the shared pot`}
             trackClassName="bg-chart-3/40"
             rangeClassName="bg-primary"
           />

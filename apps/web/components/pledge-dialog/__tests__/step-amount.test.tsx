@@ -97,6 +97,19 @@ describe("StepAmount — the rebalancing slider", () => {
     expect(slider).toHaveAttribute("aria-valuemax", "20")
   })
 
+  it("is named on the thumb and says where each pound goes", () => {
+    render(<StepAmount {...BASE} {...SPLIT} />)
+    // The thumb is the element with role="slider"; the name must be on it,
+    // not on the Radix root (axe aria-input-field-name, 2026-10-19).
+    const slider = screen.getByRole("slider", {
+      name: "Pounds to your favourites",
+    })
+    expect(slider).toHaveAttribute(
+      "aria-valuetext",
+      "£18.00 to your favourites, £2.00 to the shared pot"
+    )
+  })
+
   it("names the favourites' share as the thumb moves", () => {
     const onFavShare = vi.fn()
     render(<StepAmount {...BASE} {...SPLIT} onFavShare={onFavShare} />)
