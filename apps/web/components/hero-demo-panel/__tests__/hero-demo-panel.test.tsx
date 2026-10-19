@@ -292,14 +292,20 @@ describe("DemoCard — dialog mimics", () => {
     )
   })
 
-  it("the picker primary carries the state in its LABEL (#889): Give without picking while browsing, Next once selected", () => {
+  it("the picker primary is Next throughout — dimmed while browsing, live once selected (2026-10-19: 'Give without picking' was noise in the demo)", () => {
     const { unmount: u1 } = renderCard("picking")
+    const browsing = screen.getAllByRole("button", {
+      name: /^Next$/,
+      hidden: true,
+    })
+    expect(browsing.length).toBeGreaterThan(0)
+    expect(browsing[browsing.length - 1].className).toMatch(/opacity-50/)
     expect(
-      screen.getAllByRole("button", {
+      screen.queryByRole("button", {
         name: /^Give without picking$/,
         hidden: true,
-      }).length
-    ).toBeGreaterThan(0)
+      })
+    ).toBeNull()
     u1()
 
     const { unmount: u2 } = renderCard("selected")
