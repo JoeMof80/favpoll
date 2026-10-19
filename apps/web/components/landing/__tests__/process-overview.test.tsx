@@ -78,7 +78,7 @@ vi.mock("@/components/print-pack/pack-card", async () => {
 })
 
 describe("ProcessOverview", () => {
-  it("numbers all seven beats of the arc", () => {
+  it("numbers all eight beats of the arc", () => {
     render(<ProcessOverview />)
 
     // Every beat is numbered since the 2026-08-09 rewrite. That rewrite's
@@ -87,11 +87,12 @@ describe("ProcessOverview", () => {
     // because the section now frames the whole arc rather than one actor —
     // paper → phone → room → paper.
     const labels = [
-      t("landing.how.card.label"),
-      t("landing.how.arrive.label"),
-      t("landing.how.pick.label"),
-      t("landing.how.pledge.label"),
-      t("landing.how.reveal.label"),
+      t("landing.how.occasion.label"),
+      t("landing.how.charity.label"),
+      t("landing.how.topic.label"),
+      t("landing.how.header.label"),
+      t("landing.how.story.label"),
+      t("landing.how.share.label"),
       t("landing.how.room.label"),
       t("landing.how.keepsake.label"),
     ]
@@ -103,11 +104,11 @@ describe("ProcessOverview", () => {
   it("frames each beat as the object it actually is", () => {
     render(<ProcessOverview />)
 
-    // Four phone beats — the guest arc, and only the guest arc.
-    expect(screen.getAllByTestId("phone-frame")).toHaveLength(4)
+    // Four wizard beats — the organiser's making of a favpoll, in the
+    // wizard's own order (prototype, 2026-10-19).
     expect(
-      screen.getAllByTestId("demo-card").map((el) => el.dataset.phase)
-    ).toEqual(["arriving", "selected", "amount-picked", "note"])
+      screen.getAllByTestId("wizard-vignette").map((el) => el.dataset.pane)
+    ).toEqual(["event", "charity", "topic", "info", "story"])
 
     // The card is paper at wallet size; the display hangs in a TV, not a
     // browser window and not a phone.
@@ -125,7 +126,7 @@ describe("ProcessOverview", () => {
     render(<ProcessOverview />)
     expect(screen.getByTestId("pack-card")).toBeInTheDocument()
     expect(screen.getByTestId("tv-frame")).toBeInTheDocument()
-    expect(screen.getAllByTestId("demo-card")).toHaveLength(4)
+    expect(screen.getAllByTestId("wizard-vignette")).toHaveLength(5)
   })
 
   it("pins the six media in the sticky column on desktop", () => {
@@ -137,11 +138,11 @@ describe("ProcessOverview", () => {
     // column's header block pins at every width.
     const column = within(container.querySelector(".md\\:col-span-2")!)
 
-    expect(column.getAllByTestId("phone-frame")).toHaveLength(4)
+    expect(column.getAllByTestId("wizard-vignette")).toHaveLength(5)
     expect(column.getByTestId("pack-card")).toBeInTheDocument()
     expect(column.getByTestId("tv-frame")).toBeInTheDocument()
     // Nothing outside the pinned column.
-    expect(screen.getAllByTestId("demo-card")).toHaveLength(4)
+    expect(screen.getAllByTestId("wizard-vignette")).toHaveLength(5)
   })
 
   it("puts no controls on the mobile media", async () => {
@@ -158,7 +159,7 @@ describe("ProcessOverview", () => {
     render(<ProcessOverview />)
 
     const section = screen
-      .getByText(`1. ${t("landing.how.card.label")}`)
+      .getByText(`1. ${t("landing.how.occasion.label")}`)
       .closest("section")!
     // The page's own chrome lives outside this section, so any button found
     // here would be one this component put on a medium.
