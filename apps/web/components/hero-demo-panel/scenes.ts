@@ -106,6 +106,12 @@ export type HeroScene = {
 
 // ── Scene data ───────────────────────────────────────────────────────────────
 
+// CHARITY MARKS (founder, 2026-10-19: "lets use real logos for the
+// charities"): each charity's own published mark, taken from its site —
+// Marie Curie's daffodil (its favicon), WWF's panda (its logo), Mind's
+// squiggle (its touch icon) — served from public/demo. They are the
+// charities' trademarks shown in a demo; none of the three has agreed to
+// anything with favpoll yet, which the founder weighs at merge.
 export const SCENES: HeroScene[] = [
   {
     kind: "memorial",
@@ -145,7 +151,7 @@ export const SCENES: HeroScene[] = [
       {
         id: "ch-mc",
         name: "Marie Curie",
-        logo_url: null,
+        logo_url: "/demo/logo-marie-curie.svg",
         registered_number: "207994",
       },
     ],
@@ -376,7 +382,7 @@ export const SCENES: HeroScene[] = [
       {
         id: "ch-wwf",
         name: "WWF-UK",
-        logo_url: null,
+        logo_url: "/demo/logo-wwf.svg",
         registered_number: "1081247",
       },
     ],
@@ -541,7 +547,7 @@ export const SCENES: HeroScene[] = [
         // from memory.
         id: "ch-mind",
         name: "Mind",
-        logo_url: null,
+        logo_url: "/demo/logo-mind.png",
         registered_number: "219830",
       },
     ],
