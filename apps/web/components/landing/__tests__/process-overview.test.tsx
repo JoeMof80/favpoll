@@ -78,7 +78,7 @@ vi.mock("@/components/print-pack/pack-card", async () => {
 })
 
 describe("ProcessOverview", () => {
-  it("numbers all seven beats of the arc", () => {
+  it("numbers all eight beats of the arc", () => {
     render(<ProcessOverview />)
 
     // Every beat is numbered since the 2026-08-09 rewrite. That rewrite's
@@ -90,6 +90,7 @@ describe("ProcessOverview", () => {
       t("landing.how.occasion.label"),
       t("landing.how.charity.label"),
       t("landing.how.topic.label"),
+      t("landing.how.header.label"),
       t("landing.how.story.label"),
       t("landing.how.share.label"),
       t("landing.how.room.label"),
@@ -107,7 +108,7 @@ describe("ProcessOverview", () => {
     // wizard's own order (prototype, 2026-10-19).
     expect(
       screen.getAllByTestId("wizard-vignette").map((el) => el.dataset.pane)
-    ).toEqual(["event", "charity", "topic", "story"])
+    ).toEqual(["event", "charity", "topic", "info", "story"])
 
     // The card is paper at wallet size; the display hangs in a TV, not a
     // browser window and not a phone.
@@ -125,7 +126,7 @@ describe("ProcessOverview", () => {
     render(<ProcessOverview />)
     expect(screen.getByTestId("pack-card")).toBeInTheDocument()
     expect(screen.getByTestId("tv-frame")).toBeInTheDocument()
-    expect(screen.getAllByTestId("wizard-vignette")).toHaveLength(4)
+    expect(screen.getAllByTestId("wizard-vignette")).toHaveLength(5)
   })
 
   it("pins the six media in the sticky column on desktop", () => {
@@ -137,11 +138,11 @@ describe("ProcessOverview", () => {
     // column's header block pins at every width.
     const column = within(container.querySelector(".md\\:col-span-2")!)
 
-    expect(column.getAllByTestId("wizard-vignette")).toHaveLength(4)
+    expect(column.getAllByTestId("wizard-vignette")).toHaveLength(5)
     expect(column.getByTestId("pack-card")).toBeInTheDocument()
     expect(column.getByTestId("tv-frame")).toBeInTheDocument()
     // Nothing outside the pinned column.
-    expect(screen.getAllByTestId("wizard-vignette")).toHaveLength(4)
+    expect(screen.getAllByTestId("wizard-vignette")).toHaveLength(5)
   })
 
   it("puts no controls on the mobile media", async () => {

@@ -102,10 +102,12 @@ import { WizardNav } from "@/components/new-favpoll-wizard/wizard-nav"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { STEPS, STEP_LABELS, type WizardStep } from "@/lib/wizard-copy"
+import { FIELD_LABELS, nameLabel } from "@/lib/favpoll-fields"
+import type { RegisterPalette } from "@/lib/register-palette"
 import type { Charity, Favourite, FavpollCategory } from "@favpoll/types"
 import type { HeroScene } from "@/components/hero-demo-panel/scenes"
 
-export type WizardPane = "event" | "charity" | "topic" | "story"
+export type WizardPane = "event" | "charity" | "topic" | "info" | "story"
 
 /** The pane's natural size — the wizard in a 768px window, which the
  *  caller scales to the column at a quarter MORE than a 960px window would
@@ -137,9 +139,11 @@ function Step({ pane, scene }: { pane: WizardPane; scene: HeroScene }) {
     consent_status: "approved",
   } as unknown as Charity
   const isCause = !scene.protagonist
+  const category = categoryFor(scene)
   const storyName = scene.protagonist?.name ?? scene.heading ?? ""
   const storyContext = scene.protagonist?.context ?? scene.context ?? ""
   const storyAbout = scene.protagonist?.about ?? scene.blurb ?? ""
+  const photoUrl = scene.protagonist?.photo_url ?? scene.photo_url ?? null
 
   if (pane === "event") {
     return (
@@ -183,16 +187,48 @@ function Step({ pane, scene }: { pane: WizardPane; scene: HeroScene }) {
       </WizardStepShell>
     )
   }
+  if (pane === "info") {
+    // THE HEADER STEP (founder, 2026-10-19: "create an extra step for
+    // header, in the interests of accuracy"): the wizard's own fields in
+    // its own order — opening line, name or cause, context, the photo.
+    return (
+      <WizardStepShell title={STEP_LABELS.info}>
+        <div className="space-y-5">
+          <WizardField label={FIELD_LABELS.openingLine}>
+            <Input readOnly tabIndex={-1} value={scene.opening_line ?? ""} />
+          </WizardField>
+          <WizardField
+            label={nameLabel(isCause ? "cause" : "someone", category)}
+            required
+          >
+            <Input readOnly tabIndex={-1} value={storyName} />
+          </WizardField>
+          <WizardField label={FIELD_LABELS.context}>
+            <Input readOnly tabIndex={-1} value={storyContext} />
+          </WizardField>
+          <div className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-center sm:space-y-0 sm:gap-x-6">
+            <span className="block font-medium">{FIELD_LABELS.photo}</span>
+            {/* The avatar IS the button in the real step: the same
+                rounded-xl slot, holding the scene's photo. */}
+            <span className="block h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-border bg-background">
+              {photoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={photoUrl}
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
+              ) : null}
+            </span>
+          </div>
+        </div>
+      </WizardStepShell>
+    )
+  }
   return (
     <WizardStepShell title={STEP_LABELS.story}>
       <div className="space-y-5">
-        <WizardField label={isCause ? "Cause" : "Name"} required>
-          <Input readOnly tabIndex={-1} value={storyName} />
-        </WizardField>
-        <WizardField label={isCause ? "Event" : "Dates"}>
-          <Input readOnly tabIndex={-1} value={storyContext} />
-        </WizardField>
-        <WizardField label="About">
+        <WizardField label={FIELD_LABELS.about} required>
           <Textarea
             readOnly
             tabIndex={-1}
@@ -202,7 +238,7 @@ function Step({ pane, scene }: { pane: WizardPane; scene: HeroScene }) {
           />
         </WizardField>
         <WizardField
-          label="Your note"
+          label={FIELD_LABELS.note}
           hint="Revealed to a guest once they have pledged."
         >
           <Textarea
@@ -221,9 +257,14 @@ function Step({ pane, scene }: { pane: WizardPane; scene: HeroScene }) {
 export function WizardVignette({
   pane,
   scene,
+  palette,
 }: {
   pane: WizardPane
   scene: HeroScene
+  /** The register the wizard is drawn in. The browser frame around it
+   *  stays neutral — the TV's bezel is not themed either (founder,
+   *  2026-10-19: "lets not make the browser frame themed"). */
+  palette: RegisterPalette
 }) {
   const current = pane as WizardStep
   const idx = STEPS.indexOf(current)
@@ -242,7 +283,13 @@ export function WizardVignette({
       <DemoFrame className="h-full overflow-hidden bg-background">
         {/* The wizard's own grid (index.tsx) with the rail at 200px rather
             than 320: the step beside it. */}
-        <div className="grid min-h-0 flex-1 grid-cols-[200px_1fr] overflow-hidden rounded-b-xl border border-t-0 border-border bg-background">
+        <div
+          data-register={palette}
+          // theme-light on the SAME element as data-register: .theme-light
+          // resets the tokens and the register's light palette re-applies
+          // only on `.theme-light[data-register]`.
+          className="theme-light grid min-h-0 flex-1 grid-cols-[200px_1fr] overflow-hidden rounded-b-xl border border-t-0 border-border bg-background"
+        >
           <div className="min-h-0">
             <Rail current={current} done={done} />
           </div>

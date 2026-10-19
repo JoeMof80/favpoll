@@ -130,6 +130,12 @@ const BEATS: Beat[] = [
     medium: { kind: "wizard", pane: "topic" },
   },
   {
+    key: "header",
+    label: t("landing.how.header.label"),
+    body: t("landing.how.header.body"),
+    medium: { kind: "wizard", pane: "info" },
+  },
+  {
     key: "story",
     label: t("landing.how.story.label"),
     body: t("landing.how.story.body"),
@@ -315,19 +321,21 @@ function BeatMedium({
   }
   if (medium.kind === "wizard") {
     return (
+      // theme-light here keeps the browser chrome in light mode and
+      // NEUTRAL; the register goes on the wizard inside the frame (the
+      // vignette's `palette`), as the TV's bezel stays unthemed around a
+      // themed screen (founder, 2026-10-19).
       <div
-        data-register={paletteForSceneKind(SCENE.kind)}
-        // theme-light ON THE SAME ELEMENT as data-register (as the TV
-        // below): .theme-light resets the tokens, and the register's
-        // light palette re-applies only on `.theme-light[data-register]`
-        // — on a parent it was lost and the panes drew in the brand blue
-        // beside a green card, room and keepsake (founder, 2026-10-19).
         className={cn(
           "theme-light shrink-0 drop-shadow-xl",
           !bare && WIZARD_SCALE
         )}
       >
-        <WizardVignette pane={medium.pane} scene={SCENE} />
+        <WizardVignette
+          pane={medium.pane}
+          scene={SCENE}
+          palette={paletteForSceneKind(SCENE.kind)}
+        />
       </div>
     )
   }
