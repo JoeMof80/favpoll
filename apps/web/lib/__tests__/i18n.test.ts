@@ -119,7 +119,7 @@ describe("t", () => {
   // kills the misread: the pick does not direct the money.
   it("states the invariant the header lacked", () => {
     expect(t("landing.invariant")).toBe(
-      "Whatever wins, every pledge goes to the charity."
+      "Whatever wins, every pledge is for the charity."
     )
   })
 })
