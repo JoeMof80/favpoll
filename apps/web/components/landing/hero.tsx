@@ -585,6 +585,14 @@ export function LandingHero({
               width — which is why the poster works there and not here. If the
               register headlines should hold one line, that is a COPY change
               (shorter first beats), not a layout one. */}
+          {/* max-w-[33.75rem] (540px), not max-w-xl (founder, 2026-10-19):
+              the register headlines break as two lines each — "Pick their
+              topic and poll / favourites." then "Give to charity in their /
+              memory." — and the fundraiser's "Give to charity in support."
+              (542px rendered at 48px) fitted a 576px box on one line, so the
+              three slides stopped rhyming. 540 breaks it after "in" while the
+              longest first line, "Pick their topic and poll" (495px), still
+              holds — measured: four lines on all three slides. */}
           <h1
             className={cn(
               "mb-6 text-4xl leading-[1.12] font-light tracking-tight md:text-5xl",
@@ -592,7 +600,7 @@ export function LandingHero({
               // beat wraps to exactly two lines — 446-595px is the window
               // where the widest beat (892) does not reach three and the
               // narrowest (595) does not stay on one.
-              sceneKind ? "max-w-xl" : "max-w-3xl",
+              sceneKind ? "max-w-[33.75rem]" : "max-w-3xl",
               router && "2xl:text-6xl"
             )}
           >
