@@ -32,9 +32,11 @@ function Rail({
 }) {
   return (
     <div className="flex h-full flex-col bg-primary/10 p-5">
-      <div className="relative flex flex-1 flex-col justify-around">
+      <div className="relative flex flex-1 flex-col justify-between">
         {/* The spine, station centre to station centre: the 28px button's
-            half, inside the column. */}
+            half, inside the column. justify-between, not -around: around
+            puts half a gap above the first station and below the last, and
+            the line poked out past both (founder, 2026-10-19). */}
         <span
           aria-hidden="true"
           className="absolute top-[14px] bottom-[14px] left-[11.5px] w-px bg-primary"
