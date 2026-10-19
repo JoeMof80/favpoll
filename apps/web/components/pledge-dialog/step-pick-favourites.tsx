@@ -103,10 +103,14 @@ export function PickerPills({
             key={item.id}
             size="lg"
             selected={selectedIds.includes(item.id)}
-            onMouseDown={(e) => {
-              e.preventDefault()
-              onToggle(item.id)
-            }}
+            // mousedown is prevented so a pointer pick never steals focus
+            // from the search field (the combobox habit this picker grew
+            // from, #111). The pick itself happens on click, which the
+            // keyboard also fires — Enter and Space on a focused chip —
+            // where a mousedown-only handler left keyboard users with no
+            // way to pick at all (a11y audit, 2026-10-19).
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => onToggle(item.id)}
           >
             {item.label}
           </Chip>
@@ -120,10 +124,8 @@ export function PickerPills({
           <Chip
             size="lg"
             className="border-dashed bg-background text-primary"
-            onMouseDown={(e) => {
-              e.preventDefault()
-              onEnterAdd()
-            }}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={onEnterAdd}
           >
             + Add your own
           </Chip>
