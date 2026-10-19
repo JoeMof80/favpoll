@@ -182,9 +182,9 @@ const CARD_SCALE = "scale-[0.75] lg:scale-100 xl:scale-[1.15]"
 // above (273 / 376 / 478) give these scales; the TV stands 1120 tall
 // unscaled, which at every stop sits inside the well the phone sets.
 const DISPLAY_SCALE = "scale-[0.139] lg:scale-[0.19] xl:scale-[0.243]"
-// The wizard panes (prototype, 2026-10-19): a 640-wide browser frame at the
-// column widths above (273 / 376 / 478).
-const WIZARD_SCALE = "scale-[0.42] lg:scale-[0.58] xl:scale-[0.74]"
+// The wizard panes (prototype, 2026-10-19): the wizard at a 960px laptop
+// width in a browser frame, at the column widths above (273 / 376 / 478).
+const WIZARD_SCALE = "scale-[0.28] lg:scale-[0.39] xl:scale-[0.5]"
 
 // MOBILE IS MEASURED, NOT TUNED (2026-08-18).
 //
@@ -316,7 +316,15 @@ function BeatMedium({
     return (
       <div
         data-register={paletteForSceneKind(SCENE.kind)}
-        className={cn("shrink-0 drop-shadow-xl", !bare && WIZARD_SCALE)}
+        // theme-light ON THE SAME ELEMENT as data-register (as the TV
+        // below): .theme-light resets the tokens, and the register's
+        // light palette re-applies only on `.theme-light[data-register]`
+        // — on a parent it was lost and the panes drew in the brand blue
+        // beside a green card, room and keepsake (founder, 2026-10-19).
+        className={cn(
+          "theme-light shrink-0 drop-shadow-xl",
+          !bare && WIZARD_SCALE
+        )}
       >
         <WizardVignette pane={medium.pane} scene={SCENE} />
       </div>
