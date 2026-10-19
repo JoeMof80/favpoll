@@ -136,4 +136,15 @@ describe("pledge dialog — picking a favourite from the keyboard", () => {
     )
     expect(document.activeElement).toBe(search)
   })
+
+  it("the search field shows a focus ring from the keyboard", () => {
+    renderDialog()
+    const search = screen.getByRole("textbox", {
+      name: /pick your favourite colour/i,
+    })
+    // Bare outline-none left no visible focus at all (a11y audit,
+    // 2026-10-19); the project's focus-visible ring tokens replace it.
+    expect(search.className).toMatch(/focus-visible:ring-3/)
+    expect(search.className).toMatch(/focus-visible:ring-ring\/50/)
+  })
 })

@@ -87,6 +87,28 @@ describe("StepAmount — presets and calm", () => {
   })
 })
 
+describe("StepAmount — visible focus on the bare amount fields", () => {
+  it("both figures carry the focus-visible ring tokens", () => {
+    render(
+      <StepAmountHeader
+        pledgeAmount="18"
+        updatePledgeAmount={vi.fn()}
+        fundAmount="2"
+        onFundAmountChange={vi.fn()}
+        favouriteCount={2}
+      />
+    )
+    const favourites = screen.getByLabelText(
+      /favourites are worth|pledge amount in pounds/i
+    )
+    const pot = screen.getByLabelText(/shared pot amount/i)
+    for (const el of [favourites, pot]) {
+      expect(el.className).toMatch(/focus-visible:ring-3/)
+      expect(el.className).toMatch(/focus-visible:ring-ring\/50/)
+    }
+  })
+})
+
 describe("StepAmount — the rebalancing slider", () => {
   it("holds the favourites' share of the current sum", () => {
     render(<StepAmount {...BASE} {...SPLIT} />)
