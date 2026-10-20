@@ -18,6 +18,12 @@ import {
   incrementRateLimitCount,
   buildCacheKey,
 } from "./generate-draft-utils"
+import { InvalidInputError, parseInput } from "@/lib/action-input"
+import {
+  cachedDraftGhostsSchema,
+  generateDraftSchema,
+  pairingIsEnactedSchema,
+} from "./generate-draft-input"
 
 // The prompt, the model call and the validators live in lib/story-engine
 // — the ONE generator the wizard and the seed share (pairing table §6).
@@ -169,10 +175,18 @@ export type GeneratedDraftResult = {
 }
 
 export async function generateDraft(
-  input: GenerateDraftInput
+  rawInput: GenerateDraftInput
 ): Promise<GeneratedDraftResult> {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
+
+  // THE SHAPE, BEFORE ANY OF IT IS USED (#1109). Authenticate first so a
+  // stranger learns nothing about the fields, then parse before the rate
+  // limit, so a malformed request never counts against an organiser.
+  // The ids matter most: buildCacheKey joins topicId and primaryCharityId
+  // into a ":"-separated string, so a value carrying its own ":" shifts
+  // every field after it and addresses another shape's cached draft.
+  const input = parseInput(generateDraftSchema, rawInput, "generateDraft")
 
   checkRateLimit(userId)
 
@@ -180,8 +194,11 @@ export async function generateDraft(
 
   // ── Custom topic: skip cache + DB fetch, call Claude directly ──────────────
   if (isCustomTopic) {
-    const topicTitle = input.topicTitle
-    if (!topicTitle) throw new Error("topicTitle required for custom topics")
+    // The schema refuses an empty topicId that brings no title, so the
+    // title is present here; the ?? narrows without a cast. It replaced a
+    // bare `throw new Error("topicTitle required for custom topics")` —
+    // a developer's sentence, which the wizard showed to nobody.
+    const topicTitle = input.topicTitle ?? ""
     const itemLabels = input.itemLabels ?? []
 
     const supabase = createAdminClient()
@@ -317,7 +334,7 @@ export async function generateDraft(
       note: story.note,
       cause_label: causeLabel,
       context,
-      model: modelId,
+      model: modelId(),
       status: "generated",
     })
 
@@ -336,7 +353,17 @@ export async function generateDraft(
 // ---------------------------------------------------------------------------
 
 /** Why a generation failed, so the UI can say something true. */
-export type GenerateDraftFailure = { error: "rate_limit" | "failed" }
+export type GenerateDraftFailure = {
+  error: "rate_limit" | "invalid" | "failed"
+  /**
+   * Set only for "invalid", and only ever a sentence written for a person
+   * — the schema's own message. An internal error's message must never
+   * travel: Next redacts a THROWN message in production but returns a
+   * RETURNED one verbatim, so `err.message` here would hand the browser
+   * whatever Postgres last said.
+   */
+  message?: string
+}
 
 /**
  * Never throws across the server-action boundary — Next replaces thrown
@@ -360,6 +387,8 @@ export async function safeGenerateDraft(
       "generateDraft failed, using fallback:",
       err instanceof Error ? err.message : String(err)
     )
+    if (err instanceof InvalidInputError)
+      return { error: "invalid", message: err.message }
     return { error: rateLimited ? "rate_limit" : "failed" }
   }
 }
@@ -374,10 +403,18 @@ export async function safeGenerateDraft(
  * in the key).
  */
 export async function getCachedDraftGhosts(
-  input: GenerateDraftInput
+  rawInput: GenerateDraftInput
 ): Promise<{ about: string; note: string } | null> {
   const { userId } = await auth()
   if (!userId) return null
+  // A SILENT REFUSAL, DELIBERATELY: this is a speculative prefetch with no
+  // surface of its own, so a malformed argument means "no ghosts" exactly
+  // as a cache miss does. It uses the schema directly rather than
+  // parseInput for that reason — there is nobody to show a sentence to.
+  // Its schema also refuses the empty topicId the comment above excludes.
+  const ghostInput = cachedDraftGhostsSchema.safeParse(rawInput)
+  if (!ghostInput.success) return null
+  const input = ghostInput.data
   const supabase = createAdminClient()
   const cacheKey = buildCacheKey(
     input.register,
@@ -439,7 +476,7 @@ export async function getCachedDraftGhosts(
  * switch; the occasion edge needs only the titles, nothing of the
  * charity. False for a custom topic or an unreadable title.
  */
-export async function pairingIsEnacted(input: {
+export async function pairingIsEnacted(rawInput: {
   register: Register
   subject: "someone" | "cause"
   topicId: string
@@ -448,7 +485,12 @@ export async function pairingIsEnacted(input: {
 }): Promise<boolean> {
   const { userId } = await auth()
   if (!userId) return false
-  if (!input.topicId) return false
+  // Also a silent surface: the wizard asks alongside the ghost prefetch to
+  // pre-set a switch, so "we could not tell" and "not enacted" are the
+  // same answer. The schema subsumes the old `if (!input.topicId)` guard.
+  const parsed = pairingIsEnactedSchema.safeParse(rawInput)
+  if (!parsed.success) return false
+  const input = parsed.data
   const supabase = createAdminClient()
   const { data: topic } = await supabase
     .from("topics")
