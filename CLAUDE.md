@@ -52,11 +52,28 @@ From `apps/web`: `pnpm exec prettier --check .`, `tsc --noEmit`, `eslint`,
 `references/COMPONENT_TREE.md` when you add or remove a component) and
 `node scripts/check-dead-messages.mjs` (a key in `messages/en-GB.json`
 that no production source renders fails the build; a key referenced only
-by a test or a story counts as dead).
+by a test or a story counts as dead) and
+`node scripts/check-e2e-projects.mjs` (an e2e spec matching no Playwright
+project, or a project matching no spec — see below).
 
 Playwright runs as **E2E Tests (advisory)**. It is a real signal, not
 noise: in October 2026 it sat red for a day because its beat list had
 gone stale, and nobody looked, because the job cannot block anything.
+
+**The worse failure is green-but-empty, and the badge cannot show it.**
+Each project in `playwright.config.ts` names its specs by filename
+pattern, and Playwright does not complain when a pattern matches nothing
+— it runs zero tests and reports success. "No tests found" appears only
+when you name the file explicitly. #897 renamed
+`reveal-after-pledge.spec.ts` to `note-after-pledge.spec.ts` and left the
+`guest` project pointing at the old name, so for two and a half months
+the guest pledge flow — the only end-to-end cover the money path has —
+never ran, behind a green tick. `scripts/check-e2e-projects.mjs` now
+fails on both halves of that: a spec no project matches, and a project no
+spec matches. It asks Playwright itself (`--list`), so it cannot drift
+from the real glob behaviour, and it runs in **Format check** rather than
+in the advisory job — the job that would have shown this green is the
+wrong place to catch it.
 
 ### Which checks actually gate a merge
 
