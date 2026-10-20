@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { actionId } from "@/lib/action-input"
 import type { FavpollGrouping, Pronoun } from "@favpoll/types"
 
 // THE WIZARD'S PUBLISH PATH (#1109, 2026-10-20).
@@ -16,10 +17,7 @@ import type { FavpollGrouping, Pronoun } from "@favpoll/types"
 // than a rule about the field.
 
 const ID_MESSAGE = "That favpoll, topic or charity wasn't recognised."
-/** z.guid, not z.uuid: a `uuid` column stores any 128-bit value, while
- *  z.uuid enforces the RFC's version nibbles and would refuse an id the
- *  database handed us. */
-const id = z.guid(ID_MESSAGE)
+const id = actionId(ID_MESSAGE)
 
 /** Free text, collapsed to one line and bounded. The form caps these far
  *  lower (components/favpoll-form/schema.ts); this is the outer wall. */
