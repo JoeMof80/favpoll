@@ -21,12 +21,21 @@ const mockPurpose = vi.hoisted(() =>
 // real comparison the mirror verifies names with, and a copy of it in a
 // mock is how the two definitions drifted apart in the first place. Only
 // the network calls are mocked.
-vi.mock("@/lib/charity-commission", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/lib/charity-commission")>()),
-  verifyCharityNumber: mockVerify,
-  fetchRegisterContact: mockContact,
-  fetchRegisterPurpose: mockPurpose,
-}))
+// Mock the SHARED module, not the app's re-export of it. Since #1108 the
+// register mirror lives in @favpoll/charity-register and calls its own
+// copy of the commission client directly, so stubbing the app-local path
+// no longer intercepts it.
+vi.mock(
+  "@favpoll/charity-register/charity-commission",
+  async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import("@favpoll/charity-register/charity-commission")
+    >()),
+    verifyCharityNumber: mockVerify,
+    fetchRegisterContact: mockContact,
+    fetchRegisterPurpose: mockPurpose,
+  })
+)
 
 let mock = makeSupabaseMock()
 vi.mock("@/lib/supabase/admin", () => ({

@@ -20,7 +20,9 @@
     ],
     "paths": {
       "@/*": ["./*"],
-      "@favpoll/types": ["../../packages/types/index.ts"]
+      "@favpoll/types": ["../../packages/types/index.ts"],
+      "@favpoll/charity-register": ["../../packages/charity-register/index.ts"],
+      "@favpoll/charity-register/*": ["../../packages/charity-register/*"]
     }
   },
   "include": [

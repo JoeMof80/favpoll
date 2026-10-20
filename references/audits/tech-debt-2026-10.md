@@ -134,15 +134,17 @@ The seams are visible in each: `hero.tsx` splits into layout / `useStillBeat`
 pledge-by-card, pledge-from-pot and guest-pledge over one shared pipeline
 (the three duplicate their verification and insert logic today).
 
-### 2.3 Two libraries are copy-pasted between web and admin, and the copies are formatted differently · M · low risk · FIX NOW
+### 2.3 Two libraries are copy-pasted between web and admin, and the copies are formatted differently · M · low risk · DONE (#1108)
 
 `lib/register-mirror.ts` (298 / 266 lines) and `lib/charity-commission.ts`
 (636 / 635) exist in both apps. Diffed raw they differ on 308 and 574
 lines; diffed ignoring semicolons and trailing commas they differ on 66
 and 43 — **the two apps use different Prettier settings**, so a real
 behavioural drift would be invisible in the formatting noise. This has
-already bitten once: memory records "copied verbatim into admin — keep the
-two in sync".
+already bitten once, and the drift was real: `mirrorContactAndPurpose`
+existed only in apps/web, and three comments had diverged in the other
+file. Both now live in `packages/charity-register`, with a per-app
+binding that supplies each app's own admin client.
 
 Fix: one Prettier config at the root, then move both modules into
 `packages/` and import them. `lib/utils.ts` is identical in both and can
