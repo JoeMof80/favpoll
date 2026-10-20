@@ -19,6 +19,12 @@ const preview: Preview = {
         { name: "dark", value: "#534AB7" },
       ],
     },
+    // The framework provides next/link and the App Router hooks through a
+    // context it only mounts when told the app uses the App Router. Without
+    // this, any story reaching next/link throws "invariant expected app
+    // router to be mounted" — which is how FavpollListCard and PledgeDialog
+    // came to pass under vitest and fail in a static build (#1101).
+    nextjs: { appDirectory: true },
     layout: "centered",
     a11y: {
       test: "todo",
