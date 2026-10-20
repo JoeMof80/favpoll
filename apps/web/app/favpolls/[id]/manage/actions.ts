@@ -13,6 +13,13 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import { favpollLocks, readLockInputs, lockReason } from "@/lib/favpoll-locks"
 import { insertSubsetMembers } from "@/lib/subset-members"
 import { asResult } from "@/lib/action-result"
+import { parseInput } from "@/lib/action-input"
+import {
+  setFavpollCharitiesSchema,
+  setFavpollTopicSchema,
+  setPicksSuspendedSchema,
+  updateStoryFieldSchema,
+} from "./manage-input"
 
 export type StoryField =
   | "opening_line"
@@ -291,28 +298,62 @@ async function setPicksSuspendedInner(favpollId: string, suspend: boolean) {
 // THE EXPORTS RETURN RESULTS, NOT THROWS (lib/action-result, 2026-10-15):
 // a thrown message never reaches the organiser in production. The bodies
 // above keep their throws; these wrap them.
+// THE PARSE GOES INSIDE asResult, so a refused shape comes back as the
+// same { ok: false, error } the organiser's row already renders (#1109).
+// Parsed outside, it would throw, and Next would redact the sentence.
 export async function updateStoryField(
-  favpollId: string,
-  field: StoryField,
-  value: string | number | null
+  rawFavpollId: string,
+  rawField: StoryField,
+  rawValue: string | number | null
 ) {
-  return asResult(() => updateStoryFieldInner(favpollId, field, value))
+  return asResult(() => {
+    const [favpollId, field, value] = parseInput(
+      updateStoryFieldSchema,
+      [rawFavpollId, rawField, rawValue],
+      "updateStoryField"
+    )
+    return updateStoryFieldInner(favpollId, field, value)
+  })
 }
 
 export async function setFavpollCharities(
-  favpollId: string,
-  charityIds: string[]
+  rawFavpollId: string,
+  rawCharityIds: string[]
 ) {
-  return asResult(() => setFavpollCharitiesInner(favpollId, charityIds))
+  return asResult(() => {
+    const [favpollId, charityIds] = parseInput(
+      setFavpollCharitiesSchema,
+      [rawFavpollId, rawCharityIds],
+      "setFavpollCharities"
+    )
+    return setFavpollCharitiesInner(favpollId, charityIds)
+  })
 }
 
 export async function setFavpollTopic(
-  favpollId: string,
-  pick: { topicId: string; subsetId: string | null }
+  rawFavpollId: string,
+  rawPick: { topicId: string; subsetId: string | null }
 ) {
-  return asResult(() => setFavpollTopicInner(favpollId, pick))
+  return asResult(() => {
+    const [favpollId, pick] = parseInput(
+      setFavpollTopicSchema,
+      [rawFavpollId, rawPick],
+      "setFavpollTopic"
+    )
+    return setFavpollTopicInner(favpollId, pick)
+  })
 }
 
-export async function setPicksSuspended(favpollId: string, suspend: boolean) {
-  return asResult(() => setPicksSuspendedInner(favpollId, suspend))
+export async function setPicksSuspended(
+  rawFavpollId: string,
+  rawSuspend: boolean
+) {
+  return asResult(() => {
+    const [favpollId, suspend] = parseInput(
+      setPicksSuspendedSchema,
+      [rawFavpollId, rawSuspend],
+      "setPicksSuspended"
+    )
+    return setPicksSuspendedInner(favpollId, suspend)
+  })
 }

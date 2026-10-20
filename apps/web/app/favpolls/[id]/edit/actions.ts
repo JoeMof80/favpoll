@@ -6,6 +6,8 @@ import { favpollLocks, readLockInputs } from "@/lib/favpoll-locks"
 import type { CanvasSubmitData } from "@favpoll/types"
 import { insertSubsetMembers } from "@/lib/subset-members"
 import { asResult } from "@/lib/action-result"
+import { parseInput } from "@/lib/action-input"
+import { updateClosesAtSchema, updateFavpollSchema } from "./edit-input"
 
 type PollInput = CanvasSubmitData["poll"]
 
@@ -266,12 +268,24 @@ async function updateClosesAtInner(favpollId: string, closesAt: string) {
 }
 
 export async function updateFavpoll(
-  favpollId: string,
-  protagonistId: string,
-  input: CanvasSubmitData
+  rawFavpollId: string,
+  rawProtagonistId: string,
+  rawInput: CanvasSubmitData
 ) {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
+
+  // THIS ONE THROWS, like the rest of its own guards below (#1109). The
+  // wizard's catch renders `err.message`, so the sentence reaches the
+  // organiser in development and is REDACTED in production — which is
+  // true of every throw in this action already, and is #1105's remaining
+  // work on this file rather than this ticket's. `updateClosesAt` below
+  // is the half that was converted.
+  const [favpollId, protagonistId, input] = parseInput(
+    updateFavpollSchema,
+    [rawFavpollId, rawProtagonistId, rawInput],
+    "updateFavpoll"
+  )
 
   if (input.subject === "someone" && !input.protagonistName.trim())
     throw new Error("A name is required")
@@ -465,6 +479,16 @@ export async function updateFavpoll(
 // A RESULT, NOT A THROW (lib/action-result, 2026-10-15): the manage page's
 // Close date row shows this action's sentence, and a thrown one never
 // reaches the organiser in production.
-export async function updateClosesAt(favpollId: string, closesAt: string) {
-  return asResult(() => updateClosesAtInner(favpollId, closesAt))
+export async function updateClosesAt(
+  rawFavpollId: string,
+  rawClosesAt: string
+) {
+  return asResult(() => {
+    const [favpollId, closesAt] = parseInput(
+      updateClosesAtSchema,
+      [rawFavpollId, rawClosesAt],
+      "updateClosesAt"
+    )
+    return updateClosesAtInner(favpollId, closesAt)
+  })
 }

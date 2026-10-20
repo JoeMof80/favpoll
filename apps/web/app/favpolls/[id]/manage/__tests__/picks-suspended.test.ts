@@ -15,6 +15,10 @@ vi.mock("@/lib/supabase/admin", () => ({
 import { setPicksSuspended } from "@/app/favpolls/[id]/manage/actions"
 import { unwrap } from "@/lib/action-result"
 
+// The ids are uuid columns, so the fixtures are uuids (#1109): the
+// actions now check the format before they touch anything.
+const FAVPOLL_ID = "11111111-1111-1111-1111-111111111111"
+
 const open = {
   created_by: "user-1",
   closed_at: null,
@@ -42,7 +46,7 @@ beforeEach(() => {
 describe("setPicksSuspended", () => {
   it("refuses a stranger", async () => {
     mock.queue({ ...open, created_by: "someone-else" })
-    expect(await setPicksSuspended("f-1", true)).toEqual({
+    expect(await setPicksSuspended(FAVPOLL_ID, true)).toEqual({
       ok: false,
       error: "Unauthorized",
     })
@@ -50,7 +54,7 @@ describe("setPicksSuspended", () => {
 
   it("refuses a closed favpoll", async () => {
     mock.queue({ ...open, closed_at: "2026-01-01T00:00:00Z" })
-    expect(await setPicksSuspended("f-1", true)).toMatchObject({
+    expect(await setPicksSuspended(FAVPOLL_ID, true)).toMatchObject({
       ok: false,
       error: expect.stringContaining("closed"),
     })
@@ -61,7 +65,7 @@ describe("setPicksSuspended", () => {
     mock.queue(open)
     mock.queue(null)
     const before = Date.now()
-    const value = unwrap(await setPicksSuspended("f-1", true))
+    const value = unwrap(await setPicksSuspended(FAVPOLL_ID, true))
     expect(value).not.toBeNull()
     expect(new Date(value!).getTime()).toBeGreaterThanOrEqual(before)
     expect(lastUpdate()).toEqual({ picks_suspended_at: value })
@@ -70,7 +74,7 @@ describe("setPicksSuspended", () => {
   it("resumes with null", async () => {
     mock.queue(open)
     mock.queue(null)
-    expect(unwrap(await setPicksSuspended("f-1", false))).toBeNull()
+    expect(unwrap(await setPicksSuspended(FAVPOLL_ID, false))).toBeNull()
     expect(lastUpdate()).toEqual({ picks_suspended_at: null })
   })
 })
@@ -83,7 +87,7 @@ describe("setPicksSuspended stamping the first suspension", () => {
     mock.queue(open)
     mock.queue(null)
     mock.queue(null)
-    const value = unwrap(await setPicksSuspended("f-1", true))
+    const value = unwrap(await setPicksSuspended(FAVPOLL_ID, true))
     expect(updates()).toEqual([
       { picks_suspended_at: value },
       { picks_first_suspended_at: value },
@@ -99,7 +103,7 @@ describe("setPicksSuspended stamping the first suspension", () => {
   it("writes nothing about the standings on a resume", async () => {
     mock.queue(open)
     mock.queue(null)
-    unwrap(await setPicksSuspended("f-1", false))
+    unwrap(await setPicksSuspended(FAVPOLL_ID, false))
     expect(updates()).toEqual([{ picks_suspended_at: null }])
   })
 })
