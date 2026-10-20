@@ -76,6 +76,46 @@ protection, and they are worth keeping in the ruleset for that reason
 alone. The cost is a dependency on Vercel: if a deployment check stops
 reporting, merges wait.
 
+## Toolchain versions
+
+One pnpm and one Node, pinned in the repo, and nothing else names a version:
+
+- `packageManager: "pnpm@10.28.0"` in the root `package.json`. Corepack
+  honours it on a fresh clone, and `pnpm/action-setup` reads it when its
+  `version` input is omitted.
+- `24` in `.nvmrc`, plus `engines.node: "24.x"` in the root package.json and
+  in **both apps** — Vercel reads `engines` from the project's root directory,
+  which for these two is `apps/web` and `apps/admin`, not the repo root.
+
+**pnpm 10.28.0 because that is what Vercel builds with.** Its build log says
+`Using pnpm@10.x based on project creation date`: the choice comes from when
+the project was created, not from anything in the repo, and Vercel reads
+`packageManager` only behind an experimental corepack flag. Vercel is the only
+build check there is, so its version is the one to agree with rather than
+argue with. The lockfile is `lockfileVersion: 9.0`, which pnpm 9, 10 and 11
+all write, so the pin cost no lockfile churn.
+
+**Node 24 because both Vercel projects already build and run on 24.x**, and
+Vercel deprecated Node 20 on 1 October 2026. CI had been testing on 20 while
+production ran on 24.
+
+`.nvmrc` holds the major, `24`, not an exact patch, so CI jobs in one run can
+land on different 24.x patches — the first run after the pin drew 24.21.0 in
+two jobs and 24.22.0 in three, because `setup-node` takes the newest 24.x the
+runner has cached. That is deliberate: Vercel resolves its own patch inside
+`24.x` too, so pinning CI to one patch would make CI stricter than the thing
+it is meant to mirror. The major is what changes behaviour.
+
+Bump either by hand, in its own commit — corepack needs an exact pnpm
+version, so there is no range to track. Left to choose for itself, corepack
+fetched pnpm 12.14.0 on 2026-10-20 and broke every `pnpm` call on the
+founder's machine: 12 ships `pnpm.mjs` where the installed shim looked for
+`pnpm.cjs` (#1121).
+
+`pnpm-workspace.yaml` carries an `allowBuilds` allowlist. pnpm 10 and 11 run
+no dependency build script that is not on it, and pnpm 9 ran them all — so CI
+never exercised that list until this pin landed.
+
 ## Agent skills
 
 ### Issue tracker
