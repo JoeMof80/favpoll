@@ -11,7 +11,7 @@ Generated 2026-10-20 by `node scripts/component-tree.mjs` — do not edit by han
 ↑  already expanded above, or a shared subtree (see its section)
 ```
 
-Counts: 30 routes · 200 component files · 41 with stories · 3 unused in production
+Counts: 30 routes · 194 component files · 39 with stories · 2 unused in production
 
 ---
 
@@ -430,7 +430,7 @@ app/favpolls/[id]/page.tsx
           → components/pledge-dialog/step-pay.tsx
               → components/pledge-card/pledge-breakdown.tsx *
               → components/pledge-card/utils.ts
-              → components/stripe-checkout.tsx  ↑
+              → components/stripe-checkout.tsx
               → components/ui/button.tsx *  ↑
               → components/ui/input.tsx *  ↑
               → components/ui/switch.tsx  ↑
@@ -530,7 +530,8 @@ app/favpolls/new/page.tsx
           → components/ui/chip.tsx *  ↑
           → packages/types/ *  ↑
       → components/favpoll-form/seed-fund-modal.tsx
-          → components/stripe-checkout.tsx  ↑
+          → components/stripe-checkout.tsx
+              → components/checkout-form.tsx
           → components/ui/button.tsx *  ↑
           → components/ui/responsive-overlay.tsx *  ↑
       → components/new-favpoll-wizard/use-wizard-state.ts  ↑
@@ -1494,14 +1495,6 @@ components/new-favpoll-wizard/wizard-topic-card.tsx *
   → packages/types/ *
 ```
 
-### `components/pledge-card/pledge-card-wrapper.tsx` — used by 3
-
-```
-components/pledge-card/pledge-card-wrapper.tsx
-  → components/ui/button.tsx *
-  → components/ui/popover.tsx
-```
-
 ### `components/room-shell/index.tsx` — used by 3
 
 ```
@@ -1581,14 +1574,6 @@ components/share-favpoll-button.tsx
   → components/ui/button.tsx *
 ```
 
-### `components/stripe-checkout.tsx` — used by 3
-
-```
-components/stripe-checkout.tsx
-  → components/checkout-form.tsx
-      → components/ui/button.tsx *
-```
-
 ---
 
 ## UI primitives (`components/ui/`)
@@ -1597,7 +1582,7 @@ components/stripe-checkout.tsx
 components/ui/alert.tsx  ← 1
 components/ui/badge.tsx  ← 3
 components/ui/button-group.tsx  ← 1
-components/ui/button.tsx *  ← 79
+components/ui/button.tsx *  ← 75
 components/ui/calendar.tsx  ← 1
 components/ui/card.tsx *  ← 1
 components/ui/chip.tsx *  ← 8
@@ -1606,7 +1591,7 @@ components/ui/dropdown-menu.tsx  ← 6
 components/ui/input-group.tsx  ← 11
 components/ui/input.tsx *  ← 6
 components/ui/label.tsx  ← 1
-components/ui/popover.tsx  ← 8
+components/ui/popover.tsx  ← 5
 components/ui/ranking-bar.tsx *  ← 6
 components/ui/responsive-overlay.tsx *  ← 12
 components/ui/section-eyebrow.tsx *  ← 21
@@ -1630,7 +1615,6 @@ components/ui/tooltip.tsx  ← 2
 
 ```
 components/charity-banner.tsx
-components/pledge-card/index.tsx
 components/ui/separator.tsx
 ```
 
