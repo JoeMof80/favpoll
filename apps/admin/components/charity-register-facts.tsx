@@ -28,18 +28,18 @@
 // rather than contradicting it; the only badge is the removal, repeated
 // because the expanded row is where Deactivate actually is.
 
-import { StatusBadge } from "@/components/ui/status-badge";
+import { StatusBadge } from "@/components/ui/status-badge"
 
 /** The register publishes whole pounds — up to nine digits, which cannot
  *  sit in a row. The magnitude is what the eye checks, never the pennies. */
 function money(pounds: number): string {
-  if (pounds < 1_000) return `£${pounds}`;
-  const k = Math.round(pounds / 1_000);
-  if (k < 1_000) return `£${k}k`;
-  const m = pounds / 1_000_000;
+  if (pounds < 1_000) return `£${pounds}`
+  const k = Math.round(pounds / 1_000)
+  if (k < 1_000) return `£${k}k`
+  const m = pounds / 1_000_000
   // Above £100m a decimal is noise; below it, it is the difference between
   // two charities ("£2.4m", not "£2m").
-  return `£${m >= 100 ? Math.round(m) : m.toFixed(1).replace(/\.0$/, "")}m`;
+  return `£${m >= 100 ? Math.round(m) : m.toFixed(1).replace(/\.0$/, "")}m`
 }
 
 export function CharityRegisterFacts({
@@ -48,23 +48,23 @@ export function CharityRegisterFacts({
   place,
   registeredOn,
 }: {
-  status: string | null | undefined;
-  income: number | null | undefined;
-  place: string | null | undefined;
-  registeredOn: string | null | undefined;
+  status: string | null | undefined
+  income: number | null | undefined
+  place: string | null | undefined
+  registeredOn: string | null | undefined
 }) {
-  const removed = Boolean(status) && status !== "Registered";
+  const removed = Boolean(status) && status !== "Registered"
   const facts = [
     income == null ? null : money(income),
     place,
     // An ISO date sliced, not parsed: new Date() on a date-only string is
     // UTC midnight, which in a western timezone reads as the year before.
     registeredOn ? `registered ${registeredOn.slice(0, 4)}` : null,
-  ].filter(Boolean);
+  ].filter(Boolean)
 
   // Nothing to compare against — no mirror row, or no number on the
   // account. Both are reported once, elsewhere, properly.
-  if (!removed && facts.length === 0) return null;
+  if (!removed && facts.length === 0) return null
 
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -76,5 +76,5 @@ export function CharityRegisterFacts({
         </span>
       )}
     </div>
-  );
+  )
 }

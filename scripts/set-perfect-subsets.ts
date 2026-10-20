@@ -31,15 +31,15 @@
  * Re-running changes nothing. Nothing here writes a suggestion.
  * ---------------------------------------------------------------------------
  */
-import { createClient } from "@supabase/supabase-js";
-import { profileKey } from "../packages/types";
+import { createClient } from "@supabase/supabase-js"
+import { profileKey } from "../packages/types"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
-const DRY = process.argv.includes("--dry-run");
-const FORCE = process.argv.includes("--force");
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
+const DRY = process.argv.includes("--dry-run")
+const FORCE = process.argv.includes("--force")
 
 /** charity name → [perfect topic, perfect subset or null]. Section B of
  *  references/subsets-pairing-revisit-2026-10-01.md, ticked 2 Oct 2026.
@@ -65,61 +65,61 @@ const PERFECT: [charity: string, topic: string, subset: string | null][] = [
   ["Guide Dogs", "Dog breed", "Working dog breed"],
   // No subset: the whole list is the charity's own.
   ["Cats Protection", "Cat breed", null],
-];
+]
 
 /** "No topic of its own" — the confirmation AND the suggestion go, so
  *  the charity leaves the Perfect topics queue decided. Age UK was
  *  confirmed to Proverb on 2026-10-02 and cleared the same day: the
  *  perfect-topic rules name "a saying for an older-people charity" as
  *  the exact thing that is not a charity's own topic. */
-const CLEAR: string[] = ["Age UK"];
+const CLEAR: string[] = ["Age UK"]
 
 async function main() {
-  let set = 0;
-  let skipped = 0;
+  let set = 0
+  let skipped = 0
   for (const [name, topicTitle, subsetTitle] of PERFECT) {
     const { data: charity } = await supabase
       .from("charities")
       .select("id, name, perfect_topic_id, perfect_subset_id")
       .eq("name", name)
-      .maybeSingle();
+      .maybeSingle()
     if (!charity) {
-      console.warn(`  ✗ ${name}: no such charity here`);
-      skipped++;
-      continue;
+      console.warn(`  ✗ ${name}: no such charity here`)
+      skipped++
+      continue
     }
     const { data: topic } = await supabase
       .from("topics")
       .select("id")
       .eq("title", topicTitle)
-      .maybeSingle();
+      .maybeSingle()
     const { data: subset } = subsetTitle
       ? await supabase
           .from("topic_subsets")
           .select("id, status, topic_id")
           .eq("title", subsetTitle)
           .maybeSingle()
-      : { data: null };
+      : { data: null }
     if (!topic || (subsetTitle && !subset)) {
       console.warn(
-        `  ✗ ${name}: missing ${!topic ? `topic "${topicTitle}"` : `subset "${subsetTitle}"`}`,
-      );
-      skipped++;
-      continue;
+        `  ✗ ${name}: missing ${!topic ? `topic "${topicTitle}"` : `subset "${subsetTitle}"`}`
+      )
+      skipped++
+      continue
     }
     if (subset && subset.status !== "approved") {
       console.warn(
-        `  ✗ ${name}: subset "${subsetTitle}" is ${subset.status} — approve it on /subsets first`,
-      );
-      skipped++;
-      continue;
+        `  ✗ ${name}: subset "${subsetTitle}" is ${subset.status} — approve it on /subsets first`
+      )
+      skipped++
+      continue
     }
     if (subset && subset.topic_id !== topic.id) {
       console.warn(
-        `  ✗ ${name}: "${subsetTitle}" is not a subset of "${topicTitle}"`,
-      );
-      skipped++;
-      continue;
+        `  ✗ ${name}: "${subsetTitle}" is not a subset of "${topicTitle}"`
+      )
+      skipped++
+      continue
     }
     if (
       charity.perfect_topic_id &&
@@ -127,23 +127,23 @@ async function main() {
       !FORCE
     ) {
       console.warn(
-        `  ✗ ${name}: already confirmed to another topic — pass --force to change it`,
-      );
-      skipped++;
-      continue;
+        `  ✗ ${name}: already confirmed to another topic — pass --force to change it`
+      )
+      skipped++
+      continue
     }
-    const label = subsetTitle ? `${topicTitle} / ${subsetTitle}` : topicTitle;
+    const label = subsetTitle ? `${topicTitle} / ${subsetTitle}` : topicTitle
     if (
       charity.perfect_topic_id === topic.id &&
       charity.perfect_subset_id === (subset?.id ?? null)
     ) {
-      console.log(`  = ${name}: ${label} (already set)`);
-      continue;
+      console.log(`  = ${name}: ${label} (already set)`)
+      continue
     }
     if (DRY) {
-      console.log(`  → ${name}: ${label}`);
-      set++;
-      continue;
+      console.log(`  → ${name}: ${label}`)
+      set++
+      continue
     }
     const { error } = await supabase
       .from("charities")
@@ -155,14 +155,14 @@ async function main() {
         perfect_topic_suggested_id: topic.id,
         perfect_subset_suggested_id: subset?.id ?? null,
       })
-      .eq("id", charity.id);
+      .eq("id", charity.id)
     if (error) {
-      console.warn(`  ✗ ${name}: ${error.message}`);
-      skipped++;
-      continue;
+      console.warn(`  ✗ ${name}: ${error.message}`)
+      skipped++
+      continue
     }
-    console.log(`  ✓ ${name}: ${label}`);
-    set++;
+    console.log(`  ✓ ${name}: ${label}`)
+    set++
   }
 
   for (const name of CLEAR) {
@@ -170,39 +170,39 @@ async function main() {
       .from("charities")
       .select("id, name, registered_number, perfect_topic_id")
       .eq("name", name)
-      .maybeSingle();
+      .maybeSingle()
     if (!charity) {
-      console.warn(`  ✗ ${name}: no such charity here`);
-      skipped++;
-      continue;
+      console.warn(`  ✗ ${name}: no such charity here`)
+      skipped++
+      continue
     }
     // Clearing means both halves: the CONFIRMED topic on the account and
     // the SUGGESTION on the profile, which step 2 moved there — or the
     // next wave's suggestion quietly reappears in the queue.
-    const key = profileKey(charity.registered_number as string | null);
+    const key = profileKey(charity.registered_number as string | null)
     const { data: profile } = key
       ? await supabase
           .from("charity_profiles")
           .select("perfect_topic_suggested_id")
           .eq("registered_number", key)
           .maybeSingle()
-      : { data: null };
+      : { data: null }
     const suggested =
       (profile as { perfect_topic_suggested_id: string | null } | null)
-        ?.perfect_topic_suggested_id ?? null;
+        ?.perfect_topic_suggested_id ?? null
     if (!charity.perfect_topic_id && !suggested) {
-      console.log(`  = ${name}: already has no topic of its own`);
-      continue;
+      console.log(`  = ${name}: already has no topic of its own`)
+      continue
     }
     if (DRY) {
-      console.log(`  → ${name}: clear (no topic of its own)`);
-      set++;
-      continue;
+      console.log(`  → ${name}: clear (no topic of its own)`)
+      set++
+      continue
     }
     const { error } = await supabase
       .from("charities")
       .update({ perfect_topic_id: null, perfect_subset_id: null })
-      .eq("id", charity.id);
+      .eq("id", charity.id)
     if (!error && key) {
       await supabase
         .from("charity_profiles")
@@ -211,24 +211,24 @@ async function main() {
           perfect_subset_suggested_id: null,
           updated_at: new Date().toISOString(),
         })
-        .eq("registered_number", key);
+        .eq("registered_number", key)
     }
     if (error) {
-      console.warn(`  ✗ ${name}: ${error.message}`);
-      skipped++;
-      continue;
+      console.warn(`  ✗ ${name}: ${error.message}`)
+      skipped++
+      continue
     }
-    console.log(`  ✓ ${name}: cleared — no topic of its own`);
-    set++;
+    console.log(`  ✓ ${name}: cleared — no topic of its own`)
+    set++
   }
   console.log(
     DRY
       ? `--dry-run: ${set} would be set, ${skipped} skipped. Nothing written.`
-      : `${set} set, ${skipped} skipped.`,
-  );
+      : `${set} set, ${skipped} skipped.`
+  )
 }
 
 main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+  console.error(e)
+  process.exit(1)
+})

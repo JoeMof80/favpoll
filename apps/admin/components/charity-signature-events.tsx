@@ -1,5 +1,5 @@
-import type { SignatureEvent } from "@favpoll/types";
-import { StatusBadge } from "@/components/ui/status-badge";
+import type { SignatureEvent } from "@favpoll/types"
+import { StatusBadge } from "@/components/ui/status-badge"
 
 // WHAT THE WEBSITE READER FOUND.
 //
@@ -28,11 +28,11 @@ export function CharitySignatureEvents({
   events,
   readAt,
 }: {
-  events: SignatureEvent[] | null | undefined;
-  readAt: string | null | undefined;
+  events: SignatureEvent[] | null | undefined
+  readAt: string | null | undefined
 }) {
-  const read = readAt ? new Date(readAt).toLocaleDateString("en-GB") : null;
-  const list = events ?? [];
+  const read = readAt ? new Date(readAt).toLocaleDateString("en-GB") : null
+  const list = events ?? []
 
   return (
     <div className="flex flex-col gap-1.5">
@@ -76,5 +76,5 @@ export function CharitySignatureEvents({
         </ul>
       )}
     </div>
-  );
+  )
 }

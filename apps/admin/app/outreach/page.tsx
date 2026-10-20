@@ -1,5 +1,5 @@
-import { getOutreachPreviewRows } from "@/lib/actions/charities";
-import { OutreachPreview } from "@/components/outreach-preview";
+import { getOutreachPreviewRows } from "@/lib/actions/charities"
+import { OutreachPreview } from "@/components/outreach-preview"
 
 // RENDERED PER REQUEST, unlike /contributions and /favpolls which are
 // prerendered and kept fresh by revalidatePath from their own mutating
@@ -9,14 +9,14 @@ import { OutreachPreview } from "@/components/outreach-preview";
 // an action in this app, so none of which could revalidate the path. Without
 // this the page would serve whatever was true at build time, which for a page
 // whose entire job is reporting what is missing would be worse than useless.
-export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic"
 
 // The outreach email, read before it is sent (founder, 2026-10-07). The
 // consent queue is the list to WORK; this is the list to CHECK, and it takes
 // every charity rather than the queue's narrower set — on production that set
 // is currently empty while 42 accounts wait to be written to.
 export default async function OutreachPage() {
-  const { data, error } = await getOutreachPreviewRows();
+  const { data, error } = await getOutreachPreviewRows()
 
   return (
     <div className="space-y-6">
@@ -40,5 +40,5 @@ export default async function OutreachPage() {
 
       <OutreachPreview rows={data ?? []} />
     </div>
-  );
+  )
 }

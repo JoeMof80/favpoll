@@ -23,35 +23,35 @@
  *     --all              re-read charities that already have an image
  * ---------------------------------------------------------------------------
  */
-import { createClient } from "@supabase/supabase-js";
-import { profileKey } from "../packages/types";
-import { findCharityImage } from "../apps/web/lib/charity-image";
+import { createClient } from "@supabase/supabase-js"
+import { profileKey } from "../packages/types"
+import { findCharityImage } from "../apps/web/lib/charity-image"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
-const args = process.argv.slice(2);
-const flag = (n: string) => args.some((a) => a === `--${n}`);
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
+const args = process.argv.slice(2)
+const flag = (n: string) => args.some((a) => a === `--${n}`)
 const opt = (n: string) =>
-  args.find((a) => a.startsWith(`--${n}=`))?.slice(n.length + 3) ?? null;
+  args.find((a) => a.startsWith(`--${n}=`))?.slice(n.length + 3) ?? null
 
-const ALL = flag("all");
-const WAVE = flag("wave") || opt("wave") !== null;
-const INCOME_FLOOR = Number(opt("income") ?? 100000);
-const LIMIT = Number(opt("limit") ?? (WAVE ? 50 : 0)) || 0;
+const ALL = flag("all")
+const WAVE = flag("wave") || opt("wave") !== null
+const INCOME_FLOOR = Number(opt("income") ?? 100000)
+const LIMIT = Number(opt("limit") ?? (WAVE ? 50 : 0)) || 0
 
-type Target = { registeredNumber: string; website: string | null };
+type Target = { registeredNumber: string; website: string | null }
 
 async function waveTargets(): Promise<Target[]> {
   const { data, error } = await supabase.rpc("charity_outreach_candidates", {
     p_income_floor: INCOME_FLOOR,
     p_limit: LIMIT > 0 ? LIMIT * 5 : 500,
-  });
-  if (error) throw new Error(`candidates: ${error.message}`);
+  })
+  if (error) throw new Error(`candidates: ${error.message}`)
   return ((data ?? []) as { registered_number: string; website: string }[]).map(
-    (r) => ({ registeredNumber: r.registered_number, website: r.website }),
-  );
+    (r) => ({ registeredNumber: r.registered_number, website: r.website })
+  )
 }
 
 async function accountTargets(): Promise<Target[]> {
@@ -60,32 +60,32 @@ async function accountTargets(): Promise<Target[]> {
     .select("registered_number")
     .eq("is_active", true)
     .not("registered_number", "is", null)
-    .order("name");
-  if (error) throw new Error(error.message);
+    .order("name")
+  if (error) throw new Error(error.message)
   const numbers = (data ?? [])
     .map((c) => String(c.registered_number).trim().toUpperCase())
-    .filter((n) => profileKey(n) !== null);
-  if (numbers.length === 0) return [];
+    .filter((n) => profileKey(n) !== null)
+  if (numbers.length === 0) return []
   // The site address comes from the mirror, like every other register word.
-  const digits = numbers.filter((n) => /^[0-9]+$/.test(n)).map(Number);
+  const digits = numbers.filter((n) => /^[0-9]+$/.test(n)).map(Number)
   const { data: rows } = await supabase
     .from("register_charities")
     .select("registered_number, website")
-    .in("registered_number", digits);
+    .in("registered_number", digits)
   const site = new Map(
     (
       (rows ?? []) as { registered_number: number; website: string | null }[]
-    ).map((r) => [String(r.registered_number), r.website]),
-  );
+    ).map((r) => [String(r.registered_number), r.website])
+  )
   return numbers.map((n) => ({
     registeredNumber: n,
     website: site.get(n) ?? null,
-  }));
+  }))
 }
 
 async function main() {
-  let targets = WAVE ? await waveTargets() : await accountTargets();
-  targets = targets.filter((t) => t.website);
+  let targets = WAVE ? await waveTargets() : await accountTargets()
+  targets = targets.filter((t) => t.website)
 
   if (!ALL && targets.length > 0) {
     // A charity that already has an image is left alone — including one
@@ -96,22 +96,20 @@ async function main() {
       .select("registered_number, image_url")
       .in(
         "registered_number",
-        targets.map((t) => t.registeredNumber),
+        targets.map((t) => t.registeredNumber)
       )
-      .not("image_url", "is", null);
-    const held = new Set(
-      (have ?? []).map((p) => p.registered_number as string),
-    );
-    targets = targets.filter((t) => !held.has(t.registeredNumber));
+      .not("image_url", "is", null)
+    const held = new Set((have ?? []).map((p) => p.registered_number as string))
+    targets = targets.filter((t) => !held.has(t.registeredNumber))
   }
-  if (LIMIT > 0) targets = targets.slice(0, LIMIT);
+  if (LIMIT > 0) targets = targets.slice(0, LIMIT)
   console.log(
-    `${targets.length} ${WAVE ? "candidates" : "account charities"} with a site to read`,
-  );
+    `${targets.length} ${WAVE ? "candidates" : "account charities"} with a site to read`
+  )
 
-  let found = 0;
+  let found = 0
   for (const target of targets) {
-    const image = await findCharityImage(target.website);
+    const image = await findCharityImage(target.website)
     const { error } = await supabase.from("charity_profiles").upsert(
       {
         registered_number: target.registeredNumber,
@@ -120,27 +118,27 @@ async function main() {
         image_fetched_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       },
-      { onConflict: "registered_number" },
-    );
+      { onConflict: "registered_number" }
+    )
     if (error) {
-      console.error(`  ✗ ${target.registeredNumber}: ${error.message}`);
-      continue;
+      console.error(`  ✗ ${target.registeredNumber}: ${error.message}`)
+      continue
     }
     if (image) {
-      found++;
+      found++
       console.log(
-        `  ✓ ${target.registeredNumber}: ${image.source} — ${image.url}`,
-      );
+        `  ✓ ${target.registeredNumber}: ${image.source} — ${image.url}`
+      )
     } else {
       console.log(
-        `  – ${target.registeredNumber}: nothing on ${target.website}`,
-      );
+        `  – ${target.registeredNumber}: nothing on ${target.website}`
+      )
     }
   }
-  console.log(`${found} of ${targets.length} had an image`);
+  console.log(`${found} of ${targets.length} had an image`)
 }
 
 main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+  console.error(e)
+  process.exit(1)
+})

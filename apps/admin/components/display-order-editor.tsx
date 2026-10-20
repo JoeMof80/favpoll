@@ -1,8 +1,8 @@
-"use client";
+"use client"
 
-import { useState, useTransition } from "react";
-import { updateItemDisplayOrder } from "@/lib/actions/placeholders";
-import { Input } from "@/components/ui/input";
+import { useState, useTransition } from "react"
+import { updateItemDisplayOrder } from "@/lib/actions/placeholders"
+import { Input } from "@/components/ui/input"
 import {
   Table,
   TableBody,
@@ -10,43 +10,43 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/table"
 
 type Item = {
-  id: string;
-  label: string;
-  display_order: number | null;
-};
+  id: string
+  label: string
+  display_order: number | null
+}
 
 function ItemRow({ topicId, item }: { topicId: string; item: Item }) {
   const [order, setOrder] = useState<string>(
-    item.display_order !== null ? String(item.display_order) : "",
-  );
+    item.display_order !== null ? String(item.display_order) : ""
+  )
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">(
-    "idle",
-  );
-  const [errorMsg, setErrorMsg] = useState("");
-  const [isPending, startTransition] = useTransition();
+    "idle"
+  )
+  const [errorMsg, setErrorMsg] = useState("")
+  const [isPending, startTransition] = useTransition()
 
   function handleSave() {
-    setStatus("saving");
-    setErrorMsg("");
-    const parsed = order.trim() === "" ? null : parseInt(order, 10);
+    setStatus("saving")
+    setErrorMsg("")
+    const parsed = order.trim() === "" ? null : parseInt(order, 10)
     if (order.trim() !== "" && isNaN(parsed!)) {
-      setStatus("error");
-      setErrorMsg("Must be a number or empty");
-      return;
+      setStatus("error")
+      setErrorMsg("Must be a number or empty")
+      return
     }
     startTransition(async () => {
-      const result = await updateItemDisplayOrder(item.id, parsed, topicId);
+      const result = await updateItemDisplayOrder(item.id, parsed, topicId)
       if (result.error) {
-        setStatus("error");
-        setErrorMsg(result.error);
+        setStatus("error")
+        setErrorMsg(result.error)
       } else {
-        setStatus("saved");
-        setTimeout(() => setStatus("idle"), 2000);
+        setStatus("saved")
+        setTimeout(() => setStatus("idle"), 2000)
       }
-    });
+    })
   }
 
   return (
@@ -57,8 +57,8 @@ function ItemRow({ topicId, item }: { topicId: string; item: Item }) {
           type="number"
           value={order}
           onChange={(e) => {
-            setOrder(e.target.value);
-            setStatus("idle");
+            setOrder(e.target.value)
+            setStatus("idle")
           }}
           onBlur={handleSave}
           placeholder="—"
@@ -77,30 +77,30 @@ function ItemRow({ topicId, item }: { topicId: string; item: Item }) {
         ) : null}
       </TableCell>
     </TableRow>
-  );
+  )
 }
 
 export function DisplayOrderEditor({
   topicId,
   items,
 }: {
-  topicId: string;
-  items: Item[];
+  topicId: string
+  items: Item[]
 }) {
   if (items.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">No canonical items found.</p>
-    );
+    )
   }
 
   const sorted = [...items].sort((a, b) => {
-    const da = a.display_order ?? null;
-    const db = b.display_order ?? null;
-    if (da !== null && db !== null) return da - db;
-    if (da !== null) return -1;
-    if (db !== null) return 1;
-    return a.label.localeCompare(b.label);
-  });
+    const da = a.display_order ?? null
+    const db = b.display_order ?? null
+    if (da !== null && db !== null) return da - db
+    if (da !== null) return -1
+    if (db !== null) return 1
+    return a.label.localeCompare(b.label)
+  })
 
   return (
     <div className="flex flex-col gap-2">
@@ -125,5 +125,5 @@ export function DisplayOrderEditor({
         save on blur.
       </p>
     </div>
-  );
+  )
 }

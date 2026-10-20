@@ -22,15 +22,15 @@
  *   pnpm exec tsx --env-file=.env.local ../../scripts/backfill-cause-family.ts
  * ---------------------------------------------------------------------------
  */
-import { createClient } from "@supabase/supabase-js";
-import { profileKey, type CauseFamily } from "../packages/types";
-import { suggestCauseFamily } from "../apps/web/lib/cause-family";
-import { mirrorContactAndPurpose } from "../apps/web/lib/register-mirror";
+import { createClient } from "@supabase/supabase-js"
+import { profileKey, type CauseFamily } from "../packages/types"
+import { suggestCauseFamily } from "../apps/web/lib/cause-family"
+import { mirrorContactAndPurpose } from "../apps/web/lib/register-mirror"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 // references/favpoll-pairing-table-2026-09-23.md §2 — founder-approved.
 const CONFIRMED: Record<string, CauseFamily> = {
@@ -64,89 +64,89 @@ const CONFIRMED: Record<string, CauseFamily> = {
   Oxfam: "international",
   "Médecins Sans Frontières": "international",
   "Comic Relief": "entertainment",
-};
+}
 
 async function main() {
   const ref = (process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").match(
-    /https:\/\/([a-z0-9]+)\./,
-  )?.[1];
-  console.log(`Backfilling cause family on ${ref}…\n`);
+    /https:\/\/([a-z0-9]+)\./
+  )?.[1]
+  console.log(`Backfilling cause family on ${ref}…\n`)
 
   const { data: rows, error } = await supabase
     .from("charities")
-    .select("id, name, registered_number, cause_family");
-  if (error) throw new Error(error.message);
+    .select("id, name, registered_number, cause_family")
+  if (error) throw new Error(error.message)
   const accounts = (rows ?? []) as {
-    id: string;
-    name: string;
-    registered_number: string | null;
-    cause_family: CauseFamily | null;
-  }[];
+    id: string
+    name: string
+    registered_number: string | null
+    cause_family: CauseFamily | null
+  }[]
 
   // The register's words, and the suggestions already made, in one read
   // each.
   const mirror = await mirrorContactAndPurpose(
-    accounts.map((c) => c.registered_number),
-  );
+    accounts.map((c) => c.registered_number)
+  )
   const keys = accounts
     .map((c) => profileKey(c.registered_number))
-    .filter((k): k is string => k !== null);
+    .filter((k): k is string => k !== null)
   const { data: profileRows } = keys.length
     ? await supabase
         .from("charity_profiles")
         .select("registered_number, cause_family_suggested")
         .in("registered_number", keys)
-    : { data: [] };
+    : { data: [] }
   const suggestedAlready = new Map(
     (
       (profileRows ?? []) as {
-        registered_number: string;
-        cause_family_suggested: CauseFamily | null;
+        registered_number: string
+        cause_family_suggested: CauseFamily | null
       }[]
-    ).map((r) => [r.registered_number, r.cause_family_suggested]),
-  );
+    ).map((r) => [r.registered_number, r.cause_family_suggested])
+  )
 
-  let confirmed = 0;
-  let suggested = 0;
-  let none = 0;
+  let confirmed = 0
+  let suggested = 0
+  let none = 0
   for (const c of accounts) {
-    const known = CONFIRMED[c.name];
+    const known = CONFIRMED[c.name]
     if (known) {
-      if (c.cause_family === known) continue;
+      if (c.cause_family === known) continue
       const { error: e } = await supabase
         .from("charities")
         .update({ cause_family: known })
-        .eq("id", c.id);
-      if (e) console.error(`  ✗  ${c.name}: ${e.message}`);
+        .eq("id", c.id)
+      if (e) console.error(`  ✗  ${c.name}: ${e.message}`)
       else {
-        console.log(`  ✓  ${c.name.padEnd(30)} confirmed  ${known}`);
-        confirmed++;
+        console.log(`  ✓  ${c.name.padEnd(30)} confirmed  ${known}`)
+        confirmed++
       }
-      continue;
+      continue
     }
-    const key = profileKey(c.registered_number);
-    if (c.cause_family || (key && suggestedAlready.get(key))) continue;
-    const row = mirror.get((c.registered_number ?? "").replace(/\D/g, ""));
+    const key = profileKey(c.registered_number)
+    if (c.cause_family || (key && suggestedAlready.get(key))) continue
+    const row = mirror.get((c.registered_number ?? "").replace(/\D/g, ""))
     const guess = await suggestCauseFamily({
       name: c.name,
       activities: row?.activities ?? null,
       classification: row?.classification ?? null,
       objects: row?.objects ?? null,
       registeredNumber: key,
-    });
+    })
     if (!guess) {
       console.log(
-        `  –  ${c.name.padEnd(30)} no cause of its own (or nothing to go on)`,
-      );
-      none++;
-      continue;
+        `  –  ${c.name.padEnd(30)} no cause of its own (or nothing to go on)`
+      )
+      none++
+      continue
     }
     if (!key) {
       console.log(
-        `  –  ${c.name.padEnd(30)} no profile key (the number is not one)`,
-      );
-      none++;
-      continue;
+        `  –  ${c.name.padEnd(30)} no profile key (the number is not one)`
+      )
+      none++
+      continue
     }
     const { error: e } = await supabase.from("charity_profiles").upsert(
       {
@@ -155,22 +155,22 @@ async function main() {
         status: "drafted",
         updated_at: new Date().toISOString(),
       },
-      { onConflict: "registered_number" },
-    );
-    if (e) console.error(`  ✗  ${c.name}: ${e.message}`);
+      { onConflict: "registered_number" }
+    )
+    if (e) console.error(`  ✗  ${c.name}: ${e.message}`)
     else {
       console.log(
-        `  ?  ${c.name.padEnd(30)} suggested  ${guess}  (confirm in the outreach queue)`,
-      );
-      suggested++;
+        `  ?  ${c.name.padEnd(30)} suggested  ${guess}  (confirm in the outreach queue)`
+      )
+      suggested++
     }
   }
   console.log(
-    `\nDone — ${confirmed} confirmed from the table, ${suggested} suggested, ${none} with none.`,
-  );
+    `\nDone — ${confirmed} confirmed from the table, ${suggested} suggested, ${none} with none.`
+  )
 }
 
 main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+  console.error(err)
+  process.exit(1)
+})

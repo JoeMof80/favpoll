@@ -1,17 +1,17 @@
-"use client";
+"use client"
 
-import { useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, Mail, AlertTriangle } from "lucide-react";
-import type { OutreachPreviewRow } from "@/lib/actions/charities";
+import { useMemo, useState } from "react"
+import { ChevronLeft, ChevronRight, Mail, AlertTriangle } from "lucide-react"
+import type { OutreachPreviewRow } from "@/lib/actions/charities"
 import {
   outreachEmail,
   mailtoFor,
   OUTREACH_KINDS,
   type OutreachKind,
-} from "@/lib/outreach-email";
-import { titleCaseCharityName } from "@/lib/charity-commission";
-import { Button } from "@/components/ui/button";
-import { StatusBadge } from "@/components/ui/status-badge";
+} from "@/lib/outreach-email"
+import { titleCaseCharityName } from "@/lib/charity-commission"
+import { Button } from "@/components/ui/button"
+import { StatusBadge } from "@/components/ui/status-badge"
 
 // ─── Outreach preview ────────────────────────────────────────────────────────
 //
@@ -33,10 +33,10 @@ import { StatusBadge } from "@/components/ui/status-badge";
 
 /** A problem worth seeing before the email is sent. `blocking` means the
  *  email cannot do its job at all, not merely that it reads worse. */
-type Flag = { blocking: boolean; label: string; detail: string };
+type Flag = { blocking: boolean; label: string; detail: string }
 
 function flagsFor(row: OutreachPreviewRow, kind: OutreachKind): Flag[] {
-  const flags: Flag[] = [];
+  const flags: Flag[] = []
 
   if (!row.registered_email) {
     flags.push({
@@ -44,7 +44,7 @@ function flagsFor(row: OutreachPreviewRow, kind: OutreachKind): Flag[] {
       label: "No address",
       detail:
         "The register holds no public email for this number, so the draft opens with an empty To field. Nothing warns you — the mailto is simply addressed to nobody.",
-    });
+    })
   }
 
   if (row.register_verdict === "removed") {
@@ -53,24 +53,24 @@ function flagsFor(row: OutreachPreviewRow, kind: OutreachKind): Flag[] {
       label: "Removed from the register",
       detail:
         "Do not invite: the email asks it to receive money, and setCharityConsent refuses approval anyway.",
-    });
+    })
   }
 
   // The stored name goes into the subject line verbatim. Fixing
   // titleCaseCharityName never rewrote the rows it was fixed for.
-  const cased = titleCaseCharityName(row.name);
+  const cased = titleCaseCharityName(row.name)
   if (cased !== row.name) {
     flags.push({
       blocking: false,
       label: "Stored casing",
       detail: `The subject will read "${row.name}". Title-casing it now would give "${cased}".`,
-    });
+    })
   }
 
   if (kind === "welcome") {
     // Any fundraisable event now carries the paragraph (2026-10-15); a
     // topic only sharpens it. So the flag means NO EVENT AT ALL.
-    const count = row.signature_events?.length ?? 0;
+    const count = row.signature_events?.length ?? 0
     if (count === 0) {
       flags.push({
         blocking: false,
@@ -78,7 +78,7 @@ function flagsFor(row: OutreachPreviewRow, kind: OutreachKind): Flag[] {
         detail: !row.website_read_at
           ? "Its website was never read, so the strongest paragraph — naming the charity's own event — is missing entirely."
           : "Its website was read and nothing fundraisable was found, so the event paragraph is missing.",
-      });
+      })
     }
 
     if (!row.perfect_topic_title) {
@@ -87,63 +87,63 @@ function flagsFor(row: OutreachPreviewRow, kind: OutreachKind): Flag[] {
         label: "No topic",
         detail:
           "Item 1 falls back to the generic wording that asks THEM to suggest topics, rather than offering one.",
-      });
+      })
     }
 
     // The reason is spliced mid-sentence after one trailing full stop is
     // stripped. Two sentences become a run-on inside a numbered item.
-    const reason = row.perfect_topic_reason?.replace(/\.$/, "") ?? "";
+    const reason = row.perfect_topic_reason?.replace(/\.$/, "") ?? ""
     if (/[.!?]\s/.test(reason)) {
       flags.push({
         blocking: false,
         label: "Multi-sentence reason",
         detail:
           "The reason is spliced into item 1 after its final full stop is stripped. More than one sentence reads as a run-on.",
-      });
+      })
     }
   }
 
-  return flags;
+  return flags
 }
 
 export function OutreachPreview({ rows }: { rows: OutreachPreviewRow[] }) {
-  const [kind, setKind] = useState<OutreachKind>("invite");
-  const [index, setIndex] = useState(0);
+  const [kind, setKind] = useState<OutreachKind>("invite")
+  const [index, setIndex] = useState(0)
 
   const flagged = useMemo(
     () => rows.map((r) => flagsFor(r, kind)),
-    [rows, kind],
-  );
+    [rows, kind]
+  )
 
   const tally = useMemo(() => {
-    let blocking = 0;
-    let soft = 0;
+    let blocking = 0
+    let soft = 0
     for (const f of flagged) {
-      if (f.some((x) => x.blocking)) blocking++;
-      else if (f.length > 0) soft++;
+      if (f.some((x) => x.blocking)) blocking++
+      else if (f.length > 0) soft++
     }
-    return { blocking, soft, clean: rows.length - blocking - soft };
-  }, [flagged, rows.length]);
+    return { blocking, soft, clean: rows.length - blocking - soft }
+  }, [flagged, rows.length])
 
   if (rows.length === 0) {
-    return <p className="text-sm text-muted-foreground">No charities yet.</p>;
+    return <p className="text-sm text-muted-foreground">No charities yet.</p>
   }
 
-  const row = rows[index];
-  const flags = flagged[index];
-  const email = outreachEmail(kind, row);
+  const row = rows[index]
+  const flags = flagged[index]
+  const email = outreachEmail(kind, row)
 
   function step(by: number) {
-    setIndex((i) => (i + by + rows.length) % rows.length);
+    setIndex((i) => (i + by + rows.length) % rows.length)
   }
 
   /** The next charity with anything wrong — the reason this beats scrolling. */
   function nextIssue() {
     for (let n = 1; n <= rows.length; n++) {
-      const i = (index + n) % rows.length;
+      const i = (index + n) % rows.length
       if (flagged[i].length > 0) {
-        setIndex(i);
-        return;
+        setIndex(i)
+        return
       }
     }
   }
@@ -231,7 +231,7 @@ export function OutreachPreview({ rows }: { rows: OutreachPreviewRow[] }) {
           ))}
         </select>
 
-        <span className="font-mono text-xs tabular-nums text-muted-foreground">
+        <span className="font-mono text-xs text-muted-foreground tabular-nums">
           {index + 1}/{rows.length}
         </span>
       </div>
@@ -289,5 +289,5 @@ export function OutreachPreview({ rows }: { rows: OutreachPreviewRow[] }) {
         </span>
       </div>
     </div>
-  );
+  )
 }

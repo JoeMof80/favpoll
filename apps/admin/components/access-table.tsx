@@ -1,10 +1,10 @@
-"use client";
+"use client"
 
-import { useState, useTransition } from "react";
-import type { AccessUser } from "@/lib/actions/access";
-import { setAdminRole } from "@/lib/actions/access";
-import { Button } from "@/components/ui/button";
-import { StatusBadge } from "@/components/ui/status-badge";
+import { useState, useTransition } from "react"
+import type { AccessUser } from "@/lib/actions/access"
+import { setAdminRole } from "@/lib/actions/access"
+import { Button } from "@/components/ui/button"
+import { StatusBadge } from "@/components/ui/status-badge"
 import {
   Table,
   TableBody,
@@ -12,23 +12,23 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/table"
 
 function UserRow({ user, isSelf }: { user: AccessUser; isSelf: boolean }) {
-  const [isPending, startTransition] = useTransition();
-  const [confirmRevoke, setConfirmRevoke] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition()
+  const [confirmRevoke, setConfirmRevoke] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   function update(makeAdmin: boolean) {
-    setError(null);
+    setError(null)
     startTransition(async () => {
-      const result = await setAdminRole(user.id, makeAdmin);
+      const result = await setAdminRole(user.id, makeAdmin)
       if (result.error) {
-        setError(result.error);
+        setError(result.error)
       } else {
-        setConfirmRevoke(false);
+        setConfirmRevoke(false)
       }
-    });
+    })
   }
 
   return (
@@ -114,18 +114,18 @@ function UserRow({ user, isSelf }: { user: AccessUser; isSelf: boolean }) {
         </TableRow>
       )}
     </>
-  );
+  )
 }
 
 export function AccessTable({
   users,
   currentUserId,
 }: {
-  users: AccessUser[];
-  currentUserId: string | null;
+  users: AccessUser[]
+  currentUserId: string | null
 }) {
   if (users.length === 0) {
-    return <p className="text-sm text-muted-foreground">No users found.</p>;
+    return <p className="text-sm text-muted-foreground">No users found.</p>
   }
 
   return (
@@ -151,5 +151,5 @@ export function AccessTable({
         </TableBody>
       </Table>
     </div>
-  );
+  )
 }

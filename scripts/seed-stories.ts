@@ -46,13 +46,13 @@
  * ---------------------------------------------------------------------------
  */
 
-import { createHash, randomUUID } from "node:crypto";
-import { deflateSync } from "node:zlib";
-import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { createClient } from "@supabase/supabase-js";
-import { profileKey, type CauseFamily, type Pronoun } from "@favpoll/types";
+import { createHash, randomUUID } from "node:crypto"
+import { deflateSync } from "node:zlib"
+import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
+import { createClient } from "@supabase/supabase-js"
+import { profileKey, type CauseFamily, type Pronoun } from "@favpoll/types"
 import {
   aboutNamesEvent,
   BABY_OCCASIONS,
@@ -62,114 +62,110 @@ import {
   judgeStory,
   storyEdges,
   type StoryInput,
-} from "../apps/web/lib/story-engine";
-import { SUBSET_PARENTS } from "../apps/web/lib/pairing-table";
+} from "../apps/web/lib/story-engine"
+import { SUBSET_PARENTS } from "../apps/web/lib/pairing-table"
 import {
   revealNamesRealItem,
   hasTics,
   slipsToSingular,
-} from "../apps/web/lib/actions/generate-draft-utils";
-import { mirrorContactAndPurpose } from "../apps/web/lib/register-mirror";
-import { OCCASION_TYPES_BY_REGISTER } from "../apps/web/lib/registers";
-import { OCCASIONS, type OccasionContext } from "../apps/web/lib/occasions";
+} from "../apps/web/lib/actions/generate-draft-utils"
+import { mirrorContactAndPurpose } from "../apps/web/lib/register-mirror"
+import { OCCASION_TYPES_BY_REGISTER } from "../apps/web/lib/registers"
+import { OCCASIONS, type OccasionContext } from "../apps/web/lib/occasions"
 
-type Register =
-  | "remembering"
-  | "celebrating_one"
-  | "celebrating_many"
-  | "cause";
+type Register = "remembering" | "celebrating_one" | "celebrating_many" | "cause"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
-const SEED_USER = "user_seed_story";
+const SEED_USER = "user_seed_story"
 
 // ── safety ───────────────────────────────────────────────────────────────
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-const STAGING_REF = "eotqyintgusvzidymumb";
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ""
+const STAGING_REF = "eotqyintgusvzidymumb"
 if (
   !SUPABASE_URL.includes(STAGING_REF) &&
   process.env.ALLOW_FAVPOLL_SEED !== "1"
 ) {
   console.error(
-    `\n🚫  Refusing to seed stories.\n    URL: ${SUPABASE_URL}\n    Expected staging ref: ${STAGING_REF}\n    Set ALLOW_FAVPOLL_SEED=1 to override.\n`,
-  );
-  process.exit(1);
+    `\n🚫  Refusing to seed stories.\n    URL: ${SUPABASE_URL}\n    Expected staging ref: ${STAGING_REF}\n    Set ALLOW_FAVPOLL_SEED=1 to override.\n`
+  )
+  process.exit(1)
 }
 
 // ── args ─────────────────────────────────────────────────────────────────
-const args = process.argv.slice(2);
-const flag = (name: string) => args.includes(`--${name}`);
+const args = process.argv.slice(2)
+const flag = (name: string) => args.includes(`--${name}`)
 const opt = (name: string, dflt: string) => {
-  const a = args.find((x) => x.startsWith(`--${name}=`));
-  return a ? a.slice(name.length + 3) : dflt;
-};
-const WIPE = flag("wipe");
+  const a = args.find((x) => x.startsWith(`--${name}=`))
+  return a ? a.slice(name.length + 3) : dflt
+}
+const WIPE = flag("wipe")
 // --refresh patches the EXISTING cohort in place (full canonical item set,
 // a portrait where photo_url is null) without touching its copy.
-const REFRESH = flag("refresh");
+const REFRESH = flag("refresh")
 // --regen="Carys Bright" rewrites ONE seeded favpoll's Story in place: same
 // triple, same name, same items, fresh copy through the judge loop.
-const REGEN = opt("regen", "");
+const REGEN = opt("regen", "")
 // --rename gives every seeded protagonist a fresh, unrepeated name and
 // swaps it into the copy; nothing is regenerated.
-const RENAME = flag("rename");
+const RENAME = flag("rename")
 // --topic="Dog breed" with --regen moves the poll to that topic first.
-const REGEN_TOPIC = opt("topic", "");
+const REGEN_TOPIC = opt("topic", "")
 // --pick="Painting" with --regen names the favourite the Story is written
 // around (else a random item).
-const REGEN_PICK = opt("pick", "");
-const DRY_RUN = flag("dry-run");
-const COUNT = parseInt(opt("count", "24"), 10);
-const THREES = parseFloat(opt("threes", "0.4"));
+const REGEN_PICK = opt("pick", "")
+const DRY_RUN = flag("dry-run")
+const COUNT = parseInt(opt("count", "24"), 10)
+const THREES = parseFloat(opt("threes", "0.4"))
 // A regen is a fresh draw each time (two regens in a row named both
 // couples "David & Farid" from the same seed, 2026-09-24).
 const RNG_SEED = parseInt(
   opt("seed", opt("regen", "") ? String(Date.now() % 100000) : "1"),
-  10,
-);
-const STORY_MODEL = opt("model", "claude-sonnet-5");
+  10
+)
+const STORY_MODEL = opt("model", "claude-sonnet-5")
 // The realism judge runs on the Story model: a smaller judge passed
 // anything concrete (founder, 2026-09-24).
-const JUDGE_MODEL = opt("judge-model", STORY_MODEL);
+const JUDGE_MODEL = opt("judge-model", STORY_MODEL)
 // --registers=cause,remembering narrows the pick (re-running one register
 // after a judge fix without duplicating the rest of a cohort).
 const REGISTERS = opt("registers", "")
   .split(",")
   .map((r) => r.trim())
-  .filter(Boolean) as Register[];
+  .filter(Boolean) as Register[]
 // --occasions="Retirement,Pet memorial" narrows the pick to those occasion
 // types (a gap-targeted cohort for the exemplar bank, 2026-09-25).
 const OCCASIONS_ONLY = opt("occasions", "")
   .split(",")
   .map((o) => o.trim().toLowerCase())
-  .filter(Boolean);
-const MAX_ATTEMPTS = 3;
+  .filter(Boolean)
+const MAX_ATTEMPTS = 3
 
 // ── deterministic rng ────────────────────────────────────────────────────
 function mulberry32(a: number) {
   return () => {
-    a |= 0;
-    a = (a + 0x6d2b79f5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-const rnd = mulberry32(RNG_SEED);
-const pick = <T>(xs: readonly T[]): T => xs[Math.floor(rnd() * xs.length)];
-const chance = (p: number) => rnd() < p;
-const between = (a: number, b: number) => a + Math.floor(rnd() * (b - a + 1));
-const shuffle = <T>(xs: T[]): T[] => {
-  const out = [...xs];
-  for (let i = out.length - 1; i > 0; i--) {
-    const j = Math.floor(rnd() * (i + 1));
-    [out[i], out[j]] = [out[j], out[i]];
+    a |= 0
+    a = (a + 0x6d2b79f5) | 0
+    let t = Math.imul(a ^ (a >>> 15), 1 | a)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
   }
-  return out;
-};
+}
+const rnd = mulberry32(RNG_SEED)
+const pick = <T>(xs: readonly T[]): T => xs[Math.floor(rnd() * xs.length)]
+const chance = (p: number) => rnd() < p
+const between = (a: number, b: number) => a + Math.floor(rnd() * (b - a + 1))
+const shuffle = <T>(xs: T[]): T[] => {
+  const out = [...xs]
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(rnd() * (i + 1))
+    ;[out[i], out[j]] = [out[j], out[i]]
+  }
+  return out
+}
 
 // ── the wrapper's pools: names by pronoun, surnames, groups ──────────────
 const HE = [
@@ -233,7 +229,7 @@ const HE = [
   "Terry",
   "Vikram",
   "Will",
-];
+]
 const SHE = [
   "Margaret",
   "Sarah",
@@ -295,7 +291,7 @@ const SHE = [
   "Val",
   "Wendy",
   "Yasmin",
-];
+]
 const LAST = [
   "Mitchell",
   "Clarke",
@@ -357,20 +353,20 @@ const LAST = [
   "Whitaker",
   "Yates",
   "Zhang",
-];
+]
 
 // Draw WITHOUT replacement: the first cohorts drew with it from 20 names
 // and repeated Aisha four times in 24 favpolls (founder, 2026-09-24).
 function drawer(pool: readonly string[]) {
-  let queue: string[] = [];
+  let queue: string[] = []
   return () => {
-    if (queue.length === 0) queue = shuffle([...pool]);
-    return queue.pop()!;
-  };
+    if (queue.length === 0) queue = shuffle([...pool])
+    return queue.pop()!
+  }
 }
-const drawHe = drawer(HE);
-const drawShe = drawer(SHE);
-const drawLast = drawer(LAST);
+const drawHe = drawer(HE)
+const drawShe = drawer(SHE)
+const drawLast = drawer(LAST)
 // A pet memorial puts the ANIMAL on the card (founder, 2026-09-26): a
 // first name only, no surname, and the pronoun the owner would use.
 const PET_SHE = [
@@ -389,7 +385,7 @@ const PET_SHE = [
   "Dotty",
   "Rosie",
   "Maisie",
-];
+]
 const PET_HE = [
   "Bramble",
   "Alfie",
@@ -406,12 +402,12 @@ const PET_HE = [
   "Fergus",
   "Barney",
   "Bruno",
-];
-const PET_NAMES = [...PET_SHE, ...PET_HE];
-const drawPet = drawer(PET_NAMES);
+]
+const PET_NAMES = [...PET_SHE, ...PET_HE]
+const drawPet = drawer(PET_NAMES)
 const petPronoun = (name: string): Pronoun =>
-  PET_SHE.includes(name) ? "she" : "he";
-const drawAny = () => (chance(0.5) ? drawShe() : drawHe());
+  PET_SHE.includes(name) ? "she" : "he"
+const drawAny = () => (chance(0.5) ? drawShe() : drawHe())
 // A couple is one he and one she nine times in ten: drawing both names
 // at random made half the couples same-sex, which is nothing like the
 // population (founder, 2026-09-24: "it doesn't feel representative").
@@ -420,13 +416,13 @@ const drawCouple = () =>
     ? chance(0.5)
       ? `${drawShe()} & ${drawHe()}`
       : `${drawHe()} & ${drawShe()}`
-    : `${drawAny()} & ${drawAny()}`;
+    : `${drawAny()} & ${drawAny()}`
 
 // An enacted reunion topic implies a kind of evening, and the group must
 // fit it: a cheeseboard is a sit-down dinner at home, crisps are the pub,
 // sweets in bowls are a hall (founder, 2026-09-26: "who would be
 // reuniting who enjoy cheese?"). Unlisted groups and topics fit anywhere.
-type Setting = "home" | "pub" | "hall";
+type Setting = "home" | "pub" | "hall"
 const GROUP_SETTING: Record<string, Setting> = {
   "The Class of 2006": "hall",
   "Hillcrest School, Class of '98": "hall",
@@ -436,7 +432,7 @@ const GROUP_SETTING: Record<string, Setting> = {
   "The Marlow Street mothers' group": "home",
   "Ward 12 nurses, 1994": "pub",
   "The Hollowell Youth Orchestra": "hall",
-};
+}
 const ENACTED_SETTING: Record<string, Setting> = {
   Cheese: "home",
   Takeaway: "home",
@@ -444,7 +440,7 @@ const ENACTED_SETTING: Record<string, Setting> = {
   Beer: "pub",
   Cocktail: "pub",
   Sweet: "hall",
-};
+}
 const GROUP_NAMES: Record<string, string[]> = {
   Reunion: [
     "The Class of 2006",
@@ -476,7 +472,7 @@ const GROUP_NAMES: Record<string, string[]> = {
     "The Vale Ladies' hockey team",
     "Riverside Bowls Club",
   ],
-};
+}
 
 // Where the organiser is usually the protagonist, the Story is written
 // in the first person most of the time (founder, 2026-09-24: "surely
@@ -496,18 +492,18 @@ const FIRST_PERSON_OCCASIONS = new Set([
   "New baby",
   "Baby shower",
   "Christening",
-]);
+])
 const firstPersonHere = (occasion: string) =>
-  FIRST_PERSON_OCCASIONS.has(occasion) && chance(0.7);
+  FIRST_PERSON_OCCASIONS.has(occasion) && chance(0.7)
 
 function protagonist(
   register: Register,
   occasion: string,
-  topic?: string,
+  topic?: string
 ): {
-  name: string;
-  pronoun: Pronoun;
-  grouping: "individual" | "couple" | "group";
+  name: string
+  pronoun: Pronoun
+  grouping: "individual" | "couple" | "group"
 } {
   // A birth honours the PARENTS on behalf of the child (founder,
   // 2026-09-24): named as a couple, the baby in the context line.
@@ -516,41 +512,41 @@ function protagonist(
       name: drawCouple(),
       pronoun: firstPersonHere(occasion) ? "i" : "they",
       grouping: "couple",
-    };
+    }
   }
   // A pet memorial remembers the ANIMAL; the owner writes about it.
   if (PET_OCCASIONS.has(occasion)) {
-    const name = drawPet();
-    return { name, pronoun: petPronoun(name), grouping: "individual" };
+    const name = drawPet()
+    return { name, pronoun: petPronoun(name), grouping: "individual" }
   }
   if (register === "celebrating_many") {
     if (GROUP_NAMES[occasion]) {
       // A group's favpoll is organised by one of its own: "we", always
       // (founder, 2026-09-26: "the pronoun should be We").
-      const setting = topic ? ENACTED_SETTING[topic] : undefined;
+      const setting = topic ? ENACTED_SETTING[topic] : undefined
       const fitting = setting
         ? GROUP_NAMES[occasion].filter(
-            (n) => !GROUP_SETTING[n] || GROUP_SETTING[n] === setting,
+            (n) => !GROUP_SETTING[n] || GROUP_SETTING[n] === setting
           )
-        : GROUP_NAMES[occasion];
+        : GROUP_NAMES[occasion]
       return {
         name: pick(fitting.length ? fitting : GROUP_NAMES[occasion]),
         pronoun: "i",
         grouping: "group",
-      };
+      }
     }
     return {
       name: drawCouple(),
       pronoun: firstPersonHere(occasion) ? "i" : "they",
       grouping: "couple",
-    };
+    }
   }
-  const she = chance(0.5);
+  const she = chance(0.5)
   return {
     name: `${she ? drawShe() : drawHe()} ${drawLast()}`,
     pronoun: firstPersonHere(occasion) ? "i" : she ? "she" : "he",
     grouping: "individual",
-  };
+  }
 }
 
 // The opening line must NAME the occasion (§7: the card carries the
@@ -560,10 +556,10 @@ function occasionSpec(occasion: string) {
   return (
     OCCASIONS.find((o) => o.label.toLowerCase() === occasion.toLowerCase()) ??
     null
-  );
+  )
 }
 function resolveContext(c: OccasionContext, pronoun: Pronoun): string {
-  return typeof c === "string" ? c : c[pronoun === "i" ? "they" : pronoun];
+  return typeof c === "string" ? c : c[pronoun === "i" ? "they" : pronoun]
 }
 
 // ── portraits ────────────────────────────────────────────────────────────
@@ -579,42 +575,42 @@ const REGISTER_RGB: Record<string, [number, number, number]> = {
   celebrating_one: [192, 57, 123], // celebration magenta
   celebrating_many: [192, 57, 123],
   cause: [46, 139, 106], // fundraiser green
-};
+}
 
 function crc32(buf: Uint8Array): number {
-  let c = ~0;
+  let c = ~0
   for (const b of buf) {
-    c ^= b;
-    for (let k = 0; k < 8; k++) c = (c >>> 1) ^ (0xedb88320 & -(c & 1));
+    c ^= b
+    for (let k = 0; k < 8; k++) c = (c >>> 1) ^ (0xedb88320 & -(c & 1))
   }
-  return ~c >>> 0;
+  return ~c >>> 0
 }
 function pngChunk(type: string, data: Uint8Array): Uint8Array {
-  const len = new Uint8Array(4);
-  new DataView(len.buffer).setUint32(0, data.length);
-  const body = new Uint8Array(type.length + data.length);
-  body.set(Buffer.from(type), 0);
-  body.set(data, type.length);
-  const crc = new Uint8Array(4);
-  new DataView(crc.buffer).setUint32(0, crc32(body));
-  return Buffer.concat([len, body, crc]);
+  const len = new Uint8Array(4)
+  new DataView(len.buffer).setUint32(0, data.length)
+  const body = new Uint8Array(type.length + data.length)
+  body.set(Buffer.from(type), 0)
+  body.set(data, type.length)
+  const crc = new Uint8Array(4)
+  new DataView(crc.buffer).setUint32(0, crc32(body))
+  return Buffer.concat([len, body, crc])
 }
 
 /** A 512×512 PNG portrait, deterministic for (name, register). */
 export function makePortrait(name: string, register: string): Uint8Array {
-  const SIZE = 512;
-  const [r0, g0, b0] = REGISTER_RGB[register] ?? REGISTER_RGB.celebrating_one;
-  const h = createHash("sha256").update(`${register}:${name}`).digest();
-  const u = (i: number) => h[i % h.length] / 255;
+  const SIZE = 512
+  const [r0, g0, b0] = REGISTER_RGB[register] ?? REGISTER_RGB.celebrating_one
+  const h = createHash("sha256").update(`${register}:${name}`).digest()
+  const u = (i: number) => h[i % h.length] / 255
   // Ground: the register at a whisper. Discs: three tones of the register,
   // from deep to pale, each with its own alpha, placed by the hash.
   const ground = [
     Math.round(255 - (255 - r0) * 0.1),
     Math.round(255 - (255 - g0) * 0.1),
     Math.round(255 - (255 - b0) * 0.1),
-  ];
+  ]
   const discs = [0, 1, 2].map((i) => {
-    const t = 0.15 + i * 0.35; // 0.15 deep, 0.5 mid, 0.85 pale
+    const t = 0.15 + i * 0.35 // 0.15 deep, 0.5 mid, 0.85 pale
     return {
       cx: SIZE * (0.2 + 0.6 * u(i * 3)),
       cy: SIZE * (0.2 + 0.6 * u(i * 3 + 1)),
@@ -625,169 +621,168 @@ export function makePortrait(name: string, register: string): Uint8Array {
         Math.round(b0 + (255 - b0) * t),
       ],
       a: 0.85 - i * 0.2,
-    };
-  });
-  const raw = new Uint8Array((SIZE * 3 + 1) * SIZE);
+    }
+  })
+  const raw = new Uint8Array((SIZE * 3 + 1) * SIZE)
   for (let y = 0; y < SIZE; y++) {
-    raw[y * (SIZE * 3 + 1)] = 0; // filter: none
+    raw[y * (SIZE * 3 + 1)] = 0 // filter: none
     for (let x = 0; x < SIZE; x++) {
-      let [r, g, b] = ground;
+      let [r, g, b] = ground
       for (const d of discs) {
         const dx = x - d.cx,
-          dy = y - d.cy;
-        const dist = Math.sqrt(dx * dx + dy * dy);
+          dy = y - d.cy
+        const dist = Math.sqrt(dx * dx + dy * dy)
         // Soft edge over the last 6px so the discs don't alias.
-        const cover = Math.max(0, Math.min(1, (d.r - dist) / 6)) * d.a;
+        const cover = Math.max(0, Math.min(1, (d.r - dist) / 6)) * d.a
         if (cover > 0) {
-          r = r + (d.rgb[0] - r) * cover;
-          g = g + (d.rgb[1] - g) * cover;
-          b = b + (d.rgb[2] - b) * cover;
+          r = r + (d.rgb[0] - r) * cover
+          g = g + (d.rgb[1] - g) * cover
+          b = b + (d.rgb[2] - b) * cover
         }
       }
-      const o = y * (SIZE * 3 + 1) + 1 + x * 3;
-      raw[o] = r;
-      raw[o + 1] = g;
-      raw[o + 2] = b;
+      const o = y * (SIZE * 3 + 1) + 1 + x * 3
+      raw[o] = r
+      raw[o + 1] = g
+      raw[o + 2] = b
     }
   }
-  const ihdr = new Uint8Array(13);
-  const dv = new DataView(ihdr.buffer);
-  dv.setUint32(0, SIZE);
-  dv.setUint32(4, SIZE);
-  ihdr[8] = 8;
-  ihdr[9] = 2; // 8-bit RGB
+  const ihdr = new Uint8Array(13)
+  const dv = new DataView(ihdr.buffer)
+  dv.setUint32(0, SIZE)
+  dv.setUint32(4, SIZE)
+  ihdr[8] = 8
+  ihdr[9] = 2 // 8-bit RGB
   return Buffer.concat([
     Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
     pngChunk("IHDR", ihdr),
     pngChunk("IDAT", deflateSync(raw)),
     pngChunk("IEND", new Uint8Array(0)),
-  ]);
+  ])
 }
 
 async function uploadPortrait(
   favpollId: string,
   name: string,
-  register: string,
+  register: string
 ): Promise<string | null> {
-  const path = `seed/${favpollId}.png`;
+  const path = `seed/${favpollId}.png`
   const { error } = await supabase.storage
     .from("protagonists")
     .upload(path, makePortrait(name, register), {
       contentType: "image/png",
       upsert: true,
-    });
+    })
   if (error) {
-    console.error(`  ✗ portrait upload failed for ${name}: ${error.message}`);
-    return null;
+    console.error(`  ✗ portrait upload failed for ${name}: ${error.message}`)
+    return null
   }
-  return supabase.storage.from("protagonists").getPublicUrl(path).data
-    .publicUrl;
+  return supabase.storage.from("protagonists").getPublicUrl(path).data.publicUrl
 }
 
 // ── candidates: every triple the table motivates ─────────────────────────
 type Topic = {
-  id: string;
-  title: string;
-  is_finite: boolean;
-  favourites: { id: string; label: string; is_canonical: boolean }[];
-};
+  id: string
+  title: string
+  is_finite: boolean
+  favourites: { id: string; label: string; is_canonical: boolean }[]
+}
 type Charity = {
-  id: string;
-  name: string;
-  description: string | null;
-  activities: string | null;
-  cause_family: CauseFamily | null;
-  objects?: string | null;
-  areas?: { area: string; type: string }[] | null;
-  perfect_topic_reason?: string | null;
-  perfect_topic?: { title: string } | { title: string }[] | null;
+  id: string
+  name: string
+  description: string | null
+  activities: string | null
+  cause_family: CauseFamily | null
+  objects?: string | null
+  areas?: { area: string; type: string }[] | null
+  perfect_topic_reason?: string | null
+  perfect_topic?: { title: string } | { title: string }[] | null
   /** The confirmed SUBSET of the perfect topic (favpoll-topic-rules §1),
    *  with its members: the seed's poll carries it and lists them. */
-  perfect_subset?: PerfectSubset | PerfectSubset[] | null;
-};
+  perfect_subset?: PerfectSubset | PerfectSubset[] | null
+}
 type PerfectSubset = {
-  id: string;
-  title: string;
-  topic_subset_items: { favourite_id: string }[] | null;
-};
+  id: string
+  title: string
+  topic_subset_items: { favourite_id: string }[] | null
+}
 const oneOf = <T>(v: T | T[] | null | undefined): T | null =>
-  Array.isArray(v) ? (v[0] ?? null) : (v ?? null);
+  Array.isArray(v) ? (v[0] ?? null) : (v ?? null)
 /** The charity's confirmed perfect topic (and subset), in the engine's
  *  shape. */
 function perfectTopicOf(
-  c: Pick<Charity, "perfect_topic" | "perfect_topic_reason" | "perfect_subset">,
+  c: Pick<Charity, "perfect_topic" | "perfect_topic_reason" | "perfect_subset">
 ): { title: string; subsetTitle: string | null; reason: string | null } | null {
-  const t = oneOf(c.perfect_topic);
+  const t = oneOf(c.perfect_topic)
   return t?.title
     ? {
         title: t.title,
         subsetTitle: oneOf(c.perfect_subset)?.title ?? null,
         reason: c.perfect_topic_reason ?? null,
       }
-    : null;
+    : null
 }
 /** The charity's subset, when the seed's topic is its perfect topic. */
 function subsetFor(
   c: Charity,
-  topic: Topic,
+  topic: Topic
 ): { id: string; title: string; memberIds: Set<string> } | null {
-  const sub = oneOf(c.perfect_subset);
-  if (!sub || oneOf(c.perfect_topic)?.title !== topic.title) return null;
+  const sub = oneOf(c.perfect_subset)
+  if (!sub || oneOf(c.perfect_topic)?.title !== topic.title) return null
   return {
     id: sub.id,
     title: sub.title,
     memberIds: new Set(
-      (sub.topic_subset_items ?? []).map((i) => i.favourite_id),
+      (sub.topic_subset_items ?? []).map((i) => i.favourite_id)
     ),
-  };
+  }
 }
 
 type Candidate = {
-  register: Register;
-  occasion: string;
-  topic: Topic;
-  charity: Charity;
-  count: number;
+  register: Register
+  occasion: string
+  topic: Topic
+  charity: Charity
+  count: number
   /** A SUBSET the pairing table names in its own right (SUBSET_PARENTS,
    *  ticked 2026-10-02): the card carries it, the parent sits behind it
    *  for the edges, and the poll lists only its members. */
-  subset?: TableSubset;
-};
+  subset?: TableSubset
+}
 
-type TableSubset = { id: string; title: string; memberIds: Set<string> };
+type TableSubset = { id: string; title: string; memberIds: Set<string> }
 
 // Fine as polls, hopeless as a person's story: nobody has a believable
 // ritual around a smell, a sound, a time of day or the weather, and the
 // model invented one every time (founder, 2026-09-24). They stay valid for
 // causes and for organisers who choose them.
-const NO_PERSON_STORY = new Set(["Smell", "Sound", "Time of day", "Weather"]);
+const NO_PERSON_STORY = new Set(["Smell", "Sound", "Time of day", "Weather"])
 // And for a cause the pick has to be able to say something honest about
 // the cause: Weather and Landscape never could (founder, 2026-09-24).
-const NO_CAUSE_STORY = new Set([...NO_PERSON_STORY, "Landscape"]);
+const NO_CAUSE_STORY = new Set([...NO_PERSON_STORY, "Landscape"])
 
 function enumerate(
   topics: Topic[],
   charities: Charity[],
-  subsetsByTopic: Map<string, TableSubset[]> = new Map(),
+  subsetsByTopic: Map<string, TableSubset[]> = new Map()
 ): Candidate[] {
-  const out: Candidate[] = [];
+  const out: Candidate[] = []
   const all: Register[] = [
     "remembering",
     "celebrating_one",
     "celebrating_many",
     "cause",
-  ];
-  const registers = REGISTERS.length ? REGISTERS : all;
+  ]
+  const registers = REGISTERS.length ? REGISTERS : all
   for (const register of registers) {
     for (const occasion of OCCASION_TYPES_BY_REGISTER[register]) {
       if (
         OCCASIONS_ONLY.length &&
         !OCCASIONS_ONLY.includes(occasion.toLowerCase())
       )
-        continue;
+        continue
       for (const topic of topics) {
-        if (register !== "cause" && NO_PERSON_STORY.has(topic.title)) continue;
-        if (register === "cause" && NO_CAUSE_STORY.has(topic.title)) continue;
+        if (register !== "cause" && NO_PERSON_STORY.has(topic.title)) continue
+        if (register === "cause" && NO_CAUSE_STORY.has(topic.title)) continue
         // The topic itself, then each subset the table names on it: a
         // subset is its own candidate, scored by its own rows.
         const cards: { title: string; subset?: TableSubset }[] = [
@@ -796,7 +791,7 @@ function enumerate(
             title: subset.title,
             subset,
           })),
-        ];
+        ]
         for (const card of cards)
           for (const charity of charities) {
             const edges = storyEdges({
@@ -812,13 +807,13 @@ function enumerate(
                 activities: charity.activities,
                 causeFamily: charity.cause_family,
               },
-            });
+            })
             // The bar: 2+ edges for a person; the charity edge plus a stated
             // event for a cause (no Honour vertex to score).
             const ok =
               register === "cause"
                 ? Boolean(edges.e1 && edges.e2)
-                : edges.count >= 2;
+                : edges.count >= 2
             if (ok)
               out.push({
                 register,
@@ -827,12 +822,12 @@ function enumerate(
                 charity,
                 count: edges.count,
                 ...(card.subset ? { subset: card.subset } : {}),
-              });
+              })
           }
       }
     }
   }
-  return out;
+  return out
 }
 
 // Spread the cohort: caps per charity, topic and occasion so one row of
@@ -842,7 +837,7 @@ const REGISTER_SHARE: Record<Register, number> = {
   celebrating_many: 0.25,
   remembering: 0.2,
   cause: 0.15,
-};
+}
 
 function sample(candidates: Candidate[], n: number): Candidate[] {
   // Pick PER CHARITY from a shuffled queue, one triple per charity per
@@ -851,111 +846,111 @@ function sample(candidates: Candidate[], n: number): Candidate[] {
   // 2026-09-24). Within a charity's triples a triad is preferred with
   // probability THREES; otherwise a two. Topic and occasion caps and the
   // register mix still spread the shelf.
-  const chosen: Candidate[] = [];
-  const perTopic = new Map<string, number>();
+  const chosen: Candidate[] = []
+  const perTopic = new Map<string, number>()
   // Two of the same occasion AND topic in a cohort come out alike (two
   // Graduation · Book favpolls both opened "three years of essays";
   // founder, 2026-09-25), and retrieval makes it worse. One per pair.
-  const perPair = new Map<string, number>();
-  const perOccasion = new Map<string, number>();
-  const perRegister = new Map<Register, number>();
+  const perPair = new Map<string, number>()
+  const perOccasion = new Map<string, number>()
+  const perRegister = new Map<Register, number>()
   const cap = (m: Map<string, number>, k: string, max: number) =>
-    (m.get(k) ?? 0) < max;
+    (m.get(k) ?? 0) < max
   const bump = (m: Map<string, number>, k: string) =>
-    m.set(k, (m.get(k) ?? 0) + 1);
-  let births = 0;
-  const MAX_BIRTHS = Math.max(1, Math.round(n / 12));
+    m.set(k, (m.get(k) ?? 0) + 1)
+  let births = 0
+  const MAX_BIRTHS = Math.max(1, Math.round(n / 12))
   const registerQuota = (r: Register) =>
     REGISTERS.length || OCCASIONS_ONLY.length
       ? n
-      : Math.ceil(n * REGISTER_SHARE[r]);
-  const byCharity = new Map<string, Candidate[]>();
+      : Math.ceil(n * REGISTER_SHARE[r])
+  const byCharity = new Map<string, Candidate[]>()
   for (const c of candidates) {
-    const list = byCharity.get(c.charity.id) ?? [];
-    list.push(c);
-    byCharity.set(c.charity.id, list);
+    const list = byCharity.get(c.charity.id) ?? []
+    list.push(c)
+    byCharity.set(c.charity.id, list)
   }
   const fits = (c: Candidate) =>
     !(BABY_OCCASIONS.has(c.occasion) && births >= MAX_BIRTHS) &&
     cap(perTopic, c.topic.id, 2) &&
     cap(perPair, `${c.occasion}|${c.topic.id}`, 1) &&
     cap(perOccasion, c.occasion, OCCASIONS_ONLY.length ? 2 : 3) &&
-    (perRegister.get(c.register) ?? 0) < registerQuota(c.register);
+    (perRegister.get(c.register) ?? 0) < registerQuota(c.register)
   const take = (c: Candidate) => {
-    chosen.push(c);
-    if (BABY_OCCASIONS.has(c.occasion)) births++;
-    bump(perTopic, c.topic.id);
-    bump(perPair, `${c.occasion}|${c.topic.id}`);
-    bump(perOccasion, c.occasion);
-    perRegister.set(c.register, (perRegister.get(c.register) ?? 0) + 1);
-  };
+    chosen.push(c)
+    if (BABY_OCCASIONS.has(c.occasion)) births++
+    bump(perTopic, c.topic.id)
+    bump(perPair, `${c.occasion}|${c.topic.id}`)
+    bump(perOccasion, c.occasion)
+    perRegister.set(c.register, (perRegister.get(c.register) ?? 0) + 1)
+  }
   // A gap-targeted run walks the OCCASIONS in turn, so every one asked
   // for gets its share before any repeats; each pick still prefers a
   // charity not yet used.
   if (OCCASIONS_ONLY.length) {
-    const usedCharity = new Set<string>();
+    const usedCharity = new Set<string>()
     for (let pass = 0; chosen.length < n && pass < 8; pass++) {
       for (const occ of OCCASIONS_ONLY) {
-        if (chosen.length >= n) break;
+        if (chosen.length >= n) break
         const pool = shuffle(
-          candidates.filter((c) => c.occasion.toLowerCase() === occ && fits(c)),
-        );
-        const fresh = pool.filter((c) => !usedCharity.has(c.charity.id));
-        const from = fresh.length ? fresh : pool;
-        if (!from.length) continue;
-        const wantTriad = chance(THREES);
+          candidates.filter((c) => c.occasion.toLowerCase() === occ && fits(c))
+        )
+        const fresh = pool.filter((c) => !usedCharity.has(c.charity.id))
+        const from = fresh.length ? fresh : pool
+        if (!from.length) continue
+        const wantTriad = chance(THREES)
         const pickFrom = from.filter((c) =>
-          wantTriad ? c.count === 3 : c.count < 3,
-        );
-        const c = pickFrom.length ? pickFrom[0] : from[0];
-        take(c);
-        usedCharity.add(c.charity.id);
+          wantTriad ? c.count === 3 : c.count < 3
+        )
+        const c = pickFrom.length ? pickFrom[0] : from[0]
+        take(c)
+        usedCharity.add(c.charity.id)
       }
     }
-    return chosen;
+    return chosen
   }
-  const charityIds = shuffle([...byCharity.keys()]);
+  const charityIds = shuffle([...byCharity.keys()])
   for (let pass = 0; chosen.length < n && pass < 8; pass++) {
     for (const id of charityIds) {
-      if (chosen.length >= n) break;
-      const pool = shuffle(byCharity.get(id) ?? []).filter(fits);
-      if (pool.length === 0) continue;
-      const wantTriad = chance(THREES);
+      if (chosen.length >= n) break
+      const pool = shuffle(byCharity.get(id) ?? []).filter(fits)
+      if (pool.length === 0) continue
+      const wantTriad = chance(THREES)
       const pickFrom = pool.filter((c) =>
-        wantTriad ? c.count === 3 : c.count < 3,
-      );
-      take(pickFrom.length ? pickFrom[0] : pool[0]);
+        wantTriad ? c.count === 3 : c.count < 3
+      )
+      take(pickFrom.length ? pickFrom[0] : pool[0])
     }
   }
-  return chosen;
+  return chosen
 }
 
 // ── helpers ──────────────────────────────────────────────────────────────
 function namedItem(note: string, items: { id: string; label: string }[]) {
-  return items.find((i) => revealNamesRealItem(note, [i.label])) ?? null;
+  return items.find((i) => revealNamesRealItem(note, [i.label])) ?? null
 }
 
 async function fetchAllIds(
   table: string,
   col: string,
   values: string[] | null,
-  select = "id",
+  select = "id"
 ): Promise<string[]> {
-  const out: string[] = [];
-  const PAGE = 1000;
+  const out: string[] = []
+  const PAGE = 1000
   for (let from = 0; ; from += PAGE) {
     let q = supabase
       .from(table)
       .select(select)
-      .range(from, from + PAGE - 1);
-    q = values ? q.in(col, values) : q.eq(col, SEED_USER);
-    const { data, error } = await q;
-    if (error) throw new Error(`${table}: ${error.message}`);
-    const rows = (data ?? []) as unknown as Record<string, string | null>[];
-    for (const r of rows) if (r[select]) out.push(r[select] as string);
-    if (rows.length < PAGE) break;
+      .range(from, from + PAGE - 1)
+    q = values ? q.in(col, values) : q.eq(col, SEED_USER)
+    const { data, error } = await q
+    if (error) throw new Error(`${table}: ${error.message}`)
+    const rows = (data ?? []) as unknown as Record<string, string | null>[]
+    for (const r of rows) if (r[select]) out.push(r[select] as string)
+    if (rows.length < PAGE) break
   }
-  return out;
+  return out
 }
 
 async function deleteIn(table: string, col: string, ids: string[]) {
@@ -963,40 +958,40 @@ async function deleteIn(table: string, col: string, ids: string[]) {
     const { error } = await supabase
       .from(table)
       .delete()
-      .in(col, ids.slice(i, i + 500));
-    if (error) throw new Error(`${table} delete: ${error.message}`);
+      .in(col, ids.slice(i, i + 500))
+    if (error) throw new Error(`${table} delete: ${error.message}`)
   }
 }
 
 async function wipe() {
-  console.log("Wiping story seed…");
-  const favpollIds = await fetchAllIds("favpolls", "created_by", null);
+  console.log("Wiping story seed…")
+  const favpollIds = await fetchAllIds("favpolls", "created_by", null)
   if (favpollIds.length === 0) {
-    console.log("Nothing to wipe.");
-    return;
+    console.log("Nothing to wipe.")
+    return
   }
-  const pollIds = await fetchAllIds("favpoll_polls", "favpoll_id", favpollIds);
-  const potIds = await fetchAllIds("favpoll_pots", "favpoll_id", favpollIds);
-  const pledgeIds = await fetchAllIds("pledges", "favpoll_poll_id", pollIds);
+  const pollIds = await fetchAllIds("favpoll_polls", "favpoll_id", favpollIds)
+  const potIds = await fetchAllIds("favpoll_pots", "favpoll_id", favpollIds)
+  const pledgeIds = await fetchAllIds("pledges", "favpoll_poll_id", pollIds)
   const protagonistIds = await fetchAllIds(
     "favpolls",
     "created_by",
     null,
-    "protagonist_id",
-  );
-  await deleteIn("pledge_allocations", "pledge_id", pledgeIds);
-  await deleteIn("pledges", "favpoll_poll_id", pollIds);
-  await deleteIn("favpoll_poll_favourites", "favpoll_poll_id", pollIds);
-  await deleteIn("disbursements", "favpoll_id", favpollIds);
-  await deleteIn("pot_allocations", "pot_id", potIds);
-  await deleteIn("pot_topups", "pot_id", potIds);
-  await deleteIn("favpoll_polls", "favpoll_id", favpollIds);
-  await deleteIn("favpoll_pots", "favpoll_id", favpollIds);
-  await deleteIn("favpoll_charities", "favpoll_id", favpollIds);
-  await deleteIn("favpolls", "id", favpollIds);
-  await deleteIn("protagonists", "id", protagonistIds);
-  await supabase.from("users").delete().eq("id", SEED_USER);
-  console.log(`Wiped ${favpollIds.length} favpolls and everything under them.`);
+    "protagonist_id"
+  )
+  await deleteIn("pledge_allocations", "pledge_id", pledgeIds)
+  await deleteIn("pledges", "favpoll_poll_id", pollIds)
+  await deleteIn("favpoll_poll_favourites", "favpoll_poll_id", pollIds)
+  await deleteIn("disbursements", "favpoll_id", favpollIds)
+  await deleteIn("pot_allocations", "pot_id", potIds)
+  await deleteIn("pot_topups", "pot_id", potIds)
+  await deleteIn("favpoll_polls", "favpoll_id", favpollIds)
+  await deleteIn("favpoll_pots", "favpoll_id", favpollIds)
+  await deleteIn("favpoll_charities", "favpoll_id", favpollIds)
+  await deleteIn("favpolls", "id", favpollIds)
+  await deleteIn("protagonists", "id", protagonistIds)
+  await supabase.from("users").delete().eq("id", SEED_USER)
+  console.log(`Wiped ${favpollIds.length} favpolls and everything under them.`)
 }
 
 // ── the judge loop ───────────────────────────────────────────────────────
@@ -1004,77 +999,77 @@ async function wipe() {
 // judge, retry up to MAX_ATTEMPTS; the best attempt is returned even when
 // none passes, and the caller decides.
 type Attempt = {
-  story: Awaited<ReturnType<typeof generateStory>>;
-  item: { id: string; label: string } | null;
-  verdict: string;
-  score: number;
-};
+  story: Awaited<ReturnType<typeof generateStory>>
+  item: { id: string; label: string } | null
+  verdict: string
+  score: number
+}
 async function judgeLoop(
   input: StoryInput,
   items: { id: string; label: string }[],
   isCause: boolean,
   occasion: string,
-  label: string,
+  label: string
 ): Promise<{ best: Attempt | null; attempts: number }> {
-  let best: Attempt | null = null;
-  let attempts = 0;
+  let best: Attempt | null = null
+  let attempts = 0
   for (; attempts < MAX_ATTEMPTS; attempts++) {
-    let story;
+    let story
     try {
-      story = await generateStory(input, STORY_MODEL);
+      story = await generateStory(input, STORY_MODEL)
     } catch (err) {
       console.error(
-        `  ✗ ${label}: generate failed — ${err instanceof Error ? err.message : String(err)}`,
-      );
-      continue;
+        `  ✗ ${label}: generate failed — ${err instanceof Error ? err.message : String(err)}`
+      )
+      continue
     }
     // When the favourite was chosen up front the note must name THAT one:
     // a note naming some other real item passed P1 and hid a disobeyed
     // pick (2026-09-26: asked for Wonderwall, got Dancing Queen).
     if (process.env.SEED_DEBUG)
       console.log(
-        `  [debug] pick=${input.pick ?? "(none)"}\n  [debug] about=${story.about}\n  [debug] note=${story.note}`,
-      );
-    const named = namedItem(story.note, items);
+        `  [debug] pick=${input.pick ?? "(none)"}\n  [debug] about=${story.about}\n  [debug] note=${story.note}`
+      )
+    const named = namedItem(story.note, items)
     const item =
-      input.pick && named && named.label !== input.pick ? null : named;
-    const event = isCause ? aboutNamesEvent(story.about, occasion) : true;
+      input.pick && named && named.label !== input.pick ? null : named
+    const event = isCause ? aboutNamesEvent(story.about, occasion) : true
     // A first-person couple or group keeps "we" in the note: a lookup,
     // and part of the gate rather than a single retry.
     const plural = !(
       input.pronoun === "i" &&
       (input.grouping === "couple" || input.grouping === "group") &&
       slipsToSingular(story.note)
-    );
+    )
     // The model's tics are part of the gate too: the engine's single
     // retry let "someone always" through on every reunion (2026-09-26).
-    const clean = !hasTics(`${story.about} ${story.note}`);
-    const verdict = await judgeStory(story, input, story.edges, JUDGE_MODEL);
+    const clean = !hasTics(`${story.about} ${story.note}`)
+    const verdict = await judgeStory(story, input, story.edges, JUDGE_MODEL)
     const score =
-      (item && event && plural && clean ? 1 : 0) + (verdict.realistic ? 2 : 0);
-    const v = `P1 ${item ? "✓" : "✗"}${isCause ? ` · event ${event ? "✓" : "✗"}` : ""}${plural ? "" : " · we ✗"}${clean ? "" : " · tic ✗"} · real ${verdict.realistic ? "✓" : "✗"}${verdict.reason ? ` — ${verdict.reason}` : ""}`;
-    if (!best || score > best.score) best = { story, item, verdict: v, score };
-    if (score === 3) break;
+      (item && event && plural && clean ? 1 : 0) + (verdict.realistic ? 2 : 0)
+    const v = `P1 ${item ? "✓" : "✗"}${isCause ? ` · event ${event ? "✓" : "✗"}` : ""}${plural ? "" : " · we ✗"}${clean ? "" : " · tic ✗"} · real ${verdict.realistic ? "✓" : "✗"}${verdict.reason ? ` — ${verdict.reason}` : ""}`
+    if (!best || score > best.score) best = { story, item, verdict: v, score }
+    if (score === 3) break
   }
-  return { best, attempts };
+  return { best, attempts }
 }
 
 // ── seed ─────────────────────────────────────────────────────────────────
 type Manifest = {
-  name: string;
-  register: Register;
-  occasion: string;
-  topic: string;
-  charity: string;
-  edges: number;
-  attempts: number;
-  about: string;
-  note: string;
-  causeLabel: string | null;
-  context: string | null;
-  favpollId: string | null;
-  verdict: string;
-};
+  name: string
+  register: Register
+  occasion: string
+  topic: string
+  charity: string
+  edges: number
+  attempts: number
+  about: string
+  note: string
+  causeLabel: string | null
+  context: string | null
+  favpollId: string | null
+  verdict: string
+}
 
 async function seed() {
   const [
@@ -1088,26 +1083,26 @@ async function seed() {
     supabase
       .from("charities")
       .select(
-        "id, name, description, registered_number, cause_family, perfect_topic:topics!charities_perfect_topic_id_fkey(title), perfect_subset:topic_subsets!charities_perfect_subset_id_fkey(id, title, topic_subset_items(favourite_id))",
+        "id, name, description, registered_number, cause_family, perfect_topic:topics!charities_perfect_topic_id_fkey(title), perfect_subset:topic_subsets!charities_perfect_subset_id_fkey(id, title, topic_subset_items(favourite_id))"
       )
       .eq("is_active", true)
       .not("cause_family", "is", null),
-  ]);
-  if (tErr) throw new Error(tErr.message);
-  if (cErr) throw new Error(cErr.message);
+  ])
+  if (tErr) throw new Error(tErr.message)
+  if (cErr) throw new Error(cErr.message)
   const topics = ((topicsData ?? []) as Topic[]).filter(
-    (t) => t.favourites.length >= 5,
-  );
+    (t) => t.favourites.length >= 5
+  )
   // STEP 4/5: the register's own words come from the MIRROR and the
   // suggestion's reason from the PROFILE — the copies on `charities` are
   // gone. The generator reads exactly the same way (generate-draft's
   // fetchCharity), which is the point: one source, two callers.
   const accounts = (charitiesData ?? []) as (Charity & {
-    registered_number: string | null;
-  })[];
+    registered_number: string | null
+  })[]
   const mirror = await mirrorContactAndPurpose(
-    accounts.map((c) => c.registered_number),
-  );
+    accounts.map((c) => c.registered_number)
+  )
   const { data: profileRows } = await supabase
     .from("charity_profiles")
     .select("registered_number, perfect_topic_reason")
@@ -1115,19 +1110,19 @@ async function seed() {
       "registered_number",
       accounts
         .map((c) => profileKey(c.registered_number))
-        .filter((k): k is string => k !== null),
-    );
+        .filter((k): k is string => k !== null)
+    )
   const reasons = new Map(
     (
       (profileRows ?? []) as {
-        registered_number: string;
-        perfect_topic_reason: string | null;
+        registered_number: string
+        perfect_topic_reason: string | null
       }[]
-    ).map((r) => [r.registered_number, r.perfect_topic_reason]),
-  );
+    ).map((r) => [r.registered_number, r.perfect_topic_reason])
+  )
   const charities = accounts.map((c) => {
-    const row = mirror.get((c.registered_number ?? "").replace(/\D/g, ""));
-    const key = profileKey(c.registered_number);
+    const row = mirror.get((c.registered_number ?? "").replace(/\D/g, ""))
+    const key = profileKey(c.registered_number)
     return {
       ...c,
       activities: row?.activities ?? null,
@@ -1137,36 +1132,36 @@ async function seed() {
         type: a.type,
       })),
       perfect_topic_reason: (key ? reasons.get(key) : null) ?? null,
-    } as Charity;
-  });
+    } as Charity
+  })
   // The APPROVED subsets the table names in their own right, by parent.
   const { data: subsetRows, error: sErr } = await supabase
     .from("topic_subsets")
     .select("id, title, topic_id, topic_subset_items(favourite_id)")
-    .eq("status", "approved");
-  if (sErr) throw new Error(sErr.message);
-  const subsetsByTopic = new Map<string, TableSubset[]>();
+    .eq("status", "approved")
+  if (sErr) throw new Error(sErr.message)
+  const subsetsByTopic = new Map<string, TableSubset[]>()
   for (const r of (subsetRows ?? []) as {
-    id: string;
-    title: string;
-    topic_id: string;
-    topic_subset_items: { favourite_id: string }[] | null;
+    id: string
+    title: string
+    topic_id: string
+    topic_subset_items: { favourite_id: string }[] | null
   }[]) {
-    if (!(r.title in SUBSET_PARENTS)) continue;
-    const list = subsetsByTopic.get(r.topic_id) ?? [];
+    if (!(r.title in SUBSET_PARENTS)) continue
+    const list = subsetsByTopic.get(r.topic_id) ?? []
     list.push({
       id: r.id,
       title: r.title,
       memberIds: new Set(
-        (r.topic_subset_items ?? []).map((i) => i.favourite_id),
+        (r.topic_subset_items ?? []).map((i) => i.favourite_id)
       ),
-    });
-    subsetsByTopic.set(r.topic_id, list);
+    })
+    subsetsByTopic.set(r.topic_id, list)
   }
   if (topics.length === 0 || charities.length === 0)
     throw new Error(
-      "Need active topics and charities with a confirmed cause family — run pnpm seed and confirm families first.",
-    );
+      "Need active topics and charities with a confirmed cause family — run pnpm seed and confirm families first."
+    )
 
   // Topics already used by seeded favpolls on staging count against the
   // per-topic cap, so a third "Way to spend Sunday" cannot appear across
@@ -1175,57 +1170,57 @@ async function seed() {
   const { data: usedRows } = await supabase
     .from("favpolls")
     .select("favpoll_polls(topic_id)")
-    .eq("created_by", SEED_USER);
-  const usedTopics = new Map<string, number>();
+    .eq("created_by", SEED_USER)
+  const usedTopics = new Map<string, number>()
   for (const r of usedRows ?? []) {
     const poll = Array.isArray((r as any).favpoll_polls)
       ? (r as any).favpoll_polls[0]
-      : (r as any).favpoll_polls;
+      : (r as any).favpoll_polls
     if (poll?.topic_id)
-      usedTopics.set(poll.topic_id, (usedTopics.get(poll.topic_id) ?? 0) + 1);
+      usedTopics.set(poll.topic_id, (usedTopics.get(poll.topic_id) ?? 0) + 1)
   }
   const candidates = enumerate(topics, charities, subsetsByTopic).filter(
-    (c) => (usedTopics.get(c.topic.id) ?? 0) < 2,
-  );
-  const triads = candidates.filter((c) => c.count === 3).length;
+    (c) => (usedTopics.get(c.topic.id) ?? 0) < 2
+  )
+  const triads = candidates.filter((c) => c.count === 3).length
   console.log(
-    `Table: ${candidates.length} motivated triples from ${topics.length} topics × ${charities.length} charities (${triads} triads).`,
-  );
-  const chosen = sample(candidates, COUNT);
+    `Table: ${candidates.length} motivated triples from ${topics.length} topics × ${charities.length} charities (${triads} triads).`
+  )
+  const chosen = sample(candidates, COUNT)
   console.log(
-    `Picked ${chosen.length} (rng seed ${RNG_SEED}, ${chosen.filter((c) => c.count === 3).length} triads):`,
-  );
+    `Picked ${chosen.length} (rng seed ${RNG_SEED}, ${chosen.filter((c) => c.count === 3).length} triads):`
+  )
   for (const c of chosen)
     console.log(
-      `  ${"★".repeat(c.count).padEnd(3)} ${c.register.padEnd(16)} ${c.occasion.padEnd(20)} ${(c.subset?.title ?? c.topic.title).padEnd(24)} ${c.charity.name}`,
-    );
+      `  ${"★".repeat(c.count).padEnd(3)} ${c.register.padEnd(16)} ${c.occasion.padEnd(20)} ${(c.subset?.title ?? c.topic.title).padEnd(24)} ${c.charity.name}`
+    )
   if (DRY_RUN) {
-    console.log("\n--dry-run: no model calls, nothing written.");
-    return;
+    console.log("\n--dry-run: no model calls, nothing written.")
+    return
   }
 
   await supabase
     .from("users")
-    .upsert({ id: SEED_USER, display_name: "Story Seed" });
+    .upsert({ id: SEED_USER, display_name: "Story Seed" })
 
-  const now = Date.now();
-  const DAY = 86_400_000;
-  const iso = (t: number) => new Date(t).toISOString();
-  const manifest: Manifest[] = [];
-  let guestSeq = 0;
-  let written = 0;
+  const now = Date.now()
+  const DAY = 86_400_000
+  const iso = (t: number) => new Date(t).toISOString()
+  const manifest: Manifest[] = []
+  let guestSeq = 0
+  let written = 0
 
   for (const c of chosen) {
-    const isCause = c.register === "cause";
+    const isCause = c.register === "cause"
     const who = isCause
       ? null
-      : protagonist(c.register, c.occasion, c.topic.title);
-    const spec = occasionSpec(c.occasion);
+      : protagonist(c.register, c.occasion, c.topic.title)
+    const spec = occasionSpec(c.occasion)
     // The catalogue's Achievement lines ("Well done", "Take a bow") are
     // written after the event; a sponsored effort is cheered on before it.
-    const isEffort = EFFORT_OCCASIONS.has(c.occasion) && !isCause;
-    const isBirth = BABY_OCCASIONS.has(c.occasion);
-    const babyName = isBirth ? drawAny() : null;
+    const isEffort = EFFORT_OCCASIONS.has(c.occasion) && !isCause
+    const isBirth = BABY_OCCASIONS.has(c.occasion)
+    const babyName = isBirth ? drawAny() : null
     const effortName = pick([
       "Marathon",
       "Half marathon",
@@ -1235,14 +1230,14 @@ async function seed() {
       "London to Brighton",
       "10k",
       "Triathlon",
-    ]);
+    ])
     const openingLine = isBirth
       ? "Congratulations to"
       : isEffort
         ? pick(["Cheering on", "Backing", "Good luck to"])
         : spec
           ? pick(spec.openingLines)
-          : null;
+          : null
     const context = isBirth
       ? c.occasion === "Baby shower"
         ? `Baby ${drawLast()} due ${pick(["October", "November", "December"])}`
@@ -1251,7 +1246,7 @@ async function seed() {
         ? `${effortName} · ${pick(["4th", "12th", "19th", "26th"])} ${pick(["October", "November"])}`
         : spec
           ? resolveContext(pick(spec.contexts), who?.pronoun ?? "they")
-          : null;
+          : null
 
     // Item set follows the item-source rule (lib/poll-items) AND the
     // wizard: a finite topic's items are its closed set; an infinite
@@ -1263,12 +1258,12 @@ async function seed() {
     // the subset and lists its members, whatever the parent's openness.
     // The table's own subset on the card (ticked rows) beats the charity's
     // perfect subset; both list only the subset's members.
-    const subset = c.subset ?? subsetFor(c.charity, c.topic);
+    const subset = c.subset ?? subsetFor(c.charity, c.topic)
     const items = subset
       ? c.topic.favourites.filter((f) => subset.memberIds.has(f.id))
       : c.topic.is_finite
         ? c.topic.favourites
-        : c.topic.favourites.filter((f) => f.is_canonical);
+        : c.topic.favourites.filter((f) => f.is_canonical)
 
     const input: StoryInput = {
       register: c.register,
@@ -1294,7 +1289,7 @@ async function seed() {
       // The seed chooses the favourite: left to the model it defaults to
       // the same few (Camber Sands, Sissinghurst) cohort after cohort.
       pick: pick(items).label,
-    };
+    }
 
     // The judge loop: generate, check P1 by lookup and A1/P2 by the
     // judge, retry up to MAX_ATTEMPTS; the best attempt wins if none
@@ -1304,8 +1299,8 @@ async function seed() {
       items,
       isCause,
       c.occasion,
-      who?.name ?? c.charity.name,
-    );
+      who?.name ?? c.charity.name
+    )
     if (!best) {
       manifest.push({
         name: who?.name ?? "(cause)",
@@ -1321,15 +1316,15 @@ async function seed() {
         context: null,
         favpollId: null,
         verdict: "no story generated",
-      });
-      continue;
+      })
+      continue
     }
-    const { story, item } = best;
-    const passed = best.score === 3;
+    const { story, item } = best
+    const passed = best.score === 3
     if (!passed) {
       console.warn(
-        `  ⚠ ${who?.name ?? story.causeLabel ?? c.charity.name}: gate not met after ${attempts} attempt(s) — ${best.verdict}; skipped`,
-      );
+        `  ⚠ ${who?.name ?? story.causeLabel ?? c.charity.name}: gate not met after ${attempts} attempt(s) — ${best.verdict}; skipped`
+      )
       manifest.push({
         name: who?.name ?? story.causeLabel ?? "(cause)",
         register: c.register,
@@ -1344,22 +1339,22 @@ async function seed() {
         context: story.context,
         favpollId: null,
         verdict: best.verdict,
-      });
-      continue;
+      })
+      continue
     }
 
     // ── write ──
     // An effort's favpoll closes on the day, so it is always still open.
-    const open = EFFORT_OCCASIONS.has(c.occasion) || chance(0.6);
+    const open = EFFORT_OCCASIONS.has(c.occasion) || chance(0.6)
     const closesAt = open
       ? now + between(7, 40) * DAY
-      : now - between(3, 60) * DAY;
-    const createdAt = closesAt - between(14, 45) * DAY;
-    const favpollId = randomUUID();
-    const portraitName = who?.name ?? story.causeLabel ?? c.charity.name;
-    const photoUrl = await uploadPortrait(favpollId, portraitName, c.register);
+      : now - between(3, 60) * DAY
+    const createdAt = closesAt - between(14, 45) * DAY
+    const favpollId = randomUUID()
+    const portraitName = who?.name ?? story.causeLabel ?? c.charity.name
+    const photoUrl = await uploadPortrait(favpollId, portraitName, c.register)
 
-    let protagonistId: string | null = null;
+    let protagonistId: string | null = null
     if (who) {
       const { data, error } = await supabase
         .from("protagonists")
@@ -1372,23 +1367,23 @@ async function seed() {
           created_by: SEED_USER,
         })
         .select("id")
-        .single();
+        .single()
       if (error || !data) {
         console.error(
-          `  ✗ protagonist insert failed for ${who.name}: ${error?.message}`,
-        );
-        continue;
+          `  ✗ protagonist insert failed for ${who.name}: ${error?.message}`
+        )
+        continue
       }
-      protagonistId = data.id;
+      protagonistId = data.id
     }
 
     // Pledges: the note's item leads the standings — the payoff should be
     // visible in the numbers too. Settlement total only once closed.
-    const nPledges = between(4, 18);
+    const nPledges = between(4, 18)
     const amounts = Array.from({ length: nPledges }, () =>
-      pick([2, 3, 5, 5, 10, 10, 10, 15, 20, 25, 50]),
-    );
-    const raised = amounts.reduce((a, b) => a + b, 0);
+      pick([2, 3, 5, 5, 10, 10, 10, 15, 20, 25, 50])
+    )
+    const raised = amounts.reduce((a, b) => a + b, 0)
 
     const { error: fErr } = await supabase.from("favpolls").insert({
       id: favpollId,
@@ -1422,25 +1417,25 @@ async function seed() {
       is_listed: c.register !== "remembering",
       is_exemplar: true,
       total_raised: open ? 0 : raised,
-    });
+    })
     if (fErr) {
       console.error(
-        `  ✗ favpoll insert failed for ${who?.name ?? c.charity.name}: ${fErr.message}`,
-      );
-      continue;
+        `  ✗ favpoll insert failed for ${who?.name ?? c.charity.name}: ${fErr.message}`
+      )
+      continue
     }
     await supabase.from("favpoll_charities").insert({
       favpoll_id: favpollId,
       charity_id: c.charity.id,
       display_order: 0,
-    });
+    })
     await supabase.from("favpoll_pots").insert({
       favpoll_id: favpollId,
       created_by: SEED_USER,
       total_deposited: 0,
       total_allocated: 0,
-    });
-    const pollId = randomUUID();
+    })
+    const pollId = randomUUID()
     const { error: pErr } = await supabase.from("favpoll_polls").insert({
       id: pollId,
       favpoll_id: favpollId,
@@ -1448,12 +1443,12 @@ async function seed() {
       subset_id: subset?.id ?? null,
       personal_note: story.note,
       created_at: iso(createdAt),
-    });
+    })
     if (pErr) {
       console.error(
-        `  ✗ poll insert failed for ${who?.name ?? c.charity.name}: ${pErr.message}`,
-      );
-      continue;
+        `  ✗ poll insert failed for ${who?.name ?? c.charity.name}: ${pErr.message}`
+      )
+      continue
     }
     // A subset poll always carries its rows (as the app writes them).
     if (!c.topic.is_finite || subset) {
@@ -1464,11 +1459,11 @@ async function seed() {
           is_guest_added: false,
           is_hidden: false,
           added_by: SEED_USER,
-        })),
-      );
+        }))
+      )
     }
-    const windowEnd = Math.min(now, closesAt);
-    const others = items.filter((i) => i.id !== item?.id);
+    const windowEnd = Math.min(now, closesAt)
+    const others = items.filter((i) => i.id !== item?.id)
     const pledgeRows = amounts.map((amount, i) => ({
       id: randomUUID(),
       favpoll_poll_id: pollId,
@@ -1489,32 +1484,32 @@ async function seed() {
         item && i < Math.ceil(nPledges / 2)
           ? item.id
           : pick(others.length ? others : items).id,
-    }));
+    }))
     const { error: plErr } = await supabase
       .from("pledges")
-      .insert(pledgeRows.map(({ favourite_id: _f, ...row }) => row));
+      .insert(pledgeRows.map(({ favourite_id: _f, ...row }) => row))
     if (plErr)
       console.error(
-        `  ✗ pledges failed for ${who?.name ?? c.charity.name}: ${plErr.message}`,
-      );
+        `  ✗ pledges failed for ${who?.name ?? c.charity.name}: ${plErr.message}`
+      )
     else {
       const { error: alErr } = await supabase.from("pledge_allocations").insert(
         pledgeRows.map((r) => ({
           pledge_id: r.id,
           favourite_id: r.favourite_id,
           amount: r.total_amount,
-        })),
-      );
+        }))
+      )
       if (alErr)
         console.error(
-          `  ✗ allocations failed for ${who?.name ?? c.charity.name}: ${alErr.message}`,
-        );
+          `  ✗ allocations failed for ${who?.name ?? c.charity.name}: ${alErr.message}`
+        )
     }
 
-    written++;
+    written++
     console.log(
-      `  ✓ ${"★".repeat(c.count).padEnd(3)} ${(who?.name ?? story.causeLabel ?? c.charity.name).padEnd(28)} ${c.occasion} · ${c.topic.title} · ${c.charity.name} (${attempts + (best.score === 3 ? 1 : 0)} attempt${attempts ? "s" : ""}, ${open ? "open" : "closed"})`,
-    );
+      `  ✓ ${"★".repeat(c.count).padEnd(3)} ${(who?.name ?? story.causeLabel ?? c.charity.name).padEnd(28)} ${c.occasion} · ${c.topic.title} · ${c.charity.name} (${attempts + (best.score === 3 ? 1 : 0)} attempt${attempts ? "s" : ""}, ${open ? "open" : "closed"})`
+    )
     manifest.push({
       name: who?.name ?? story.causeLabel ?? "(cause)",
       register: c.register,
@@ -1529,56 +1524,56 @@ async function seed() {
       context: story.context,
       favpollId,
       verdict: best.verdict,
-    });
+    })
   }
 
   const out = join(
     tmpdir(),
-    `seed-stories-${new Date().toISOString().replace(/[:.]/g, "-")}.json`,
-  );
-  writeFileSync(out, JSON.stringify(manifest, null, 2));
+    `seed-stories-${new Date().toISOString().replace(/[:.]/g, "-")}.json`
+  )
+  writeFileSync(out, JSON.stringify(manifest, null, 2))
   console.log(
-    `\nDone: ${written}/${chosen.length} written (${manifest.filter((m) => !m.favpollId).length} skipped at the gate). Manifest: ${out}`,
-  );
-  console.log("Tear down with: --wipe");
+    `\nDone: ${written}/${chosen.length} written (${manifest.filter((m) => !m.favpollId).length} skipped at the gate). Manifest: ${out}`
+  )
+  console.log("Tear down with: --wipe")
 }
 
 // ── refresh: patch the existing cohort in place ──────────────────────────
 async function refresh() {
-  console.log("Refreshing the existing story seed…");
+  console.log("Refreshing the existing story seed…")
   const { data: f, error } = await supabase
     .from("favpolls")
     .select(
-      "id, subject, category, grouping, cause_label, photo_url, protagonists(id, name, photo_url), favpoll_polls(id, topics(id, is_finite, favourites(id, is_canonical)), favpoll_poll_favourites(favourite_id))",
+      "id, subject, category, grouping, cause_label, photo_url, protagonists(id, name, photo_url), favpoll_polls(id, topics(id, is_finite, favourites(id, is_canonical)), favpoll_poll_favourites(favourite_id))"
     )
-    .eq("created_by", SEED_USER);
-  if (error) throw new Error(error.message);
+    .eq("created_by", SEED_USER)
+  if (error) throw new Error(error.message)
   const one = <T>(v: T | T[] | null): T | null =>
-    Array.isArray(v) ? (v[0] ?? null) : v;
+    Array.isArray(v) ? (v[0] ?? null) : v
   let items = 0,
-    portraits = 0;
+    portraits = 0
   for (const x of f ?? []) {
     const p = one(x.protagonists as any) as {
-      id: string;
-      name: string;
-      photo_url: string | null;
-    } | null;
-    const poll = one(x.favpoll_polls as any) as any;
+      id: string
+      name: string
+      photo_url: string | null
+    } | null
+    const poll = one(x.favpoll_polls as any) as any
     const topic = one(poll?.topics) as {
-      id: string;
-      is_finite: boolean;
-      favourites: { id: string; is_canonical: boolean }[];
-    } | null;
+      id: string
+      is_finite: boolean
+      favourites: { id: string; is_canonical: boolean }[]
+    } | null
     // Full canonical set for infinite topics — add what the curated subset left out.
     if (topic && !topic.is_finite) {
       const have = new Set(
         (poll.favpoll_poll_favourites as { favourite_id: string }[]).map(
-          (r) => r.favourite_id,
-        ),
-      );
+          (r) => r.favourite_id
+        )
+      )
       const missing = topic.favourites.filter(
-        (fv) => fv.is_canonical && !have.has(fv.id),
-      );
+        (fv) => fv.is_canonical && !have.has(fv.id)
+      )
       if (missing.length) {
         const { error: e } = await supabase
           .from("favpoll_poll_favourites")
@@ -1589,13 +1584,13 @@ async function refresh() {
               is_guest_added: false,
               is_hidden: false,
               added_by: SEED_USER,
-            })),
-          );
+            }))
+          )
         if (e)
           console.error(
-            `  ✗ items for ${p?.name ?? x.cause_label}: ${e.message}`,
-          );
-        else items += missing.length;
+            `  ✗ items for ${p?.name ?? x.cause_label}: ${e.message}`
+          )
+        else items += missing.length
       }
     }
     // A portrait where there is none.
@@ -1606,31 +1601,31 @@ async function refresh() {
           ? "remembering"
           : x.grouping === "individual"
             ? "celebrating_one"
-            : "celebrating_many";
-    const name = p?.name ?? x.cause_label ?? x.id;
+            : "celebrating_many"
+    const name = p?.name ?? x.cause_label ?? x.id
     if (p && !p.photo_url) {
-      const url = await uploadPortrait(x.id, name, register);
+      const url = await uploadPortrait(x.id, name, register)
       if (url) {
         await supabase
           .from("protagonists")
           .update({ photo_url: url })
-          .eq("id", p.id);
-        portraits++;
+          .eq("id", p.id)
+        portraits++
       }
     } else if (!p && !x.photo_url) {
-      const url = await uploadPortrait(x.id, name, register);
+      const url = await uploadPortrait(x.id, name, register)
       if (url) {
         await supabase
           .from("favpolls")
           .update({ photo_url: url })
-          .eq("id", x.id);
-        portraits++;
+          .eq("id", x.id)
+        portraits++
       }
     }
   }
   console.log(
-    `Refreshed ${f?.length ?? 0} favpolls: ${items} items added, ${portraits} portraits set.`,
-  );
+    `Refreshed ${f?.length ?? 0} favpolls: ${items} items added, ${portraits} portraits set.`
+  )
 }
 
 // ── rename: fresh names, copy kept ───────────────────────────────────────
@@ -1638,98 +1633,98 @@ async function rename() {
   const { data: f, error } = await supabase
     .from("favpolls")
     .select(
-      "id, occasion_type, grouping, protagonists(id, name, about, pronoun), favpoll_polls(id, personal_note)",
+      "id, occasion_type, grouping, protagonists(id, name, about, pronoun), favpoll_polls(id, personal_note)"
     )
     .eq("created_by", SEED_USER)
-    .eq("subject", "someone");
-  if (error) throw new Error(error.message);
+    .eq("subject", "someone")
+  if (error) throw new Error(error.message)
   const one = <T>(v: T | T[] | null): T | null =>
-    Array.isArray(v) ? (v[0] ?? null) : v;
+    Array.isArray(v) ? (v[0] ?? null) : v
   const swap = (text: string, from: string, to: string) => {
     // The whole name, its "and" form, and its possessives.
-    let out = text.split(from).join(to);
+    let out = text.split(from).join(to)
     if (from.includes(" & "))
       out = out
         .split(from.replace(" & ", " and "))
-        .join(to.replace(" & ", " and "));
-    const fromFirst = from.includes(" & ") ? from : from.split(" ")[0];
-    const toFirst = to.includes(" & ") ? to : to.split(" ")[0];
-    out = out.split(fromFirst).join(toFirst);
+        .join(to.replace(" & ", " and "))
+    const fromFirst = from.includes(" & ") ? from : from.split(" ")[0]
+    const toFirst = to.includes(" & ") ? to : to.split(" ")[0]
+    out = out.split(fromFirst).join(toFirst)
     // Re-form the possessive for the new name: "James' was" must become
     // "Arthur's was", and "Nora's" must become "Carys'".
-    const bare = toFirst.replace(/['\u2019]s?$/, "");
-    const poss = bare.endsWith("s") ? `${bare}'` : `${bare}'s`;
+    const bare = toFirst.replace(/['\u2019]s?$/, "")
+    const poss = bare.endsWith("s") ? `${bare}'` : `${bare}'s`
     return out
       .split(`${bare}'s`)
       .join(poss)
       .split(`${bare}' `)
       .join(`${poss} `)
       .split(`${bare}'.`)
-      .join(`${poss}.`);
-  };
-  let n = 0;
+      .join(`${poss}.`)
+  }
+  let n = 0
   for (const x of f ?? []) {
     const p = one(x.protagonists as any) as {
-      id: string;
-      name: string;
-      about: string;
-      pronoun: Pronoun | null;
-    } | null;
+      id: string
+      name: string
+      about: string
+      pronoun: Pronoun | null
+    } | null
     const poll = one(x.favpoll_polls as any) as {
-      id: string;
-      personal_note: string;
-    } | null;
-    if (!p || !poll || x.grouping === "group") continue;
+      id: string
+      personal_note: string
+    } | null
+    if (!p || !poll || x.grouping === "group") continue
     const fresh =
       x.grouping === "couple"
         ? drawCouple()
         : PET_OCCASIONS.has(x.occasion_type ?? "")
           ? drawPet()
-          : `${p.pronoun === "she" ? drawShe() : drawHe()} ${drawLast()}`;
-    const about = swap(p.about, p.name, fresh);
-    const note = swap(poll.personal_note, p.name, fresh);
+          : `${p.pronoun === "she" ? drawShe() : drawHe()} ${drawLast()}`
+    const about = swap(p.about, p.name, fresh)
+    const note = swap(poll.personal_note, p.name, fresh)
     await supabase
       .from("protagonists")
       .update({ name: fresh, about })
-      .eq("id", p.id);
+      .eq("id", p.id)
     await supabase
       .from("favpoll_polls")
       .update({ personal_note: note })
-      .eq("id", poll.id);
-    n++;
-    console.log(`  ${p.name.padEnd(22)} → ${fresh}`);
+      .eq("id", poll.id)
+    n++
+    console.log(`  ${p.name.padEnd(22)} → ${fresh}`)
   }
-  console.log(`Renamed ${n}.`);
+  console.log(`Renamed ${n}.`)
 }
 
 // The founder edits the cohort in references/seeded-stories-<date>.md; a
 // regen writes its result there too so the file, staging and the review
 // page cannot drift (2026-09-25).
-const REFS_DIR = join(__dirname, "..", "references");
+const REFS_DIR = join(__dirname, "..", "references")
 function syncEditableMd(
   id: string,
   heading: string,
   about: string,
   note: string,
-  idLine?: string,
+  idLine?: string
 ) {
   // Whichever Stories file holds this id (one file per cohort).
-  if (!existsSync(REFS_DIR)) return;
+  if (!existsSync(REFS_DIR)) return
   const file = readdirSync(REFS_DIR)
     .filter(
-      (f) => /^seeded-stories-.*\.md$/.test(f) && !f.includes("alternatives"),
+      (f) => /^seeded-stories-.*\.md$/.test(f) && !f.includes("alternatives")
     )
     .map((f) => join(REFS_DIR, f))
-    .find((f) => readFileSync(f, "utf8").includes("`id " + id + "`"));
-  if (!file) return;
-  const md = readFileSync(file, "utf8");
+    .find((f) => readFileSync(f, "utf8").includes("`id " + id + "`"))
+  if (!file) return
+  const md = readFileSync(file, "utf8")
   const re = new RegExp(
     "(### \\d+\\. )[^\\n]*(\\n`id " +
       id +
-      "`)([^\\n]*)(\\n\\n\\*\\*About\\*\\*\\n\\n)([\\s\\S]*?)(\\n\\n\\*\\*Note\\*\\*\\n\\n)([\\s\\S]*?)(?=\\n\\n### |\\n\\n## |$)",
-  );
-  const m = md.match(re);
-  if (!m || m.index === undefined) return;
+      "`)([^\\n]*)(\\n\\n\\*\\*About\\*\\*\\n\\n)([\\s\\S]*?)(\\n\\n\\*\\*Note\\*\\*\\n\\n)([\\s\\S]*?)(?=\\n\\n### |\\n\\n## |$)"
+  )
+  const m = md.match(re)
+  if (!m || m.index === undefined) return
   const out =
     md.slice(0, m.index) +
     m[1] +
@@ -1740,39 +1735,39 @@ function syncEditableMd(
     about +
     m[6] +
     note +
-    md.slice(m.index + m[0].length);
-  writeFileSync(file, out);
-  console.log(`  ↳ ${file.split("/").slice(-2).join("/")} updated`);
+    md.slice(m.index + m[0].length)
+  writeFileSync(file, out)
+  console.log(`  ↳ ${file.split("/").slice(-2).join("/")} updated`)
   // The originals follow, so a regeneration is not mistaken for one of
   // the founder's edits by the exemplar-bank builder.
-  const originalsPath = file.replace(/\.md$/, ".original.json");
+  const originalsPath = file.replace(/\.md$/, ".original.json")
   if (existsSync(originalsPath)) {
     const originals = JSON.parse(readFileSync(originalsPath, "utf8")) as {
-      id: string;
-      name?: string;
-      pronoun?: string | null;
-      about: string;
-      note: string;
-      occasion?: string;
-      topic?: string;
-      charity?: string;
-    }[];
-    const o = originals.find((r) => r.id === id);
+      id: string
+      name?: string
+      pronoun?: string | null
+      about: string
+      note: string
+      occasion?: string
+      topic?: string
+      charity?: string
+    }[]
+    const o = originals.find((r) => r.id === id)
     if (o) {
-      o.about = about;
-      o.note = note;
-      const [name, occ, top, cha] = heading.split(" · ");
-      if (name) o.name = name;
-      if (occ) o.occasion = occ;
-      if (top) o.topic = top;
-      if (cha) o.charity = cha;
+      o.about = about
+      o.note = note
+      const [name, occ, top, cha] = heading.split(" · ")
+      if (name) o.name = name
+      if (occ) o.occasion = occ
+      if (top) o.topic = top
+      if (cha) o.charity = cha
       // The voice on the id line is the pronoun: a pet rename or a group
       // moving to "we" must reach the originals too.
-      const voice = idLine?.split(" · ").pop()?.trim();
-      if (voice === "first person") o.pronoun = "i";
+      const voice = idLine?.split(" · ").pop()?.trim()
+      if (voice === "first person") o.pronoun = "i"
       else if (voice?.startsWith("third person, "))
-        o.pronoun = voice.slice("third person, ".length);
-      writeFileSync(originalsPath, JSON.stringify(originals, null, 1));
+        o.pronoun = voice.slice("third person, ".length)
+      writeFileSync(originalsPath, JSON.stringify(originals, null, 1))
     }
   }
 }
@@ -1782,46 +1777,46 @@ async function regen(name: string) {
   const { data: f, error } = await supabase
     .from("favpolls")
     .select(
-      "id, subject, category, grouping, occasion_type, cause_label, protagonists(id, name, pronoun), favpoll_polls(id, subset_id, topic_subsets(title, topic_subset_items(favourite_id)), topics(title, is_finite, favourites(id, label, is_canonical)), favpoll_poll_favourites(favourite_id)), favpoll_charities(charities(name, description, activities, cause_family, objects, areas, perfect_topic_reason, perfect_topic:topics!charities_perfect_topic_id_fkey(title)))",
+      "id, subject, category, grouping, occasion_type, cause_label, protagonists(id, name, pronoun), favpoll_polls(id, subset_id, topic_subsets(title, topic_subset_items(favourite_id)), topics(title, is_finite, favourites(id, label, is_canonical)), favpoll_poll_favourites(favourite_id)), favpoll_charities(charities(name, description, activities, cause_family, objects, areas, perfect_topic_reason, perfect_topic:topics!charities_perfect_topic_id_fkey(title)))"
     )
-    .eq("created_by", SEED_USER);
-  if (error) throw new Error(error.message);
+    .eq("created_by", SEED_USER)
+  if (error) throw new Error(error.message)
   const one = <T>(v: T | T[] | null): T | null =>
-    Array.isArray(v) ? (v[0] ?? null) : v;
-  const want = name.trim().toLowerCase();
+    Array.isArray(v) ? (v[0] ?? null) : v
+  const want = name.trim().toLowerCase()
   const x = (f ?? []).find(
     (r: any) =>
       (one(r.protagonists) as any)?.name?.toLowerCase() === want ||
-      r.cause_label?.toLowerCase() === want,
-  );
-  if (!x) throw new Error(`No seeded favpoll named "${name}"`);
+      r.cause_label?.toLowerCase() === want
+  )
+  if (!x) throw new Error(`No seeded favpoll named "${name}"`)
   const p = one(x.protagonists as any) as {
-    id: string;
-    name: string;
-    pronoun: Pronoun | null;
-  } | null;
-  const poll = one(x.favpoll_polls as any) as any;
-  const topic = one(poll.topics) as Topic;
-  const ch = one(one(x.favpoll_charities as any)?.charities) as Charity;
-  const isCause = x.subject === "cause";
+    id: string
+    name: string
+    pronoun: Pronoun | null
+  } | null
+  const poll = one(x.favpoll_polls as any) as any
+  const topic = one(poll.topics) as Topic
+  const ch = one(one(x.favpoll_charities as any)?.charities) as Charity
+  const isCause = x.subject === "cause"
   const register: Register = isCause
     ? "cause"
     : x.category === "memorial"
       ? "remembering"
       : x.grouping === "individual"
         ? "celebrating_one"
-        : "celebrating_many";
+        : "celebrating_many"
   const curated = new Set(
     (poll.favpoll_poll_favourites as { favourite_id: string }[]).map(
-      (r) => r.favourite_id,
-    ),
-  );
+      (r) => r.favourite_id
+    )
+  )
   // A subset poll carries its rows (favpoll-topic-rules §1): the members.
-  const regenSubset = oneOf(poll.topic_subsets as PerfectSubset | null);
+  const regenSubset = oneOf(poll.topic_subsets as PerfectSubset | null)
   const items =
     topic.is_finite && !poll.subset_id
       ? topic.favourites
-      : topic.favourites.filter((fv) => curated.has(fv.id));
+      : topic.favourites.filter((fv) => curated.has(fv.id))
   const input: StoryInput = {
     register,
     subject: isCause ? "cause" : "someone",
@@ -1847,13 +1842,13 @@ async function regen(name: string) {
         items.find((i) => i.label.toLowerCase() === REGEN_PICK.toLowerCase())
           ?.label) ||
       pick(items).label,
-  };
+  }
   // If the table has moved under the favpoll (a row narrowed), the
   // triple may be below the seed bar: re-pick the topic for the same
   // occasion and charity, keeping the name, before writing.
   const bar = isCause
     ? (e: ReturnType<typeof storyEdges>) => Boolean(e.e1 && e.e2)
-    : (e: ReturnType<typeof storyEdges>) => e.count >= 2;
+    : (e: ReturnType<typeof storyEdges>) => e.count >= 2
   // Re-pick only when the triple has NO edge left: a row deliberately
   // left at one edge (Song at a reunion, by the founder's choice) was
   // being moved on every regen without --topic (2026-09-26).
@@ -1861,42 +1856,41 @@ async function regen(name: string) {
     const { data: allTopics } = await supabase
       .from("topics")
       .select("id, title, is_finite, favourites(id, label, is_canonical)")
-      .eq("is_active", true);
+      .eq("is_active", true)
     const options = ((allTopics ?? []) as Topic[])
       .filter(
         (t) =>
           t.favourites.length >= 5 &&
-          !(isCause ? NO_CAUSE_STORY : NO_PERSON_STORY).has(t.title),
+          !(isCause ? NO_CAUSE_STORY : NO_PERSON_STORY).has(t.title)
       )
       .map((t) => ({ t, e: storyEdges({ ...input, topicTitle: t.title }) }))
-      .filter(({ e }) => bar(e));
+      .filter(({ e }) => bar(e))
     if (options.length === 0 && !REGEN_TOPIC)
       throw new Error(
-        "No topic meets the seed bar for this occasion and charity",
-      );
+        "No topic meets the seed bar for this occasion and charity"
+      )
     const wanted = REGEN_TOPIC
       ? ((allTopics ?? []) as Topic[]).find(
-          (t) => t.title.toLowerCase() === REGEN_TOPIC.toLowerCase(),
+          (t) => t.title.toLowerCase() === REGEN_TOPIC.toLowerCase()
         )
-      : null;
-    if (REGEN_TOPIC && !wanted) throw new Error(`No topic "${REGEN_TOPIC}"`);
-    const best = Math.max(...options.map((o) => o.e.count));
-    const newTopic =
-      wanted ?? pick(options.filter((o) => o.e.count === best)).t;
+      : null
+    if (REGEN_TOPIC && !wanted) throw new Error(`No topic "${REGEN_TOPIC}"`)
+    const best = Math.max(...options.map((o) => o.e.count))
+    const newTopic = wanted ?? pick(options.filter((o) => o.e.count === best)).t
     console.log(
-      `  topic ${topic.title} → ${newTopic.title} (the old triple fell below the bar)`,
-    );
+      `  topic ${topic.title} → ${newTopic.title} (the old triple fell below the bar)`
+    )
     const newItems = newTopic.is_finite
       ? newTopic.favourites
-      : newTopic.favourites.filter((f) => f.is_canonical);
+      : newTopic.favourites.filter((f) => f.is_canonical)
     await supabase
       .from("favpoll_poll_favourites")
       .delete()
-      .eq("favpoll_poll_id", poll.id);
+      .eq("favpoll_poll_id", poll.id)
     await supabase
       .from("favpoll_polls")
       .update({ topic_id: newTopic.id })
-      .eq("id", poll.id);
+      .eq("id", poll.id)
     if (!newTopic.is_finite)
       await supabase.from("favpoll_poll_favourites").insert(
         newItems.map((f) => ({
@@ -1905,31 +1899,31 @@ async function regen(name: string) {
           is_guest_added: false,
           is_hidden: false,
           added_by: SEED_USER,
-        })),
-      );
+        }))
+      )
     // Allocations must point at the new items: spread them, the note's
     // item re-leads below.
     const { data: pledges } = await supabase
       .from("pledges")
       .select("id")
-      .eq("favpoll_poll_id", poll.id);
+      .eq("favpoll_poll_id", poll.id)
     for (const pl of pledges ?? [])
       await supabase
         .from("pledge_allocations")
         .update({ favourite_id: pick(newItems).id })
-        .eq("pledge_id", pl.id);
-    topic.title = newTopic.title;
-    topic.is_finite = newTopic.is_finite;
-    topic.favourites = newTopic.favourites;
-    items.length = 0;
-    items.push(...newItems);
-    input.topicTitle = newTopic.title;
-    input.itemLabels = newItems.map((i) => i.label);
+        .eq("pledge_id", pl.id)
+    topic.title = newTopic.title
+    topic.is_finite = newTopic.is_finite
+    topic.favourites = newTopic.favourites
+    items.length = 0
+    items.push(...newItems)
+    input.topicTitle = newTopic.title
+    input.itemLabels = newItems.map((i) => i.label)
     input.pick =
       (REGEN_PICK &&
         newItems.find((i) => i.label.toLowerCase() === REGEN_PICK.toLowerCase())
           ?.label) ||
-      pick(newItems).label;
+      pick(newItems).label
   }
   // A birth favpoll seeded with the BABY on the card becomes the parents'
   // (2026-09-24): a couple is named, the baby moves to the context line.
@@ -1938,8 +1932,8 @@ async function regen(name: string) {
     BABY_OCCASIONS.has(x.occasion_type ?? "") &&
     x.grouping === "individual"
   ) {
-    const babyFirst = p.name.split(" ")[0];
-    const parents = drawCouple();
+    const babyFirst = p.name.split(" ")[0]
+    const parents = drawCouple()
     await supabase
       .from("protagonists")
       .update({
@@ -1947,7 +1941,7 @@ async function regen(name: string) {
         pronoun: "they",
         context: `Welcoming ${babyFirst}`,
       })
-      .eq("id", p.id);
+      .eq("id", p.id)
     await supabase
       .from("favpolls")
       .update({
@@ -1955,14 +1949,14 @@ async function regen(name: string) {
         is_plural: true,
         opening_line: "Congratulations to",
       })
-      .eq("id", x.id);
-    console.log(`  ${p.name} → ${parents}, welcoming ${babyFirst}`);
-    p.name = parents;
-    p.pronoun = "they";
-    (x as any).grouping = "couple";
-    input.displayName = parents;
-    input.pronoun = undefined;
-    input.grouping = "couple";
+      .eq("id", x.id)
+    console.log(`  ${p.name} → ${parents}, welcoming ${babyFirst}`)
+    p.name = parents
+    p.pronoun = "they"
+    ;(x as any).grouping = "couple"
+    input.displayName = parents
+    input.pronoun = undefined
+    input.grouping = "couple"
   }
   // A pet memorial seeded with the OWNER on the card becomes the animal's
   // (2026-09-26): a pet name and its pronoun; the owner is the writer.
@@ -1971,56 +1965,56 @@ async function regen(name: string) {
     PET_OCCASIONS.has(x.occasion_type ?? "") &&
     !PET_NAMES.includes(p.name)
   ) {
-    const petName = drawPet();
-    const pronoun = petPronoun(petName);
+    const petName = drawPet()
+    const pronoun = petPronoun(petName)
     await supabase
       .from("protagonists")
       .update({ name: petName, pronoun })
-      .eq("id", p.id);
-    console.log(`  ${p.name} → ${petName} (the animal is on the card)`);
-    p.name = petName;
-    p.pronoun = pronoun;
-    input.displayName = petName;
-    input.pronoun = pronoun;
+      .eq("id", p.id)
+    console.log(`  ${p.name} → ${petName} (the animal is on the card)`)
+    p.name = petName
+    p.pronoun = pronoun
+    input.displayName = petName
+    input.pronoun = pronoun
   }
   // A group's favpoll is written by one of its own: "we" (2026-09-26).
   if (p && x.grouping === "group" && p.pronoun !== "i") {
-    await supabase.from("protagonists").update({ pronoun: "i" }).eq("id", p.id);
-    console.log(`  ${p.name}: ${p.pronoun} → we`);
-    p.pronoun = "i";
-    input.pronoun = "i";
+    await supabase.from("protagonists").update({ pronoun: "i" }).eq("id", p.id)
+    console.log(`  ${p.name}: ${p.pronoun} → we`)
+    p.pronoun = "i"
+    input.pronoun = "i"
   }
   console.log(
-    `Regenerating ${p?.name ?? x.cause_label}: ${x.occasion_type} · ${topic.title} · ${ch.name} (${"★".repeat(storyEdges(input).count) || "no edges"})`,
-  );
+    `Regenerating ${p?.name ?? x.cause_label}: ${x.occasion_type} · ${topic.title} · ${ch.name} (${"★".repeat(storyEdges(input).count) || "no edges"})`
+  )
   const { best, attempts } = await judgeLoop(
     input,
     items,
     isCause,
     x.occasion_type,
-    p?.name ?? x.cause_label,
-  );
+    p?.name ?? x.cause_label
+  )
   if (!best || best.score < 3) {
     console.warn(
-      `  ⚠ gate not met after ${attempts} attempt(s) — ${best?.verdict ?? "no story"}; nothing written`,
-    );
-    return;
+      `  ⚠ gate not met after ${attempts} attempt(s) — ${best?.verdict ?? "no story"}; nothing written`
+    )
+    return
   }
-  const { story, item } = best;
+  const { story, item } = best
   if (p)
     await supabase
       .from("protagonists")
       .update({ about: story.about })
-      .eq("id", p.id);
+      .eq("id", p.id)
   else
     await supabase
       .from("favpolls")
       .update({ description: story.about })
-      .eq("id", x.id);
+      .eq("id", x.id)
   await supabase
     .from("favpoll_polls")
     .update({ personal_note: story.note })
-    .eq("id", poll.id);
+    .eq("id", poll.id)
   // The note's item leads the standings: re-point the first half of the
   // pledges' allocations to it.
   if (item) {
@@ -2028,36 +2022,36 @@ async function regen(name: string) {
       .from("pledges")
       .select("id")
       .eq("favpoll_poll_id", poll.id)
-      .order("created_at");
+      .order("created_at")
     const lead = (pledges ?? [])
       .slice(0, Math.ceil((pledges ?? []).length / 2))
-      .map((r) => r.id);
+      .map((r) => r.id)
     if (lead.length)
       await supabase
         .from("pledge_allocations")
         .update({ favourite_id: item.id })
-        .in("pledge_id", lead);
+        .in("pledge_id", lead)
   }
   console.log(
-    `  ✓ written (${attempts + 1} attempt${attempts ? "s" : ""})\n  ABOUT: ${story.about}\n  NOTE:  ${story.note}`,
-  );
-  const edgeCount = storyEdges(input).count;
+    `  ✓ written (${attempts + 1} attempt${attempts ? "s" : ""})\n  ABOUT: ${story.about}\n  NOTE:  ${story.note}`
+  )
+  const edgeCount = storyEdges(input).count
   const voice =
     p?.pronoun === "i"
       ? "first person"
       : isCause
         ? "cause"
-        : `third person, ${p?.pronoun ?? x.grouping}`;
+        : `third person, ${p?.pronoun ?? x.grouping}`
   syncEditableMd(
     x.id,
     `${p?.name ?? x.cause_label} · ${x.occasion_type} · ${topic.title} · ${ch.name}`,
     story.about,
     story.note,
-    ` · ${"★".repeat(edgeCount)}${"☆".repeat(3 - edgeCount)} · ${voice}`,
-  );
+    ` · ${"★".repeat(edgeCount)}${"☆".repeat(3 - edgeCount)} · ${voice}`
+  )
 }
 
-(WIPE
+;(WIPE
   ? wipe()
   : REFRESH
     ? refresh()
@@ -2067,6 +2061,6 @@ async function regen(name: string) {
         ? rename()
         : seed()
 ).catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+  console.error(e)
+  process.exit(1)
+})

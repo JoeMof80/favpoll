@@ -1,11 +1,11 @@
-"use client";
+"use client"
 
-import { useState, useTransition } from "react";
-import type { HomemadeTopic } from "@/lib/actions/subsets";
-import { promoteHomemadeTopic } from "@/lib/actions/subsets";
-import type { AdminTopic } from "@/lib/actions/topics";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useState, useTransition } from "react"
+import type { HomemadeTopic } from "@/lib/actions/subsets"
+import { promoteHomemadeTopic } from "@/lib/actions/subsets"
+import type { AdminTopic } from "@/lib/actions/topics"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   Table,
   TableBody,
@@ -13,7 +13,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/table"
 
 // PROMOTION (favpoll-topic-rules §1, ruling 8): pick the parent, keep or
 // correct the name, press Promote. The action refuses when fewer than six
@@ -22,25 +22,25 @@ function HomemadeRow({
   row,
   parents,
 }: {
-  row: HomemadeTopic;
-  parents: AdminTopic[];
+  row: HomemadeTopic
+  parents: AdminTopic[]
 }) {
-  const [isPending, startTransition] = useTransition();
-  const [parent, setParent] = useState("");
-  const [title, setTitle] = useState(row.title);
-  const [error, setError] = useState<string | null>(null);
-  const [unmatched, setUnmatched] = useState<string[]>([]);
+  const [isPending, startTransition] = useTransition()
+  const [parent, setParent] = useState("")
+  const [title, setTitle] = useState(row.title)
+  const [error, setError] = useState<string | null>(null)
+  const [unmatched, setUnmatched] = useState<string[]>([])
 
   function promote() {
-    setError(null);
-    setUnmatched([]);
+    setError(null)
+    setUnmatched([])
     startTransition(async () => {
-      const r = await promoteHomemadeTopic(row.id, parent, title);
+      const r = await promoteHomemadeTopic(row.id, parent, title)
       if (r.error) {
-        setError(r.error);
-        setUnmatched(r.unmatched ?? []);
+        setError(r.error)
+        setUnmatched(r.unmatched ?? [])
       }
-    });
+    })
   }
 
   return (
@@ -74,7 +74,7 @@ function HomemadeRow({
             disabled={isPending}
             onChange={(e) => setParent(e.target.value)}
             aria-label="Parent topic"
-            className="h-8 rounded-lg border border-border bg-background px-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            className="h-8 rounded-lg border border-border bg-background px-2 text-sm focus:ring-1 focus:ring-ring focus:outline-none"
           >
             <option value="">Subset of…</option>
             {parents.map((t) => (
@@ -102,15 +102,15 @@ function HomemadeRow({
         {error && <p className="mt-1 text-xs text-destructive">{error}</p>}
       </TableCell>
     </TableRow>
-  );
+  )
 }
 
 export function HomemadeTopicsTable({
   rows,
   parents,
 }: {
-  rows: HomemadeTopic[];
-  parents: AdminTopic[];
+  rows: HomemadeTopic[]
+  parents: AdminTopic[]
 }) {
   return (
     <div className="overflow-x-auto rounded-xl border border-border">
@@ -129,5 +129,5 @@ export function HomemadeTopicsTable({
         </TableBody>
       </Table>
     </div>
-  );
+  )
 }

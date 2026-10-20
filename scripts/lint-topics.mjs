@@ -14,117 +14,114 @@
 // Heuristic, not a parser: a flagged miss is always worth a look; a pass is high-
 // confidence but not a proof. Multi-answer reveals pass if ANY named item is valid.
 
-import fs from "node:fs";
+import fs from "node:fs"
 
-const PATH = process.argv.find((a) => a.endsWith(".ts")) || "scripts/seed.ts";
-const strict = process.argv.includes("--strict");
-const src = fs.readFileSync(PATH, "utf8");
-const OPEN = new Set(["celebration", "other", "default"]);
+const PATH = process.argv.find((a) => a.endsWith(".ts")) || "scripts/seed.ts"
+const strict = process.argv.includes("--strict")
+const src = fs.readFileSync(PATH, "utf8")
+const OPEN = new Set(["celebration", "other", "default"])
 
 // --- item lists -------------------------------------------------------------
-const itemsHeader = src.indexOf("const topicItems");
-const itemsSection = src.slice(itemsHeader);
-const items = {};
-const blockRe = /(?:"([^"]+)"|([A-Za-z][A-Za-z ]*?)):\s*\[([\s\S]*?)\],?\n/g;
-let bm;
+const itemsHeader = src.indexOf("const topicItems")
+const itemsSection = src.slice(itemsHeader)
+const items = {}
+const blockRe = /(?:"([^"]+)"|([A-Za-z][A-Za-z ]*?)):\s*\[([\s\S]*?)\],?\n/g
+let bm
 while ((bm = blockRe.exec(itemsSection))) {
-  const title = (bm[1] ?? bm[2] ?? "").trim();
-  if (!title || /function|const |async |Record/.test(title)) continue;
+  const title = (bm[1] ?? bm[2] ?? "").trim()
+  if (!title || /function|const |async |Record/.test(title)) continue
   const list = [...bm[3].matchAll(/"([^"]+)"/g)].map((x) =>
-    x[1].replace(/\\'/g, "'"),
-  );
-  if (list.length) items[title] = list;
+    x[1].replace(/\\'/g, "'")
+  )
+  if (list.length) items[title] = list
 }
 
 // --- walk topics: find each `title: "X"` then scan occasions until next title -
-const topicsSrc = src.slice(src.indexOf("const topics"), itemsHeader);
-const titleRe = /title:\s*"([^"]+)"/g;
-const titlePositions = [];
-let tm;
-while ((tm = titleRe.exec(topicsSrc))) titlePositions.push([tm.index, tm[1]]);
+const topicsSrc = src.slice(src.indexOf("const topics"), itemsHeader)
+const titleRe = /title:\s*"([^"]+)"/g
+const titlePositions = []
+let tm
+while ((tm = titleRe.exec(topicsSrc))) titlePositions.push([tm.index, tm[1]])
 
 const occRe =
-  /(\w+):\s*\{\s*about:[\s\S]*?reveal:\s*\n?\s*"([\s\S]*?)",?\n\s*\}/g;
+  /(\w+):\s*\{\s*about:[\s\S]*?reveal:\s*\n?\s*"([\s\S]*?)",?\n\s*\}/g
 
-let checked = 0;
-const misses = [];
-const noItem = [];
+let checked = 0
+const misses = []
+const noItem = []
 
 for (let i = 0; i < titlePositions.length; i++) {
-  const [start, title] = titlePositions[i];
+  const [start, title] = titlePositions[i]
   const end =
-    i + 1 < titlePositions.length ? titlePositions[i + 1][0] : topicsSrc.length;
-  const block = topicsSrc.slice(start, end);
-  const list = items[title];
-  if (!list) continue;
+    i + 1 < titlePositions.length ? titlePositions[i + 1][0] : topicsSrc.length
+  const block = topicsSrc.slice(start, end)
+  const list = items[title]
+  if (!list) continue
 
-  occRe.lastIndex = 0;
-  let om;
+  occRe.lastIndex = 0
+  let om
   while ((om = occRe.exec(block))) {
-    const occ = om[1];
-    if (OPEN.has(occ)) continue;
-    const reveal = om[2]
-      .replace(/\\'/g, "'")
-      .replace(/\s+/g, " ")
-      .toLowerCase();
+    const occ = om[1]
+    if (OPEN.has(occ)) continue
+    const reveal = om[2].replace(/\\'/g, "'").replace(/\s+/g, " ").toLowerCase()
 
     // Normalise the reveal: & → and, collapse whitespace
-    const normReveal = reveal.replace(/\s*&\s*/g, " and ");
+    const normReveal = reveal.replace(/\s*&\s*/g, " and ")
 
     const hit = list.some((label) => {
       // Base normalisation: lowercase, & → and
-      const full = label.toLowerCase().replace(/\s*&\s*/g, " and ");
-      if (normReveal.includes(full)) return true;
+      const full = label.toLowerCase().replace(/\s*&\s*/g, " and ")
+      if (normReveal.includes(full)) return true
 
       // Strip parenthetical qualifiers: "Monster Munch (pickled onion)" → "monster munch"
-      const noParens = full.replace(/\s*\([^)]*\)/g, "").trim();
-      if (noParens.length >= 3 && normReveal.includes(noParens)) return true;
+      const noParens = full.replace(/\s*\([^)]*\)/g, "").trim()
+      if (noParens.length >= 3 && normReveal.includes(noParens)) return true
 
       // Strip a leading article: "the west indies" → "west indies"
-      const noArticle = full.replace(/^(the |a |an )/, "");
-      if (noArticle.length >= 3 && normReveal.includes(noArticle)) return true;
+      const noArticle = full.replace(/^(the |a |an )/, "")
+      if (noArticle.length >= 3 && normReveal.includes(noArticle)) return true
 
       // Song-style "Title — Artist": match on the title portion before the dash
-      const titlePart = full.split(/\s+—\s+/)[0].trim();
-      if (titlePart.length >= 3 && normReveal.includes(titlePart)) return true;
+      const titlePart = full.split(/\s+—\s+/)[0].trim()
+      if (titlePart.length >= 3 && normReveal.includes(titlePart)) return true
 
       // "By train" / "On motorbike" / "By river": match on the significant word(s)
       // after a leading short preposition
-      const stripped = full.replace(/^(by|on|in|at|the)\s+/, "").trim();
-      if (stripped.length >= 4 && normReveal.includes(stripped)) return true;
+      const stripped = full.replace(/^(by|on|in|at|the)\s+/, "").trim()
+      if (stripped.length >= 4 && normReveal.includes(stripped)) return true
 
       // fall back to first distinctive token
-      const tok = full.split(/[ —(]/)[0].replace(/['".,!?;:]$/, "");
-      return tok.length >= 4 && normReveal.includes(tok);
-    });
+      const tok = full.split(/[ —(]/)[0].replace(/['".,!?;:]$/, "")
+      return tok.length >= 4 && normReveal.includes(tok)
+    })
 
-    checked++;
+    checked++
     if (!hit) {
-      const asserts = /\b(hers|his|theirs)\s+(is|was|are)\b/.test(reveal);
-      const target = `${title} / ${occ}: "${om[2].trim()}"`;
-      if (asserts) misses.push(target);
-      else noItem.push(`${title} / ${occ}`);
+      const asserts = /\b(hers|his|theirs)\s+(is|was|are)\b/.test(reveal)
+      const target = `${title} / ${occ}: "${om[2].trim()}"`
+      if (asserts) misses.push(target)
+      else noItem.push(`${title} / ${occ}`)
     }
   }
 }
 
 console.log(
-  `Linted ${titlePositions.length} topics, ${checked} reveals checked.\n`,
-);
+  `Linted ${titlePositions.length} topics, ${checked} reveals checked.\n`
+)
 if (misses.length) {
   console.log(
-    `\u2717 ${misses.length} reveal(s) name an answer not found in the item list:`,
-  );
-  misses.forEach((m) => console.log("   " + m));
-  console.log("");
+    `\u2717 ${misses.length} reveal(s) name an answer not found in the item list:`
+  )
+  misses.forEach((m) => console.log("   " + m))
+  console.log("")
 }
 if (noItem.length) {
   console.log(
-    `\u2022 ${noItem.length} reveal(s) name no specific item (review):`,
-  );
-  noItem.forEach((n) => console.log("   " + n));
-  console.log("");
+    `\u2022 ${noItem.length} reveal(s) name no specific item (review):`
+  )
+  noItem.forEach((n) => console.log("   " + n))
+  console.log("")
 }
-const fail = misses.length > 0 || (strict && noItem.length > 0);
-if (!fail) console.log("\u2713 All checked reveals resolve to a listed item.");
-process.exit(fail ? 1 : 0);
+const fail = misses.length > 0 || (strict && noItem.length > 0)
+if (!fail) console.log("\u2713 All checked reveals resolve to a listed item.")
+process.exit(fail ? 1 : 0)

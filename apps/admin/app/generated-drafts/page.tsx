@@ -1,27 +1,27 @@
 import {
   getGeneratedDrafts,
   type DraftStatus,
-} from "@/lib/actions/generated-drafts";
-import { DraftsTable } from "@/components/drafts-table";
-import { cn } from "@/lib/utils";
+} from "@/lib/actions/generated-drafts"
+import { DraftsTable } from "@/components/drafts-table"
+import { cn } from "@/lib/utils"
 
 const STATUS_OPTIONS: { value: DraftStatus; label: string }[] = [
   { value: "generated", label: "Generated" },
   { value: "curated", label: "Curated" },
   { value: "rejected", label: "Rejected" },
-];
+]
 
 type Props = {
-  searchParams: Promise<{ status?: string }>;
-};
+  searchParams: Promise<{ status?: string }>
+}
 
 export default async function GeneratedDraftsPage({ searchParams }: Props) {
-  const { status: statusParam } = await searchParams;
+  const { status: statusParam } = await searchParams
   const filter: DraftStatus =
-    STATUS_OPTIONS.find((o) => o.value === statusParam)?.value ?? "generated";
+    STATUS_OPTIONS.find((o) => o.value === statusParam)?.value ?? "generated"
 
-  const { data, error } = await getGeneratedDrafts(filter);
-  const drafts = data ?? [];
+  const { data, error } = await getGeneratedDrafts(filter)
+  const drafts = data ?? []
 
   return (
     <div className="space-y-6">
@@ -45,7 +45,7 @@ export default async function GeneratedDraftsPage({ searchParams }: Props) {
               "rounded-full px-3 py-0.5 text-xs font-medium transition-colors",
               filter === value
                 ? "bg-primary text-primary-foreground"
-                : "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                : "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             )}
           >
             {label}
@@ -61,5 +61,5 @@ export default async function GeneratedDraftsPage({ searchParams }: Props) {
 
       {drafts.length > 0 && <DraftsTable drafts={drafts} />}
     </div>
-  );
+  )
 }

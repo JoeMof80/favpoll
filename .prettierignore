@@ -1,0 +1,29 @@
+node_modules/
+dist/
+coverage/
+.turbo/
+pnpm-lock.yaml
+.pnpm-store/
+
+# Build output and generated types
+**/.next/
+**/next-env.d.ts
+.vercel/
+supabase/.temp/
+
+# Large or generated inputs, never ours to format
+apps/web/register-extract/
+apps/web/e2e/.state/
+apps/web/test-results/
+apps/web/playwright-report/
+*.min.js
+
+# PROSE IS NOT CODE. references/ holds 90 documents written by hand, and
+# .claude/ holds skill and command files. Prettier reflows markdown — it
+# rewraps paragraphs, renumbers lists and reshapes tables — which would
+# bury their real edits in noise and can change how they render. Format
+# code; leave the writing alone.
+references/
+.claude/
+docs/
+*.md

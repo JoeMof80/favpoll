@@ -16,11 +16,11 @@
 // ---------------------------------------------------------------------------
 
 type Ph = {
-  pronouns: "they";
-  group: "set";
-  about: string;
-  reveal: string;
-};
+  pronouns: "they"
+  group: "set"
+  about: string
+  reveal: string
+}
 
 export const celebratingManySetOverrides: Record<string, Ph> = {
   "Football team": {
@@ -100,4 +100,4 @@ export const celebratingManySetOverrides: Record<string, Ph> = {
     reveal:
       "Theirs is badminton. Wednesday nights, mixed doubles, fiercely contested.",
   },
-};
+}

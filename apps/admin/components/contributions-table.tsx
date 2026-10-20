@@ -1,14 +1,14 @@
-"use client";
+"use client"
 
-import { useState, useTransition } from "react";
-import type { Contribution } from "@/lib/actions/contributions";
+import { useState, useTransition } from "react"
+import type { Contribution } from "@/lib/actions/contributions"
 import {
   acceptContribution,
   rejectContribution,
-} from "@/lib/actions/contributions";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { StatusBadge } from "@/components/ui/status-badge";
+} from "@/lib/actions/contributions"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { StatusBadge } from "@/components/ui/status-badge"
 import {
   Table,
   TableBody,
@@ -16,41 +16,41 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/table"
 
 function ReviewBadge({ status }: { status: Contribution["review_status"] }) {
   if (status === "accepted")
-    return <StatusBadge tone="success">Accepted</StatusBadge>;
+    return <StatusBadge tone="success">Accepted</StatusBadge>
   if (status === "rejected")
-    return <StatusBadge tone="destructive">Rejected</StatusBadge>;
-  return <StatusBadge tone="warning">Pending</StatusBadge>;
+    return <StatusBadge tone="destructive">Rejected</StatusBadge>
+  return <StatusBadge tone="warning">Pending</StatusBadge>
 }
 
 function PendingRow({ item }: { item: Contribution }) {
-  const [isPending, startTransition] = useTransition();
-  const [showRejectForm, setShowRejectForm] = useState(false);
-  const [reason, setReason] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition()
+  const [showRejectForm, setShowRejectForm] = useState(false)
+  const [reason, setReason] = useState("")
+  const [error, setError] = useState<string | null>(null)
 
   function handleAccept() {
-    setError(null);
+    setError(null)
     startTransition(async () => {
-      const result = await acceptContribution(item.id);
-      if (result.error) setError(result.error);
-    });
+      const result = await acceptContribution(item.id)
+      if (result.error) setError(result.error)
+    })
   }
 
   function handleReject() {
-    setError(null);
+    setError(null)
     startTransition(async () => {
-      const result = await rejectContribution(item.id, reason);
+      const result = await rejectContribution(item.id, reason)
       if (result.error) {
-        setError(result.error);
+        setError(result.error)
       } else {
-        setShowRejectForm(false);
-        setReason("");
+        setShowRejectForm(false)
+        setReason("")
       }
-    });
+    })
   }
 
   return (
@@ -114,9 +114,9 @@ function PendingRow({ item }: { item: Contribution }) {
                   variant="ghost"
                   disabled={isPending}
                   onClick={() => {
-                    setShowRejectForm(false);
-                    setReason("");
-                    setError(null);
+                    setShowRejectForm(false)
+                    setReason("")
+                    setError(null)
                   }}
                 >
                   Cancel
@@ -127,13 +127,13 @@ function PendingRow({ item }: { item: Contribution }) {
         </TableRow>
       )}
     </>
-  );
+  )
 }
 
 export function PendingContributionsTable({
   items,
 }: {
-  items: Contribution[];
+  items: Contribution[]
 }) {
   return (
     <div className="rounded-lg border border-border">
@@ -153,15 +153,15 @@ export function PendingContributionsTable({
         </TableBody>
       </Table>
     </div>
-  );
+  )
 }
 
 export function ReviewedContributionsTable({
   items,
 }: {
-  items: Contribution[];
+  items: Contribution[]
 }) {
-  const showReason = items.some((i) => i.rejection_reason);
+  const showReason = items.some((i) => i.rejection_reason)
   return (
     <div className="rounded-lg border border-border">
       <Table>
@@ -199,5 +199,5 @@ export function ReviewedContributionsTable({
         </TableBody>
       </Table>
     </div>
-  );
+  )
 }

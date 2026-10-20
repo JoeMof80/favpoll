@@ -1,24 +1,24 @@
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import { ArrowLeft } from "lucide-react";
-import { readReference } from "@/lib/library-read";
+import Link from "next/link"
+import { notFound } from "next/navigation"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
+import { ArrowLeft } from "lucide-react"
+import { readReference } from "@/lib/library-read"
 
 // A reference note as a reading page: one column, the markdown rendered
 // with the `reading` styles in globals.css. The file comes off the disk at
 // request time (lib/library-read), so it is always the checked-out version.
-export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic"
 
 export default async function LibraryReaderPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string }>
 }) {
-  const { slug } = await params;
-  const found = await readReference(slug);
-  if (!found) notFound();
-  const { entry, markdown } = found;
+  const { slug } = await params
+  const found = await readReference(slug)
+  if (!found) notFound()
+  const { entry, markdown } = found
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -39,5 +39,5 @@ export default async function LibraryReaderPage({
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
       </article>
     </div>
-  );
+  )
 }

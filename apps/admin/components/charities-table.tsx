@@ -1,16 +1,16 @@
-"use client";
+"use client"
 
 import {
   CAUSE_FAMILIES,
   CAUSE_FAMILY_LABELS,
   type CauseFamily,
-} from "@favpoll/types";
+} from "@favpoll/types"
 
-import { useEffect, useState, useTransition } from "react";
-import { ChevronDown, ChevronRight, Search } from "lucide-react";
-import type { Charity } from "@/lib/actions/charities";
-import { CharityRegisterFacts } from "@/components/charity-register-facts";
-import { CharitySignatureEvents } from "@/components/charity-signature-events";
+import { useEffect, useState, useTransition } from "react"
+import { ChevronDown, ChevronRight, Search } from "lucide-react"
+import type { Charity } from "@/lib/actions/charities"
+import { CharityRegisterFacts } from "@/components/charity-register-facts"
+import { CharitySignatureEvents } from "@/components/charity-signature-events"
 import {
   createCharity,
   updateCharity,
@@ -20,13 +20,13 @@ import {
   setCharityTopics,
   searchCharityRegister,
   setCharityConsent,
-} from "@/lib/actions/charities";
-import type { RegisterSearchResult } from "@/lib/charity-commission";
-import type { AdminTopic } from "@/lib/actions/topics";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { StatusBadge, type StatusTone } from "@/components/ui/status-badge";
+} from "@/lib/actions/charities"
+import type { RegisterSearchResult } from "@/lib/charity-commission"
+import type { AdminTopic } from "@/lib/actions/topics"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { StatusBadge, type StatusTone } from "@/components/ui/status-badge"
 import {
   Table,
   TableBody,
@@ -34,9 +34,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/table"
 
-const VALID_MARKETS = ["en-GB"];
+const VALID_MARKETS = ["en-GB"]
 
 // ─── Badges ──────────────────────────────────────────────────────────────────
 
@@ -47,18 +47,18 @@ const VERIFICATION_BADGES: Record<string, { label: string; tone: StatusTone }> =
     not_found: { label: "Not on register", tone: "destructive" },
     removed: { label: "Removed from register", tone: "destructive" },
     error: { label: "Check failed", tone: "neutral" },
-  };
+  }
 
 function VerificationBadge({
   status,
   verifiedName,
 }: {
-  status: string | null;
-  verifiedName: string | null;
+  status: string | null
+  verifiedName: string | null
 }) {
-  if (!status) return <span className="text-muted-foreground">—</span>;
-  const badge = VERIFICATION_BADGES[status];
-  if (!badge) return <span className="text-muted-foreground">—</span>;
+  if (!status) return <span className="text-muted-foreground">—</span>
+  const badge = VERIFICATION_BADGES[status]
+  if (!badge) return <span className="text-muted-foreground">—</span>
   return (
     <StatusBadge
       tone={badge.tone}
@@ -70,25 +70,25 @@ function VerificationBadge({
     >
       {badge.label}
     </StatusBadge>
-  );
+  )
 }
 
 const CONSENT_BADGES: Record<string, { label: string; tone: StatusTone }> = {
   pending: { label: "Pending", tone: "warning" },
   approved: { label: "Approved", tone: "success" },
   declined: { label: "Declined", tone: "destructive" },
-};
+}
 
 function ConsentBadge({
   status,
   draftedAt,
 }: {
-  status: string | null;
-  draftedAt: string | null;
+  status: string | null
+  draftedAt: string | null
 }) {
-  if (!status) return <span className="text-muted-foreground">—</span>;
-  const badge = CONSENT_BADGES[status];
-  if (!badge) return <span className="text-muted-foreground">—</span>;
+  if (!status) return <span className="text-muted-foreground">—</span>
+  const badge = CONSENT_BADGES[status]
+  if (!badge) return <span className="text-muted-foreground">—</span>
   return (
     <StatusBadge
       tone={badge.tone}
@@ -100,7 +100,7 @@ function ConsentBadge({
     >
       {badge.label}
     </StatusBadge>
-  );
+  )
 }
 
 // ─── Field wrapper ────────────────────────────────────────────────────────────
@@ -110,9 +110,9 @@ function Field({
   className,
   children,
 }: {
-  label: string;
-  className?: string;
-  children: React.ReactNode;
+  label: string
+  className?: string
+  children: React.ReactNode
 }) {
   return (
     <div className={className}>
@@ -121,21 +121,21 @@ function Field({
       </label>
       {children}
     </div>
-  );
+  )
 }
 
 function MarketSelect({
   value,
   onChange,
 }: {
-  value: string;
-  onChange: (value: string) => void;
+  value: string
+  onChange: (value: string) => void
 }) {
   return (
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="h-8 w-full rounded-lg border border-border bg-background px-3 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+      className="h-8 w-full rounded-lg border border-border bg-background px-3 text-sm focus:ring-1 focus:ring-ring focus:outline-none"
     >
       {VALID_MARKETS.map((m) => (
         <option key={m} value={m}>
@@ -143,57 +143,57 @@ function MarketSelect({
         </option>
       ))}
     </select>
-  );
+  )
 }
 
 type CharityFormValues = {
-  name: string;
-  description: string;
-  impact_statement: string;
-  registered_number: string;
-  logo_url: string;
-  market: string;
+  name: string
+  description: string
+  impact_statement: string
+  registered_number: string
+  logo_url: string
+  market: string
   /** "" = no cause of its own. Saved as CONFIRMED — so it is never
    *  pre-filled from the model's suggestion; an unrelated edit must not
    *  silently confirm a guess. */
-  cause_family: string;
-};
+  cause_family: string
+}
 
 // ─── Register typeahead ───────────────────────────────────────────────────────
 
 function RegisterSearch({
   onPick,
 }: {
-  onPick: (result: RegisterSearchResult) => void;
+  onPick: (result: RegisterSearchResult) => void
 }) {
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState<RegisterSearchResult[]>([]);
-  const [searching, setSearching] = useState(false);
+  const [query, setQuery] = useState("")
+  const [results, setResults] = useState<RegisterSearchResult[]>([])
+  const [searching, setSearching] = useState(false)
 
   useEffect(() => {
-    const q = query.trim();
+    const q = query.trim()
     if (q.length < 3) {
-      setResults([]);
-      setSearching(false);
-      return;
+      setResults([])
+      setSearching(false)
+      return
     }
-    let cancelled = false;
-    setSearching(true);
+    let cancelled = false
+    setSearching(true)
     const timer = setTimeout(() => {
       searchCharityRegister(q).then((rows) => {
-        if (cancelled) return;
-        setResults(rows);
-        setSearching(false);
-      });
-    }, 300);
+        if (cancelled) return
+        setResults(rows)
+        setSearching(false)
+      })
+    }, 300)
     return () => {
-      cancelled = true;
-      clearTimeout(timer);
-    };
-  }, [query]);
+      cancelled = true
+      clearTimeout(timer)
+    }
+  }, [query])
 
   const showEmpty =
-    !searching && query.trim().length >= 3 && results.length === 0;
+    !searching && query.trim().length >= 3 && results.length === 0
 
   return (
     <div>
@@ -229,9 +229,9 @@ function RegisterSearch({
                 size="sm"
                 className="w-full justify-between font-normal"
                 onClick={() => {
-                  onPick(r);
-                  setQuery("");
-                  setResults([]);
+                  onPick(r)
+                  setQuery("")
+                  setResults([])
                 }}
               >
                 <span className="truncate">{r.displayName}</span>
@@ -243,7 +243,7 @@ function RegisterSearch({
         </div>
       )}
     </div>
-  );
+  )
 }
 
 function CharityFields({
@@ -251,18 +251,18 @@ function CharityFields({
   set,
   suggestedFamily,
 }: {
-  form: CharityFormValues;
-  set: (field: keyof CharityFormValues, value: string) => void;
+  form: CharityFormValues
+  set: (field: keyof CharityFormValues, value: string) => void
   /** The model's guess from the register (edit form only) — shown as a
    *  hint, never pre-selected. */
-  suggestedFamily?: CauseFamily | null;
+  suggestedFamily?: CauseFamily | null
 }) {
   return (
     <div className="space-y-3">
       <RegisterSearch
         onPick={(r) => {
-          set("name", r.displayName);
-          set("registered_number", r.registeredNumber);
+          set("name", r.displayName)
+          set("registered_number", r.registeredNumber)
         }}
       />
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -318,7 +318,7 @@ function CharityFields({
           <select
             value={form.cause_family}
             onChange={(e) => set("cause_family", e.target.value)}
-            className="h-8 w-full rounded-lg border border-border bg-background px-3 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            className="h-8 w-full rounded-lg border border-border bg-background px-3 text-sm focus:ring-1 focus:ring-ring focus:outline-none"
           >
             <option value="">No cause of its own</option>
             {CAUSE_FAMILIES.map((f) => (
@@ -336,7 +336,7 @@ function CharityFields({
         </Field>
       </div>
     </div>
-  );
+  )
 }
 
 // ─── Add charity form ─────────────────────────────────────────────────────────
@@ -349,29 +349,29 @@ const EMPTY_FORM: CharityFormValues = {
   logo_url: "",
   market: "en-GB",
   cause_family: "",
-};
+}
 
 export function AddCharityForm() {
-  const [open, setOpen] = useState(false);
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState<CharityFormValues>(EMPTY_FORM);
+  const [open, setOpen] = useState(false)
+  const [isPending, startTransition] = useTransition()
+  const [error, setError] = useState<string | null>(null)
+  const [form, setForm] = useState<CharityFormValues>(EMPTY_FORM)
 
   function set(field: keyof CharityFormValues, value: string) {
-    setForm((prev) => ({ ...prev, [field]: value }));
+    setForm((prev) => ({ ...prev, [field]: value }))
   }
 
   function handleSubmit() {
-    setError(null);
+    setError(null)
     startTransition(async () => {
-      const result = await createCharity(form);
+      const result = await createCharity(form)
       if (result.error) {
-        setError(result.error);
+        setError(result.error)
       } else {
-        setOpen(false);
-        setForm(EMPTY_FORM);
+        setOpen(false)
+        setForm(EMPTY_FORM)
       }
-    });
+    })
   }
 
   if (!open) {
@@ -379,7 +379,7 @@ export function AddCharityForm() {
       <Button type="button" size="sm" onClick={() => setOpen(true)}>
         + Add charity
       </Button>
-    );
+    )
   }
 
   return (
@@ -402,15 +402,15 @@ export function AddCharityForm() {
           variant="ghost"
           disabled={isPending}
           onClick={() => {
-            setOpen(false);
-            setError(null);
+            setOpen(false)
+            setError(null)
           }}
         >
           Cancel
         </Button>
       </div>
     </div>
-  );
+  )
 }
 
 // ─── Suggested topics editor ──────────────────────────────────────────────────
@@ -419,45 +419,45 @@ function TopicsEditor({
   charityId,
   allTopics,
 }: {
-  charityId: string;
-  allTopics: AdminTopic[];
+  charityId: string
+  allTopics: AdminTopic[]
 }) {
-  const [loaded, setLoaded] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [search, setSearch] = useState("");
-  const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [loaded, setLoaded] = useState(false)
+  const [open, setOpen] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [search, setSearch] = useState("")
+  const [pending, setPending] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   function toggleOpen() {
     if (!open && !loaded) {
       getCharityTopics(charityId).then(({ data }) => {
-        setSelectedIds(data ?? []);
-        setLoaded(true);
-      });
+        setSelectedIds(data ?? [])
+        setLoaded(true)
+      })
     }
-    setOpen((v) => !v);
-    setSearch("");
-    setError(null);
+    setOpen((v) => !v)
+    setSearch("")
+    setError(null)
   }
 
   function handleSave() {
-    setError(null);
-    setPending(true);
+    setError(null)
+    setPending(true)
     setCharityTopics(charityId, selectedIds).then(({ error: e }) => {
-      setPending(false);
+      setPending(false)
       if (e) {
-        setError(e);
+        setError(e)
       } else {
-        setOpen(false);
-        setSearch("");
+        setOpen(false)
+        setSearch("")
       }
-    });
+    })
   }
 
   const filtered = allTopics.filter((t) =>
-    t.title.toLowerCase().includes(search.toLowerCase()),
-  );
+    t.title.toLowerCase().includes(search.toLowerCase())
+  )
 
   return (
     <div>
@@ -482,7 +482,7 @@ function TopicsEditor({
           />
           <div className="max-h-48 space-y-0.5 overflow-y-auto">
             {filtered.map((t) => {
-              const checked = selectedIds.includes(t.id);
+              const checked = selectedIds.includes(t.id)
               return (
                 <Button
                   key={t.id}
@@ -494,7 +494,7 @@ function TopicsEditor({
                     setSelectedIds((prev) =>
                       checked
                         ? prev.filter((id) => id !== t.id)
-                        : [...prev, t.id],
+                        : [...prev, t.id]
                     )
                   }
                 >
@@ -504,7 +504,7 @@ function TopicsEditor({
                   />
                   {t.title}
                 </Button>
-              );
+              )
             })}
             {filtered.length === 0 && (
               <p className="py-2 text-center text-xs text-muted-foreground">
@@ -535,7 +535,7 @@ function TopicsEditor({
         </div>
       )}
     </div>
-  );
+  )
 }
 
 // ─── Charity row ──────────────────────────────────────────────────────────────
@@ -544,15 +544,15 @@ function CharityRow({
   charity,
   allTopics,
 }: {
-  charity: Charity;
-  allTopics: AdminTopic[];
+  charity: Charity
+  allTopics: AdminTopic[]
 }) {
-  const [open, setOpen] = useState(false);
-  const [isPending, startTransition] = useTransition();
-  const [editing, setEditing] = useState(false);
-  const [confirmDeactivate, setConfirmDeactivate] = useState(false);
-  const [warning, setWarning] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [open, setOpen] = useState(false)
+  const [isPending, startTransition] = useTransition()
+  const [editing, setEditing] = useState(false)
+  const [confirmDeactivate, setConfirmDeactivate] = useState(false)
+  const [warning, setWarning] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const [form, setForm] = useState<CharityFormValues>({
     name: charity.name,
     description: charity.description ?? "",
@@ -561,57 +561,57 @@ function CharityRow({
     logo_url: charity.logo_url ?? "",
     market: charity.market,
     cause_family: charity.cause_family ?? "",
-  });
+  })
 
   function set(field: keyof CharityFormValues, value: string) {
-    setForm((prev) => ({ ...prev, [field]: value }));
+    setForm((prev) => ({ ...prev, [field]: value }))
   }
 
   function handleSave() {
-    setError(null);
+    setError(null)
     startTransition(async () => {
-      const result = await updateCharity(charity.id, form);
+      const result = await updateCharity(charity.id, form)
       if (result.error) {
-        setError(result.error);
+        setError(result.error)
       } else {
-        setEditing(false);
+        setEditing(false)
       }
-    });
+    })
   }
 
   function handleDeactivate() {
-    setError(null);
-    setWarning(null);
+    setError(null)
+    setWarning(null)
     startTransition(async () => {
-      const result = await deactivateCharity(charity.id);
+      const result = await deactivateCharity(charity.id)
       if (result.error) {
-        setError(result.error);
+        setError(result.error)
       } else {
-        setConfirmDeactivate(false);
-        if (result.warning) setWarning(result.warning);
+        setConfirmDeactivate(false)
+        if (result.warning) setWarning(result.warning)
       }
-    });
+    })
   }
 
   function handleReactivate() {
-    setError(null);
-    setWarning(null);
+    setError(null)
+    setWarning(null)
     startTransition(async () => {
-      const result = await reactivateCharity(charity.id);
-      if (result.error) setError(result.error);
-    });
+      const result = await reactivateCharity(charity.id)
+      if (result.error) setError(result.error)
+    })
   }
 
   function handleConsent(status: "approved" | "declined") {
-    setError(null);
-    setWarning(null);
+    setError(null)
+    setWarning(null)
     startTransition(async () => {
-      const result = await setCharityConsent(charity.id, status);
-      if (result.error) setError(result.error);
-    });
+      const result = await setCharityConsent(charity.id, status)
+      if (result.error) setError(result.error)
+    })
   }
 
-  const Chevron = open ? ChevronDown : ChevronRight;
+  const Chevron = open ? ChevronDown : ChevronRight
 
   return (
     <>
@@ -678,7 +678,7 @@ function CharityRow({
               onClick={(e) => e.stopPropagation()}
             >
               {error && <p className="text-sm text-destructive">{error}</p>}
-              {warning && <p className="text-sm text-warning">{warning}</p>}
+              {warning && <p className="text-warning text-sm">{warning}</p>}
 
               {editing ? (
                 <div className="space-y-3">
@@ -702,8 +702,8 @@ function CharityRow({
                       variant="ghost"
                       disabled={isPending}
                       onClick={() => {
-                        setEditing(false);
-                        setError(null);
+                        setEditing(false)
+                        setError(null)
                       }}
                     >
                       Cancel
@@ -738,10 +738,10 @@ function CharityRow({
                       variant="outline"
                       disabled={isPending}
                       onClick={() => {
-                        setEditing(true);
-                        setConfirmDeactivate(false);
-                        setError(null);
-                        setWarning(null);
+                        setEditing(true)
+                        setConfirmDeactivate(false)
+                        setError(null)
+                        setWarning(null)
                       }}
                     >
                       Edit
@@ -765,8 +765,8 @@ function CharityRow({
                             variant="ghost"
                             disabled={isPending}
                             onClick={() => {
-                              setConfirmDeactivate(false);
-                              setError(null);
+                              setConfirmDeactivate(false)
+                              setError(null)
                             }}
                           >
                             Cancel
@@ -841,7 +841,7 @@ function CharityRow({
         </TableRow>
       )}
     </>
-  );
+  )
 }
 
 // ─── Charities table ──────────────────────────────────────────────────────────
@@ -850,11 +850,11 @@ export function CharitiesTable({
   charities,
   allTopics,
 }: {
-  charities: Charity[];
-  allTopics: AdminTopic[];
+  charities: Charity[]
+  allTopics: AdminTopic[]
 }) {
   if (charities.length === 0) {
-    return <p className="text-sm text-muted-foreground">No charities found.</p>;
+    return <p className="text-sm text-muted-foreground">No charities found.</p>
   }
 
   return (
@@ -883,5 +883,5 @@ export function CharitiesTable({
         </TableBody>
       </Table>
     </div>
-  );
+  )
 }

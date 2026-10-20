@@ -10,15 +10,15 @@
  *   pnpm exec tsx --env-file=.env.local ../../scripts/build-seeded-stories.ts > /tmp/stories.json
  * ---------------------------------------------------------------------------
  */
-import { createClient } from "@supabase/supabase-js";
-import { storyEdges } from "../apps/web/lib/story-engine";
-import { deriveRegister } from "../apps/web/lib/registers";
-import type { CauseFamily } from "../packages/types";
+import { createClient } from "@supabase/supabase-js"
+import { storyEdges } from "../apps/web/lib/story-engine"
+import { deriveRegister } from "../apps/web/lib/registers"
+import type { CauseFamily } from "../packages/types"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 async function main() {
   const { data, error } = await supabase
@@ -28,19 +28,19 @@ async function main() {
        description, closed_at, closes_at, photo_url,
        protagonists!favpolls_protagonist_id_fkey ( name, context, about, photo_url, pronoun ),
        favpoll_polls ( personal_note, subset_id, topics ( title, favourites ( id ) ), topic_subsets ( title, topic_subset_items ( favourite_id ) ) ),
-       favpoll_charities ( charities ( name, description, activities, cause_family ) )`,
+       favpoll_charities ( charities ( name, description, activities, cause_family ) )`
     )
-    .eq("created_by", "user_seed_story");
-  if (error) throw new Error(error.message);
+    .eq("created_by", "user_seed_story")
+  if (error) throw new Error(error.message)
 
   const out = (data ?? []).map((f: any) => {
-    const poll = f.favpoll_polls;
-    const charity = f.favpoll_charities?.[0]?.charities ?? null;
-    const subset = poll?.topic_subsets ?? null;
-    const parentTitle = poll?.topics?.title ?? "";
-    const cardTopic = subset?.title ?? parentTitle;
-    const isCause = f.subject === "cause";
-    const register = deriveRegister(f.category, f.grouping, f.subject);
+    const poll = f.favpoll_polls
+    const charity = f.favpoll_charities?.[0]?.charities ?? null
+    const subset = poll?.topic_subsets ?? null
+    const parentTitle = poll?.topics?.title ?? ""
+    const cardTopic = subset?.title ?? parentTitle
+    const isCause = f.subject === "cause"
+    const register = deriveRegister(f.category, f.grouping, f.subject)
     const edges = storyEdges({
       register,
       subject: isCause ? "cause" : "someone",
@@ -56,10 +56,10 @@ async function main() {
             causeFamily: charity.cause_family as CauseFamily | null,
           }
         : { name: "", description: null, activities: null, causeFamily: null },
-    } as any);
+    } as any)
     const items = subset
       ? (subset.topic_subset_items ?? []).length
-      : (poll?.topics?.favourites ?? []).length;
+      : (poll?.topics?.favourites ?? []).length
     return {
       id: f.id,
       register,
@@ -83,13 +83,13 @@ async function main() {
         e2: edges.e2 ?? null,
         e3: edges.e3 ?? null,
       },
-    };
-  });
-  out.sort((a, b) => a.name.localeCompare(b.name));
-  process.stdout.write(JSON.stringify(out, null, 1));
+    }
+  })
+  out.sort((a, b) => a.name.localeCompare(b.name))
+  process.stdout.write(JSON.stringify(out, null, 1))
 }
 
 main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+  console.error(e)
+  process.exit(1)
+})

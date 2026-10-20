@@ -78,17 +78,20 @@ export const regeneratedPlaceholders: Record<string, Record<Register, Ph>> = {
     celebrating_many: {
       about:
         "They've disagreed about the best time of year since roughly their third date, and show no sign of resolving it.",
-      reveal: "Hers is spring, his is summer. Five years in, still unsettled, still enjoyed.",
+      reveal:
+        "Hers is spring, his is summer. Five years in, still unsettled, still enjoyed.",
     },
     cause: {
       about:
         "Pick the season you'd defend and pledge what it's worth. Everyone's certain they're right about this one.",
-      reveal: "Our pick to start: autumn — the one that knows how to make an exit.",
+      reveal:
+        "Our pick to start: autumn — the one that knows how to make an exit.",
     },
     neutral: {
       about:
         "Some people are entirely loyal to one season, and a little suspicious of anyone who isn't.",
-      reveal: "Theirs is winter. They like the quiet, and the excuse to stay in.",
+      reveal:
+        "Theirs is winter. They like the quiet, and the excuse to stay in.",
     },
   },
 
@@ -108,17 +111,20 @@ export const regeneratedPlaceholders: Record<string, Record<Register, Ph>> = {
     celebrating_many: {
       about:
         "They met on one day, got engaged on another, and have been gently arguing about which is better ever since.",
-      reveal: "Hers is Saturday, his is Friday. The argument is part of the marriage now.",
+      reveal:
+        "Hers is Saturday, his is Friday. The argument is part of the marriage now.",
     },
     cause: {
       about:
         "Pick the day you'd defend and pledge what it's worth. Everyone has a favourite; few will admit why.",
-      reveal: "Our pick to start: Tuesday — quietly the most underrated day there is.",
+      reveal:
+        "Our pick to start: Tuesday — quietly the most underrated day there is.",
     },
     neutral: {
       about:
         "Some people have strong, immovable feelings about the days of the week and will share them unprompted.",
-      reveal: "Theirs is Sunday. The one day nobody is allowed to schedule anything.",
+      reveal:
+        "Theirs is Sunday. The one day nobody is allowed to schedule anything.",
     },
   },
 
@@ -177,12 +183,14 @@ export const regeneratedPlaceholders: Record<string, Record<Register, Ph>> = {
     cause: {
       about:
         "Pick the hour you'd defend and pledge what it's worth. Morning people and night owls, this is your moment.",
-      reveal: "Our pick to start: dusk — the hour the day finally lets its shoulders down.",
+      reveal:
+        "Our pick to start: dusk — the hour the day finally lets its shoulders down.",
     },
     neutral: {
       about:
         "Some people know exactly when they're at their best and arrange their lives around it without apology.",
-      reveal: "Theirs is late night. That's when the good thinking happens, they'll tell you.",
+      reveal:
+        "Theirs is late night. That's when the good thinking happens, they'll tell you.",
     },
   },
 
@@ -202,17 +210,20 @@ export const regeneratedPlaceholders: Record<string, Record<Register, Ph>> = {
     celebrating_many: {
       about:
         "They grew up to the same music without knowing each other existed, and discovered it on a second date that ran long.",
-      reveal: "Theirs is the 2000s. The wedding playlist made the overlap embarrassingly plain.",
+      reveal:
+        "Theirs is the 2000s. The wedding playlist made the overlap embarrassingly plain.",
     },
     cause: {
       about:
         "Pick the decade that shaped you and pledge what it's worth. Everyone thinks theirs was the best one.",
-      reveal: "Our pick to start: the 1970s — loud, certain, and not remotely sorry.",
+      reveal:
+        "Our pick to start: the 1970s — loud, certain, and not remotely sorry.",
     },
     neutral: {
       about:
         "Some people belong, culturally, to one decade and have quietly stayed there ever since.",
-      reveal: "Theirs is the 1990s. They'll defend it at length, given the smallest opening.",
+      reveal:
+        "Theirs is the 1990s. They'll defend it at length, given the smallest opening.",
     },
   },
 
@@ -232,7 +243,8 @@ export const regeneratedPlaceholders: Record<string, Record<Register, Ph>> = {
     celebrating_many: {
       about:
         "They have a settled, much-enjoyed argument about which animal best suits them, and neither has ever conceded.",
-      reveal: "Hers is the deer, his is the dog. They've agreed only never to agree.",
+      reveal:
+        "Hers is the deer, his is the dog. They've agreed only never to agree.",
     },
     cause: {
       about:
@@ -243,7 +255,8 @@ export const regeneratedPlaceholders: Record<string, Record<Register, Ph>> = {
     neutral: {
       about:
         "Some people keep a favourite animal the way others keep a favourite chair — settled, and ready when asked.",
-      reveal: "Theirs is the dog. No elaborate reasoning. The dog was always going to win.",
+      reveal:
+        "Theirs is the dog. No elaborate reasoning. The dog was always going to win.",
     },
   },
 
@@ -251,7 +264,8 @@ export const regeneratedPlaceholders: Record<string, Record<Register, Ph>> = {
     remembering: {
       about:
         "She kept a garden largely for other creatures and logged every bird that visited. Decades of notebooks are still in the shed.",
-      reveal: "Hers was the robin. She could name a bird by its song before it appeared.",
+      reveal:
+        "Hers was the robin. She could name a bird by its song before it appeared.",
     },
     celebrating_one: {
       about:
@@ -262,7 +276,8 @@ export const regeneratedPlaceholders: Record<string, Record<Register, Ph>> = {
     celebrating_many: {
       about:
         "They went away specifically to settle a long-running disagreement about birds, and came back exactly as divided.",
-      reveal: "Hers is the kingfisher, his is the puffin. The trip resolved nothing, happily.",
+      reveal:
+        "Hers is the kingfisher, his is the puffin. The trip resolved nothing, happily.",
     },
     cause: {
       about:
@@ -273,7 +288,8 @@ export const regeneratedPlaceholders: Record<string, Record<Register, Ph>> = {
     neutral: {
       about:
         "Some people notice the birds everyone else walks past, and have a clear favourite ready.",
-      reveal: "Theirs is the blackbird. Clear voice, unhurried, entirely itself.",
+      reveal:
+        "Theirs is the blackbird. Clear voice, unhurried, entirely itself.",
     },
   },
 
@@ -291,14 +307,18 @@ export const regeneratedPlaceholders: Record<string, Record<Register, Ph>> = {
     celebrating_many: {
       about:
         "She'd chosen her flower years before they met; he agreed the moment he heard it, which she found suspicious.",
-      reveal: "Theirs is wisteria. She'd known long before the wedding. He knew better than to disagree.",
+      reveal:
+        "Theirs is wisteria. She'd known long before the wedding. He knew better than to disagree.",
     },
     cause: {
-      about: "Pick the bloom that stops you in your tracks and pledge what it's worth.",
-      reveal: "Our pick to start: the sunflower — impossible to be in a bad mood near.",
+      about:
+        "Pick the bloom that stops you in your tracks and pledge what it's worth.",
+      reveal:
+        "Our pick to start: the sunflower — impossible to be in a bad mood near.",
     },
     neutral: {
-      about: "Some people have a flower that's simply theirs, no occasion required.",
+      about:
+        "Some people have a flower that's simply theirs, no occasion required.",
       reveal: "Theirs is the rose. Predictable, they'll admit. Also correct.",
     },
   },
@@ -307,17 +327,20 @@ export const regeneratedPlaceholders: Record<string, Record<Register, Ph>> = {
     remembering: {
       about:
         "She planted a sapling decades ago and watched it shade a whole lawn. A garden without a proper tree, she'd say, is just a lawn with ambitions.",
-      reveal: "Hers was the oak. It is now older than most of the people who knew her.",
+      reveal:
+        "Hers was the oak. It is now older than most of the people who knew her.",
     },
     celebrating_one: {
       about:
         "She planted hers in her first garden for the structure and the autumn berries, and considers it one of her better decisions.",
-      reveal: "Hers is the rowan. The berries each autumn are her annual vindication.",
+      reveal:
+        "Hers is the rowan. The berries each autumn are her annual vindication.",
     },
     celebrating_many: {
       about:
         "They planted one together on their first anniversary, in the wrong spot, and have argued about moving it ever since.",
-      reveal: "Theirs is the silver birch. Still in the wrong place. Still not moving.",
+      reveal:
+        "Theirs is the silver birch. Still in the wrong place. Still not moving.",
     },
     cause: {
       about: "Pick the tree you'd sit under and pledge what it's worth.",
@@ -327,7 +350,8 @@ export const regeneratedPlaceholders: Record<string, Record<Register, Ph>> = {
     neutral: {
       about:
         "Some people have a tree they'd choose without hesitation, usually for reasons they can't fully explain.",
-      reveal: "Theirs is the willow. You don't notice how much shade it gives until it's gone.",
+      reveal:
+        "Theirs is the willow. You don't notice how much shade it gives until it's gone.",
     },
   },
 
@@ -341,7 +365,8 @@ export const regeneratedPlaceholders: Record<string, Record<Register, Ph>> = {
     celebrating_one: {
       about:
         "She has a favourite kind of weather most people wouldn't choose, and will explain at length why they're wrong.",
-      reveal: "Hers is warm rain. Brief, unexpected, the best quality of light. She's not wrong.",
+      reveal:
+        "Hers is warm rain. Brief, unexpected, the best quality of light. She's not wrong.",
     },
     celebrating_many: {
       about:
@@ -357,7 +382,8 @@ export const regeneratedPlaceholders: Record<string, Record<Register, Ph>> = {
     neutral: {
       about:
         "Some people have a kind of weather they'd happily live inside, whatever everyone else thinks of it.",
-      reveal: "Theirs is the thunderstorm. They'll stand at the window for the whole thing.",
+      reveal:
+        "Theirs is the thunderstorm. They'll stand at the window for the whole thing.",
     },
   },
 
@@ -365,27 +391,32 @@ export const regeneratedPlaceholders: Record<string, Record<Register, Ph>> = {
     remembering: {
       about:
         "She loved the English countryside with the quiet certainty of someone who'd never felt the need to say so, and walked the same hills for thirty years.",
-      reveal: "Hers was rolling hills. She still found something new to notice every time.",
+      reveal:
+        "Hers was rolling hills. She still found something new to notice every time.",
     },
     celebrating_one: {
       about:
         "Her opinions on landscape were formed almost entirely on weekend walks, and she's suspicious of anyone who prefers the flat.",
-      reveal: "Hers is mountains. The only landscape, she says, that asks something of you.",
+      reveal:
+        "Hers is mountains. The only landscape, she says, that asks something of you.",
     },
     celebrating_many: {
       about:
         "They argued about where to get married for a year and chose the one kind of view neither could object to.",
-      reveal: "Theirs is the coastline. The single answer that ended the argument.",
+      reveal:
+        "Theirs is the coastline. The single answer that ended the argument.",
     },
     cause: {
-      about: "Pick the view that takes your breath away and pledge what it's worth.",
+      about:
+        "Pick the view that takes your breath away and pledge what it's worth.",
       reveal:
         "Our pick to start: open moorland — space to think, without being told what to think.",
     },
     neutral: {
       about:
         "Some people have a landscape that returns them to themselves, and know exactly where it is.",
-      reveal: "Theirs is woodland. Something about the way the light moves in it.",
+      reveal:
+        "Theirs is woodland. Something about the way the light moves in it.",
     },
   },
 }

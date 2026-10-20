@@ -1,5 +1,5 @@
-import { LibraryIndex } from "@/components/library-index";
-import { LIBRARY, SECTIONS, entriesIn, slugFor } from "@/lib/library";
+import { LibraryIndex } from "@/components/library-index"
+import { LIBRARY, SECTIONS, entriesIn, slugFor } from "@/lib/library"
 
 // THE LIBRARY: the documents that matter, in the sections the founder
 // reaches for them by, each readable here or one click away. The registry
@@ -11,8 +11,8 @@ export default function LibraryPage() {
       ...e,
       href: e.kind === "reference" ? `/library/${slugFor(e)}` : e.source,
     })),
-  }));
-  const latest = [...LIBRARY].sort((a, b) => b.date.localeCompare(a.date))[0];
+  }))
+  const latest = [...LIBRARY].sort((a, b) => b.date.localeCompare(a.date))[0]
 
   return (
     <div className="space-y-6">
@@ -35,5 +35,5 @@ export default function LibraryPage() {
       </div>
       <LibraryIndex sections={sections} />
     </div>
-  );
+  )
 }

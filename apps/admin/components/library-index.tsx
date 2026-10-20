@@ -1,38 +1,38 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import Link from "next/link";
-import { ExternalLink, FileText, BookOpen, Search, Link2 } from "lucide-react";
-import type { LibraryEntry, LibrarySection } from "@/lib/library";
+import { useState } from "react"
+import Link from "next/link"
+import { ExternalLink, FileText, BookOpen, Search, Link2 } from "lucide-react"
+import type { LibraryEntry, LibrarySection } from "@/lib/library"
 
-type Row = LibraryEntry & { href: string };
+type Row = LibraryEntry & { href: string }
 
 const KIND_LABEL: Record<LibraryEntry["kind"], string> = {
   reference: "Note",
   artifact: "Claude artifact",
   doc: "Claude doc",
   external: "Link",
-};
+}
 
 const KIND_ICON = {
   reference: FileText,
   artifact: ExternalLink,
   doc: BookOpen,
   external: Link2,
-} as const;
+} as const
 
 export function LibraryIndex({
   sections,
 }: {
-  sections: { section: LibrarySection; entries: Row[] }[];
+  sections: { section: LibrarySection; entries: Row[] }[]
 }) {
-  const [q, setQ] = useState("");
-  const needle = q.trim().toLowerCase();
+  const [q, setQ] = useState("")
+  const needle = q.trim().toLowerCase()
   const matches = (e: Row) =>
     !needle ||
     e.title.toLowerCase().includes(needle) ||
     e.summary.toLowerCase().includes(needle) ||
-    e.source.toLowerCase().includes(needle);
+    e.source.toLowerCase().includes(needle)
 
   return (
     <div className="space-y-10">
@@ -53,8 +53,8 @@ export function LibraryIndex({
       </label>
 
       {sections.map(({ section, entries }) => {
-        const shown = entries.filter(matches);
-        if (shown.length === 0) return null;
+        const shown = entries.filter(matches)
+        if (shown.length === 0) return null
         return (
           <section key={section} aria-labelledby={`lib-${section}`}>
             <h2
@@ -65,8 +65,8 @@ export function LibraryIndex({
             </h2>
             <ul className="divide-y divide-border rounded-lg border border-border bg-card">
               {shown.map((e) => {
-                const Icon = KIND_ICON[e.kind];
-                const external = e.kind !== "reference";
+                const Icon = KIND_ICON[e.kind]
+                const external = e.kind !== "reference"
                 const inner = (
                   <>
                     <Icon
@@ -85,9 +85,9 @@ export function LibraryIndex({
                       <span className="block">{e.date}</span>
                     </span>
                   </>
-                );
+                )
                 const cls =
-                  "flex items-start gap-3 px-4 py-3 transition-colors hover:bg-muted/60";
+                  "flex items-start gap-3 px-4 py-3 transition-colors hover:bg-muted/60"
                 return (
                   <li key={e.source}>
                     {external ? (
@@ -105,11 +105,11 @@ export function LibraryIndex({
                       </Link>
                     )}
                   </li>
-                );
+                )
               })}
             </ul>
           </section>
-        );
+        )
       })}
 
       {needle &&
@@ -119,5 +119,5 @@ export function LibraryIndex({
           </p>
         )}
     </div>
-  );
+  )
 }
