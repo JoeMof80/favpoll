@@ -1,466 +1,1650 @@
 # Component Tree
 
-Rebuilt 2026-06-23 from source. Last updated 2026-06-29 (PR #132 — TypedReveal).
+Generated 2026-10-20 by `node scripts/component-tree.mjs` — do not edit by hand; rerun it (CI: `--check`).
 
 ## Legend
 
 ```
-→  renders / imports
+→  imports / renders
 *  Storybook story exists
-⚠  unused in production (no non-story importers)
+⚠  no production importer (only tests, stories, or nothing)
+↑  already expanded above, or a shared subtree (see its section)
 ```
+
+Counts: 30 routes · 211 component files · 46 with stories · 12 unused in production
 
 ---
 
-## `app/layout.tsx` — Root layout
+## Routes
+
+### `app/about/page.tsx`
 
 ```
-app/layout.tsx
-  → clerk-provider.tsx  (ClerkProvider)
-      → @clerk/nextjs/ClerkProvider
-  → @favpoll/ui/ThemeProvider
-  → lib/edit-mode-context.tsx  (EditModeProvider)
-  → header.tsx  (Header)
-      → favpoll-logo.tsx  (FavpollLogo)
-      → user-button-client.tsx  (UserButtonClient)  — lazy dynamic import, no SSR
-      → @favpoll/ui/MenuButton  (Moon/Sun theme toggle)
-      → ui/button.tsx *
-      → new-favpoll-button.tsx  (NewFavpollButton)  — redirects signed-out users to /sign-in
-  → sonner/Toaster  (position="bottom-center")
+app/about/page.tsx
+  → components/contact-form.tsx
+      → components/ui/button.tsx *
+      → components/ui/input.tsx *
+      → components/ui/label.tsx
+      → components/ui/textarea.tsx
+  → components/landing/fade-in.tsx
+  → components/landing/hero-texture.tsx
+  → components/ui/button.tsx *  ↑
+  → components/ui/section-eyebrow.tsx *
 ```
 
----
-
-## Entry points
-
-### `app/page.tsx` — Home
-
-Server component. Queries `favpolls` (is_private=false, not closed, limit 6) via `createAdminClient`.
+### `app/appeals/[slug]/manage/page.tsx`
 
 ```
-app/page.tsx
-  → hero-demo-panel/index.tsx  (HeroDemoPanel)
-      → hero-demo-panel/hero-pitch-column.tsx  (HeroPitchColumn)
-      → hero-demo-panel/demo-card.tsx  (DemoCard)
-          → ui/button.tsx *
-          → ui/ranking-bar.tsx *
-          → ui/reveal-quote.tsx *
-      → ui/chip.tsx *
-  → live-favpolls-carousel.tsx  (LiveFavpollsCarousel)  — Embla carousel with Autoplay
-      → favpoll-summary-card.tsx  (FavpollSummaryCard)
-          → favpoll-card/favpoll-header.tsx  (FavpollHeader) *
-          → favpoll-card/section-label.tsx  (SectionLabel) *
-          → favpoll-list-card/favpoll-list-card-charity-carousel.tsx  (FavpollListCardCharityCarousel)
-          → closing-label.tsx  (ClosingLabel)
-      → ui/button.tsx
-  → ui/button.tsx *
-  → ui/section-eyebrow.tsx *
+app/appeals/[slug]/manage/page.tsx
+  → app/appeals/appeal-form.tsx
+      → components/favpoll-form/date-helpers.ts
+      → components/favpoll-form/date-time-picker.tsx *  ↑
+      → components/favpoll-form/edit-helpers.tsx  ↑
+      → components/favpoll-form/hero-photo-overlay.tsx  ↑
+      → components/favpoll-form/schema.ts
+      → components/new-favpoll-wizard/wizard-field.tsx  ↑
+      → components/ui/button.tsx *
+      → components/ui/input-group.tsx  ↑
+      → components/ui/switch.tsx
+      → components/ui/textarea.tsx
+  → components/page-sheet.tsx
+      → components/page-ground.tsx
+  → components/ui/section-eyebrow.tsx *
+  → lib/appeals-admin.ts  (lib)
+  → lib/supabase/admin.ts  (lib)
 ```
 
----
-
-### `app/favpolls/page.tsx` — Live favpolls list
-
-Server component with `auth()` for pledge detection. Queries favpolls with poll results.
+### `app/appeals/[slug]/page.tsx`
 
 ```
-app/favpolls/page.tsx
-  → ui/section-eyebrow.tsx *
-  → favpoll-list-card.tsx  (FavpollListCard) *  — one per favpoll
-      → favpoll-card/favpoll-header.tsx  (FavpollHeader) *
-      → favpoll-card/section-label.tsx  (SectionLabel) *
-      → ui/tooltip-icon-button.tsx *
-      → pledge-dialog/index.tsx  (PledgeDialog) *  — see PledgeDialog subtree
-      → favpoll-list-card/favpoll-list-card-results.tsx  (FavpollListCardResults)
-          → favpoll-card/poll-results.tsx  (PollResults)
-      → favpoll-list-card/favpoll-list-card-charity-carousel.tsx  (FavpollListCardCharityCarousel)
-      → ui/button.tsx
-  → favpoll-list-card-empty.tsx  (FavpollListCardEmpty) *  — when list is empty
-      → ui/button.tsx
+app/appeals/[slug]/page.tsx
+  → components/favpoll-summary-card.tsx *
+      → components/closing-label.tsx
+      → components/favpoll-card/favpoll-header.tsx *
+          → components/favpoll-card/types.ts
+      → components/favpoll-list-card/favpoll-list-card-charity-carousel.tsx  ↑
+      → components/poll-heading.tsx *  ↑
+      → components/ui/badge.tsx
+      → packages/types/ *
+  → components/goal-progress.tsx
+  → components/landing/quiet-tail.tsx
+  → components/page-layout.tsx
+      → components/page-ground.tsx
+      → components/shell-scroller.tsx
+  → components/share-favpoll-button.tsx
+      → components/ui/button.tsx *
+  → components/ui/button.tsx *  ↑
+  → components/ui/section-eyebrow.tsx *
+  → lib/appeals-admin.ts  (lib)
+  → lib/display.ts  (lib)
+  → lib/supabase/admin.ts  (lib)
 ```
 
----
-
-### `app/favpolls/new/page.tsx` — New favpoll wizard
-
-Server component. Fetches charities, topics, categories, charity_topics via `getWizardData()`.
+### `app/appeals/new/page.tsx`
 
 ```
-app/favpolls/new/page.tsx
-  → new-favpoll-wizard/index.tsx  (NewFavpollWizard)
-      → new-favpoll-wizard/use-wizard-state.ts  (useWizardState)  — all wizard state + routing
-      → new-favpoll-wizard/wizard-triad-rail.tsx  (WizardTriadRail) *  — desktop left column
-      → new-favpoll-wizard/wizard-progress-strip.tsx  (WizardProgressStrip) *  — mobile <ol>
-      → new-favpoll-wizard/wizard-step-shell.tsx  (WizardStepShell)  — title + guidance wrapper
-      → new-favpoll-wizard/wizard-nav.tsx  (WizardNav) *  — Back + Next/Set-up buttons
-      → new-favpoll-wizard/wizard-charity-card.tsx  (WizardCharityCard) *  — selected charity receipt
-      → new-favpoll-wizard/wizard-topic-card.tsx  (WizardTopicCard) *  — selected topic + item chips
-      → favpoll-flow/honour-step.tsx  (HonourStep)  — step 1: subject/category/grouping/causeLabel
-      → favpoll-flow/charity-step.tsx  (CharityStep)  — step 2: charity chip grid
-      → favpoll-flow/love-step.tsx  (LoveStep)  — step 3: topic chip grid + suggestions
-      → favpoll-flow/topic-items-dialog.tsx  (TopicItemsDialog)  — search + add items sheet
-      → ui/responsive-overlay.tsx *  — charity + love overlays (search input in header prop)
-      → ui/button.tsx
+app/appeals/new/page.tsx
+  → app/appeals/appeal-form.tsx
+      → components/favpoll-form/date-helpers.ts
+      → components/favpoll-form/date-time-picker.tsx *  ↑
+      → components/favpoll-form/edit-helpers.tsx  ↑
+      → components/favpoll-form/hero-photo-overlay.tsx  ↑
+      → components/favpoll-form/schema.ts
+      → components/new-favpoll-wizard/wizard-field.tsx  ↑
+      → components/ui/button.tsx *
+      → components/ui/input-group.tsx  ↑
+      → components/ui/switch.tsx
+      → components/ui/textarea.tsx
+  → components/page-sheet.tsx
+      → components/page-ground.tsx
+  → components/ui/section-eyebrow.tsx *
+  → lib/appeals-admin.ts  (lib)
+  → lib/supabase/admin.ts  (lib)
 ```
 
----
-
-### `app/favpolls/new/details/page.tsx` — Create favpoll form
-
-Server component. Reached from wizard with query params pre-populating form values.
+### `app/celebration/page.tsx`
 
 ```
-app/favpolls/new/details/page.tsx
-  → favpoll-form/index.tsx  (FavpollForm)  — create mode
-      [see FavpollForm subtree]
+app/celebration/page.tsx
+  → components/landing/demo-fixture.ts
+      → components/hero-demo-panel/scenes.ts *
+          → components/favpoll-card/types.ts
+      → components/keepsake/keepsake-document.tsx  ↑
+      → components/landing/topic-picker-vignette.tsx  ↑
+      → components/print-pack/pack-card.tsx  ↑
+  → components/landing/fold.tsx
+  → components/landing/folded-card-vignette.tsx
+      → components/landing/demo-fixture.ts  ↑
+      → components/landing/vignette.tsx
+      → components/print-pack/pack-card.tsx  ↑
+  → components/landing/hero.tsx
+      → components/hero-demo-panel/demo-card.tsx *  ↑
+      → components/hero-demo-panel/demo-frame.tsx
+      → components/hero-demo-panel/phone-frame.tsx
+      → components/hero-demo-panel/scenes.ts *  ↑
+      → components/landing/count-up.tsx
+      → components/landing/hero-texture.tsx
+      → components/landing/quiet-tail.tsx
+      → components/landing/use-demo-loop.ts
+          → components/hero-demo-panel/scenes.ts *  ↑
+      → components/ui/button.tsx *
+      → components/ui/ranking-bar.tsx *
+  → components/landing/how-it-works-hints.tsx
+      → components/charity-row.tsx *  ↑
+      → components/hero-demo-panel/scenes.ts *  ↑
+      → components/landing/demo-fixture.ts  ↑
+      → components/pledge-card/pledge-breakdown.tsx *
+      → components/ui/button.tsx *  ↑
+      → components/ui/ranking-bar.tsx *  ↑
+      → packages/types/ *
+  → components/landing/how-it-works-steps.tsx
+      → components/landing/how-it-works-hints.tsx  ↑
+  → components/landing/ideas-section.tsx
+      → components/ui/section-eyebrow.tsx *
+  → components/landing/keepsake-vignette.tsx
+      → components/keepsake/keepsake-document.tsx  ↑
+      → components/keepsake/keepsake-sheet.tsx
+          → components/keepsake/keepsake-document.tsx  ↑
+      → components/landing/demo-fixture.ts  ↑
+      → components/landing/vignette.tsx  ↑
+  → components/landing/live-vignette.tsx
+      → components/hero-demo-panel/scenes.ts *  ↑
+      → components/hero-demo-panel/tv-frame.tsx
+      → components/landing/demo-fixture.ts  ↑
+      → components/landing/display-still.tsx
+          → components/hero-demo-panel/scene-favourites.ts
+              → components/hero-demo-panel/scenes.ts *  ↑
+              → packages/types/ *  ↑
+          → components/hero-demo-panel/scenes.ts *  ↑
+          → components/room-shell/  ↑
+          → packages/types/ *  ↑
+      → components/landing/vignette.tsx  ↑
+  → components/landing/note-vignette.tsx
+      → components/favpoll-card/poll-note.tsx *  ↑
+      → components/hero-demo-panel/demo-card.tsx *  ↑
+      → components/hero-demo-panel/phone-frame.tsx  ↑
+      → components/hero-demo-panel/scenes.ts *  ↑
+      → components/landing/demo-fixture.ts  ↑
+      → components/landing/vignette.tsx  ↑
+      → components/poll-heading.tsx *  ↑
+  → components/landing/open-right-now.tsx
+      → components/landing/fade-in.tsx
+      → components/live-favpolls-carousel.tsx *
+          → components/favpoll-summary-card.tsx *  ↑
+          → components/ui/button.tsx *  ↑
+      → components/ui/button.tsx *  ↑
+      → components/ui/section-eyebrow.tsx *  ↑
+  → components/landing/pro-section.tsx
+      → components/ui/button.tsx *  ↑
+  → components/landing/quiet-tail.tsx  ↑
+  → components/register-scope.tsx
+  → components/ui/button.tsx *  ↑
+  → lib/i18n.ts  (lib)
+  → lib/live-favpolls.ts  (lib)
 ```
 
----
-
-### `app/favpolls/[id]/page.tsx` — Favpoll guest/edit page
-
-Server component with `auth()`. Queries favpoll + poll + charities + pot. Redirects on 404.
+### `app/charities/[id]/page.tsx`
 
 ```
-app/favpolls/[id]/page.tsx
-  → favpoll-content/index.tsx  (FavpollContent)
-      → favpoll-content/use-favpoll-content.ts  (useFavpollContent)  — hook
-      → favpoll-hero.tsx  (FavpollHero) *  — when subject='someone'
-          → heroes/base-favpoll-hero.tsx  (BaseFavpollHero)
-              → hero-layout.tsx  (HeroLayout)  — Framer Motion scroll animations
-              → favpoll-hero-avatar.tsx  (ProtagonistAvatar) *  — photo or hatched initials circle
-              → ui/section-eyebrow.tsx
-      → cause-hero.tsx  (CauseHero)  — when subject='cause'; shows getFavpollHeadline + cause_label
-          → ui/section-eyebrow.tsx
-      → countdown.tsx  (Countdown) *
-      → ui/section-eyebrow.tsx
-      → charity-banner.tsx  (CharityBanner) *
-          → charity-row.tsx  (CharityRow) *
-      → poll-section/index.tsx  (PollSection) *
-          → poll-section/use-poll-section.ts  (usePollSection)  — hook; fires onViewChange on transitions
-          → poll-heading.tsx  (PollHeading) *
-              → favpoll-card/section-label.tsx  (SectionLabel)
-              → favpoll-card/poll-reveal.tsx  (PollReveal) *  — purple-tinted reveal card post-pledge
-              → ui/tooltip-icon-button.tsx *
-          → poll-section/typed-reveal.tsx  (TypedReveal)  — post-pledge typewriter; wraps PollReveal
-              → favpoll-card/poll-reveal.tsx  (PollReveal)  — non-animated / SSR path delegates here
-          → ranking-list/index.tsx  (RankingList)
-              → ranking-list/hide-toggle.tsx  (HideToggle)
-              → ranking-list/use-ranking-items.ts  (useRankingItems)
-              → ui/ranking-bar.tsx *
-          → poll-section/empty-poll-alert.tsx  (EmptyPollAlert) *  — amber alert when all items hidden
-          → ui/tabs.tsx
-      → pledge-dialog/index.tsx  (PledgeDialog) *  — see PledgeDialog subtree
-      → favpoll-form/seed-fund-modal.tsx  (SeedFundModal)  — guest variant="guest"; "Help others take part"
-      → favpoll-list-card/favpoll-list-card-charity-carousel.tsx  (FavpollListCardCharityCarousel)
-          — fixed bottom mobile charity strip
-      → page-layout.tsx  (PageLayout)
-      → ui/button.tsx
-  → favpoll-subheader.tsx  (FavpollSubheader)  — organiser edit/share controls
-      → ui/button.tsx
+app/charities/[id]/page.tsx
+  → components/closing-label.tsx
+  → components/favpoll-card/favpoll-header.tsx *
+      → components/favpoll-card/types.ts
+  → components/favpoll-summary-card.tsx *
+      → components/closing-label.tsx  ↑
+      → components/favpoll-card/favpoll-header.tsx *  ↑
+      → components/favpoll-list-card/favpoll-list-card-charity-carousel.tsx  ↑
+      → components/poll-heading.tsx *  ↑
+      → components/ui/badge.tsx
+      → packages/types/ *
+  → components/landing/quiet-tail.tsx
+  → components/page-layout.tsx
+      → components/page-ground.tsx
+      → components/shell-scroller.tsx
+  → components/private-charity-page.tsx
+      → components/page-layout.tsx  ↑
+      → components/ui/section-eyebrow.tsx *
+  → components/ui/section-eyebrow.tsx *  ↑
+  → lib/appeals-admin.ts  (lib)
+  → lib/charity-legal-name.ts  (lib)
+  → lib/charity-profile-page.ts  (lib)
+  → lib/display.ts  (lib)
+  → lib/i18n.ts  (lib)
+  → lib/supabase/admin.ts  (lib)
+  → packages/types/ *  ↑
 ```
 
----
-
-### `app/favpolls/[id]/edit/page.tsx` — Edit favpoll form
-
-Server component. Queries existing favpoll data to pre-fill form.
+### `app/charities/page.tsx`
 
 ```
-app/favpolls/[id]/edit/page.tsx
-  → favpoll-form/index.tsx  (FavpollForm)  — edit mode
-      [see FavpollForm subtree; SeedFundModal not rendered in edit mode;
-       EditableCountdown shows live Countdown with CloseDateOverlay affordance;
-       CommandPanel shows Occasion/Charity/Topic as editable overlays]
+app/charities/page.tsx
+  → lib/i18n.ts  (lib)
+  → lib/supabase/admin.ts  (lib)
+  → packages/types/ *
 ```
 
----
-
-### `app/favpolls/[id]/display/page.tsx` — Live display screen
-
-Server component. Renders full-screen projector view.
+### `app/favpolls/[id]/display/page.tsx`
 
 ```
 app/favpolls/[id]/display/page.tsx
-  → display-screen/index.tsx  (DisplayScreen) *
-      → display-screen/display-poll-section.tsx  (DisplayPollSection)
-          → display-screen/display-ranking-row.tsx  (DisplayRankingRow)
-      → ranking-list/use-ranking-items.ts  (useRankingItems)
-          — real-time Supabase subscription (channel per favpoll poll)
-      → ui/ranking-bar.tsx
-      → QRCodeSVG  (qrcode.react)
 ```
 
----
+### `app/favpolls/[id]/edit/page.tsx`
 
-### `app/my-favpolls/page.tsx` — Organiser management surface
+```
+app/favpolls/[id]/edit/page.tsx
+```
 
-Server component with `auth()`. Queries organiser's favpolls with full management data.
+### `app/favpolls/[id]/keepsake/page.tsx`
+
+```
+app/favpolls/[id]/keepsake/page.tsx
+  → components/keepsake/keepsake-document.tsx
+      → components/bump-chart.tsx *  ↑
+      → components/landing/hero-texture.tsx
+  → components/keepsake/keepsake-view.tsx
+      → components/keepsake/export-csv-button.tsx
+          → components/ui/button.tsx *
+      → components/keepsake/export-image-button.tsx
+          → components/ui/button.tsx *  ↑
+      → components/keepsake/keepsake-document.tsx  ↑
+      → components/print-workspace/
+          → components/ui/button.tsx *  ↑
+          → components/ui/segmented-control.tsx *
+          → components/ui/toolbar-band.tsx *
+      → components/ui/button.tsx *  ↑
+      → components/ui/segmented-control.tsx *  ↑
+  → components/page-ground.tsx
+  → components/register-scope.tsx
+  → components/ui/button.tsx *  ↑
+  → lib/display.ts  (lib)
+  → lib/poll-title.ts  (lib)
+  → lib/rank-history.ts  (lib)
+  → lib/register-palette.ts  (lib)
+  → lib/registers.ts  (lib)
+  → lib/supabase/admin.ts  (lib)
+  → lib/supabase/paginate.ts  (lib)
+```
+
+### `app/favpolls/[id]/live/page.tsx`
+
+```
+app/favpolls/[id]/live/page.tsx
+```
+
+### `app/favpolls/[id]/manage/page.tsx`
+
+```
+app/favpolls/[id]/manage/page.tsx
+  → app/favpolls/[id]/manage/manage-client.tsx
+      → components/branded-qr.tsx
+      → components/bump-chart.tsx *  ↑
+      → components/countdown.tsx *
+          → components/favpoll-card/types.ts
+          → components/ui/section-eyebrow.tsx *
+      → components/guest-book.tsx *  ↑
+      → components/manage/charity-rows.tsx
+          → components/favpoll-flow/charity-step.tsx
+              → components/ui/button.tsx *
+              → components/ui/chip.tsx *  ↑
+              → packages/types/ *
+          → components/new-favpoll-wizard/wizard-charity-card.tsx *  ↑
+          → components/ui/button.tsx *  ↑
+          → components/ui/responsive-overlay.tsx *  ↑
+          → packages/types/ *  ↑
+      → components/manage/editable-row.tsx
+          → components/favpoll-form/date-helpers.ts
+          → components/favpoll-form/date-time-picker.tsx *  ↑
+          → components/favpoll-form/edit-helpers.tsx  ↑
+          → components/favpoll-form/goal-picker.tsx
+              → components/new-favpoll-wizard/wizard-field.tsx  ↑
+              → components/ui/button.tsx *  ↑
+              → components/ui/input-group.tsx  ↑
+          → components/manage/settings-rows.tsx  ↑
+          → components/mention-textarea.tsx
+              → components/ui/textarea.tsx
+          → components/new-favpoll-wizard/wizard-field.tsx  ↑
+          → components/ui/input-group.tsx  ↑
+      → components/manage/favourites-row.tsx
+          → components/favpoll-flow/topic-items-dialog.tsx
+              → components/ui/button.tsx *  ↑
+              → components/ui/chip.tsx *  ↑
+              → components/ui/input-group.tsx  ↑
+              → components/ui/responsive-overlay.tsx *  ↑
+          → components/favpoll-flow/topic-step.tsx
+              → components/favpoll-form/schema.ts
+              → components/ui/button.tsx *  ↑
+              → components/ui/chip.tsx *  ↑
+              → packages/types/ *  ↑
+          → components/favpoll-form/schema.ts  ↑
+          → components/new-favpoll-wizard/wizard-topic-card.tsx *  ↑
+          → components/ui/button.tsx *  ↑
+          → components/ui/responsive-overlay.tsx *  ↑
+          → packages/types/ *  ↑
+      → components/manage/photo-row.tsx
+          → components/favpoll-form/hero-photo-overlay.tsx  ↑
+          → components/favpoll-form/schema.ts  ↑
+          → components/manage/settings-rows.tsx  ↑
+          → components/ui/button.tsx *  ↑
+      → components/manage/pledges-over-time.tsx
+          → components/ui/section-eyebrow.tsx *  ↑
+      → components/manage/settings-rows.tsx  ↑
+      → components/new-favpoll-wizard/wizard-placeholders.ts
+      → components/organizer-row/utils.ts
+      → components/ranking-list/
+          → components/ranking-list/hide-toggle.tsx
+          → components/ranking-list/use-ranking-items.ts
+              → components/ranking-list/utils.ts
+              → packages/types/ *  ↑
+          → components/ranking-list/utils.ts  ↑
+          → components/ui/ranking-bar.tsx *
+          → packages/types/ *  ↑
+      → components/ui/button.tsx *  ↑
+      → components/ui/popover.tsx
+      → components/ui/responsive-overlay.tsx *  ↑
+      → components/ui/section-eyebrow.tsx *  ↑
+      → components/ui/segmented-control.tsx *
+      → components/ui/switch-line.tsx
+          → components/ui/switch.tsx
+      → components/ui/toolbar-band.tsx *
+      → packages/types/ *  ↑
+  → app/favpolls/new/wizard-data.ts
+      → packages/types/ *  ↑
+  → components/guest-book.tsx *
+      → components/ui/responsive-overlay.tsx *  ↑
+      → components/ui/section-eyebrow.tsx *  ↑
+  → components/manage/pledges-over-time.tsx  ↑
+  → components/page-ground.tsx
+  → components/register-scope.tsx
+  → lib/charity-consent.ts  (lib)
+  → lib/favpoll-locks.ts  (lib)
+  → lib/live-totals.ts  (lib)
+  → lib/organizer-favpolls.ts  (lib)
+  → lib/poll-standings.ts  (lib)
+  → lib/rank-history.ts  (lib)
+  → lib/register-palette.ts  (lib)
+  → lib/supabase/admin.ts  (lib)
+  → lib/supabase/paginate.ts  (lib)
+  → packages/types/ *  ↑
+```
+
+### `app/favpolls/[id]/page.tsx`
+
+```
+app/favpolls/[id]/page.tsx
+  → components/favpoll-content/
+      → components/favpoll-content/mobile-charity-footer.tsx
+          → components/favpoll-content/use-hide-on-scroll.ts
+          → components/favpoll-list-card/favpoll-list-card-charity-carousel.tsx  ↑
+          → components/goal-progress.tsx
+          → packages/types/ *
+      → components/favpoll-content/use-favpoll-content.ts
+          → packages/types/ *  ↑
+      → components/favpoll-sheet/
+          → components/bump-chart.tsx *  ↑
+          → components/cause-hero.tsx
+              → components/favpoll-hero-avatar.tsx *
+              → components/hero-layout.tsx
+              → components/mention-text.tsx  ↑
+              → components/ui/section-eyebrow.tsx *
+              → packages/types/ *  ↑
+          → components/countdown.tsx *
+              → components/favpoll-card/types.ts
+              → components/ui/section-eyebrow.tsx *  ↑
+          → components/favpoll-hero.tsx *
+              → components/heroes/base-favpoll-hero.tsx
+              → packages/types/ *  ↑
+          → components/favpoll-list-card/favpoll-list-card-charity-carousel.tsx  ↑
+          → components/goal-progress.tsx  ↑
+          → components/guest-book.tsx *  ↑
+          → components/heroes/fundraiser-slots.tsx
+              → components/ui/section-eyebrow.tsx *  ↑
+          → components/page-layout.tsx  ↑
+          → components/poll-section/ *
+              → components/lock-card-content.tsx
+              → components/poll-heading.tsx *  ↑
+              → components/poll-section/empty-poll-alert.tsx *
+              → components/poll-section/typed-note.tsx
+              → components/poll-section/use-poll-section.ts
+              → components/ranking-list/
+              → components/standings-skeleton.tsx
+              → components/ui/badge.tsx
+              → components/ui/button.tsx *
+              → components/ui/dropdown-menu.tsx
+              → packages/types/ *  ↑
+              → packages/ui/
+          → components/shell-scroller.tsx
+          → components/ui/responsive-overlay.tsx *  ↑
+          → components/ui/section-eyebrow.tsx *  ↑
+          → packages/types/ *  ↑
+      → components/guest-book.tsx *  ↑
+      → components/pledge-dialog/ *
+          → components/pledge-dialog/step-amount.tsx
+              → components/ui/button.tsx *  ↑
+              → components/ui/input-group.tsx  ↑
+              → components/ui/slider.tsx
+              → components/ui/tabs.tsx
+          → components/pledge-dialog/step-guest-book.tsx
+              → components/ui/input.tsx *
+              → components/ui/switch.tsx
+          → components/pledge-dialog/step-pay.tsx
+              → components/pledge-card/pledge-breakdown.tsx *
+              → components/pledge-card/utils.ts
+              → components/stripe-checkout.tsx  ↑
+              → components/ui/button.tsx *  ↑
+              → components/ui/input.tsx *  ↑
+              → components/ui/switch.tsx  ↑
+          → components/pledge-dialog/step-pick-favourites.tsx
+              → components/ui/chip.tsx *  ↑
+              → packages/types/ *  ↑
+          → components/pledge-dialog/use-pledge-dialog.ts
+              → components/pledge-card/use-pledge.ts
+              → packages/types/ *  ↑
+          → components/poll-heading.tsx *  ↑
+          → components/ui/button.tsx *  ↑
+          → components/ui/responsive-overlay.tsx *  ↑
+          → packages/types/ *  ↑
+      → packages/types/ *  ↑
+  → components/favpoll-subheader.tsx
+      → components/share-favpoll-button.tsx  ↑
+      → components/ui/button.tsx *  ↑
+  → components/register-scope.tsx
+  → lib/charity-consent.ts  (lib)
+  → lib/compare-labels.ts  (lib)
+  → lib/og/favpoll-og-data.ts  (lib)
+  → lib/og/favpoll-og.ts  (lib)
+  → lib/picks-suspended.ts  (lib)
+  → lib/poll-standings.ts  (lib)
+  → lib/poll-title.ts  (lib)
+  → lib/rank-history.ts  (lib)
+  → lib/register-palette.ts  (lib)
+  → lib/supabase/admin.ts  (lib)
+  → lib/supabase/paginate.ts  (lib)
+  → packages/types/ *  ↑
+```
+
+### `app/favpolls/[id]/stationery/page.tsx`
+
+```
+app/favpolls/[id]/stationery/page.tsx
+  → components/page-ground.tsx
+  → components/print-pack/pack-document.tsx
+      → components/branded-qr.tsx
+      → components/keepsake/export-image-button.tsx
+          → components/ui/button.tsx *
+      → components/print-pack/avery-sheet.tsx
+          → components/print-pack/pack-card.tsx  ↑
+          → components/print-pack/pack-sheet.tsx
+              → components/print-pack/pack-card.tsx  ↑
+      → components/print-pack/insert-card.tsx
+          → components/branded-qr.tsx  ↑
+          → components/favpoll-logo.tsx
+          → components/print-pack/pack-card.tsx  ↑
+      → components/print-pack/pack-card.tsx  ↑
+      → components/print-pack/pack-sheet.tsx  ↑
+      → components/print-workspace/
+          → components/ui/button.tsx *  ↑
+          → components/ui/segmented-control.tsx *
+          → components/ui/toolbar-band.tsx *
+      → components/ui/button-group.tsx
+      → components/ui/button.tsx *  ↑
+      → components/ui/dropdown-menu.tsx
+      → components/ui/popover.tsx
+      → components/ui/segmented-control.tsx *  ↑
+      → components/ui/switch.tsx
+  → components/print-pack/qr-export.tsx
+      → components/branded-qr.tsx  ↑
+      → components/ui/button.tsx *  ↑
+      → components/ui/dropdown-menu.tsx  ↑
+  → components/register-scope.tsx
+  → components/ui/button.tsx *  ↑
+  → lib/display.ts  (lib)
+  → lib/register-palette.ts  (lib)
+  → lib/supabase/admin.ts  (lib)
+```
+
+### `app/favpolls/new/page.tsx`
+
+```
+app/favpolls/new/page.tsx
+  → app/favpolls/new/wizard-data.ts
+      → packages/types/ *
+  → components/new-favpoll-wizard/
+      → components/favpoll-flow/charity-step.tsx
+          → components/ui/button.tsx *
+          → components/ui/chip.tsx *  ↑
+          → packages/types/ *  ↑
+      → components/favpoll-flow/event-step.tsx
+          → components/register-link.tsx
+          → components/ui/toggle-group.tsx
+              → components/ui/toggle.tsx
+          → packages/types/ *  ↑
+      → components/favpoll-flow/topic-items-dialog.tsx
+          → components/ui/button.tsx *  ↑
+          → components/ui/chip.tsx *  ↑
+          → components/ui/input-group.tsx  ↑
+          → components/ui/responsive-overlay.tsx *  ↑
+      → components/favpoll-flow/topic-step.tsx
+          → components/favpoll-form/schema.ts
+          → components/ui/button.tsx *  ↑
+          → components/ui/chip.tsx *  ↑
+          → packages/types/ *  ↑
+      → components/favpoll-form/seed-fund-modal.tsx
+          → components/stripe-checkout.tsx  ↑
+          → components/ui/button.tsx *  ↑
+          → components/ui/responsive-overlay.tsx *  ↑
+      → components/new-favpoll-wizard/use-wizard-state.ts  ↑
+      → components/new-favpoll-wizard/wizard-charity-card.tsx *  ↑
+      → components/new-favpoll-wizard/wizard-details-step.tsx
+          → components/favpoll-form/date-helpers.ts
+          → components/favpoll-form/date-time-picker.tsx *  ↑
+          → components/favpoll-form/goal-picker.tsx
+              → components/new-favpoll-wizard/wizard-field.tsx  ↑
+              → components/ui/button.tsx *  ↑
+              → components/ui/input-group.tsx  ↑
+          → components/new-favpoll-wizard/use-wizard-state.ts  ↑
+          → components/new-favpoll-wizard/wizard-field.tsx  ↑
+          → components/ui/segmented-control.tsx *
+          → components/ui/switch-line.tsx
+              → components/ui/switch.tsx
+      → components/new-favpoll-wizard/wizard-info-step.tsx
+          → components/favpoll-form/edit-helpers.tsx  ↑
+          → components/favpoll-form/hero-photo-overlay.tsx  ↑
+          → components/favpoll-form/schema.ts  ↑
+          → components/new-favpoll-wizard/use-wizard-state.ts  ↑
+          → components/new-favpoll-wizard/wizard-field.tsx  ↑
+          → components/new-favpoll-wizard/wizard-placeholders.ts
+          → components/ui/button.tsx *  ↑
+          → components/ui/input-group.tsx  ↑
+      → components/new-favpoll-wizard/wizard-nav.tsx *
+          → components/ui/button.tsx *  ↑
+      → components/new-favpoll-wizard/wizard-progress-strip.tsx *
+          → components/new-favpoll-wizard/wizard-step-rail.tsx *  ↑
+          → components/ui/button.tsx *  ↑
+      → components/new-favpoll-wizard/wizard-step-rail.tsx *  ↑
+      → components/new-favpoll-wizard/wizard-step-shell.tsx
+      → components/new-favpoll-wizard/wizard-story-step.tsx
+          → components/favpoll-form/edit-helpers.tsx  ↑
+          → components/mention-textarea.tsx
+              → components/ui/textarea.tsx
+          → components/new-favpoll-wizard/use-wizard-state.ts  ↑
+          → components/new-favpoll-wizard/wizard-field.tsx  ↑
+          → components/new-favpoll-wizard/wizard-generate-button.tsx
+              → components/icons/people.tsx
+              → components/new-favpoll-wizard/use-wizard-state.ts  ↑
+              → components/ui/button.tsx *  ↑
+              → components/ui/dropdown-menu.tsx
+          → components/new-favpoll-wizard/wizard-generate-help.tsx
+              → components/icons/people.tsx  ↑
+              → components/ui/button.tsx *  ↑
+              → components/ui/popover.tsx
+          → components/new-favpoll-wizard/wizard-placeholders.ts  ↑
+          → components/ui/input-group.tsx  ↑
+      → components/new-favpoll-wizard/wizard-topic-card.tsx *  ↑
+      → components/register-scope.tsx
+      → components/ui/button.tsx *  ↑
+      → components/ui/input-group.tsx  ↑
+      → components/ui/responsive-overlay.tsx *  ↑
+      → packages/types/ *  ↑
+  → lib/charity-consent.ts  (lib)
+  → lib/supabase/admin.ts  (lib)
+  → packages/types/ *  ↑
+```
+
+### `app/favpolls/page.tsx`
+
+```
+app/favpolls/page.tsx
+  → app/favpolls/favpolls-list-client.tsx
+      → app/favpolls/list-utils.ts
+      → components/favpoll-list-card-empty.tsx *
+          → components/favpoll-logo.tsx
+          → components/new-favpoll-button.tsx
+              → components/ui/button.tsx *
+      → components/favpoll-list-card.tsx *
+          → components/closing-label.tsx
+          → components/favpoll-card/favpoll-header.tsx *
+              → components/favpoll-card/types.ts
+          → components/favpoll-card/types.ts  ↑
+          → components/favpoll-hero-avatar.tsx *
+          → components/favpoll-list-card/favpoll-list-card-charity-carousel.tsx  ↑
+          → components/favpoll-list-card/favpoll-list-card-results.tsx
+              → components/favpoll-card/poll-results.tsx
+              → components/favpoll-list-card/use-favpoll-list-card-pledge.ts
+          → components/favpoll-list-card/use-favpoll-list-card-pledge.ts  ↑
+          → components/lock-card-content.tsx
+          → components/mention-text.tsx  ↑
+          → components/pledge-dialog/ *
+              → components/pledge-dialog/step-amount.tsx
+              → components/pledge-dialog/step-guest-book.tsx
+              → components/pledge-dialog/step-pay.tsx
+              → components/pledge-dialog/step-pick-favourites.tsx
+              → components/pledge-dialog/use-pledge-dialog.ts
+              → components/poll-heading.tsx *  ↑
+              → components/ui/button.tsx *  ↑
+              → components/ui/responsive-overlay.tsx *  ↑
+              → packages/types/ *
+          → components/poll-heading.tsx *  ↑
+          → components/ui/badge.tsx
+          → components/ui/button.tsx *  ↑
+          → components/ui/tooltip.tsx
+          → packages/types/ *  ↑
+      → components/favpoll-list-card/use-favpoll-list-card-pledge.ts  ↑
+      → components/list-controls.tsx  ↑
+      → components/ui/toolbar-band.tsx *
+  → app/favpolls/list-utils.ts  ↑
+  → components/favpoll-list-card.tsx *  ↑
+  → components/favpoll-list-card/use-favpoll-list-card-pledge.ts  ↑
+  → components/new-favpoll-fab.tsx
+      → components/new-favpoll-button.tsx  ↑
+  → components/page-ground.tsx
+  → components/ui/section-eyebrow.tsx *
+  → lib/live-totals.ts  (lib)
+  → lib/poll-standings.ts  (lib)
+  → lib/poll-title.ts  (lib)
+  → lib/supabase/admin.ts  (lib)
+  → packages/types/ *  ↑
+```
+
+### `app/features/page.tsx`
+
+```
+app/features/page.tsx
+  → components/landing/fade-in.tsx
+  → components/landing/feature-nav.tsx
+  → components/landing/fund-vignette.tsx
+      → components/landing/vignette.tsx
+      → components/ui/button.tsx *
+  → components/landing/hero-texture.tsx
+  → components/landing/keepsake-vignette.tsx
+      → components/keepsake/keepsake-document.tsx  ↑
+      → components/keepsake/keepsake-sheet.tsx
+          → components/keepsake/keepsake-document.tsx  ↑
+      → components/landing/demo-fixture.ts  ↑
+      → components/landing/vignette.tsx  ↑
+  → components/landing/live-vignette.tsx
+      → components/hero-demo-panel/scenes.ts *
+          → components/favpoll-card/types.ts
+      → components/hero-demo-panel/tv-frame.tsx
+      → components/landing/demo-fixture.ts  ↑
+      → components/landing/display-still.tsx
+          → components/hero-demo-panel/scene-favourites.ts
+              → components/hero-demo-panel/scenes.ts *  ↑
+              → packages/types/ *
+          → components/hero-demo-panel/scenes.ts *  ↑
+          → components/room-shell/  ↑
+          → packages/types/ *  ↑
+      → components/landing/vignette.tsx  ↑
+  → components/landing/note-vignette.tsx
+      → components/favpoll-card/poll-note.tsx *  ↑
+      → components/hero-demo-panel/demo-card.tsx *  ↑
+      → components/hero-demo-panel/phone-frame.tsx
+      → components/hero-demo-panel/scenes.ts *  ↑
+      → components/landing/demo-fixture.ts  ↑
+      → components/landing/vignette.tsx  ↑
+      → components/poll-heading.tsx *  ↑
+  → components/landing/pack-vignette.tsx
+      → components/landing/demo-fixture.ts  ↑
+      → components/landing/vignette.tsx  ↑
+      → components/print-pack/avery-sheet.tsx
+          → components/print-pack/pack-card.tsx  ↑
+          → components/print-pack/pack-sheet.tsx
+              → components/print-pack/pack-card.tsx  ↑
+      → components/print-pack/pack-card.tsx  ↑
+      → components/print-pack/pack-sheet.tsx  ↑
+  → components/landing/quiet-tail.tsx
+  → components/landing/topic-picker-vignette.tsx
+      → components/landing/vignette.tsx  ↑
+      → components/poll-heading.tsx *  ↑
+      → components/ui/button.tsx *  ↑
+      → components/ui/chip.tsx *  ↑
+      → components/ui/input-group.tsx  ↑
+  → components/ui/button.tsx *  ↑
+  → lib/i18n.ts  (lib)
+```
+
+### `app/fundraiser/page.tsx`
+
+```
+app/fundraiser/page.tsx
+  → components/landing/demo-fixture.ts
+      → components/hero-demo-panel/scenes.ts *
+          → components/favpoll-card/types.ts
+      → components/keepsake/keepsake-document.tsx  ↑
+      → components/landing/topic-picker-vignette.tsx  ↑
+      → components/print-pack/pack-card.tsx  ↑
+  → components/landing/fold.tsx
+  → components/landing/hero.tsx
+      → components/hero-demo-panel/demo-card.tsx *  ↑
+      → components/hero-demo-panel/demo-frame.tsx
+      → components/hero-demo-panel/phone-frame.tsx
+      → components/hero-demo-panel/scenes.ts *  ↑
+      → components/landing/count-up.tsx
+      → components/landing/hero-texture.tsx
+      → components/landing/quiet-tail.tsx
+      → components/landing/use-demo-loop.ts
+          → components/hero-demo-panel/scenes.ts *  ↑
+      → components/ui/button.tsx *
+      → components/ui/ranking-bar.tsx *
+  → components/landing/how-it-works-hints.tsx
+      → components/charity-row.tsx *  ↑
+      → components/hero-demo-panel/scenes.ts *  ↑
+      → components/landing/demo-fixture.ts  ↑
+      → components/pledge-card/pledge-breakdown.tsx *
+      → components/ui/button.tsx *  ↑
+      → components/ui/ranking-bar.tsx *  ↑
+      → packages/types/ *
+  → components/landing/how-it-works-steps.tsx
+      → components/landing/how-it-works-hints.tsx  ↑
+  → components/landing/ideas-section.tsx
+      → components/ui/section-eyebrow.tsx *
+  → components/landing/keepsake-vignette.tsx
+      → components/keepsake/keepsake-document.tsx  ↑
+      → components/keepsake/keepsake-sheet.tsx
+          → components/keepsake/keepsake-document.tsx  ↑
+      → components/landing/demo-fixture.ts  ↑
+      → components/landing/vignette.tsx
+  → components/landing/note-vignette.tsx
+      → components/favpoll-card/poll-note.tsx *  ↑
+      → components/hero-demo-panel/demo-card.tsx *  ↑
+      → components/hero-demo-panel/phone-frame.tsx  ↑
+      → components/hero-demo-panel/scenes.ts *  ↑
+      → components/landing/demo-fixture.ts  ↑
+      → components/landing/vignette.tsx  ↑
+      → components/poll-heading.tsx *  ↑
+  → components/landing/open-right-now.tsx
+      → components/landing/fade-in.tsx
+      → components/live-favpolls-carousel.tsx *
+          → components/favpoll-summary-card.tsx *  ↑
+          → components/ui/button.tsx *  ↑
+      → components/ui/button.tsx *  ↑
+      → components/ui/section-eyebrow.tsx *  ↑
+  → components/landing/pro-section.tsx
+      → components/ui/button.tsx *  ↑
+  → components/landing/quiet-tail.tsx  ↑
+  → components/landing/share-vignette.tsx
+      → components/landing/vignette.tsx  ↑
+      → components/share-favpoll-button.tsx  ↑
+      → components/ui/button.tsx *  ↑
+  → components/landing/topic-picker-vignette.tsx
+      → components/landing/vignette.tsx  ↑
+      → components/poll-heading.tsx *  ↑
+      → components/ui/button.tsx *  ↑
+      → components/ui/chip.tsx *  ↑
+      → components/ui/input-group.tsx  ↑
+  → components/register-scope.tsx
+  → components/ui/button.tsx *  ↑
+  → lib/i18n.ts  (lib)
+  → lib/live-favpolls.ts  (lib)
+```
+
+### `app/layout.tsx`
+
+```
+app/layout.tsx
+  → components/clerk-provider.tsx
+  → components/header-mount.tsx
+      → components/header.tsx
+          → components/account-menu.tsx
+              → components/ui/dropdown-menu.tsx
+          → components/header-bar.tsx
+              → components/favpoll-logo.tsx
+          → components/register-link.tsx
+          → components/ui/button.tsx *
+          → packages/ui/
+              → packages/ui/src/menu-button.tsx
+              → packages/ui/src/theme-provider.tsx
+  → components/site-footer-mount.tsx
+      → components/landing/site-footer.tsx
+          → components/favpoll-logo.tsx  ↑
+  → components/skip-link.tsx
+  → lib/og/site.ts  (lib)
+  → lib/utils.ts  (lib)
+  → packages/ui/  ↑
+```
+
+### `app/live/[slug]/page.tsx`
+
+```
+app/live/[slug]/page.tsx
+  → components/register-scope.tsx
+  → components/room-shell/
+      → components/branded-qr.tsx
+      → components/favpoll-logo.tsx
+      → components/favpoll-sheet/
+          → components/bump-chart.tsx *  ↑
+          → components/cause-hero.tsx
+              → components/favpoll-hero-avatar.tsx *
+              → components/hero-layout.tsx
+              → components/mention-text.tsx  ↑
+              → components/ui/section-eyebrow.tsx *
+              → packages/types/ *
+          → components/countdown.tsx *
+              → components/favpoll-card/types.ts
+              → components/ui/section-eyebrow.tsx *  ↑
+          → components/favpoll-hero.tsx *
+              → components/heroes/base-favpoll-hero.tsx
+              → packages/types/ *  ↑
+          → components/favpoll-list-card/favpoll-list-card-charity-carousel.tsx  ↑
+          → components/goal-progress.tsx
+          → components/guest-book.tsx *  ↑
+          → components/heroes/fundraiser-slots.tsx
+              → components/ui/section-eyebrow.tsx *  ↑
+          → components/page-layout.tsx  ↑
+          → components/poll-section/ *
+              → components/lock-card-content.tsx
+              → components/poll-heading.tsx *  ↑
+              → components/poll-section/empty-poll-alert.tsx *
+              → components/poll-section/typed-note.tsx
+              → components/poll-section/use-poll-section.ts
+              → components/ranking-list/
+              → components/standings-skeleton.tsx
+              → components/ui/badge.tsx
+              → components/ui/button.tsx *
+              → components/ui/dropdown-menu.tsx
+              → packages/types/ *  ↑
+              → packages/ui/
+          → components/shell-scroller.tsx
+          → components/ui/responsive-overlay.tsx *  ↑
+          → components/ui/section-eyebrow.tsx *  ↑
+          → packages/types/ *  ↑
+      → components/guest-book.tsx *  ↑
+      → components/room-shell/display-chrome.tsx
+          → components/room-shell/  ↑
+          → components/ui/button.tsx *  ↑
+          → components/ui/dropdown-menu.tsx  ↑
+          → packages/ui/  ↑
+      → components/room-shell/podium.tsx
+          → components/landing/hero-texture.tsx
+          → packages/types/ *  ↑
+      → packages/types/ *  ↑
+  → lib/compare-labels.ts  (lib)
+  → lib/picks-suspended.ts  (lib)
+  → lib/poll-items.ts  (lib)
+  → lib/poll-standings.ts  (lib)
+  → lib/poll-title.ts  (lib)
+  → lib/register-palette.ts  (lib)
+  → lib/registers.ts  (lib)
+  → lib/supabase/admin.ts  (lib)
+  → lib/supabase/paginate.ts  (lib)
+  → packages/types/ *  ↑
+```
+
+### `app/memorial/page.tsx`
+
+```
+app/memorial/page.tsx
+  → components/landing/demo-fixture.ts
+      → components/hero-demo-panel/scenes.ts *
+          → components/favpoll-card/types.ts
+      → components/keepsake/keepsake-document.tsx  ↑
+      → components/landing/topic-picker-vignette.tsx  ↑
+      → components/print-pack/pack-card.tsx  ↑
+  → components/landing/fold.tsx
+  → components/landing/hero.tsx
+      → components/hero-demo-panel/demo-card.tsx *  ↑
+      → components/hero-demo-panel/demo-frame.tsx
+      → components/hero-demo-panel/phone-frame.tsx
+      → components/hero-demo-panel/scenes.ts *  ↑
+      → components/landing/count-up.tsx
+      → components/landing/hero-texture.tsx
+      → components/landing/quiet-tail.tsx
+      → components/landing/use-demo-loop.ts
+          → components/hero-demo-panel/scenes.ts *  ↑
+      → components/ui/button.tsx *
+      → components/ui/ranking-bar.tsx *
+  → components/landing/how-it-works-steps.tsx
+      → components/landing/how-it-works-hints.tsx  ↑
+  → components/landing/ideas-section.tsx
+      → components/ui/section-eyebrow.tsx *
+  → components/landing/keepsake-vignette.tsx
+      → components/keepsake/keepsake-document.tsx  ↑
+      → components/keepsake/keepsake-sheet.tsx
+          → components/keepsake/keepsake-document.tsx  ↑
+      → components/landing/demo-fixture.ts  ↑
+      → components/landing/vignette.tsx
+  → components/landing/live-vignette.tsx
+      → components/hero-demo-panel/scenes.ts *  ↑
+      → components/hero-demo-panel/tv-frame.tsx
+      → components/landing/demo-fixture.ts  ↑
+      → components/landing/display-still.tsx
+          → components/hero-demo-panel/scene-favourites.ts
+              → components/hero-demo-panel/scenes.ts *  ↑
+              → packages/types/ *
+          → components/hero-demo-panel/scenes.ts *  ↑
+          → components/room-shell/  ↑
+          → packages/types/ *  ↑
+      → components/landing/vignette.tsx  ↑
+  → components/landing/note-vignette.tsx
+      → components/favpoll-card/poll-note.tsx *  ↑
+      → components/hero-demo-panel/demo-card.tsx *  ↑
+      → components/hero-demo-panel/phone-frame.tsx  ↑
+      → components/hero-demo-panel/scenes.ts *  ↑
+      → components/landing/demo-fixture.ts  ↑
+      → components/landing/vignette.tsx  ↑
+      → components/poll-heading.tsx *  ↑
+  → components/landing/open-right-now.tsx
+      → components/landing/fade-in.tsx
+      → components/live-favpolls-carousel.tsx *
+          → components/favpoll-summary-card.tsx *  ↑
+          → components/ui/button.tsx *  ↑
+      → components/ui/button.tsx *  ↑
+      → components/ui/section-eyebrow.tsx *  ↑
+  → components/landing/order-of-service-vignette.tsx
+      → components/landing/demo-fixture.ts  ↑
+      → components/landing/vignette.tsx  ↑
+      → components/print-pack/insert-card.tsx
+          → components/branded-qr.tsx
+          → components/favpoll-logo.tsx
+          → components/print-pack/pack-card.tsx  ↑
+  → components/landing/pro-section.tsx
+      → components/ui/button.tsx *  ↑
+  → components/landing/quiet-tail.tsx  ↑
+  → components/register-scope.tsx
+  → components/ui/button.tsx *  ↑
+  → lib/i18n.ts  (lib)
+  → lib/live-favpolls.ts  (lib)
+```
+
+### `app/my-favpolls/page.tsx`
 
 ```
 app/my-favpolls/page.tsx
-  → new-favpoll-button.tsx  (NewFavpollButton)
-  → app/my-favpolls/organizer-page-client.tsx  (OrganizerPageClient)
-      — client: filter (All/Active/Closed) + sort (Closing soonest/Recently created/Highest raised)
-      → organizer-card/index.tsx  (OrganizerCard)  — one per favpoll
-          → favpoll-card/favpoll-header.tsx  (FavpollHeader)
-          → favpoll-card/section-label.tsx  (SectionLabel)
-          → ui/button.tsx
-          → ui/switch.tsx  — Listed/Unlisted toggle (calls setFavpollListed)
-          → QRCodeSVG  (qrcode.react)
-      → ui/button.tsx
+  → app/my-favpolls/organizer-page-client.tsx
+      → components/list-controls.tsx  ↑
+      → components/organizer-row/console-row.tsx
+          → components/organizer-row/utils.ts
+          → components/ui/button.tsx *
+          → components/ui/tooltip.tsx
+          → packages/types/ *
+      → components/organizer-row/utils.ts  ↑
+      → components/ui/toolbar-band.tsx *
+  → components/new-favpoll-button.tsx
+      → components/ui/button.tsx *  ↑
+  → components/new-favpoll-fab.tsx
+      → components/new-favpoll-button.tsx  ↑
+  → components/page-ground.tsx
+  → lib/live-totals.ts  (lib)
+  → lib/organizer-favpolls.ts  (lib)
+  → lib/supabase/admin.ts  (lib)
 ```
 
----
-
-### `app/rankings/page.tsx` — Global all-time rankings
-
-Server component. Queries all categories, topics, and favourites.
+### `app/p/[code]/page.tsx`
 
 ```
-app/rankings/page.tsx
-  → app/rankings/rankings-client.tsx  (RankingsClient)
-      → ui/chip.tsx
-      → favpoll-card/section-label.tsx  (SectionLabel)
-      → favpoll-card/poll-results.tsx  (PollResults)
+app/p/[code]/page.tsx
+  → lib/supabase/admin.ts  (lib)
 ```
 
----
-
-### `app/topics/[id]/page.tsx` — Individual topic rankings
-
-Server component. Queries topic + all favourites for that topic.
+### `app/page.tsx`
 
 ```
-app/topics/[id]/page.tsx
-  → page-layout.tsx  (PageLayout)
-  → ui/button.tsx
-  → app/topics/[id]/topic-rankings.tsx  (TopicRankings)
-      → ui/tabs.tsx
-      → ui/ranking-bar.tsx
-      → favpoll-card/section-label.tsx  (SectionLabel)
-      → ui/button.tsx
+app/page.tsx
+  → components/landing/capability-grid.tsx
+      → components/ui/section-eyebrow.tsx *
+  → components/landing/fade-in.tsx
+  → components/landing/hero-texture.tsx
+  → components/landing/open-right-now.tsx
+      → components/landing/fade-in.tsx  ↑
+      → components/live-favpolls-carousel.tsx *
+          → components/favpoll-summary-card.tsx *  ↑
+          → components/ui/button.tsx *
+      → components/ui/button.tsx *  ↑
+      → components/ui/section-eyebrow.tsx *  ↑
+  → components/landing/process-overview.tsx
+      → components/hero-demo-panel/demo-card.tsx *  ↑
+      → components/hero-demo-panel/phone-frame.tsx
+      → components/hero-demo-panel/scenes.ts *
+          → components/favpoll-card/types.ts
+      → components/hero-demo-panel/tv-frame.tsx
+      → components/keepsake/keepsake-sheet.tsx
+          → components/keepsake/keepsake-document.tsx  ↑
+      → components/landing/demo-fixture.ts  ↑
+      → components/landing/display-still.tsx
+          → components/hero-demo-panel/scene-favourites.ts
+              → components/hero-demo-panel/scenes.ts *  ↑
+              → packages/types/ *
+          → components/hero-demo-panel/scenes.ts *  ↑
+          → components/room-shell/  ↑
+          → packages/types/ *  ↑
+      → components/landing/wizard-vignettes.tsx
+          → components/favpoll-flow/event-step.tsx
+              → components/register-link.tsx
+              → components/ui/toggle-group.tsx
+              → packages/types/ *  ↑
+          → components/hero-demo-panel/demo-frame.tsx
+          → components/hero-demo-panel/scenes.ts *  ↑
+          → components/new-favpoll-wizard/wizard-charity-card.tsx *  ↑
+          → components/new-favpoll-wizard/wizard-field.tsx  ↑
+          → components/new-favpoll-wizard/wizard-nav.tsx *
+              → components/ui/button.tsx *  ↑
+          → components/new-favpoll-wizard/wizard-step-rail.tsx *  ↑
+          → components/new-favpoll-wizard/wizard-step-shell.tsx
+          → components/new-favpoll-wizard/wizard-topic-card.tsx *  ↑
+          → components/ui/button.tsx *  ↑
+          → components/ui/input.tsx *
+          → components/ui/textarea.tsx
+          → packages/types/ *  ↑
+      → components/print-pack/pack-card.tsx  ↑
+      → components/register-link.tsx  ↑
+      → components/ui/button.tsx *  ↑
+      → components/ui/section-eyebrow.tsx *  ↑
+  → components/landing/quiet-tail.tsx
+  → components/landing/record-flow.tsx
+  → components/landing/rotating-register-hero.tsx
+      → components/landing/demo-fixture.ts  ↑
+      → components/landing/hero.tsx  ↑
+      → components/ui/button.tsx *  ↑
+  → components/ui/button.tsx *  ↑
+  → lib/i18n.ts  (lib)
+  → lib/live-favpolls.ts  (lib)
 ```
 
----
-
-### `app/pledges/withdraw/page.tsx` — Guest pledge withdrawal
-
-Server component. Validates token then calls withdrawPledge action.
+### `app/pledges/withdraw/page.tsx`
 
 ```
 app/pledges/withdraw/page.tsx
-  → ui/button.tsx
+  → app/pledges/withdraw/actions.ts  (server action)
+  → components/ui/button.tsx *
+  → lib/i18n.ts  (lib)
+  → lib/supabase/admin.ts  (lib)
 ```
 
----
-
-### `app/landing-v2/page.tsx` — Alternative landing page
-
-Server component. Animated Venn hero + six-step how-it-works + CTA.
+### `app/privacy/page.tsx`
 
 ```
-app/landing-v2/page.tsx
-  → landing-v2/how-it-works.tsx  (HowItWorks)
-      → landing-v2/how-it-works-step1-preview.tsx  (Step1Preview)
-      → landing-v2/how-it-works-step2-preview.tsx  (Step2Preview)
-      → landing-v2/how-it-works-step3-preview.tsx  (Step3Preview)
-      → landing-v2/how-it-works-step4-preview.tsx  (Step4Preview)
-      → landing-v2/how-it-works-step5-preview.tsx  (Step5Preview)
-      → landing-v2/how-it-works-step6-preview.tsx  (Step6Preview)
-      — step previews use landing-v2/how-it-works-preview-card.tsx  (PreviewCard)
-  → landing-v2/occasion-eyebrow.tsx  (OccasionEyebrow)  — cycles occasion names every 2.8s
-  → landing-v2/honour-charity-love-venn.tsx  (HonourCharityLoveVenn) *
-      — three rotating SVG rings; baked path coords, no FavpollMarkGlyph import
-  → ui/button.tsx
-  → ui/section-eyebrow.tsx
+app/privacy/page.tsx
+```
+
+### `app/record/page.tsx`
+
+```
+app/record/page.tsx
+  → app/record/record-client.tsx
+      → components/favpoll-card/poll-results.tsx
+          → components/favpoll-card/types.ts
+          → components/ui/ranking-bar.tsx *
+      → components/list-controls.tsx  ↑
+      → components/new-favpoll-fab.tsx
+          → components/new-favpoll-button.tsx
+              → components/ui/button.tsx *
+      → components/page-ground.tsx
+      → components/poll-heading.tsx *  ↑
+      → components/ui/chip.tsx *  ↑
+      → packages/types/ *
+  → lib/supabase/admin.ts  (lib)
+  → packages/types/ *  ↑
+```
+
+### `app/sign-in/[[...sign-in]]/page.tsx`
+
+```
+app/sign-in/[[...sign-in]]/page.tsx
+  → components/auth-shell.tsx
+```
+
+### `app/sign-in/layout.tsx`
+
+```
+app/sign-in/layout.tsx
+```
+
+### `app/sign-up/[[...sign-up]]/page.tsx`
+
+```
+app/sign-up/[[...sign-up]]/page.tsx
+  → components/auth-shell.tsx
+```
+
+### `app/sign-up/layout.tsx`
+
+```
+app/sign-up/layout.tsx
+```
+
+### `app/terms/page.tsx`
+
+```
+app/terms/page.tsx
+```
+
+### `app/topics/[id]/page.tsx`
+
+```
+app/topics/[id]/page.tsx
+  → app/topics/[id]/topic-rankings.tsx
+      → components/poll-heading.tsx *  ↑
+      → components/ui/button.tsx *
+      → components/ui/ranking-bar.tsx *
+      → components/ui/tabs.tsx
+      → packages/types/ *
+  → components/page-layout.tsx
+      → components/page-ground.tsx
+      → components/shell-scroller.tsx
+  → components/topic-chart-card.tsx
+      → components/bump-chart.tsx *  ↑
+      → components/ui/responsive-overlay.tsx *  ↑
+  → components/ui/button.tsx *  ↑
+  → lib/i18n.ts  (lib)
+  → lib/rank-history.ts  (lib)
+  → lib/record.ts  (lib)
+  → lib/subset-record.ts  (lib)
+  → lib/supabase/admin.ts  (lib)
+  → lib/supabase/paginate.ts  (lib)
+  → packages/types/ *  ↑
 ```
 
 ---
 
 ## Shared subtrees
 
-### `FavpollForm` (favpoll-form/index.tsx)
+Components with three or more production importers, expanded once.
 
-Used by `app/favpolls/new/details/page.tsx` (create) and `app/favpolls/[id]/edit/page.tsx` (edit).
-
-```
-FavpollForm  (favpoll-form/index.tsx)
-  → favpoll-form/form-inner.tsx  (FormInner)  — layout, generation logic, session storage hydration
-      → favpoll-form/command-panel.tsx  (CommandPanel)
-          — floating fixed bottom-4 right-4 w-72 desktop; full-width bottom bar mobile
-          → favpoll-form/close-date-overlay.tsx  (CloseDateOverlay)  — create mode: Publish overlay
-              → favpoll-form/date-time-picker.tsx  (DateTimePicker) *
-                  → ui/calendar.tsx
-                  → ui/popover.tsx
-                  → ui/card.tsx
-                  → ui/input-group.tsx
-          → favpoll-flow/honour-step.tsx  (HonourStep)  — edit mode: Occasion overlay
-          → favpoll-flow/charity-step.tsx  (CharityStep)  — edit mode: Charity overlay
-          → favpoll-flow/love-step.tsx  (LoveStep)  — edit mode: Topic overlay
-          → favpoll-flow/topic-items-dialog.tsx  (TopicItemsDialog)  — edit mode
-          → ui/responsive-overlay.tsx
-          → ui/button.tsx
-          → ui/switch.tsx  — Listed/Unlisted toggle
-      → favpoll-form/preview-panel.tsx  (PreviewPanel)  — ~90-line coordinator
-          → favpoll-form/editable-hero.tsx  (EditableHero) *
-              — thin orchestrator; delegates all editing to overlay sub-components
-              → favpoll-form/hero-name-overlay.tsx  (HeroNameOverlay)
-              → favpoll-form/hero-context-overlay.tsx  (HeroContextOverlay)
-              → favpoll-form/hero-cause-label-overlay.tsx  (HeroCauseLabelOverlay)
-              → favpoll-form/hero-opening-line-overlay.tsx  (HeroOpeningLineOverlay)
-              → favpoll-form/hero-about-overlay.tsx  (HeroAboutOverlay)
-              → favpoll-form/hero-photo-overlay.tsx  (HeroPhotoOverlay)
-                  — Cropper (react-easy-crop) + getCroppedBlob canvas utility; 3-phase flow
-              → favpoll-hero-avatar.tsx  (ProtagonistAvatar) *
-              → editable-field.tsx  (EditableField)
-              → ui/section-eyebrow.tsx
-              → ui/button.tsx
-          → favpoll-form/editable-poll-area.tsx  (EditablePollArea) *
-              — poll topic label, reveal toggle, reveal overlay, pledge/results preview
-              → pledge-panel.tsx  (PledgePanel)  — organiser form preview only
-                  → pledge-panel-picker-header.tsx  (PledgePanelPickerHeader)
-                  → pledge-panel-picker-items.tsx  (PledgePanelPickerItems)
-                  → ui/chip.tsx
-                  → ui/button.tsx
-                  → ui/input-group.tsx
-                  → ui/responsive-overlay.tsx
-              → favpoll-card/poll-results.tsx  (PollResults)
-              → favpoll-card/section-label.tsx  (SectionLabel)
-              → ui/responsive-overlay.tsx
-              → ui/tabs.tsx
-              → ui/switch.tsx
-              → ui/button.tsx
-              → ui/tooltip-icon-button.tsx
-          → favpoll-form/editable-countdown.tsx  (EditableCountdown) *
-              → countdown.tsx  (Countdown) *
-              → favpoll-form/close-date-overlay.tsx  (CloseDateOverlay)  — edit mode only
-          → charity-banner.tsx  (CharityBanner) *
-              → charity-row.tsx  (CharityRow) *
-  → favpoll-form/seed-fund-modal.tsx  (SeedFundModal)  — create mode only, post-publish
-      → stripe-checkout.tsx  (StripeCheckout)  — inline prop (no overlay wrapper)
-          → checkout-form.tsx  (CheckoutForm)  — must render inside Stripe Elements provider
-      → ui/responsive-overlay.tsx  — hideCloseButton; no × button
-      → ui/button.tsx
-      → ui/switch.tsx
-  → ui/form.tsx  (Form)
-```
-
----
-
-### `PledgeDialog` (pledge-dialog/index.tsx)
-
-Used by `favpoll-list-card.tsx` (listing card) and `favpoll-content/index.tsx` (favpoll page). Self-contained trigger + 3-step `ResponsiveOverlay`.
+### `components/landing/demo-fixture.ts` — used by 13
 
 ```
-PledgeDialog *
-  → pledge-dialog/use-pledge-dialog.ts  (usePledgeDialog)
-      → pledge-card/use-pledge.ts  (usePledge)
-      → computePledgeAllocations  (pledge-panel.tsx)
-  → pledge-dialog/step-pick-favourites.tsx
-      PickerHeader  — chip + search field in overlay header prop (inline)
-      PickerItems   — chip grid; Chip per favourite (inline)
-  → pledge-dialog/step-amount.tsx
-      StepAmountHeader  — rendered in overlay header prop (inline)
-      StepAmount  — AmountInput + breakdown + funding path (card/shared-fund tabs) (inline)
-          → pledge-card/pledge-breakdown.tsx  (PledgeBreakdown) *
-          → ui/input-group.tsx
-          → ui/tabs.tsx
-          → ui/button.tsx
-  → pledge-dialog/step-pay.tsx  (StepPay)  — step 3
-      → stripe-checkout.tsx  (StripeCheckout)
-          → checkout-form.tsx  (CheckoutForm)
-  → pledge-dialog/step-indicator.tsx  (StepIndicator)  ⚠ extracted but never imported — dead code
-  → ui/responsive-overlay.tsx  — Sheet mobile / Dialog desktop
-  → ui/button.tsx
+components/landing/demo-fixture.ts
+  → components/hero-demo-panel/scenes.ts *
+      → components/favpoll-card/types.ts
+  → components/keepsake/keepsake-document.tsx  ↑
+  → components/landing/topic-picker-vignette.tsx  ↑
+  → components/print-pack/pack-card.tsx  ↑
+```
+
+### `components/ui/responsive-overlay.tsx` — used by 12
+
+```
+components/ui/responsive-overlay.tsx *
+  → components/ui/button.tsx *
+  → components/ui/dialog.tsx
+  → components/ui/sheet.tsx
+      → components/ui/button.tsx *  ↑
+```
+
+### `components/ui/input-group.tsx` — used by 11
+
+```
+components/ui/input-group.tsx
+  → components/ui/button.tsx *
+  → components/ui/input.tsx *
+  → components/ui/textarea.tsx
+```
+
+### `components/poll-heading.tsx` — used by 10
+
+```
+components/poll-heading.tsx *
+  → components/favpoll-card/types.ts
+  → components/ui/button.tsx *
+```
+
+### `components/new-favpoll-wizard/wizard-field.tsx` — used by 8
+
+```
+components/new-favpoll-wizard/wizard-field.tsx
+  → components/ui/button.tsx *
+  → components/ui/popover.tsx
+```
+
+### `components/print-pack/pack-card.tsx` — used by 8
+
+```
+components/print-pack/pack-card.tsx
+  → components/branded-qr.tsx
+```
+
+### `components/ui/chip.tsx` — used by 8
+
+```
+components/ui/chip.tsx *
+  → components/ui/button.tsx *
+```
+
+### `components/guest-book.tsx` — used by 6
+
+```
+components/guest-book.tsx *
+  → components/ui/responsive-overlay.tsx *  ↑
+  → components/ui/section-eyebrow.tsx *
+```
+
+### `components/favpoll-form/edit-helpers.tsx` — used by 5
+
+```
+components/favpoll-form/edit-helpers.tsx
+  → components/ui/button.tsx *
+```
+
+### `components/keepsake/keepsake-document.tsx` — used by 5
+
+```
+components/keepsake/keepsake-document.tsx
+  → components/bump-chart.tsx *  ↑
+  → components/landing/hero-texture.tsx
+```
+
+### `components/mention-text.tsx` — used by 5
+
+```
+components/mention-text.tsx
+```
+
+### `components/new-favpoll-wizard/use-wizard-state.ts` — used by 5
+
+```
+components/new-favpoll-wizard/use-wizard-state.ts
+  → components/favpoll-form/schema.ts
+  → packages/types/ *
+```
+
+### `components/page-layout.tsx` — used by 5
+
+```
+components/page-layout.tsx
+  → components/page-ground.tsx
+  → components/shell-scroller.tsx
+```
+
+### `components/bump-chart.tsx` — used by 4
+
+```
+components/bump-chart.tsx *
+  → components/ui/section-eyebrow.tsx *
+```
+
+### `components/charity-row.tsx` — used by 4
+
+```
+components/charity-row.tsx *
+  → components/favpoll-card/types.ts
+  → packages/types/ *
+```
+
+### `components/favpoll-list-card/favpoll-list-card-charity-carousel.tsx` — used by 4
+
+```
+components/favpoll-list-card/favpoll-list-card-charity-carousel.tsx
+  → components/charity-row.tsx *  ↑
+  → components/favpoll-card/types.ts
+  → packages/types/ *
+```
+
+### `components/landing/hero.tsx` — used by 4
+
+```
+components/landing/hero.tsx
+  → components/hero-demo-panel/demo-card.tsx *  ↑
+  → components/hero-demo-panel/demo-frame.tsx
+  → components/hero-demo-panel/phone-frame.tsx
+  → components/hero-demo-panel/scenes.ts *
+      → components/favpoll-card/types.ts
+  → components/landing/count-up.tsx
+  → components/landing/hero-texture.tsx
+  → components/landing/quiet-tail.tsx
+  → components/landing/use-demo-loop.ts
+      → components/hero-demo-panel/scenes.ts *  ↑
+  → components/ui/button.tsx *
+  → components/ui/ranking-bar.tsx *
+```
+
+### `components/landing/keepsake-vignette.tsx` — used by 4
+
+```
+components/landing/keepsake-vignette.tsx
+  → components/keepsake/keepsake-document.tsx  ↑
+  → components/keepsake/keepsake-sheet.tsx
+      → components/keepsake/keepsake-document.tsx  ↑
+  → components/landing/demo-fixture.ts  ↑
+  → components/landing/vignette.tsx
+```
+
+### `components/landing/note-vignette.tsx` — used by 4
+
+```
+components/landing/note-vignette.tsx
+  → components/favpoll-card/poll-note.tsx *  ↑
+  → components/hero-demo-panel/demo-card.tsx *  ↑
+  → components/hero-demo-panel/phone-frame.tsx
+  → components/hero-demo-panel/scenes.ts *
+      → components/favpoll-card/types.ts
+  → components/landing/demo-fixture.ts  ↑
+  → components/landing/vignette.tsx
+  → components/poll-heading.tsx *  ↑
+```
+
+### `components/landing/open-right-now.tsx` — used by 4
+
+```
+components/landing/open-right-now.tsx
+  → components/landing/fade-in.tsx
+  → components/live-favpolls-carousel.tsx *
+      → components/favpoll-summary-card.tsx *  ↑
+      → components/ui/button.tsx *
+  → components/ui/button.tsx *  ↑
+  → components/ui/section-eyebrow.tsx *
+```
+
+### `components/favpoll-card/poll-note.tsx` — used by 3
+
+```
+components/favpoll-card/poll-note.tsx *
+  → components/mention-text.tsx  ↑
+```
+
+### `components/favpoll-form/date-time-picker.tsx` — used by 3
+
+```
+components/favpoll-form/date-time-picker.tsx *
+  → components/favpoll-form/constants.ts
+  → components/ui/button.tsx *
+  → components/ui/calendar.tsx
+      → components/ui/button.tsx *  ↑
+  → components/ui/card.tsx *
+  → components/ui/input-group.tsx  ↑
+  → components/ui/popover.tsx
+  → components/ui/responsive-overlay.tsx *  ↑
+```
+
+### `components/favpoll-form/hero-photo-overlay.tsx` — used by 3
+
+```
+components/favpoll-form/hero-photo-overlay.tsx
+  → components/favpoll-form/edit-helpers.tsx  ↑
+  → components/favpoll-form/schema.ts
+  → components/favpoll-hero-avatar.tsx *
+  → components/ui/button.tsx *
+  → components/ui/input-group.tsx  ↑
+  → components/ui/responsive-overlay.tsx *  ↑
+```
+
+### `components/favpoll-summary-card.tsx` — used by 3
+
+```
+components/favpoll-summary-card.tsx *
+  → components/closing-label.tsx
+  → components/favpoll-card/favpoll-header.tsx *
+      → components/favpoll-card/types.ts
+  → components/favpoll-list-card/favpoll-list-card-charity-carousel.tsx  ↑
+  → components/poll-heading.tsx *  ↑
+  → components/ui/badge.tsx
+  → packages/types/ *
+```
+
+### `components/hero-demo-panel/demo-card.tsx` — used by 3
+
+```
+components/hero-demo-panel/demo-card.tsx *
+  → components/charity-row.tsx *  ↑
+  → components/favpoll-card/poll-note.tsx *  ↑
+  → components/favpoll-hero-avatar.tsx *
+  → components/favpoll-logo.tsx
+  → components/goal-progress.tsx
+  → components/hero-demo-panel/phone-frame.tsx
+  → components/hero-demo-panel/scenes.ts *
+      → components/favpoll-card/types.ts
+  → components/hero-demo-panel/variants.ts
+  → components/landing/hero-texture.tsx
+  → components/lock-card-content.tsx
+  → components/pledge-dialog/step-amount.tsx
+      → components/ui/button.tsx *
+      → components/ui/input-group.tsx  ↑
+      → components/ui/slider.tsx
+      → components/ui/tabs.tsx
+  → components/pledge-dialog/step-pick-favourites.tsx
+      → components/ui/chip.tsx *  ↑
+      → packages/types/ *
+  → components/poll-heading.tsx *  ↑
+  → components/standings-skeleton.tsx
+  → components/ui/button.tsx *  ↑
+  → components/ui/chip.tsx *  ↑
+  → components/ui/ranking-bar.tsx *
+  → components/ui/section-eyebrow.tsx *
+  → packages/types/ *  ↑
+```
+
+### `components/landing/how-it-works-hints.tsx` — used by 3
+
+```
+components/landing/how-it-works-hints.tsx
+  → components/charity-row.tsx *  ↑
+  → components/hero-demo-panel/scenes.ts *
+      → components/favpoll-card/types.ts
+  → components/landing/demo-fixture.ts  ↑
+  → components/pledge-card/pledge-breakdown.tsx *
+  → components/ui/button.tsx *
+  → components/ui/ranking-bar.tsx *
+  → packages/types/ *
+```
+
+### `components/landing/ideas-section.tsx` — used by 3
+
+```
+components/landing/ideas-section.tsx
+  → components/ui/section-eyebrow.tsx *
+```
+
+### `components/landing/live-vignette.tsx` — used by 3
+
+```
+components/landing/live-vignette.tsx
+  → components/hero-demo-panel/scenes.ts *
+      → components/favpoll-card/types.ts
+  → components/hero-demo-panel/tv-frame.tsx
+  → components/landing/demo-fixture.ts  ↑
+  → components/landing/display-still.tsx
+      → components/hero-demo-panel/scene-favourites.ts
+          → components/hero-demo-panel/scenes.ts *  ↑
+          → packages/types/ *
+      → components/hero-demo-panel/scenes.ts *  ↑
+      → components/room-shell/  ↑
+      → packages/types/ *  ↑
+  → components/landing/vignette.tsx
+```
+
+### `components/landing/topic-picker-vignette.tsx` — used by 3
+
+```
+components/landing/topic-picker-vignette.tsx
+  → components/landing/vignette.tsx
+  → components/poll-heading.tsx *  ↑
+  → components/ui/button.tsx *
+  → components/ui/chip.tsx *  ↑
+  → components/ui/input-group.tsx  ↑
+```
+
+### `components/list-controls.tsx` — used by 3
+
+```
+components/list-controls.tsx
+  → components/ui/input.tsx *
+  → components/ui/segmented-control.tsx *
+```
+
+### `components/manage/settings-rows.tsx` — used by 3
+
+```
+components/manage/settings-rows.tsx
+  → components/new-favpoll-wizard/wizard-field.tsx  ↑
+  → components/new-favpoll-wizard/wizard-step-shell.tsx
+```
+
+### `components/new-favpoll-wizard/wizard-charity-card.tsx` — used by 3
+
+```
+components/new-favpoll-wizard/wizard-charity-card.tsx *
+  → components/ui/button.tsx *
+  → packages/types/ *
+```
+
+### `components/new-favpoll-wizard/wizard-step-rail.tsx` — used by 3
+
+```
+components/new-favpoll-wizard/wizard-step-rail.tsx *
+  → components/ui/button.tsx *
+```
+
+### `components/new-favpoll-wizard/wizard-topic-card.tsx` — used by 3
+
+```
+components/new-favpoll-wizard/wizard-topic-card.tsx *
+  → components/favpoll-form/schema.ts
+  → components/poll-heading.tsx *  ↑
+  → components/ui/button.tsx *
+  → components/ui/chip.tsx *  ↑
+  → packages/types/ *
+```
+
+### `components/pledge-card/pledge-card-wrapper.tsx` — used by 3
+
+```
+components/pledge-card/pledge-card-wrapper.tsx
+  → components/ui/button.tsx *
+  → components/ui/popover.tsx
+```
+
+### `components/room-shell/index.tsx` — used by 3
+
+```
+components/room-shell/
+  → components/branded-qr.tsx
+  → components/favpoll-logo.tsx
+  → components/favpoll-sheet/
+      → components/bump-chart.tsx *  ↑
+      → components/cause-hero.tsx
+          → components/favpoll-hero-avatar.tsx *
+          → components/hero-layout.tsx
+              → components/favpoll-logo.tsx  ↑
+              → components/shell-scroller.tsx
+          → components/mention-text.tsx  ↑
+          → components/ui/section-eyebrow.tsx *
+          → packages/types/ *
+      → components/countdown.tsx *
+          → components/favpoll-card/types.ts
+          → components/ui/section-eyebrow.tsx *  ↑
+      → components/favpoll-hero.tsx *
+          → components/heroes/base-favpoll-hero.tsx
+              → components/favpoll-hero-avatar.tsx *  ↑
+              → components/hero-layout.tsx  ↑
+              → components/mention-text.tsx  ↑
+              → components/ui/section-eyebrow.tsx *  ↑
+              → packages/types/ *  ↑
+          → packages/types/ *  ↑
+      → components/favpoll-list-card/favpoll-list-card-charity-carousel.tsx  ↑
+      → components/goal-progress.tsx
+      → components/guest-book.tsx *  ↑
+      → components/heroes/fundraiser-slots.tsx
+          → components/ui/section-eyebrow.tsx *  ↑
+      → components/page-layout.tsx  ↑
+      → components/poll-section/ *
+          → components/lock-card-content.tsx
+          → components/poll-heading.tsx *  ↑
+          → components/poll-section/empty-poll-alert.tsx *
+              → components/ui/alert.tsx
+          → components/poll-section/typed-note.tsx
+              → components/favpoll-card/poll-note.tsx *  ↑
+              → components/mention-text.tsx  ↑
+          → components/poll-section/use-poll-section.ts
+          → components/ranking-list/
+              → components/ranking-list/hide-toggle.tsx
+              → components/ranking-list/use-ranking-items.ts
+              → components/ranking-list/utils.ts
+              → components/ui/ranking-bar.tsx *
+              → packages/types/ *  ↑
+          → components/standings-skeleton.tsx
+          → components/ui/badge.tsx
+          → components/ui/button.tsx *
+          → components/ui/dropdown-menu.tsx
+          → packages/types/ *  ↑
+          → packages/ui/
+              → packages/ui/src/menu-button.tsx
+              → packages/ui/src/theme-provider.tsx
+      → components/shell-scroller.tsx  ↑
+      → components/ui/responsive-overlay.tsx *  ↑
+      → components/ui/section-eyebrow.tsx *  ↑
+      → packages/types/ *  ↑
+  → components/guest-book.tsx *  ↑
+  → components/room-shell/display-chrome.tsx
+      → components/room-shell/  ↑
+      → components/ui/button.tsx *  ↑
+      → components/ui/dropdown-menu.tsx  ↑
+      → packages/ui/  ↑
+  → components/room-shell/podium.tsx
+      → components/landing/hero-texture.tsx
+      → packages/types/ *  ↑
+  → packages/types/ *  ↑
+```
+
+### `components/share-favpoll-button.tsx` — used by 3
+
+```
+components/share-favpoll-button.tsx
+  → components/ui/button.tsx *
+```
+
+### `components/stripe-checkout.tsx` — used by 3
+
+```
+components/stripe-checkout.tsx
+  → components/checkout-form.tsx
+      → components/ui/button.tsx *
 ```
 
 ---
 
 ## UI primitives (`components/ui/`)
 
-| Component | Used by (production) | Story |
-|-----------|----------------------|-------|
-| `alert` | `poll-section/empty-poll-alert` | — |
-| `button` | throughout | ✓ |
-| `calendar` | `favpoll-form/date-time-picker`, `favpoll-form/close-date-overlay` | — |
-| `card` | `favpoll-form/date-time-picker` | ✓ |
-| `chip` | `pledge-panel`, `pledge-dialog/step-pick-favourites`, `favpoll-flow/love-step`, `favpoll-flow/charity-step`, `new-favpoll-wizard/wizard-topic-card`, `hero-demo-panel`, `rankings-client` | ✓ |
-| `dialog` | `ui/responsive-overlay` (desktop path) | — |
-| `field` | `ui/form` | ✓ |
-| `form` | `favpoll-form/index` | — |
-| `input` | `favpoll-form/editable-hero` (border-stripped in header prop) | ✓ |
-| `input-group` | `pledge-panel`, `pledge-dialog/step-amount`, `favpoll-form/date-time-picker` | — |
-| `label` | `ui/form`, `ui/field` | — |
-| `occasion-tag` | ⚠ unused in production | ✓ |
-| `popover` | `favpoll-form/date-time-picker` | — |
-| `ranking-bar` | `ranking-list`, `display-screen`, `hero-demo-panel/demo-card`, `app/topics/[id]/topic-rankings` | ✓ |
-| `responsive-overlay` | `pledge-dialog`, `favpoll-form/*`, `favpoll-flow/*`, `pledge-panel` | ✓ |
-| `reveal-quote` | `hero-demo-panel/demo-card` | ✓ |
-| `section-eyebrow` | `app/page`, `app/favpolls/page`, `favpoll-content`, `cause-hero`, `heroes/base-favpoll-hero`, `favpoll-form/editable-hero`, `app/landing-v2/page` | ✓ |
-| `separator` | (shadcn composition only) | — |
-| `sheet` | `ui/responsive-overlay` (mobile path) | — |
-| `switch` | `favpoll-form/editable-poll-area`, `favpoll-form/command-panel`, `favpoll-form/seed-fund-modal`, `organizer-card` | — |
-| `tabs` | `poll-section`, `app/topics/[id]/topic-rankings`, `pledge-dialog/step-amount`, `favpoll-form/editable-poll-area` | — |
-| `textarea` | `favpoll-form/editable-hero`, `favpoll-form/editable-poll-area` (border-stripped in header prop) | — |
-| `toggle` | `ui/toggle-group` (internal) | — |
-| `toggle-group` | `favpoll-flow/honour-step` (subject + category rows) | — |
-| `tooltip` | `ui/tooltip-icon-button` | — |
-| `tooltip-icon-button` | `favpoll-list-card`, `poll-heading`, `favpoll-form/editable-poll-area` | ✓ |
-
----
-
-## `favpoll-card/` — Shared poll rendering primitives
-
-These are standalone rendering primitives, not a self-contained card. They are imported individually by multiple consumers.
-
-| Component | Used in production by |
-|-----------|----------------------|
-| `favpoll-header.tsx`  (FavpollHeader) | `favpoll-list-card`, `favpoll-summary-card`, `organizer-card` |
-| `poll-reveal.tsx`  (PollReveal) | `poll-heading` |
-| `poll-results.tsx`  (PollResults) | `favpoll-form/editable-poll-area`, `favpoll-list-card/favpoll-list-card-results`, `app/rankings/rankings-client` |
-| `section-label.tsx`  (SectionLabel) | `favpoll-list-card`, `favpoll-summary-card`, `organizer-card`, `poll-heading`, `favpoll-form/editable-poll-area`, `app/rankings/rankings-client`, `app/topics/[id]/topic-rankings` |
-
-Stories exist in `components/favpoll-card/stories/` for `favpoll-header`, `poll-reveal`, and `section-label`.
-
----
-
-## `pledge-card/` — Partially active subsystem
-
-The hooks and utilities in this directory are still in use; the rendered components are not.
-
-| File | Status |
-|------|--------|
-| `use-pledge.ts`  (usePledge) | ✓ Used by `pledge-dialog/use-pledge-dialog.ts` |
-| `utils.ts`  (GBP, FUND_GREEN/AMBER/RED, formatCharityLabel) | ✓ Used by `pledge-dialog/step-amount.tsx` |
-| `pledge-breakdown.tsx`  (PledgeBreakdown) | ✓ Used by `pledge-dialog/step-amount.tsx` |
-| `index.tsx`  (PledgeCard) | ⚠ No production importers — superseded by PledgeDialog |
-| `pledge-card-wrapper.tsx`  (PledgeCardWrapper) | ⚠ No production importers — re-exported from index |
-| `live-pledge-card.tsx`  (LivePledgeCard) | ⚠ No production importers — re-exported from index |
-| `preview-pledge-card.tsx`  (PreviewPledgeCard) | ⚠ No production importers — composed in index |
-| `amount-input.tsx`  (AmountInput) | ⚠ No production importers — amount input is now inline in step-amount |
-| `amount-presets.tsx`  (AmountPresets) | ⚠ No production importers — presets are now inline in step-amount |
+```
+components/ui/alert.tsx  ← 1
+components/ui/badge.tsx  ← 3
+components/ui/button-group.tsx  ← 1
+components/ui/button.tsx *  ← 81
+components/ui/calendar.tsx  ← 1
+components/ui/card.tsx *  ← 1
+components/ui/chip.tsx *  ← 8
+components/ui/dialog.tsx  ← 1
+components/ui/dropdown-menu.tsx  ← 6
+components/ui/field.tsx * ⚠  ← 0
+components/ui/form.tsx ⚠  ← 0
+components/ui/input-group.tsx  ← 11
+components/ui/input.tsx *  ← 6
+components/ui/label.tsx  ← 3
+components/ui/occasion-tag.tsx * ⚠  ← 0
+components/ui/popover.tsx  ← 8
+components/ui/ranking-bar.tsx *  ← 6
+components/ui/responsive-overlay.tsx *  ← 12
+components/ui/section-eyebrow.tsx *  ← 21
+components/ui/segmented-control.tsx *  ← 6
+components/ui/separator.tsx  ← 1
+components/ui/sheet.tsx  ← 1
+components/ui/slider.tsx  ← 1
+components/ui/switch-line.tsx  ← 2
+components/ui/switch.tsx  ← 5
+components/ui/tabs.tsx  ← 2
+components/ui/textarea.tsx  ← 5
+components/ui/ticker.tsx ⚠  ← 0
+components/ui/toggle-group.tsx  ← 1
+components/ui/toggle.tsx  ← 1
+components/ui/toolbar-band.tsx *  ← 4
+components/ui/tooltip-icon-button.tsx * ⚠  ← 0
+components/ui/tooltip.tsx  ← 3
+```
 
 ---
 
 ## Unused in production ⚠
 
-Components with no non-story, non-test importers:
+```
+components/favpoll-card/section-label.tsx
+components/keepsake/print-button.tsx
+components/landing/goal-vignette.tsx
+components/landing/guest-book-vignette.tsx
+components/landing/honour-charity-love-venn.tsx
+components/pledge-card/index.tsx
+components/pledge-dialog/step-indicator.tsx
+components/ui/field.tsx
+components/ui/form.tsx
+components/ui/occasion-tag.tsx
+components/ui/ticker.tsx
+components/ui/tooltip-icon-button.tsx
+```
 
-| Component | Reason |
-|-----------|--------|
-| `ui/occasion-tag.tsx` | No production importers found |
-| `honour-charity-love-venn.tsx` (root-level) | Superseded by `landing-v2/honour-charity-love-venn.tsx`; `landing-v2/page.tsx` imports the scoped variant |
-| `landing-v2/favpoll-mark.tsx` | `landing-v2/honour-charity-love-venn.tsx` embeds its own paths inline; this file is never imported |
-| `pledge-card/index.tsx` (`PledgeCard`) | Superseded by `PledgeDialog`; no importers outside the pledge-card directory |
-| `pledge-card/pledge-card-wrapper.tsx` | No importers outside pledge-card directory |
-| `pledge-card/live-pledge-card.tsx` | No importers outside pledge-card directory |
-| `pledge-card/preview-pledge-card.tsx` | No importers outside pledge-card directory |
-| `pledge-card/amount-input.tsx` | Amount input now inline in `pledge-dialog/step-amount.tsx` |
-| `pledge-card/amount-presets.tsx` | Presets now inline in `pledge-dialog/step-amount.tsx` |
-
-Deleted in this PR (confirmed zero importers, safe to remove):
-- `components/favpoll-form/photo-crop-modal.tsx` — crop logic moved inline to `editable-hero.tsx`
-- `components/live-display-section.tsx` — manage page retired; OrganizerCard carries the live display link
-
-> `FavpollMark` (default export of `components/favpoll-mark.tsx`) has no non-story importers; `FavpollMarkGlyph` from the same file is used by the root-level `honour-charity-love-venn.tsx`. Both could be deleted alongside that venn, but this is deferred.
