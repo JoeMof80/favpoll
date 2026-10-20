@@ -10,6 +10,21 @@ export default defineConfig({
         find: "@favpoll/types",
         replacement: resolve(__dirname, "../../packages/types/index.ts"),
       },
+      // The subpath must precede the bare name (prefix matching).
+      {
+        find: "@favpoll/charity-register/charity-commission",
+        replacement: resolve(
+          __dirname,
+          "../../packages/charity-register/charity-commission.ts"
+        ),
+      },
+      {
+        find: "@favpoll/charity-register",
+        replacement: resolve(
+          __dirname,
+          "../../packages/charity-register/index.ts"
+        ),
+      },
       { find: "@", replacement: resolve(__dirname, ".") },
     ],
   },
