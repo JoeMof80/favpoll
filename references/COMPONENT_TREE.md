@@ -11,7 +11,7 @@ Generated 2026-10-20 by `node scripts/component-tree.mjs` — do not edit by han
 ↑  already expanded above, or a shared subtree (see its section)
 ```
 
-Counts: 30 routes · 211 component files · 46 with stories · 12 unused in production
+Counts: 30 routes · 200 component files · 41 with stories · 1 unused in production
 
 ---
 
@@ -1603,12 +1603,9 @@ components/ui/card.tsx *  ← 1
 components/ui/chip.tsx *  ← 8
 components/ui/dialog.tsx  ← 1
 components/ui/dropdown-menu.tsx  ← 6
-components/ui/field.tsx * ⚠  ← 0
-components/ui/form.tsx ⚠  ← 0
 components/ui/input-group.tsx  ← 11
 components/ui/input.tsx *  ← 6
 components/ui/label.tsx  ← 3
-components/ui/occasion-tag.tsx * ⚠  ← 0
 components/ui/popover.tsx  ← 8
 components/ui/ranking-bar.tsx *  ← 6
 components/ui/responsive-overlay.tsx *  ← 12
@@ -1621,11 +1618,9 @@ components/ui/switch-line.tsx  ← 2
 components/ui/switch.tsx  ← 5
 components/ui/tabs.tsx  ← 2
 components/ui/textarea.tsx  ← 5
-components/ui/ticker.tsx ⚠  ← 0
 components/ui/toggle-group.tsx  ← 1
 components/ui/toggle.tsx  ← 1
 components/ui/toolbar-band.tsx *  ← 4
-components/ui/tooltip-icon-button.tsx * ⚠  ← 0
 components/ui/tooltip.tsx  ← 3
 ```
 
@@ -1634,17 +1629,6 @@ components/ui/tooltip.tsx  ← 3
 ## Unused in production ⚠
 
 ```
-components/favpoll-card/section-label.tsx
-components/keepsake/print-button.tsx
-components/landing/goal-vignette.tsx
-components/landing/guest-book-vignette.tsx
-components/landing/honour-charity-love-venn.tsx
 components/pledge-card/index.tsx
-components/pledge-dialog/step-indicator.tsx
-components/ui/field.tsx
-components/ui/form.tsx
-components/ui/occasion-tag.tsx
-components/ui/ticker.tsx
-components/ui/tooltip-icon-button.tsx
 ```
 
