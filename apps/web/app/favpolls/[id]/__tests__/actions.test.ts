@@ -29,6 +29,8 @@ import {
   createPledge,
   createGuestPledge,
   addOrganizerItem,
+  pledgeFromFund,
+  topUpFund,
   topUpFundAsGuest,
   deleteFavpoll,
 } from "@/app/favpolls/[id]/actions"
@@ -590,6 +592,186 @@ describe("topUpFundAsGuest", () => {
     await expect(
       topUpFundAsGuest("favpoll-1", 10, "pi_topup_1")
     ).rejects.toThrow("Favpoll not found")
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────────────────
+// pledgeFromFund
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("pledgeFromFund", () => {
+  const input = {
+    favpollPollId: "poll-1",
+    potId: "pot-1",
+    totalAmount: 10,
+    allocations: [{ favouriteId: "item-a", amount: 10 }],
+  }
+
+  it("throws 'Not authenticated' when userId is null", async () => {
+    mockAuth.mockResolvedValueOnce({ userId: null })
+    await expect(pledgeFromFund(input)).rejects.toThrow("Not authenticated")
+  })
+
+  it("reserves from the pot, then records the pledge with no card", async () => {
+    mock.queue("pot-1") // pot_allocate → truthy means reserved
+    mock.queue({ id: "pledge-1" }) // pledge insert
+
+    await pledgeFromFund(input)
+
+    expect(mock.callsFor("rpc:pot_allocate")[0]!.args[0]).toEqual({
+      p_pot_id: "pot-1",
+      p_amount: 10,
+    })
+    const pledgeInsert = mock
+      .callsFor("pledges")
+      .find((c) => c.method === "insert")!
+    expect(pledgeInsert.args[0]).toMatchObject({
+      pot_allocation_id: "pot-1",
+      total_amount: 10,
+      fee: 0,
+    })
+    // No card was charged, so no PaymentIntent is verified or stored.
+    expect(mockVerify).not.toHaveBeenCalled()
+    expect(pledgeInsert.args[0]).not.toHaveProperty("payment_intent_id")
+  })
+
+  it("refuses when the pot cannot cover it, and records nothing", async () => {
+    mock.queue(null) // pot_allocate → not allocated
+
+    await expect(pledgeFromFund(input)).rejects.toThrow(
+      "There isn't enough left in the shared pot for that."
+    )
+    expect(mock.callsFor("pledges")).toHaveLength(0)
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────────────────
+// topUpFund
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("topUpFund", () => {
+  it("credits the fund against the signed-in user", async () => {
+    mock.queue("pot-1")
+
+    await topUpFund("favpoll-1", 10, "pi_topup_1")
+
+    expect(mock.callsFor("rpc:pot_top_up")[0]!.args[0]).toEqual({
+      p_favpoll_id: "favpoll-1",
+      p_amount: 10,
+      p_payment_intent_id: "pi_topup_1",
+      p_clerk_user_id: "user-1",
+    })
+  })
+
+  it("throws 'Not authenticated' when userId is null", async () => {
+    mockAuth.mockResolvedValueOnce({ userId: null })
+    await expect(topUpFund("favpoll-1", 10, "pi_topup_1")).rejects.toThrow(
+      "Not authenticated"
+    )
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────────────────
+// A malformed argument (#1104)
+//
+// A typed parameter is checked at the call site and nowhere else, so each
+// money action parses its argument against ./pledge-input first. These
+// prove the refusal happens BEFORE anything is written and before the
+// PaymentIntent is even looked up — a crafted request should cost nothing.
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("the money path refuses a malformed argument", () => {
+  const cardPledge = {
+    favpollPollId: "poll-1",
+    potAllocationId: null,
+    totalAmount: 10,
+    allocations: [{ favouriteId: "item-a", amount: 10 }],
+    paymentIntentId: "pi_test_123",
+  }
+
+  function expectNothingTouched() {
+    expect(mock.from).not.toHaveBeenCalled()
+    expect(mock.rpc).not.toHaveBeenCalled()
+    expect(mockVerify).not.toHaveBeenCalled()
+    expect(mockVerifyTopUp).not.toHaveBeenCalled()
+  }
+
+  it("createPledge: an amount that is not a number", async () => {
+    await expect(
+      createPledge({ ...cardPledge, totalAmount: "10" as any })
+    ).rejects.toThrow("That amount isn't a number we can take.")
+    expectNothingTouched()
+  })
+
+  it("createPledge: a negative amount", async () => {
+    await expect(
+      createPledge({ ...cardPledge, totalAmount: -10 })
+    ).rejects.toThrow("That amount isn't a number we can take.")
+    expectNothingTouched()
+  })
+
+  it("createPledge: no poll", async () => {
+    await expect(
+      createPledge({ ...cardPledge, favpollPollId: "" })
+    ).rejects.toThrow("Missing the favpoll.")
+    expectNothingTouched()
+  })
+
+  it("createPledge: an allocation that is not a pick", async () => {
+    await expect(
+      createPledge({
+        ...cardPledge,
+        allocations: [{ favouriteId: "item-a", amount: "lots" as any }],
+      })
+    ).rejects.toThrow("That amount isn't a number we can take.")
+    expectNothingTouched()
+  })
+
+  it("createGuestPledge: an amount that is not a number", async () => {
+    await expect(
+      createGuestPledge({
+        ...cardPledge,
+        guestEmail: "guest@example.com",
+        totalAmount: null as any,
+      })
+    ).rejects.toThrow("That amount isn't a number we can take.")
+    expectNothingTouched()
+  })
+
+  it("pledgeFromFund: no pot", async () => {
+    await expect(
+      pledgeFromFund({
+        favpollPollId: "poll-1",
+        potId: "",
+        totalAmount: 10,
+        allocations: [],
+      })
+    ).rejects.toThrow("Missing the shared pot.")
+    expectNothingTouched()
+  })
+
+  it("topUpFund: an amount that is not a number", async () => {
+    await expect(
+      topUpFund("favpoll-1", Number.NaN, "pi_topup_1")
+    ).rejects.toThrow("That amount isn't a number we can take.")
+    expectNothingTouched()
+  })
+
+  it("topUpFundAsGuest: an infinite amount", async () => {
+    await expect(
+      topUpFundAsGuest("favpoll-1", Number.POSITIVE_INFINITY, "pi_topup_1")
+    ).rejects.toThrow("That amount isn't a number we can take.")
+    expectNothingTouched()
+  })
+
+  it("leaves an empty PaymentIntent to verifyPledgePayment, which says so", async () => {
+    // The schema deliberately does NOT refuse this: "Missing payment
+    // reference" is the existing contract and the better sentence.
+    mockVerify.mockRejectedValueOnce(new Error("Missing payment reference"))
+
+    await expect(
+      createPledge({ ...cardPledge, paymentIntentId: "" })
+    ).rejects.toThrow("Missing payment reference")
   })
 })
 

@@ -16,24 +16,28 @@ import {
 } from "@/lib/charity-consent"
 import { sendPledgeConfirmation, sendGuestItemAdded } from "@/lib/email"
 import { verifyPledgePayment, verifyTopUpPayment } from "@/lib/stripe-verify"
+import { parseInput } from "@/lib/action-input"
+import {
+  createPledgeSchema,
+  createGuestPledgeSchema,
+  pledgeFromFundSchema,
+  topUpFundSchema,
+  type CreatePledgeInput,
+  type CreateGuestPledgeInput,
+  type PledgeFromFundInput,
+  type GiftAidInput,
+} from "./pledge-input"
 
-type PledgeAllocationInput = {
-  favouriteId: string
-  amount: number
-}
+// Every shape below is declared once, in ./pledge-input, and parsed at
+// the top of the action that takes it: a typed parameter is checked at
+// the call site and nowhere else (#1104 — lib/action-input says why).
 
 // Gift Aid declaration (founder go, 2026-09-15): the four fields HMRC's
 // claim schedule needs. The CHARITY claims from HMRC — favpoll is not a
 // Gift Aid agent and takes no cut of the uplift. Applies to the pledge
 // amount only, never the tip. Card pledges only: the fund path never
 // offers it (a pot allocation isn't the participant's own gift).
-type GiftAidInput = {
-  firstName: string
-  lastName: string
-  houseNameOrNumber: string
-  postcode: string
-}
-
+//
 // Inserted after the pledge row exists (like allocations, the charge has
 // already happened by now — but a silently dropped declaration would be
 // an unclaimable pledge forever, so failure surfaces rather than logs).
@@ -77,25 +81,6 @@ async function assertUnusedPaymentIntent(
   }
 }
 
-type CreatePledgeInput = {
-  favpollPollId: string
-  potAllocationId: string | null
-  totalAmount: number
-  /** Optional contribution to favpoll (pounds) — never charity money */
-  tipAmount?: number
-  /** Hide the name from the public guest book (organiser still sees it) */
-  isAnonymous?: boolean
-  /** Short guest book message (100-char limit enforced client-side) */
-  message?: string | null
-  /** Guest opted out of showing their donation amount */
-  hideAmount?: boolean
-  allocations: PledgeAllocationInput[]
-  /** The Stripe PaymentIntent that charged this pledge */
-  paymentIntentId: string
-  /** Optional Gift Aid declaration — pledge amount only, never the tip */
-  giftAid?: GiftAidInput | null
-}
-
 // SUSPENDED PICKS (lib/picks-suspended, founder 2026-10-02): once the
 // organiser suspends the picks, every pledge is a gift with no favourite
 // attached. The dialog has already skipped the pick step; this is the
@@ -116,7 +101,8 @@ async function allocationsAllowed(
   return !favpoll || !picksSuspended(favpoll)
 }
 
-export async function createPledge(input: CreatePledgeInput) {
+export async function createPledge(rawInput: CreatePledgeInput) {
+  const input = parseInput(createPledgeSchema, rawInput, "createPledge")
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
 
@@ -179,27 +165,6 @@ export async function createPledge(input: CreatePledgeInput) {
   }
 }
 
-type CreateGuestPledgeInput = {
-  favpollPollId: string
-  guestEmail: string
-  totalAmount: number
-  /** Optional contribution to favpoll (pounds) — never charity money */
-  tipAmount?: number
-  /** Name shown on the guest book; blank = appears as "Someone" */
-  displayName?: string | null
-  /** Hide the name from the public guest book (organiser still sees it) */
-  isAnonymous?: boolean
-  /** Short guest book message (100-char limit enforced client-side) */
-  message?: string | null
-  /** Guest opted out of showing their donation amount */
-  hideAmount?: boolean
-  allocations: PledgeAllocationInput[]
-  /** The Stripe PaymentIntent that charged this pledge */
-  paymentIntentId: string
-  /** Optional Gift Aid declaration — pledge amount only, never the tip */
-  giftAid?: GiftAidInput | null
-}
-
 /**
  * Pre-payment probe: does an active guest pledge already exist for this
  * email on this poll? Checked BEFORE Stripe charges — createGuestPledge
@@ -255,7 +220,12 @@ export async function guestPreflightState(
   return { hasAccount: !!account, hasActivePledge: !!pledge }
 }
 
-export async function createGuestPledge(input: CreateGuestPledgeInput) {
+export async function createGuestPledge(rawInput: CreateGuestPledgeInput) {
+  const input = parseInput(
+    createGuestPledgeSchema,
+    rawInput,
+    "createGuestPledge"
+  )
   if (!input.guestEmail) throw new Error("Email is required")
 
   await verifyPledgePayment({
@@ -612,15 +582,8 @@ export async function addOrganizerItem(favpollId: string, label: string) {
   return favouriteId
 }
 
-export async function pledgeFromFund(input: {
-  favpollPollId: string
-  potId: string
-  totalAmount: number
-  isAnonymous?: boolean
-  /** Short guest book message (100-char limit enforced client-side) */
-  message?: string | null
-  allocations: PledgeAllocationInput[]
-}) {
+export async function pledgeFromFund(rawInput: PledgeFromFundInput) {
+  const input = parseInput(pledgeFromFundSchema, rawInput, "pledgeFromFund")
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
 
@@ -716,7 +679,12 @@ export async function topUpFundAsGuest(
   amount: number,
   paymentIntentId: string
 ) {
-  await creditFund(favpollId, amount, paymentIntentId, null)
+  const [id, pounds, pi] = parseInput(
+    topUpFundSchema,
+    [favpollId, amount, paymentIntentId],
+    "topUpFundAsGuest"
+  )
+  await creditFund(id, pounds, pi, null)
 }
 
 export async function topUpFund(
@@ -724,9 +692,14 @@ export async function topUpFund(
   amount: number,
   paymentIntentId: string
 ) {
+  const [id, pounds, pi] = parseInput(
+    topUpFundSchema,
+    [favpollId, amount, paymentIntentId],
+    "topUpFund"
+  )
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
-  await creditFund(favpollId, amount, paymentIntentId, userId)
+  await creditFund(id, pounds, pi, userId)
 }
 
 // Deletion is for favpolls that never took money: any pledge or shared-fund
