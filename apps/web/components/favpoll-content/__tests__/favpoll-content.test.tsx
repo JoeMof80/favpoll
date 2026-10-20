@@ -33,9 +33,6 @@ vi.mock("@/components/pledge-card", () => ({
   PledgeCard: () => null,
   LivePledgeCard: () => null,
 }))
-vi.mock("@/components/charity-banner", () => ({
-  CharityBanner: () => null,
-}))
 vi.mock("@/components/countdown", () => ({
   Countdown: () => null,
 }))

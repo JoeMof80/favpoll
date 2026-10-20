@@ -19,8 +19,8 @@ type Props = {
 }
 
 // The phone's charity surface: fixed to the bottom, always visible. On a
-// phone the right column — CharityBanner, its goal bar, the share button —
-// is not rendered at all (PageLayout hides it below md), so until 2026-08-29
+// phone the right column — the charity card, its goal bar, the share
+// button — is not rendered at all (PageLayout hides it below md), so until 2026-08-29
 // a guest on a phone never saw the pledge goal: the most motivating number a
 // fundraiser has, invisible on the device most guests hold.
 //
