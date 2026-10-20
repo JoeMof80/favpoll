@@ -5,9 +5,9 @@ export const VALID_REGISTERS = [
   "celebrating_many",
   "cause",
   "neutral",
-] as const;
+] as const
 
-export type RegisterKey = (typeof VALID_REGISTERS)[number];
+export type RegisterKey = (typeof VALID_REGISTERS)[number]
 
 /** Human-readable labels for each register shown in the admin UI. */
 export const REGISTER_LABELS: Record<RegisterKey, string> = {
@@ -16,14 +16,14 @@ export const REGISTER_LABELS: Record<RegisterKey, string> = {
   celebrating_many: "Celebrating a couple / group",
   cause: "Supporting a cause",
   neutral: "Other / open",
-};
+}
 
-export type PlaceholderEntry = { about: string; reveal: string };
-export type PlaceholdersMap = Partial<Record<RegisterKey, PlaceholderEntry>>;
+export type PlaceholderEntry = { about: string; reveal: string }
+export type PlaceholdersMap = Partial<Record<RegisterKey, PlaceholderEntry>>
 
 export type Topic = {
-  id: string;
-  title: string;
-  is_finite: boolean;
-  placeholders: PlaceholdersMap;
-};
+  id: string
+  title: string
+  is_finite: boolean
+  placeholders: PlaceholdersMap
+}

@@ -10,9 +10,9 @@ type Register =
   | "celebrating_one"
   | "celebrating_many"
   | "cause"
-  | "neutral";
+  | "neutral"
 
-type Ph = { about: string; reveal: string };
+type Ph = { about: string; reveal: string }
 
 export const regeneratedPlaceholdersBatch5: Record<
   string,
@@ -733,4 +733,4 @@ export const regeneratedPlaceholdersBatch5: Record<
         "Theirs is Tom and Jerry. Honest about effort and outcome, and never bettered.",
     },
   },
-};
+}

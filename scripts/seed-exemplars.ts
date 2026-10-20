@@ -28,31 +28,31 @@
  * ---------------------------------------------------------------------------
  */
 
-import { randomUUID } from "node:crypto";
-import { createClient } from "@supabase/supabase-js";
+import { randomUUID } from "node:crypto"
+import { createClient } from "@supabase/supabase-js"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
-const SEED_USER_ID = "user_seed_exemplar";
+const SEED_USER_ID = "user_seed_exemplar"
 
 // ─────────────────────── Safety guard ────────────────────────────────────────
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-const STAGING_REF = "eotqyintgusvzidymumb";
-const isStaging = SUPABASE_URL.includes(STAGING_REF);
-const allowOverride = process.env.ALLOW_FAVPOLL_SEED === "1";
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ""
+const STAGING_REF = "eotqyintgusvzidymumb"
+const isStaging = SUPABASE_URL.includes(STAGING_REF)
+const allowOverride = process.env.ALLOW_FAVPOLL_SEED === "1"
 
 if (!isStaging && !allowOverride) {
   console.error(
     `\n🚫  Refusing to seed exemplars.\n` +
       `    URL: ${SUPABASE_URL}\n` +
       `    Expected staging ref: ${STAGING_REF}\n` +
-      `    Set ALLOW_FAVPOLL_SEED=1 to override.\n`,
-  );
-  process.exit(1);
+      `    Set ALLOW_FAVPOLL_SEED=1 to override.\n`
+  )
+  process.exit(1)
 }
 
 // ─────────────────────── Exemplar definitions ────────────────────────────────
@@ -156,7 +156,7 @@ const EXEMPLARS = [
     pledgeAmounts: [30, 20, 15, 15, 10, 5],
     closedDaysAgo: 60,
   },
-];
+]
 
 // ─────────────────────── Lookup tables ───────────────────────────────────────
 
@@ -178,15 +178,15 @@ const OPENING_LINE_PREFIXES: Record<string, string> = {
   Award: "Congratulations to",
   Promotion: "Congratulations to",
   Fundraiser: "In support of",
-};
+}
 
 // Hand-built register → DB occasion model mapping. Duplication risk: if
 // lib/registers.ts deriveRegister() changes, update this table too.
 function registerToOccasionModel(register: string): {
-  category: string | null;
-  grouping: string;
-  subject: string;
-  is_listed: boolean;
+  category: string | null
+  grouping: string
+  subject: string
+  is_listed: boolean
 } {
   switch (register) {
     case "remembering":
@@ -195,21 +195,21 @@ function registerToOccasionModel(register: string): {
         grouping: "individual",
         subject: "someone",
         is_listed: false,
-      };
+      }
     case "celebrating_one":
       return {
         category: "celebration",
         grouping: "individual",
         subject: "someone",
         is_listed: true,
-      };
+      }
     case "celebrating_many":
       return {
         category: "celebration",
         grouping: "couple",
         subject: "someone",
         is_listed: true,
-      };
+      }
     case "cause":
       // A cause has no type — category is null (2026-07-13 remodel);
       // deriveRegister is subject-first so the cause register still derives.
@@ -218,26 +218,26 @@ function registerToOccasionModel(register: string): {
         grouping: "individual",
         subject: "cause",
         is_listed: true,
-      };
+      }
     default: // neutral
       return {
         category: null,
         grouping: "individual",
         subject: "someone",
         is_listed: true,
-      };
+      }
   }
 }
 
 // ─────────────────────── Helpers ─────────────────────────────────────────────
 
 function daysAgo(n: number): string {
-  return new Date(Date.now() - n * 86400000).toISOString();
+  return new Date(Date.now() - n * 86400000).toISOString()
 }
 
 function closingDate(closedDaysAgo: number): string {
   // closes_at was set before the favpoll closed
-  return new Date(Date.now() - (closedDaysAgo + 3) * 86400000).toISOString();
+  return new Date(Date.now() - (closedDaysAgo + 3) * 86400000).toISOString()
 }
 
 // ─────────────────────── Helpers ─────────────────────────────────────────────
@@ -247,32 +247,32 @@ async function ensureSeedUser() {
     .from("users")
     .select("id")
     .eq("id", SEED_USER_ID)
-    .maybeSingle();
-  if (existing) return;
+    .maybeSingle()
+  if (existing) return
   const { error } = await supabase.from("users").insert({
     id: SEED_USER_ID,
     email: "exemplar.organiser@example.test",
     display_name: "Exemplar Organiser",
-  });
-  if (error) console.error("  ✗ user insert:", error.message);
+  })
+  if (error) console.error("  ✗ user insert:", error.message)
 }
 
 // ─────────────────────── Main ─────────────────────────────────────────────────
 
 async function main() {
-  console.log("🌱  Seeding exemplar favpolls…");
+  console.log("🌱  Seeding exemplar favpolls…")
 
-  await ensureSeedUser();
+  await ensureSeedUser()
 
   // Check how many exemplars already exist
   const { count: existing } = await supabase
     .from("favpolls")
     .select("id", { count: "exact", head: true })
-    .eq("created_by", SEED_USER_ID);
+    .eq("created_by", SEED_USER_ID)
 
   if ((existing ?? 0) >= EXEMPLARS.length) {
-    console.log(`✓  ${existing} exemplar(s) already exist — nothing to do.`);
-    return;
+    console.log(`✓  ${existing} exemplar(s) already exist — nothing to do.`)
+    return
   }
 
   // Fetch topics and charities for ID lookup
@@ -282,20 +282,20 @@ async function main() {
       .select("id, title, is_finite, favourites ( id, label )")
       .eq("is_active", true),
     supabase.from("charities").select("id, name").eq("is_active", true),
-  ]);
+  ])
 
-  const topicByTitle = new Map((topics ?? []).map((t) => [t.title, t]));
-  const charityByName = new Map((charities ?? []).map((c) => [c.name, c]));
+  const topicByTitle = new Map((topics ?? []).map((t) => [t.title, t]))
+  const charityByName = new Map((charities ?? []).map((c) => [c.name, c]))
 
-  let created = 0;
-  let totalPledges = 0;
+  let created = 0
+  let totalPledges = 0
 
   for (const ex of EXEMPLARS) {
-    const isCause = ex.register === "cause";
-    const occasionModel = registerToOccasionModel(ex.register);
+    const isCause = ex.register === "cause"
+    const occasionModel = registerToOccasionModel(ex.register)
     const openingLine = ex.occasionType
       ? (OPENING_LINE_PREFIXES[ex.occasionType] ?? null)
-      : null;
+      : null
 
     // Idempotency: cause exemplars have no protagonist — check favpolls by
     // cause_label; person exemplars check protagonists by name.
@@ -304,41 +304,41 @@ async function main() {
         .from("favpolls")
         .select("id", { count: "exact", head: true })
         .eq("cause_label", ex.name)
-        .eq("created_by", SEED_USER_ID);
+        .eq("created_by", SEED_USER_ID)
       if ((exists ?? 0) > 0) {
-        console.log(`  ↳ skip  ${ex.name} (already seeded)`);
-        continue;
+        console.log(`  ↳ skip  ${ex.name} (already seeded)`)
+        continue
       }
     } else {
       const { count: exists } = await supabase
         .from("protagonists")
         .select("id", { count: "exact", head: true })
         .eq("name", ex.name)
-        .eq("created_by", SEED_USER_ID);
+        .eq("created_by", SEED_USER_ID)
       if ((exists ?? 0) > 0) {
-        console.log(`  ↳ skip  ${ex.name} (already seeded)`);
-        continue;
+        console.log(`  ↳ skip  ${ex.name} (already seeded)`)
+        continue
       }
     }
 
-    const topic = topicByTitle.get(ex.topicTitle);
+    const topic = topicByTitle.get(ex.topicTitle)
     if (!topic) {
       console.warn(
-        `  ⚠  Topic not found: "${ex.topicTitle}" — skipping ${ex.name}`,
-      );
-      continue;
+        `  ⚠  Topic not found: "${ex.topicTitle}" — skipping ${ex.name}`
+      )
+      continue
     }
 
-    const charity = charityByName.get(ex.charityName);
+    const charity = charityByName.get(ex.charityName)
     if (!charity) {
       console.warn(
-        `  ⚠  Charity not found: "${ex.charityName}" — skipping ${ex.name}`,
-      );
-      continue;
+        `  ⚠  Charity not found: "${ex.charityName}" — skipping ${ex.name}`
+      )
+      continue
     }
 
     // 1. Protagonist (skipped for cause favpolls — no individual honoured)
-    let protagonistId: string | null = null;
+    let protagonistId: string | null = null
     if (!isCause) {
       const { data: protagonist, error: protError } = await supabase
         .from("protagonists")
@@ -349,16 +349,16 @@ async function main() {
           created_by: SEED_USER_ID,
         })
         .select("id")
-        .single();
+        .single()
 
       if (protError || !protagonist) {
         console.error(
           `  ✗  protagonist insert failed for ${ex.name}:`,
-          protError?.message,
-        );
-        continue;
+          protError?.message
+        )
+        continue
       }
-      protagonistId = protagonist.id;
+      protagonistId = protagonist.id
     }
 
     // 2. Favpoll (closed, exemplar)
@@ -383,21 +383,21 @@ async function main() {
         total_raised: ex.pledgeAmounts.reduce((a, b) => a + b, 0),
       })
       .select("id")
-      .single();
+      .single()
 
     if (favpollError || !favpoll) {
       console.error(
         `  ✗  favpoll insert failed for ${ex.name}:`,
-        favpollError?.message,
-      );
-      continue;
+        favpollError?.message
+      )
+      continue
     }
 
     // 3. Favpoll charity
     await supabase.from("favpoll_charities").insert({
       favpoll_id: favpoll.id,
       charity_id: charity.id,
-    });
+    })
 
     // 4. Favpoll pot (mandatory — every favpoll must have one)
     // Columns are created_by / total_deposited / total_allocated — the old
@@ -409,10 +409,10 @@ async function main() {
       created_by: SEED_USER_ID,
       total_deposited: 0,
       total_allocated: 0,
-    });
+    })
     if (potError) {
-      console.error(`  ✗  pot insert failed for ${ex.name}:`, potError.message);
-      continue;
+      console.error(`  ✗  pot insert failed for ${ex.name}:`, potError.message)
+      continue
     }
 
     // 5. Favpoll poll
@@ -424,54 +424,54 @@ async function main() {
         personal_note: ex.personal_note,
       })
       .select("id")
-      .single();
+      .single()
 
     if (pollError || !favpollPoll) {
       console.error(
         `  ✗  favpoll_poll insert failed for ${ex.name}:`,
-        pollError?.message,
-      );
-      continue;
+        pollError?.message
+      )
+      continue
     }
 
     // 6. Favpoll poll favourites (for finite topics; infinite gets favpoll_poll_favourites)
     const favourites =
       (topic as { favourites: { id: string; label: string }[] }).favourites ??
-      [];
-    const isFinite = (topic as { is_finite: boolean }).is_finite;
+      []
+    const isFinite = (topic as { is_finite: boolean }).is_finite
 
     if (isFinite && favourites.length > 0) {
       await supabase.from("favpoll_poll_favourites").insert(
         favourites.map((item) => ({
           favpoll_poll_id: favpollPoll.id,
           favourite_id: item.id,
-        })),
-      );
+        }))
+      )
     }
 
     // 7. Pledge allocations (simulated pledges to show results)
-    const pledgeAmounts = ex.pledgeAmounts;
-    let pledgesWritten = 0;
+    const pledgeAmounts = ex.pledgeAmounts
+    let pledgesWritten = 0
     const itemsForAlloc =
-      isFinite && favourites.length > 0 ? favourites : favourites.slice(0, 5); // fallback for infinite
+      isFinite && favourites.length > 0 ? favourites : favourites.slice(0, 5) // fallback for infinite
 
     if (itemsForAlloc.length > 0) {
       // Distribute pledge amounts: first item gets the most, spread across items
-      const guestId = "user_seed_exemplar_guest";
+      const guestId = "user_seed_exemplar_guest"
 
       for (let i = 0; i < pledgeAmounts.length; i++) {
-        const amount = pledgeAmounts[i];
+        const amount = pledgeAmounts[i]
         // Assign to item in a top-heavy distribution (0,0,1,1,2,2,…)
         const itemIndex = Math.min(
           Math.floor(
             i /
               Math.ceil(
-                pledgeAmounts.length / Math.max(itemsForAlloc.length, 1),
-              ),
+                pledgeAmounts.length / Math.max(itemsForAlloc.length, 1)
+              )
           ),
-          itemsForAlloc.length - 1,
-        );
-        const item = itemsForAlloc[itemIndex];
+          itemsForAlloc.length - 1
+        )
+        const item = itemsForAlloc[itemIndex]
 
         // The money column is total_amount; `currency` and `status` do not
         // exist on pledges. The old shape failed on EVERY row and the error
@@ -495,14 +495,14 @@ async function main() {
             is_anonymous: true,
           })
           .select("id")
-          .single();
+          .single()
 
         if (pledgeError || !pledge) {
           console.error(
             `  ✗  pledge insert failed for ${ex.name}:`,
-            pledgeError?.message,
-          );
-          continue;
+            pledgeError?.message
+          )
+          continue
         }
 
         const { error: allocError } = await supabase
@@ -511,31 +511,31 @@ async function main() {
             pledge_id: pledge.id,
             favourite_id: item.id,
             amount,
-          });
+          })
         if (allocError) {
           console.error(
             `  ✗  allocation insert failed for ${ex.name}:`,
-            allocError.message,
-          );
+            allocError.message
+          )
         } else {
-          pledgesWritten++;
+          pledgesWritten++
         }
       }
     }
 
     console.log(
-      `  ✓  ${ex.name} (${ex.register} / ${ex.occasionType ?? "—"} / ${ex.topicTitle}) — ${pledgesWritten}/${pledgeAmounts.length} pledges`,
-    );
-    created++;
-    totalPledges += pledgesWritten;
+      `  ✓  ${ex.name} (${ex.register} / ${ex.occasionType ?? "—"} / ${ex.topicTitle}) — ${pledgesWritten}/${pledgeAmounts.length} pledges`
+    )
+    created++
+    totalPledges += pledgesWritten
   }
 
   console.log(
-    `\n✅  Done — ${created} exemplar(s) created, ${totalPledges} pledge(s) written.`,
-  );
+    `\n✅  Done — ${created} exemplar(s) created, ${totalPledges} pledge(s) written.`
+  )
 }
 
 main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+  console.error(err)
+  process.exit(1)
+})

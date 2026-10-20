@@ -1,12 +1,12 @@
-"use client";
+"use client"
 
-import { useState, useTransition } from "react";
-import type { PerfectTopicQueueRow } from "@/lib/actions/charities";
-import { dismissPerfectTopicSuggestion } from "@/lib/actions/charities";
-import type { AdminTopic } from "@/lib/actions/topics";
-import { CAUSE_FAMILY_LABELS } from "@favpoll/types";
-import { Button } from "@/components/ui/button";
-import { PerfectTopicSelect } from "@/components/perfect-topic-select";
+import { useState, useTransition } from "react"
+import type { PerfectTopicQueueRow } from "@/lib/actions/charities"
+import { dismissPerfectTopicSuggestion } from "@/lib/actions/charities"
+import type { AdminTopic } from "@/lib/actions/topics"
+import { CAUSE_FAMILY_LABELS } from "@favpoll/types"
+import { Button } from "@/components/ui/button"
+import { PerfectTopicSelect } from "@/components/perfect-topic-select"
 
 // ─── Perfect topic queue ─────────────────────────────────────────────────────
 //
@@ -24,18 +24,18 @@ function Row({
   row,
   topics,
 }: {
-  row: PerfectTopicQueueRow;
-  topics: AdminTopic[];
+  row: PerfectTopicQueueRow
+  topics: AdminTopic[]
 }) {
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition()
+  const [error, setError] = useState<string | null>(null)
 
   function dismiss() {
-    setError(null);
+    setError(null)
     startTransition(async () => {
-      const r = await dismissPerfectTopicSuggestion(row.id);
-      if (r.error) setError(r.error);
-    });
+      const r = await dismissPerfectTopicSuggestion(row.id)
+      if (r.error) setError(r.error)
+    })
   }
 
   return (
@@ -64,17 +64,17 @@ function Row({
         {isPending ? "…" : "No topic of its own"}
       </Button>
     </div>
-  );
+  )
 }
 
 export function PerfectTopicQueue({
   rows,
   topics,
 }: {
-  rows: PerfectTopicQueueRow[];
-  topics: AdminTopic[];
+  rows: PerfectTopicQueueRow[]
+  topics: AdminTopic[]
 }) {
-  if (rows.length === 0) return null;
+  if (rows.length === 0) return null
   return (
     <section className="space-y-3">
       <div>
@@ -94,5 +94,5 @@ export function PerfectTopicQueue({
         ))}
       </div>
     </section>
-  );
+  )
 }

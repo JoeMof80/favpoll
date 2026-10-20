@@ -1,15 +1,15 @@
-"use client";
+"use client"
 
-import { useState, useTransition } from "react";
+import { useState, useTransition } from "react"
 import {
   VALID_REGISTERS,
   REGISTER_LABELS,
   type PlaceholdersMap,
   type RegisterKey,
-} from "@/lib/occasions";
-import { updatePlaceholder } from "@/lib/actions/placeholders";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+} from "@/lib/occasions"
+import { updatePlaceholder } from "@/lib/actions/placeholders"
+import { Button } from "@/components/ui/button"
+import { Textarea } from "@/components/ui/textarea"
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Single register row
@@ -21,32 +21,32 @@ function RegisterRow({
   about: initialAbout,
   reveal: initialReveal,
 }: {
-  topicId: string;
-  register: RegisterKey;
-  about: string;
-  reveal: string;
+  topicId: string
+  register: RegisterKey
+  about: string
+  reveal: string
 }) {
-  const [about, setAbout] = useState(initialAbout);
-  const [reveal, setReveal] = useState(initialReveal);
+  const [about, setAbout] = useState(initialAbout)
+  const [reveal, setReveal] = useState(initialReveal)
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">(
-    "idle",
-  );
-  const [errorMsg, setErrorMsg] = useState("");
-  const [isPending, startTransition] = useTransition();
+    "idle"
+  )
+  const [errorMsg, setErrorMsg] = useState("")
+  const [isPending, startTransition] = useTransition()
 
   function handleSave() {
-    setStatus("saving");
-    setErrorMsg("");
+    setStatus("saving")
+    setErrorMsg("")
     startTransition(async () => {
-      const result = await updatePlaceholder(topicId, register, about, reveal);
+      const result = await updatePlaceholder(topicId, register, about, reveal)
       if (result.error) {
-        setStatus("error");
-        setErrorMsg(result.error);
+        setStatus("error")
+        setErrorMsg(result.error)
       } else {
-        setStatus("saved");
-        setTimeout(() => setStatus("idle"), 2000);
+        setStatus("saved")
+        setTimeout(() => setStatus("idle"), 2000)
       }
-    });
+    })
   }
 
   return (
@@ -61,30 +61,30 @@ function RegisterRow({
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        <label className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
           About
         </label>
         <Textarea
           rows={4}
           value={about}
           onChange={(e) => {
-            setAbout(e.target.value);
-            setStatus("idle");
+            setAbout(e.target.value)
+            setStatus("idle")
           }}
           placeholder="Placeholder text shown in the protagonist about field…"
         />
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        <label className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
           Reveal
         </label>
         <Textarea
           rows={3}
           value={reveal}
           onChange={(e) => {
-            setReveal(e.target.value);
-            setStatus("idle");
+            setReveal(e.target.value)
+            setStatus("idle")
           }}
           placeholder="Placeholder text shown in the poll reveal field…"
         />
@@ -104,14 +104,14 @@ function RegisterRow({
               : "Save"}
         </Button>
         {status === "saved" && (
-          <span className="text-xs text-success">Changes saved</span>
+          <span className="text-success text-xs">Changes saved</span>
         )}
         {status === "error" && (
           <span className="text-xs text-destructive">{errorMsg}</span>
         )}
       </div>
     </div>
-  );
+  )
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -122,8 +122,8 @@ export function OccasionEditor({
   topicId,
   placeholders,
 }: {
-  topicId: string;
-  placeholders: PlaceholdersMap;
+  topicId: string
+  placeholders: PlaceholdersMap
 }) {
   return (
     <div className="flex flex-col gap-4">
@@ -137,5 +137,5 @@ export function OccasionEditor({
         />
       ))}
     </div>
-  );
+  )
 }

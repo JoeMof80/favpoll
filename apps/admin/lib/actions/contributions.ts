@@ -1,40 +1,40 @@
-"use server";
+"use server"
 
-import { revalidatePath } from "next/cache";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { revalidatePath } from "next/cache"
+import { createAdminClient } from "@/lib/supabase/admin"
 
 export type Contribution = {
-  id: string;
-  label: string;
-  topic_id: string;
-  topic_title: string;
-  favpoll_title: string;
-  favpoll_id: string;
-  protagonist_name: string;
-  review_status: "pending_review" | "accepted" | "rejected";
-  rejection_reason: string | null;
-  reviewed_at: string | null;
-  reviewed_by: string | null;
-  created_at: string;
-};
+  id: string
+  label: string
+  topic_id: string
+  topic_title: string
+  favpoll_title: string
+  favpoll_id: string
+  protagonist_name: string
+  review_status: "pending_review" | "accepted" | "rejected"
+  rejection_reason: string | null
+  reviewed_at: string | null
+  reviewed_by: string | null
+  created_at: string
+}
 
 export async function getPendingContributions(): Promise<{
-  data: Contribution[] | null;
-  error: string | null;
+  data: Contribution[] | null
+  error: string | null
 }> {
-  const supabase = createAdminClient();
+  const supabase = createAdminClient()
 
   const { data, error } = await supabase
     .from("favourites")
     .select(
       `id, label, topic_id, review_status, rejection_reason, reviewed_at, reviewed_by, created_at,
-       topics!inner(title, favpoll_polls!inner(favpoll_id, favpolls!inner(id, opening_line, protagonists!favpolls_protagonist_id_fkey(name))))`,
+       topics!inner(title, favpoll_polls!inner(favpoll_id, favpolls!inner(id, opening_line, protagonists!favpolls_protagonist_id_fkey(name))))`
     )
     .eq("review_status", "pending_review")
     .eq("source", "guest")
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: true })
 
-  if (error) return { data: null, error: error.message };
+  if (error) return { data: null, error: error.message }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- nested join shape
   const rows = (data ?? []).map((item: any) => ({
@@ -52,28 +52,28 @@ export async function getPendingContributions(): Promise<{
     reviewed_at: item.reviewed_at,
     reviewed_by: item.reviewed_by,
     created_at: item.created_at,
-  }));
+  }))
 
-  return { data: rows, error: null };
+  return { data: rows, error: null }
 }
 
 export async function getReviewedContributions(): Promise<{
-  data: Contribution[] | null;
-  error: string | null;
+  data: Contribution[] | null
+  error: string | null
 }> {
-  const supabase = createAdminClient();
+  const supabase = createAdminClient()
 
   const { data, error } = await supabase
     .from("favourites")
     .select(
       `id, label, topic_id, review_status, rejection_reason, reviewed_at, reviewed_by, created_at,
-       topics!inner(title, favpoll_polls!inner(favpoll_id, favpolls!inner(id, opening_line, protagonists!favpolls_protagonist_id_fkey(name))))`,
+       topics!inner(title, favpoll_polls!inner(favpoll_id, favpolls!inner(id, opening_line, protagonists!favpolls_protagonist_id_fkey(name))))`
     )
     .neq("review_status", "pending_review")
     .eq("source", "guest")
-    .order("reviewed_at", { ascending: false });
+    .order("reviewed_at", { ascending: false })
 
-  if (error) return { data: null, error: error.message };
+  if (error) return { data: null, error: error.message }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- nested join shape
   const rows = (data ?? []).map((item: any) => ({
@@ -91,15 +91,15 @@ export async function getReviewedContributions(): Promise<{
     reviewed_at: item.reviewed_at,
     reviewed_by: item.reviewed_by,
     created_at: item.created_at,
-  }));
+  }))
 
-  return { data: rows, error: null };
+  return { data: rows, error: null }
 }
 
 export async function acceptContribution(
-  itemId: string,
+  itemId: string
 ): Promise<{ error: string | null }> {
-  const supabase = createAdminClient();
+  const supabase = createAdminClient()
 
   const { error } = await supabase
     .from("favourites")
@@ -110,30 +110,30 @@ export async function acceptContribution(
       reviewed_at: new Date().toISOString(),
     })
     .eq("id", itemId)
-    .eq("review_status", "pending_review");
+    .eq("review_status", "pending_review")
 
-  if (error) return { error: error.message };
+  if (error) return { error: error.message }
 
-  revalidatePath("/contributions");
-  return { error: null };
+  revalidatePath("/contributions")
+  return { error: null }
 }
 
 export async function rejectContribution(
   itemId: string,
-  reason: string,
+  reason: string
 ): Promise<{ error: string | null }> {
-  const trimmedReason = reason.trim();
-  if (!trimmedReason) return { error: "A rejection reason is required." };
+  const trimmedReason = reason.trim()
+  if (!trimmedReason) return { error: "A rejection reason is required." }
 
-  const supabase = createAdminClient();
+  const supabase = createAdminClient()
 
   // Hide on all favpoll poll favourites for this favourite so it's not shown to guests
   const { error: hideError } = await supabase
     .from("favpoll_poll_favourites")
     .update({ is_hidden: true, hidden_at: new Date().toISOString() })
-    .eq("favourite_id", itemId);
+    .eq("favourite_id", itemId)
 
-  if (hideError) return { error: hideError.message };
+  if (hideError) return { error: hideError.message }
 
   const { error } = await supabase
     .from("favourites")
@@ -143,10 +143,10 @@ export async function rejectContribution(
       reviewed_at: new Date().toISOString(),
     })
     .eq("id", itemId)
-    .eq("review_status", "pending_review");
+    .eq("review_status", "pending_review")
 
-  if (error) return { error: error.message };
+  if (error) return { error: error.message }
 
-  revalidatePath("/contributions");
-  return { error: null };
+  revalidatePath("/contributions")
+  return { error: null }
 }

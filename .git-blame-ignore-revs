@@ -1,0 +1,6 @@
+# Commits that only reformat. Ignore them in blame:
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+# GitHub reads this file automatically.
+
+# One Prettier config at the root (#1103) — 127 files, formatting only.
+3bd5c69a8b8cbd4b876bd04e3c1536c3f0f3b807

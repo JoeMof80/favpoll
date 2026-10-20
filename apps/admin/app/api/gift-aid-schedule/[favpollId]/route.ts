@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { NextResponse } from "next/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 
 // Gift Aid schedule CSV per favpoll PER CHARITY (founder go, 2026-09-15;
 // per-charity split 2026-09-15). The CHARITY claims from HMRC — favpoll
@@ -20,16 +20,16 @@ import { createAdminClient } from "@/lib/supabase/admin";
 // in proxy.ts covers every non-cron route, including this one.
 
 function csvField(value: string): string {
-  return /[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
+  return /[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value
 }
 
 // HMRC's schedule wants DD/MM/YY
 function hmrcDate(iso: string): string {
-  const d = new Date(iso);
-  const dd = String(d.getUTCDate()).padStart(2, "0");
-  const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
-  const yy = String(d.getUTCFullYear() % 100).padStart(2, "0");
-  return `${dd}/${mm}/${yy}`;
+  const d = new Date(iso)
+  const dd = String(d.getUTCDate()).padStart(2, "0")
+  const mm = String(d.getUTCMonth() + 1).padStart(2, "0")
+  const yy = String(d.getUTCFullYear() % 100).padStart(2, "0")
+  return `${dd}/${mm}/${yy}`
 }
 
 // Mirrors splitEqually (apps/web/lib/disbursement/split.ts): penny-even,
@@ -37,20 +37,20 @@ function hmrcDate(iso: string): string {
 function shareAtIndex(
   totalPounds: number,
   count: number,
-  index: number,
+  index: number
 ): number {
-  const totalPence = Math.round(totalPounds * 100);
-  const base = Math.floor(totalPence / count);
-  const remainder = totalPence - base * count;
-  return (base + (index < remainder ? 1 : 0)) / 100;
+  const totalPence = Math.round(totalPounds * 100)
+  const base = Math.floor(totalPence / count)
+  const remainder = totalPence - base * count
+  return (base + (index < remainder ? 1 : 0)) / 100
 }
 
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ favpollId: string }> },
+  { params }: { params: Promise<{ favpollId: string }> }
 ) {
-  const { favpollId } = await params;
-  const supabase = createAdminClient();
+  const { favpollId } = await params
+  const supabase = createAdminClient()
 
   // Stable charity order = ascending id, matching the deterministic
   // ordering the split must agree on across surfaces.
@@ -58,31 +58,31 @@ export async function GET(
     .from("favpoll_charities")
     .select("charity_id")
     .eq("favpoll_id", favpollId)
-    .order("charity_id", { ascending: true });
+    .order("charity_id", { ascending: true })
 
   if (charityErr) {
-    return NextResponse.json({ error: charityErr.message }, { status: 500 });
+    return NextResponse.json({ error: charityErr.message }, { status: 500 })
   }
-  const charityIds = (charityRows ?? []).map((r) => r.charity_id as string);
+  const charityIds = (charityRows ?? []).map((r) => r.charity_id as string)
   if (charityIds.length === 0) {
     return NextResponse.json(
       { error: "This favpoll has no charities." },
-      { status: 404 },
-    );
+      { status: 404 }
+    )
   }
 
-  const requested = new URL(req.url).searchParams.get("charity");
-  let charityIndex = 0;
+  const requested = new URL(req.url).searchParams.get("charity")
+  let charityIndex = 0
   if (charityIds.length > 1) {
-    charityIndex = requested ? charityIds.indexOf(requested) : -1;
+    charityIndex = requested ? charityIds.indexOf(requested) : -1
     if (charityIndex === -1) {
       return NextResponse.json(
         {
           error:
             "This favpoll splits across charities — pass ?charity=<id> so amounts are that charity's share.",
         },
-        { status: 400 },
-      );
+        { status: 400 }
+      )
     }
   }
 
@@ -91,14 +91,14 @@ export async function GET(
     .select(
       `first_name, last_name, house_name_or_number, postcode,
        pledges!inner(total_amount, created_at, withdrawn_at,
-         favpoll_polls!inner(favpoll_id))`,
+         favpoll_polls!inner(favpoll_id))`
     )
     .eq("pledges.favpoll_polls.favpoll_id", favpollId)
     .is("pledges.withdrawn_at", null)
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: true })
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
   const header = [
@@ -111,11 +111,11 @@ export async function GET(
     "Sponsored event",
     "Donation date",
     "Amount",
-  ].join(",");
+  ].join(",")
 
   const rows = (data ?? []).map((d) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- nested join shape
-    const pledge = d.pledges as any;
+    const pledge = d.pledges as any
     return [
       "", // Title — not captured
       csvField(d.first_name),
@@ -128,20 +128,20 @@ export async function GET(
       shareAtIndex(
         Number(pledge.total_amount),
         charityIds.length,
-        charityIndex,
+        charityIndex
       ).toFixed(2),
-    ].join(",");
-  });
+    ].join(",")
+  })
 
   const filename =
     charityIds.length > 1
       ? `gift-aid-schedule-${favpollId}-${charityIds[charityIndex]}.csv`
-      : `gift-aid-schedule-${favpollId}.csv`;
+      : `gift-aid-schedule-${favpollId}.csv`
 
   return new NextResponse([header, ...rows].join("\n") + "\n", {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
       "Content-Disposition": `attachment; filename="${filename}"`,
     },
-  });
+  })
 }

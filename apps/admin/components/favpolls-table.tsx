@@ -1,13 +1,13 @@
-"use client";
+"use client"
 
-import { useMemo, useState, useTransition } from "react";
-import { ExternalLink } from "lucide-react";
-import type { OversightFavpoll } from "@/lib/actions/favpolls";
-import { setListed, closeFavpollNow } from "@/lib/actions/favpolls";
-import { setExemplar } from "@/lib/actions/exemplars";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { StatusBadge } from "@/components/ui/status-badge";
+import { useMemo, useState, useTransition } from "react"
+import { ExternalLink } from "lucide-react"
+import type { OversightFavpoll } from "@/lib/actions/favpolls"
+import { setListed, closeFavpollNow } from "@/lib/actions/favpolls"
+import { setExemplar } from "@/lib/actions/exemplars"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { StatusBadge } from "@/components/ui/status-badge"
 import {
   Table,
   TableBody,
@@ -15,41 +15,41 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/table"
 
 const GBP = new Intl.NumberFormat("en-GB", {
   style: "currency",
   currency: "GBP",
   minimumFractionDigits: 0,
   maximumFractionDigits: 0,
-});
+})
 
-type StatusFilter = "all" | "open" | "closed";
+type StatusFilter = "all" | "open" | "closed"
 
 function FavpollRow({
   favpoll,
   webBaseUrl,
 }: {
-  favpoll: OversightFavpoll;
-  webBaseUrl: string | null;
+  favpoll: OversightFavpoll
+  webBaseUrl: string | null
 }) {
-  const [isPending, startTransition] = useTransition();
-  const [confirmClose, setConfirmClose] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition()
+  const [confirmClose, setConfirmClose] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   function run(action: () => Promise<{ error: string | null }>) {
-    setError(null);
+    setError(null)
     startTransition(async () => {
-      const result = await action();
+      const result = await action()
       if (result.error) {
-        setError(result.error);
+        setError(result.error)
       } else {
-        setConfirmClose(false);
+        setConfirmClose(false)
       }
-    });
+    })
   }
 
-  const isClosed = !!favpoll.closed_at;
+  const isClosed = !!favpoll.closed_at
 
   return (
     <>
@@ -184,28 +184,28 @@ function FavpollRow({
         </TableRow>
       )}
     </>
-  );
+  )
 }
 
 export function FavpollsTable({
   favpolls,
   webBaseUrl,
 }: {
-  favpolls: OversightFavpoll[];
-  webBaseUrl: string | null;
+  favpolls: OversightFavpoll[]
+  webBaseUrl: string | null
 }) {
-  const [search, setSearch] = useState("");
-  const [status, setStatus] = useState<StatusFilter>("all");
+  const [search, setSearch] = useState("")
+  const [status, setStatus] = useState<StatusFilter>("all")
 
   const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
+    const q = search.trim().toLowerCase()
     return favpolls.filter((f) => {
-      if (status === "open" && f.closed_at) return false;
-      if (status === "closed" && !f.closed_at) return false;
-      if (q && !f.display_name.toLowerCase().includes(q)) return false;
-      return true;
-    });
-  }, [favpolls, search, status]);
+      if (status === "open" && f.closed_at) return false
+      if (status === "closed" && !f.closed_at) return false
+      if (q && !f.display_name.toLowerCase().includes(q)) return false
+      return true
+    })
+  }, [favpolls, search, status])
 
   return (
     <div className="space-y-4">
@@ -264,5 +264,5 @@ export function FavpollsTable({
         </div>
       )}
     </div>
-  );
+  )
 }

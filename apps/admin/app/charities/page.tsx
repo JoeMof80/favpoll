@@ -4,23 +4,23 @@ import {
   getNameReviewQueue,
   getPerfectTopicQueue,
   getRegisterRemovals,
-} from "@/lib/actions/charities";
-import { getTopics } from "@/lib/actions/topics";
-import { CharitiesTable, AddCharityForm } from "@/components/charities-table";
-import { ConsentQueue } from "@/components/consent-queue";
-import { PerfectTopicQueue } from "@/components/perfect-topic-queue";
-import { RegisterRemovals } from "@/components/register-removals";
-import { NameReviewQueue } from "@/components/name-review-queue";
+} from "@/lib/actions/charities"
+import { getTopics } from "@/lib/actions/topics"
+import { CharitiesTable, AddCharityForm } from "@/components/charities-table"
+import { ConsentQueue } from "@/components/consent-queue"
+import { PerfectTopicQueue } from "@/components/perfect-topic-queue"
+import { RegisterRemovals } from "@/components/register-removals"
+import { NameReviewQueue } from "@/components/name-review-queue"
 
-const MARKETS = ["en-GB"];
+const MARKETS = ["en-GB"]
 
 type Props = {
-  searchParams: Promise<{ market?: string }>;
-};
+  searchParams: Promise<{ market?: string }>
+}
 
 export default async function CharitiesPage({ searchParams }: Props) {
-  const { market } = await searchParams;
-  const activeMarket = MARKETS.includes(market ?? "") ? market : undefined;
+  const { market } = await searchParams
+  const activeMarket = MARKETS.includes(market ?? "") ? market : undefined
 
   const [
     { data: charities, error },
@@ -36,7 +36,7 @@ export default async function CharitiesPage({ searchParams }: Props) {
     getPerfectTopicQueue(),
     getRegisterRemovals(),
     getNameReviewQueue(),
-  ]);
+  ])
 
   return (
     <div className="space-y-6">
@@ -47,7 +47,7 @@ export default async function CharitiesPage({ searchParams }: Props) {
 
       {/* Market filter */}
       <div className="flex items-center gap-2">
-        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        <span className="text-xs font-medium tracking-wider text-muted-foreground uppercase">
           Market
         </span>
         <a
@@ -90,5 +90,5 @@ export default async function CharitiesPage({ searchParams }: Props) {
 
       <CharitiesTable charities={charities ?? []} allTopics={topics ?? []} />
     </div>
-  );
+  )
 }

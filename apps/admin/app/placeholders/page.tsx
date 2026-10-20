@@ -1,6 +1,6 @@
-import Link from "next/link";
-import { getTopics } from "@/lib/actions/placeholders";
-import { StatusBadge } from "@/components/ui/status-badge";
+import Link from "next/link"
+import { getTopics } from "@/lib/actions/placeholders"
+import { StatusBadge } from "@/components/ui/status-badge"
 import {
   Table,
   TableBody,
@@ -8,32 +8,32 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/table"
 
 export default async function PlaceholdersPage() {
-  const { data: topics, error } = await getTopics();
+  const { data: topics, error } = await getTopics()
 
   if (error || !topics) {
     return (
       <div>
-        <h1 className="text-2xl font-semibold mb-4">Placeholders</h1>
+        <h1 className="mb-4 text-2xl font-semibold">Placeholders</h1>
         <p className="text-sm text-destructive">
           {error ?? "Failed to load topics."}
         </p>
       </div>
-    );
+    )
   }
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-6">Placeholders</h1>
-      <div className="mb-6 rounded-md border border-warning/40 bg-warning-muted px-4 py-3 text-sm text-foreground">
+      <h1 className="mb-6 text-2xl font-semibold">Placeholders</h1>
+      <div className="border-warning/40 bg-warning-muted mb-6 rounded-md border px-4 py-3 text-sm text-foreground">
         <strong>Dormant.</strong> Per-occasion placeholders are no longer used
         by the New Favpoll form — field prompts are now generated from the
         favpoll register. This data will be repurposed as exemplar favpoll
         content in a future release.
       </div>
-      <p className="text-sm text-muted-foreground mb-6">
+      <p className="mb-6 text-sm text-muted-foreground">
         Select a topic to view its stored placeholder text.
       </p>
       <div className="max-w-2xl rounded-lg border border-border">
@@ -47,7 +47,7 @@ export default async function PlaceholdersPage() {
           </TableHeader>
           <TableBody>
             {topics.map((topic) => {
-              const count = Object.keys(topic.placeholders ?? {}).length;
+              const count = Object.keys(topic.placeholders ?? {}).length
               return (
                 <TableRow key={topic.id} className="relative">
                   <TableCell className="font-medium text-foreground">
@@ -67,11 +67,11 @@ export default async function PlaceholdersPage() {
                     </StatusBadge>
                   </TableCell>
                 </TableRow>
-              );
+              )
             })}
           </TableBody>
         </Table>
       </div>
     </div>
-  );
+  )
 }

@@ -39,13 +39,13 @@
  * the one they chose.
  * ---------------------------------------------------------------------------
  */
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
-const DRY = process.argv.includes("--dry-run");
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
+const DRY = process.argv.includes("--dry-run")
 /**
  * Renaming a label that has been PICKED rewrites what somebody chose, so the
  * rename refuses by default. Dev and staging are the exception and need this
@@ -54,7 +54,7 @@ const DRY = process.argv.includes("--dry-run");
  * the record. Never pass it against production — there, an item with history
  * has history because a guest put it there.
  */
-const FORCE = process.argv.includes("--force-seeded-rename");
+const FORCE = process.argv.includes("--force-seeded-rename")
 
 const RECREDITS = [
   {
@@ -68,32 +68,32 @@ const RECREDITS = [
     from: "Time to Say Goodbye — Andrea Bocelli",
     to: "Time to Say Goodbye — Andrea Bocelli & Sarah Brightman",
   },
-];
+]
 /** Joins Funeral song as well: it is the chart's recording. */
-const SECOND_VERSION = "Over the Rainbow — Eva Cassidy";
+const SECOND_VERSION = "Over the Rainbow — Eva Cassidy"
 
 async function main() {
   const { data: topic } = await supabase
     .from("topics")
     .select("id")
     .eq("title", "Song")
-    .maybeSingle();
+    .maybeSingle()
   if (!topic) {
-    console.log("No Song topic here — nothing to do.");
-    return;
+    console.log("No Song topic here — nothing to do.")
+    return
   }
 
   const { data: favs } = await supabase
     .from("favourites")
     .select("id, label, all_time_count, event_count, total_pledge_count")
-    .eq("topic_id", topic.id);
-  const byLabel = new Map((favs ?? []).map((f) => [f.label.toLowerCase(), f]));
+    .eq("topic_id", topic.id)
+  const byLabel = new Map((favs ?? []).map((f) => [f.label.toLowerCase(), f]))
 
   // ── 1. The credits ───────────────────────────────────────────────────────
   for (const RECREDIT of RECREDITS) {
-    const wrong = byLabel.get(RECREDIT.from.toLowerCase());
+    const wrong = byLabel.get(RECREDIT.from.toLowerCase())
     if (!wrong) {
-      console.log(`Credit: "${RECREDIT.from}" is not here — already done.`);
+      console.log(`Credit: "${RECREDIT.from}" is not here — already done.`)
     } else if (
       (wrong.all_time_count || wrong.event_count || wrong.total_pledge_count) &&
       !FORCE
@@ -104,26 +104,26 @@ async function main() {
         `Credit: REFUSING to rename "${RECREDIT.from}" — it has history ` +
           `(${wrong.all_time_count} picks, ${wrong.event_count} events). ` +
           `Pass --force-seeded-rename if and only if that history is the ` +
-          `seeded exemplars (dev/staging), never on production.`,
-      );
+          `seeded exemplars (dev/staging), never on production.`
+      )
     } else if (DRY) {
-      console.log(`→ would recredit to "${RECREDIT.to}"`);
+      console.log(`→ would recredit to "${RECREDIT.to}"`)
     } else {
       const { error } = await supabase
         .from("favourites")
         .update({ label: RECREDIT.to })
-        .eq("id", wrong.id);
-      if (error) throw new Error(error.message);
-      console.log(`Credit: recredited to "${RECREDIT.to}"`);
+        .eq("id", wrong.id)
+      if (error) throw new Error(error.message)
+      console.log(`Credit: recredited to "${RECREDIT.to}"`)
     }
   }
 
   // ── 2. The second version ────────────────────────────────────────────────
-  let versionId = byLabel.get(SECOND_VERSION.toLowerCase())?.id;
+  let versionId = byLabel.get(SECOND_VERSION.toLowerCase())?.id
   if (versionId) {
-    console.log(`Version: "${SECOND_VERSION}" already on the Song list.`);
+    console.log(`Version: "${SECOND_VERSION}" already on the Song list.`)
   } else if (DRY) {
-    console.log(`→ would add "${SECOND_VERSION}" to the Song list`);
+    console.log(`→ would add "${SECOND_VERSION}" to the Song list`)
   } else {
     const { data: created, error } = await supabase
       .from("favourites")
@@ -135,10 +135,10 @@ async function main() {
         markets: ["en-GB"],
       })
       .select("id")
-      .single();
-    if (error) throw new Error(error.message);
-    versionId = created.id;
-    console.log(`Version: added "${SECOND_VERSION}"`);
+      .single()
+    if (error) throw new Error(error.message)
+    versionId = created.id
+    console.log(`Version: added "${SECOND_VERSION}"`)
   }
 
   const { data: subset } = await supabase
@@ -146,35 +146,35 @@ async function main() {
     .select("id, topic_subset_items(favourite_id)")
     .eq("topic_id", topic.id)
     .eq("title", "Funeral song")
-    .maybeSingle();
+    .maybeSingle()
   if (!subset) {
-    console.log("No Funeral song subset here — the item is enough.");
-    return;
+    console.log("No Funeral song subset here — the item is enough.")
+    return
   }
   const have = new Set(
-    (subset.topic_subset_items ?? []).map((i) => i.favourite_id),
-  );
+    (subset.topic_subset_items ?? []).map((i) => i.favourite_id)
+  )
   if (DRY) {
     console.log(
       versionId && have.has(versionId)
         ? `Funeral song: ${have.size} members, already a member.`
         : `→ would add it to Funeral song (${have.size} → ${have.size + 1}, ` +
-            `ruling 7's ceiling is 16)`,
-    );
-    return;
+            `ruling 7's ceiling is 16)`
+    )
+    return
   }
   if (!versionId || have.has(versionId)) {
-    console.log(`Funeral song: ${have.size} members, nothing to add.`);
-    return;
+    console.log(`Funeral song: ${have.size} members, nothing to add.`)
+    return
   }
   const { error } = await supabase
     .from("topic_subset_items")
-    .insert({ subset_id: subset.id, favourite_id: versionId });
-  if (error) throw new Error(error.message);
-  console.log(`Funeral song: ${have.size} → ${have.size + 1} members`);
+    .insert({ subset_id: subset.id, favourite_id: versionId })
+  if (error) throw new Error(error.message)
+  console.log(`Funeral song: ${have.size} → ${have.size + 1} members`)
 }
 
 main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+  console.error(e)
+  process.exit(1)
+})

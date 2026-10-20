@@ -1,19 +1,19 @@
-"use client";
+"use client"
 
-import { useState, useTransition } from "react";
-import { X } from "lucide-react";
-import type { SubsetRow } from "@/lib/actions/subsets";
+import { useState, useTransition } from "react"
+import { X } from "lucide-react"
+import type { SubsetRow } from "@/lib/actions/subsets"
 import {
   approveSubset,
   rejectSubset,
   removeSubsetItem,
   renameSubset,
   setSubsetActive,
-} from "@/lib/actions/subsets";
-import { SUBSET_MAX_ITEMS, SUBSET_MIN_ITEMS } from "@/lib/subsets";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { StatusBadge } from "@/components/ui/status-badge";
+} from "@/lib/actions/subsets"
+import { SUBSET_MAX_ITEMS, SUBSET_MIN_ITEMS } from "@/lib/subsets"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { StatusBadge } from "@/components/ui/status-badge"
 import {
   Table,
   TableBody,
@@ -21,7 +21,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/table"
 
 function SourceBadge({ source }: { source: SubsetRow["source"] }) {
   const label =
@@ -31,24 +31,24 @@ function SourceBadge({ source }: { source: SubsetRow["source"] }) {
         ? "charity"
         : source === "homemade"
           ? "homemade"
-          : "by hand";
-  return <StatusBadge tone="neutral">{label}</StatusBadge>;
+          : "by hand"
+  return <StatusBadge tone="neutral">{label}</StatusBadge>
 }
 
 function SubsetRowView({ row }: { row: SubsetRow }) {
-  const [isPending, startTransition] = useTransition();
-  const [title, setTitle] = useState(row.title);
-  const [error, setError] = useState<string | null>(null);
-  const renamed = title.trim() !== row.title;
-  const tooFew = row.items.length < SUBSET_MIN_ITEMS;
+  const [isPending, startTransition] = useTransition()
+  const [title, setTitle] = useState(row.title)
+  const [error, setError] = useState<string | null>(null)
+  const renamed = title.trim() !== row.title
+  const tooFew = row.items.length < SUBSET_MIN_ITEMS
 
   const run = (fn: () => Promise<{ error: string | null }>) => {
-    setError(null);
+    setError(null)
     startTransition(async () => {
-      const r = await fn();
-      if (r.error) setError(r.error);
-    });
-  };
+      const r = await fn()
+      if (r.error) setError(r.error)
+    })
+  }
 
   return (
     <TableRow>
@@ -118,7 +118,7 @@ function SubsetRowView({ row }: { row: SubsetRow }) {
           {row.items.length} of {SUBSET_MIN_ITEMS} to {SUBSET_MAX_ITEMS}
         </p>
       </TableCell>
-      <TableCell className="align-top text-right">
+      <TableCell className="text-right align-top">
         <div className="flex justify-end gap-2">
           {row.status === "proposed" && (
             <>
@@ -176,7 +176,7 @@ function SubsetRowView({ row }: { row: SubsetRow }) {
         </div>
       </TableCell>
     </TableRow>
-  );
+  )
 }
 
 export function SubsetsTable({ rows }: { rows: SubsetRow[] }) {
@@ -198,5 +198,5 @@ export function SubsetsTable({ rows }: { rows: SubsetRow[] }) {
         </TableBody>
       </Table>
     </div>
-  );
+  )
 }

@@ -1,39 +1,39 @@
-"use server";
+"use server"
 
-import { revalidatePath } from "next/cache";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { revalidatePath } from "next/cache"
+import { createAdminClient } from "@/lib/supabase/admin"
 
 export type OversightFavpoll = {
-  id: string;
-  display_name: string;
-  category: string | null;
-  total_raised: number;
-  is_listed: boolean;
-  is_exemplar: boolean;
-  closed_at: string | null;
-  closes_at: string | null;
-  created_at: string;
+  id: string
+  display_name: string
+  category: string | null
+  total_raised: number
+  is_listed: boolean
+  is_exemplar: boolean
+  closed_at: string | null
+  closes_at: string | null
+  created_at: string
   /** Ascending by id — the deterministic order the Gift Aid split uses */
-  charities: { id: string; name: string }[];
-};
+  charities: { id: string; name: string }[]
+}
 
 export async function getAllFavpolls(): Promise<{
-  data: OversightFavpoll[] | null;
-  error: string | null;
+  data: OversightFavpoll[] | null
+  error: string | null
 }> {
-  const supabase = createAdminClient();
+  const supabase = createAdminClient()
 
   const { data, error } = await supabase
     .from("favpolls")
     .select(
       `id, category, total_raised, is_listed, is_exemplar, closed_at,
        closes_at, created_at, cause_label, protagonist:protagonists ( name ),
-       favpoll_charities ( charity_id, charities ( name ) )`,
+       favpoll_charities ( charity_id, charities ( name ) )`
     )
     .order("created_at", { ascending: false })
-    .limit(200);
+    .limit(200)
 
-  if (error) return { data: null, error: error.message };
+  if (error) return { data: null, error: error.message }
 
   const rows = (data ?? []).map((ev) => ({
     id: ev.id,
@@ -48,30 +48,30 @@ export async function getAllFavpolls(): Promise<{
     created_at: ev.created_at,
     charities: (
       (ev.favpoll_charities ?? []) as unknown as {
-        charity_id: string;
-        charities: { name: string } | null;
+        charity_id: string
+        charities: { name: string } | null
       }[]
     )
       .map((fc) => ({ id: fc.charity_id, name: fc.charities?.name ?? "—" }))
       .sort((a, b) => a.id.localeCompare(b.id)),
-  }));
-  return { data: rows, error: null };
+  }))
+  return { data: rows, error: null }
 }
 
 export async function setListed(
   favpollId: string,
-  isListed: boolean,
+  isListed: boolean
 ): Promise<{ error: string | null }> {
-  const supabase = createAdminClient();
+  const supabase = createAdminClient()
 
   const { error } = await supabase
     .from("favpolls")
     .update({ is_listed: isListed })
-    .eq("id", favpollId);
+    .eq("id", favpollId)
 
-  if (error) return { error: error.message };
-  revalidatePath("/favpolls");
-  return { error: null };
+  if (error) return { error: error.message }
+  revalidatePath("/favpolls")
+  return { error: null }
 }
 
 /**
@@ -81,30 +81,30 @@ export async function setListed(
  * close is an intervention, not the scheduled lifecycle event.
  */
 export async function closeFavpollNow(
-  favpollId: string,
+  favpollId: string
 ): Promise<{ error: string | null }> {
-  const supabase = createAdminClient();
+  const supabase = createAdminClient()
 
   const { data: pledgeRows, error: pledgeErr } = await supabase
     .from("pledges")
     .select("total_amount, favpoll_polls!inner(favpoll_id)")
     .eq("favpoll_polls.favpoll_id", favpollId)
-    .is("withdrawn_at", null);
+    .is("withdrawn_at", null)
 
-  if (pledgeErr) return { error: pledgeErr.message };
+  if (pledgeErr) return { error: pledgeErr.message }
 
   const totalRaised = (pledgeRows ?? []).reduce(
     (sum: number, row: { total_amount: number }) =>
       sum + (row.total_amount ?? 0),
-    0,
-  );
+    0
+  )
 
   const { error } = await supabase
     .from("favpolls")
     .update({ closed_at: new Date().toISOString(), total_raised: totalRaised })
-    .eq("id", favpollId);
+    .eq("id", favpollId)
 
-  if (error) return { error: error.message };
-  revalidatePath("/favpolls");
-  return { error: null };
+  if (error) return { error: error.message }
+  revalidatePath("/favpolls")
+  return { error: null }
 }

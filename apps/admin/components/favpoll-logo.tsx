@@ -35,5 +35,5 @@ export function FavpollLogo({ className }: { className?: string }) {
         fav<span className="opacity-60">poll</span>
       </span>
     </span>
-  );
+  )
 }

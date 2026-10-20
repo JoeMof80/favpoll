@@ -257,7 +257,13 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Check formatting
-        run: pnpm --filter @favpoll/web exec prettier --check .
+        # The whole repo, from apps/web — that is the only working directory
+        # where prettier-plugin-tailwindcss resolves, and without the plugin
+        # the root config fails to load and prettier silently checks nothing.
+        # Config and ignore file both live at the root (#1103).
+        run: |
+          cd apps/web
+          pnpm exec prettier --ignore-path ../../.prettierignore --check ../..
 
       - name: Component tree is current
         run: node scripts/component-tree.mjs --check

@@ -1,128 +1,128 @@
-"use server";
+"use server"
 
 import {
   CAUSE_FAMILIES,
   charityNameNeedsReview,
   type CauseFamily,
   type SignatureEvent,
-} from "@favpoll/types";
+} from "@favpoll/types"
 
-import { auth } from "@clerk/nextjs/server";
-import { revalidatePath } from "next/cache";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { auth } from "@clerk/nextjs/server"
+import { revalidatePath } from "next/cache"
+import { createAdminClient } from "@/lib/supabase/admin"
 import {
   type RegisterSearchResult,
   type VerificationStatus,
-} from "@/lib/charity-commission";
+} from "@/lib/charity-commission"
 import {
   searchRegisterMirrorFirst,
   verifyOnMirror,
   placeFromAddress,
-} from "@/lib/register-mirror";
+} from "@/lib/register-mirror"
 
 /** Live search of the Register of Charities for the admin typeahead. */
 export async function searchCharityRegister(
-  query: string,
+  query: string
 ): Promise<RegisterSearchResult[]> {
   // The register mirror first (2026-09-27), the API for what it lacks.
-  return (await searchRegisterMirrorFirst(query)).results;
+  return (await searchRegisterMirrorFirst(query)).results
 }
 
-const VALID_MARKETS = ["en-GB"];
+const VALID_MARKETS = ["en-GB"]
 
 export type Charity = {
-  id: string;
-  name: string;
-  description: string | null;
-  logo_url: string | null;
-  impact_statement: string | null;
-  registered_number: string | null;
-  verification_status: VerificationStatus | null;
-  verified_name: string | null;
-  verified_at: string | null;
-  consent_status: "pending" | "approved" | "declined" | null;
-  invite_drafted_at: string | null;
-  consent_decided_at: string | null;
-  is_active: boolean;
-  market: string;
-  created_at: string;
+  id: string
+  name: string
+  description: string | null
+  logo_url: string | null
+  impact_statement: string | null
+  registered_number: string | null
+  verification_status: VerificationStatus | null
+  verified_name: string | null
+  verified_at: string | null
+  consent_status: "pending" | "approved" | "declined" | null
+  invite_drafted_at: string | null
+  consent_decided_at: string | null
+  is_active: boolean
+  market: string
+  created_at: string
   /** Cause family (references/favpoll-pairing-table §2): the confirmed
    *  value the generator reads, the model's suggestion, and the register
    *  text it came from. Selected by getCharities. */
-  cause_family?: CauseFamily | null;
-  cause_family_suggested?: CauseFamily | null;
-  activities?: string | null;
+  cause_family?: CauseFamily | null
+  cause_family_suggested?: CauseFamily | null
+  activities?: string | null
   /** The fundraising events read from the charity's own website, and when
    *  it was read. BOTH, because "no events" is otherwise ambiguous between
    *  "we have never looked" and "we looked and there were none" — and the
    *  difference is the whole point of showing them here. */
-  signature_events?: SignatureEvent[] | null;
-  website_read_at?: string | null;
+  signature_events?: SignatureEvent[] | null
+  website_read_at?: string | null
   /** What the REGISTER says about this number, beside what the account
    *  claims. See registerByKey for why. */
-  register_status?: string | null;
-  register_income?: number | null;
-  register_place?: string | null;
-  register_registered_on?: string | null;
-};
+  register_status?: string | null
+  register_income?: number | null
+  register_place?: string | null
+  register_registered_on?: string | null
+}
 
 /** Charity Commission fields for an insert/update, from a (name, number) pair. */
 async function verificationFields(
   name: string,
-  registeredNumber: string | null,
+  registeredNumber: string | null
 ): Promise<{
-  verification_status: VerificationStatus | null;
-  verified_name: string | null;
-  verified_at: string | null;
+  verification_status: VerificationStatus | null
+  verified_name: string | null
+  verified_at: string | null
 }> {
   if (!registeredNumber) {
     return {
       verification_status: null,
       verified_name: null,
       verified_at: null,
-    };
+    }
   }
-  const result = await verifyOnMirror(registeredNumber, name);
+  const result = await verifyOnMirror(registeredNumber, name)
   return {
     verification_status: result.status,
     verified_name: result.registeredName,
     verified_at: new Date().toISOString(),
-  };
+  }
 }
 
 export async function getCharities(
-  market?: string,
+  market?: string
 ): Promise<{ data: Charity[] | null; error: string | null }> {
-  const supabase = createAdminClient();
+  const supabase = createAdminClient()
 
   let query = supabase
     .from("charities")
     .select(
-      "id, name, description, logo_url, impact_statement, registered_number, verification_status, verified_name, verified_at, consent_status, consent_decided_at, invite_drafted_at, is_active, market, created_at, cause_family",
+      "id, name, description, logo_url, impact_statement, registered_number, verification_status, verified_name, verified_at, consent_status, consent_decided_at, invite_drafted_at, is_active, market, created_at, cause_family"
     )
-    .order("name", { ascending: true });
+    .order("name", { ascending: true })
 
   if (market) {
-    query = query.eq("market", market);
+    query = query.eq("market", market)
   }
 
-  const { data, error } = await query;
+  const { data, error } = await query
 
-  if (error) return { data: null, error: error.message };
+  if (error) return { data: null, error: error.message }
 
   // The suggested family comes from the PROFILE (step 2) and the
   // register's own words from the MIRROR (step 4); the account row keeps
   // what it agreed to.
-  const rows = (data ?? []) as Charity[];
-  const numbers = rows.map((c) => c.registered_number);
+  const rows = (data ?? []) as Charity[]
+  const numbers = rows.map((c) => c.registered_number)
   const [suggestions, register] = await Promise.all([
     suggestionsByKey(numbers),
     registerByKey(numbers),
-  ]);
+  ])
   return {
     data: rows.map((c) => {
-      const key = profileKey(c.registered_number);
-      const reg = register.get((c.registered_number ?? "").replace(/\D/g, ""));
+      const key = profileKey(c.registered_number)
+      const reg = register.get((c.registered_number ?? "").replace(/\D/g, ""))
       return {
         ...c,
         cause_family_suggested: key
@@ -139,51 +139,51 @@ export async function getCharities(
         register_income: reg?.latest_income ?? null,
         register_place: reg?.place ?? null,
         register_registered_on: reg?.registered_on ?? null,
-      };
+      }
     }),
     error: null,
-  };
+  }
 }
 
 /** The form sends the family as a string ("" = no cause of its own). */
 function parseCauseFamily(
-  value: string | null | undefined,
+  value: string | null | undefined
 ): { ok: true; family: CauseFamily | null } | { ok: false; error: string } {
   if (value === undefined || value === null || value === "")
-    return { ok: true, family: null };
+    return { ok: true, family: null }
   if ((CAUSE_FAMILIES as readonly string[]).includes(value))
-    return { ok: true, family: value as CauseFamily };
-  return { ok: false, error: `Unknown cause family: ${value}` };
+    return { ok: true, family: value as CauseFamily }
+  return { ok: false, error: `Unknown cause family: ${value}` }
 }
 
 export async function createCharity(input: {
-  name: string;
-  description?: string;
-  impact_statement?: string;
-  registered_number?: string;
-  logo_url?: string;
-  market: string;
-  cause_family?: string;
+  name: string
+  description?: string
+  impact_statement?: string
+  registered_number?: string
+  logo_url?: string
+  market: string
+  cause_family?: string
 }): Promise<{ error: string | null }> {
-  if (!input.name.trim()) return { error: "Name is required." };
-  const family = parseCauseFamily(input.cause_family);
-  if (!family.ok) return { error: family.error };
+  if (!input.name.trim()) return { error: "Name is required." }
+  const family = parseCauseFamily(input.cause_family)
+  if (!family.ok) return { error: family.error }
   if (!VALID_MARKETS.includes(input.market)) {
     return {
       error: `Invalid market. Must be one of: ${VALID_MARKETS.join(", ")}.`,
-    };
+    }
   }
 
-  const supabase = createAdminClient();
+  const supabase = createAdminClient()
 
-  const name = input.name.trim();
-  const registeredNumber = input.registered_number?.trim() || null;
+  const name = input.name.trim()
+  const registeredNumber = input.registered_number?.trim() || null
 
   // Nothing fetches the register's contact or purpose here any more:
   // step 4 pointed every reader at the mirror, so copying them onto the
   // account was removed and these two round trips were left fetching
   // values that went straight in the bin (the linter noticed).
-  const logoUrl = input.logo_url?.trim() || null;
+  const logoUrl = input.logo_url?.trim() || null
   const { error } = await supabase.from("charities").insert({
     name,
     description: input.description?.trim() || null,
@@ -198,80 +198,80 @@ export async function createCharity(input: {
     market: input.market,
     is_active: true,
     ...(await verificationFields(name, registeredNumber)),
-  });
+  })
 
-  if (error) return { error: error.message };
+  if (error) return { error: error.message }
 
   // The same guard as updateCharity: an admin may well be adding a charity
   // a wave has already prepared a profile for, scraped image and all.
   if (logoUrl && registeredNumber) {
-    await dropScrapedImageByNumber(registeredNumber);
+    await dropScrapedImageByNumber(registeredNumber)
   }
 
-  revalidatePath("/charities");
-  return { error: null };
+  revalidatePath("/charities")
+  return { error: null }
 }
 
 export async function updateCharity(
   id: string,
   data: {
-    name?: string;
-    description?: string;
-    impact_statement?: string;
-    registered_number?: string;
-    logo_url?: string;
-    market?: string;
-    cause_family?: string;
-  },
+    name?: string
+    description?: string
+    impact_statement?: string
+    registered_number?: string
+    logo_url?: string
+    market?: string
+    cause_family?: string
+  }
 ): Promise<{ error: string | null }> {
   if (data.name !== undefined && !data.name.trim()) {
-    return { error: "Name cannot be empty." };
+    return { error: "Name cannot be empty." }
   }
 
-  const updates: Record<string, string | null> = {};
+  const updates: Record<string, string | null> = {}
   if (data.cause_family !== undefined) {
-    const family = parseCauseFamily(data.cause_family);
-    if (!family.ok) return { error: family.error };
-    updates.cause_family = family.family;
+    const family = parseCauseFamily(data.cause_family)
+    if (!family.ok) return { error: family.error }
+    updates.cause_family = family.family
   }
-  if (data.name !== undefined) updates.name = data.name.trim();
+  if (data.name !== undefined) updates.name = data.name.trim()
   if (data.description !== undefined)
-    updates.description = data.description.trim() || null;
+    updates.description = data.description.trim() || null
   if (data.impact_statement !== undefined)
-    updates.impact_statement = data.impact_statement.trim() || null;
+    updates.impact_statement = data.impact_statement.trim() || null
   if (data.registered_number !== undefined)
-    updates.registered_number = data.registered_number.trim() || null;
+    updates.registered_number = data.registered_number.trim() || null
   if (data.logo_url !== undefined)
-    updates.logo_url = data.logo_url.trim() || null;
-  if (data.market !== undefined) updates.market = data.market;
+    updates.logo_url = data.logo_url.trim() || null
+  if (data.market !== undefined) updates.market = data.market
 
-  const supabase = createAdminClient();
+  const supabase = createAdminClient()
 
   // Re-verify against the Charity Commission whenever the number changes.
   // The name for the mismatch check comes from this update or, failing
   // that, the stored row.
   if (data.registered_number !== undefined) {
-    let name = data.name?.trim();
+    let name = data.name?.trim()
     if (!name && updates.registered_number) {
       const { data: existing } = await supabase
         .from("charities")
         .select("name")
         .eq("id", id)
-        .single();
-      name = (existing as { name: string } | null)?.name ?? "";
+        .single()
+      name = (existing as { name: string } | null)?.name ?? ""
     }
     Object.assign(
       updates,
-      await verificationFields(name ?? "", updates.registered_number),
-    );
+      await verificationFields(name ?? "", updates.registered_number)
+    )
   }
 
   const { error } = await supabase
     .from("charities")
     .update(updates)
-    .eq("id", id);
+    .eq("id", id)
 
-  if (error) return { error: error.message };
+  if (error) return { error: error.message }
 
   // A GIVEN LOGO DROPS THE SCRAPED IMAGE (decision 2's second guard). The
   // charity's own og:image lives on the profile for the private page; the
@@ -279,11 +279,11 @@ export async function updateCharity(
   // fallback, or a scraped image ends up served publicly by accident.
   // Here is the moment it has to fire.
   if (updates.logo_url) {
-    await dropScrapedImage(id);
+    await dropScrapedImage(id)
   }
 
-  revalidatePath("/charities");
-  return { error: null };
+  revalidatePath("/charities")
+  return { error: null }
 }
 
 /** Clears a scraped og:image or favicon from a charity's profile, leaving
@@ -291,10 +291,10 @@ export async function updateCharity(
  *  saved and an image that is not dropped must not look like a failed
  *  save, but it must be loud in the logs. */
 async function dropScrapedImageByNumber(
-  registeredNumber: string | null,
+  registeredNumber: string | null
 ): Promise<void> {
-  const key = profileKey(registeredNumber);
-  if (!key) return;
+  const key = profileKey(registeredNumber)
+  if (!key) return
   const { error } = await createAdminClient()
     .from("charity_profiles")
     .update({
@@ -303,12 +303,9 @@ async function dropScrapedImageByNumber(
       updated_at: new Date().toISOString(),
     })
     .eq("registered_number", key)
-    .in("image_source", ["og", "favicon"]);
+    .in("image_source", ["og", "favicon"])
   if (error) {
-    console.error(
-      "[charity-profile] scraped image not dropped:",
-      error.message,
-    );
+    console.error("[charity-profile] scraped image not dropped:", error.message)
   }
 }
 
@@ -318,103 +315,101 @@ async function dropScrapedImage(charityId: string): Promise<void> {
     .from("charities")
     .select("registered_number")
     .eq("id", charityId)
-    .maybeSingle();
+    .maybeSingle()
   await dropScrapedImageByNumber(
     (charity as { registered_number: string | null } | null)
-      ?.registered_number ?? null,
-  );
+      ?.registered_number ?? null
+  )
 }
 
 export async function deactivateCharity(
-  id: string,
+  id: string
 ): Promise<{ error: string | null; warning?: string }> {
-  const supabase = createAdminClient();
+  const supabase = createAdminClient()
 
   const { data: usages, error: countError } = await supabase
     .from("favpoll_charities")
     .select("id")
-    .eq("charity_id", id);
+    .eq("charity_id", id)
 
-  if (countError) return { error: countError.message };
+  if (countError) return { error: countError.message }
 
   const { error } = await supabase
     .from("charities")
     .update({ is_active: false })
-    .eq("id", id);
+    .eq("id", id)
 
-  if (error) return { error: error.message };
+  if (error) return { error: error.message }
 
-  revalidatePath("/charities");
+  revalidatePath("/charities")
 
-  const favpollCount = usages?.length ?? 0;
+  const favpollCount = usages?.length ?? 0
   if (favpollCount > 0) {
     return {
       error: null,
       warning: `This charity is used in ${favpollCount} favpoll${favpollCount === 1 ? "" : "s"}. It will no longer appear as an option for new favpolls.`,
-    };
+    }
   }
 
-  return { error: null };
+  return { error: null }
 }
 
 export async function reactivateCharity(
-  id: string,
+  id: string
 ): Promise<{ error: string | null }> {
-  const supabase = createAdminClient();
+  const supabase = createAdminClient()
 
   const { error } = await supabase
     .from("charities")
     .update({ is_active: true })
-    .eq("id", id);
+    .eq("id", id)
 
-  if (error) return { error: error.message };
+  if (error) return { error: error.message }
 
-  revalidatePath("/charities");
-  return { error: null };
+  revalidatePath("/charities")
+  return { error: null }
 }
 
 export async function getCharityTopics(
-  charityId: string,
+  charityId: string
 ): Promise<{ data: string[] | null; error: string | null }> {
-  const supabase = createAdminClient();
+  const supabase = createAdminClient()
 
   const { data, error } = await supabase
     .from("charity_topics")
     .select("topic_id")
-    .eq("charity_id", charityId);
+    .eq("charity_id", charityId)
 
-  if (error) return { data: null, error: error.message };
+  if (error) return { data: null, error: error.message }
   return {
     data: (data ?? []).map((r: { topic_id: string }) => r.topic_id),
     error: null,
-  };
+  }
 }
 
 export async function setCharityTopics(
   charityId: string,
-  topicIds: string[],
+  topicIds: string[]
 ): Promise<{ error: string | null }> {
-  const supabase = createAdminClient();
+  const supabase = createAdminClient()
 
   const { error: delError } = await supabase
     .from("charity_topics")
     .delete()
-    .eq("charity_id", charityId);
+    .eq("charity_id", charityId)
 
-  if (delError) return { error: delError.message };
+  if (delError) return { error: delError.message }
 
   if (topicIds.length > 0) {
     const { error: insError } = await supabase
       .from("charity_topics")
-      .insert(
-        topicIds.map((topic_id) => ({ charity_id: charityId, topic_id })),
-      );
+      .insert(topicIds.map((topic_id) => ({ charity_id: charityId, topic_id })))
 
-    if (insError) return { error: insError.message };
+    if (insError) return { error: insError.message }
   }
 
-  revalidatePath("/charities");
-  return { error: null };
+  revalidatePath("/charities")
+  return { error: null }
 }
 
 // ─── SUGGESTIONS LIVE ON THE PROFILE (step 2 of the profiles note) ──────────
@@ -432,55 +427,55 @@ export async function setCharityTopics(
  *  async function — exporting it built fine under typecheck and vitest and
  *  failed the Next build, which is the only thing that checks the rule. */
 function profileKey(registeredNumber: string | null): string | null {
-  if (!registeredNumber) return null;
-  const key = registeredNumber.trim().toUpperCase();
+  if (!registeredNumber) return null
+  const key = registeredNumber.trim().toUpperCase()
   return /^([0-9]{6,10}(-[0-9]+)?|SC[0-9]{3,6}|NIC[0-9]{3,6})$/.test(key)
     ? key
-    : null;
+    : null
 }
 
 type ProfileSuggestions = {
-  perfect_topic_suggested_id: string | null;
-  perfect_subset_suggested_id: string | null;
-  perfect_topic_reason: string | null;
-  cause_family_suggested: CauseFamily | null;
-  signature_events: SignatureEvent[] | null;
-  website_read_at: string | null;
-  topic_family: string | null;
-};
+  perfect_topic_suggested_id: string | null
+  perfect_subset_suggested_id: string | null
+  perfect_topic_reason: string | null
+  cause_family_suggested: CauseFamily | null
+  signature_events: SignatureEvent[] | null
+  website_read_at: string | null
+  topic_family: string | null
+}
 
 /** The profiles for a set of account numbers, keyed by the profile key. */
 async function suggestionsByKey(
-  numbers: (string | null)[],
+  numbers: (string | null)[]
 ): Promise<Map<string, ProfileSuggestions>> {
   const keys = [
     ...new Set(numbers.map(profileKey).filter((k): k is string => !!k)),
-  ];
-  if (keys.length === 0) return new Map();
+  ]
+  if (keys.length === 0) return new Map()
   const { data, error } = await createAdminClient()
     .from("charity_profiles")
     .select(
-      "registered_number, perfect_topic_suggested_id, perfect_subset_suggested_id, perfect_topic_reason, cause_family_suggested, signature_events, website_read_at, topic_family",
+      "registered_number, perfect_topic_suggested_id, perfect_subset_suggested_id, perfect_topic_reason, cause_family_suggested, signature_events, website_read_at, topic_family"
     )
-    .in("registered_number", keys);
+    .in("registered_number", keys)
   if (error) {
-    console.error("[charities] profiles unreadable:", error.message);
-    return new Map();
+    console.error("[charities] profiles unreadable:", error.message)
+    return new Map()
   }
   return new Map(
     (data ?? []).map((row) => {
       const { registered_number, ...rest } = row as ProfileSuggestions & {
-        registered_number: string;
-      };
-      return [registered_number, rest];
-    }),
-  );
+        registered_number: string
+      }
+      return [registered_number, rest]
+    })
+  )
 }
 
 type RegisterContactAndPurpose = {
-  email: string | null;
-  website: string | null;
-  activities: string | null;
+  email: string | null
+  website: string | null
+  activities: string | null
   /** THE REGISTER'S OWN FACTS, which admin had no way to see. The account
    *  row says what we agreed; these say what the Commission holds, and the
    *  two sitting side by side is how a wrong number announces itself —
@@ -488,11 +483,11 @@ type RegisterContactAndPurpose = {
    *  National Canine Defence League number most sources still quote)
    *  instead of 1167663 "DOGS TRUST" (£143m) from the day it was created,
    *  and nothing on this page could have shown it. */
-  status: string | null;
-  latest_income: number | null;
-  place: string | null;
-  registered_on: string | null;
-};
+  status: string | null
+  latest_income: number | null
+  place: string | null
+  registered_on: string | null
+}
 
 /** THE REGISTER'S OWN CONTACT AND PURPOSE for a set of account numbers
  *  (step 4 of the charity-profiles note): read from the mirror, not from
@@ -501,37 +496,37 @@ type RegisterContactAndPurpose = {
  *  nothing — the single-row readers keep the API fallback, a list does
  *  not earn one. */
 async function registerByKey(
-  numbers: (string | null)[],
+  numbers: (string | null)[]
 ): Promise<Map<string, RegisterContactAndPurpose>> {
   const digits = [
     ...new Set(
       numbers
         .map((n) => (n ?? "").replace(/\D/g, ""))
-        .filter((n) => n.length > 0),
+        .filter((n) => n.length > 0)
     ),
-  ].map(Number);
-  if (digits.length === 0) return new Map();
+  ].map(Number)
+  if (digits.length === 0) return new Map()
   const { data, error } = await createAdminClient()
     .from("register_charities")
     .select(
-      "registered_number, email, website, activities, status, latest_income, address, registered_on",
+      "registered_number, email, website, activities, status, latest_income, address, registered_on"
     )
-    .in("registered_number", digits);
+    .in("registered_number", digits)
   if (error) {
-    console.error("[charities] mirror unreadable:", error.message);
-    return new Map();
+    console.error("[charities] mirror unreadable:", error.message)
+    return new Map()
   }
   return new Map(
     (
       data as {
-        registered_number: number;
-        email: string | null;
-        website: string | null;
-        activities: string | null;
-        status: string | null;
-        latest_income: number | null;
-        address: string | null;
-        registered_on: string | null;
+        registered_number: number
+        email: string | null
+        website: string | null
+        activities: string | null
+        status: string | null
+        latest_income: number | null
+        address: string | null
+        registered_on: string | null
       }[]
     ).map((row) => [
       String(row.registered_number),
@@ -544,25 +539,24 @@ async function registerByKey(
         place: placeFromAddress(row.address),
         registered_on: row.registered_on,
       },
-    ]),
-  );
+    ])
+  )
 }
 
 /** Titles for the suggested topic and subset ids a set of profiles holds.
  *  The account's CONFIRMED titles arrive on its own joins; a suggestion
  *  lives on the profile, which holds ids and not names. */
 async function suggestionTitles(
-  profiles: Map<string, ProfileSuggestions>,
+  profiles: Map<string, ProfileSuggestions>
 ): Promise<{ topics: Map<string, string>; subsets: Map<string, string> }> {
-  const topicIds = new Set<string>();
-  const subsetIds = new Set<string>();
+  const topicIds = new Set<string>()
+  const subsetIds = new Set<string>()
   for (const p of profiles.values()) {
-    if (p.perfect_topic_suggested_id)
-      topicIds.add(p.perfect_topic_suggested_id);
+    if (p.perfect_topic_suggested_id) topicIds.add(p.perfect_topic_suggested_id)
     if (p.perfect_subset_suggested_id)
-      subsetIds.add(p.perfect_subset_suggested_id);
+      subsetIds.add(p.perfect_subset_suggested_id)
   }
-  const supabase = createAdminClient();
+  const supabase = createAdminClient()
   const [topics, subsets] = await Promise.all([
     topicIds.size
       ? supabase
@@ -576,21 +570,21 @@ async function suggestionTitles(
           .select("id, title")
           .in("id", [...subsetIds])
       : Promise.resolve({ data: [] }),
-  ]);
+  ])
   return {
     topics: new Map(
       ((topics.data ?? []) as { id: string; title: string }[]).map((t) => [
         t.id,
         t.title,
-      ]),
+      ])
     ),
     subsets: new Map(
       ((subsets.data ?? []) as { id: string; title: string }[]).map((t) => [
         t.id,
         t.title,
-      ]),
+      ])
     ),
-  };
+  }
 }
 
 /** THE REMOVAL CHECK (references/charity-profiles-2026-09-27.md §3) —
@@ -603,121 +597,121 @@ async function suggestionTitles(
  * loudly; the function is register_account_removals(), migration
  * 20261004140000. */
 export type RegisterRemoval = {
-  charity_id: string;
-  name: string;
-  registered_number: string | null;
+  charity_id: string
+  name: string
+  registered_number: string | null
   /** removed = deregistered; gone = absent from the latest extract
    *  (possibly an interrupted load); unknown = no mirror row at all. */
-  verdict: "removed" | "gone" | "unknown";
-  is_active: boolean;
-  consent_status: string | null;
-  register_name: string | null;
-  register_status: string | null;
-  removed_on: string | null;
-  extract_date: string | null;
-  latest_extract: string | null;
-  favpoll_count: number;
-  open_count: number;
-  raised: number;
-  pending_disbursements: number;
-  pending_amount: number;
-  gift_aid_declarations: number;
-};
+  verdict: "removed" | "gone" | "unknown"
+  is_active: boolean
+  consent_status: string | null
+  register_name: string | null
+  register_status: string | null
+  removed_on: string | null
+  extract_date: string | null
+  latest_extract: string | null
+  favpoll_count: number
+  open_count: number
+  raised: number
+  pending_disbursements: number
+  pending_amount: number
+  gift_aid_declarations: number
+}
 
 export async function getRegisterRemovals(): Promise<{
-  data: RegisterRemoval[] | null;
-  error: string | null;
+  data: RegisterRemoval[] | null
+  error: string | null
 }> {
   const { data, error } = await createAdminClient().rpc(
-    "register_account_removals",
-  );
-  if (error) return { data: null, error: error.message };
-  return { data: (data ?? []) as RegisterRemoval[], error: null };
+    "register_account_removals"
+  )
+  if (error) return { data: null, error: error.message }
+  return { data: (data ?? []) as RegisterRemoval[], error: null }
 }
 
 /** The verdicts by charity id, for a queue row to carry. */
 async function removalsById(): Promise<Map<string, RegisterRemoval>> {
-  const { data } = await getRegisterRemovals();
-  return new Map((data ?? []).map((r) => [r.charity_id, r]));
+  const { data } = await getRegisterRemovals()
+  return new Map((data ?? []).map((r) => [r.charity_id, r]))
 }
 
 export type ConsentQueueRow = {
-  id: string;
-  name: string;
-  registered_number: string | null;
-  registered_email: string | null;
-  invite_drafted_at: string | null;
-  favpoll_count: number;
+  id: string
+  name: string
+  registered_number: string | null
+  registered_email: string | null
+  invite_drafted_at: string | null
+  favpoll_count: number
   /** Cause family (references/favpoll-pairing-table §2): the confirmed
    *  value, the model's suggestion, and the register text it came from. */
-  cause_family: CauseFamily | null;
-  cause_family_suggested: CauseFamily | null;
-  activities: string | null;
+  cause_family: CauseFamily | null
+  cause_family_suggested: CauseFamily | null
+  activities: string | null
   /** The PERFECT TOPIC (2026-09-26): confirmed id, the model's suggestion,
    *  one sentence why (or why none), and the confirmed topic's title for
    *  the welcome email. */
-  perfect_topic_id: string | null;
-  perfect_topic_suggested_id: string | null;
-  perfect_topic_reason: string | null;
-  perfect_topic_title: string | null;
+  perfect_topic_id: string | null
+  perfect_topic_suggested_id: string | null
+  perfect_topic_reason: string | null
+  perfect_topic_title: string | null
   /** A SUBSET of the perfect topic (favpoll-topic-rules §1): confirmed
    *  id, the suggester's, and the confirmed subset's title. */
-  perfect_subset_id: string | null;
-  perfect_subset_suggested_id: string | null;
-  perfect_subset_title: string | null;
+  perfect_subset_id: string | null
+  perfect_subset_suggested_id: string | null
+  perfect_subset_title: string | null
   /** The fundraising events read from its website (2026-09-27). */
-  signature_events: SignatureEvent[] | null;
-  registered_website: string | null;
+  signature_events: SignatureEvent[] | null
+  registered_website: string | null
   /** The REMOVAL CHECK's verdict, when the register has something to say
    *  about this number: a removed charity must not be invited or
    *  approved. Null is the ordinary case — cleanly Registered. */
-  register_verdict: RegisterRemoval["verdict"] | null;
-  register_removed_on: string | null;
-};
+  register_verdict: RegisterRemoval["verdict"] | null
+  register_removed_on: string | null
+}
 
 /** CONSENT OUTREACH QUEUE — pending charities in use on at least one
  * favpoll: the ones where pledges are actually waiting on an agreement.
  * favpoll owns outreach (the organiser invite path was retired, web
  * #868); this is the team's list to work. Never-drafted first. */
 export async function getConsentQueue(): Promise<{
-  data: ConsentQueueRow[] | null;
-  error: string | null;
+  data: ConsentQueueRow[] | null
+  error: string | null
 }> {
-  const supabase = createAdminClient();
+  const supabase = createAdminClient()
 
   const [{ data: links, error: linkError }, removals] = await Promise.all([
     supabase.from("favpoll_charities").select("charity_id"),
     removalsById(),
-  ]);
-  if (linkError) return { data: null, error: linkError.message };
+  ])
+  if (linkError) return { data: null, error: linkError.message }
 
-  const counts = new Map<string, number>();
+  const counts = new Map<string, number>()
   for (const l of (links ?? []) as { charity_id: string }[]) {
-    counts.set(l.charity_id, (counts.get(l.charity_id) ?? 0) + 1);
+    counts.set(l.charity_id, (counts.get(l.charity_id) ?? 0) + 1)
   }
-  if (counts.size === 0) return { data: [], error: null };
+  if (counts.size === 0) return { data: [], error: null }
 
   const { data, error } = await supabase
     .from("charities")
     .select(
-      "id, name, registered_number, invite_drafted_at, cause_family, perfect_topic_id, perfect_subset_id, perfect_topic:topics!charities_perfect_topic_id_fkey(title), perfect_subset:topic_subsets!charities_perfect_subset_id_fkey(title)",
+      "id, name, registered_number, invite_drafted_at, cause_family, perfect_topic_id, perfect_subset_id, perfect_topic:topics!charities_perfect_topic_id_fkey(title), perfect_subset:topic_subsets!charities_perfect_subset_id_fkey(title)"
     )
     .eq("consent_status", "pending")
     .in("id", [...counts.keys()])
-    .order("name", { ascending: true });
-  if (error) return { data: null, error: error.message };
+    .order("name", { ascending: true })
+  if (error) return { data: null, error: error.message }
 
   // The suggestions, from the profile; the contact and the register's own
   // words, from the mirror. A charity whose number has neither simply has
   // nothing to show — the row still works.
   const numbers = (data ?? []).map(
-    (c) => (c as { registered_number: string | null }).registered_number,
-  );
+    (c) => (c as { registered_number: string | null }).registered_number
+  )
   const [suggestions, register] = await Promise.all([
     suggestionsByKey(numbers),
     registerByKey(numbers),
-  ]);
-  const titles = await suggestionTitles(suggestions);
+  ])
+  const titles = await suggestionTitles(suggestions)
 
   const rows = (data ?? [])
     .map((c) => {
@@ -737,29 +731,27 @@ export async function getConsentQueue(): Promise<{
         | "cause_family_suggested"
         | "signature_events"
       > & {
-        perfect_topic?: { title: string } | { title: string }[] | null;
-        perfect_subset?: { title: string } | { title: string }[] | null;
-      };
-      const pt = Array.isArray(perfect_topic)
-        ? perfect_topic[0]
-        : perfect_topic;
+        perfect_topic?: { title: string } | { title: string }[] | null
+        perfect_subset?: { title: string } | { title: string }[] | null
+      }
+      const pt = Array.isArray(perfect_topic) ? perfect_topic[0] : perfect_topic
       const ps = Array.isArray(perfect_subset)
         ? perfect_subset[0]
-        : perfect_subset;
-      const removal = removals.get(rest.id);
-      const key = profileKey(rest.registered_number);
-      const profile = key ? suggestions.get(key) : undefined;
+        : perfect_subset
+      const removal = removals.get(rest.id)
+      const key = profileKey(rest.registered_number)
+      const profile = key ? suggestions.get(key) : undefined
       const onRegister = register.get(
-        (rest.registered_number ?? "").replace(/\D/g, ""),
-      );
+        (rest.registered_number ?? "").replace(/\D/g, "")
+      )
       // The CONFIRMED titles come from the account's own joins; a
       // suggestion's title is looked up from the profile's ids.
       const suggestedTopic = profile?.perfect_topic_suggested_id
         ? titles.topics.get(profile.perfect_topic_suggested_id)
-        : undefined;
+        : undefined
       const suggestedSubset = profile?.perfect_subset_suggested_id
         ? titles.subsets.get(profile.perfect_subset_suggested_id)
-        : undefined;
+        : undefined
       return {
         ...rest,
         registered_email: onRegister?.email ?? null,
@@ -776,31 +768,31 @@ export async function getConsentQueue(): Promise<{
         favpoll_count: counts.get(rest.id) ?? 0,
         register_verdict: removal?.verdict ?? null,
         register_removed_on: removal?.removed_on ?? null,
-      };
+      }
     })
     .sort(
-      (a, b) => Number(!!a.invite_drafted_at) - Number(!!b.invite_drafted_at),
-    );
-  return { data: rows, error: null };
+      (a, b) => Number(!!a.invite_drafted_at) - Number(!!b.invite_drafted_at)
+    )
+  return { data: rows, error: null }
 }
 
 /** Stamps the team's outreach — called when a drafted invite is opened.
  * Unconditional, unlike the retired organiser path's first-only rule:
  * the stamp records the MOST RECENT contact, so re-invites re-stamp. */
 export async function markCharityContacted(
-  id: string,
+  id: string
 ): Promise<{ error: string | null }> {
-  const supabase = createAdminClient();
+  const supabase = createAdminClient()
 
   const { error } = await supabase
     .from("charities")
     .update({ invite_drafted_at: new Date().toISOString() })
-    .eq("id", id);
+    .eq("id", id)
 
-  if (error) return { error: error.message };
+  if (error) return { error: error.message }
 
-  revalidatePath("/charities");
-  return { error: null };
+  revalidatePath("/charities")
+  return { error: null }
 }
 
 /** CAUSE FAMILY — the admin's confirmation (references/favpoll-pairing-table
@@ -809,19 +801,19 @@ export async function markCharityContacted(
  * is a valid, honest answer: a grant-maker has no cause of its own. */
 export async function setCauseFamily(
   id: string,
-  family: CauseFamily | null,
+  family: CauseFamily | null
 ): Promise<{ error: string | null }> {
   if (family !== null && !CAUSE_FAMILIES.includes(family)) {
-    return { error: `Unknown cause family: ${family}` };
+    return { error: `Unknown cause family: ${family}` }
   }
-  const supabase = createAdminClient();
+  const supabase = createAdminClient()
   const { error } = await supabase
     .from("charities")
     .update({ cause_family: family })
-    .eq("id", id);
-  if (error) return { error: error.message };
-  revalidatePath("/charities");
-  return { error: null };
+    .eq("id", id)
+  if (error) return { error: error.message }
+  revalidatePath("/charities")
+  return { error: null }
 }
 
 /** PERFECT TOPIC — the admin's confirmation (lib/perfect-topic.ts). Only
@@ -830,9 +822,9 @@ export async function setCauseFamily(
 export async function setPerfectTopic(
   id: string,
   topicId: string | null,
-  subsetId: string | null = null,
+  subsetId: string | null = null
 ): Promise<{ error: string | null }> {
-  const supabase = createAdminClient();
+  const supabase = createAdminClient()
   // The subset must belong to the topic (a trigger enforces it); no topic
   // means no subset.
   const { error } = await supabase
@@ -841,10 +833,10 @@ export async function setPerfectTopic(
       perfect_topic_id: topicId,
       perfect_subset_id: topicId ? subsetId : null,
     })
-    .eq("id", id);
-  if (error) return { error: error.message };
-  revalidatePath("/charities");
-  return { error: null };
+    .eq("id", id)
+  if (error) return { error: error.message }
+  revalidatePath("/charities")
+  return { error: null }
 }
 
 /** PERFECT TOPIC QUEUE — every active charity whose suggestion is still
@@ -855,40 +847,40 @@ export async function setPerfectTopic(
  * (founder, 2026-10-02: "where are the perfect topics to be reviewed?").
  * This is that door. */
 export type PerfectTopicQueueRow = {
-  id: string;
-  name: string;
-  cause_family: CauseFamily | null;
-  perfect_topic_id: string | null;
-  perfect_topic_suggested_id: string | null;
-  perfect_topic_reason: string | null;
-  perfect_subset_id: string | null;
-  perfect_subset_suggested_id: string | null;
-  signature_events: SignatureEvent[] | null;
-};
+  id: string
+  name: string
+  cause_family: CauseFamily | null
+  perfect_topic_id: string | null
+  perfect_topic_suggested_id: string | null
+  perfect_topic_reason: string | null
+  perfect_subset_id: string | null
+  perfect_subset_suggested_id: string | null
+  signature_events: SignatureEvent[] | null
+}
 
 export async function getPerfectTopicQueue(): Promise<{
-  data: PerfectTopicQueueRow[] | null;
-  error: string | null;
+  data: PerfectTopicQueueRow[] | null
+  error: string | null
 }> {
-  const supabase = createAdminClient();
+  const supabase = createAdminClient()
   // Unconfirmed accounts first, then the profiles that have something to
   // say about them: the suggestion moved to the profile (step 2), so the
   // "has a suggestion" filter is no longer a column on this table.
   const { data, error } = await supabase
     .from("charities")
     .select(
-      "id, name, registered_number, cause_family, perfect_topic_id, perfect_subset_id",
+      "id, name, registered_number, cause_family, perfect_topic_id, perfect_subset_id"
     )
     .eq("is_active", true)
     .is("perfect_topic_id", null)
-    .order("name", { ascending: true });
-  if (error) return { data: null, error: error.message };
+    .order("name", { ascending: true })
+  if (error) return { data: null, error: error.message }
 
   const suggestions = await suggestionsByKey(
     (data ?? []).map(
-      (c) => (c as { registered_number: string | null }).registered_number,
-    ),
-  );
+      (c) => (c as { registered_number: string | null }).registered_number
+    )
+  )
   const rows = (data ?? [])
     .map((c) => {
       const row = c as Omit<
@@ -897,9 +889,9 @@ export async function getPerfectTopicQueue(): Promise<{
         | "perfect_subset_suggested_id"
         | "perfect_topic_reason"
         | "signature_events"
-      > & { registered_number: string | null };
-      const key = profileKey(row.registered_number);
-      const profile = key ? suggestions.get(key) : undefined;
+      > & { registered_number: string | null }
+      const key = profileKey(row.registered_number)
+      const profile = key ? suggestions.get(key) : undefined
       return {
         ...row,
         perfect_topic_suggested_id: profile?.perfect_topic_suggested_id ?? null,
@@ -907,10 +899,10 @@ export async function getPerfectTopicQueue(): Promise<{
           profile?.perfect_subset_suggested_id ?? null,
         perfect_topic_reason: profile?.perfect_topic_reason ?? null,
         signature_events: profile?.signature_events ?? null,
-      } as PerfectTopicQueueRow;
+      } as PerfectTopicQueueRow
     })
-    .filter((r) => r.perfect_topic_suggested_id != null);
-  return { data: rows, error: null };
+    .filter((r) => r.perfect_topic_suggested_id != null)
+  return { data: rows, error: null }
 }
 
 /** "No topic of its own" — the other real answer (a hospice, a
@@ -918,19 +910,19 @@ export async function getPerfectTopicQueue(): Promise<{
  * queue; a later backfill --all may suggest again. The suggestion lives on
  * the PROFILE now, so that is what is cleared (step 2). */
 export async function dismissPerfectTopicSuggestion(
-  id: string,
+  id: string
 ): Promise<{ error: string | null }> {
-  const supabase = createAdminClient();
+  const supabase = createAdminClient()
   const { data: charity } = await supabase
     .from("charities")
     .select("registered_number")
     .eq("id", id)
-    .maybeSingle();
+    .maybeSingle()
   const key = profileKey(
     (charity as { registered_number: string | null } | null)
-      ?.registered_number ?? null,
-  );
-  if (!key) return { error: "That charity has no profile to clear." };
+      ?.registered_number ?? null
+  )
+  if (!key) return { error: "That charity has no profile to clear." }
   const { error } = await supabase
     .from("charity_profiles")
     .update({
@@ -938,10 +930,10 @@ export async function dismissPerfectTopicSuggestion(
       perfect_subset_suggested_id: null,
       updated_at: new Date().toISOString(),
     })
-    .eq("registered_number", key);
-  if (error) return { error: error.message };
-  revalidatePath("/charities");
-  return { error: null };
+    .eq("registered_number", key)
+  if (error) return { error: error.message }
+  revalidatePath("/charities")
+  return { error: null }
 }
 
 // ─── ACCEPTING A NAME THE REGISTER DOES NOT RECOGNISE ───────────────────────
@@ -960,72 +952,72 @@ export async function dismissPerfectTopicSuggestion(
 // and the acceptance lapses (isCharityVerified in @favpoll/types).
 
 export type NameReviewRow = {
-  id: string;
-  name: string;
-  registered_number: string | null;
-  verified_name: string | null;
-  verified_at: string | null;
-  consent_status: "pending" | "approved" | "declined" | null;
-  is_active: boolean;
+  id: string
+  name: string
+  registered_number: string | null
+  verified_name: string | null
+  verified_at: string | null
+  consent_status: "pending" | "approved" | "declined" | null
+  is_active: boolean
   /** Every name the register knows for the number, so an admin can see
    *  what they are being asked to accept rather than take it on trust. */
-  register_knows: string[];
-};
+  register_knows: string[]
+}
 
 /** The charities whose display name the register does not recognise and
  *  nobody has accepted. Not an error list — a short queue of judgements. */
 export async function getNameReviewQueue(): Promise<{
-  data: NameReviewRow[] | null;
-  error: string | null;
+  data: NameReviewRow[] | null
+  error: string | null
 }> {
-  const supabase = createAdminClient();
+  const supabase = createAdminClient()
   const { data, error } = await supabase
     .from("charities")
     .select(
-      "id, name, registered_number, verification_status, verified_name, verified_at, consent_status, is_active, name_accepted_at, name_accepted_name",
+      "id, name, registered_number, verification_status, verified_name, verified_at, consent_status, is_active, name_accepted_at, name_accepted_name"
     )
     .eq("verification_status", "name_mismatch")
-    .order("name", { ascending: true });
-  if (error) return { data: null, error: error.message };
+    .order("name", { ascending: true })
+  if (error) return { data: null, error: error.message }
 
   // Exactly the columns selected — `charityNameNeedsReview` asks for four
   // of them and the queue row shows the rest.
   type Selected = {
-    id: string;
-    name: string;
-    registered_number: string | null;
-    verification_status: VerificationStatus | null;
-    verified_name: string | null;
-    verified_at: string | null;
-    consent_status: "pending" | "approved" | "declined" | null;
-    is_active: boolean;
-    name_accepted_at: string | null;
-    name_accepted_name: string | null;
-  };
+    id: string
+    name: string
+    registered_number: string | null
+    verification_status: VerificationStatus | null
+    verified_name: string | null
+    verified_at: string | null
+    consent_status: "pending" | "approved" | "declined" | null
+    is_active: boolean
+    name_accepted_at: string | null
+    name_accepted_name: string | null
+  }
   const rows = ((data ?? []) as Selected[]).filter((c) =>
-    charityNameNeedsReview(c),
-  );
-  if (rows.length === 0) return { data: [], error: null };
+    charityNameNeedsReview(c)
+  )
+  if (rows.length === 0) return { data: [], error: null }
 
   // What the register calls them, so the decision is informed.
   const digits = rows
     .map((c) => (c.registered_number ?? "").replace(/\D/g, ""))
     .filter(Boolean)
-    .map(Number);
+    .map(Number)
   const { data: names } = digits.length
     ? await supabase
         .from("register_charity_names")
         .select("registered_number, name, name_type")
         .in("registered_number", digits)
-    : { data: [] };
-  const known = new Map<string, string[]>();
+    : { data: [] }
+  const known = new Map<string, string[]>()
   for (const n of (names ?? []) as {
-    registered_number: number;
-    name: string;
-    name_type: string;
+    registered_number: number
+    name: string
+    name_type: string
   }[]) {
-    const key = String(n.registered_number);
-    known.set(key, [...(known.get(key) ?? []), `${n.name} (${n.name_type})`]);
+    const key = String(n.registered_number)
+    known.set(key, [...(known.get(key) ?? []), `${n.name} (${n.name_type})`])
   }
 
   return {
@@ -1041,28 +1033,28 @@ export async function getNameReviewQueue(): Promise<{
         known.get((c.registered_number ?? "").replace(/\D/g, "")) ?? [],
     })),
     error: null,
-  };
+  }
 }
 
 /** "Yes, that is them." Records WHO and WHEN, and the register name the
  *  acceptance was about. */
 export async function acceptCharityName(
-  id: string,
+  id: string
 ): Promise<{ error: string | null }> {
-  const { userId } = await auth();
-  if (!userId) return { error: "Not signed in." };
-  const supabase = createAdminClient();
+  const { userId } = await auth()
+  if (!userId) return { error: "Not signed in." }
+  const supabase = createAdminClient()
 
   const { data: charity } = await supabase
     .from("charities")
     .select("verification_status, verified_name")
     .eq("id", id)
-    .maybeSingle();
+    .maybeSingle()
   const row = charity as {
-    verification_status: string | null;
-    verified_name: string | null;
-  } | null;
-  if (!row) return { error: "No such charity." };
+    verification_status: string | null
+    verified_name: string | null
+  } | null
+  if (!row) return { error: "No such charity." }
   // An acceptance is about a NAME. A charity the register has removed, or
   // a number that resolves to nothing, is not a name problem and must not
   // be waved through here.
@@ -1070,7 +1062,7 @@ export async function acceptCharityName(
     return {
       error:
         "That charity is not waiting on a name — only a name difference can be accepted.",
-    };
+    }
   }
 
   const { error } = await supabase
@@ -1080,17 +1072,17 @@ export async function acceptCharityName(
       name_accepted_by: userId,
       name_accepted_name: row.verified_name,
     })
-    .eq("id", id);
-  if (error) return { error: error.message };
-  revalidatePath("/charities");
-  return { error: null };
+    .eq("id", id)
+  if (error) return { error: error.message }
+  revalidatePath("/charities")
+  return { error: null }
 }
 
 /** Undo — the name goes back to being unaccounted for. */
 export async function clearCharityNameAcceptance(
-  id: string,
+  id: string
 ): Promise<{ error: string | null }> {
-  const supabase = createAdminClient();
+  const supabase = createAdminClient()
   const { error } = await supabase
     .from("charities")
     .update({
@@ -1098,10 +1090,10 @@ export async function clearCharityNameAcceptance(
       name_accepted_by: null,
       name_accepted_name: null,
     })
-    .eq("id", id);
-  if (error) return { error: error.message };
-  revalidatePath("/charities");
-  return { error: null };
+    .eq("id", id)
+  if (error) return { error: error.message }
+  revalidatePath("/charities")
+  return { error: null }
 }
 
 /** CONSENT — approve or decline a charity for receiving pledges (the
@@ -1111,9 +1103,9 @@ export async function clearCharityNameAcceptance(
  * statuses are what gates money on the web app. */
 export async function setCharityConsent(
   id: string,
-  status: "approved" | "declined",
+  status: "approved" | "declined"
 ): Promise<{ error: string | null }> {
-  const supabase = createAdminClient();
+  const supabase = createAdminClient()
 
   // THE REMOVAL CHECK, as a guard and not just a warning: approval lists
   // the charity and opens the money rail to it, so a number the register
@@ -1125,19 +1117,19 @@ export async function setCharityConsent(
       .from("charities")
       .select("name, registered_number")
       .eq("id", id)
-      .maybeSingle();
+      .maybeSingle()
     const number = (charity as { registered_number: string | null } | null)
-      ?.registered_number;
+      ?.registered_number
     if (number) {
       const check = await verifyOnMirror(
         number,
-        (charity as { name: string }).name,
-      );
+        (charity as { name: string }).name
+      )
       if (check.status === "removed") {
         return {
           error:
             "The register has removed this charity. It cannot be approved — money must not move to a deregistered charity.",
-        };
+        }
       }
     }
   }
@@ -1149,32 +1141,32 @@ export async function setCharityConsent(
       consent_decided_at: new Date().toISOString(),
       is_active: status === "approved",
     })
-    .eq("id", id);
+    .eq("id", id)
 
-  if (error) return { error: error.message };
+  if (error) return { error: error.message }
 
-  revalidatePath("/charities");
-  return { error: null };
+  revalidatePath("/charities")
+  return { error: null }
 }
 
 /** A charity as the OUTREACH PREVIEW needs it: everything the two emails
  *  interpolate, plus what decides whether sending one is a good idea. */
 export type OutreachPreviewRow = {
-  id: string;
-  name: string;
-  registered_number: string | null;
-  registered_email: string | null;
-  consent_status: string;
-  is_active: boolean;
-  invite_drafted_at: string | null;
-  favpoll_count: number;
-  signature_events: SignatureEvent[] | null;
-  website_read_at: string | null;
-  perfect_topic_title: string | null;
-  perfect_subset_title: string | null;
-  perfect_topic_reason: string | null;
-  register_verdict: RegisterRemoval["verdict"] | null;
-};
+  id: string
+  name: string
+  registered_number: string | null
+  registered_email: string | null
+  consent_status: string
+  is_active: boolean
+  invite_drafted_at: string | null
+  favpoll_count: number
+  signature_events: SignatureEvent[] | null
+  website_read_at: string | null
+  perfect_topic_title: string | null
+  perfect_subset_title: string | null
+  perfect_topic_reason: string | null
+  register_verdict: RegisterRemoval["verdict"] | null
+}
 
 /** EVERY charity, for the outreach preview — not the consent queue's
  *  narrower set.
@@ -1188,67 +1180,67 @@ export type OutreachPreviewRow = {
  *  every charity so we can preview any issues.")
  */
 export async function getOutreachPreviewRows(): Promise<{
-  data: OutreachPreviewRow[] | null;
-  error: string | null;
+  data: OutreachPreviewRow[] | null
+  error: string | null
 }> {
-  const supabase = createAdminClient();
+  const supabase = createAdminClient()
 
   const [{ data, error }, { data: links }, removals] = await Promise.all([
     supabase
       .from("charities")
       .select(
-        "id, name, registered_number, consent_status, is_active, invite_drafted_at, perfect_topic:topics!charities_perfect_topic_id_fkey(title), perfect_subset:topic_subsets!charities_perfect_subset_id_fkey(title)",
+        "id, name, registered_number, consent_status, is_active, invite_drafted_at, perfect_topic:topics!charities_perfect_topic_id_fkey(title), perfect_subset:topic_subsets!charities_perfect_subset_id_fkey(title)"
       )
       .order("name", { ascending: true }),
     supabase.from("favpoll_charities").select("charity_id"),
     removalsById(),
-  ]);
-  if (error) return { data: null, error: error.message };
+  ])
+  if (error) return { data: null, error: error.message }
 
-  const counts = new Map<string, number>();
+  const counts = new Map<string, number>()
   for (const l of (links ?? []) as { charity_id: string }[]) {
-    counts.set(l.charity_id, (counts.get(l.charity_id) ?? 0) + 1);
+    counts.set(l.charity_id, (counts.get(l.charity_id) ?? 0) + 1)
   }
 
   const numbers = (data ?? []).map(
-    (c) => (c as { registered_number: string | null }).registered_number,
-  );
+    (c) => (c as { registered_number: string | null }).registered_number
+  )
   const [suggestions, register] = await Promise.all([
     suggestionsByKey(numbers),
     registerByKey(numbers),
-  ]);
-  const titles = await suggestionTitles(suggestions);
+  ])
+  const titles = await suggestionTitles(suggestions)
 
   const rows: OutreachPreviewRow[] = (data ?? []).map((c) => {
     const row = c as {
-      id: string;
-      name: string;
-      registered_number: string | null;
-      consent_status: string;
-      is_active: boolean;
-      invite_drafted_at: string | null;
-      perfect_topic?: { title: string } | { title: string }[] | null;
-      perfect_subset?: { title: string } | { title: string }[] | null;
-    };
+      id: string
+      name: string
+      registered_number: string | null
+      consent_status: string
+      is_active: boolean
+      invite_drafted_at: string | null
+      perfect_topic?: { title: string } | { title: string }[] | null
+      perfect_subset?: { title: string } | { title: string }[] | null
+    }
     const pt = Array.isArray(row.perfect_topic)
       ? row.perfect_topic[0]
-      : row.perfect_topic;
+      : row.perfect_topic
     const ps = Array.isArray(row.perfect_subset)
       ? row.perfect_subset[0]
-      : row.perfect_subset;
-    const key = profileKey(row.registered_number);
-    const profile = key ? suggestions.get(key) : undefined;
+      : row.perfect_subset
+    const key = profileKey(row.registered_number)
+    const profile = key ? suggestions.get(key) : undefined
     const onRegister = register.get(
-      (row.registered_number ?? "").replace(/\D/g, ""),
-    );
+      (row.registered_number ?? "").replace(/\D/g, "")
+    )
     // A SUGGESTED title counts here: the welcome's topic sentence renders
     // from whichever title the queue would show, confirmed or not.
     const suggestedTopic = profile?.perfect_topic_suggested_id
       ? titles.topics.get(profile.perfect_topic_suggested_id)
-      : undefined;
+      : undefined
     const suggestedSubset = profile?.perfect_subset_suggested_id
       ? titles.subsets.get(profile.perfect_subset_suggested_id)
-      : undefined;
+      : undefined
     return {
       id: row.id,
       name: row.name,
@@ -1264,8 +1256,8 @@ export async function getOutreachPreviewRows(): Promise<{
       perfect_subset_title: ps?.title ?? suggestedSubset ?? null,
       perfect_topic_reason: profile?.perfect_topic_reason ?? null,
       register_verdict: removals.get(row.id)?.verdict ?? null,
-    };
-  });
+    }
+  })
 
-  return { data: rows, error: null };
+  return { data: rows, error: null }
 }

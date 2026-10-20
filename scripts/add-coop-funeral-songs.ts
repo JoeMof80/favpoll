@@ -26,42 +26,42 @@
  * removes nothing. --dry-run says what it would do.
  * ---------------------------------------------------------------------------
  */
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
-const DRY = process.argv.includes("--dry-run");
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
+const DRY = process.argv.includes("--dry-run")
 
 const SONGS = [
   "The Best — Tina Turner",
   "We'll Meet Again — Vera Lynn",
   "You Raise Me Up — Westlife",
-];
+]
 
 async function main() {
   const { data: topic } = await supabase
     .from("topics")
     .select("id")
     .eq("title", "Song")
-    .maybeSingle();
+    .maybeSingle()
   if (!topic) {
-    console.log("No Song topic here — nothing to do.");
-    return;
+    console.log("No Song topic here — nothing to do.")
+    return
   }
 
   const { data: favs } = await supabase
     .from("favourites")
     .select("id, label")
-    .eq("topic_id", topic.id);
+    .eq("topic_id", topic.id)
   const byLabel = new Map(
-    (favs ?? []).map((f) => [f.label.toLowerCase(), f.id]),
-  );
+    (favs ?? []).map((f) => [f.label.toLowerCase(), f.id])
+  )
 
   // The same row shape seed.ts writes, so a later seed run is a no-op
   // rather than a duplicate: it filters on the lower-cased label.
-  const missing = SONGS.filter((l) => !byLabel.has(l.toLowerCase()));
+  const missing = SONGS.filter((l) => !byLabel.has(l.toLowerCase()))
   if (missing.length > 0 && !DRY) {
     const { data: created, error } = await supabase
       .from("favourites")
@@ -72,48 +72,48 @@ async function main() {
           is_canonical: true,
           source: "seed",
           markets: ["en-GB"],
-        })),
+        }))
       )
-      .select("id, label");
-    if (error) throw new Error(error.message);
-    for (const f of created ?? []) byLabel.set(f.label.toLowerCase(), f.id);
+      .select("id, label")
+    if (error) throw new Error(error.message)
+    for (const f of created ?? []) byLabel.set(f.label.toLowerCase(), f.id)
   }
   console.log(
     DRY
       ? `→ would add ${missing.length} of 3 to the Song list`
       : `Song: ${missing.length} added (${favs?.length ?? 0} → ${
           (favs?.length ?? 0) + missing.length
-        } items)`,
-  );
+        } items)`
+  )
 
   const { data: subset } = await supabase
     .from("topic_subsets")
     .select("id, status, topic_subset_items(favourite_id)")
     .eq("topic_id", topic.id)
     .eq("title", "Funeral song")
-    .maybeSingle();
+    .maybeSingle()
   if (!subset) {
-    console.log("No Funeral song subset here — the items are enough.");
-    return;
+    console.log("No Funeral song subset here — the items are enough.")
+    return
   }
 
   const have = new Set(
-    (subset.topic_subset_items ?? []).map((i) => i.favourite_id),
-  );
-  const rows: { subset_id: string; favourite_id: string }[] = [];
+    (subset.topic_subset_items ?? []).map((i) => i.favourite_id)
+  )
+  const rows: { subset_id: string; favourite_id: string }[] = []
   // A dry run has created nothing, so a song that is missing from the list
   // has no id to join by. Counting it anyway is the whole point: a dry run
   // that said "nothing to add" before adding three would be a lie.
-  let wouldJoin = 0;
+  let wouldJoin = 0
   for (const label of SONGS) {
-    const id = byLabel.get(label.toLowerCase());
+    const id = byLabel.get(label.toLowerCase())
     if (!id) {
-      if (DRY) wouldJoin++;
-      continue;
+      if (DRY) wouldJoin++
+      continue
     }
-    if (have.has(id)) continue;
-    if (DRY) wouldJoin++;
-    else rows.push({ subset_id: subset.id, favourite_id: id });
+    if (have.has(id)) continue
+    if (DRY) wouldJoin++
+    else rows.push({ subset_id: subset.id, favourite_id: id })
   }
 
   if (DRY) {
@@ -122,22 +122,20 @@ async function main() {
         ? `Funeral song: ${have.size} members, nothing to add.`
         : `→ would add ${wouldJoin} members to Funeral song (${have.size} → ${
             have.size + wouldJoin
-          })`,
-    );
-    return;
+          })`
+    )
+    return
   }
   if (rows.length === 0) {
-    console.log(`Funeral song: ${have.size} members, nothing to add.`);
-    return;
+    console.log(`Funeral song: ${have.size} members, nothing to add.`)
+    return
   }
-  const { error } = await supabase.from("topic_subset_items").insert(rows);
-  if (error) throw new Error(error.message);
-  console.log(
-    `Funeral song: ${have.size} → ${have.size + rows.length} members`,
-  );
+  const { error } = await supabase.from("topic_subset_items").insert(rows)
+  if (error) throw new Error(error.message)
+  console.log(`Funeral song: ${have.size} → ${have.size + rows.length} members`)
 }
 
 main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+  console.error(e)
+  process.exit(1)
+})

@@ -1,18 +1,18 @@
-import { createClient } from "@supabase/supabase-js";
-import { regeneratedPlaceholders } from "./placeholders-regenerated";
-import { regeneratedPlaceholdersBatch2 } from "./placeholders-regenerated-2";
-import { regeneratedPlaceholdersBatch3 } from "./placeholders-regenerated-3";
-import { regeneratedPlaceholdersBatch4 } from "./placeholders-regenerated-4";
-import { regeneratedPlaceholdersBatch5 } from "./placeholders-regenerated-5";
-import { regeneratedPlaceholdersBatch6 } from "./placeholders-regenerated-6";
-import { regeneratedPlaceholdersBatch7 } from "./placeholders-regenerated-7";
-import { regeneratedPlaceholdersBatch8 } from "./placeholders-regenerated-8";
-import { celebratingManySetOverrides } from "./celebrating-many-groups";
+import { createClient } from "@supabase/supabase-js"
+import { regeneratedPlaceholders } from "./placeholders-regenerated"
+import { regeneratedPlaceholdersBatch2 } from "./placeholders-regenerated-2"
+import { regeneratedPlaceholdersBatch3 } from "./placeholders-regenerated-3"
+import { regeneratedPlaceholdersBatch4 } from "./placeholders-regenerated-4"
+import { regeneratedPlaceholdersBatch5 } from "./placeholders-regenerated-5"
+import { regeneratedPlaceholdersBatch6 } from "./placeholders-regenerated-6"
+import { regeneratedPlaceholdersBatch7 } from "./placeholders-regenerated-7"
+import { regeneratedPlaceholdersBatch8 } from "./placeholders-regenerated-8"
+import { celebratingManySetOverrides } from "./celebrating-many-groups"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 // ---------------------------------------------------------------------------
 // Data
@@ -170,7 +170,7 @@ const charities = [
     description: "Support and research for stroke survivors",
     registered_number: "211015",
   },
-];
+]
 
 const categories = [
   { label: "Nature", description: "Natural world and our place in it" },
@@ -196,7 +196,7 @@ const categories = [
   { label: "Everyday life", description: "Small things that make up a life" },
   { label: "Childhood", description: "What we remember from growing up" },
   { label: "Time", description: "Seasons, moments, and the rhythm of days" },
-];
+]
 
 // ---------------------------------------------------------------------------
 // Placeholder writing discipline
@@ -217,29 +217,29 @@ type RegisterKey =
   | "celebrating_one"
   | "celebrating_many"
   | "cause"
-  | "neutral";
+  | "neutral"
 
 // Raw seed data uses occasion-type keys for readability; normalised to 5
 // register keys before writing to the DB.
 // Topics with regenerated placeholders use register keys directly (no normalization needed).
 type RawTopicPlaceholders = {
-  [occasion: string]: { about: string; reveal: string };
-};
+  [occasion: string]: { about: string; reveal: string }
+}
 
 type TopicPlaceholders = Record<
   RegisterKey,
   { pronouns: "she" | "he" | "they"; about: string; reveal: string }
->;
+>
 
 type TopicPlaceholders = Record<
   RegisterKey,
   {
-    about: string;
-    reveal: string;
-    pronouns?: "she" | "he" | "they";
-    group?: "pair" | "set";
+    about: string
+    reveal: string
+    pronouns?: "she" | "he" | "they"
+    group?: "pair" | "set"
   }
->;
+>
 
 const REGISTER_KEYS = new Set<string>([
   "remembering",
@@ -247,7 +247,7 @@ const REGISTER_KEYS = new Set<string>([
   "celebrating_many",
   "cause",
   "neutral",
-]);
+])
 
 const OCCASION_TO_REGISTER: Record<string, RegisterKey> = {
   // remembering
@@ -291,7 +291,7 @@ const OCCASION_TO_REGISTER: Record<string, RegisterKey> = {
   "Charity night": "cause",
   // neutral
   default: "neutral",
-};
+}
 
 /**
  * Combined register-keyed placeholder map built from all 6 regenerated-batch
@@ -315,51 +315,51 @@ const combinedPlaceholders = (() => {
     regeneratedPlaceholdersBatch6 as never,
     regeneratedPlaceholdersBatch7 as never,
     regeneratedPlaceholdersBatch8 as never,
-  ];
+  ]
   const map: Record<
     string,
     Record<
       RegisterKey,
       {
-        about: string;
-        reveal: string;
-        pronouns?: "she" | "he" | "they";
-        group?: "pair" | "set";
+        about: string
+        reveal: string
+        pronouns?: "she" | "he" | "they"
+        group?: "pair" | "set"
       }
     >
-  > = {};
+  > = {}
   for (const batch of batches) {
     for (const [title, data] of Object.entries(batch)) {
       if (map[title])
         throw new Error(
-          `Duplicate topic title in placeholder batches: "${title}"`,
-        );
-      map[title] = { ...data };
+          `Duplicate topic title in placeholder batches: "${title}"`
+        )
+      map[title] = { ...data }
     }
   }
   // Apply group tags to celebrating_many entries
   for (const [title, registers] of Object.entries(map)) {
-    if (!registers.celebrating_many) continue;
-    const override = celebratingManySetOverrides[title];
+    if (!registers.celebrating_many) continue
+    const override = celebratingManySetOverrides[title]
     if (override) {
-      registers.celebrating_many = { ...override };
+      registers.celebrating_many = { ...override }
     } else {
       registers.celebrating_many = {
         ...registers.celebrating_many,
         group: "pair",
-      };
+      }
     }
   }
-  return map;
-})();
+  return map
+})()
 
 type TopicSeed = {
-  title: string;
-  description: string;
-  is_finite: boolean;
-  categories: string[];
-  placeholders: RawTopicPlaceholders | TopicPlaceholders;
-};
+  title: string
+  description: string
+  is_finite: boolean
+  categories: string[]
+  placeholders: RawTopicPlaceholders | TopicPlaceholders
+}
 
 const topics: TopicSeed[] = [
   // ── Finite ──────────────────────────────────────────────────────────────────
@@ -5523,7 +5523,7 @@ const topics: TopicSeed[] = [
       },
     },
   },
-];
+]
 
 // ---------------------------------------------------------------------------
 // Topic items
@@ -5631,7 +5631,7 @@ const topicItemDisplayOrder: Record<string, Record<string, number>> = {
     "Boxing Day": 22,
     Hogmanay: 23,
   },
-};
+}
 
 const topicItems: Record<string, string[]> = {
   Colour: [
@@ -10093,7 +10093,7 @@ const topicItems: Record<string, string[]> = {
     "Thai red curry",
     "Vindaloo",
   ],
-};
+}
 
 // ---------------------------------------------------------------------------
 // Seed functions
@@ -10109,126 +10109,120 @@ const CHARITY_TOPIC_SEED: Record<string, string[]> = {
   "Marie Curie": ["Season", "Colour"],
   Mind: ["Hobby"],
   "British Heart Foundation": ["Form of exercise"],
-};
+}
 
 async function seedCharityTopics() {
-  console.log("Seeding charity topics…");
+  console.log("Seeding charity topics…")
 
   const { data: charityRows } = await supabase
     .from("charities")
-    .select("id, name");
-  const { data: topicRows } = await supabase.from("topics").select("id, title");
+    .select("id, name")
+  const { data: topicRows } = await supabase.from("topics").select("id, title")
 
   const charityByName = new Map(
-    (charityRows ?? []).map((r: { id: string; name: string }) => [
-      r.name,
-      r.id,
-    ]),
-  );
+    (charityRows ?? []).map((r: { id: string; name: string }) => [r.name, r.id])
+  )
   const topicByTitle = new Map(
-    (topicRows ?? []).map((r: { id: string; title: string }) => [
-      r.title,
-      r.id,
-    ]),
-  );
+    (topicRows ?? []).map((r: { id: string; title: string }) => [r.title, r.id])
+  )
 
-  let inserted = 0;
-  let skipped = 0;
+  let inserted = 0
+  let skipped = 0
 
   for (const [charityName, topicTitles] of Object.entries(CHARITY_TOPIC_SEED)) {
-    const charityId = charityByName.get(charityName);
+    const charityId = charityByName.get(charityName)
     if (!charityId)
-      throw new Error(`seedCharityTopics: charity "${charityName}" not found`);
+      throw new Error(`seedCharityTopics: charity "${charityName}" not found`)
 
     for (const topicTitle of topicTitles) {
-      const topicId = topicByTitle.get(topicTitle);
+      const topicId = topicByTitle.get(topicTitle)
       if (!topicId)
         throw new Error(
-          `seedCharityTopics: topic "${topicTitle}" not found (charity "${charityName}")`,
-        );
+          `seedCharityTopics: topic "${topicTitle}" not found (charity "${charityName}")`
+        )
 
       const { data: existing } = await supabase
         .from("charity_topics")
         .select("charity_id")
         .eq("charity_id", charityId)
         .eq("topic_id", topicId)
-        .maybeSingle();
+        .maybeSingle()
 
       if (existing) {
-        skipped++;
-        continue;
+        skipped++
+        continue
       }
 
       const { error } = await supabase
         .from("charity_topics")
-        .insert({ charity_id: charityId, topic_id: topicId });
+        .insert({ charity_id: charityId, topic_id: topicId })
       if (error)
-        console.error(`  ✗ ${charityName} → ${topicTitle}:`, error.message);
-      else inserted++;
+        console.error(`  ✗ ${charityName} → ${topicTitle}:`, error.message)
+      else inserted++
     }
   }
 
-  console.log(`  ${inserted} inserted, ${skipped} already existed`);
+  console.log(`  ${inserted} inserted, ${skipped} already existed`)
 }
 
 async function seedCharities() {
-  console.log("Seeding charities…");
-  let inserted = 0;
+  console.log("Seeding charities…")
+  let inserted = 0
   for (const charity of charities) {
     const { data: existing } = await supabase
       .from("charities")
       .select("id")
       .eq("name", charity.name)
-      .maybeSingle();
-    if (existing) continue;
-    const { error } = await supabase.from("charities").insert(charity);
-    if (error) console.error(`  ✗ ${charity.name}:`, error.message);
-    else inserted++;
+      .maybeSingle()
+    if (existing) continue
+    const { error } = await supabase.from("charities").insert(charity)
+    if (error) console.error(`  ✗ ${charity.name}:`, error.message)
+    else inserted++
   }
   console.log(
-    `  ${inserted} inserted, ${charities.length - inserted} already existed`,
-  );
+    `  ${inserted} inserted, ${charities.length - inserted} already existed`
+  )
 }
 
 async function seedCategories() {
-  console.log("Seeding categories…");
-  let inserted = 0;
+  console.log("Seeding categories…")
+  let inserted = 0
   for (const cat of categories) {
     const { data: existing } = await supabase
       .from("categories")
       .select("id")
       .eq("label", cat.label)
-      .maybeSingle();
-    if (existing) continue;
-    const { error } = await supabase.from("categories").insert(cat);
-    if (error) console.error(`  ✗ ${cat.label}:`, error.message);
-    else inserted++;
+      .maybeSingle()
+    if (existing) continue
+    const { error } = await supabase.from("categories").insert(cat)
+    if (error) console.error(`  ✗ ${cat.label}:`, error.message)
+    else inserted++
   }
   console.log(
-    `  ${inserted} inserted, ${categories.length - inserted} already existed`,
-  );
+    `  ${inserted} inserted, ${categories.length - inserted} already existed`
+  )
 }
 
 async function seedTopics() {
-  console.log("Seeding topics…");
-  let inserted = 0;
-  let updated = 0;
+  console.log("Seeding topics…")
+  let inserted = 0
+  let updated = 0
   for (const topic of topics) {
-    const placeholders = combinedPlaceholders[topic.title];
+    const placeholders = combinedPlaceholders[topic.title]
 
     const { data: existing } = await supabase
       .from("topics")
       .select("id, is_finite")
       .eq("title", topic.title)
-      .maybeSingle();
+      .maybeSingle()
 
     if (existing) {
-      const patch: Record<string, unknown> = { placeholders };
+      const patch: Record<string, unknown> = { placeholders }
       if (existing.is_finite !== topic.is_finite)
-        patch.is_finite = topic.is_finite;
-      await supabase.from("topics").update(patch).eq("id", existing.id);
-      updated++;
-      continue;
+        patch.is_finite = topic.is_finite
+      await supabase.from("topics").update(patch).eq("id", existing.id)
+      updated++
+      continue
     }
 
     const { error } = await supabase.from("topics").insert({
@@ -10237,38 +10231,38 @@ async function seedTopics() {
       is_finite: topic.is_finite,
       is_active: true,
       placeholders,
-    });
-    if (error) console.error(`  ✗ ${topic.title}:`, error.message);
-    else inserted++;
+    })
+    if (error) console.error(`  ✗ ${topic.title}:`, error.message)
+    else inserted++
   }
-  console.log(`  ${inserted} inserted, ${updated} updated`);
+  console.log(`  ${inserted} inserted, ${updated} updated`)
 }
 
 async function seedTopicItems() {
-  console.log("Seeding topic items…");
-  let inserted = 0;
+  console.log("Seeding topic items…")
+  let inserted = 0
 
-  const { data: allTopics } = await supabase.from("topics").select("id, title");
+  const { data: allTopics } = await supabase.from("topics").select("id, title")
   const topicByTitle = Object.fromEntries(
-    (allTopics ?? []).map((t) => [t.title, t.id]),
-  );
+    (allTopics ?? []).map((t) => [t.title, t.id])
+  )
 
   for (const [title, items] of Object.entries(topicItems)) {
-    const topicId = topicByTitle[title];
+    const topicId = topicByTitle[title]
     if (!topicId) {
-      console.error(`  ✗ Topic not found: ${title}`);
-      continue;
+      console.error(`  ✗ Topic not found: ${title}`)
+      continue
     }
 
     const { data: existing } = await supabase
       .from("favourites")
       .select("label")
-      .eq("topic_id", topicId);
+      .eq("topic_id", topicId)
     const existingLabels = new Set(
-      (existing ?? []).map((i: { label: string }) => i.label.toLowerCase()),
-    );
+      (existing ?? []).map((i: { label: string }) => i.label.toLowerCase())
+    )
 
-    const orderMap = topicItemDisplayOrder[title];
+    const orderMap = topicItemDisplayOrder[title]
     const toInsert = items
       .filter((label) => !existingLabels.has(label.toLowerCase()))
       .map((label) => ({
@@ -10280,46 +10274,46 @@ async function seedTopicItems() {
         ...(orderMap?.[label] !== undefined
           ? { display_order: orderMap[label] }
           : {}),
-      }));
+      }))
 
-    if (toInsert.length === 0) continue;
+    if (toInsert.length === 0) continue
 
-    const { error } = await supabase.from("favourites").insert(toInsert);
-    if (error) console.error(`  ✗ Items for "${title}":`, error.message);
-    else inserted += toInsert.length;
+    const { error } = await supabase.from("favourites").insert(toInsert)
+    if (error) console.error(`  ✗ Items for "${title}":`, error.message)
+    else inserted += toInsert.length
   }
 
-  console.log(`  ${inserted} items inserted`);
+  console.log(`  ${inserted} items inserted`)
 }
 
 async function seedTopicCategories() {
-  console.log("Seeding topic–category links…");
-  let inserted = 0;
+  console.log("Seeding topic–category links…")
+  let inserted = 0
 
-  const { data: allTopics } = await supabase.from("topics").select("id, title");
+  const { data: allTopics } = await supabase.from("topics").select("id, title")
   const topicByTitle = Object.fromEntries(
-    (allTopics ?? []).map((t) => [t.title, t.id]),
-  );
+    (allTopics ?? []).map((t) => [t.title, t.id])
+  )
 
   const { data: allCategories } = await supabase
     .from("categories")
-    .select("id, label");
+    .select("id, label")
   const categoryByLabel = Object.fromEntries(
     (allCategories ?? []).map((c: { id: string; label: string }) => [
       c.label,
       c.id,
-    ]),
-  );
+    ])
+  )
 
   for (const topic of topics) {
-    const topicId = topicByTitle[topic.title];
-    if (!topicId) continue;
+    const topicId = topicByTitle[topic.title]
+    if (!topicId) continue
 
     for (const catLabel of topic.categories) {
-      const categoryId = categoryByLabel[catLabel];
+      const categoryId = categoryByLabel[catLabel]
       if (!categoryId) {
-        console.error(`  ✗ Category not found: ${catLabel}`);
-        continue;
+        console.error(`  ✗ Category not found: ${catLabel}`)
+        continue
       }
 
       const { data: existing } = await supabase
@@ -10327,20 +10321,20 @@ async function seedTopicCategories() {
         .select("topic_id")
         .eq("topic_id", topicId)
         .eq("category_id", categoryId)
-        .maybeSingle();
+        .maybeSingle()
 
-      if (existing) continue;
+      if (existing) continue
 
       const { error } = await supabase
         .from("topic_categories")
-        .insert({ topic_id: topicId, category_id: categoryId });
+        .insert({ topic_id: topicId, category_id: categoryId })
       if (error)
-        console.error(`  ✗ Link ${topic.title} → ${catLabel}:`, error.message);
-      else inserted++;
+        console.error(`  ✗ Link ${topic.title} → ${catLabel}:`, error.message)
+      else inserted++
     }
   }
 
-  console.log(`  ${inserted} links inserted`);
+  console.log(`  ${inserted} links inserted`)
 }
 
 // ---------------------------------------------------------------------------
@@ -10354,39 +10348,39 @@ async function seedTopicCategories() {
  * those topics must be created first (by this seed or another).
  */
 async function applyAllPlaceholders() {
-  console.log("Applying placeholders to all topics…");
+  console.log("Applying placeholders to all topics…")
 
-  const { data: rows } = await supabase.from("topics").select("id, title");
+  const { data: rows } = await supabase.from("topics").select("id, title")
   const idByTitle = new Map(
-    (rows ?? []).map((r: { id: string; title: string }) => [r.title, r.id]),
-  );
+    (rows ?? []).map((r: { id: string; title: string }) => [r.title, r.id])
+  )
 
-  const missing: string[] = [];
-  let patched = 0;
+  const missing: string[] = []
+  let patched = 0
 
   for (const [title, placeholders] of Object.entries(combinedPlaceholders)) {
-    const id = idByTitle.get(title);
+    const id = idByTitle.get(title)
     if (!id) {
-      missing.push(title);
-      continue;
+      missing.push(title)
+      continue
     }
     const { error } = await supabase
       .from("topics")
       .update({ placeholders })
-      .eq("id", id);
-    if (error) console.error(`  ✗ placeholders for "${title}":`, error.message);
-    else patched++;
+      .eq("id", id)
+    if (error) console.error(`  ✗ placeholders for "${title}":`, error.message)
+    else patched++
   }
 
   if (missing.length > 0) {
     throw new Error(
       `Placeholder map has ${missing.length} title(s) with no topic row ` +
         `(these topics must be created before this seed runs):\n` +
-        missing.map((t) => `  "${t}"`).join("\n"),
-    );
+        missing.map((t) => `  "${t}"`).join("\n")
+    )
   }
 
-  console.log(`  ${patched} topics had placeholders applied`);
+  console.log(`  ${patched} topics had placeholders applied`)
 }
 
 const ALL_REGISTER_KEYS: RegisterKey[] = [
@@ -10395,7 +10389,7 @@ const ALL_REGISTER_KEYS: RegisterKey[] = [
   "celebrating_many",
   "cause",
   "neutral",
-];
+]
 
 /**
  * Asserts that every active topic whose title appears in combinedPlaceholders
@@ -10405,50 +10399,48 @@ const ALL_REGISTER_KEYS: RegisterKey[] = [
  * the writes succeeded; this confirms what's in the DB is correct.
  */
 async function assertAllTopicsHavePlaceholders() {
-  console.log("Asserting placeholder completeness…");
+  console.log("Asserting placeholder completeness…")
 
   const { data: rows } = await supabase
     .from("topics")
     .select("title, placeholders")
-    .eq("is_active", true);
+    .eq("is_active", true)
 
-  const covered = new Set(Object.keys(combinedPlaceholders));
-  const bad: string[] = [];
+  const covered = new Set(Object.keys(combinedPlaceholders))
+  const bad: string[] = []
 
   for (const row of rows ?? []) {
-    if (!covered.has(row.title)) continue; // topic not in the map — skip
+    if (!covered.has(row.title)) continue // topic not in the map — skip
     const ph = row.placeholders as Record<
       string,
       { pronouns?: string; about?: string; reveal?: string }
-    > | null;
+    > | null
     if (!ph) {
-      bad.push(`"${row.title}": no placeholders`);
-      continue;
+      bad.push(`"${row.title}": no placeholders`)
+      continue
     }
     const missingKeys = ALL_REGISTER_KEYS.filter(
-      (k) => !ph[k]?.about || !ph[k]?.reveal,
-    );
+      (k) => !ph[k]?.about || !ph[k]?.reveal
+    )
     if (missingKeys.length > 0) {
-      bad.push(
-        `"${row.title}": missing/empty keys — ${missingKeys.join(", ")}`,
-      );
+      bad.push(`"${row.title}": missing/empty keys — ${missingKeys.join(", ")}`)
     }
-    const cm = ph["celebrating_many"] as { group?: string } | undefined;
+    const cm = ph["celebrating_many"] as { group?: string } | undefined
     if (cm && !cm.group) {
-      bad.push(`"${row.title}": celebrating_many missing group field`);
+      bad.push(`"${row.title}": celebrating_many missing group field`)
     }
   }
 
   if (bad.length > 0) {
     throw new Error(
       `${bad.length} active topic(s) have incomplete placeholder sets:\n` +
-        bad.map((b) => `  ${b}`).join("\n"),
-    );
+        bad.map((b) => `  ${b}`).join("\n")
+    )
   }
 
   console.log(
-    "  ✓ All active topics in the map have complete 5-register placeholder sets",
-  );
+    "  ✓ All active topics in the map have complete 5-register placeholder sets"
+  )
 }
 
 // ---------------------------------------------------------------------------
@@ -10456,19 +10448,19 @@ async function assertAllTopicsHavePlaceholders() {
 // ---------------------------------------------------------------------------
 
 async function seed() {
-  console.log("Starting seed…\n");
-  await seedCharities();
-  await seedCategories();
-  await seedTopics();
-  await applyAllPlaceholders();
-  await assertAllTopicsHavePlaceholders();
-  await seedTopicItems();
-  await seedTopicCategories();
-  await seedCharityTopics();
-  console.log("\nSeed complete.");
+  console.log("Starting seed…\n")
+  await seedCharities()
+  await seedCategories()
+  await seedTopics()
+  await applyAllPlaceholders()
+  await assertAllTopicsHavePlaceholders()
+  await seedTopicItems()
+  await seedTopicCategories()
+  await seedCharityTopics()
+  console.log("\nSeed complete.")
 }
 
 seed().catch((err) => {
-  console.error("Seed failed:", err);
-  process.exit(1);
-});
+  console.error("Seed failed:", err)
+  process.exit(1)
+})

@@ -1,10 +1,10 @@
-import Link from "next/link";
+import Link from "next/link"
 import {
   getDashboardStats,
   getRecentFavpolls,
   getRecentPledges,
-} from "@/lib/actions/dashboard";
-import { StatusBadge } from "@/components/ui/status-badge";
+} from "@/lib/actions/dashboard"
+import { StatusBadge } from "@/components/ui/status-badge"
 import {
   Table,
   TableBody,
@@ -12,19 +12,19 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/table"
 
 const GBP = new Intl.NumberFormat("en-GB", {
   style: "currency",
   currency: "GBP",
   minimumFractionDigits: 0,
   maximumFractionDigits: 0,
-});
+})
 
 const GBP_EXACT = new Intl.NumberFormat("en-GB", {
   style: "currency",
   currency: "GBP",
-});
+})
 
 function StatTile({
   label,
@@ -33,11 +33,11 @@ function StatTile({
   href,
   alert,
 }: {
-  label: string;
-  value: string;
-  hint?: string;
-  href?: string;
-  alert?: boolean;
+  label: string
+  value: string
+  hint?: string
+  href?: string
+  alert?: boolean
 }) {
   const inner = (
     <div
@@ -51,15 +51,15 @@ function StatTile({
       <p className="mt-1 text-2xl font-semibold tabular-nums">{value}</p>
       {hint && <p className="mt-0.5 text-xs text-muted-foreground">{hint}</p>}
     </div>
-  );
-  return href ? <Link href={href}>{inner}</Link> : inner;
+  )
+  return href ? <Link href={href}>{inner}</Link> : inner
 }
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-GB", {
     day: "numeric",
     month: "short",
-  });
+  })
 }
 
 export default async function DashboardPage() {
@@ -67,7 +67,7 @@ export default async function DashboardPage() {
     getDashboardStats(),
     getRecentFavpolls(),
     getRecentPledges(),
-  ]);
+  ])
 
   if (stats.error || !stats.data) {
     return (
@@ -77,10 +77,10 @@ export default async function DashboardPage() {
           {stats.error ?? "Failed to load stats."}
         </p>
       </div>
-    );
+    )
   }
 
-  const s = stats.data;
+  const s = stats.data
 
   return (
     <div className="space-y-8">
@@ -214,7 +214,7 @@ export default async function DashboardPage() {
                       <TableCell className="tabular-nums">
                         {GBP_EXACT.format(p.total_amount)}
                       </TableCell>
-                      <TableCell className="tabular-nums text-muted-foreground">
+                      <TableCell className="text-muted-foreground tabular-nums">
                         {p.tip_amount > 0
                           ? GBP_EXACT.format(p.tip_amount)
                           : "—"}
@@ -235,5 +235,5 @@ export default async function DashboardPage() {
         </section>
       </div>
     </div>
-  );
+  )
 }

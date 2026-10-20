@@ -1,21 +1,21 @@
-"use server";
+"use server"
 
-import { revalidatePath } from "next/cache";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { revalidatePath } from "next/cache"
+import { createAdminClient } from "@/lib/supabase/admin"
 
 export async function setExemplar(
   favpollId: string,
-  value: boolean,
+  value: boolean
 ): Promise<{ error: string | null }> {
-  const supabase = createAdminClient();
+  const supabase = createAdminClient()
 
   const { error } = await supabase
     .from("favpolls")
     .update({ is_exemplar: value })
-    .eq("id", favpollId);
+    .eq("id", favpollId)
 
-  if (error) return { error: error.message };
+  if (error) return { error: error.message }
 
-  revalidatePath("/favpolls");
-  return { error: null };
+  revalidatePath("/favpolls")
+  return { error: null }
 }
