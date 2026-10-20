@@ -252,6 +252,83 @@ describe("GET /api/cron/close-favpolls — closes favpolls", () => {
       .find((c) => c.method === "update")!
     expect(favpollsUpdate.args[0].total_raised).toBe(100)
   })
+
+  // THE CAST THIS REPLACED READ `.favpoll_id` OFF AN ASSUMED OBJECT, so a
+  // relation that arrived as a one-element array — which this project has
+  // known PostgREST can return since 2026-09-06 — gave `undefined`, and
+  // the pledge went into a bucket nothing reads. The favpoll's
+  // total_raised came out 0, and that total decides the disbursement
+  // split (#1106).
+  it("attributes a pledge whose relation arrives as an array", async () => {
+    const favpollId = "favpoll-1"
+    const userId = "user-1"
+
+    mock.queue([
+      { id: favpollId, created_by: userId, protagonists: { name: "A" } },
+    ])
+    mock.queue([
+      // the array shape, which the object-only cast lost
+      { favpoll_polls: [{ favpoll_id: favpollId }], total_amount: 70 },
+      { favpoll_polls: { favpoll_id: favpollId }, total_amount: 30 },
+    ])
+    mock.queue([]) // no charities
+    mock.queue([{ id: userId, email: "u@test.com", display_name: null }])
+    mock.queue(null) // update
+
+    await GET(makeRequest("Bearer test-secret"))
+
+    const favpollsUpdate = mock
+      .callsFor("favpolls")
+      .find((c) => c.method === "update")!
+    expect(favpollsUpdate.args[0].total_raised).toBe(100)
+  })
+
+  // Equivalent to what already happened — such a row went to
+  // `raisedByFavpoll["undefined"]`, which nothing reads — but said out
+  // loud instead of by accident.
+  it("leaves a pledge it cannot attribute out of every total", async () => {
+    const favpollId = "favpoll-1"
+    const userId = "user-1"
+
+    mock.queue([
+      { id: favpollId, created_by: userId, protagonists: { name: "A" } },
+    ])
+    mock.queue([
+      { favpoll_polls: { favpoll_id: favpollId }, total_amount: 40 },
+      { favpoll_polls: null, total_amount: 999 },
+    ])
+    mock.queue([])
+    mock.queue([{ id: userId, email: "u@test.com", display_name: null }])
+    mock.queue(null)
+
+    await GET(makeRequest("Bearer test-secret"))
+
+    const favpollsUpdate = mock
+      .callsFor("favpolls")
+      .find((c) => c.method === "update")!
+    expect(favpollsUpdate.args[0].total_raised).toBe(40)
+  })
+
+  // The protagonist's name is read through the same helper, and the
+  // close email says it.
+  it("reads the protagonist's name whichever shape it arrives in", async () => {
+    const favpollId = "favpoll-1"
+    const userId = "user-1"
+
+    mock.queue([
+      { id: favpollId, created_by: userId, protagonists: [{ name: "Joan" }] },
+    ])
+    mock.queue([{ favpoll_polls: { favpoll_id: favpollId }, total_amount: 10 }])
+    mock.queue([])
+    mock.queue([{ id: userId, email: "u@test.com", display_name: null }])
+    mock.queue(null)
+
+    await GET(makeRequest("Bearer test-secret"))
+
+    expect(mockEmail.sendFavpollClosed).toHaveBeenCalledWith(
+      expect.objectContaining({ protagonistName: "Joan" })
+    )
+  })
 })
 
 // ─────────────────────────────────────────────────────────────────────────────

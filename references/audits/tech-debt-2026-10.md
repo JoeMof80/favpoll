@@ -429,15 +429,93 @@ and `landing.invariant` — which a copy sweep edited for a line no component
 renders, and which only its own test kept alive. A key referenced solely by
 a test or a story counts as dead: the test keeps it compiling, not visible.
 
-### 2.6 Type escapes concentrate in the money and auth paths · M · medium risk · FIX WHEN TOUCHED
+### 2.6 Type escapes concentrate in the money and auth paths · M · medium risk · DONE for the relation casts (#1106)
 
-29 `as unknown as` in the web app, 22 of them under `app/api`,
-`app/favpolls`, `lib/stripe-verify`, `lib/disbursement` or `lib/supabase`.
-The pattern is `(row.favpoll_polls as unknown as { favpoll_id: string })`
-— working around Supabase's generated join types. One typed helper for
-joined rows would remove most of them. Also 12 `process.env.X!`
-non-null assertions, which turn a missing variable into a runtime crash
-rather than a startup error.
+Three things this entry got wrong, and one it got righter than it knew.
+
+**"Working around Supabase's generated join types" — there are no
+generated types.** Every client in the repo is built without one:
+`createClient<Database>` appears nowhere, in either app or the scripts.
+The casts are therefore not working around an awkward generated shape;
+they are hand-written assertions about data that has no type at all.
+
+**The file list was wrong.** `lib/stripe-verify.ts` had zero,
+`lib/supabase/` had zero, and `lib/disbursement` is not a path. The casts
+were 11 in `app/favpolls` and 7 in `app/api`.
+
+**"The pattern is the same each time" — there were two.** The entry's own
+example is the first, and it was the one worth fixing:
+
+1. **A to-one embedded relation asserted to be an object** —
+   `ec.charities as unknown as Charity | null`. Eight of these.
+2. **A whole row asserted to a hand-written type** —
+   `(favpolls ?? []) as unknown as RawFavpoll[]`. Ten of these, and a
+   relation helper does nothing for them: they need the generated types
+   the first finding says do not exist. Left, counted, with that reason.
+   Raised as its own entry (#1138).
+
+**What it got righter than it knew: the first kind were latent bugs, not
+untidy types.** `lib/poll-title.ts` has carried this sentence since the
+subset work — *"PostgREST hands back an object or a one-element array
+depending on the join, so both are accepted"* — and
+`app/appeals/[slug]/page.tsx` dates the lesson to 2026-09-06. Six sites
+handled both shapes. Eight asserted the array could not happen. When it
+does, the cast reads a field off the array itself, gets `undefined`, and
+says nothing.
+
+The worst of the eight was in the close-favpolls cron:
+
+```
+const favpollId = (row.favpoll_polls as unknown as { favpoll_id: string }).favpoll_id
+raisedByFavpoll[favpollId] = (raisedByFavpoll[favpollId] ?? 0) + (row.total_amount ?? 0)
+```
+
+An array-shaped relation made `favpollId` undefined, so the pledge went
+into `raisedByFavpoll["undefined"]` — a key nothing ever reads, since the
+only read is by a real favpoll id. The pledge vanished from
+`total_raised`, **and that total decides the disbursement split.**
+Measured on two rows, one of each shape: £70 and £30 in, £30 out. The
+skip that replaces it is behaviour-preserving, because that bucket was
+already never read; what changes is that the array shape is now
+attributed instead of lost.
+
+`lib/supabase/relation.ts` holds `one` and `many`, generalised from the
+narrow `one` that `poll-title.ts` had already named. Its parameter is
+`unknown`, which is the truth about what it is handed.
+
+**The environment variables: NOT CHANGED, and the attempt is the record
+(#1106, 2026-10-20).** `lib/env.ts` was written — a `requiredEnv(name)`
+that throws `Missing required environment variable: X`, naming the
+variable and never its value — and applied to eleven of the twelve. CI
+refused it, and the refusal is the useful part of this entry.
+
+Two failures, neither of which the entry anticipated:
+
+1. **Two route test files failed at IMPORT.** `app/api/webhooks/stripe`
+   and `app/api/stripe/payment-intent` construct Stripe at module scope,
+   so the throw fired when vitest loaded the module. Those tests mock
+   Stripe and never need a key; `process.env.STRIPE_SECRET_KEY!` had been
+   handing the constructor `undefined` and the constructor did not mind.
+2. **`lib/stripe-verify.ts` was already lazy, and still broke.** Its
+   `new Stripe(...)` sits inside a function, so the timing was right —
+   but the throw is caught by that module's own error handling and comes
+   back out as `Payment not found`. Six verification tests changed their
+   message.
+
+So the entry's framing — that these assertions "turn a missing variable
+into a runtime crash rather than a startup error" — is right about the
+problem and wrong about the fix being small. Making the message better
+also made the failure FIRE where it previously did not: in a test run, in
+CI, and on any fresh clone without the variables. A louder failure is not
+automatically a better one when the thing that was quiet was also
+harmless.
+
+What this actually needs is the question the first attempt set aside: a
+distinction between "needed at module load" and "needed at the moment of
+use", and somewhere for the check to live that is neither of those — a
+boot-time or build-time assertion that runs once, in production, where
+the variables genuinely must exist. That is a design, not a helper, and
+it is not attempted here. The twelve assertions stand.
 
 ---
 

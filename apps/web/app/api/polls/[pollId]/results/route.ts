@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { pollStandings } from "@/lib/poll-standings"
+import { one } from "@/lib/supabase/relation"
 
 export type PollResultItem = {
   label: string
@@ -81,9 +82,7 @@ export async function GET(
     return NextResponse.json({ error: "Not entitled" }, { status: 403 })
   }
 
-  const isFinite =
-    (poll?.topics as unknown as { is_finite: boolean } | null)?.is_finite ??
-    false
+  const isFinite = one<{ is_finite: boolean }>(poll?.topics)?.is_finite ?? false
 
   // A subset poll carries its own rows whatever the parent's openness.
   const subsetId = (poll as { subset_id?: string | null }).subset_id ?? null
@@ -109,7 +108,7 @@ export async function GET(
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
     items = (data ?? [])
-      .map((row) => row.favourites as unknown as ItemRow | null)
+      .map((row) => one<ItemRow>(row.favourites))
       .filter((f): f is ItemRow => Boolean(f))
   }
 

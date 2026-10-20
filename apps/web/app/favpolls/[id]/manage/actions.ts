@@ -14,6 +14,7 @@ import { favpollLocks, readLockInputs, lockReason } from "@/lib/favpoll-locks"
 import { insertSubsetMembers } from "@/lib/subset-members"
 import { asResult } from "@/lib/action-result"
 import { parseInput } from "@/lib/action-input"
+import { one } from "@/lib/supabase/relation"
 import {
   setFavpollCharitiesSchema,
   setFavpollTopicSchema,
@@ -157,8 +158,7 @@ async function setFavpollCharitiesInner(
     .eq("id", favpollId)
     .single()
   const appeal = row?.appeal_id
-    ? ((row as unknown as { appeals: { charity_id: string } | null }).appeals ??
-      null)
+    ? one<{ charity_id: string }>(row.appeals)
     : null
   if (appeal && ids.join(",") !== appeal.charity_id)
     throw new Error("This favpoll's charity is set by its appeal.")

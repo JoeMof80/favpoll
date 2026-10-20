@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { fetchPollItems } from "@/lib/poll-items"
 import { pollStandings, overlayStandings } from "@/lib/poll-standings"
+import { one } from "@/lib/supabase/relation"
 
 export async function GET(
   request: Request,
@@ -71,9 +72,7 @@ export async function GET(
   // pledge sums overlaid onto the all_time_* fields (lib/poll-standings).
   // The previous raw `favourites` select leaked the all-time record onto a
   // guest's bars — a fresh poll showed £1.2K rankings after one pledge.
-  const isFinite =
-    (poll.topics as unknown as { is_finite: boolean } | null)?.is_finite ??
-    false
+  const isFinite = one<{ is_finite: boolean }>(poll.topics)?.is_finite ?? false
 
   const [rawItems, standings] = await Promise.all([
     fetchPollItems(supabase, {

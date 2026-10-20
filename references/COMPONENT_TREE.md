@@ -365,6 +365,7 @@ app/favpolls/[id]/manage/page.tsx
   → lib/register-palette.ts  (lib)
   → lib/supabase/admin.ts  (lib)
   → lib/supabase/paginate.ts  (lib)
+  → lib/supabase/relation.ts  (lib)
   → packages/types/ *  ↑
 ```
 
