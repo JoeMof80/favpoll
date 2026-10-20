@@ -14,18 +14,18 @@ Sizes: S < 1h · M < 1 day · L > 1 day.
 
 ## The shape of the thing
 
-| | |
-|---|---|
-| Source files (apps/web, excl. tests/stories) | 346 |
-| Lines | 55,187 |
-| Comment lines | 8,854 (16%) |
-| Dated founder rulings in comments | 549 |
-| TODO / FIXME / HACK | 0 |
-| Routes | 30 |
-| Component files | 211 (46 with a story = 22%) |
-| Tests | 1,458 web + 177 admin, 0 failing |
-| `as unknown as` | 29 (22 in money/auth paths) |
-| `: any` | 10 · `@ts-ignore` 0 · `eslint-disable` 68 |
+|                                              |                                           |
+| -------------------------------------------- | ----------------------------------------- |
+| Source files (apps/web, excl. tests/stories) | 346                                       |
+| Lines                                        | 55,187                                    |
+| Comment lines                                | 8,854 (16%)                               |
+| Dated founder rulings in comments            | 549                                       |
+| TODO / FIXME / HACK                          | 0                                         |
+| Routes                                       | 30                                        |
+| Component files                              | 211 (46 with a story = 22%)               |
+| Tests                                        | 1,458 web + 177 admin, 0 failing          |
+| `as unknown as`                              | 29 (22 in money/auth paths)               |
+| `: any`                                      | 10 · `@ts-ignore` 0 · `eslint-disable` 68 |
 
 The headline is the last two rows of the first column. There are no TODOs
 because the history lives in the comments instead: 549 dated rulings
@@ -49,11 +49,11 @@ charity profiles all return zero rows to the public key.
 The exception is three **views**, which run as their owner and so read
 straight past RLS on the tables beneath them:
 
-| View | Reads from | Public key can read it |
-|---|---|---|
-| `register_profile_floor` | `register_charities` (locked) | yes — verified, 1 row returned |
-| `charity_profiles_stale` | `charity_profiles` + `register_charities` (both locked) | yes (times out on size, not denied) |
-| `charity_profiles_unkeyable` | `charities` | yes |
+| View                         | Reads from                                              | Public key can read it              |
+| ---------------------------- | ------------------------------------------------------- | ----------------------------------- |
+| `register_profile_floor`     | `register_charities` (locked)                           | yes — verified, 1 row returned      |
+| `charity_profiles_stale`     | `charity_profiles` + `register_charities` (both locked) | yes (times out on size, not denied) |
+| `charity_profiles_unkeyable` | `charities`                                             | yes                                 |
 
 What leaks is public Charity Commission data plus `consent_status` and
 `is_active` for every charity — not money, not personal data. So: real,
@@ -119,15 +119,15 @@ all assume a tracker and a doc layout).
 
 ### 2.2 Seven files over 700 lines mix layout, data, animation and copy · L each · medium risk · FIX WHEN TOUCHED
 
-| File | Lines | What it holds |
-|---|---|---|
-| `lib/pairing-table.ts` | 1,374 | data table — fine as data, but it is code |
-| `components/landing/hero.tsx` | 1,073 | layout + beat state machine + copy + carousel |
-| `app/favpolls/[id]/manage/manage-client.tsx` | 1,014 | seven sections in one client component |
-| `lib/story-engine.ts` | 956 | generation rules |
-| `app/favpolls/[id]/actions.ts` | 878 | 13 exported actions, three pledge paths |
-| `components/new-favpoll-wizard/use-wizard-state.ts` | 832 | whole wizard state |
-| `components/hero-demo-panel/demo-card.tsx` | 819 | demo rendering + the still beat |
+| File                                                | Lines | What it holds                                 |
+| --------------------------------------------------- | ----- | --------------------------------------------- |
+| `lib/pairing-table.ts`                              | 1,374 | data table — fine as data, but it is code     |
+| `components/landing/hero.tsx`                       | 1,073 | layout + beat state machine + copy + carousel |
+| `app/favpolls/[id]/manage/manage-client.tsx`        | 1,014 | seven sections in one client component        |
+| `lib/story-engine.ts`                               | 956   | generation rules                              |
+| `app/favpolls/[id]/actions.ts`                      | 878   | 13 exported actions, three pledge paths       |
+| `components/new-favpoll-wizard/use-wizard-state.ts` | 832   | whole wizard state                            |
+| `components/hero-demo-panel/demo-card.tsx`          | 819   | demo rendering + the still beat               |
 
 The seams are visible in each: `hero.tsx` splits into layout / `useStillBeat`
 / copy; `manage-client.tsx` splits by section; `actions.ts` splits into
@@ -167,12 +167,18 @@ files.
 Note the trap: five of these have Storybook stories, so "it has a story"
 is not evidence of use.
 
-### 2.5 33 of 177 message keys are dead · S · low risk · FIX NOW · first issue
+### 2.5 20 of 177 message keys are dead · S · low risk · FIX NOW · first issue
 
-Including the whole `landing.how.*` set (10 keys), `celebrations.moment.*`
-and `celebrations.presence.*` (7), and `landing.invariant` — which the
-copy sweep edited yesterday for a line that no component renders. Counted
-with dynamic prefixes (`home.assure.`, `home.capability.`) accounted for.
+**Corrected 2026-10-20 while fixing it: 20, not the 33 first counted.** The
+first pass checked only `t("literal")` calls and template prefixes, so it
+missed keys referenced as bare strings elsewhere and over-reported by 13.
+
+The 20 are the whole `landing.how.*` set (10 keys, left behind when How It
+Works was reframed as the organiser's process), `celebrations.moment.*` and
+`celebrations.presence.*` (7), `home.router.explore`, `home.shines.title`,
+and `landing.invariant` — which a copy sweep edited for a line no component
+renders, and which only its own test kept alive. A key referenced solely by
+a test or a story counts as dead: the test keeps it compiling, not visible.
 
 ### 2.6 Type escapes concentrate in the money and auth paths · M · medium risk · FIX WHEN TOUCHED
 
@@ -204,16 +210,16 @@ and a migration check. The component-tree check landed today (#1092).
 46 of 211 component files have a story; all 178 stories pass as browser
 tests in CI, so what exists is accurate. The gaps are the big surfaces:
 
-| Area | Files | Stories |
-|---|---|---|
-| `components/landing` | 32 | 1 |
-| `components/ui` | 33 | 12 |
-| `components/manage` | 6 | 0 |
-| `components/keepsake` | 6 | 0 |
-| `components/print-pack` | 6 | 0 |
-| `components/room-shell` | 3 | 0 |
-| `components/heroes` | 2 | 0 |
-| `favpoll-sheet`, `guest-book` | 2 | 0 |
+| Area                          | Files | Stories |
+| ----------------------------- | ----- | ------- |
+| `components/landing`          | 32    | 1       |
+| `components/ui`               | 33    | 12      |
+| `components/manage`           | 6     | 0       |
+| `components/keepsake`         | 6     | 0       |
+| `components/print-pack`       | 6     | 0       |
+| `components/room-shell`       | 3     | 0       |
+| `components/heroes`           | 2     | 0       |
+| `favpoll-sheet`, `guest-book` | 2     | 0       |
 
 ### 3.3 Fifteen stories fail in a static Storybook build · S · low risk · FIX NOW
 
