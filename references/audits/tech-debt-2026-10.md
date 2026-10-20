@@ -142,8 +142,8 @@ the files whose first line is the directive: `app/appeals/actions.ts`,
 `lib/actions/favpoll-poll-favourites.ts`. The original "six action files"
 counted only the ones named `actions.ts`, which missed two.
 
-**`lib/actions/generate-draft.ts` is converted (#1109, first of the
-seven).** It was taken first because its unvalidated fields are not only
+**`lib/actions/generate-draft.ts` is converted (#1109, first of eight —
+which is what leaves the seven listed above).** It was taken first because its unvalidated fields are not only
 a shape risk. `topicTitle`, `itemLabels` and `displayName` are
 interpolated verbatim into the Story prompt — `displayName` inside a
 quoted instruction — so the boundary there is the boundary of a model
@@ -181,7 +181,53 @@ module-level in-memory `Map`, which on Vercel is per instance, while
 `lib/rate-limit.ts` already provides a shared one that five other call
 sites use.
 
-Still to do: the remaining seven (#1109).
+**`app/favpolls/new/actions.ts` is converted (#1109, second).** The
+wizard's publish path: four exported actions, one of which writes seven
+tables. Four things came out of it.
+
+**A filename chose part of a storage key.** `uploadPersonPhoto` built the
+object key from `file.name.split(".").pop()`, so the uploader supplied the
+extension: a name of `../../../etc/passwd` produced the key
+`<user>/<ts>./etc/passwd`, and a name with no dot at all made the whole
+name the extension. The key is built from the TYPE now, through a map the
+schema has already accepted, and the filename is not read.
+
+**The bucket is public and the content type was the client's word for
+it.** `formData.get("photo") as File` was the entire check, so a string, a
+missing field, a 200MB file or a `text/html` upload all got through — the
+last of those being a page served from the project's own storage domain.
+The allowlist is deliberately generous (jpeg, png, webp, gif, avif, heic,
+heif) because every honest caller re-encodes through a canvas and sends
+jpeg; what it refuses is a file that is not an image at all.
+
+**`insertSubsetMembers` was an endpoint that could never work.** It was
+exported from the `"use server"` file, so Next published it, but its first
+parameter is a Supabase client and a client cannot cross the wire.
+Validating it would have been guarding a door into a wall, so it moved to
+`lib/subset-members.ts` and the three server-side callers import it from
+there. The right treatment for an action that is not one is to stop
+exporting it, the same judgement that kept `withdrawPledge` off the
+helper for the opposite reason.
+
+**`closesAt` was a RangeError waiting at the end of the wizard.** A string
+`Date` could not read reached `new Date(...).toISOString()` and threw,
+which the organiser saw as a generic failure after filling in every step.
+It is an ISO datetime with a sentence of its own now. The same shape of
+win: an unknown `grouping` used to make a favpoll quietly plural, because
+`is_plural` is derived as `grouping !== "individual"`.
+
+**Raised, not taken: `potAmount` is money.** It writes
+`favpoll_pots.total_deposited` directly and both callers send `null`, so a
+crafted request could credit a pot with no payment behind it. The schema
+bounds it as a nonnegative finite number — a negative or a NaN would have
+corrupted the pot, and no legitimate caller is affected — but whether a
+non-zero value should be refused outright is a ledger decision and is the
+founder's to make.
+
+Still to do: the remaining six (#1109) — `app/appeals/actions.ts`,
+`app/favpolls/actions.ts`, `app/favpolls/[id]/edit/actions.ts`,
+`app/favpolls/[id]/manage/actions.ts`, `app/favpolls/new/wizard-data.ts`
+and `lib/actions/favpoll-poll-favourites.ts`.
 
 ### 1.4 Actions still throw where the project decided they should return · M · low risk · DONE for the pledge path (#1105, PR #1127)
 

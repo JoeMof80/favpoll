@@ -4,7 +4,7 @@ import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { favpollLocks, readLockInputs } from "@/lib/favpoll-locks"
 import type { CanvasSubmitData } from "@favpoll/types"
-import { insertSubsetMembers } from "@/app/favpolls/new/actions"
+import { insertSubsetMembers } from "@/lib/subset-members"
 import { asResult } from "@/lib/action-result"
 
 type PollInput = CanvasSubmitData["poll"]

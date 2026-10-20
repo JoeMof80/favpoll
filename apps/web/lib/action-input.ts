@@ -50,6 +50,24 @@ export class InvalidInputError extends Error {
   }
 }
 
+/**
+ * The same, for an action that takes FormData — the shape the original
+ * entry prescribed and #1104 had no use for, because the money actions
+ * take typed objects. `uploadPersonPhoto` is the first real caller.
+ *
+ * `formData.get(...) as File` is the assumption this replaces: entries()
+ * yields strings and Files exactly as they arrived, and the schema says
+ * which it wanted. A field sent more than once collapses to its last
+ * value, which no form here does on purpose.
+ */
+export function parseFormData<S extends z.ZodType>(
+  schema: S,
+  formData: FormData,
+  label: string
+): z.output<S> {
+  return parseInput(schema, Object.fromEntries(formData.entries()), label)
+}
+
 /** Parse a server action's argument, or throw the first failure as the
  *  sentence the caller should show. `label` names the action in the log. */
 export function parseInput<S extends z.ZodType>(
