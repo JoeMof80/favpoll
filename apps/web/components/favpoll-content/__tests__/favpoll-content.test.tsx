@@ -29,9 +29,6 @@ vi.mock("@/components/poll-section", () => ({
     <div data-testid="poll-section" data-protagonist-name={protagonistName} />
   ),
 }))
-vi.mock("@/components/charity-banner", () => ({
-  CharityBanner: () => null,
-}))
 vi.mock("@/components/countdown", () => ({
   Countdown: () => null,
 }))

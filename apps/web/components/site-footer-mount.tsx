@@ -6,8 +6,8 @@ import { SiteFooter } from "@/components/landing/site-footer"
 // The footer is marketing/trust chrome, so it renders ONLY on the
 // marketing/trust surfaces (allowlist — new routes default clean). The
 // three-surfaces doctrine keeps it off everything task-shaped: the guest
-// favpoll page (self-evident, zero marketing; CharityBanner already carries
-// the no-fee trust line at the point of pledge), the wizard/details/edit
+// favpoll page (self-evident, zero marketing; the charity surface already
+// carries the no-fee trust line at the point of pledge), the wizard/details/edit
 // workspaces, dashboards, auth, and the projector/print surfaces.
 const INCLUDED = [
   /^\/$/, // landing

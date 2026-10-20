@@ -11,7 +11,7 @@ Generated 2026-10-20 by `node scripts/component-tree.mjs` — do not edit by han
 ↑  already expanded above, or a shared subtree (see its section)
 ```
 
-Counts: 30 routes · 194 component files · 39 with stories · 2 unused in production
+Counts: 30 routes · 192 component files · 38 with stories · 0 unused in production
 
 ---
 
@@ -1253,14 +1253,6 @@ components/bump-chart.tsx *
   → components/ui/section-eyebrow.tsx *
 ```
 
-### `components/charity-row.tsx` — used by 4
-
-```
-components/charity-row.tsx *
-  → components/favpoll-card/types.ts
-  → packages/types/ *
-```
-
 ### `components/favpoll-list-card/favpoll-list-card-charity-carousel.tsx` — used by 4
 
 ```
@@ -1323,6 +1315,14 @@ components/landing/open-right-now.tsx
       → components/ui/button.tsx *
   → components/ui/button.tsx *  ↑
   → components/ui/section-eyebrow.tsx *
+```
+
+### `components/charity-row.tsx` — used by 3
+
+```
+components/charity-row.tsx *
+  → components/favpoll-card/types.ts
+  → packages/types/ *
 ```
 
 ### `components/favpoll-card/poll-note.tsx` — used by 3
@@ -1582,7 +1582,7 @@ components/share-favpoll-button.tsx
 components/ui/alert.tsx  ← 1
 components/ui/badge.tsx  ← 3
 components/ui/button-group.tsx  ← 1
-components/ui/button.tsx *  ← 75
+components/ui/button.tsx *  ← 74
 components/ui/calendar.tsx  ← 1
 components/ui/card.tsx *  ← 1
 components/ui/chip.tsx *  ← 8
@@ -1596,7 +1596,6 @@ components/ui/ranking-bar.tsx *  ← 6
 components/ui/responsive-overlay.tsx *  ← 12
 components/ui/section-eyebrow.tsx *  ← 21
 components/ui/segmented-control.tsx *  ← 6
-components/ui/separator.tsx ⚠  ← 0
 components/ui/sheet.tsx  ← 1
 components/ui/slider.tsx  ← 1
 components/ui/switch-line.tsx  ← 2
@@ -1613,8 +1612,5 @@ components/ui/tooltip.tsx  ← 2
 
 ## Unused in production ⚠
 
-```
-components/charity-banner.tsx
-components/ui/separator.tsx
-```
+(none)
 
