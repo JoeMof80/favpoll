@@ -128,6 +128,23 @@ guest on a page whose button did nothing; it now gets the same not-found
 page the withdrawal page gives for the same condition. Its token-only
 authorisation is documented in place, as this entry asked.
 
+**The renamed-spec hole is closed (#1129, 2026-10-20).**
+`scripts/check-e2e-projects.mjs` fails on a spec no project matches AND on
+a project no spec matches — the second being the #897 shape, where a
+pattern pointing at a file that no longer exists runs empty and passes. It
+asks Playwright itself (`playwright test --list --reporter=json`, which
+starts no browser and no web server) rather than reimplementing its glob
+matching, and attributes files by each spec's own `tests[].projectName`.
+
+It lives in **Format check**, not the advisory E2E job: the failure is a
+suite that passes having run nothing, so the job that would have shown it
+green is the wrong place to catch it.
+
+Verified by reproducing #897 — renaming the spec and leaving the project
+on the old name. Playwright's own verdict in that state: **exit 0, 16
+specs instead of 17, the guest pledge flow silently absent.** The check
+reports both halves and exits 1.
+
 **Found while in there, raised separately:** the action redirects a stale
 token to `/pledges/withdraw/invalid`, a route that **does not exist** —
 so a guest clicking an already-used withdrawal link gets a 404 instead of

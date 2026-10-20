@@ -282,3 +282,9 @@ jobs:
 
       - name: Check for message keys nothing renders
         run: node scripts/check-dead-messages.mjs
+
+      # Here rather than in the E2E job, which is advisory: the failure this
+      # catches is a suite that PASSES having run nothing, so the job that
+      # would have shown it green is exactly the wrong place to look (#1129).
+      - name: Every e2e spec belongs to a Playwright project
+        run: node scripts/check-e2e-projects.mjs
