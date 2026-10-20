@@ -22,6 +22,7 @@ import { deriveRankHistory } from "@/lib/rank-history"
 import { pledgeTimeline } from "@/components/manage/pledges-over-time"
 import { getWizardData } from "@/app/favpolls/new/wizard-data"
 import type { TopicWithMeta } from "@favpoll/types"
+import { one } from "@/lib/supabase/relation"
 
 export const metadata = {
   title: "Manage favpoll — favpoll",
@@ -191,7 +192,7 @@ export default async function ManageFavpollPage({
     .order("name")
   const pickerCharities = [...((activeCharities ?? []) as Charity[])]
   for (const ec of ev.favpoll_charities ?? []) {
-    const own = ec.charities as unknown as Charity | null
+    const own = one<Charity>(ec.charities)
     if (own && !pickerCharities.some((c) => c.id === own.id))
       pickerCharities.push(own)
   }
@@ -286,7 +287,7 @@ export default async function ManageFavpollPage({
   if (isOpen && !locks.topic) {
     const data = await getWizardData()
     const charityIds = (ev.favpoll_charities ?? [])
-      .map((ec) => (ec.charities as unknown as { id: string } | null)?.id)
+      .map((ec) => one<{ id: string }>(ec.charities)?.id)
       .filter((v): v is string => !!v)
     const suggestedIds = charityIds.flatMap(
       (c) => data.suggestedTopicIds[c] ?? []

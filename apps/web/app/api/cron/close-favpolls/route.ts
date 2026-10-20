@@ -2,6 +2,7 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import { fetchAllRows } from "@/lib/supabase/paginate"
 import { sendFavpollClosed } from "@/lib/email"
 import { disbursementProvider, splitEqually } from "@/lib/disbursement"
+import { one } from "@/lib/supabase/relation"
 
 // Vercel cron (see vercel.json) — cron invocations are GET requests, so this
 // must be a GET handler or the schedule silently never fires.
@@ -49,8 +50,21 @@ export async function GET(request: Request) {
 
   const raisedByFavpoll: Record<string, number> = {}
   for (const row of pledgeTotals) {
-    const favpollId = (row.favpoll_polls as unknown as { favpoll_id: string })
-      .favpoll_id
+    // THE CAST HERE COULD UNDERSTATE WHAT A FAVPOLL RAISED (#1106).
+    // It read `.favpoll_id` off a relation asserted to be an object, so
+    // if PostgREST handed back a one-element array — which this project
+    // has known it can since 2026-09-06 — the id was `undefined` and the
+    // pledge went into `raisedByFavpoll["undefined"]`. That key is never
+    // read (the only read is by a real favpoll id, below), so the
+    // pledge simply vanished from the total that decides the
+    // disbursement split. `one` handles both shapes, so it is attributed.
+    //
+    // The skip is behaviour-preserving rather than new: a row with no
+    // resolvable favpoll already went to a bucket nothing reads, so
+    // leaving it out of every total is what was already happening — now
+    // said out loud instead of by accident.
+    const favpollId = one<{ favpoll_id: string }>(row.favpoll_polls)?.favpoll_id
+    if (!favpollId) continue
     raisedByFavpoll[favpollId] =
       (raisedByFavpoll[favpollId] ?? 0) + (row.total_amount ?? 0)
   }
@@ -91,8 +105,7 @@ export async function GET(request: Request) {
   for (const favpoll of favpolls) {
     const totalRaised = raisedByFavpoll[favpoll.id] ?? 0
     const protagonistName =
-      (favpoll.protagonists as unknown as { name: string } | null)?.name ??
-      "someone special"
+      one<{ name: string }>(favpoll.protagonists)?.name ?? "someone special"
 
     // ORDER MATTERS (2026-07-21): disbursements are written FIRST and the
     // close marker LAST, with every step idempotent — so any failure leaves
