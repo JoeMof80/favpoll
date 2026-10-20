@@ -1,4 +1,5 @@
 import Stripe from "stripe"
+import { requiredEnv } from "@/lib/env"
 
 // Server-side payment truth for pledges (2026-07-20). Historically the
 // pledge actions recorded whatever amount the client claimed, never touching
@@ -20,7 +21,7 @@ import Stripe from "stripe"
 let stripeClient: Stripe | null = null
 function stripe(): Stripe {
   if (!stripeClient) {
-    stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY!)
+    stripeClient = new Stripe(requiredEnv("STRIPE_SECRET_KEY"))
   }
   return stripeClient
 }

@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js"
+import { requiredEnv } from "@/lib/env"
 import { headers } from "next/headers"
 import { Webhook } from "svix"
 import { sendPledgesClaimed } from "@/lib/email"
@@ -23,8 +24,8 @@ type ClerkWebhookEvent = {
 
 function getSupabaseAdmin() {
   return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    requiredEnv("NEXT_PUBLIC_SUPABASE_URL"),
+    requiredEnv("SUPABASE_SERVICE_ROLE_KEY")
   )
 }
 

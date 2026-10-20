@@ -6,6 +6,19 @@ import { Elements } from "@stripe/react-stripe-js"
 import { CheckoutForm } from "./checkout-form"
 import { formatPoundsExact } from "@/lib/i18n"
 
+// THE ONE `process.env.X!` LEFT, DELIBERATELY (#1106, 2026-10-20).
+//
+// `requiredEnv` throws, and this is module scope in a CLIENT component:
+// a throw here renders the error boundary instead of the page, so a
+// deploy missing this key would lose the whole pledge surface rather
+// than the card field on it. The other eleven are server-side, where a
+// throw is the failure arriving somewhere a log can hold it.
+//
+// A NEXT_PUBLIC_ variable is also inlined at BUILD time, so an absent
+// one is a build-or-deploy misconfiguration rather than a runtime
+// condition — which is an argument for catching it at build, not for
+// throwing in the browser. Recorded in the register's 2.6 as the open
+// half of the question.
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
   {

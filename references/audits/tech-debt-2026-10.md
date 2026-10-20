@@ -429,15 +429,74 @@ and `landing.invariant` — which a copy sweep edited for a line no component
 renders, and which only its own test kept alive. A key referenced solely by
 a test or a story counts as dead: the test keeps it compiling, not visible.
 
-### 2.6 Type escapes concentrate in the money and auth paths · M · medium risk · FIX WHEN TOUCHED
+### 2.6 Type escapes concentrate in the money and auth paths · M · medium risk · DONE for the relation casts (#1106)
 
-29 `as unknown as` in the web app, 22 of them under `app/api`,
-`app/favpolls`, `lib/stripe-verify`, `lib/disbursement` or `lib/supabase`.
-The pattern is `(row.favpoll_polls as unknown as { favpoll_id: string })`
-— working around Supabase's generated join types. One typed helper for
-joined rows would remove most of them. Also 12 `process.env.X!`
-non-null assertions, which turn a missing variable into a runtime crash
-rather than a startup error.
+Three things this entry got wrong, and one it got righter than it knew.
+
+**"Working around Supabase's generated join types" — there are no
+generated types.** Every client in the repo is built without one:
+`createClient<Database>` appears nowhere, in either app or the scripts.
+The casts are therefore not working around an awkward generated shape;
+they are hand-written assertions about data that has no type at all.
+
+**The file list was wrong.** `lib/stripe-verify.ts` had zero,
+`lib/supabase/` had zero, and `lib/disbursement` is not a path. The casts
+were 11 in `app/favpolls` and 7 in `app/api`.
+
+**"The pattern is the same each time" — there were two.** The entry's own
+example is the first, and it was the one worth fixing:
+
+1. **A to-one embedded relation asserted to be an object** —
+   `ec.charities as unknown as Charity | null`. Eight of these.
+2. **A whole row asserted to a hand-written type** —
+   `(favpolls ?? []) as unknown as RawFavpoll[]`. Ten of these, and a
+   relation helper does nothing for them: they need the generated types
+   the first finding says do not exist. Left, counted, with that reason.
+   Raised as its own entry (#1138).
+
+**What it got righter than it knew: the first kind were latent bugs, not
+untidy types.** `lib/poll-title.ts` has carried this sentence since the
+subset work — *"PostgREST hands back an object or a one-element array
+depending on the join, so both are accepted"* — and
+`app/appeals/[slug]/page.tsx` dates the lesson to 2026-09-06. Six sites
+handled both shapes. Eight asserted the array could not happen. When it
+does, the cast reads a field off the array itself, gets `undefined`, and
+says nothing.
+
+The worst of the eight was in the close-favpolls cron:
+
+```
+const favpollId = (row.favpoll_polls as unknown as { favpoll_id: string }).favpoll_id
+raisedByFavpoll[favpollId] = (raisedByFavpoll[favpollId] ?? 0) + (row.total_amount ?? 0)
+```
+
+An array-shaped relation made `favpollId` undefined, so the pledge went
+into `raisedByFavpoll["undefined"]` — a key nothing ever reads, since the
+only read is by a real favpoll id. The pledge vanished from
+`total_raised`, **and that total decides the disbursement split.**
+Measured on two rows, one of each shape: £70 and £30 in, £30 out. The
+skip that replaces it is behaviour-preserving, because that bucket was
+already never read; what changes is that the array shape is now
+attributed instead of lost.
+
+`lib/supabase/relation.ts` holds `one` and `many`, generalised from the
+narrow `one` that `poll-title.ts` had already named. Its parameter is
+`unknown`, which is the truth about what it is handed.
+
+**The environment variables: eleven of twelve.** `lib/env.ts` throws
+`Missing required environment variable: X`, naming the variable and never
+its value. The twelfth, `components/stripe-checkout.tsx`, keeps its `!`
+on purpose: it is module scope in a CLIENT component, so a throw renders
+the error boundary instead of the page — a deploy missing that key would
+lose the whole pledge surface rather than the card field on it. A
+`NEXT_PUBLIC_` variable is also inlined at build, so an absent one is a
+build misconfiguration, which argues for catching it at build rather than
+throwing in a browser.
+
+This does **not** move when the failure happens, only what it says. A
+module-scope constant still fails when its module first loads; a function
+still fails when first called. Failing at boot or at build is the open
+half of the question and is not attempted here.
 
 ---
 

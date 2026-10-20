@@ -1,4 +1,5 @@
 import Stripe from "stripe"
+import { requiredEnv } from "@/lib/env"
 import { NextResponse } from "next/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 
@@ -13,7 +14,7 @@ import { createAdminClient } from "@/lib/supabase/admin"
 // STRIPE_WEBHOOK_SECRET in the environment. Until then the route answers
 // 503 (and Stripe retries, harmlessly).
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+const stripe = new Stripe(requiredEnv("STRIPE_SECRET_KEY"))
 
 export async function POST(req: Request) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET
