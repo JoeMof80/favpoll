@@ -16,6 +16,10 @@ apps/web/register-extract/
 apps/web/e2e/.state/
 apps/web/test-results/
 apps/web/playwright-report/
+# Storybook's static build. Gitignored, but a local `storybook build` left
+# 117 generated files failing `prettier --check` (#1110) — the same reason
+# playwright-report is here.
+apps/web/storybook-static/
 *.min.js
 
 # PROSE IS NOT CODE. references/ holds 90 documents written by hand, and
