@@ -11,7 +11,7 @@ import { createAdminClient } from "@/lib/supabase/admin"
 // axis — stay with the wizard's locks until their rows arrive.
 
 import { favpollLocks, readLockInputs, lockReason } from "@/lib/favpoll-locks"
-import { insertSubsetMembers } from "@/app/favpolls/new/actions"
+import { insertSubsetMembers } from "@/lib/subset-members"
 import { asResult } from "@/lib/action-result"
 
 export type StoryField =

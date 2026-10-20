@@ -15,6 +15,14 @@ import {
 } from "@/lib/perfect-topic"
 import { suggestSignatureEvents } from "@/lib/charity-events"
 import { OCCASION_TYPES_BY_REGISTER } from "@/lib/registers"
+import { parseFormData, parseInput } from "@/lib/action-input"
+import { insertSubsetMembers } from "@/lib/subset-members"
+import {
+  createFavpollSchema,
+  personPhotoSchema,
+  photoExtension,
+  registerCharitySchema,
+} from "./create-favpoll-input"
 import type { Charity } from "@favpoll/types"
 
 type CustomTopic = {
@@ -90,8 +98,13 @@ export async function uploadPersonPhoto(formData: FormData): Promise<string> {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
 
-  const file = formData.get("photo") as File
-  if (!file || file.size === 0) throw new Error("No file provided")
+  // `formData.get("photo") as File` was the whole check: a string, a
+  // missing field or a 200MB executable all got past it (#1109).
+  const { photo: file } = parseFormData(
+    personPhotoSchema,
+    formData,
+    "uploadPersonPhoto"
+  )
 
   const supabase = createAdminClient()
 
@@ -99,13 +112,22 @@ export async function uploadPersonPhoto(formData: FormData): Promise<string> {
     .createBucket("protagonists", { public: true })
     .catch(() => null)
 
-  const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg"
+  // THE EXTENSION COMES FROM THE TYPE, NOT THE FILENAME. It used to be
+  // `file.name.split(".").pop()`, so the uploader chose part of the
+  // object key: a name of "../../../etc/passwd" made the key
+  // "<user>/<ts>./etc/passwd", and a name with no dot at all made the
+  // whole name the extension. The schema has already accepted the type,
+  // so the map cannot miss.
+  const ext = photoExtension(file.type)
   const path = `${userId}/${Date.now()}.${ext}`
   const bytes = await file.arrayBuffer()
 
   const { error } = await supabase.storage
     .from("protagonists")
     .upload(path, bytes, {
+      // The schema has confirmed this is one of the image types, which
+      // matters because the bucket is PUBLIC: an unchecked content type
+      // would let a caller serve a page from the project's storage domain.
       contentType: file.type,
       upsert: true,
     })
@@ -259,34 +281,18 @@ async function createPollForFavpoll(
   }
 }
 
-/** The subset's members, as the poll's rows (favpoll-topic-rules §1). */
-export async function insertSubsetMembers(
-  supabase: ReturnType<typeof createAdminClient>,
-  favpollPollId: string,
-  subsetId: string,
-  userId: string
-) {
-  const { data: members } = await supabase
-    .from("topic_subset_items")
-    .select("favourite_id")
-    .eq("subset_id", subsetId)
-  const ids = (members ?? []).map((m) => m.favourite_id as string)
-  if (ids.length === 0) return
-  await supabase.from("favpoll_poll_favourites").insert(
-    ids.map((favourite_id) => ({
-      favpoll_poll_id: favpollPollId,
-      favourite_id,
-      is_guest_added: false,
-      added_by: userId,
-    }))
-  )
-}
-
 export async function createFavpoll(
-  input: CreateFavpollInput
+  rawInput: CreateFavpollInput
 ): Promise<{ favpollId: string }> {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
+
+  // This writes seven tables, so the shape is checked before the first
+  // one. `closesAt` is the field that most needed it: a string Date could
+  // not read reached `new Date(...).toISOString()` below and threw a
+  // RangeError, which the organiser saw as a generic failure at the end
+  // of the wizard.
+  const input = parseInput(createFavpollSchema, rawInput, "createFavpoll")
 
   const supabase = createAdminClient()
   await ensureUser(supabase, userId)
@@ -417,12 +423,18 @@ export async function createFavpoll(
  * OFF the public catalogue (is_active false) and consent 'pending' —
  * approval flips both.
  */
-export async function findOrCreateRegisterCharity(input: {
+export async function findOrCreateRegisterCharity(rawInput: {
   registeredNumber: string
   displayName: string
 }): Promise<Charity> {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
+
+  const input = parseInput(
+    registerCharitySchema,
+    rawInput,
+    "findOrCreateRegisterCharity"
+  )
 
   const number = input.registeredNumber.replace(/\D/g, "")
   if (!number) throw new Error("Invalid charity number")
