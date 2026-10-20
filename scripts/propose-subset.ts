@@ -17,46 +17,46 @@
  * that topic is left alone.
  * ---------------------------------------------------------------------------
  */
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
-const args = process.argv.slice(2);
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
+const args = process.argv.slice(2)
 const opt = (n: string) =>
-  args.find((a) => a.startsWith(`--${n}=`))?.slice(n.length + 3) ?? null;
+  args.find((a) => a.startsWith(`--${n}=`))?.slice(n.length + 3) ?? null
 
 async function main() {
-  const topicTitle = opt("topic");
-  const title = opt("title")?.trim();
+  const topicTitle = opt("topic")
+  const title = opt("title")?.trim()
   const labels = (opt("items") ?? "")
     .split(",")
     .map((l) => l.trim())
-    .filter(Boolean);
-  const reason = opt("reason")?.trim() || null;
+    .filter(Boolean)
+  const reason = opt("reason")?.trim() || null
   if (!topicTitle || !title || labels.length === 0)
-    throw new Error("--topic, --title and --items are all required");
+    throw new Error("--topic, --title and --items are all required")
 
   const { data: topic, error: tErr } = await supabase
     .from("topics")
     .select("id, title, favourites(id, label, is_canonical, review_status)")
     .eq("title", topicTitle)
     .eq("is_active", true)
-    .maybeSingle();
-  if (tErr) throw new Error(tErr.message);
-  if (!topic) throw new Error(`no active topic titled "${topicTitle}"`);
+    .maybeSingle()
+  if (tErr) throw new Error(tErr.message)
+  if (!topic) throw new Error(`no active topic titled "${topicTitle}"`)
 
   const byKey = new Map(
     (topic.favourites ?? [])
       .filter((f) => f.is_canonical && f.review_status !== "rejected")
-      .map((f) => [f.label.toLowerCase(), f]),
-  );
-  const ids: string[] = [];
+      .map((f) => [f.label.toLowerCase(), f])
+  )
+  const ids: string[] = []
   for (const l of labels) {
-    const f = byKey.get(l.toLowerCase());
-    if (!f) console.log(`  ✗ not on ${topic.title}'s list: ${l}`);
-    else if (!ids.includes(f.id)) ids.push(f.id);
+    const f = byKey.get(l.toLowerCase())
+    if (!f) console.log(`  ✗ not on ${topic.title}'s list: ${l}`)
+    else if (!ids.includes(f.id)) ids.push(f.id)
   }
 
   const { data: row, error: sErr } = await supabase
@@ -69,25 +69,25 @@ async function main() {
         source: "admin",
         reason,
       },
-      { onConflict: "topic_id,title", ignoreDuplicates: true },
+      { onConflict: "topic_id,title", ignoreDuplicates: true }
     )
     .select("id")
-    .maybeSingle();
-  if (sErr) throw new Error(sErr.message);
+    .maybeSingle()
+  if (sErr) throw new Error(sErr.message)
   if (!row) {
-    console.log(`  – ${topic.title} › ${title}: already there, left alone`);
-    return;
+    console.log(`  – ${topic.title} › ${title}: already there, left alone`)
+    return
   }
   if (ids.length > 0) {
     const { error: iErr } = await supabase
       .from("topic_subset_items")
-      .insert(ids.map((favourite_id) => ({ subset_id: row.id, favourite_id })));
-    if (iErr) throw new Error(iErr.message);
+      .insert(ids.map((favourite_id) => ({ subset_id: row.id, favourite_id })))
+    if (iErr) throw new Error(iErr.message)
   }
-  console.log(`  proposed ${topic.title} › ${title} (${ids.length} items)`);
+  console.log(`  proposed ${topic.title} › ${title} (${ids.length} items)`)
 }
 
 main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+  console.error(e)
+  process.exit(1)
+})

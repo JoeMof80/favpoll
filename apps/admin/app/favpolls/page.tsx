@@ -1,9 +1,9 @@
-import { getAllFavpolls } from "@/lib/actions/favpolls";
-import { FavpollsTable } from "@/components/favpolls-table";
+import { getAllFavpolls } from "@/lib/actions/favpolls"
+import { FavpollsTable } from "@/components/favpolls-table"
 
 export default async function FavpollsPage() {
-  const { data: favpolls, error } = await getAllFavpolls();
-  const webBaseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? null;
+  const { data: favpolls, error } = await getAllFavpolls()
+  const webBaseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? null
 
   return (
     <div className="space-y-6">
@@ -22,5 +22,5 @@ export default async function FavpollsPage() {
         <FavpollsTable favpolls={favpolls ?? []} webBaseUrl={webBaseUrl} />
       )}
     </div>
-  );
+  )
 }

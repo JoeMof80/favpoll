@@ -1,25 +1,25 @@
 import {
   getPendingContributions,
   getReviewedContributions,
-} from "@/lib/actions/contributions";
+} from "@/lib/actions/contributions"
 import {
   PendingContributionsTable,
   ReviewedContributionsTable,
-} from "@/components/contributions-table";
+} from "@/components/contributions-table"
 
 export default async function ContributionsPage() {
   const [pending, reviewed] = await Promise.all([
     getPendingContributions(),
     getReviewedContributions(),
-  ]);
+  ])
 
-  const pendingItems = pending.data ?? [];
+  const pendingItems = pending.data ?? []
   const acceptedItems = (reviewed.data ?? []).filter(
-    (i) => i.review_status === "accepted",
-  );
+    (i) => i.review_status === "accepted"
+  )
   const rejectedItems = (reviewed.data ?? []).filter(
-    (i) => i.review_status === "rejected",
-  );
+    (i) => i.review_status === "rejected"
+  )
 
   return (
     <div className="space-y-8">
@@ -27,7 +27,7 @@ export default async function ContributionsPage() {
 
       {/* Pending */}
       <section>
-        <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
+        <h2 className="mb-3 text-sm font-medium tracking-wider text-muted-foreground uppercase">
           Pending ({pendingItems.length})
         </h2>
         {pending.error && (
@@ -44,7 +44,7 @@ export default async function ContributionsPage() {
 
       {/* Accepted */}
       <section>
-        <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
+        <h2 className="mb-3 text-sm font-medium tracking-wider text-muted-foreground uppercase">
           Accepted ({acceptedItems.length})
         </h2>
         {acceptedItems.length === 0 ? (
@@ -56,7 +56,7 @@ export default async function ContributionsPage() {
 
       {/* Rejected */}
       <section>
-        <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
+        <h2 className="mb-3 text-sm font-medium tracking-wider text-muted-foreground uppercase">
           Rejected ({rejectedItems.length})
         </h2>
         {rejectedItems.length === 0 ? (
@@ -66,5 +66,5 @@ export default async function ContributionsPage() {
         )}
       </section>
     </div>
-  );
+  )
 }

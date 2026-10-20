@@ -1,19 +1,19 @@
-import { getHomemadeTopics, getSubsets } from "@/lib/actions/subsets";
-import { getTopics } from "@/lib/actions/topics";
-import { SubsetsTable } from "@/components/subsets-table";
-import { HomemadeTopicsTable } from "@/components/homemade-topics-table";
+import { getHomemadeTopics, getSubsets } from "@/lib/actions/subsets"
+import { getTopics } from "@/lib/actions/topics"
+import { SubsetsTable } from "@/components/subsets-table"
+import { HomemadeTopicsTable } from "@/components/homemade-topics-table"
 
 // SUBSETS (favpoll-topic-rules §1): the admin's door. The scan proposes,
 // the admin approves; only approved subsets reach the picker.
 export default async function SubsetsPage() {
   const [{ data, error }, { data: homemade }, { data: topics }] =
-    await Promise.all([getSubsets(), getHomemadeTopics(), getTopics()]);
-  const rows = data ?? [];
+    await Promise.all([getSubsets(), getHomemadeTopics(), getTopics()])
+  const rows = data ?? []
   // Parents are catalogue topics only.
-  const parents = (topics ?? []).filter((t) => t.is_catalogue);
-  const proposed = rows.filter((r) => r.status === "proposed");
-  const approved = rows.filter((r) => r.status === "approved");
-  const rejected = rows.filter((r) => r.status === "rejected");
+  const parents = (topics ?? []).filter((t) => t.is_catalogue)
+  const proposed = rows.filter((r) => r.status === "proposed")
+  const approved = rows.filter((r) => r.status === "approved")
+  const rejected = rows.filter((r) => r.status === "rejected")
 
   return (
     <div className="space-y-8">
@@ -30,7 +30,7 @@ export default async function SubsetsPage() {
       {error && <p className="text-sm text-destructive">{error}</p>}
 
       <section>
-        <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
+        <h2 className="mb-3 text-sm font-medium tracking-wider text-muted-foreground uppercase">
           Proposed ({proposed.length})
         </h2>
         {proposed.length === 0 ? (
@@ -43,7 +43,7 @@ export default async function SubsetsPage() {
       </section>
 
       <section>
-        <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
+        <h2 className="mb-3 text-sm font-medium tracking-wider text-muted-foreground uppercase">
           Approved ({approved.length})
         </h2>
         {approved.length === 0 ? (
@@ -54,7 +54,7 @@ export default async function SubsetsPage() {
       </section>
 
       <section>
-        <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
+        <h2 className="mb-3 text-sm font-medium tracking-wider text-muted-foreground uppercase">
           Homemade topics ({(homemade ?? []).length})
         </h2>
         <p className="mb-3 max-w-2xl text-sm text-muted-foreground">
@@ -72,7 +72,7 @@ export default async function SubsetsPage() {
       </section>
 
       <section>
-        <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
+        <h2 className="mb-3 text-sm font-medium tracking-wider text-muted-foreground uppercase">
           Rejected ({rejected.length})
         </h2>
         {rejected.length === 0 ? (
@@ -82,5 +82,5 @@ export default async function SubsetsPage() {
         )}
       </section>
     </div>
-  );
+  )
 }

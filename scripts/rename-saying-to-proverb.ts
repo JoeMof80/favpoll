@@ -24,13 +24,13 @@
  * Idempotent: a database already renamed reports and changes nothing.
  * ---------------------------------------------------------------------------
  */
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
-const DRY = process.argv.includes("--dry-run");
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
+const DRY = process.argv.includes("--dry-run")
 
 /** Sayings, mottos and modern coinages — not proverbs. */
 const TRIM = [
@@ -42,31 +42,31 @@ const TRIM = [
   "Onwards and upwards",
   "Strong opinions, loosely held",
   "There's no such thing as a daft question",
-];
+]
 
 async function main() {
   const { data: found } = await supabase
     .from("topics")
     .select("id, title")
-    .in("title", ["Saying", "Proverb"]);
-  const rows = found ?? [];
+    .in("title", ["Saying", "Proverb"])
+  const rows = found ?? []
   if (rows.length === 0) {
-    console.log("No Saying or Proverb topic here — nothing to do.");
-    return;
+    console.log("No Saying or Proverb topic here — nothing to do.")
+    return
   }
   // ORDER MATTERS: seeding first creates "Proverb" beside "Saying",
   // because the seed inserts a title it cannot find. Refuse rather than
   // rename one of a pair and leave the catalogue holding both.
   if (rows.length > 1) {
     throw new Error(
-      'Both "Saying" and "Proverb" exist here — the seed ran before this script. Merge them by hand: move any pledged item to the keeper, delete the empty topic, then re-run.',
-    );
+      'Both "Saying" and "Proverb" exist here — the seed ran before this script. Merge them by hand: move any pledged item to the keeper, delete the empty topic, then re-run.'
+    )
   }
-  const topic = rows[0];
+  const topic = rows[0]
 
   if (topic.title === "Saying") {
     if (DRY) {
-      console.log('  → rename topic "Saying" to "Proverb"');
+      console.log('  → rename topic "Saying" to "Proverb"')
     } else {
       const { error } = await supabase
         .from("topics")
@@ -74,12 +74,12 @@ async function main() {
           title: "Proverb",
           description: "The one they always came back to",
         })
-        .eq("id", topic.id);
-      if (error) throw new Error(error.message);
-      console.log('  ✓ topic renamed to "Proverb"');
+        .eq("id", topic.id)
+      if (error) throw new Error(error.message)
+      console.log('  ✓ topic renamed to "Proverb"')
     }
   } else {
-    console.log("  = topic is already Proverb");
+    console.log("  = topic is already Proverb")
   }
 
   const { data: subset } = await supabase
@@ -87,16 +87,16 @@ async function main() {
     .select("id")
     .eq("topic_id", topic.id)
     .eq("title", "British saying")
-    .maybeSingle();
+    .maybeSingle()
   if (subset) {
     if (DRY) {
-      console.log('  → rename subset "British saying" to "British proverb"');
+      console.log('  → rename subset "British saying" to "British proverb"')
     } else {
       await supabase
         .from("topic_subsets")
         .update({ title: "British proverb" })
-        .eq("id", subset.id);
-      console.log('  ✓ subset renamed to "British proverb"');
+        .eq("id", subset.id)
+      console.log('  ✓ subset renamed to "British proverb"')
     }
   }
 
@@ -106,47 +106,47 @@ async function main() {
       .select("id, label, all_time_count")
       .eq("topic_id", topic.id)
       .eq("label", label)
-      .maybeSingle();
-    if (!item) continue;
+      .maybeSingle()
+    if (!item) continue
     if ((item.all_time_count ?? 0) > 0) {
       console.warn(
-        `  ✗ "${label}": ${item.all_time_count} pledge(s) on it — left alone, the record keeps what guests picked`,
-      );
-      continue;
+        `  ✗ "${label}": ${item.all_time_count} pledge(s) on it — left alone, the record keeps what guests picked`
+      )
+      continue
     }
     // A pick inside a live poll counts too, whatever the all-time total says.
     const { count } = await supabase
       .from("pledge_allocations")
       .select("id", { count: "exact", head: true })
-      .eq("favourite_id", item.id);
+      .eq("favourite_id", item.id)
     if (count) {
-      console.warn(`  ✗ "${label}": ${count} allocation(s) — left alone`);
-      continue;
+      console.warn(`  ✗ "${label}": ${count} allocation(s) — left alone`)
+      continue
     }
     if (DRY) {
-      console.log(`  → delete "${label}"`);
-      continue;
+      console.log(`  → delete "${label}"`)
+      continue
     }
     await supabase
       .from("favpoll_poll_favourites")
       .delete()
-      .eq("favourite_id", item.id);
+      .eq("favourite_id", item.id)
     await supabase
       .from("topic_subset_items")
       .delete()
-      .eq("favourite_id", item.id);
+      .eq("favourite_id", item.id)
     const { error } = await supabase
       .from("favourites")
       .delete()
-      .eq("id", item.id);
-    if (error) console.warn(`  ✗ "${label}": ${error.message}`);
-    else console.log(`  ✓ deleted "${label}"`);
+      .eq("id", item.id)
+    if (error) console.warn(`  ✗ "${label}": ${error.message}`)
+    else console.log(`  ✓ deleted "${label}"`)
   }
 
-  console.log(DRY ? "--dry-run: nothing written." : "Done.");
+  console.log(DRY ? "--dry-run: nothing written." : "Done.")
 }
 
 main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+  console.error(e)
+  process.exit(1)
+})

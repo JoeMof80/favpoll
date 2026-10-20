@@ -1,4 +1,4 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
   // THE LIBRARY reads references/*.md off the disk at request time
@@ -7,6 +7,6 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/library/[slug]": ["../../references/*.md"],
   },
-};
+}
 
-export default nextConfig;
+export default nextConfig

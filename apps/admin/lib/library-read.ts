@@ -1,7 +1,7 @@
-import "server-only";
-import { readFile } from "node:fs/promises";
-import path from "node:path";
-import { findBySlug, type LibraryEntry } from "./library";
+import "server-only"
+import { readFile } from "node:fs/promises"
+import path from "node:path"
+import { findBySlug, type LibraryEntry } from "./library"
 
 // Only a file the registry names is ever read, and only from references/.
 // The slug comes from the URL; the registry turns it back into a filename,
@@ -11,16 +11,16 @@ import { findBySlug, type LibraryEntry } from "./library";
 // development that is the working directory's parent; on Vercel the files
 // are carried into the function by next.config's outputFileTracingIncludes
 // and keep the same relative position.
-const REFERENCES_DIR = path.resolve(process.cwd(), "../../references");
+const REFERENCES_DIR = path.resolve(process.cwd(), "../../references")
 
 export async function readReference(
-  slug: string,
+  slug: string
 ): Promise<{ entry: LibraryEntry; markdown: string } | null> {
-  const entry = findBySlug(slug);
-  if (!entry || entry.kind !== "reference") return null;
+  const entry = findBySlug(slug)
+  if (!entry || entry.kind !== "reference") return null
   const markdown = await readFile(
     path.join(REFERENCES_DIR, entry.source),
-    "utf8",
-  );
-  return { entry, markdown };
+    "utf8"
+  )
+  return { entry, markdown }
 }

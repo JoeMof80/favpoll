@@ -16,13 +16,13 @@
  * Idempotent: it adds what is missing and removes nothing a guest picked.
  * ---------------------------------------------------------------------------
  */
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
-const DRY = process.argv.includes("--dry-run");
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
+const DRY = process.argv.includes("--dry-run")
 
 const MEMBERS = [
   "An Englishman's home is his castle",
@@ -36,66 +36,66 @@ const MEMBERS = [
   "Least said, soonest mended",
   "Mustn't grumble",
   "It'll be grand",
-];
+]
 
 async function main() {
   const { data: topic } = await supabase
     .from("topics")
     .select("id")
     .eq("title", "Proverb")
-    .maybeSingle();
+    .maybeSingle()
   if (!topic) {
-    console.log("No Proverb topic here — nothing to do.");
-    return;
+    console.log("No Proverb topic here — nothing to do.")
+    return
   }
   const { data: subset } = await supabase
     .from("topic_subsets")
     .select("id, status, topic_subset_items(favourite_id)")
     .eq("topic_id", topic.id)
     .eq("title", "British proverb")
-    .maybeSingle();
+    .maybeSingle()
   if (!subset) {
-    console.log("No British proverb subset here — the copy will create it.");
-    return;
+    console.log("No British proverb subset here — the copy will create it.")
+    return
   }
   const { data: favs } = await supabase
     .from("favourites")
     .select("id, label")
-    .eq("topic_id", topic.id);
+    .eq("topic_id", topic.id)
   const byLabel = new Map(
-    (favs ?? []).map((f) => [f.label.toLowerCase(), f.id]),
-  );
+    (favs ?? []).map((f) => [f.label.toLowerCase(), f.id])
+  )
   const have = new Set(
-    (subset.topic_subset_items ?? []).map((i) => i.favourite_id),
-  );
-  const rows: { subset_id: string; favourite_id: string }[] = [];
+    (subset.topic_subset_items ?? []).map((i) => i.favourite_id)
+  )
+  const rows: { subset_id: string; favourite_id: string }[] = []
   for (const label of MEMBERS) {
-    const id = byLabel.get(label.toLowerCase());
+    const id = byLabel.get(label.toLowerCase())
     // A label the trim removed here simply is not a member here.
-    if (!id || have.has(id)) continue;
-    rows.push({ subset_id: subset.id, favourite_id: id });
+    if (!id || have.has(id)) continue
+    rows.push({ subset_id: subset.id, favourite_id: id })
   }
   if (rows.length === 0) {
-    console.log(`British proverb: ${have.size} members, nothing to add.`);
+    console.log(`British proverb: ${have.size} members, nothing to add.`)
   } else if (DRY) {
-    console.log(`→ would add ${rows.length} members`);
+    console.log(`→ would add ${rows.length} members`)
   } else {
-    const { error } = await supabase.from("topic_subset_items").insert(rows);
-    if (error) throw new Error(error.message);
+    const { error } = await supabase.from("topic_subset_items").insert(rows)
+    if (error) throw new Error(error.message)
     console.log(
-      `British proverb: ${have.size} → ${have.size + rows.length} members`,
-    );
+      `British proverb: ${have.size} → ${have.size + rows.length} members`
+    )
   }
   if (!DRY && subset.status !== "approved") {
     await supabase
       .from("topic_subsets")
       .update({ status: "approved", is_active: true })
-      .eq("id", subset.id);
-    console.log("British proverb: approved");
+      .eq("id", subset.id)
+    console.log("British proverb: approved")
   }
 }
 
 main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+  console.error(e)
+  process.exit(1)
+})

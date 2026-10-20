@@ -34,13 +34,13 @@
  * --dry-run says what it would change.
  * ---------------------------------------------------------------------------
  */
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
-const DRY = process.argv.includes("--dry-run");
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
+const DRY = process.argv.includes("--dry-run")
 
 const FIXES = [
   {
@@ -53,51 +53,51 @@ const FIXES = [
     from: "MAC Bevan Charitable Trust",
     to: "Mac Bevan Charitable Trust",
   },
-];
+]
 
 async function main() {
-  let changed = 0;
+  let changed = 0
   for (const fix of FIXES) {
     const { data: rows, error } = await supabase
       .from("charities")
       .select("id, name")
-      .eq("registered_number", fix.registered_number);
-    if (error) throw new Error(error.message);
+      .eq("registered_number", fix.registered_number)
+    if (error) throw new Error(error.message)
 
-    const row = (rows ?? [])[0];
+    const row = (rows ?? [])[0]
     if (!row) {
-      console.log(`  – ${fix.registered_number}: not in this database.`);
-      continue;
+      console.log(`  – ${fix.registered_number}: not in this database.`)
+      continue
     }
     if (row.name === fix.to) {
-      console.log(`  – ${fix.registered_number}: already "${fix.to}".`);
-      continue;
+      console.log(`  – ${fix.registered_number}: already "${fix.to}".`)
+      continue
     }
     if (row.name !== fix.from) {
       // Someone has edited it since. Their wording wins over this script's.
       console.log(
         `  ! ${fix.registered_number}: holds "${row.name}", not the string ` +
-          `this script was written for. LEFT ALONE.`,
-      );
-      continue;
+          `this script was written for. LEFT ALONE.`
+      )
+      continue
     }
     if (DRY) {
-      console.log(`  → would set "${fix.from}" to "${fix.to}"`);
-      changed++;
-      continue;
+      console.log(`  → would set "${fix.from}" to "${fix.to}"`)
+      changed++
+      continue
     }
     const { error: upErr } = await supabase
       .from("charities")
       .update({ name: fix.to })
-      .eq("id", row.id);
-    if (upErr) throw new Error(upErr.message);
-    console.log(`  ✓ "${fix.from}" → "${fix.to}"`);
-    changed++;
+      .eq("id", row.id)
+    if (upErr) throw new Error(upErr.message)
+    console.log(`  ✓ "${fix.from}" → "${fix.to}"`)
+    changed++
   }
-  console.log(DRY ? `${changed} would change.` : `${changed} changed.`);
+  console.log(DRY ? `${changed} would change.` : `${changed} changed.`)
 }
 
 main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+  console.error(e)
+  process.exit(1)
+})

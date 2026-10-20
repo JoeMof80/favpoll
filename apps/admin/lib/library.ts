@@ -16,28 +16,28 @@
 // Only files named here can be read — the reader checks the registry before
 // touching the disk.
 
-export type LibraryKind = "reference" | "artifact" | "doc" | "external";
+export type LibraryKind = "reference" | "artifact" | "doc" | "external"
 
 export type LibraryEntry = {
   /** Shown as the title; the registry's own words, not the file's heading. */
-  title: string;
+  title: string
   /** One line: what it is and why you would open it. */
-  summary: string;
-  kind: LibraryKind;
+  summary: string
+  kind: LibraryKind
   /** reference: the filename under references/. Otherwise: the URL. */
-  source: string;
+  source: string
   /** ISO date of the document's last substantive revision. */
-  date: string;
-  section: LibrarySection;
-};
+  date: string
+  section: LibrarySection
+}
 
 export const SECTIONS = [
   "The rail & the law",
   "Product & research",
   "Channels & outreach",
   "Running the company",
-] as const;
-export type LibrarySection = (typeof SECTIONS)[number];
+] as const
+export type LibrarySection = (typeof SECTIONS)[number]
 
 export const LIBRARY: LibraryEntry[] = [
   // ── The rail & the law ──────────────────────────────────────────────────
@@ -368,19 +368,19 @@ export const LIBRARY: LibraryEntry[] = [
     date: "2026-05-19",
     section: "Running the company",
   },
-];
+]
 
 /** The slug a reference reads at: its filename without the extension. */
 export function slugFor(entry: LibraryEntry): string {
-  return entry.source.replace(/\.md$/i, "");
+  return entry.source.replace(/\.md$/i, "")
 }
 
 export function findBySlug(slug: string): LibraryEntry | undefined {
-  return LIBRARY.find((e) => e.kind === "reference" && slugFor(e) === slug);
+  return LIBRARY.find((e) => e.kind === "reference" && slugFor(e) === slug)
 }
 
 export function entriesIn(section: LibrarySection): LibraryEntry[] {
   return LIBRARY.filter((e) => e.section === section).sort((a, b) =>
-    b.date.localeCompare(a.date),
-  );
+    b.date.localeCompare(a.date)
+  )
 }

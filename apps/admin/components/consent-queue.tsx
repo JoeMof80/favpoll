@@ -1,25 +1,25 @@
-"use client";
+"use client"
 
-import { useState, useTransition } from "react";
-import { Mail } from "lucide-react";
-import type { ConsentQueueRow } from "@/lib/actions/charities";
-import type { AdminTopic } from "@/lib/actions/topics";
+import { useState, useTransition } from "react"
+import { Mail } from "lucide-react"
+import type { ConsentQueueRow } from "@/lib/actions/charities"
+import type { AdminTopic } from "@/lib/actions/topics"
 import {
   markCharityContacted,
   setCauseFamily,
   setCharityConsent,
-} from "@/lib/actions/charities";
+} from "@/lib/actions/charities"
 import {
   CAUSE_FAMILIES,
   CAUSE_FAMILY_LABELS,
   type CauseFamily,
-} from "@favpoll/types";
-import { Button } from "@/components/ui/button";
-import { StatusBadge } from "@/components/ui/status-badge";
-import { PerfectTopicSelect } from "@/components/perfect-topic-select";
+} from "@favpoll/types"
+import { Button } from "@/components/ui/button"
+import { StatusBadge } from "@/components/ui/status-badge"
+import { PerfectTopicSelect } from "@/components/perfect-topic-select"
 // The words live in lib/outreach-email.ts so /outreach can render the
 // same ones without opening a draft. Behaviour here is unchanged.
-import { inviteEmail, welcomeEmail, mailtoFor } from "@/lib/outreach-email";
+import { inviteEmail, welcomeEmail, mailtoFor } from "@/lib/outreach-email"
 
 // ─── Consent outreach queue ──────────────────────────────────────────────────
 //
@@ -41,18 +41,18 @@ import { inviteEmail, welcomeEmail, mailtoFor } from "@/lib/outreach-email";
 // `activities` text sits beneath so the admin can judge it. "No cause of
 // its own" is a real choice — grant-makers get it — not a missing value.
 function CauseFamilySelect({ row }: { row: ConsentQueueRow }) {
-  const [isPending, startTransition] = useTransition();
+  const [isPending, startTransition] = useTransition()
   const [value, setValue] = useState<CauseFamily | "">(
-    row.cause_family ?? row.cause_family_suggested ?? "",
-  );
-  const confirmed = row.cause_family != null;
-  const suggested = !confirmed && row.cause_family_suggested != null;
+    row.cause_family ?? row.cause_family_suggested ?? ""
+  )
+  const confirmed = row.cause_family != null
+  const suggested = !confirmed && row.cause_family_suggested != null
 
   function handleChange(next: CauseFamily | "") {
-    setValue(next);
+    setValue(next)
     startTransition(async () => {
-      await setCauseFamily(row.id, next === "" ? null : next);
-    });
+      await setCauseFamily(row.id, next === "" ? null : next)
+    })
   }
 
   return (
@@ -63,7 +63,7 @@ function CauseFamilySelect({ row }: { row: ConsentQueueRow }) {
           value={value}
           disabled={isPending}
           onChange={(e) => handleChange(e.target.value as CauseFamily | "")}
-          className="h-8 rounded-lg border border-border bg-background px-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+          className="h-8 rounded-lg border border-border bg-background px-2 text-sm focus:ring-1 focus:ring-ring focus:outline-none"
         >
           <option value="">No cause of its own</option>
           {CAUSE_FAMILIES.map((f) => (
@@ -93,35 +93,35 @@ function CauseFamilySelect({ row }: { row: ConsentQueueRow }) {
         </p>
       )}
     </div>
-  );
+  )
 }
 
 function QueueRow({
   row,
   topics,
 }: {
-  row: ConsentQueueRow;
-  topics: AdminTopic[];
+  row: ConsentQueueRow
+  topics: AdminTopic[]
 }) {
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition()
+  const [error, setError] = useState<string | null>(null)
   // A charity the register has removed is neither invited nor approved:
   // the invite asks it to receive money, and approval opens the rail.
   // Decline stays available — it is the way out.
-  const removed = row.register_verdict === "removed";
+  const removed = row.register_verdict === "removed"
 
   function handleConsent(status: "approved" | "declined") {
-    setError(null);
+    setError(null)
     startTransition(async () => {
-      const result = await setCharityConsent(row.id, status);
+      const result = await setCharityConsent(row.id, status)
       if (result.error) {
-        setError(result.error);
+        setError(result.error)
       } else if (status === "approved" && row.registered_email) {
         // Approval removes the row from the queue, so the welcome email
         // drafts NOW — the one moment the ask can't be forgotten.
-        window.location.href = mailtoFor(welcomeEmail(row));
+        window.location.href = mailtoFor(welcomeEmail(row))
       }
-    });
+    })
   }
 
   return (
@@ -206,19 +206,19 @@ function QueueRow({
 
       {error && <p className="w-full text-sm text-destructive">{error}</p>}
     </div>
-  );
+  )
 }
 
 export function ConsentQueue({
   rows,
   topics = [],
 }: {
-  rows: ConsentQueueRow[];
-  topics?: AdminTopic[];
+  rows: ConsentQueueRow[]
+  topics?: AdminTopic[]
 }) {
   // No section at all when nothing is waiting — the queue only exists
   // when there is work.
-  if (rows.length === 0) return null;
+  if (rows.length === 0) return null
 
   return (
     <section className="space-y-2">
@@ -234,5 +234,5 @@ export function ConsentQueue({
         ))}
       </div>
     </section>
-  );
+  )
 }

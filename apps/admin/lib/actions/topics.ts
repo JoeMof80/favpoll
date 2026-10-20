@@ -1,41 +1,41 @@
-"use server";
+"use server"
 
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/supabase/admin"
 
 export type AdminTopic = {
-  id: string;
-  title: string;
+  id: string
+  title: string
   /** A catalogue topic (no organiser made it): the only kind a subset
    *  can have as its parent. */
-  is_catalogue: boolean;
+  is_catalogue: boolean
   /** The topic's approved, listed SUBSETS (favpoll-topic-rules §1): a
    *  charity's perfect topic may be one of these, confirmed beside it. */
-  subsets: { id: string; title: string }[];
-};
+  subsets: { id: string; title: string }[]
+}
 
 export async function getTopics(): Promise<{
-  data: AdminTopic[] | null;
-  error: string | null;
+  data: AdminTopic[] | null
+  error: string | null
 }> {
-  const supabase = createAdminClient();
+  const supabase = createAdminClient()
 
   const { data, error } = await supabase
     .from("topics")
     .select(
-      "id, title, created_by, topic_subsets(id, title, status, is_active)",
+      "id, title, created_by, topic_subsets(id, title, status, is_active)"
     )
     .eq("is_active", true)
-    .order("title");
+    .order("title")
 
-  if (error) return { data: null, error: error.message };
+  if (error) return { data: null, error: error.message }
   type Raw = {
-    id: string;
-    title: string;
-    created_by: string | null;
+    id: string
+    title: string
+    created_by: string | null
     topic_subsets:
       | { id: string; title: string; status: string; is_active: boolean }[]
-      | null;
-  };
+      | null
+  }
   return {
     data: ((data ?? []) as Raw[]).map((t) => ({
       id: t.id,
@@ -47,5 +47,5 @@ export async function getTopics(): Promise<{
         .sort((a, b) => a.title.localeCompare(b.title)),
     })),
     error: null,
-  };
+  }
 }

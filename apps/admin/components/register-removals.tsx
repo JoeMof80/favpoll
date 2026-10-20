@@ -1,5 +1,5 @@
-import type { RegisterRemoval } from "@/lib/actions/charities";
-import { StatusBadge } from "@/components/ui/status-badge";
+import type { RegisterRemoval } from "@/lib/actions/charities"
+import { StatusBadge } from "@/components/ui/status-badge"
 
 // ─── The removal check ───────────────────────────────────────────────────────
 //
@@ -19,35 +19,35 @@ const GBP = new Intl.NumberFormat("en-GB", {
   currency: "GBP",
   minimumFractionDigits: 0,
   maximumFractionDigits: 0,
-});
+})
 
-const date = (iso: string) => new Date(iso).toLocaleDateString("en-GB");
+const date = (iso: string) => new Date(iso).toLocaleDateString("en-GB")
 
 /** What is at stake on this account — the reason a removal is urgent
  *  rather than tidy. "Nothing points at it yet" is the good case. */
 function Stake({ row }: { row: RegisterRemoval }) {
-  const parts: string[] = [];
+  const parts: string[] = []
   if (row.favpoll_count > 0)
     parts.push(
       `${row.favpoll_count} favpoll${row.favpoll_count === 1 ? "" : "s"}` +
-        (row.open_count > 0 ? ` (${row.open_count} still open)` : ""),
-    );
-  if (row.raised > 0) parts.push(`${GBP.format(row.raised)} raised`);
+        (row.open_count > 0 ? ` (${row.open_count} still open)` : "")
+    )
+  if (row.raised > 0) parts.push(`${GBP.format(row.raised)} raised`)
   if (row.pending_disbursements > 0)
     parts.push(
       `${row.pending_disbursements} payout${
         row.pending_disbursements === 1 ? "" : "s"
-      } pending, ${GBP.format(row.pending_amount)}`,
-    );
+      } pending, ${GBP.format(row.pending_amount)}`
+    )
   if (row.gift_aid_declarations > 0)
-    parts.push(`${row.gift_aid_declarations} Gift Aid declarations`);
-  if (!row.is_active) parts.push("already inactive");
+    parts.push(`${row.gift_aid_declarations} Gift Aid declarations`)
+  if (!row.is_active) parts.push("already inactive")
 
   return (
     <p className="text-xs text-muted-foreground">
       {parts.length === 0 ? "Nothing points at it yet" : parts.join(" · ")}
     </p>
-  );
+  )
 }
 
 function Row({ row }: { row: RegisterRemoval }) {
@@ -80,21 +80,21 @@ function Row({ row }: { row: RegisterRemoval }) {
         <StatusBadge tone="warning">Not in the latest extract</StatusBadge>
       )}
     </div>
-  );
+  )
 }
 
 export function RegisterRemovals({ rows }: { rows: RegisterRemoval[] }) {
-  const removed = rows.filter((r) => r.verdict === "removed");
-  const gone = rows.filter((r) => r.verdict === "gone");
-  const unknown = rows.filter((r) => r.verdict === "unknown");
+  const removed = rows.filter((r) => r.verdict === "removed")
+  const gone = rows.filter((r) => r.verdict === "gone")
+  const unknown = rows.filter((r) => r.verdict === "unknown")
 
   // No section at all when every account is cleanly Registered.
-  if (rows.length === 0) return null;
+  if (rows.length === 0) return null
 
   // Nothing is wrong, something is merely unknown: one quiet line, and
   // none of the alarm.
   if (removed.length === 0 && gone.length === 0) {
-    return <UnknownLine rows={unknown} />;
+    return <UnknownLine rows={unknown} />
   }
 
   return (
@@ -108,7 +108,7 @@ export function RegisterRemovals({ rows }: { rows: RegisterRemoval[] }) {
         </span>
       </h2>
 
-      <div className="divide-y divide-destructive/20 rounded-lg border border-destructive/40 bg-destructive-muted/30">
+      <div className="bg-destructive-muted/30 divide-y divide-destructive/20 rounded-lg border border-destructive/40">
         {[...removed, ...gone].map((row) => (
           <Row key={row.charity_id} row={row} />
         ))}
@@ -131,23 +131,23 @@ export function RegisterRemovals({ rows }: { rows: RegisterRemoval[] }) {
 
       <UnknownLine rows={unknown} />
     </section>
-  );
+  )
 }
 
 /** Quiet by design: a charity registered since the extract has no mirror
  *  row and verifies against the live API perfectly well. A typo lives
  *  here too, which is why it is named rather than hidden. */
 function UnknownLine({ rows }: { rows: RegisterRemoval[] }) {
-  if (rows.length === 0) return null;
+  if (rows.length === 0) return null
   return (
     <p className="text-xs text-muted-foreground">
       No mirror row (registered since the extract, a linked number, or a typo):{" "}
       {rows
         .map(
           (r) =>
-            `${r.name}${r.registered_number ? ` (${r.registered_number})` : ""}`,
+            `${r.name}${r.registered_number ? ` (${r.registered_number})` : ""}`
         )
         .join(", ")}
     </p>
-  );
+  )
 }

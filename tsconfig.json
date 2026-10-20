@@ -7,7 +7,9 @@
     "skipLibCheck": true,
     "typeRoots": ["apps/web/node_modules/@types"],
     "paths": {
-      "@supabase/supabase-js": ["./apps/web/node_modules/@supabase/supabase-js/dist/index.d.cts"]
+      "@supabase/supabase-js": [
+        "./apps/web/node_modules/@supabase/supabase-js/dist/index.d.cts"
+      ]
     }
   },
   "include": ["scripts/**/*.ts"]

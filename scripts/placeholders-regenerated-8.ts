@@ -24,7 +24,8 @@ export const regeneratedPlaceholdersBatch8: Record<
     remembering: {
       about:
         "There was a sound that meant she was home before anyone saw her, and the whole house knew it.",
-      reveal: "Hers was the kettle boiling. Four times a day, more in a crisis.",
+      reveal:
+        "Hers was the kettle boiling. Four times a day, more in a crisis.",
     },
     celebrating_one: {
       about:
@@ -152,7 +153,8 @@ export const regeneratedPlaceholdersBatch8: Record<
     celebrating_many: {
       about:
         "They tape one and watch the other live — the schedule is sacred and the order is not discussed.",
-      reveal: "Hers is Emmerdale, his is Neighbours. The omnibus settled nothing.",
+      reveal:
+        "Hers is Emmerdale, his is Neighbours. The omnibus settled nothing.",
     },
     cause: {
       about: "Pick the one you never missed and pledge what it's worth.",
@@ -170,7 +172,8 @@ export const regeneratedPlaceholdersBatch8: Record<
     remembering: {
       about:
         "Every summer, same seafront, and she went straight past the gentle rides without a glance.",
-      reveal: "Hers was the waltzers. Front seat, arms up, well into her seventies.",
+      reveal:
+        "Hers was the waltzers. Front seat, arms up, well into her seventies.",
     },
     celebrating_one: {
       about:
@@ -243,8 +246,7 @@ export const regeneratedPlaceholdersBatch8: Record<
         "Hers is the vampire, his is the werewolf. They have been arguing about who would win since 2014.",
     },
     cause: {
-      about:
-        "Pick the costume you come back to and pledge what it's worth.",
+      about: "Pick the costume you come back to and pledge what it's worth.",
       reveal:
         "Our pick to start: the ghost — the one everybody has worn at least once.",
     },
@@ -303,8 +305,7 @@ export const regeneratedPlaceholdersBatch8: Record<
     },
     cause: {
       about: "Pick the one you'd sail with and pledge what it's worth.",
-      reveal:
-        "Our pick to start: Captain Hook — the one everybody met first.",
+      reveal: "Our pick to start: Captain Hook — the one everybody met first.",
     },
     neutral: {
       about:
@@ -357,7 +358,8 @@ export const regeneratedPlaceholdersBatch8: Record<
     celebrating_many: {
       about:
         "A couple who disagree entirely about which part is worth the ticket.",
-      reveal: "Hers is the acrobats, his is the clowns. They sit together anyway.",
+      reveal:
+        "Hers is the acrobats, his is the clowns. They sit together anyway.",
     },
     cause: {
       about:

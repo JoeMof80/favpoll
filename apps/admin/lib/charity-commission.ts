@@ -2,26 +2,26 @@
 // https://api-portal.charitycommission.gov.uk/ — auth via the
 // Ocp-Apim-Subscription-Key header (CHARITY_COMMISSION_API_KEY).
 
-const API_BASE = "https://api.charitycommission.gov.uk/register/api";
+const API_BASE = "https://api.charitycommission.gov.uk/register/api"
 
 export type VerificationStatus =
   | "verified"
   | "name_mismatch"
   | "not_found"
   | "removed"
-  | "error";
+  | "error"
 
 export type CharityVerification = {
-  status: VerificationStatus;
+  status: VerificationStatus
   /** The name on the register, when the charity number resolved. */
-  registeredName: string | null;
-};
+  registeredName: string | null
+}
 
 type RegisterDetails = {
-  charity_name: string;
-  reg_status: string; // "R" = registered
-  date_of_removal: string | null;
-};
+  charity_name: string
+  reg_status: string // "R" = registered
+  date_of_removal: string | null
+}
 
 /** The ONE answer to "is this the same charity name": case, spaces and
  *  punctuation all dropped, so "BARNARDO'S" and "Barnardos" are the same
@@ -53,7 +53,7 @@ export function normaliseName(name: string): string {
       // "UK" is part of the brand in Diabetes UK and Age UK.
       .replace(/[\s,.]*\b(limited|ltd)\.?\s*$/, "")
       .replace(/[^a-z0-9]+/g, "")
-  );
+  )
 }
 
 /**
@@ -63,65 +63,64 @@ export function normaliseName(name: string): string {
  */
 export async function verifyCharityNumber(
   registeredNumber: string,
-  ourName: string,
+  ourName: string
 ): Promise<CharityVerification> {
-  const apiKey = process.env.CHARITY_COMMISSION_API_KEY;
+  const apiKey = process.env.CHARITY_COMMISSION_API_KEY
   if (!apiKey) {
-    console.error("[charity-commission] CHARITY_COMMISSION_API_KEY not set");
-    return { status: "error", registeredName: null };
+    console.error("[charity-commission] CHARITY_COMMISSION_API_KEY not set")
+    return { status: "error", registeredName: null }
   }
 
-  const digits = registeredNumber.replace(/\D/g, "");
-  if (!digits) return { status: "not_found", registeredName: null };
+  const digits = registeredNumber.replace(/\D/g, "")
+  if (!digits) return { status: "not_found", registeredName: null }
 
   try {
     const res = await fetch(`${API_BASE}/allcharitydetails/${digits}/0`, {
       headers: { "Ocp-Apim-Subscription-Key": apiKey },
       cache: "no-store",
-    });
+    })
 
-    if (res.status === 404)
-      return { status: "not_found", registeredName: null };
+    if (res.status === 404) return { status: "not_found", registeredName: null }
     if (!res.ok) {
-      console.error(`[charity-commission] lookup failed: HTTP ${res.status}`);
-      return { status: "error", registeredName: null };
+      console.error(`[charity-commission] lookup failed: HTTP ${res.status}`)
+      return { status: "error", registeredName: null }
     }
 
-    const details = (await res.json()) as RegisterDetails;
-    const registeredName = details.charity_name ?? null;
+    const details = (await res.json()) as RegisterDetails
+    const registeredName = details.charity_name ?? null
 
     if (details.reg_status !== "R" || details.date_of_removal) {
-      return { status: "removed", registeredName };
+      return { status: "removed", registeredName }
     }
     if (
       registeredName &&
       normaliseName(registeredName) !== normaliseName(ourName)
     ) {
-      return { status: "name_mismatch", registeredName };
+      return { status: "name_mismatch", registeredName }
     }
-    return { status: "verified", registeredName };
+    return { status: "verified", registeredName }
   } catch (err) {
-    console.error("[charity-commission] lookup error:", err);
-    return { status: "error", registeredName: null };
+    console.error("[charity-commission] lookup error:", err)
+    return { status: "error", registeredName: null }
   }
 }
 
 // ─── Register search (admin "Add from register" typeahead) ───────────────────
 
 export type RegisterSearchResult = {
-  registeredNumber: string;
+  registeredNumber: string
   /** The register's name, ALL CAPS as stored there. */
-  registeredName: string;
+  registeredName: string
   /** Suggested display name for the favpoll charity list. */
-  displayName: string;
-};
+  displayName: string
+}
 
 type RegisterSearchRow = {
-  reg_charity_number: number;
-  charity_name: string;
-  reg_status: string;
-  group_subsid_suffix: number;
-};
+  reg_charity_number: number
+  charity_name: string
+  reg_status: string
+  group_subsid_suffix: number
+}
 
 /**
  * Title-case a register name (stored ALL CAPS) for use as a display-name
@@ -160,7 +159,7 @@ const ACRONYMS = new Set([
   "yha",
   "ymca",
   "ywca",
-]);
+])
 
 /** Short tokens with no vowel that are words all the same: the ordinal
  *  suffixes (1st, 2nd, 3rd, 25th), the titles, and the Welsh place-names
@@ -197,7 +196,7 @@ const VOWELLESS_WORDS = new Set([
   "yn",
   "ynys",
   "yr",
-]);
+])
 
 /** Does this token read as an acronym? The default is NO — a short token is
  *  a word unless there is reason to think otherwise.
@@ -210,14 +209,14 @@ const VOWELLESS_WORDS = new Set([
  *  A denylist of every short word in the language was never going to close;
  *  an allowlist of real acronyms is finite. */
 function readsAsAcronym(word: string): boolean {
-  const letters = word.replace(/[^\p{L}]/gu, "");
-  if (letters.length < 2) return false; // an initial, or a stray "'s"
-  if (ACRONYMS.has(word)) return true;
-  if (VOWELLESS_WORDS.has(word)) return false;
+  const letters = word.replace(/[^\p{L}]/gu, "")
+  if (letters.length < 2) return false // an initial, or a stray "'s"
+  if (ACRONYMS.has(word)) return true
+  if (VOWELLESS_WORDS.has(word)) return false
   // Diacritics are stripped before the vowel test, or "Ynys Môn"
   // reads as vowel-less and comes back shouting "MÔN".
-  const plain = letters.normalize("NFD").replace(/\p{M}/gu, "");
-  return !/[aeiou]/.test(plain); // NSPCC, RSPB, BHF and friends
+  const plain = letters.normalize("NFD").replace(/\p{M}/gu, "")
+  return !/[aeiou]/.test(plain) // NSPCC, RSPB, BHF and friends
 }
 
 /** Connecting words that stay lower-case INSIDE a name — "Friends of the
@@ -246,13 +245,13 @@ const MINOR_WORDS = new Set([
   "upon",
   "via",
   "with",
-]);
+])
 
 /** The ordinal suffixes, which stay lower-case when a digit runs into them:
  *  the register holds thousands of scout groups ("128TH OLDHAM...", "1ST
  *  MITCHAM...") and "128Th" is as wrong as "128TH". Away from a digit these
  *  are words again — "ST JOHN" is a saint, not an ordinal. */
-const ORDINAL_SUFFIXES = new Set(["st", "nd", "rd", "th"]);
+const ORDINAL_SUFFIXES = new Set(["st", "nd", "rd", "th"])
 
 /** Capitalise the first LETTER, not the first character: 390 register names
  *  open with a quote ("'CHESTNUTS' PRE-SCHOOL"), and the token the matcher
@@ -268,40 +267,40 @@ const ORDINAL_SUFFIXES = new Set(["st", "nd", "rd", "th"]);
  *  "Åland Trust" as "åLand Trust". Found while measuring the outreach
  *  preview's casing flag against production. */
 function capitaliseWord(word: string): string {
-  const letters = word.replace(/[^\p{L}]/gu, "");
-  if (letters.length === 1 && word.startsWith("'")) return word;
-  return word.replace(/\p{L}/u, (c) => c.toUpperCase());
+  const letters = word.replace(/[^\p{L}]/gu, "")
+  if (letters.length === 1 && word.startsWith("'")) return word
+  return word.replace(/\p{L}/u, (c) => c.toUpperCase())
 }
 
 export function titleCaseCharityName(name: string): string {
-  const lower = name.toLowerCase();
-  const words = [...lower.matchAll(/[\p{L}']+/gu)];
-  const firstAt = words[0]?.index;
-  const lastAt = words[words.length - 1]?.index;
+  const lower = name.toLowerCase()
+  const words = [...lower.matchAll(/[\p{L}']+/gu)]
+  const firstAt = words[0]?.index
+  const lastAt = words[words.length - 1]?.index
   /** A connecting word is only "inside" the name between two other words:
    *  punctuation starts a fresh phrase, so "Shelter: The National Campaign"
    *  keeps its capital where "Friends of the Earth" does not. */
   const inside = (offset: number) =>
     offset !== firstAt &&
     offset !== lastAt &&
-    !/[.:;!?\-\u2013\u2014(\[/|&]\s*$/.test(lower.slice(0, offset));
+    !/[.:;!?\-\u2013\u2014(\[/|&]\s*$/.test(lower.slice(0, offset))
   return lower.replace(/[\p{L}']+/gu, (w, offset: number) => {
     // Both lookups go through the letters, so a quoted "'the" is still the
     // connecting word "the" and "'nspcc" is still the acronym.
-    const letters = w.replace(/[^\p{L}]/gu, "");
+    const letters = w.replace(/[^\p{L}]/gu, "")
     if (
       ORDINAL_SUFFIXES.has(letters) &&
       /[0-9]/.test(lower.charAt(offset - 1))
     ) {
-      return w;
+      return w
     }
     if (MINOR_WORDS.has(letters)) {
-      if (inside(offset)) return w;
+      if (inside(offset)) return w
     } else if (readsAsAcronym(letters)) {
-      return w.toUpperCase();
+      return w.toUpperCase()
     }
-    return capitaliseWord(w);
-  });
+    return capitaliseWord(w)
+  })
 }
 
 /** Query variants covering the register's literal substring match: the
@@ -309,20 +308,20 @@ export function titleCaseCharityName(name: string): string {
  * so we search both spellings and merge (found the hard way — the founder
  * couldn't find St Luke's Cheshire Hospice, 2026-09-07). */
 export function registerQueryVariants(query: string): string[] {
-  const trimmed = query.trim();
-  const stripped = trimmed.replace(/['\u2019]/g, "");
-  const possessive = stripped.replace(/([a-z])s(\s|$)/gi, "$1's$2");
+  const trimmed = query.trim()
+  const stripped = trimmed.replace(/['\u2019]/g, "")
+  const possessive = stripped.replace(/([a-z])s(\s|$)/gi, "$1's$2")
   return [...new Set([trimmed, stripped, possessive])].filter(
-    (v) => v.length >= 3,
-  );
+    (v) => v.length >= 3
+  )
 }
 
 function normForMatch(s: string): string {
-  return s.toLowerCase().replace(/['\u2019]/g, "");
+  return s.toLowerCase().replace(/['\u2019]/g, "")
 }
 
 function escapeRegex(s: string): string {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
 }
 
 /** Relevance over the register's flat order: names starting with the
@@ -332,52 +331,52 @@ function escapeRegex(s: string): string {
  * behind every shorter St Luke's.) */
 function rankRows(
   rows: RegisterSearchRow[],
-  variants: string[],
+  variants: string[]
 ): RegisterSearchRow[] {
-  const norms = variants.map(normForMatch).filter(Boolean);
+  const norms = variants.map(normForMatch).filter(Boolean)
   const score = (name: string): number => {
-    const n = normForMatch(name);
-    let best = 3;
+    const n = normForMatch(name)
+    let best = 3
     for (const v of norms) {
-      if (n.startsWith(v)) return 0;
-      if (best > 1 && new RegExp(`\\b${escapeRegex(v)}`).test(n)) best = 1;
-      else if (best > 2 && n.includes(v)) best = 2;
+      if (n.startsWith(v)) return 0
+      if (best > 1 && new RegExp(`\\b${escapeRegex(v)}`).test(n)) best = 1
+      else if (best > 2 && n.includes(v)) best = 2
     }
-    return best;
-  };
+    return best
+  }
   return rows
     .map((r) => ({ r, s: score(r.charity_name) }))
     .sort(
-      (a, b) => a.s - b.s || a.r.charity_name.localeCompare(b.r.charity_name),
+      (a, b) => a.s - b.s || a.r.charity_name.localeCompare(b.r.charity_name)
     )
-    .map((x) => x.r);
+    .map((x) => x.r)
 }
 
 export type RegisterSearch = {
-  results: RegisterSearchResult[];
+  results: RegisterSearchResult[]
   /** Registered main-charity matches before the cap — drives the
    * "N matches — keep typing" hint. */
-  total: number;
-};
+  total: number
+}
 
 async function fetchRegisterRows(
   apiKey: string,
-  variant: string,
+  variant: string
 ): Promise<RegisterSearchRow[]> {
   const res = await fetch(
     `${API_BASE}/searchCharityName/${encodeURIComponent(variant)}`,
     {
       headers: { "Ocp-Apim-Subscription-Key": apiKey },
       cache: "no-store",
-    },
-  );
+    }
+  )
 
-  if (res.status === 404) return []; // the API 404s on "no matches"
+  if (res.status === 404) return [] // the API 404s on "no matches"
   if (!res.ok) {
-    console.error(`[charity-commission] search failed: HTTP ${res.status}`);
-    return [];
+    console.error(`[charity-commission] search failed: HTTP ${res.status}`)
+    return []
   }
-  return (await res.json()) as RegisterSearchRow[];
+  return (await res.json()) as RegisterSearchRow[]
 }
 
 /**
@@ -388,23 +387,23 @@ async function fetchRegisterRows(
  */
 export async function searchRegisterRanked(
   query: string,
-  cap = 20,
+  cap = 20
 ): Promise<RegisterSearch> {
-  const apiKey = process.env.CHARITY_COMMISSION_API_KEY;
-  const variants = registerQueryVariants(query);
-  if (!apiKey || variants.length === 0) return { results: [], total: 0 };
+  const apiKey = process.env.CHARITY_COMMISSION_API_KEY
+  const variants = registerQueryVariants(query)
+  if (!apiKey || variants.length === 0) return { results: [], total: 0 }
 
   try {
     const lists = await Promise.all(
-      variants.map((v) => fetchRegisterRows(apiKey, v)),
-    );
-    const byNumber = new Map<number, RegisterSearchRow>();
+      variants.map((v) => fetchRegisterRows(apiKey, v))
+    )
+    const byNumber = new Map<number, RegisterSearchRow>()
     for (const row of lists.flat()) {
       if (row.reg_status === "R" && row.group_subsid_suffix === 0) {
-        byNumber.set(row.reg_charity_number, row);
+        byNumber.set(row.reg_charity_number, row)
       }
     }
-    const ranked = rankRows([...byNumber.values()], variants);
+    const ranked = rankRows([...byNumber.values()], variants)
     return {
       total: ranked.length,
       results: ranked.slice(0, cap).map((r) => ({
@@ -412,45 +411,45 @@ export async function searchRegisterRanked(
         registeredName: r.charity_name,
         displayName: titleCaseCharityName(r.charity_name),
       })),
-    };
+    }
   } catch (err) {
-    console.error("[charity-commission] search error:", err);
-    return { results: [], total: 0 };
+    console.error("[charity-commission] search error:", err)
+    return { results: [], total: 0 }
   }
 }
 
 /** Results-only view of searchRegisterRanked (admin typeahead shape). */
 export async function searchRegister(
-  query: string,
+  query: string
 ): Promise<RegisterSearchResult[]> {
-  return (await searchRegisterRanked(query)).results;
+  return (await searchRegisterRanked(query)).results
 }
 
 // ─── Register contact details (email prefill + picker confirm) ───────────────
 
 export type RegisterContact = {
-  email: string | null;
-  website: string | null;
+  email: string | null
+  website: string | null
   /** The register's (ALL CAPS) name — identity check for the confirm step. */
-  registeredName: string | null;
+  registeredName: string | null
   /** "Town, County" from the registered address — the human disambiguator. */
-  place: string | null;
-};
+  place: string | null
+}
 
 const EMPTY_CONTACT: RegisterContact = {
   email: null,
   website: null,
   registeredName: null,
   place: null,
-};
+}
 
 function titleCasePlace(s: string): string {
   return s
     .toLowerCase()
     .replace(
       /(^|[\s-])([a-z])/g,
-      (_m, a: string, b: string) => a + b.toUpperCase(),
-    );
+      (_m, a: string, b: string) => a + b.toUpperCase()
+    )
 }
 
 /** The register's contact details for a charity number — prefills the
@@ -458,28 +457,28 @@ function titleCasePlace(s: string): string {
  * confirm step. Never throws; any failure returns nulls so contact
  * stays strictly optional. */
 export async function fetchRegisterContact(
-  registeredNumber: string,
+  registeredNumber: string
 ): Promise<RegisterContact> {
-  const apiKey = process.env.CHARITY_COMMISSION_API_KEY;
-  const digits = registeredNumber.replace(/\D/g, "");
-  if (!apiKey || !digits) return EMPTY_CONTACT;
+  const apiKey = process.env.CHARITY_COMMISSION_API_KEY
+  const digits = registeredNumber.replace(/\D/g, "")
+  if (!apiKey || !digits) return EMPTY_CONTACT
 
   try {
     const res = await fetch(`${API_BASE}/allcharitydetails/${digits}/0`, {
       headers: { "Ocp-Apim-Subscription-Key": apiKey },
       cache: "no-store",
-    });
-    if (!res.ok) return EMPTY_CONTACT;
+    })
+    if (!res.ok) return EMPTY_CONTACT
     const details = (await res.json()) as {
-      email?: string | null;
-      web?: string | null;
-      charity_name?: string | null;
-      address_line_one?: string | null;
-      address_line_two?: string | null;
-      address_line_three?: string | null;
-      address_line_four?: string | null;
-      address_line_five?: string | null;
-    };
+      email?: string | null
+      web?: string | null
+      charity_name?: string | null
+      address_line_one?: string | null
+      address_line_two?: string | null
+      address_line_three?: string | null
+      address_line_four?: string | null
+      address_line_five?: string | null
+    }
     const lines = [
       details.address_line_one,
       details.address_line_two,
@@ -488,16 +487,16 @@ export async function fetchRegisterContact(
       details.address_line_five,
     ]
       .map((l) => (l ?? "").trim())
-      .filter(Boolean);
+      .filter(Boolean)
     return {
       email: details.email?.trim() || null,
       website: details.web?.trim() || null,
       registeredName: details.charity_name?.trim() || null,
       // The last two address lines are typically town + county.
       place: lines.slice(-2).map(titleCasePlace).join(", ") || null,
-    };
+    }
   } catch {
-    return EMPTY_CONTACT;
+    return EMPTY_CONTACT
   }
 }
 
@@ -518,23 +517,23 @@ export async function fetchRegisterContact(
 // Two calls, both optional, never throws — purpose is strictly additive.
 
 export type RegisterClassification = {
-  what: string[];
-  who: string[];
-  how: string[];
-};
+  what: string[]
+  who: string[]
+  how: string[]
+}
 
-export type RegisterArea = { area: string; type: string };
+export type RegisterArea = { area: string; type: string }
 
 export type RegisterPurpose = {
-  activities: string | null;
-  classification: RegisterClassification | null;
+  activities: string | null
+  classification: RegisterClassification | null
   /** charitygoverningdocument.charitable_objects — the legal purpose. */
-  objects: string | null;
+  objects: string | null
   /** charityareaofoperation — local authorities or countries. */
-  areas: RegisterArea[] | null;
+  areas: RegisterArea[] | null
   /** charityoverview.grant_making_main_activity. */
-  grantMaking: boolean | null;
-};
+  grantMaking: boolean | null
+}
 
 const EMPTY_PURPOSE: RegisterPurpose = {
   activities: null,
@@ -542,94 +541,94 @@ const EMPTY_PURPOSE: RegisterPurpose = {
   objects: null,
   areas: null,
   grantMaking: null,
-};
+}
 
 type WhoWhatWhere = {
-  classification_type?: string | null;
-  classification_desc?: string | null;
-};
+  classification_type?: string | null
+  classification_desc?: string | null
+}
 
 function normaliseClassification(
-  rows: WhoWhatWhere[] | null | undefined,
+  rows: WhoWhatWhere[] | null | undefined
 ): RegisterClassification | null {
-  if (!Array.isArray(rows) || rows.length === 0) return null;
+  if (!Array.isArray(rows) || rows.length === 0) return null
   const pick = (type: string) =>
     rows
       .filter((r) => r.classification_type === type)
       .map((r) => (r.classification_desc ?? "").trim())
-      .filter(Boolean);
-  const c = { what: pick("What"), who: pick("Who"), how: pick("How") };
-  return c.what.length || c.who.length || c.how.length ? c : null;
+      .filter(Boolean)
+  const c = { what: pick("What"), who: pick("Who"), how: pick("How") }
+  return c.what.length || c.who.length || c.how.length ? c : null
 }
 
 export async function fetchRegisterPurpose(
-  registeredNumber: string,
+  registeredNumber: string
 ): Promise<RegisterPurpose> {
-  const apiKey = process.env.CHARITY_COMMISSION_API_KEY;
-  const digits = registeredNumber.replace(/\D/g, "");
-  if (!apiKey || !digits) return EMPTY_PURPOSE;
-  const headers = { "Ocp-Apim-Subscription-Key": apiKey };
+  const apiKey = process.env.CHARITY_COMMISSION_API_KEY
+  const digits = registeredNumber.replace(/\D/g, "")
+  if (!apiKey || !digits) return EMPTY_PURPOSE
+  const headers = { "Ocp-Apim-Subscription-Key": apiKey }
 
   const get = (op: string) =>
     fetch(`${API_BASE}/${op}/${digits}/0`, {
       headers,
       cache: "no-store",
-    }).catch(() => null);
+    }).catch(() => null)
   const [detailsRes, overviewRes, govRes, areaRes] = await Promise.all([
     get("allcharitydetails"),
     get("charityoverview"),
     get("charitygoverningdocument"),
     get("charityareaofoperation"),
-  ]);
+  ])
 
-  let classification: RegisterClassification | null = null;
+  let classification: RegisterClassification | null = null
   if (detailsRes?.ok) {
     const details = (await detailsRes.json().catch(() => null)) as {
-      who_what_where?: WhoWhatWhere[] | null;
-    } | null;
-    classification = normaliseClassification(details?.who_what_where);
+      who_what_where?: WhoWhatWhere[] | null
+    } | null
+    classification = normaliseClassification(details?.who_what_where)
   }
 
-  let activities: string | null = null;
-  let grantMaking: boolean | null = null;
+  let activities: string | null = null
+  let grantMaking: boolean | null = null
   if (overviewRes?.ok) {
     const overview = (await overviewRes.json().catch(() => null)) as {
-      activities?: string | null;
-      grant_making_main_activity?: boolean | null;
-    } | null;
-    activities = overview?.activities?.trim() || null;
+      activities?: string | null
+      grant_making_main_activity?: boolean | null
+    } | null
+    activities = overview?.activities?.trim() || null
     grantMaking =
       typeof overview?.grant_making_main_activity === "boolean"
         ? overview.grant_making_main_activity
-        : null;
+        : null
   }
 
-  let objects: string | null = null;
+  let objects: string | null = null
   if (govRes?.ok) {
     const gov = (await govRes.json().catch(() => null)) as {
-      charitable_objects?: string | null;
-    } | null;
-    objects = gov?.charitable_objects?.replace(/\s+/g, " ").trim() || null;
+      charitable_objects?: string | null
+    } | null
+    objects = gov?.charitable_objects?.replace(/\s+/g, " ").trim() || null
   }
 
-  let areas: RegisterArea[] | null = null;
+  let areas: RegisterArea[] | null = null
   if (areaRes?.ok) {
     const rows = (await areaRes.json().catch(() => null)) as
       | {
-          area_of_operation?: string | null;
-          geographic_area_type?: string | null;
+          area_of_operation?: string | null
+          geographic_area_type?: string | null
         }[]
-      | null;
+      | null
     if (Array.isArray(rows) && rows.length > 0) {
       areas = rows
         .map((r) => ({
           area: (r.area_of_operation ?? "").trim(),
           type: (r.geographic_area_type ?? "").trim(),
         }))
-        .filter((r) => r.area);
-      if (areas.length === 0) areas = null;
+        .filter((r) => r.area)
+      if (areas.length === 0) areas = null
     }
   }
 
-  return { activities, classification, objects, areas, grantMaking };
+  return { activities, classification, objects, areas, grantMaking }
 }

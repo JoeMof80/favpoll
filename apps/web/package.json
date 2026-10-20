@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "format": "prettier --write \"**/*.{ts,tsx}\"",
+    "format": "prettier --ignore-path ../../.prettierignore --write ../..",
     "typecheck": "tsc --noEmit",
     "seed": "tsx --env-file=.env.local ../../scripts/seed.ts",
     "seed:scale": "tsx --env-file=.env.local ../../scripts/seed-scale.ts",
@@ -20,7 +20,8 @@
     "test:e2e": "playwright test",
     "test:e2e:report": "playwright show-report",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "format:check": "prettier --ignore-path ../../.prettierignore --check ../.."
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

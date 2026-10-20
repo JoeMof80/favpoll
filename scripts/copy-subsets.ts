@@ -16,48 +16,48 @@
  *     --dry-run   report, write nothing
  * ---------------------------------------------------------------------------
  */
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js"
 
-const DRY = process.argv.includes("--dry-run");
+const DRY = process.argv.includes("--dry-run")
 const source = createClient(
   process.env.SOURCE_SUPABASE_URL!,
-  process.env.SOURCE_SUPABASE_SERVICE_ROLE_KEY!,
-);
+  process.env.SOURCE_SUPABASE_SERVICE_ROLE_KEY!
+)
 const target = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 type SourceSubset = {
-  title: string;
-  source: string;
-  reason: string | null;
-  is_active: boolean;
-  topics: { title: string } | { title: string }[] | null;
-  topic_subset_items: { favourites: { label: string } | null }[] | null;
-};
+  title: string
+  source: string
+  reason: string | null
+  is_active: boolean
+  topics: { title: string } | { title: string }[] | null
+  topic_subset_items: { favourites: { label: string } | null }[] | null
+}
 const one = <T>(v: T | T[] | null | undefined): T | null =>
-  Array.isArray(v) ? (v[0] ?? null) : (v ?? null);
+  Array.isArray(v) ? (v[0] ?? null) : (v ?? null)
 
 async function main() {
   console.log(
-    `${process.env.SOURCE_SUPABASE_URL!.slice(8, 28)} → ${process.env.NEXT_PUBLIC_SUPABASE_URL!.slice(8, 28)}${DRY ? " (dry run)" : ""}`,
-  );
+    `${process.env.SOURCE_SUPABASE_URL!.slice(8, 28)} → ${process.env.NEXT_PUBLIC_SUPABASE_URL!.slice(8, 28)}${DRY ? " (dry run)" : ""}`
+  )
   const { data: subsets, error } = await source
     .from("topic_subsets")
     .select(
-      "title, source, reason, is_active, topics(title), topic_subset_items(favourites(label))",
+      "title, source, reason, is_active, topics(title), topic_subset_items(favourites(label))"
     )
     .eq("status", "approved")
-    .order("title");
-  if (error) throw new Error(error.message);
+    .order("title")
+  if (error) throw new Error(error.message)
 
   const { data: targetTopics, error: tErr } = await target
     .from("topics")
     .select("id, title, favourites(id, label)")
     .eq("is_active", true)
-    .is("created_by", null);
-  if (tErr) throw new Error(tErr.message);
+    .is("created_by", null)
+  if (tErr) throw new Error(tErr.message)
   const byTitle = new Map(
     (targetTopics ?? []).map((t) => [
       t.title.toLowerCase(),
@@ -67,41 +67,41 @@ async function main() {
           ((t.favourites ?? []) as { id: string; label: string }[]).map((f) => [
             f.label.toLowerCase(),
             f.id,
-          ]),
+          ])
         ),
       },
-    ]),
-  );
+    ])
+  )
 
-  let created = 0;
-  let extended = 0;
-  let skipped = 0;
-  const missing: string[] = [];
+  let created = 0
+  let extended = 0
+  let skipped = 0
+  const missing: string[] = []
   for (const s of (subsets ?? []) as SourceSubset[]) {
-    const parentTitle = one(s.topics)?.title ?? "";
-    const parent = byTitle.get(parentTitle.toLowerCase());
+    const parentTitle = one(s.topics)?.title ?? ""
+    const parent = byTitle.get(parentTitle.toLowerCase())
     if (!parent) {
       console.log(
-        `  ✗ ${parentTitle} › ${s.title}: no such topic on the target`,
-      );
-      skipped++;
-      continue;
+        `  ✗ ${parentTitle} › ${s.title}: no such topic on the target`
+      )
+      skipped++
+      continue
     }
     const labels = (s.topic_subset_items ?? [])
       .map((i) => i.favourites?.label)
-      .filter((l): l is string => Boolean(l));
-    const ids: string[] = [];
+      .filter((l): l is string => Boolean(l))
+    const ids: string[] = []
     for (const l of labels) {
-      const id = parent.favs.get(l.toLowerCase());
-      if (id) ids.push(id);
-      else missing.push(`${parentTitle} › ${s.title}: ${l}`);
+      const id = parent.favs.get(l.toLowerCase())
+      if (id) ids.push(id)
+      else missing.push(`${parentTitle} › ${s.title}: ${l}`)
     }
     if (ids.length < 6) {
       console.log(
-        `  ✗ ${parentTitle} › ${s.title}: only ${ids.length} members on the target's list`,
-      );
-      skipped++;
-      continue;
+        `  ✗ ${parentTitle} › ${s.title}: only ${ids.length} members on the target's list`
+      )
+      skipped++
+      continue
     }
 
     const { data: existing } = await target
@@ -109,21 +109,21 @@ async function main() {
       .select("id, topic_subset_items(favourite_id)")
       .eq("topic_id", parent.id)
       .eq("title", s.title)
-      .maybeSingle();
+      .maybeSingle()
 
     if (DRY) {
       console.log(
-        `  ${existing ? "would extend" : "would create"} ${parentTitle} › ${s.title} (${ids.length})`,
-      );
-      continue;
+        `  ${existing ? "would extend" : "would create"} ${parentTitle} › ${s.title} (${ids.length})`
+      )
+      continue
     }
 
-    let subsetId = existing?.id as string | undefined;
+    let subsetId = existing?.id as string | undefined
     const have = new Set(
       ((existing?.topic_subset_items ?? []) as { favourite_id: string }[]).map(
-        (i) => i.favourite_id,
-      ),
-    );
+        (i) => i.favourite_id
+      )
+    )
     if (!subsetId) {
       const { data: row, error: iErr } = await target
         .from("topic_subsets")
@@ -137,37 +137,37 @@ async function main() {
           reviewed_at: new Date().toISOString(),
         })
         .select("id")
-        .single();
+        .single()
       if (iErr || !row) {
-        console.log(`  ✗ ${parentTitle} › ${s.title}: ${iErr?.message}`);
-        skipped++;
-        continue;
+        console.log(`  ✗ ${parentTitle} › ${s.title}: ${iErr?.message}`)
+        skipped++
+        continue
       }
-      subsetId = row.id as string;
-      created++;
+      subsetId = row.id as string
+      created++
     }
-    const toAdd = ids.filter((id) => !have.has(id));
+    const toAdd = ids.filter((id) => !have.has(id))
     if (toAdd.length > 0) {
       const { error: mErr } = await target
         .from("topic_subset_items")
         .insert(
-          toAdd.map((favourite_id) => ({ subset_id: subsetId, favourite_id })),
-        );
+          toAdd.map((favourite_id) => ({ subset_id: subsetId, favourite_id }))
+        )
       if (mErr)
-        console.log(`  ✗ ${parentTitle} › ${s.title} members: ${mErr.message}`);
-      else if (existing) extended++;
+        console.log(`  ✗ ${parentTitle} › ${s.title} members: ${mErr.message}`)
+      else if (existing) extended++
     }
     console.log(
-      `  ${existing ? "extended" : "created"} ${parentTitle} › ${s.title} (${ids.length}${toAdd.length && existing ? `, +${toAdd.length}` : ""})`,
-    );
+      `  ${existing ? "extended" : "created"} ${parentTitle} › ${s.title} (${ids.length}${toAdd.length && existing ? `, +${toAdd.length}` : ""})`
+    )
   }
   console.log(
-    `${created} created, ${extended} extended, ${skipped} skipped, ${missing.length} members not on the target's list`,
-  );
-  if (missing.length) console.log("  " + missing.join("\n  "));
+    `${created} created, ${extended} extended, ${skipped} skipped, ${missing.length} members not on the target's list`
+  )
+  if (missing.length) console.log("  " + missing.join("\n  "))
 }
 
 main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+  console.error(e)
+  process.exit(1)
+})

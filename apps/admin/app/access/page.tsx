@@ -1,12 +1,12 @@
-import { auth } from "@clerk/nextjs/server";
-import { getUsers } from "@/lib/actions/access";
-import { AccessTable } from "@/components/access-table";
+import { auth } from "@clerk/nextjs/server"
+import { getUsers } from "@/lib/actions/access"
+import { AccessTable } from "@/components/access-table"
 
 export default async function AccessPage() {
   const [{ data: users, error }, { userId }] = await Promise.all([
     getUsers(),
     auth(),
-  ]);
+  ])
 
   return (
     <div className="space-y-6">
@@ -24,5 +24,5 @@ export default async function AccessPage() {
         <AccessTable users={users ?? []} currentUserId={userId} />
       )}
     </div>
-  );
+  )
 }

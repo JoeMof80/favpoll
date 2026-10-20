@@ -1,11 +1,11 @@
-"use client";
+"use client"
 
-import { useState, useTransition } from "react";
-import { BadgeCheck } from "lucide-react";
-import type { NameReviewRow } from "@/lib/actions/charities";
-import { acceptCharityName } from "@/lib/actions/charities";
-import { Button } from "@/components/ui/button";
-import { StatusBadge } from "@/components/ui/status-badge";
+import { useState, useTransition } from "react"
+import { BadgeCheck } from "lucide-react"
+import type { NameReviewRow } from "@/lib/actions/charities"
+import { acceptCharityName } from "@/lib/actions/charities"
+import { Button } from "@/components/ui/button"
+import { StatusBadge } from "@/components/ui/status-badge"
 
 // ─── Names the register does not recognise ──────────────────────────────────
 //
@@ -22,8 +22,8 @@ import { StatusBadge } from "@/components/ui/status-badge";
 // register's name later changes.
 
 function Row({ row }: { row: NameReviewRow }) {
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition()
+  const [error, setError] = useState<string | null>(null)
 
   return (
     <div className="flex flex-wrap items-start gap-x-3 gap-y-2 px-4 py-3">
@@ -69,23 +69,23 @@ function Row({ row }: { row: NameReviewRow }) {
         size="sm"
         disabled={isPending}
         onClick={() => {
-          setError(null);
+          setError(null)
           startTransition(async () => {
-            const result = await acceptCharityName(row.id);
-            if (result.error) setError(result.error);
-          });
+            const result = await acceptCharityName(row.id)
+            if (result.error) setError(result.error)
+          })
         }}
       >
         <BadgeCheck className="size-3.5" aria-hidden="true" />
         {isPending ? "…" : "That's them"}
       </Button>
     </div>
-  );
+  )
 }
 
 export function NameReviewQueue({ rows }: { rows: NameReviewRow[] }) {
   // No section when every name is accounted for.
-  if (rows.length === 0) return null;
+  if (rows.length === 0) return null
 
   return (
     <section className="space-y-2">
@@ -106,5 +106,5 @@ export function NameReviewQueue({ rows }: { rows: NameReviewRow[] }) {
         never appears here — that is not a name problem.
       </p>
     </section>
-  );
+  )
 }

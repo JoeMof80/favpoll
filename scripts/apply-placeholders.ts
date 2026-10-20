@@ -71,7 +71,9 @@ let src = fs.readFileSync(seedPath, "utf8")
 const topicsStart = src.indexOf("const topics: TopicSeed[]")
 const topicsEnd = src.indexOf("\nconst topicItems")
 if (topicsStart === -1 || topicsEnd === -1) {
-  throw new Error("Could not locate const topics / const topicItems boundaries in seed.ts")
+  throw new Error(
+    "Could not locate const topics / const topicItems boundaries in seed.ts"
+  )
 }
 const topicsSrc = src.slice(topicsStart, topicsEnd)
 
@@ -154,10 +156,7 @@ for (let i = topicPositions.length - 1; i >= 0; i--) {
   // Generate the replacement block
   const replacement = buildBlock(data)
 
-  src =
-    src.slice(0, braceOpen) +
-    replacement +
-    src.slice(braceClose + 1)
+  src = src.slice(0, braceOpen) + replacement + src.slice(braceClose + 1)
 }
 
 // ---------------------------------------------------------------------------

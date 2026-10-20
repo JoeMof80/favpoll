@@ -1,4 +1,4 @@
-import type { SignatureEvent } from "@favpoll/types";
+import type { SignatureEvent } from "@favpoll/types"
 
 // ─── The outreach emails, as data ────────────────────────────────────────────
 //
@@ -28,21 +28,21 @@ import type { SignatureEvent } from "@favpoll/types";
 /** Everything the two emails interpolate. Structural on purpose, so a
  *  ConsentQueueRow satisfies it and the preview can pass a narrower row. */
 export type OutreachRow = {
-  name: string;
-  registered_email: string | null;
-  signature_events: SignatureEvent[] | null;
-  perfect_topic_title: string | null;
-  perfect_subset_title: string | null;
-  perfect_topic_reason: string | null;
-};
+  name: string
+  registered_email: string | null
+  signature_events: SignatureEvent[] | null
+  perfect_topic_title: string | null
+  perfect_subset_title: string | null
+  perfect_topic_reason: string | null
+}
 
 export type OutreachEmail = {
   /** Null when the register holds no public address: the mailto then opens
    *  with an EMPTY recipient, which is the failure the preview is for. */
-  to: string | null;
-  subject: string;
-  body: string;
-};
+  to: string | null
+  subject: string
+  body: string
+}
 
 export function inviteEmail(row: OutreachRow): OutreachEmail {
   return {
@@ -58,7 +58,7 @@ export function inviteEmail(row: OutreachRow): OutreachEmail {
       "Thank you,",
       "The favpoll team",
     ].join("\n"),
-  };
+  }
 }
 
 // The WELCOME follows Approve (founder, 2026-09-18): the invite stays a
@@ -76,9 +76,9 @@ export function welcomeEmail(row: OutreachRow): OutreachEmail {
   // favourite because there is none to pick at a half marathon. Naming the
   // event is the hook; the topic is a bonus. So: topic-matched first, else
   // the first fundraisable event with different wording. 9 → 22.
-  const events = row.signature_events ?? [];
-  const event = events.find((e) => e.topic) ?? events[0] ?? null;
-  const when = event?.when ? ` (${event.when})` : "";
+  const events = row.signature_events ?? []
+  const event = events.find((e) => e.topic) ?? events[0] ?? null
+  const when = event?.when ? ` (${event.when})` : ""
   return {
     to: row.registered_email,
     subject: `Welcome to favpoll — ${row.name}`,
@@ -108,7 +108,7 @@ export function welcomeEmail(row: OutreachRow): OutreachEmail {
       "Thank you,",
       "The favpoll team",
     ].join("\n"),
-  };
+  }
 }
 
 /** The mailto the team's mail client opens. An absent recipient is passed
@@ -116,16 +116,16 @@ export function welcomeEmail(row: OutreachRow): OutreachEmail {
  *  with nobody in the To field is the honest result. */
 export function mailtoFor(email: OutreachEmail): string {
   return `mailto:${encodeURIComponent(email.to ?? "")}?subject=${encodeURIComponent(
-    email.subject,
-  )}&body=${encodeURIComponent(email.body)}`;
+    email.subject
+  )}&body=${encodeURIComponent(email.body)}`
 }
 
-export const OUTREACH_KINDS = ["invite", "welcome"] as const;
-export type OutreachKind = (typeof OUTREACH_KINDS)[number];
+export const OUTREACH_KINDS = ["invite", "welcome"] as const
+export type OutreachKind = (typeof OUTREACH_KINDS)[number]
 
 export function outreachEmail(
   kind: OutreachKind,
-  row: OutreachRow,
+  row: OutreachRow
 ): OutreachEmail {
-  return kind === "invite" ? inviteEmail(row) : welcomeEmail(row);
+  return kind === "invite" ? inviteEmail(row) : welcomeEmail(row)
 }

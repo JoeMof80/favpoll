@@ -16,14 +16,14 @@
  * refused, as the admin's own Approve refuses it.
  * ---------------------------------------------------------------------------
  */
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
-const DRY = process.argv.includes("--dry-run");
-const MIN_ITEMS = 6;
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
+const DRY = process.argv.includes("--dry-run")
+const MIN_ITEMS = 6
 
 /** [parent topic, subset] — the pair, because "Sunday roast" is a subset
  *  of three different topics and only those three are meant. */
@@ -54,51 +54,51 @@ const TICKED: [topic: string, subset: string][] = [
   ["Castle", "Seaside castle"],
   ["Hymn", "Sunday service"],
   ["Radio station", "BBC station"],
-];
+]
 
 async function main() {
   let approved = 0,
     already = 0,
-    skipped = 0;
+    skipped = 0
   for (const [topicTitle, subsetTitle] of TICKED) {
     const { data: topic } = await supabase
       .from("topics")
       .select("id")
       .eq("title", topicTitle)
-      .maybeSingle();
+      .maybeSingle()
     if (!topic) {
-      console.warn(`  ✗ ${topicTitle} › ${subsetTitle}: no such topic here`);
-      skipped++;
-      continue;
+      console.warn(`  ✗ ${topicTitle} › ${subsetTitle}: no such topic here`)
+      skipped++
+      continue
     }
     const { data: subset } = await supabase
       .from("topic_subsets")
       .select("id, status, topic_subset_items(favourite_id)")
       .eq("topic_id", topic.id)
       .eq("title", subsetTitle)
-      .maybeSingle();
+      .maybeSingle()
     if (!subset) {
-      console.warn(`  ✗ ${topicTitle} › ${subsetTitle}: no such subset here`);
-      skipped++;
-      continue;
+      console.warn(`  ✗ ${topicTitle} › ${subsetTitle}: no such subset here`)
+      skipped++
+      continue
     }
     if (subset.status === "approved") {
-      console.log(`  = ${topicTitle} › ${subsetTitle} (already approved)`);
-      already++;
-      continue;
+      console.log(`  = ${topicTitle} › ${subsetTitle} (already approved)`)
+      already++
+      continue
     }
-    const n = (subset.topic_subset_items ?? []).length;
+    const n = (subset.topic_subset_items ?? []).length
     if (n < MIN_ITEMS) {
       console.warn(
-        `  ✗ ${topicTitle} › ${subsetTitle}: ${n} items, under the floor of ${MIN_ITEMS}`,
-      );
-      skipped++;
-      continue;
+        `  ✗ ${topicTitle} › ${subsetTitle}: ${n} items, under the floor of ${MIN_ITEMS}`
+      )
+      skipped++
+      continue
     }
     if (DRY) {
-      console.log(`  → ${topicTitle} › ${subsetTitle} (${n} items)`);
-      approved++;
-      continue;
+      console.log(`  → ${topicTitle} › ${subsetTitle} (${n} items)`)
+      approved++
+      continue
     }
     const { error } = await supabase
       .from("topic_subsets")
@@ -107,23 +107,23 @@ async function main() {
         is_active: true,
         reviewed_at: new Date().toISOString(),
       })
-      .eq("id", subset.id);
+      .eq("id", subset.id)
     if (error) {
-      console.warn(`  ✗ ${topicTitle} › ${subsetTitle}: ${error.message}`);
-      skipped++;
-      continue;
+      console.warn(`  ✗ ${topicTitle} › ${subsetTitle}: ${error.message}`)
+      skipped++
+      continue
     }
-    console.log(`  ✓ ${topicTitle} › ${subsetTitle} (${n} items)`);
-    approved++;
+    console.log(`  ✓ ${topicTitle} › ${subsetTitle} (${n} items)`)
+    approved++
   }
   console.log(
     DRY
       ? `--dry-run: ${approved} would be approved, ${already} already, ${skipped} skipped.`
-      : `${approved} approved, ${already} already, ${skipped} skipped.`,
-  );
+      : `${approved} approved, ${already} already, ${skipped} skipped.`
+  )
 }
 
 main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+  console.error(e)
+  process.exit(1)
+})

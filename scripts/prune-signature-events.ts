@@ -29,61 +29,61 @@
  * Idempotent. --dry-run lists what it would drop.
  * ---------------------------------------------------------------------------
  */
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js"
 import {
   couldFundraiseAt,
   type SignatureEvent,
-} from "../apps/web/lib/charity-events";
+} from "../apps/web/lib/charity-events"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
-const DRY = process.argv.includes("--dry-run");
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
+const DRY = process.argv.includes("--dry-run")
 
 async function main() {
   const { data, error } = await supabase
     .from("charity_profiles")
     .select("registered_number, signature_events")
-    .not("signature_events", "is", null);
-  if (error) throw new Error(error.message);
+    .not("signature_events", "is", null)
+  if (error) throw new Error(error.message)
 
-  let profiles = 0;
-  let dropped = 0;
-  let kept = 0;
+  let profiles = 0
+  let dropped = 0
+  let kept = 0
 
   for (const p of data ?? []) {
-    const events = (p.signature_events ?? []) as SignatureEvent[];
-    if (events.length === 0) continue;
-    const keep = events.filter((e) => couldFundraiseAt(e));
-    kept += keep.length;
-    if (keep.length === events.length) continue;
+    const events = (p.signature_events ?? []) as SignatureEvent[]
+    if (events.length === 0) continue
+    const keep = events.filter((e) => couldFundraiseAt(e))
+    kept += keep.length
+    if (keep.length === events.length) continue
 
-    const lost = events.filter((e) => !couldFundraiseAt(e));
-    dropped += lost.length;
-    profiles++;
+    const lost = events.filter((e) => !couldFundraiseAt(e))
+    dropped += lost.length
+    profiles++
     console.log(
       `  ${p.registered_number}: ${events.length} → ${keep.length}` +
-        (keep.length === 0 ? "  (none left)" : ""),
-    );
-    for (const e of lost) console.log(`      drop  ${e.name} — ${e.kind}`);
+        (keep.length === 0 ? "  (none left)" : "")
+    )
+    for (const e of lost) console.log(`      drop  ${e.name} — ${e.kind}`)
 
-    if (DRY) continue;
+    if (DRY) continue
     const { error: upErr } = await supabase
       .from("charity_profiles")
       .update({ signature_events: keep })
-      .eq("registered_number", p.registered_number);
-    if (upErr) throw new Error(upErr.message);
+      .eq("registered_number", p.registered_number)
+    if (upErr) throw new Error(upErr.message)
   }
 
   console.log(
     `\n${DRY ? "would drop" : "dropped"} ${dropped} event${
       dropped === 1 ? "" : "s"
-    } across ${profiles} profile${profiles === 1 ? "" : "s"}; ${kept} kept.`,
-  );
+    } across ${profiles} profile${profiles === 1 ? "" : "s"}; ${kept} kept.`
+  )
 }
 
 main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+  console.error(e)
+  process.exit(1)
+})

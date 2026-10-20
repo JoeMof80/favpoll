@@ -1,26 +1,26 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { Plus_Jakarta_Sans } from "next/font/google";
-import { ClerkProvider, UserButton } from "@clerk/nextjs";
-import { ThemeProvider, MenuButton } from "@favpoll/ui";
-import { Sidebar } from "@/components/sidebar";
-import { FavpollLogo } from "@/components/favpoll-logo";
-import "./globals.css";
+import type { Metadata } from "next"
+import Link from "next/link"
+import { Plus_Jakarta_Sans } from "next/font/google"
+import { ClerkProvider, UserButton } from "@clerk/nextjs"
+import { ThemeProvider, MenuButton } from "@favpoll/ui"
+import { Sidebar } from "@/components/sidebar"
+import { FavpollLogo } from "@/components/favpoll-logo"
+import "./globals.css"
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-plus-jakarta-sans",
-});
+})
 
 export const metadata: Metadata = {
   title: "favpoll admin",
   description: "favpoll administration",
-};
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <ClerkProvider>
@@ -29,7 +29,7 @@ export default function RootLayout({
         suppressHydrationWarning
         className={`${plusJakartaSans.variable} h-full antialiased`}
       >
-        <body className="h-full flex flex-col bg-background text-foreground font-sans">
+        <body className="flex h-full flex-col bg-background font-sans text-foreground">
           <ThemeProvider>
             <header className="sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between border-b border-border bg-background px-6">
               <Link
@@ -38,7 +38,7 @@ export default function RootLayout({
                 className="inline-flex items-center gap-2.5"
               >
                 <FavpollLogo />
-                <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground">
+                <span className="bg-secondary text-secondary-foreground rounded-full px-2 py-0.5 text-xs font-medium">
                   admin
                 </span>
               </Link>
@@ -47,7 +47,7 @@ export default function RootLayout({
                 <UserButton />
               </div>
             </header>
-            <div className="flex flex-1 min-h-0">
+            <div className="flex min-h-0 flex-1">
               <Sidebar />
               <main className="flex-1 overflow-auto p-8">{children}</main>
             </div>
@@ -55,5 +55,5 @@ export default function RootLayout({
         </body>
       </html>
     </ClerkProvider>
-  );
+  )
 }

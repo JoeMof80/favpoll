@@ -77,7 +77,8 @@ export const regeneratedPlaceholdersBatch7: Record<
     neutral: {
       about:
         "Some people have one hymn that finds them, whether or not they went looking.",
-      reveal: "Theirs is How Great Thou Art. In full voice by the second verse.",
+      reveal:
+        "Theirs is How Great Thou Art. In full voice by the second verse.",
     },
   },
 
@@ -101,8 +102,7 @@ export const regeneratedPlaceholdersBatch7: Record<
         "Hers is The Wheels on the Bus, his is Sleeping Bunnies. The baby will rule in due course.",
     },
     cause: {
-      about:
-        "Pick the rhyme you never forgot and pledge what it's worth.",
+      about: "Pick the rhyme you never forgot and pledge what it's worth.",
       reveal:
         "Our pick to start: Incy Wincy Spider — down comes the rain, up he goes again.",
     },
@@ -124,8 +124,7 @@ export const regeneratedPlaceholdersBatch7: Record<
     celebrating_one: {
       about:
         "She can quote whole scenes on request and frequently without request.",
-      reveal:
-        "Hers is Fawlty Towers. Twelve episodes, known to the syllable.",
+      reveal: "Hers is Fawlty Towers. Twelve episodes, known to the syllable.",
     },
     celebrating_many: {
       about:
@@ -134,14 +133,12 @@ export const regeneratedPlaceholdersBatch7: Record<
         "Hers is Gavin & Stacey, his is Peep Show. The sofa negotiations continue.",
     },
     cause: {
-      about:
-        "Pick the sitcom you'd keep forever and pledge what it's worth.",
+      about: "Pick the sitcom you'd keep forever and pledge what it's worth.",
       reveal:
         "Our pick to start: Dad's Army — half a century on and still on duty.",
     },
     neutral: {
-      about:
-        "Some people have one sitcom that fixes any kind of day.",
+      about: "Some people have one sitcom that fixes any kind of day.",
       reveal: "Theirs is The Royle Family. Nothing happens, perfectly.",
     },
   },
@@ -172,8 +169,7 @@ export const regeneratedPlaceholdersBatch7: Record<
         "Our pick to start: Do They Know It's Christmas? — the song that showed what a song could do.",
     },
     neutral: {
-      about:
-        "Everyone has the one song that flips the switch to Christmas.",
+      about: "Everyone has the one song that flips the switch to Christmas.",
       reveal:
         "Theirs is Driving Home for Christmas. Traffic jam optional, volume not.",
     },
@@ -204,8 +200,7 @@ export const regeneratedPlaceholdersBatch7: Record<
         "Our pick to start: Fuller's London Pride — a pint with the city in its name.",
     },
     neutral: {
-      about:
-        "Some people scan the taps; some people already know.",
+      about: "Some people scan the taps; some people already know.",
       reveal: "Theirs is Old Speckled Hen. No menu required.",
     },
   },
@@ -236,8 +231,7 @@ export const regeneratedPlaceholdersBatch7: Record<
         "Our pick to start: Blackpool — the lights half the country grew up with.",
     },
     neutral: {
-      about:
-        "Everyone has one town where the bucket and spade came out.",
+      about: "Everyone has one town where the bucket and spade came out.",
       reveal: "Theirs is Scarborough. Two bays, one deckchair, no contest.",
     },
   },
@@ -268,9 +262,9 @@ export const regeneratedPlaceholdersBatch7: Record<
         "Our pick to start: Concorde — the one everyone ran outside to watch.",
     },
     neutral: {
-      about:
-        "Some people never stopped looking up when something flies over.",
-      reveal: "Theirs is the Hot air balloon. The slowest way to fly, the best view.",
+      about: "Some people never stopped looking up when something flies over.",
+      reveal:
+        "Theirs is the Hot air balloon. The slowest way to fly, the best view.",
     },
   },
 
@@ -300,8 +294,7 @@ export const regeneratedPlaceholdersBatch7: Record<
         "Our pick to start: Pigs in blankets — the first dish to empty at any table.",
     },
     neutral: {
-      about:
-        "Everyone has the part of the roast they'd defend with a fork.",
+      about: "Everyone has the part of the roast they'd defend with a fork.",
       reveal: "Theirs is the Stuffing. Everything else is garnish.",
     },
   },
@@ -316,7 +309,8 @@ export const regeneratedPlaceholdersBatch7: Record<
     celebrating_one: {
       about:
         "He has a streak going that the whole family monitors and dares not mention aloud.",
-      reveal: "His is Wordle. The streak is at 312 and nobody breathes near it.",
+      reveal:
+        "His is Wordle. The streak is at 312 and nobody breathes near it.",
     },
     celebrating_many: {
       about:

@@ -1,18 +1,18 @@
-"use client";
+"use client"
 
-import { useState, useTransition } from "react";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { useState, useTransition } from "react"
+import { ChevronDown, ChevronRight } from "lucide-react"
 import type {
   GeneratedDraft,
   DraftStatus,
-} from "@/lib/actions/generated-drafts";
+} from "@/lib/actions/generated-drafts"
 import {
   updateGeneratedDraft,
   setGeneratedDraftStatus,
-} from "@/lib/actions/generated-drafts";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { StatusBadge } from "@/components/ui/status-badge";
+} from "@/lib/actions/generated-drafts"
+import { Button } from "@/components/ui/button"
+import { Textarea } from "@/components/ui/textarea"
+import { StatusBadge } from "@/components/ui/status-badge"
 import {
   Table,
   TableBody,
@@ -20,14 +20,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/table"
 
 function DraftStatusBadge({ status }: { status: DraftStatus }) {
   if (status === "curated")
-    return <StatusBadge tone="success">Curated</StatusBadge>;
+    return <StatusBadge tone="success">Curated</StatusBadge>
   if (status === "rejected")
-    return <StatusBadge tone="destructive">Rejected</StatusBadge>;
-  return <StatusBadge tone="warning">Generated</StatusBadge>;
+    return <StatusBadge tone="destructive">Rejected</StatusBadge>
+  return <StatusBadge tone="warning">Generated</StatusBadge>
 }
 
 function EditableField({
@@ -36,41 +36,41 @@ function EditableField({
   draftId,
   field,
 }: {
-  label: string;
-  initial: string;
-  draftId: string;
-  field: "about" | "note";
+  label: string
+  initial: string
+  draftId: string
+  field: "about" | "note"
 }) {
-  const [value, setValue] = useState(initial);
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-  const [saved, setSaved] = useState(false);
+  const [value, setValue] = useState(initial)
+  const [isPending, startTransition] = useTransition()
+  const [error, setError] = useState<string | null>(null)
+  const [saved, setSaved] = useState(false)
 
   function handleSave() {
-    setError(null);
-    setSaved(false);
+    setError(null)
+    setSaved(false)
     startTransition(async () => {
-      const result = await updateGeneratedDraft(draftId, { [field]: value });
+      const result = await updateGeneratedDraft(draftId, { [field]: value })
       if (result.error) {
-        setError(result.error);
+        setError(result.error)
       } else {
-        setSaved(true);
+        setSaved(true)
       }
-    });
+    })
   }
 
-  const dirty = value !== initial;
+  const dirty = value !== initial
 
   return (
     <div className="space-y-1.5">
-      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+      <p className="text-xs font-medium tracking-wider text-muted-foreground uppercase">
         {label}
       </p>
       <Textarea
         value={value}
         onChange={(e) => {
-          setValue(e.target.value);
-          setSaved(false);
+          setValue(e.target.value)
+          setSaved(false)
         }}
         rows={3}
         className="resize-none"
@@ -84,28 +84,28 @@ function EditableField({
         >
           {isPending ? "Saving…" : "Save"}
         </Button>
-        {saved && <span className="text-xs text-success">Saved</span>}
+        {saved && <span className="text-success text-xs">Saved</span>}
         {error && <span className="text-xs text-destructive">{error}</span>}
       </div>
     </div>
-  );
+  )
 }
 
 function DraftRow({ draft }: { draft: GeneratedDraft }) {
-  const [open, setOpen] = useState(false);
-  const [isPending, startTransition] = useTransition();
-  const [statusError, setStatusError] = useState<string | null>(null);
+  const [open, setOpen] = useState(false)
+  const [isPending, startTransition] = useTransition()
+  const [statusError, setStatusError] = useState<string | null>(null)
 
   function handleStatus(status: "curated" | "rejected") {
-    setStatusError(null);
+    setStatusError(null)
     startTransition(async () => {
-      const result = await setGeneratedDraftStatus(draft.id, status);
-      if (result.error) setStatusError(result.error);
-    });
+      const result = await setGeneratedDraftStatus(draft.id, status)
+      if (result.error) setStatusError(result.error)
+    })
   }
 
-  const isGenerated = draft.status === "generated";
-  const Chevron = open ? ChevronDown : ChevronRight;
+  const isGenerated = draft.status === "generated"
+  const Chevron = open ? ChevronDown : ChevronRight
 
   return (
     <>
@@ -183,7 +183,7 @@ function DraftRow({ draft }: { draft: GeneratedDraft }) {
         </TableRow>
       )}
     </>
-  );
+  )
 }
 
 export function DraftsTable({ drafts }: { drafts: GeneratedDraft[] }) {
@@ -208,5 +208,5 @@ export function DraftsTable({ drafts }: { drafts: GeneratedDraft[] }) {
         </TableBody>
       </Table>
     </div>
-  );
+  )
 }
