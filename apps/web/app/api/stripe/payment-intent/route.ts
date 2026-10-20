@@ -1,5 +1,4 @@
 import Stripe from "stripe"
-import { requiredEnv } from "@/lib/env"
 import { NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import {
@@ -14,7 +13,7 @@ import {
   consentPosture,
 } from "@/lib/charity-consent"
 
-const stripe = new Stripe(requiredEnv("STRIPE_SECRET_KEY"))
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 // Sanity ceiling per charge part (pounds) — hostile-input guard, not a
 // product limit.

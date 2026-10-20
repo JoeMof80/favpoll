@@ -483,20 +483,39 @@ attributed instead of lost.
 narrow `one` that `poll-title.ts` had already named. Its parameter is
 `unknown`, which is the truth about what it is handed.
 
-**The environment variables: eleven of twelve.** `lib/env.ts` throws
-`Missing required environment variable: X`, naming the variable and never
-its value. The twelfth, `components/stripe-checkout.tsx`, keeps its `!`
-on purpose: it is module scope in a CLIENT component, so a throw renders
-the error boundary instead of the page — a deploy missing that key would
-lose the whole pledge surface rather than the card field on it. A
-`NEXT_PUBLIC_` variable is also inlined at build, so an absent one is a
-build misconfiguration, which argues for catching it at build rather than
-throwing in a browser.
+**The environment variables: NOT CHANGED, and the attempt is the record
+(#1106, 2026-10-20).** `lib/env.ts` was written — a `requiredEnv(name)`
+that throws `Missing required environment variable: X`, naming the
+variable and never its value — and applied to eleven of the twelve. CI
+refused it, and the refusal is the useful part of this entry.
 
-This does **not** move when the failure happens, only what it says. A
-module-scope constant still fails when its module first loads; a function
-still fails when first called. Failing at boot or at build is the open
-half of the question and is not attempted here.
+Two failures, neither of which the entry anticipated:
+
+1. **Two route test files failed at IMPORT.** `app/api/webhooks/stripe`
+   and `app/api/stripe/payment-intent` construct Stripe at module scope,
+   so the throw fired when vitest loaded the module. Those tests mock
+   Stripe and never need a key; `process.env.STRIPE_SECRET_KEY!` had been
+   handing the constructor `undefined` and the constructor did not mind.
+2. **`lib/stripe-verify.ts` was already lazy, and still broke.** Its
+   `new Stripe(...)` sits inside a function, so the timing was right —
+   but the throw is caught by that module's own error handling and comes
+   back out as `Payment not found`. Six verification tests changed their
+   message.
+
+So the entry's framing — that these assertions "turn a missing variable
+into a runtime crash rather than a startup error" — is right about the
+problem and wrong about the fix being small. Making the message better
+also made the failure FIRE where it previously did not: in a test run, in
+CI, and on any fresh clone without the variables. A louder failure is not
+automatically a better one when the thing that was quiet was also
+harmless.
+
+What this actually needs is the question the first attempt set aside: a
+distinction between "needed at module load" and "needed at the moment of
+use", and somewhere for the check to live that is neither of those — a
+boot-time or build-time assertion that runs once, in production, where
+the variables genuinely must exist. That is a design, not a helper, and
+it is not attempted here. The twelve assertions stand.
 
 ---
 

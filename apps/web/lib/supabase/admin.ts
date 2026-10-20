@@ -1,10 +1,9 @@
 import { createClient } from "@supabase/supabase-js"
-import { requiredEnv } from "@/lib/env"
 
 export function createAdminClient() {
   return createClient(
-    requiredEnv("NEXT_PUBLIC_SUPABASE_URL"),
-    requiredEnv("SUPABASE_SERVICE_ROLE_KEY"),
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
     {
       global: {
         // Supabase reads are GETs through Next's patched fetch, which the
