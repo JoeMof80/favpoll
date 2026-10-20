@@ -216,13 +216,20 @@ It is an ISO datetime with a sentence of its own now. The same shape of
 win: an unknown `grouping` used to make a favpoll quietly plural, because
 `is_plural` is derived as `grouping !== "individual"`.
 
-**Raised, not taken: `potAmount` is money.** It writes
-`favpoll_pots.total_deposited` directly and both callers send `null`, so a
-crafted request could credit a pot with no payment behind it. The schema
-bounds it as a nonnegative finite number — a negative or a NaN would have
-corrupted the pot, and no legitimate caller is affected — but whether a
-non-zero value should be refused outright is a ledger decision and is the
-founder's to make.
+**`potAmount` is money, and the founder locked it (2026-10-20).** It
+writes `favpoll_pots.total_deposited` directly, and it is the only route
+to that column that does not go through a payment — the legitimate one is
+`creditFund` -> `rpc("pot_top_up")`, which runs after
+`verifyPledgePayment` has matched a PaymentIntent that already succeeded.
+So a crafted request credited a shared pot with money nobody paid, and
+because `deleteFavpoll` refuses a favpoll whose pot holds anything, left
+it undeletable as well.
+
+It now accepts `null` or `0` and nothing else: both callers send `null`,
+zero is the same thing said differently and the column's default, and no
+other value is something that form can mean. It was raised rather than
+narrowed in the first pass because a ledger field is not a schema's
+decision to take alone.
 
 **The four small files are converted (#1109, third).**
 `app/favpolls/actions.ts`, `lib/actions/favpoll-poll-favourites.ts`,

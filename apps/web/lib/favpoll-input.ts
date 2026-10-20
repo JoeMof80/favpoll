@@ -117,11 +117,23 @@ export const favpollScalars = {
     .optional(),
   goalAmount: money("goal").optional(),
   /**
-   * MONEY, AND AS PERMISSIVE AS IT WAS. This writes
-   * `favpoll_pots.total_deposited` directly and every caller sends null. A
-   * nonnegative, finite bound is a strict improvement — a negative or a
-   * NaN would corrupt the pot — but whether a non-zero value should be
-   * refused outright is a ledger decision, raised rather than taken.
+   * LOCKED TO NOTHING (founder's call, 2026-10-20).
+   *
+   * `createFavpoll` writes this straight to
+   * `favpoll_pots.total_deposited`, and it is the ONLY route to that
+   * column that does not go through a payment: the legitimate one is
+   * `creditFund` -> `rpc("pot_top_up")`, which runs after
+   * `verifyPledgePayment` has matched a PaymentIntent that already
+   * succeeded. So a crafted request here credited a shared pot with money
+   * nobody paid — and, because `deleteFavpoll` refuses a favpoll whose
+   * pot has anything in it, left it undeletable too.
+   *
+   * Both callers send `null`. Zero is kept because it is the same thing
+   * said differently and the column's default. Nothing else is a value
+   * this form can mean.
    */
-  potAmount: money("amount"),
+  potAmount: z.union(
+    [z.literal(0), z.null()],
+    "A shared pot is credited by a payment, not by this form."
+  ),
 }
