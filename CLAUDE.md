@@ -48,3 +48,21 @@ has the new one — a restart gives the chunk a new ETag.
 From `apps/web`: `pnpm exec prettier --check .`, `tsc --noEmit`, `eslint`,
 `vitest run`. From the repo root: `node scripts/check-hex-colors.mjs`
 (never hardcode a hex — use the tokens in `app/globals.css`).
+
+## Agent skills
+
+### Issue tracker
+
+GitHub Issues on `JoeMof80/favpoll`, via the `gh` CLI. See
+`docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+The five canonical names, unchanged; `wontfix` already existed. See
+`docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context. The canonical glossary is `references/GLOSSARY.md`; new
+decisions go in `docs/adr/`, and `references/` is the historical archive.
+See `docs/agents/domain.md`.
