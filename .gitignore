@@ -48,7 +48,7 @@ pnpm-debug.log*
 .env.production-admin
 
 # reference binaries
-references/*.pdf
+references/**/*.pdf
 
 # typescript
 *.tsbuildinfo
