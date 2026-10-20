@@ -264,3 +264,6 @@ jobs:
 
       - name: Check for hardcoded hex colours
         run: node scripts/check-hex-colors.mjs
+
+      - name: Check for message keys nothing renders
+        run: node scripts/check-dead-messages.mjs
