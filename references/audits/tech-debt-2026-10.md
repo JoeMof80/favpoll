@@ -264,9 +264,54 @@ Housekeeping: the `z.guid` id schema and its reasoning now live once, as
 `actionId` in `lib/action-input.ts`, rather than being copy-pasted into a
 fourth schema file.
 
-Still to do: two (#1109) — `app/favpolls/[id]/edit/actions.ts` and
-`app/favpolls/[id]/manage/actions.ts`. Both already RETURN results
-(#1049), so both need schemas only.
+**The last two are converted (#1109, fourth — the entry is DONE).**
+`app/favpolls/[id]/edit/actions.ts` and
+`app/favpolls/[id]/manage/actions.ts`. Three things.
+
+**An unknown field wrote nothing and reported success.** `updateStoryField`
+took a `field` typed as `StoryField` and checked nowhere, and nothing
+downstream refused an unrecognised one: `LIMITS[field]` is `undefined`, so
+the length guard passes; the two required-field guards name specific
+fields; and the switch that writes has **no default**. So a field the
+action did not know fell through all of it, wrote nothing, threw nothing,
+and `asResult` answered `{ ok: true }`. Of the three answers an action can
+give, a silent success is the worst, and it is exactly what this entry's
+"no action silently accepts a field it does not understand" was about.
+
+**The per-field rules stayed where they were.** `updateStoryFieldInner`
+already states the length limits, "A name is required", "The goal must be
+a positive amount." — and all of them read `isCause` out of the database
+to decide which column a field lands in. A schema cannot know that, so
+the schemas here add only what the shape can carry: the field name, the
+id, and that a value is one of the three kinds a column takes.
+
+**`updateFavpoll` still throws, and that is #1105's half.** The wizard's
+catch renders `err.message`, which Next redacts in production — so a
+schema sentence reaches the organiser in development and does not in
+production, exactly as every other throw in that action already does
+not. Converting it is #1105's remaining work on this file; its sibling
+`updateClosesAt` is the half that was already converted, and it parses
+inside `asResult` so its sentence does travel. The two entries meet here,
+and the sequencing means 1.3 cannot fully deliver "an actionable message"
+for that one action until 1.4 reaches it.
+
+**The field schemas now live once.** Creation and editing write the same
+columns from two differently shaped arguments (`CreateFavpollInput` and
+`CanvasSubmitData`), so the definitions moved to `lib/favpoll-input.ts`
+and each path composes the shape it actually receives. Two schemas
+describing the same column would have drifted, which is the thing this
+entry exists to stop.
+
+Found while in there: the edit tests had been asserting against
+`closesAt: "2028-01-01T00:00"` — a `datetime-local` string that no caller
+produces, since both the wizard and the manage row send
+`.toISOString()`. The fixtures were loose rather than the schema being
+tight; there is no `datetime-local` input anywhere in the app.
+
+**All eight files are done.** `lib/action-input.ts` ended up with four
+entry points, and which one an action uses is a property of its caller:
+`parseInput` throws, `tryParseInput` returns, `parseFormData` does either
+for a FormData argument, and a bare `safeParse` suits a silent surface.
 
 ### 1.4 Actions still throw where the project decided they should return · M · low risk · DONE for the pledge path (#1105, PR #1127)
 

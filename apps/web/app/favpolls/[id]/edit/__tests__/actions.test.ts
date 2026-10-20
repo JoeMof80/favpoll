@@ -16,6 +16,15 @@ vi.mock("@/lib/supabase/admin", () => ({
 import { updateFavpoll, updateClosesAt } from "@/app/favpolls/[id]/edit/actions"
 import type { CanvasSubmitData } from "@favpoll/types"
 
+// The ids are uuid columns, so the fixtures are uuids (#1109): the
+// actions now check the format before they touch anything.
+const FAVPOLL_ID = "11111111-1111-1111-1111-111111111111"
+const PROT_ID = "22222222-2222-2222-2222-222222222222"
+const CHARITY_ID = "33333333-3333-3333-3333-333333333333"
+const CHARITY_2_ID = "44444444-4444-4444-4444-444444444444"
+const POLL_ID = "66666666-6666-6666-6666-666666666666"
+const TOPIC_ID = "55555555-5555-5555-5555-555555555555"
+
 function makeInput(
   overrides: Partial<CanvasSubmitData> = {}
 ): CanvasSubmitData {
@@ -31,14 +40,14 @@ function makeInput(
     openingLine: null,
     description: null,
     isListed: true,
-    charityIds: ["charity-1"],
-    closesAt: "2028-01-01T00:00",
+    charityIds: [CHARITY_ID],
+    closesAt: "2028-01-01T00:00:00.000Z",
     isPrivate: false,
     allowGuestItems: true,
     potAmount: null,
     poll: {
-      id: "poll-1",
-      topicId: "topic-1",
+      id: POLL_ID,
+      topicId: TOPIC_ID,
       topicIsCustom: false,
       customTopicTitle: "",
       customTopicItems: [],
@@ -82,7 +91,7 @@ describe("updateFavpoll — auth & ownership", () => {
   it("throws 'Not authenticated' when userId is null", async () => {
     mockAuth.mockResolvedValueOnce({ userId: null })
     await expect(
-      updateFavpoll("favpoll-1", "prot-1", makeInput())
+      updateFavpoll(FAVPOLL_ID, PROT_ID, makeInput())
     ).rejects.toThrow("Not authenticated")
   })
 
@@ -90,7 +99,7 @@ describe("updateFavpoll — auth & ownership", () => {
     mock.queue({ ...makeFavpollRow(), created_by: "other-user" })
 
     await expect(
-      updateFavpoll("favpoll-1", "prot-1", makeInput())
+      updateFavpoll(FAVPOLL_ID, PROT_ID, makeInput())
     ).rejects.toThrow("Unauthorized")
   })
 
@@ -98,7 +107,7 @@ describe("updateFavpoll — auth & ownership", () => {
     mock.queue(null) // no favpoll row
 
     await expect(
-      updateFavpoll("favpoll-1", "prot-1", makeInput())
+      updateFavpoll(FAVPOLL_ID, PROT_ID, makeInput())
     ).rejects.toThrow("Unauthorized")
   })
 })
@@ -116,9 +125,9 @@ describe("updateFavpoll — extension validation", () => {
 
     await expect(
       updateFavpoll(
-        "favpoll-1",
-        "prot-1",
-        makeInput({ closesAt: "2028-01-01T00:00" })
+        FAVPOLL_ID,
+        PROT_ID,
+        makeInput({ closesAt: "2028-01-01T00:00:00.000Z" })
       )
     ).rejects.toThrow("Maximum extensions reached")
   })
@@ -128,9 +137,9 @@ describe("updateFavpoll — extension validation", () => {
 
     await expect(
       updateFavpoll(
-        "favpoll-1",
-        "prot-1",
-        makeInput({ closesAt: "2021-01-01T00:00" })
+        FAVPOLL_ID,
+        PROT_ID,
+        makeInput({ closesAt: "2021-01-01T00:00:00.000Z" })
       )
     ).rejects.toThrow("Closing date must be in the future")
   })
@@ -145,9 +154,9 @@ describe("updateFavpoll — extension validation", () => {
 
     await expect(
       updateFavpoll(
-        "favpoll-1",
-        "prot-1",
-        makeInput({ closesAt: "2027-06-01T00:00" })
+        FAVPOLL_ID,
+        PROT_ID,
+        makeInput({ closesAt: "2027-06-01T00:00:00.000Z" })
       )
     ).rejects.toThrow("Closing date cannot be extended beyond")
   })
@@ -159,9 +168,9 @@ describe("updateFavpoll — extension validation", () => {
 
     await expect(
       updateFavpoll(
-        "favpoll-1",
-        "prot-1",
-        makeInput({ closesAt: "2028-01-01T00:00" })
+        FAVPOLL_ID,
+        PROT_ID,
+        makeInput({ closesAt: "2028-01-01T00:00:00.000Z" })
       )
     ).resolves.not.toThrow()
   })
@@ -172,9 +181,9 @@ describe("updateFavpoll — extension validation", () => {
     )
 
     await updateFavpoll(
-      "favpoll-1",
-      "prot-1",
-      makeInput({ closesAt: "2028-01-01T00:00" })
+      FAVPOLL_ID,
+      PROT_ID,
+      makeInput({ closesAt: "2028-01-01T00:00:00.000Z" })
     )
 
     const favpollsUpdate = mock
@@ -188,9 +197,9 @@ describe("updateFavpoll — extension validation", () => {
     queueHappyPath(makeFavpollRow({ closes_at: "2028-01-01T00:00:00Z" }))
 
     await updateFavpoll(
-      "favpoll-1",
-      "prot-1",
-      makeInput({ closesAt: "2028-01-01T00:00" }) // same date → no extension
+      FAVPOLL_ID,
+      PROT_ID,
+      makeInput({ closesAt: "2028-01-01T00:00:00.000Z" }) // same date → no extension
     )
 
     const favpollsUpdate = mock
@@ -209,8 +218,8 @@ describe("updateFavpoll — DB writes", () => {
     queueHappyPath()
 
     await updateFavpoll(
-      "favpoll-1",
-      "prot-1",
+      FAVPOLL_ID,
+      PROT_ID,
       makeInput({
         protagonistName: "  Bob  ",
         dateLabel: "1990–2025",
@@ -232,7 +241,7 @@ describe("updateFavpoll — DB writes", () => {
     queueHappyPath()
 
     await updateFavpoll(
-      "favpoll-1",
+      FAVPOLL_ID,
       "",
       makeInput({
         subject: "cause",
@@ -261,8 +270,8 @@ describe("updateFavpoll — DB writes", () => {
     queueHappyPath()
 
     await updateFavpoll(
-      "favpoll-1",
-      "prot-1",
+      FAVPOLL_ID,
+      PROT_ID,
       makeInput({
         photoUrl: "https://example.com/me.jpg",
         dateLabel: "1990–2025",
@@ -289,9 +298,9 @@ describe("updateFavpoll — DB writes", () => {
     queueHappyPath()
 
     await updateFavpoll(
-      "favpoll-1",
-      "prot-1",
-      makeInput({ charityIds: ["c-1", "c-2"] })
+      FAVPOLL_ID,
+      PROT_ID,
+      makeInput({ charityIds: [CHARITY_ID, CHARITY_2_ID] })
     )
 
     const charityDelete = mock
@@ -304,11 +313,11 @@ describe("updateFavpoll — DB writes", () => {
       .find((c) => c.method === "insert")!
     expect(charityInsert.args[0]).toHaveLength(2)
     expect(charityInsert.args[0][0]).toMatchObject({
-      charity_id: "c-1",
+      charity_id: CHARITY_ID,
       display_order: 0,
     })
     expect(charityInsert.args[0][1]).toMatchObject({
-      charity_id: "c-2",
+      charity_id: CHARITY_2_ID,
       display_order: 1,
     })
   })
@@ -322,7 +331,7 @@ describe("updateFavpoll — DB writes", () => {
     // No charity insert since charityIds is empty
     mock.queue([]) // favpoll_polls select
 
-    await updateFavpoll("favpoll-1", "prot-1", makeInput({ charityIds: [] }))
+    await updateFavpoll(FAVPOLL_ID, PROT_ID, makeInput({ charityIds: [] }))
 
     const charityInserts = mock
       .callsFor("favpoll_charities")
@@ -341,7 +350,7 @@ describe("updateClosesAt", () => {
   it("refuses a close in the past even when it SHORTENS (a past close is a close)", async () => {
     mock.queue(makeFavpollRow({ closes_at: soon, closed_at: null }))
     const yesterday = new Date(Date.now() - 86_400_000).toISOString()
-    expect(await updateClosesAt("favpoll-1", yesterday)).toEqual({
+    expect(await updateClosesAt(FAVPOLL_ID, yesterday)).toEqual({
       ok: false,
       error: "Closing date must be in the future",
     })
@@ -353,7 +362,7 @@ describe("updateClosesAt", () => {
     )
     mock.queue(null) // favpolls update
     const tomorrow = new Date(Date.now() + 86_400_000).toISOString()
-    expect(await updateClosesAt("favpoll-1", tomorrow)).toEqual({
+    expect(await updateClosesAt(FAVPOLL_ID, tomorrow)).toEqual({
       ok: true,
       value: undefined,
     })
@@ -364,9 +373,72 @@ describe("updateClosesAt", () => {
       makeFavpollRow({ closes_at: soon, closed_at: null, extension_count: 2 })
     )
     const later = new Date(Date.now() + 14 * 86_400_000).toISOString()
-    expect(await updateClosesAt("favpoll-1", later)).toMatchObject({
+    expect(await updateClosesAt(FAVPOLL_ID, later)).toMatchObject({
       ok: false,
       error: expect.stringContaining("Maximum extensions reached"),
     })
+  })
+})
+
+// ---------------------------------------------------------------------------
+// The schema at the boundary (#1109)
+// ---------------------------------------------------------------------------
+
+describe("updateFavpoll checks its arguments", () => {
+  // THIS ONE THROWS, like every other guard in the action. The wizard's
+  // catch renders err.message, so the sentence shows in development and
+  // is redacted in production — converting it to a result is #1105's
+  // remaining work on this file, not this ticket's.
+  it("throws for an id that is not one, before reading anything", async () => {
+    await expect(
+      updateFavpoll("favpoll-1", PROT_ID, makeInput())
+    ).rejects.toThrow("That favpoll, topic or charity wasn't recognised.")
+    expect(mock.from).not.toHaveBeenCalled()
+  })
+
+  it("throws for a closing date it cannot read", async () => {
+    await expect(
+      updateFavpoll(
+        FAVPOLL_ID,
+        PROT_ID,
+        makeInput({ closesAt: "next Tuesday" })
+      )
+    ).rejects.toThrow("That closing date didn't make sense.")
+    expect(mock.from).not.toHaveBeenCalled()
+  })
+
+  // A cause favpoll has no protagonist row and the wizard calls this with
+  // "" for it (use-wizard-state: `edit.protagonistId ?? ""`), so the empty
+  // string is a legitimate value rather than a missing one.
+  it("accepts the empty protagonist id a cause favpoll sends", async () => {
+    queueHappyPath()
+
+    await expect(
+      updateFavpoll(
+        FAVPOLL_ID,
+        "",
+        makeInput({ subject: "cause", causeLabel: "Winter" })
+      )
+    ).resolves.toBeUndefined()
+  })
+})
+
+describe("updateClosesAt answers with a result, not a throw", () => {
+  it("returns the refusal for an id that is not one", async () => {
+    await expect(
+      updateClosesAt("favpoll-1", "2028-01-01T00:00:00.000Z")
+    ).resolves.toEqual({
+      ok: false,
+      error: "That favpoll, topic or charity wasn't recognised.",
+    })
+    expect(mock.from).not.toHaveBeenCalled()
+  })
+
+  it("returns the refusal for a date it cannot read", async () => {
+    await expect(updateClosesAt(FAVPOLL_ID, "next Tuesday")).resolves.toEqual({
+      ok: false,
+      error: "That closing date didn't make sense.",
+    })
+    expect(mock.from).not.toHaveBeenCalled()
   })
 })
