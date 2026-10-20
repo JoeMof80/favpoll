@@ -47,7 +47,34 @@ has the new one — a restart gives the chunk a new ETag.
 
 From `apps/web`: `pnpm exec prettier --check .`, `tsc --noEmit`, `eslint`,
 `vitest run`. From the repo root: `node scripts/check-hex-colors.mjs`
-(never hardcode a hex — use the tokens in `app/globals.css`).
+(never hardcode a hex — use the tokens in `app/globals.css`),
+`node scripts/component-tree.mjs --check` (regenerate and commit
+`references/COMPONENT_TREE.md` when you add or remove a component) and
+`node scripts/check-dead-messages.mjs` (a key in `messages/en-GB.json`
+that no production source renders fails the build; a key referenced only
+by a test or a story counts as dead).
+
+Playwright runs as **E2E Tests (advisory)**. It is a real signal, not
+noise: in October 2026 it sat red for a day because its beat list had
+gone stale, and nobody looked, because the job cannot block anything.
+
+### Which checks actually gate a merge
+
+Only the ones in the `main-protection` ruleset. Everything else reports
+and is ignored by the merge button, so read the ruleset rather than the
+list of green ticks.
+
+**The build is the only thing that catches a `"use server"` module
+exporting something that is not an async function.** Verified on
+2026-10-20 by exporting a `const` from `apps/admin/lib/actions/charities.ts`:
+`tsc --noEmit` passed, all 177 admin tests passed, and `next build` failed
+with "Only async functions are allowed to be exported in a `use server`
+file." There is no GitHub Actions build job, because Vercel builds both
+apps on every pull request, including ones that touch no application code.
+That makes `Vercel – favpoll-web` and `Vercel – favpoll-admin` the build
+protection, and they are worth keeping in the ruleset for that reason
+alone. The cost is a dependency on Vercel: if a deployment check stops
+reporting, merges wait.
 
 ## Agent skills
 
