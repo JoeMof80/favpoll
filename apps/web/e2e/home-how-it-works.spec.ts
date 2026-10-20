@@ -23,14 +23,17 @@ import { test, expect } from "@playwright/test"
 // jsdom cannot catch this: it has no layout engine, so every rect is zero. It
 // has to be a browser, at a real phone width.
 
-// The seven beats, in order. Named rather than counted so a dropped beat
-// fails here too.
+// The eight beats, in order — the ORGANISER's process since #1085
+// ("How to hold a favpoll"), which replaced the guest journey this list
+// used to name. Named rather than counted so a dropped beat fails here
+// too; keep it in step with BEATS in components/landing/process-overview.
 const BEATS = [
-  "card",
-  "arriving",
-  "selected",
-  "amount-picked",
-  "reveal",
+  "occasion",
+  "charity",
+  "topic",
+  "header",
+  "story",
+  "share",
   "room",
   "keepsake",
 ] as const
