@@ -99,6 +99,13 @@ all write, so the pin cost no lockfile churn.
 Vercel deprecated Node 20 on 1 October 2026. CI had been testing on 20 while
 production ran on 24.
 
+`.nvmrc` holds the major, `24`, not an exact patch, so CI jobs in one run can
+land on different 24.x patches — the first run after the pin drew 24.21.0 in
+two jobs and 24.22.0 in three, because `setup-node` takes the newest 24.x the
+runner has cached. That is deliberate: Vercel resolves its own patch inside
+`24.x` too, so pinning CI to one patch would make CI stricter than the thing
+it is meant to mirror. The major is what changes behaviour.
+
 Bump either by hand, in its own commit — corepack needs an exact pnpm
 version, so there is no range to track. Left to choose for itself, corepack
 fetched pnpm 12.14.0 on 2026-10-20 and broke every `pnpm` call on the
