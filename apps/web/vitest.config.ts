@@ -10,25 +10,13 @@ const dirname =
     ? __dirname
     : path.dirname(fileURLToPath(import.meta.url))
 
-// Aliases shared by all test projects
-const sharedAliases = [
-  // Must come before the "@" catch-all so specific paths win
-  {
-    find: "@/app/favpolls/new/actions",
-    replacement: resolve(dirname, ".storybook/__mocks__/actions.ts"),
-  },
-  {
-    find: "@favpoll/types",
-    replacement: resolve(dirname, "../../packages/types/index.ts"),
-  },
-  { find: "@", replacement: resolve(dirname, ".") },
-]
+import { baseAliases, storyAliases } from "./.storybook/aliases"
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    alias: sharedAliases,
+    alias: baseAliases,
   },
   test: {
     // 5s (vitest's default) is too tight for a 117-file suite running in
@@ -62,28 +50,9 @@ export default defineConfig({
             configDir: path.join(dirname, ".storybook"),
           }),
         ],
-        resolve: {
-          alias: [
-            // Stub server-only modules for the browser environment
-            {
-              find: "@/lib/actions/favpoll-poll-favourites",
-              replacement: resolve(
-                dirname,
-                ".storybook/__mocks__/favpoll-poll-favourites.ts"
-              ),
-            },
-            // next/navigation requires App Router context which isn't set up in the
-            // vitest-browser runner — stub the hooks that stories need.
-            {
-              find: "next/navigation",
-              replacement: resolve(
-                dirname,
-                ".storybook/__mocks__/next-navigation.ts"
-              ),
-            },
-            ...sharedAliases,
-          ],
-        },
+        // The same map .storybook/main.ts uses, so a story cannot pass here
+        // and fail in a static build.
+        resolve: { alias: storyAliases },
         test: {
           name: "storybook",
           browser: {
