@@ -91,9 +91,6 @@ export function useFavpollContent({
     }
   }
 
-  const showPledgeCard =
-    !isClosed && !!pollWithItems && !pledgeConfirmed && !localEntitled
-
   // Must be stable (useCallback + [] deps) — usePollSection's effects include
   // onViewChange in their deps and have cleanup that cancels timeouts; an
   // unstable reference causes re-fires that cancel the showRankings timer.
@@ -115,7 +112,6 @@ export function useFavpollContent({
     handlePledgeSuccess,
     pledgeConfirmed,
     addItemHandler,
-    showPledgeCard,
     handleViewChange,
     localEntitled,
     effectiveNote,

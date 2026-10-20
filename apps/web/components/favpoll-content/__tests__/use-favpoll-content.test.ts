@@ -199,32 +199,6 @@ describe("useFavpollContent — addItemHandler", () => {
 })
 
 describe("useFavpollContent — derived values", () => {
-  it("showPledgeCard is true when not closed, poll is set, and not entitled", () => {
-    const { result } = renderHook(() => useFavpollContent(defaults))
-    expect(result.current.showPledgeCard).toBe(true)
-  })
-
-  it("showPledgeCard is false when closed", () => {
-    const { result } = renderHook(() =>
-      useFavpollContent({ ...defaults, isClosed: true })
-    )
-    expect(result.current.showPledgeCard).toBe(false)
-  })
-
-  it("showPledgeCard is false when pollWithItems is null", () => {
-    const { result } = renderHook(() =>
-      useFavpollContent({ ...defaults, pollWithItems: null })
-    )
-    expect(result.current.showPledgeCard).toBe(false)
-  })
-
-  it("showPledgeCard is false when entitled", () => {
-    const { result } = renderHook(() =>
-      useFavpollContent({ ...defaults, entitled: true })
-    )
-    expect(result.current.showPledgeCard).toBe(false)
-  })
-
   it("localEntitled starts as the entitled prop value", () => {
     const { result } = renderHook(() =>
       useFavpollContent({ ...defaults, entitled: true })
