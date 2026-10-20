@@ -11,7 +11,7 @@ Generated 2026-10-20 by `node scripts/component-tree.mjs` — do not edit by han
 ↑  already expanded above, or a shared subtree (see its section)
 ```
 
-Counts: 30 routes · 192 component files · 38 with stories · 0 unused in production
+Counts: 30 routes · 192 component files · 45 with stories · 0 unused in production
 
 ---
 
@@ -109,14 +109,14 @@ app/celebration/page.tsx
   → components/landing/demo-fixture.ts
       → components/hero-demo-panel/scenes.ts *
           → components/favpoll-card/types.ts
-      → components/keepsake/keepsake-document.tsx  ↑
+      → components/keepsake/keepsake-document.tsx *  ↑
       → components/landing/topic-picker-vignette.tsx  ↑
-      → components/print-pack/pack-card.tsx  ↑
+      → components/print-pack/pack-card.tsx *  ↑
   → components/landing/fold.tsx
   → components/landing/folded-card-vignette.tsx
       → components/landing/demo-fixture.ts  ↑
       → components/landing/vignette.tsx
-      → components/print-pack/pack-card.tsx  ↑
+      → components/print-pack/pack-card.tsx *  ↑
   → components/landing/hero.tsx
       → components/hero-demo-panel/demo-card.tsx *  ↑
       → components/hero-demo-panel/demo-frame.tsx
@@ -142,9 +142,9 @@ app/celebration/page.tsx
   → components/landing/ideas-section.tsx
       → components/ui/section-eyebrow.tsx *
   → components/landing/keepsake-vignette.tsx
-      → components/keepsake/keepsake-document.tsx  ↑
-      → components/keepsake/keepsake-sheet.tsx
-          → components/keepsake/keepsake-document.tsx  ↑
+      → components/keepsake/keepsake-document.tsx *  ↑
+      → components/keepsake/keepsake-sheet.tsx *
+          → components/keepsake/keepsake-document.tsx *  ↑
       → components/landing/demo-fixture.ts  ↑
       → components/landing/vignette.tsx  ↑
   → components/landing/live-vignette.tsx
@@ -239,7 +239,7 @@ app/favpolls/[id]/edit/page.tsx
 
 ```
 app/favpolls/[id]/keepsake/page.tsx
-  → components/keepsake/keepsake-document.tsx
+  → components/keepsake/keepsake-document.tsx *
       → components/bump-chart.tsx *  ↑
       → components/landing/hero-texture.tsx
   → components/keepsake/keepsake-view.tsx
@@ -247,7 +247,7 @@ app/favpolls/[id]/keepsake/page.tsx
           → components/ui/button.tsx *
       → components/keepsake/export-image-button.tsx
           → components/ui/button.tsx *  ↑
-      → components/keepsake/keepsake-document.tsx  ↑
+      → components/keepsake/keepsake-document.tsx *  ↑
       → components/print-workspace/
           → components/ui/button.tsx *  ↑
           → components/ui/segmented-control.tsx *
@@ -326,7 +326,7 @@ app/favpolls/[id]/manage/page.tsx
           → components/favpoll-form/schema.ts  ↑
           → components/manage/settings-rows.tsx  ↑
           → components/ui/button.tsx *  ↑
-      → components/manage/pledges-over-time.tsx
+      → components/manage/pledges-over-time.tsx *
           → components/ui/section-eyebrow.tsx *  ↑
       → components/manage/settings-rows.tsx  ↑
       → components/new-favpoll-wizard/wizard-placeholders.ts
@@ -353,7 +353,7 @@ app/favpolls/[id]/manage/page.tsx
   → components/guest-book.tsx *
       → components/ui/responsive-overlay.tsx *  ↑
       → components/ui/section-eyebrow.tsx *  ↑
-  → components/manage/pledges-over-time.tsx  ↑
+  → components/manage/pledges-over-time.tsx *  ↑
   → components/page-ground.tsx
   → components/register-scope.tsx
   → lib/charity-consent.ts  (lib)
@@ -381,7 +381,7 @@ app/favpolls/[id]/page.tsx
           → packages/types/ *
       → components/favpoll-content/use-favpoll-content.ts
           → packages/types/ *  ↑
-      → components/favpoll-sheet/
+      → components/favpoll-sheet/ *
           → components/bump-chart.tsx *  ↑
           → components/cause-hero.tsx
               → components/favpoll-hero-avatar.tsx *
@@ -474,14 +474,14 @@ app/favpolls/[id]/stationery/page.tsx
       → components/keepsake/export-image-button.tsx
           → components/ui/button.tsx *
       → components/print-pack/avery-sheet.tsx
-          → components/print-pack/pack-card.tsx  ↑
+          → components/print-pack/pack-card.tsx *  ↑
           → components/print-pack/pack-sheet.tsx
-              → components/print-pack/pack-card.tsx  ↑
-      → components/print-pack/insert-card.tsx
+              → components/print-pack/pack-card.tsx *  ↑
+      → components/print-pack/insert-card.tsx *
           → components/branded-qr.tsx  ↑
           → components/favpoll-logo.tsx
-          → components/print-pack/pack-card.tsx  ↑
-      → components/print-pack/pack-card.tsx  ↑
+          → components/print-pack/pack-card.tsx *  ↑
+      → components/print-pack/pack-card.tsx *  ↑
       → components/print-pack/pack-sheet.tsx  ↑
       → components/print-workspace/
           → components/ui/button.tsx *  ↑
@@ -659,9 +659,9 @@ app/features/page.tsx
       → components/ui/button.tsx *
   → components/landing/hero-texture.tsx
   → components/landing/keepsake-vignette.tsx
-      → components/keepsake/keepsake-document.tsx  ↑
-      → components/keepsake/keepsake-sheet.tsx
-          → components/keepsake/keepsake-document.tsx  ↑
+      → components/keepsake/keepsake-document.tsx *  ↑
+      → components/keepsake/keepsake-sheet.tsx *
+          → components/keepsake/keepsake-document.tsx *  ↑
       → components/landing/demo-fixture.ts  ↑
       → components/landing/vignette.tsx  ↑
   → components/landing/live-vignette.tsx
@@ -689,10 +689,10 @@ app/features/page.tsx
       → components/landing/demo-fixture.ts  ↑
       → components/landing/vignette.tsx  ↑
       → components/print-pack/avery-sheet.tsx
-          → components/print-pack/pack-card.tsx  ↑
+          → components/print-pack/pack-card.tsx *  ↑
           → components/print-pack/pack-sheet.tsx
-              → components/print-pack/pack-card.tsx  ↑
-      → components/print-pack/pack-card.tsx  ↑
+              → components/print-pack/pack-card.tsx *  ↑
+      → components/print-pack/pack-card.tsx *  ↑
       → components/print-pack/pack-sheet.tsx  ↑
   → components/landing/quiet-tail.tsx
   → components/landing/topic-picker-vignette.tsx
@@ -712,9 +712,9 @@ app/fundraiser/page.tsx
   → components/landing/demo-fixture.ts
       → components/hero-demo-panel/scenes.ts *
           → components/favpoll-card/types.ts
-      → components/keepsake/keepsake-document.tsx  ↑
+      → components/keepsake/keepsake-document.tsx *  ↑
       → components/landing/topic-picker-vignette.tsx  ↑
-      → components/print-pack/pack-card.tsx  ↑
+      → components/print-pack/pack-card.tsx *  ↑
   → components/landing/fold.tsx
   → components/landing/hero.tsx
       → components/hero-demo-panel/demo-card.tsx *  ↑
@@ -741,9 +741,9 @@ app/fundraiser/page.tsx
   → components/landing/ideas-section.tsx
       → components/ui/section-eyebrow.tsx *
   → components/landing/keepsake-vignette.tsx
-      → components/keepsake/keepsake-document.tsx  ↑
-      → components/keepsake/keepsake-sheet.tsx
-          → components/keepsake/keepsake-document.tsx  ↑
+      → components/keepsake/keepsake-document.tsx *  ↑
+      → components/keepsake/keepsake-sheet.tsx *
+          → components/keepsake/keepsake-document.tsx *  ↑
       → components/landing/demo-fixture.ts  ↑
       → components/landing/vignette.tsx
   → components/landing/note-vignette.tsx
@@ -813,7 +813,7 @@ app/live/[slug]/page.tsx
   → components/room-shell/
       → components/branded-qr.tsx
       → components/favpoll-logo.tsx
-      → components/favpoll-sheet/
+      → components/favpoll-sheet/ *
           → components/bump-chart.tsx *  ↑
           → components/cause-hero.tsx
               → components/favpoll-hero-avatar.tsx *
@@ -856,7 +856,7 @@ app/live/[slug]/page.tsx
           → components/ui/button.tsx *  ↑
           → components/ui/dropdown-menu.tsx  ↑
           → packages/ui/  ↑
-      → components/room-shell/podium.tsx
+      → components/room-shell/podium.tsx *
           → components/landing/hero-texture.tsx
           → packages/types/ *  ↑
       → packages/types/ *  ↑
@@ -879,9 +879,9 @@ app/memorial/page.tsx
   → components/landing/demo-fixture.ts
       → components/hero-demo-panel/scenes.ts *
           → components/favpoll-card/types.ts
-      → components/keepsake/keepsake-document.tsx  ↑
+      → components/keepsake/keepsake-document.tsx *  ↑
       → components/landing/topic-picker-vignette.tsx  ↑
-      → components/print-pack/pack-card.tsx  ↑
+      → components/print-pack/pack-card.tsx *  ↑
   → components/landing/fold.tsx
   → components/landing/hero.tsx
       → components/hero-demo-panel/demo-card.tsx *  ↑
@@ -900,9 +900,9 @@ app/memorial/page.tsx
   → components/landing/ideas-section.tsx
       → components/ui/section-eyebrow.tsx *
   → components/landing/keepsake-vignette.tsx
-      → components/keepsake/keepsake-document.tsx  ↑
-      → components/keepsake/keepsake-sheet.tsx
-          → components/keepsake/keepsake-document.tsx  ↑
+      → components/keepsake/keepsake-document.tsx *  ↑
+      → components/keepsake/keepsake-sheet.tsx *
+          → components/keepsake/keepsake-document.tsx *  ↑
       → components/landing/demo-fixture.ts  ↑
       → components/landing/vignette.tsx
   → components/landing/live-vignette.tsx
@@ -935,10 +935,10 @@ app/memorial/page.tsx
   → components/landing/order-of-service-vignette.tsx
       → components/landing/demo-fixture.ts  ↑
       → components/landing/vignette.tsx  ↑
-      → components/print-pack/insert-card.tsx
+      → components/print-pack/insert-card.tsx *
           → components/branded-qr.tsx
           → components/favpoll-logo.tsx
-          → components/print-pack/pack-card.tsx  ↑
+          → components/print-pack/pack-card.tsx *  ↑
   → components/landing/pro-section.tsx
       → components/ui/button.tsx *  ↑
   → components/landing/quiet-tail.tsx  ↑
@@ -999,8 +999,8 @@ app/page.tsx
       → components/hero-demo-panel/scenes.ts *
           → components/favpoll-card/types.ts
       → components/hero-demo-panel/tv-frame.tsx
-      → components/keepsake/keepsake-sheet.tsx
-          → components/keepsake/keepsake-document.tsx  ↑
+      → components/keepsake/keepsake-sheet.tsx *
+          → components/keepsake/keepsake-document.tsx *  ↑
       → components/landing/demo-fixture.ts  ↑
       → components/landing/display-still.tsx
           → components/hero-demo-panel/scene-favourites.ts
@@ -1027,7 +1027,7 @@ app/page.tsx
           → components/ui/input.tsx *
           → components/ui/textarea.tsx
           → packages/types/ *  ↑
-      → components/print-pack/pack-card.tsx  ↑
+      → components/print-pack/pack-card.tsx *  ↑
       → components/register-link.tsx  ↑
       → components/ui/button.tsx *  ↑
       → components/ui/section-eyebrow.tsx *  ↑
@@ -1148,9 +1148,9 @@ Components with three or more production importers, expanded once.
 components/landing/demo-fixture.ts
   → components/hero-demo-panel/scenes.ts *
       → components/favpoll-card/types.ts
-  → components/keepsake/keepsake-document.tsx  ↑
+  → components/keepsake/keepsake-document.tsx *  ↑
   → components/landing/topic-picker-vignette.tsx  ↑
-  → components/print-pack/pack-card.tsx  ↑
+  → components/print-pack/pack-card.tsx *  ↑
 ```
 
 ### `components/ui/responsive-overlay.tsx` — used by 12
@@ -1191,7 +1191,7 @@ components/new-favpoll-wizard/wizard-field.tsx
 ### `components/print-pack/pack-card.tsx` — used by 8
 
 ```
-components/print-pack/pack-card.tsx
+components/print-pack/pack-card.tsx *
   → components/branded-qr.tsx
 ```
 
@@ -1220,7 +1220,7 @@ components/guest-book.tsx *
 ### `components/keepsake/keepsake-document.tsx` — used by 5
 
 ```
-components/keepsake/keepsake-document.tsx
+components/keepsake/keepsake-document.tsx *
   → components/bump-chart.tsx *  ↑
   → components/landing/hero-texture.tsx
 ```
@@ -1291,9 +1291,9 @@ components/landing/hero.tsx
 
 ```
 components/landing/keepsake-vignette.tsx
-  → components/keepsake/keepsake-document.tsx  ↑
-  → components/keepsake/keepsake-sheet.tsx
-      → components/keepsake/keepsake-document.tsx  ↑
+  → components/keepsake/keepsake-document.tsx *  ↑
+  → components/keepsake/keepsake-sheet.tsx *
+      → components/keepsake/keepsake-document.tsx *  ↑
   → components/landing/demo-fixture.ts  ↑
   → components/landing/vignette.tsx
 ```
@@ -1508,7 +1508,7 @@ components/new-favpoll-wizard/wizard-topic-card.tsx *
 components/room-shell/
   → components/branded-qr.tsx
   → components/favpoll-logo.tsx
-  → components/favpoll-sheet/
+  → components/favpoll-sheet/ *
       → components/bump-chart.tsx *  ↑
       → components/cause-hero.tsx
           → components/favpoll-hero-avatar.tsx *
@@ -1568,7 +1568,7 @@ components/room-shell/
       → components/ui/button.tsx *  ↑
       → components/ui/dropdown-menu.tsx  ↑
       → packages/ui/  ↑
-  → components/room-shell/podium.tsx
+  → components/room-shell/podium.tsx *
       → components/landing/hero-texture.tsx
       → packages/types/ *  ↑
   → packages/types/ *  ↑

@@ -581,6 +581,55 @@ tests in CI, so what exists is accurate. The gaps are the big surfaces:
 | `components/heroes`           | 2     | 0       |
 | `favpoll-sheet`, `guest-book` | 2     | 0       |
 
+**Five of the named surfaces now have one (#1110, 2026-10-20), and two of
+them never needed one.** The table's last two rows were wrong:
+`guest-book.stories.tsx` already existed, and so did
+`favpoll-hero.stories.tsx` and `favpoll-hero-avatar.stories.tsx` — the
+heroes the issue called storyless are the two files in
+`components/heroes/`, not the hero surface.
+
+**The repo already counts this, better than this entry did.**
+`references/COMPONENT_TREE.md` marks every component reached by a story
+with a `*` and prints the total, so the coverage number is a generated
+fact rather than a `find | wc`: it read **38 with stories** before this
+change and **45** after. Use that line, not a hand count — the 46-of-211
+in this entry matches neither, and is probably story EXPORTS against
+component files.
+
+Added, one per surface that genuinely had none, choosing the component a
+newcomer would want to see rather than the easiest to render:
+
+| Story | Variants | What it shows |
+| --- | --- | --- |
+| `Manage/PledgesOverTime` | 4 | the dashboard chart, built through the exported `pledgeTimeline` so it cannot drift from how the page builds its points |
+| `PrintPack/InsertCard` | 5 | the card an organiser slips into an order of service, with the QR's short `/p/<code>` form |
+| `RoomShell/Podium` | 4 | the witnessed close, bronze to gold |
+| `Keepsake/KeepsakeSheet` | 5 | A4, both orientations, both dials, scaled from the top-left as the real caller does |
+| `FavpollSheet/FavpollSheet` | 6 | guest and room from one component, which is the whole point of it — fixture lifted from its own test so a story and its test describe the same favpoll |
+
+All 24 render from a static `storybook build` (166 stories in the built
+index, up from 142), which is the criterion that matters: #1101 existed
+because stories could pass under vitest and fail the static build.
+
+**The a11y addon found real violations, and they are pre-existing.** Run
+with `test: "error"` instead of the configured `"todo"`, three of the five
+report `color-contrast` failures on muted treatments — the insert card,
+the keepsake and the sheet; the chart and the podium are clean. The
+stories exposed them rather than caused them, which is the argument for
+having stories. Raised as #1143, `ready-for-human`, because two of the
+three surfaces are PRINT (axe applies screen ratios to paper) and the
+muted steps are the register-ink grammar, not an accident. They fail
+nothing today: `preview.tsx` keeps `a11y: { test: "todo" }`.
+
+**Local note, not a defect.** The browser-test project passes 142 tests
+on 33 files on a clean tree and fails to import seven files with all five
+new stories added — including `@storybook/addon-vitest`'s own setup file,
+and including stories this change never touched. Each new file passes on
+its own. That is the Vite server failing to serve modules under load on
+an 8GB machine, not a code error, and the memory caps that make this
+machine survivable must not be raised to paper over it (see CLAUDE.md).
+CI is the arbiter.
+
 ### 3.3 Fifteen stories fail in a static Storybook build · S · low risk · FIX NOW
 
 `FavpollListCard` (5), `PledgeDialog` (5) and `PollSection` (5) throw
