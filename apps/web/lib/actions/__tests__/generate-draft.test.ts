@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
+import { describe, it, expect, vi, beforeEach } from "vitest"
 import { makeSupabaseMock } from "@/tests/mocks/supabase-admin"
 
 const mockAuth = vi.hoisted(() =>
@@ -11,6 +11,18 @@ let mock = makeSupabaseMock()
 vi.mock("@/lib/supabase/admin", () => ({
   createAdminClient: () => mock.supabase,
 }))
+
+// The shared limiter (#1132) is mocked rather than driven through the
+// Supabase mock, because `isRateLimited` consumes that mock's response
+// queue and would shift every other test's expectations by two. The
+// pattern is app/api/contact/__tests__/route.test.ts's.
+const mockIsRateLimited = vi.hoisted(() => vi.fn().mockResolvedValue(false))
+vi.mock("@/lib/rate-limit", () => ({
+  isRateLimited: mockIsRateLimited,
+  ipFromHeaders: () => "1.2.3.4",
+  RATE_LIMIT_MESSAGE: "Too many requests — please try again in a few minutes.",
+}))
+vi.mock("next/headers", () => ({ headers: () => new Headers() }))
 
 const mockMessagesCreate = vi.hoisted(() => vi.fn())
 vi.mock("@anthropic-ai/sdk", () => ({
@@ -42,8 +54,6 @@ import {
   inventsCondition,
   hasTics,
   slipsToSingular,
-  _rateLimitStore,
-  RATE_LIMIT_MAX,
   RateLimitError,
 } from "../generate-draft-utils"
 
@@ -84,11 +94,8 @@ beforeEach(() => {
   mock = makeSupabaseMock()
   mockAuth.mockResolvedValue({ userId: "user-1" })
   mockMessagesCreate.mockReset()
-  _rateLimitStore.clear()
-})
-
-afterEach(() => {
-  _rateLimitStore.clear()
+  mockIsRateLimited.mockReset()
+  mockIsRateLimited.mockResolvedValue(false)
 })
 
 // ---------------------------------------------------------------------------
@@ -539,94 +546,98 @@ describe("generateDraft — cache miss, cause", () => {
 // Rate limiting
 // ---------------------------------------------------------------------------
 
-describe("rate limiting", () => {
-  it(`allows ${RATE_LIMIT_MAX} successful generations then throws RateLimitError`, async () => {
-    for (let i = 0; i < RATE_LIMIT_MAX; i++) {
-      mock.queue(null) // cache miss
-      mock.queue(TOPIC_DATA)
-      mockLLMResponse("About.", "Her favourite was always Red.")
-      mock.queue(null) // insert
-    }
+describe("rate limiting — the shared limiter (#1132)", () => {
+  const input = {
+    register: "celebrating_one" as const,
+    subject: "someone" as const,
+    topicId: TOPIC_ID,
+  }
 
-    const input = {
-      register: "celebrating_one" as const,
-      subject: "someone" as const,
-      topicId: TOPIC_ID,
-    }
+  function queueOneGeneration() {
+    mock.queue(null) // cache miss
+    mock.queue(TOPIC_DATA) // topics
+    mockLLMResponse("About.", "Hers is Blue.")
+    mock.queue(null) // insert
+  }
 
-    for (let i = 0; i < RATE_LIMIT_MAX; i++) {
-      await expect(generateDraft(input)).resolves.toBeDefined()
-    }
+  it("generates while the limiter allows it", async () => {
+    queueOneGeneration()
+
+    await expect(generateDraft(input)).resolves.toBeDefined()
+    expect(mockIsRateLimited).toHaveBeenCalled()
+  })
+
+  it("throws RateLimitError when the limiter says no", async () => {
+    mock.queue(null) // cache miss
+    mockIsRateLimited.mockResolvedValue(true)
 
     await expect(generateDraft(input)).rejects.toBeInstanceOf(RateLimitError)
   })
 
-  it("throws immediately — no DB call is made when rate-limited", async () => {
-    for (let i = 0; i < RATE_LIMIT_MAX; i++) {
-      mock.queue(null) // cache miss
-      mock.queue(TOPIC_DATA)
-      mockLLMResponse("About.", "Her favourite was always Blue.")
-      mock.queue(null) // insert
-      await generateDraft({
-        register: "celebrating_one",
-        subject: "someone",
-        topicId: TOPIC_ID,
-      })
-    }
+  it("never reaches the model when limited", async () => {
+    mock.queue(null) // cache miss
+    mockIsRateLimited.mockResolvedValue(true)
 
-    const callsBefore = mock.calls.length
-
-    await expect(
-      generateDraft({
-        register: "celebrating_one",
-        subject: "someone",
-        topicId: TOPIC_ID,
-      })
-    ).rejects.toBeInstanceOf(RateLimitError)
-
-    expect(mock.calls.length).toBe(callsBefore) // no new DB calls
+    await expect(generateDraft(input)).rejects.toBeInstanceOf(RateLimitError)
+    expect(mockMessagesCreate).not.toHaveBeenCalled()
   })
 
-  it("cache hits do not consume quota", async () => {
-    for (let i = 0; i < RATE_LIMIT_MAX; i++) {
-      mock.queue({ about: "Cached.", note: "Cached — Red." })
-      await generateDraft({
-        register: "celebrating_one",
-        subject: "someone",
-        topicId: TOPIC_ID,
-      })
-    }
+  // COUNTS THE ORGANISER AND THE ADDRESS SEPARATELY, the shape
+  // app/favpolls/[id]/actions.ts already uses for guest items. Signup is
+  // open, so an account is cheap and a per-account limit alone bounds
+  // patience rather than volume.
+  it("counts the organiser and the address they came from", async () => {
+    queueOneGeneration()
 
-    // Still able to generate — cache hits consumed nothing
-    mock.queue(null) // cache miss
-    mock.queue(TOPIC_DATA)
-    mockLLMResponse("About.", "Her favourite was always Red.")
-    mock.queue(null) // insert
+    await generateDraft(input)
 
-    await expect(
-      generateDraft({
-        register: "celebrating_one",
-        subject: "someone",
-        topicId: TOPIC_ID,
-      })
-    ).resolves.toBeDefined()
+    const scopes = mockIsRateLimited.mock.calls.map((c) => c[0])
+    expect(scopes).toContain("generate-draft")
+    expect(scopes).toContain("generate-draft-ip")
+    const ids = mockIsRateLimited.mock.calls.map((c) => c[1])
+    expect(ids).toContain("user-1")
+    expect(ids).toContain("1.2.3.4")
   })
 
-  it("failed LLM call does not consume quota", async () => {
+  // THE HALF OF THE OLD BEHAVIOUR WORTH KEEPING. The limiter is called
+  // only where a model call is about to happen, so a cache hit does not
+  // consult it at all — and the first click on a shared draft is the
+  // common case.
+  it("does not consult the limiter on a cache hit", async () => {
+    mock.queue({
+      about: "A cached about.",
+      note: "A cached note.",
+      cause_label: null,
+      context: null,
+    })
+
+    const result = await generateDraft(input)
+
+    expect(result.fromCache).toBe(true)
+    expect(mockIsRateLimited).not.toHaveBeenCalled()
+  })
+
+  // A DELIBERATE CHANGE, not an oversight. The old in-memory counter
+  // incremented only after a success, so a failed generation cost
+  // nothing. `check_rate_limit` increments on every call and cannot
+  // un-count — and the old kindness was true of the counter, not of the
+  // bill: a model call that fails has usually already spent its tokens.
+  it("counts an attempt that then fails, where the old counter did not", async () => {
     mock.queue(null) // cache miss
-    mock.queue(TOPIC_DATA)
-    mockMessagesCreate.mockRejectedValueOnce(new Error("API key missing"))
+    mock.queue(TOPIC_DATA) // topics
+    mockMessagesCreate.mockRejectedValue(new Error("model down"))
 
+    await expect(generateDraft(input)).rejects.toThrow()
+    expect(mockIsRateLimited).toHaveBeenCalled()
+  })
+
+  // A refused SHAPE still costs nothing, because the schema runs before
+  // the limiter does (#1109 + #1132).
+  it("does not consult the limiter for an argument it refused", async () => {
     await expect(
-      generateDraft({
-        register: "celebrating_one",
-        subject: "someone",
-        topicId: TOPIC_ID,
-      })
-    ).rejects.toThrow()
-
-    const entry = _rateLimitStore.get("user-1")
-    expect(entry?.count ?? 0).toBe(0)
+      generateDraft({ ...input, topicId: "topic-1" })
+    ).rejects.toThrow("That topic, subset or charity wasn't recognised.")
+    expect(mockIsRateLimited).not.toHaveBeenCalled()
   })
 })
 
@@ -677,33 +688,17 @@ describe("safeGenerateDraft", () => {
     consoleSpy.mockRestore()
   })
 
-  it("reports rate_limit when the rate limit is exceeded", async () => {
-    for (let i = 0; i < RATE_LIMIT_MAX; i++) {
-      mock.queue(null)
-      mock.queue(TOPIC_DATA)
-      mockLLMResponse("About.", "Her favourite was always Red.")
-      mock.queue(null)
-      await generateDraft({
+  it("reports rate_limit when the limiter says no", async () => {
+    mock.queue(null) // cache miss
+    mockIsRateLimited.mockResolvedValue(true)
+
+    await expect(
+      safeGenerateDraft({
         register: "celebrating_one",
         subject: "someone",
         topicId: TOPIC_ID,
       })
-    }
-
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
-
-    const result = await safeGenerateDraft({
-      register: "celebrating_one",
-      subject: "someone",
-      topicId: TOPIC_ID,
-    })
-
-    expect(result).toEqual({ error: "rate_limit" })
-    expect(consoleSpy).toHaveBeenCalledWith(
-      expect.stringContaining("generateDraft failed, using fallback:"),
-      expect.any(String)
-    )
-    consoleSpy.mockRestore()
+    ).resolves.toEqual({ error: "rate_limit" })
   })
 
   it("returns result when generation succeeds", async () => {
@@ -1723,7 +1718,8 @@ describe("the generator refuses a malformed argument", () => {
     await expect(
       generateDraft({ ...valid, topicId: "topic-1" })
     ).rejects.toThrow()
-    expect(_rateLimitStore.get("user-1")).toBeUndefined()
+    // The schema runs before the limiter, so a refused shape is free.
+    expect(mockIsRateLimited).not.toHaveBeenCalled()
   })
 })
 

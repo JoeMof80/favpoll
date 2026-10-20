@@ -1,40 +1,16 @@
 import type { Register } from "@favpoll/types"
 
-// ---------------------------------------------------------------------------
-// Rate limiter — per organiser, 5-minute window, max 5 calls
-// ---------------------------------------------------------------------------
-export const RATE_LIMIT_MAX = 5
-export const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000
-
-export const _rateLimitStore = new Map<
-  string,
-  { count: number; resetAt: number }
->()
-
+/**
+ * The signal `safeGenerateDraft` reads to answer `{ error: "rate_limit" }`,
+ * so the wizard can say "that's a lot of examples" rather than "something
+ * went wrong". The counting itself moved to lib/rate-limit (#1132) — this
+ * module held a `Map`, which on Vercel is per instance.
+ */
 export class RateLimitError extends Error {
   constructor() {
     super("Rate limit exceeded — try again in a few minutes.")
     this.name = "RateLimitError"
   }
-}
-
-export function checkRateLimit(userId: string): void {
-  const now = Date.now()
-  const entry = _rateLimitStore.get(userId)
-  if (!entry || entry.resetAt <= now) {
-    _rateLimitStore.set(userId, {
-      count: 0,
-      resetAt: now + RATE_LIMIT_WINDOW_MS,
-    })
-    return
-  }
-  if (entry.count >= RATE_LIMIT_MAX) throw new RateLimitError()
-}
-
-export function incrementRateLimitCount(userId: string): void {
-  const entry = _rateLimitStore.get(userId)
-  if (!entry || entry.resetAt <= Date.now()) return
-  entry.count++
 }
 
 // ---------------------------------------------------------------------------

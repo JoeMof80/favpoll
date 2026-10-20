@@ -12,12 +12,9 @@ import type {
   Pronoun,
   Register,
 } from "@favpoll/types"
-import {
-  checkRateLimit,
-  RateLimitError,
-  incrementRateLimitCount,
-  buildCacheKey,
-} from "./generate-draft-utils"
+import { headers } from "next/headers"
+import { RateLimitError, buildCacheKey } from "./generate-draft-utils"
+import { ipFromHeaders, isRateLimited } from "@/lib/rate-limit"
 import { InvalidInputError, parseInput } from "@/lib/action-input"
 import {
   cachedDraftGhostsSchema,
@@ -109,6 +106,51 @@ async function fetchCharity(
 
 const modelId = () => process.env.LLM_MODEL_ID ?? "claude-sonnet-5"
 
+// THE LIMITER COUNTS ATTEMPTS, NOT SUCCESSES (#1132, 2026-10-20).
+//
+// It used to be a module-level `Map` in generate-draft-utils, which on
+// Vercel is per function instance — so the real ceiling was five
+// generations times however many instances were warm. lib/rate-limit is
+// the shared one, backed by the `rate_limits` table, and five other call
+// sites already use it.
+//
+// It counts differently, and that is a deliberate behaviour change rather
+// than an oversight. `check_rate_limit` increments on every call, so a
+// generation that then FAILS now costs the organiser an attempt where
+// before it cost nothing. That old kindness was true of the counter and
+// not of the bill: by the time the model call fails it has usually
+// already spent its tokens — a timeout on a 16,000-token request is
+// billed like any other. Counting attempts is the honest unit for the
+// thing this limit exists to bound.
+//
+// A CACHE HIT STILL COSTS NOTHING, because this is called only where a
+// model call is about to happen — after the cache has been consulted and
+// missed. That half of the old behaviour is the half worth keeping, and
+// it is the common first click.
+//
+// Two keys, the shape `guest-item` in app/favpolls/[id]/actions.ts
+// already uses: the organiser, and the address they came from. Signup is
+// open, so an account is cheap and a per-account limit alone is a limit
+// on patience rather than on volume.
+//
+// INHERITED, NOT CHOSEN: `isRateLimited` fails OPEN. For the pledge path
+// that is clearly right — a limiter outage must never block a payment.
+// Here it trades money for availability, since what gets through costs
+// tokens. Changing it would change it for all six callers, so it stays,
+// noted.
+const GENERATION_LIMITS = [
+  { name: "5m", max: 8, windowSeconds: 300 },
+  { name: "1h", max: 40, windowSeconds: 3600 },
+]
+
+async function assertGenerationAllowed(userId: string) {
+  const ip = ipFromHeaders(await headers())
+  if (await isRateLimited("generate-draft", userId, GENERATION_LIMITS))
+    throw new RateLimitError()
+  if (await isRateLimited("generate-draft-ip", ip, GENERATION_LIMITS))
+    throw new RateLimitError()
+}
+
 /** The table key for the occasion: the caller's, else the register's
  *  default (which pairs with nothing). */
 /** The cache is keyed by the subset when there is one: a Story in the
@@ -188,8 +230,6 @@ export async function generateDraft(
   // every field after it and addresses another shape's cached draft.
   const input = parseInput(generateDraftSchema, rawInput, "generateDraft")
 
-  checkRateLimit(userId)
-
   const isCustomTopic = !input.topicId
 
   // ── Custom topic: skip cache + DB fetch, call Claude directly ──────────────
@@ -200,6 +240,9 @@ export async function generateDraft(
     // a developer's sentence, which the wizard showed to nobody.
     const topicTitle = input.topicTitle ?? ""
     const itemLabels = input.itemLabels ?? []
+
+    // No cache on this branch, so the model call is certain from here.
+    await assertGenerationAllowed(userId)
 
     const supabase = createAdminClient()
     const charity = await fetchCharity(supabase, input.primaryCharityId)
@@ -221,7 +264,6 @@ export async function generateDraft(
       modelId()
     )
 
-    incrementRateLimitCount(userId)
     return {
       about: story.about,
       note: story.note,
@@ -263,6 +305,11 @@ export async function generateDraft(
       }
     }
   }
+
+  // THE CACHE HAS MISSED, so a model call is about to happen and this is
+  // where the attempt is counted. Above this line a cache hit has already
+  // returned, having cost nothing.
+  await assertGenerationAllowed(userId)
 
   const { data: topic, error: topicErr } = await supabase
     .from("topics")
@@ -338,7 +385,6 @@ export async function generateDraft(
       status: "generated",
     })
 
-  incrementRateLimitCount(userId)
   return {
     about: story.about,
     note: story.note,
