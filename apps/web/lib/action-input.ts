@@ -36,6 +36,20 @@ function firstMessage(error: z.ZodError, label: string): string {
   return error.issues[0]?.message || FALLBACK
 }
 
+/**
+ * A refusal whose message was WRITTEN FOR A PERSON, so a wrapper can tell
+ * it apart from an incidental failure (#1109). The distinction matters
+ * because Next redacts thrown messages in production but returns returned
+ * ones verbatim: a wrapper that turned every `err.message` into a result
+ * would hand the browser whatever Postgres or Stripe last said.
+ */
+export class InvalidInputError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = "InvalidInputError"
+  }
+}
+
 /** Parse a server action's argument, or throw the first failure as the
  *  sentence the caller should show. `label` names the action in the log. */
 export function parseInput<S extends z.ZodType>(
@@ -45,5 +59,5 @@ export function parseInput<S extends z.ZodType>(
 ): z.output<S> {
   const parsed = schema.safeParse(input)
   if (parsed.success) return parsed.data
-  throw new Error(firstMessage(parsed.error, label))
+  throw new InvalidInputError(firstMessage(parsed.error, label))
 }

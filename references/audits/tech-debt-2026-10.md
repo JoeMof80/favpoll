@@ -134,7 +134,54 @@ so a guest clicking an already-used withdrawal link gets a 404 instead of
 an explanation. Left alone because what that page should say is a copy
 decision.
 
-Still to do: the remaining five action files (#1109).
+**The remaining files are seven, not five (#1109, 2026-10-20).** Counting
+the files whose first line is the directive: `app/appeals/actions.ts`,
+`app/favpolls/actions.ts`, `app/favpolls/[id]/edit/actions.ts`,
+`app/favpolls/[id]/manage/actions.ts`, `app/favpolls/new/actions.ts`,
+`app/favpolls/new/wizard-data.ts` and
+`lib/actions/favpoll-poll-favourites.ts`. The original "six action files"
+counted only the ones named `actions.ts`, which missed two.
+
+**`lib/actions/generate-draft.ts` is converted (#1109, first of the
+seven).** It was taken first because its unvalidated fields are not only
+a shape risk. `topicTitle`, `itemLabels` and `displayName` are
+interpolated verbatim into the Story prompt — `displayName` inside a
+quoted instruction — so the boundary there is the boundary of a model
+call. Three things came out of doing it:
+
+**Its schemas are deliberately TIGHTER than the pledge path's**, for
+reasons that invert one by one. Nothing has been charged, so a refusal
+costs a toast rather than a debit. Every id is machine-supplied by a
+picker, so a format check cannot refuse an honest person. And the free
+text reaches a prompt, so bounding its length bounds what a generation
+can cost.
+
+**`buildCacheKey` joins the ids into a ":"-separated string**, so an id
+carrying its own ":" shifts every field after it and addresses a
+different shape's cached draft — readable on the way in, writable on the
+way out. That is what the id format check is actually for, and there is a
+test named after it. The check is `z.guid`, not `z.uuid`: a `uuid` column
+stores any 128-bit value, while `z.uuid` enforces the RFC's version and
+variant nibbles and would refuse an id the database handed us.
+
+**The schema is also where a developer's sentence became a person's.**
+`throw new Error("topicTitle required for custom topics")` was true and
+useless; the organiser who caused it saw a generic toast. `parseInput` now
+throws an `InvalidInputError`, which `safeGenerateDraft` is allowed to
+return as a message and an internal error is not — Next redacts a thrown
+message in production but returns a returned one verbatim, so without the
+distinction `err.message` would have handed the browser whatever Postgres
+last said.
+
+Two things found while in there, both raised separately: the `model`
+column recorded the `modelId` FUNCTION rather than its result, so no
+draft has ever recorded which model wrote it (fixed in the same pull
+request, one character); and the action's rate limiter is a
+module-level in-memory `Map`, which on Vercel is per instance, while
+`lib/rate-limit.ts` already provides a shared one that five other call
+sites use.
+
+Still to do: the remaining seven (#1109).
 
 ### 1.4 Actions still throw where the project decided they should return · M · low risk · DONE for the pledge path (#1105, PR #1127)
 

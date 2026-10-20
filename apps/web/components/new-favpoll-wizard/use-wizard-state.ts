@@ -565,10 +565,16 @@ export function useWizardState(
         // Say something true instead of failing silently. The old code
         // returned here with no toast, so a failed Generate was
         // indistinguishable from a dead button (founder, 2026-09-23).
+        // An "invalid" result carries the schema's own sentence, which names
+        // the thing the organiser can fix ("A topic of your own needs a name
+        // before we can write about it"). Anything else stays generic: a
+        // returned message is NOT redacted by Next, so only sentences
+        // written for a person may travel (#1109).
         toast.error(
           result.error === "rate_limit"
             ? "That's a lot of examples — try again in a few minutes."
-            : "Couldn't generate an example just now. Try again in a moment.",
+            : (result.message ??
+                "Couldn't generate an example just now. Try again in a moment."),
           { style: TOAST_ERROR_STYLE }
         )
         return
