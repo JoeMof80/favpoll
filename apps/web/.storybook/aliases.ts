@@ -39,6 +39,23 @@ export const baseAliases: StoryAlias[] = [
     find: "@favpoll/types",
     replacement: path.resolve(webDir, "../../packages/types/index.ts"),
   },
+  // The subpath must precede the bare name: a string `find` matches by
+  // prefix, so "@favpoll/charity-register" would otherwise swallow
+  // "@favpoll/charity-register/charity-commission".
+  {
+    find: "@favpoll/charity-register/charity-commission",
+    replacement: path.resolve(
+      webDir,
+      "../../packages/charity-register/charity-commission.ts"
+    ),
+  },
+  {
+    find: "@favpoll/charity-register",
+    replacement: path.resolve(
+      webDir,
+      "../../packages/charity-register/index.ts"
+    ),
+  },
   { find: "@", replacement: webDir },
 ]
 
