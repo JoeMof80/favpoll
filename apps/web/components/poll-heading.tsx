@@ -173,7 +173,7 @@ export function PollHeading({
     )
   }
 
-  // The quiet default — SectionLabel's old tone, in the two-line grammar.
+  // The quiet default, in the two-line grammar.
   return (
     <div className="flex min-w-0 flex-col">
       <HeadingLines

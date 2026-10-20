@@ -90,8 +90,7 @@ export function FavpollSummaryCard({ favpoll, className }: Props) {
       {topicTitle && (
         <div className="relative border-t border-border px-3 py-2">
           {/* The Favourite eyebrow (founder, 2026-09-01) — PollHeading's
-              default mode, SectionLabel's old muted tone in the shared
-              two-line grammar. */}
+              default mode, in the shared two-line grammar. */}
           <PollHeading topicTitle={topicTitle} size="md" />
           <ClosingLabel
             closesAt={favpoll.closes_at}
