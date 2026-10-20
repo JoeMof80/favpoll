@@ -126,7 +126,15 @@ test.describe("reveal after pledge", () => {
     // "Pledge" now only appears on the shared-pot payment path)
     await dialog.getByRole("button", { name: /^next/i }).click()
 
-    // ── 6. Step 3: Review & pay ───────────────────────────────────────────────
+    // ── 6. Step 3: Guest book ─────────────────────────────────────────────────
+    // The guest book redesign (#905–#921) put a name-and-message step
+    // between the amount and the bill. Both fields are optional, so this
+    // beat is just the step and its Next; a guest who fills nothing
+    // appears as "Someone".
+    await expect(dialog).toContainText(/guest book/i, { timeout: 10_000 })
+    await dialog.getByRole("button", { name: /^next/i }).click()
+
+    // ── 7. Step 4: Review & pay ───────────────────────────────────────────────
     // StepPay renders the itemised bill, then StripeCheckout inline=true,
     // with showEmailCapture=true (clerkUserId null for a guest).
     await expect(dialog).toContainText(/review & pay/i, { timeout: 15_000 })
@@ -255,12 +263,12 @@ test.describe("reveal after pledge", () => {
     // This submits form#pledge-checkout-form which Stripe's Elements handles.
     await dialog.getByRole("button", { name: /pay now/i }).click()
 
-    // ── 7. Wait for payment to succeed and dialog to close ────────────────────
+    // ── 8. Wait for payment to succeed and dialog to close ────────────────────
     // Stripe test-mode cards process synchronously (redirect: "if_required"
     // and 4242 never triggers 3DS, so no redirect occurs).
     await expect(dialog).not.toBeVisible({ timeout: 30_000 })
 
-    // ── 8. Confirm the reveal is now visible ──────────────────────────────────
+    // ── 9. Confirm the reveal is now visible ──────────────────────────────────
     // PledgeDialog.onPledgeSuccess → FavpollContent.handlePledgeSuccess →
     // pledgeConfirmed = true → TypedNote mounts and types the reveal out.
     //
@@ -281,7 +289,7 @@ test.describe("reveal after pledge", () => {
     await expect(revealBlock).toContainText("Cornflower blue")
     await expect(revealBlock).toContainText(noteText, { timeout: 10_000 })
 
-    // ── 9. Confirm results ranking is visible ─────────────────────────────────
+    // ── 10. Confirm results ranking is visible ─────────────────────────────────
     // After pledging, the poll switches to results view and renders a RankingList
     const rankingList = page.getByRole("list", { name: /rankings/i })
     await expect(rankingList).toBeVisible({ timeout: 10_000 })
