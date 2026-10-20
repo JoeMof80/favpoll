@@ -81,6 +81,28 @@ Only the ones in the `main-protection` ruleset. Everything else reports
 and is ignored by the merge button, so read the ruleset rather than the
 list of green ticks.
 
+Six gate as of 2026-10-20: `Test`, `Typecheck`, `Lint`, `Format check`,
+`Vercel – favpoll-web` and `Vercel – favpoll-admin` (en dashes in the
+last two, not hyphens — paste them, a typed hyphen matches nothing and
+fails silently). `E2E Tests (advisory)` and `Vercel Preview Comments`
+report and do not gate.
+
+**A BRANCH MUST BE UP TO DATE WITH `main` TO MERGE** — the ruleset sets
+`strict_required_status_checks_policy: true`, and the founder kept it
+deliberately on 2026-10-20. So a pull request whose checks all passed can
+still be refused, with `mergeStateStatus: BEHIND`, when something else
+merged while its CI was running. Nothing is wrong with it:
+
+```sh
+gh pr update-branch <n>   # then wait for the second CI run, then merge
+```
+
+The cost is one extra round trip per merge whenever pull requests land in
+parallel. What it buys is that every commit on `main` was tested against
+the `main` it landed on, rather than against an older one — which is the
+whole point of the six checks, and worth the wait on a repo where the
+build check is also the only thing catching a bad `"use server"` export.
+
 **The build is the only thing that catches a `"use server"` module
 exporting something that is not an async function.** Verified on
 2026-10-20 by exporting a `const` from `apps/admin/lib/actions/charities.ts`:
