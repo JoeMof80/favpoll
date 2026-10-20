@@ -179,7 +179,23 @@ draft has ever recorded which model wrote it (fixed in the same pull
 request, one character); and the action's rate limiter is a
 module-level in-memory `Map`, which on Vercel is per instance, while
 `lib/rate-limit.ts` already provides a shared one that five other call
-sites use.
+sites use. **DONE (#1132, 2026-10-20):** the generator is the sixth
+caller now, and the `Map` is gone.
+
+It counts ATTEMPTS where the `Map` counted successes, which is a
+deliberate change and not an oversight. `check_rate_limit` increments on
+every call and cannot un-count; and the old kindness was true of the
+counter rather than of the bill, because a model call that fails has
+usually already spent its tokens — a timeout on a 16,000-token request
+is billed like any other. A CACHE HIT STILL COSTS NOTHING, because the
+limiter is consulted only where a model call is about to happen, which
+is the half worth keeping and the common first click. Two keys,
+organiser and address, the shape guest items already use: signup is
+open, so an account is cheap and a per-account limit alone bounds
+patience rather than volume. Inherited rather than chosen:
+`isRateLimited` fails OPEN, which is clearly right for a pledge and
+trades money for availability here — changing it would change it for all
+six callers.
 
 **`app/favpolls/new/actions.ts` is converted (#1109, second).** The
 wizard's publish path: four exported actions, one of which writes seven
