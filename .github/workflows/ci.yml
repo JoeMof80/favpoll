@@ -14,6 +14,14 @@ on:
 # pnpm 9 and Node 20 (22 in the E2E job, for no recorded reason), Vercel built
 # with pnpm 10 and Node 24, and the machine the code was written on ran
 # pnpm 11. See CLAUDE.md for why those two versions and not others.
+#
+# The actions themselves are pinned by MAJOR, which is GitHub's own
+# convention and not the toolchain's exactness. They moved v4 -> v7 in
+# #1131 because v4 declares the Node 20 runtime, which GitHub was already
+# force-running on Node 24 while printing a deprecation notice on every
+# job. Every "breaking change" across those majors is that same runtime
+# bump; upload-artifact v6+ additionally wants a runner newer than
+# 2.327.1, which ubuntu-latest is long past.
 
 jobs:
   test:
@@ -21,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup pnpm
         # No `version:` — the pin is the root package.json's packageManager
@@ -29,7 +37,7 @@ jobs:
         uses: pnpm/action-setup@v6
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm
@@ -93,7 +101,7 @@ jobs:
     environment: "Preview – favpoll-web"
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup pnpm
         # No `version:` — the pin is the root package.json's packageManager
@@ -101,7 +109,7 @@ jobs:
         uses: pnpm/action-setup@v6
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm
@@ -184,7 +192,7 @@ jobs:
 
       - name: Upload Playwright report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report
           path: apps/web/playwright-report/
@@ -195,7 +203,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup pnpm
         # No `version:` — the pin is the root package.json's packageManager
@@ -203,7 +211,7 @@ jobs:
         uses: pnpm/action-setup@v6
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm
@@ -222,7 +230,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup pnpm
         # No `version:` — the pin is the root package.json's packageManager
@@ -230,7 +238,7 @@ jobs:
         uses: pnpm/action-setup@v6
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm
@@ -249,7 +257,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup pnpm
         # No `version:` — the pin is the root package.json's packageManager
@@ -257,7 +265,7 @@ jobs:
         uses: pnpm/action-setup@v6
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm
