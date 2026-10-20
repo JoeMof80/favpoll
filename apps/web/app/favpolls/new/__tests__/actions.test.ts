@@ -707,13 +707,21 @@ describe("createFavpoll refuses a malformed argument", () => {
     expectNothingWritten()
   })
 
-  // potAmount writes favpoll_pots.total_deposited directly. Both real
-  // callers send null; a negative would have corrupted the pot.
-  it("refuses a negative pot amount", async () => {
+  // potAmount writes favpoll_pots.total_deposited directly, and it is the
+  // only route to that column that does not go through a payment: the
+  // legitimate one is creditFund -> rpc("pot_top_up"), after a
+  // PaymentIntent has been matched. Both real callers send null, so
+  // nothing else is a value this form can mean (founder's call,
+  // 2026-10-20).
+  it.each([
+    ["a credit nobody paid for", 500],
+    ["a negative balance", -500],
+    ["a fraction of a penny", 0.001],
+  ])("refuses %s as a pot amount", async (_name, potAmount) => {
     await expect(
       createFavpoll({
         ...BASE_INPUT,
-        potAmount: -500,
+        potAmount,
         poll: {
           topicId: TOPIC_ID,
           customTopic: null,
@@ -721,8 +729,27 @@ describe("createFavpoll refuses a malformed argument", () => {
           infiniteItems: null,
         },
       })
-    ).rejects.toThrow("That amount isn't a number we can take.")
+    ).rejects.toThrow(
+      "A shared pot is credited by a payment, not by this form."
+    )
     expectNothingWritten()
+  })
+
+  it("still accepts the nothing both callers actually send", async () => {
+    queueCanonicalPoll()
+
+    await expect(
+      createFavpoll({
+        ...BASE_INPUT,
+        potAmount: null,
+        poll: {
+          topicId: TOPIC_ID,
+          customTopic: null,
+          note: null,
+          infiniteItems: null,
+        },
+      })
+    ).resolves.toEqual({ favpollId: "favpoll-1" })
   })
 
   it("drops a field it does not understand instead of honouring it", async () => {
