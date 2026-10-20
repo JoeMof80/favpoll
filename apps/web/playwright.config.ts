@@ -45,11 +45,20 @@ export default defineConfig({
     },
 
     // ── Guest flows (no auth) ─────────────────────────────────────────────────
-    // Tests the pledge → reveal flow as an unauthenticated guest.
+    // Tests the pledge → note flow as an unauthenticated guest.
+    //
+    // THE FILENAME HERE IS LOAD-BEARING. #897 renamed the spec with
+    // personal_reveal → personal_note and left this pattern pointing at
+    // reveal-after-pledge.spec.ts, so from that merge until 2026-10-20 the
+    // guest pledge flow — the spec's own header calls it HIGHEST PRIORITY,
+    // and it is the only end-to-end cover the money path has — matched no
+    // project and silently never ran. Playwright reports "No tests found"
+    // only when you name the file explicitly; a whole-suite run just
+    // passes without it.
     {
       name: "guest",
       use: { ...devices["Desktop Chrome"] },
-      testMatch: "**/reveal-after-pledge.spec.ts",
+      testMatch: "**/note-after-pledge.spec.ts",
     },
 
     // ── Organiser flows (auth required) ──────────────────────────────────────

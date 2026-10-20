@@ -9,7 +9,17 @@ const mockRedirect = vi.hoisted(() =>
   })
 )
 
-vi.mock("next/navigation", () => ({ redirect: mockRedirect }))
+// notFound throws the same way, for the same reason
+const mockNotFound = vi.hoisted(() =>
+  vi.fn().mockImplementation(() => {
+    throw new Error("NEXT_NOT_FOUND")
+  })
+)
+
+vi.mock("next/navigation", () => ({
+  redirect: mockRedirect,
+  notFound: mockNotFound,
+}))
 
 // The mock is re-created per test; the module-level reference is replaced each time
 let mock = makeSupabaseMock()
@@ -29,13 +39,28 @@ function makeFormData(token?: string): FormData {
 beforeEach(() => {
   mock = makeSupabaseMock()
   mockRedirect.mockClear()
+  mockNotFound.mockClear()
 })
 
+// A missing or blank token can only be a tampered request: the page
+// renders the token as a hidden field. It used to return silently, which
+// left the guest on a page whose button appeared to do nothing. Now it
+// gets the same not-found page the withdrawal page gives for a token that
+// matches no pledge (#1104).
 describe("withdrawPledge — no token", () => {
-  it("returns early without querying DB when token is missing", async () => {
-    await withdrawPledge(makeFormData())
+  it("shows not-found without querying the DB when the token is missing", async () => {
+    await expect(withdrawPledge(makeFormData())).rejects.toThrow(
+      "NEXT_NOT_FOUND"
+    )
     expect(mock.from).not.toHaveBeenCalled()
     expect(mockRedirect).not.toHaveBeenCalled()
+  })
+
+  it("shows not-found for a blank token", async () => {
+    await expect(withdrawPledge(makeFormData(""))).rejects.toThrow(
+      "NEXT_NOT_FOUND"
+    )
+    expect(mock.from).not.toHaveBeenCalled()
   })
 })
 

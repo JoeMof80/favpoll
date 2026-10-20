@@ -16,14 +16,16 @@ import {
 
 const mockRouter = vi.hoisted(() => ({ push: vi.fn(), refresh: vi.fn() }))
 const mockActions = vi.hoisted(() => ({
-  createPledge: vi.fn().mockResolvedValue(undefined),
-  createGuestPledge: vi.fn().mockResolvedValue(undefined),
+  createPledge: vi.fn().mockResolvedValue({ ok: true, value: undefined }),
+  createGuestPledge: vi
+    .fn()
+    .mockResolvedValue({ ok: true, value: "guest-token" }),
   guestPreflightState: vi
     .fn()
     .mockResolvedValue({ hasAccount: false, hasActivePledge: false }),
-  topUpFund: vi.fn().mockResolvedValue(undefined),
-  topUpFundAsGuest: vi.fn().mockResolvedValue(undefined),
-  pledgeFromFund: vi.fn().mockResolvedValue(undefined),
+  topUpFund: vi.fn().mockResolvedValue({ ok: true, value: undefined }),
+  topUpFundAsGuest: vi.fn().mockResolvedValue({ ok: true, value: undefined }),
+  pledgeFromFund: vi.fn().mockResolvedValue({ ok: true, value: undefined }),
 }))
 
 vi.mock("next/navigation", () => ({ useRouter: () => mockRouter }))
@@ -924,7 +926,10 @@ describe("usePledge — handleFundConfirm", () => {
   })
 
   it("sets error and stops submitting on pledgeFromFund failure", async () => {
-    mockActions.pledgeFromFund.mockRejectedValueOnce(new Error("Fund error"))
+    mockActions.pledgeFromFund.mockResolvedValueOnce({
+      ok: false,
+      error: "Fund error",
+    })
 
     const { result } = renderHook(() =>
       usePledge({
@@ -1084,7 +1089,10 @@ describe("usePledge — handlePledgePaymentSuccess", () => {
   })
 
   it("sets error on failure and re-throws for CheckoutForm to display", async () => {
-    mockActions.createPledge.mockRejectedValueOnce(new Error("DB error"))
+    mockActions.createPledge.mockResolvedValueOnce({
+      ok: false,
+      error: "DB error",
+    })
 
     const { result } = renderHook(() =>
       usePledge({

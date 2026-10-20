@@ -10,10 +10,12 @@ import type { FavpollPollWithItems, Favourite } from "@favpoll/types"
 
 const mockRouter = vi.hoisted(() => ({ push: vi.fn(), refresh: vi.fn() }))
 const mockActions = vi.hoisted(() => ({
-  createPledge: vi.fn().mockResolvedValue(undefined),
-  createGuestPledge: vi.fn().mockResolvedValue(undefined),
-  topUpFund: vi.fn().mockResolvedValue(undefined),
-  pledgeFromFund: vi.fn().mockResolvedValue(undefined),
+  createPledge: vi.fn().mockResolvedValue({ ok: true, value: undefined }),
+  createGuestPledge: vi
+    .fn()
+    .mockResolvedValue({ ok: true, value: "guest-token" }),
+  topUpFund: vi.fn().mockResolvedValue({ ok: true, value: undefined }),
+  pledgeFromFund: vi.fn().mockResolvedValue({ ok: true, value: undefined }),
 }))
 vi.mock("next/navigation", () => ({ useRouter: () => mockRouter }))
 vi.mock("@/app/favpolls/[id]/actions", () => mockActions)

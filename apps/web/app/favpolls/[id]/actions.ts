@@ -16,24 +16,36 @@ import {
 } from "@/lib/charity-consent"
 import { sendPledgeConfirmation, sendGuestItemAdded } from "@/lib/email"
 import { verifyPledgePayment, verifyTopUpPayment } from "@/lib/stripe-verify"
+import { parseInput } from "@/lib/action-input"
+import { asResult } from "@/lib/action-result"
+import {
+  createPledgeSchema,
+  createGuestPledgeSchema,
+  pledgeFromFundSchema,
+  topUpFundSchema,
+  type CreatePledgeInput,
+  type CreateGuestPledgeInput,
+  type PledgeFromFundInput,
+  type GiftAidInput,
+} from "./pledge-input"
 
-type PledgeAllocationInput = {
-  favouriteId: string
-  amount: number
-}
+// Every shape below is declared once, in ./pledge-input, and parsed at
+// the top of the action that takes it: a typed parameter is checked at
+// the call site and nowhere else (#1104 — lib/action-input says why).
+//
+// TWO KINDS OF EXPORT IN THIS FILE, DELIBERATELY (#1105). The money path
+// returns results: Next redacts a thrown message in production, so a
+// failure the guest needs to read has to travel as a value. Those bodies
+// are the `…Inner` functions, wrapped together at the foot of the file —
+// the same shape manage/actions.ts uses. Everything else still throws
+// and is converted file by file; the register tracks the rest.
 
 // Gift Aid declaration (founder go, 2026-09-15): the four fields HMRC's
 // claim schedule needs. The CHARITY claims from HMRC — favpoll is not a
 // Gift Aid agent and takes no cut of the uplift. Applies to the pledge
 // amount only, never the tip. Card pledges only: the fund path never
 // offers it (a pot allocation isn't the participant's own gift).
-type GiftAidInput = {
-  firstName: string
-  lastName: string
-  houseNameOrNumber: string
-  postcode: string
-}
-
+//
 // Inserted after the pledge row exists (like allocations, the charge has
 // already happened by now — but a silently dropped declaration would be
 // an unclaimable pledge forever, so failure surfaces rather than logs).
@@ -77,25 +89,6 @@ async function assertUnusedPaymentIntent(
   }
 }
 
-type CreatePledgeInput = {
-  favpollPollId: string
-  potAllocationId: string | null
-  totalAmount: number
-  /** Optional contribution to favpoll (pounds) — never charity money */
-  tipAmount?: number
-  /** Hide the name from the public guest book (organiser still sees it) */
-  isAnonymous?: boolean
-  /** Short guest book message (100-char limit enforced client-side) */
-  message?: string | null
-  /** Guest opted out of showing their donation amount */
-  hideAmount?: boolean
-  allocations: PledgeAllocationInput[]
-  /** The Stripe PaymentIntent that charged this pledge */
-  paymentIntentId: string
-  /** Optional Gift Aid declaration — pledge amount only, never the tip */
-  giftAid?: GiftAidInput | null
-}
-
 // SUSPENDED PICKS (lib/picks-suspended, founder 2026-10-02): once the
 // organiser suspends the picks, every pledge is a gift with no favourite
 // attached. The dialog has already skipped the pick step; this is the
@@ -116,7 +109,8 @@ async function allocationsAllowed(
   return !favpoll || !picksSuspended(favpoll)
 }
 
-export async function createPledge(input: CreatePledgeInput) {
+async function createPledgeInner(rawInput: CreatePledgeInput) {
+  const input = parseInput(createPledgeSchema, rawInput, "createPledge")
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
 
@@ -179,27 +173,6 @@ export async function createPledge(input: CreatePledgeInput) {
   }
 }
 
-type CreateGuestPledgeInput = {
-  favpollPollId: string
-  guestEmail: string
-  totalAmount: number
-  /** Optional contribution to favpoll (pounds) — never charity money */
-  tipAmount?: number
-  /** Name shown on the guest book; blank = appears as "Someone" */
-  displayName?: string | null
-  /** Hide the name from the public guest book (organiser still sees it) */
-  isAnonymous?: boolean
-  /** Short guest book message (100-char limit enforced client-side) */
-  message?: string | null
-  /** Guest opted out of showing their donation amount */
-  hideAmount?: boolean
-  allocations: PledgeAllocationInput[]
-  /** The Stripe PaymentIntent that charged this pledge */
-  paymentIntentId: string
-  /** Optional Gift Aid declaration — pledge amount only, never the tip */
-  giftAid?: GiftAidInput | null
-}
-
 /**
  * Pre-payment probe: does an active guest pledge already exist for this
  * email on this poll? Checked BEFORE Stripe charges — createGuestPledge
@@ -255,7 +228,12 @@ export async function guestPreflightState(
   return { hasAccount: !!account, hasActivePledge: !!pledge }
 }
 
-export async function createGuestPledge(input: CreateGuestPledgeInput) {
+async function createGuestPledgeInner(rawInput: CreateGuestPledgeInput) {
+  const input = parseInput(
+    createGuestPledgeSchema,
+    rawInput,
+    "createGuestPledge"
+  )
   if (!input.guestEmail) throw new Error("Email is required")
 
   await verifyPledgePayment({
@@ -612,15 +590,8 @@ export async function addOrganizerItem(favpollId: string, label: string) {
   return favouriteId
 }
 
-export async function pledgeFromFund(input: {
-  favpollPollId: string
-  potId: string
-  totalAmount: number
-  isAnonymous?: boolean
-  /** Short guest book message (100-char limit enforced client-side) */
-  message?: string | null
-  allocations: PledgeAllocationInput[]
-}) {
+async function pledgeFromFundInner(rawInput: PledgeFromFundInput) {
+  const input = parseInput(pledgeFromFundSchema, rawInput, "pledgeFromFund")
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
 
@@ -711,22 +682,32 @@ async function creditFund(
   }
 }
 
-export async function topUpFundAsGuest(
+async function topUpFundAsGuestInner(
   favpollId: string,
   amount: number,
   paymentIntentId: string
 ) {
-  await creditFund(favpollId, amount, paymentIntentId, null)
+  const [id, pounds, pi] = parseInput(
+    topUpFundSchema,
+    [favpollId, amount, paymentIntentId],
+    "topUpFundAsGuest"
+  )
+  await creditFund(id, pounds, pi, null)
 }
 
-export async function topUpFund(
+async function topUpFundInner(
   favpollId: string,
   amount: number,
   paymentIntentId: string
 ) {
+  const [id, pounds, pi] = parseInput(
+    topUpFundSchema,
+    [favpollId, amount, paymentIntentId],
+    "topUpFund"
+  )
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
-  await creditFund(favpollId, amount, paymentIntentId, userId)
+  await creditFund(id, pounds, pi, userId)
 }
 
 // Deletion is for favpolls that never took money: any pledge or shared-fund
@@ -875,4 +856,56 @@ export async function setFavpollVisibility(
     .eq("id", favpollId)
 
   if (error) throw new Error(error.message)
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// THE MONEY PATH'S EXPORT BOUNDARY (#1105)
+//
+// Next strips the message from an error thrown inside a server action in
+// production builds, so every sentence above — "There isn't enough left
+// in the shared pot for that.", "This payment has already been
+// recorded.", "Missing payment reference", a schema's refusal — reached
+// the guest as a paragraph about omitted details. On the money path that
+// is the worst place for it: the card has already been charged, and the
+// guest needs to know whether their pledge landed and what to do if it
+// did not.
+//
+// So the bodies keep throwing where it reads best and `asResult` turns
+// the outcome into a value here; the callers `unwrap` it, which throws a
+// real Error on the client, where the dialogs already show one inline.
+// lib/action-result has the history.
+//
+// guestPledgeExists and guestPreflightState stay as they are: they are
+// pre-payment reads whose return value is structural, not a message, and
+// a result would make every caller unwrap a boolean for nothing.
+// ─────────────────────────────────────────────────────────────────────────
+
+export async function createPledge(input: CreatePledgeInput) {
+  return asResult(() => createPledgeInner(input))
+}
+
+export async function createGuestPledge(input: CreateGuestPledgeInput) {
+  return asResult(() => createGuestPledgeInner(input))
+}
+
+export async function pledgeFromFund(input: PledgeFromFundInput) {
+  return asResult(() => pledgeFromFundInner(input))
+}
+
+export async function topUpFundAsGuest(
+  favpollId: string,
+  amount: number,
+  paymentIntentId: string
+) {
+  return asResult(() =>
+    topUpFundAsGuestInner(favpollId, amount, paymentIntentId)
+  )
+}
+
+export async function topUpFund(
+  favpollId: string,
+  amount: number,
+  paymentIntentId: string
+) {
+  return asResult(() => topUpFundInner(favpollId, amount, paymentIntentId))
 }

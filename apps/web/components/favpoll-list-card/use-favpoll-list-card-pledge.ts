@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { createPledge } from "@/app/favpolls/[id]/actions"
+import { unwrap } from "@/lib/action-result"
 
 export type CardStep = "idle" | "ready" | "paying" | "pledged"
 
@@ -90,13 +91,15 @@ export function useFavpollListCardPledge({ pollId, initialResults }: Options) {
     }))
 
     try {
-      await createPledge({
-        favpollPollId: pollId,
-        potAllocationId: null,
-        totalAmount: amount,
-        allocations,
-        paymentIntentId: paymentIntentId ?? "",
-      })
+      unwrap(
+        await createPledge({
+          favpollPollId: pollId,
+          potAllocationId: null,
+          totalAmount: amount,
+          allocations,
+          paymentIntentId: paymentIntentId ?? "",
+        })
+      )
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save pledge")
       setClientSecret(null)

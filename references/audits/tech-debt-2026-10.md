@@ -6,7 +6,7 @@ a size, a risk, and a recommended verdict — the verdict is the founder's
 to set. Supersedes the open items of `architecture-survey-2026-07-20.md`
 (the Tier 1 money items there were fixed in #301–#303).
 
-Verdicts: **FIX NOW** · **FIX WHEN TOUCHED** · **LEAVE** (with the reason
+Verdicts: **FIX NOW** · **FIX WHEN TOUCHED** · *LEAVE** (with the reason
 recorded, so it is a decision and not an oversight).
 
 Sizes: S < 1h · M < 1 day · L > 1 day.
@@ -79,27 +79,90 @@ under `consent-first`.
 `lib/poll-standings.ts` is the other untested module that produces numbers
 users see.
 
-### 1.3 No server action validates its input · M · medium risk · FIX NOW
+### 1.3 No server action validates its input · M · medium risk · DONE (#1104, PR #1127)
 
-Across the six server-action files there are **zero** zod schemas or
-`safeParse` calls. Every action reads `formData.get(...) as string` and
-trusts the shape. Auth itself is handled (`[id]/actions.ts`: 13 exports, 9
-`auth()` calls, 12 `created_by` checks; `new/actions.ts`: 4 of 4), so this
-is about malformed input, not impersonation. A shared `parse(schema,
-formData)` helper plus one schema per action is the contained fix.
+Two things this entry got wrong, both found at the point of doing the work.
 
-`app/pledges/withdraw/actions.ts` deliberately has no `auth()` — it is
-authorised by `guest_token` alone, which is correct for a link emailed to
-a guest. Worth a comment saying so, because it reads like an omission.
+**"Zero zod schemas" was wrong.** zod 4.4.3 was already a dependency of
+`apps/web` and `components/favpoll-form/schema.ts` was already a real
+schema with custom messages. Nothing had to be introduced; the pattern
+was already in the codebase, just not on the server.
 
-### 1.4 Actions still throw where the project decided they should return · M · low risk · FIX WHEN TOUCHED
+**"Every action reads `formData.get(...) as string`" was wrong for the
+pledge path, which is the part that touches money.** Those actions take
+typed object arguments, not FormData — `createPledge(input:
+CreatePledgeInput)` — so the prescribed `parse(schema, formData)` helper
+was the wrong shape for them. Only `withdrawPledge` takes FormData, and
+it was the one action that should NOT use the helper (below).
 
-`lib/action-result.ts` exists and is tested, and the manage surface was
-converted in #1049, but **none of the six action files use it** (`asResult`
-/ `ActionResult` appear 0 times in all six). Next redacts thrown messages
-in production, so a failure in the wizard or the pledge path reaches the
-user as a generic error. Convert one file per PR, starting with the pledge
-path.
+What shipped: `lib/action-input.ts` parses an action's ARGUMENT against a
+schema and throws the failing field's sentence; `app/favpolls/[id]/
+pledge-input.ts` holds one schema per money action, with the TypeScript
+types derived from the schemas so the two cannot drift.
+
+What the schemas deliberately do not do is tighten anything an honest
+person could get wrong. **By the time a pledge action runs, the card has
+already been charged** — `verifyPledgePayment` is the first thing
+`createPledge` does, against a PaymentIntent that has already
+succeeded — so a refusal there is somebody debited for nothing. The
+schemas guard the shape, which only a crafted request or a bug gets
+wrong. Left loose on purpose: no floor on an amount (it has already been
+charged and matched against the PaymentIntent), `.min(1)` on an id rather
+than `.uuid()`, an empty `paymentIntentId` still falling through to
+`verifyPledgePayment`'s better sentence, and unknown keys stripped rather
+than refused.
+
+Two things worth carrying forward:
+
+**zod answers a wrong TYPE before it runs any check, with its own
+sentence.** `z.number().finite("…")` therefore sent a guest "Invalid
+input: expected number, received string" and the custom message never
+fired — zod rejects NaN and Infinity at the base type. Every constructor
+now carries its sentence as the first argument.
+
+**`withdrawPledge` does not use the helper, and must not.** Its failures
+are pages, not sentences: a form action that redirects has no caller to
+render a result, and `asResult`'s try/catch would swallow the redirect
+Next throws. Its missing-token case used to return silently, leaving the
+guest on a page whose button did nothing; it now gets the same not-found
+page the withdrawal page gives for the same condition. Its token-only
+authorisation is documented in place, as this entry asked.
+
+**Found while in there, raised separately:** the action redirects a stale
+token to `/pledges/withdraw/invalid`, a route that **does not exist** —
+so a guest clicking an already-used withdrawal link gets a 404 instead of
+an explanation. Left alone because what that page should say is a copy
+decision.
+
+Still to do: the remaining five action files (#1109).
+
+### 1.4 Actions still throw where the project decided they should return · M · low risk · DONE for the pledge path (#1105, PR #1127)
+
+This entry contradicted itself and was wrong on the count. "The manage
+surface was converted in #1049" and "none of the six action files use it"
+cannot both hold, because `manage/actions.ts` **is** one of the six: it
+uses `asResult` five times, and `edit/actions.ts` twice. The real gap was
+that the money path did not.
+
+The pledge path now returns results. The five money actions keep their
+bodies as `…Inner` functions and are wrapped together at the foot of
+`app/favpolls/[id]/actions.ts`, the shape `manage/actions.ts` already
+used; the three callers (`use-pledge`, `use-favpoll-list-card-pledge`,
+`seed-fund-modal`) `unwrap`, which throws a real Error on the client
+where the dialogs already show one inline.
+
+`guestPledgeExists` and `guestPreflightState` stay as they are: they are
+pre-payment reads whose return value is structural, not a message, and a
+result would make every caller unwrap a boolean for nothing.
+
+**Verified against a production build, not the dev server**, as this
+entry's acceptance criteria asked — see the PR for the probe. Both
+`topUpFund` (converted) and `addOrganizerItem` (not) refuse an
+unauthenticated caller with the same sentence from the same file, one
+returned and one thrown, so the build's treatment of each is a controlled
+comparison.
+
+Still to do: the wizard and the remaining action files, one per PR.
 
 ---
 

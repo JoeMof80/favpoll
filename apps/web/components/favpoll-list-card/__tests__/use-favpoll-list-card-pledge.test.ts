@@ -2,7 +2,9 @@
 import { describe, it, expect, vi } from "vitest"
 import { renderHook, act } from "@testing-library/react"
 
-const mockCreatePledge = vi.hoisted(() => vi.fn().mockResolvedValue(undefined))
+const mockCreatePledge = vi.hoisted(() =>
+  vi.fn().mockResolvedValue({ ok: true, value: undefined })
+)
 vi.mock("@/app/favpolls/[id]/actions", () => ({
   createPledge: mockCreatePledge,
 }))
