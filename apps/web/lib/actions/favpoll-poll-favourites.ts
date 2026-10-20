@@ -3,6 +3,9 @@
 import { auth } from "@clerk/nextjs/server"
 import { revalidatePath } from "next/cache"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { actionId, parseInput } from "@/lib/action-input"
+
+const NOT_A_FAVOURITE = "That favourite wasn't recognised."
 
 async function verifyOrganiser(
   favouriteId: string,
@@ -31,9 +34,15 @@ async function verifyOrganiser(
   return favpollData.id as string
 }
 
-export async function hideFavpollPollFavourite(favouriteId: string) {
+export async function hideFavpollPollFavourite(rawFavouriteId: string) {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
+
+  const favouriteId = parseInput(
+    actionId(NOT_A_FAVOURITE),
+    rawFavouriteId,
+    "hideFavpollPollFavourite"
+  )
 
   const favpollId = await verifyOrganiser(favouriteId, userId)
 
@@ -52,9 +61,15 @@ export async function hideFavpollPollFavourite(favouriteId: string) {
   revalidatePath(`/favpolls/${favpollId}`)
 }
 
-export async function showFavpollPollFavourite(favouriteId: string) {
+export async function showFavpollPollFavourite(rawFavouriteId: string) {
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
+
+  const favouriteId = parseInput(
+    actionId(NOT_A_FAVOURITE),
+    rawFavouriteId,
+    "showFavpollPollFavourite"
+  )
 
   const favpollId = await verifyOrganiser(favouriteId, userId)
 

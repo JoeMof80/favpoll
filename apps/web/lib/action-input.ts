@@ -1,4 +1,4 @@
-import type { z } from "zod"
+import { z } from "zod"
 
 // WHAT A SERVER ACTION MAY BELIEVE ABOUT ITS ARGUMENT (2026-10-20).
 //
@@ -51,6 +51,37 @@ export class InvalidInputError extends Error {
 }
 
 /**
+ * An id the client hands back. `z.guid`, not `z.uuid`: a Postgres `uuid`
+ * column stores any 128-bit value, while `z.uuid` enforces the RFC's
+ * version and variant nibbles and would refuse an id the database itself
+ * handed us. The message is the caller's, because what the id names
+ * differs — a topic, a charity, a favpoll, a favourite.
+ *
+ * Checking the FORMAT of a machine-supplied id costs nothing and buys
+ * something: ids are concatenated into cache keys and interpolated into
+ * revalidation paths, where an id carrying its own separator is a value
+ * that addresses something other than itself.
+ */
+export const actionId = (message: string) => z.guid(message)
+
+/**
+ * For an action whose contract is a RETURNED result rather than a throw —
+ * `app/appeals/actions.ts` answers `{ error }` and its form renders it, so
+ * throwing would break the caller rather than inform it. Same parse, same
+ * log, different exit.
+ */
+export function tryParseInput<S extends z.ZodType>(
+  schema: S,
+  input: unknown,
+  label: string
+): { ok: true; data: z.output<S> } | { ok: false; error: string } {
+  const parsed = schema.safeParse(input)
+  if (parsed.success) return { ok: true, data: parsed.data }
+  return { ok: false, error: firstMessage(parsed.error, label) }
+}
+
+/**
+ * The same, for an action that takes FormData/**
  * The same, for an action that takes FormData — the shape the original
  * entry prescribed and #1104 had no use for, because the money actions
  * take typed objects. `uploadPersonPhoto` is the first real caller.

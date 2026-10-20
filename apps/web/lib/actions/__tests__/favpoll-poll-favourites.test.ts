@@ -20,7 +20,9 @@ import {
   showFavpollPollFavourite,
 } from "@/lib/actions/favpoll-poll-favourites"
 
-const ITEM_ID = "epi-1"
+// A uuid, because the action now checks the format (#1109): the id is
+// machine-supplied by the ranking list, never typed.
+const ITEM_ID = "11111111-1111-1111-1111-111111111111"
 const FAVPOLL_ID = "favpoll-1"
 const ORGANISER_ID = "user-1"
 const OTHER_USER_ID = "user-2"
@@ -156,5 +158,21 @@ describe("showFavpollPollFavourite", () => {
     await showFavpollPollFavourite(ITEM_ID)
 
     expect(mockRevalidatePath).toHaveBeenCalledWith(`/favpolls/${FAVPOLL_ID}`)
+  })
+})
+
+describe("both refuse an id the column could not hold (#1109)", () => {
+  it("hide refuses without looking anything up", async () => {
+    await expect(hideFavpollPollFavourite("epi-1")).rejects.toThrow(
+      "That favourite wasn't recognised."
+    )
+    expect(mock.from).not.toHaveBeenCalled()
+  })
+
+  it("show refuses without looking anything up", async () => {
+    await expect(showFavpollPollFavourite("epi-1")).rejects.toThrow(
+      "That favourite wasn't recognised."
+    )
+    expect(mock.from).not.toHaveBeenCalled()
   })
 })

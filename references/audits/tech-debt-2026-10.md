@@ -224,10 +224,49 @@ corrupted the pot, and no legitimate caller is affected — but whether a
 non-zero value should be refused outright is a ledger decision and is the
 founder's to make.
 
-Still to do: the remaining six (#1109) — `app/appeals/actions.ts`,
-`app/favpolls/actions.ts`, `app/favpolls/[id]/edit/actions.ts`,
-`app/favpolls/[id]/manage/actions.ts`, `app/favpolls/new/wizard-data.ts`
-and `lib/actions/favpoll-poll-favourites.ts`.
+**The four small files are converted (#1109, third).**
+`app/favpolls/actions.ts`, `lib/actions/favpoll-poll-favourites.ts`,
+`app/appeals/actions.ts` and `app/favpolls/new/wizard-data.ts` went
+together: 305 lines between them, and four near-identical pull requests
+would have been harder to read than one. Three things worth keeping.
+
+**There are now three idioms, and which one an action uses is a property
+of its caller, not a preference.** `parseInput` THROWS, for an action
+whose caller catches or whose wrapper converts (`generateDraft`,
+`createFavpoll`, `deleteFavpoll` — the last because it ends in
+`redirect()`, which Next throws, leaving no caller to render to).
+`tryParseInput` RETURNS, for an action whose contract already is a result:
+`app/appeals/actions.ts` answers `{ error }` and its form renders the
+string, so a thrown message would break the caller rather than inform it.
+And a bare `safeParse` returning the action's own "nothing" suits a
+silent surface, which is what the ghost prefetch and the enacted lookup
+are.
+
+**`createAppeal` had the right checks in the wrong place.** It validated
+the name, the slug's shape and the charity by hand and returned good
+sentences for all three. Those sentences are unchanged; they are the
+schema's now, which is what let `updateAppeal` be fixed in the same
+breath — its `input.name.trim()` was a TypeError waiting for an argument
+without a name, a 500 where the form wanted a sentence.
+
+**`wizard-data.ts` was never an action, and had nothing to validate.**
+`getWizardData()` takes no arguments, so the schema treatment this file
+was listed for does not apply to it. What the listing did surface is that
+the `"use server"` directive published it as an endpoint: it is imported
+only by two server components, both of which call `auth()` for
+themselves, so the directive was the one UNAUTHENTICATED way to ask for
+the entire active catalogue — every charity with its register website and
+email overlaid, every topic, every subset — in a single request. The
+directive is gone. That is the second time the honest answer was "this is
+not an action, stop publishing it as one", after `insertSubsetMembers`.
+
+Housekeeping: the `z.guid` id schema and its reasoning now live once, as
+`actionId` in `lib/action-input.ts`, rather than being copy-pasted into a
+fourth schema file.
+
+Still to do: two (#1109) — `app/favpolls/[id]/edit/actions.ts` and
+`app/favpolls/[id]/manage/actions.ts`. Both already RETURN results
+(#1049), so both need schemas only.
 
 ### 1.4 Actions still throw where the project decided they should return · M · low risk · DONE for the pledge path (#1105, PR #1127)
 

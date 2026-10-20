@@ -1,4 +1,19 @@
-"use server"
+// WHY THIS IS NOT A SERVER ACTION (#1109, 2026-10-20).
+//
+// It carried "use server" and so Next published it as an endpoint, but it
+// takes no arguments, is imported only by two server components
+// (app/favpolls/new/page.tsx and app/favpolls/[id]/manage/page.tsx), and
+// both of those call auth() for themselves. The directive was therefore
+// the one UNAUTHENTICATED way to ask for the whole active catalogue —
+// every charity with its register website and email overlaid, every
+// topic, every subset — in one request.
+//
+// There was nothing to validate: an action with no parameters has no
+// input, so the schema treatment this file was listed for does not apply
+// to it. Removing the directive is the fix instead, and it is the same
+// judgement as insertSubsetMembers in app/favpolls/new/actions.ts: when a
+// thing is not an action, stop publishing it as one. A plain async
+// function is what both callers wanted.
 
 import { createAdminClient } from "@/lib/supabase/admin"
 import { mirrorContactAndPurpose } from "@/lib/register-mirror"

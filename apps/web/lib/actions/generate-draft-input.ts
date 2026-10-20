@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { actionId } from "@/lib/action-input"
 import type { FavpollGrouping, Pronoun, Register } from "@favpoll/types"
 import { OCCASION_TYPES_BY_REGISTER } from "@/lib/registers"
 
@@ -22,12 +23,8 @@ import { OCCASION_TYPES_BY_REGISTER } from "@/lib/registers"
 //    It does NOT make the prompt injection-proof: that needs the prompt
 //    itself to delimit its inputs, which is its own change.
 
-/** The ids are uuid columns, so the check is "what that column can hold":
- *  z.guid, not z.uuid. Postgres stores any 128-bit value under `uuid`,
- *  while z.uuid enforces the RFC's version and variant nibbles and would
- *  refuse an id the database handed us. */
 const ID_MESSAGE = "That topic, subset or charity wasn't recognised."
-const id = z.guid(ID_MESSAGE)
+const id = actionId(ID_MESSAGE)
 
 /**
  * A single-line field that ends up inside the prompt. Collapsed, not just
