@@ -11,7 +11,7 @@ Generated 2026-10-20 by `node scripts/component-tree.mjs` — do not edit by han
 ↑  already expanded above, or a shared subtree (see its section)
 ```
 
-Counts: 30 routes · 211 component files · 46 with stories · 12 unused in production
+Counts: 30 routes · 200 component files · 41 with stories · 3 unused in production
 
 ---
 
@@ -1140,7 +1140,7 @@ app/topics/[id]/page.tsx
 
 Components with three or more production importers, expanded once.
 
-### `components/landing/demo-fixture.ts` — used by 13
+### `components/landing/demo-fixture.ts` — used by 12
 
 ```
 components/landing/demo-fixture.ts
@@ -1200,19 +1200,19 @@ components/ui/chip.tsx *
   → components/ui/button.tsx *
 ```
 
-### `components/guest-book.tsx` — used by 6
-
-```
-components/guest-book.tsx *
-  → components/ui/responsive-overlay.tsx *  ↑
-  → components/ui/section-eyebrow.tsx *
-```
-
 ### `components/favpoll-form/edit-helpers.tsx` — used by 5
 
 ```
 components/favpoll-form/edit-helpers.tsx
   → components/ui/button.tsx *
+```
+
+### `components/guest-book.tsx` — used by 5
+
+```
+components/guest-book.tsx *
+  → components/ui/responsive-overlay.tsx *  ↑
+  → components/ui/section-eyebrow.tsx *
 ```
 
 ### `components/keepsake/keepsake-document.tsx` — used by 5
@@ -1597,36 +1597,31 @@ components/stripe-checkout.tsx
 components/ui/alert.tsx  ← 1
 components/ui/badge.tsx  ← 3
 components/ui/button-group.tsx  ← 1
-components/ui/button.tsx *  ← 81
+components/ui/button.tsx *  ← 79
 components/ui/calendar.tsx  ← 1
 components/ui/card.tsx *  ← 1
 components/ui/chip.tsx *  ← 8
 components/ui/dialog.tsx  ← 1
 components/ui/dropdown-menu.tsx  ← 6
-components/ui/field.tsx * ⚠  ← 0
-components/ui/form.tsx ⚠  ← 0
 components/ui/input-group.tsx  ← 11
 components/ui/input.tsx *  ← 6
-components/ui/label.tsx  ← 3
-components/ui/occasion-tag.tsx * ⚠  ← 0
+components/ui/label.tsx  ← 1
 components/ui/popover.tsx  ← 8
 components/ui/ranking-bar.tsx *  ← 6
 components/ui/responsive-overlay.tsx *  ← 12
 components/ui/section-eyebrow.tsx *  ← 21
 components/ui/segmented-control.tsx *  ← 6
-components/ui/separator.tsx  ← 1
+components/ui/separator.tsx ⚠  ← 0
 components/ui/sheet.tsx  ← 1
 components/ui/slider.tsx  ← 1
 components/ui/switch-line.tsx  ← 2
 components/ui/switch.tsx  ← 5
 components/ui/tabs.tsx  ← 2
 components/ui/textarea.tsx  ← 5
-components/ui/ticker.tsx ⚠  ← 0
 components/ui/toggle-group.tsx  ← 1
 components/ui/toggle.tsx  ← 1
 components/ui/toolbar-band.tsx *  ← 4
-components/ui/tooltip-icon-button.tsx * ⚠  ← 0
-components/ui/tooltip.tsx  ← 3
+components/ui/tooltip.tsx  ← 2
 ```
 
 ---
@@ -1634,17 +1629,8 @@ components/ui/tooltip.tsx  ← 3
 ## Unused in production ⚠
 
 ```
-components/favpoll-card/section-label.tsx
-components/keepsake/print-button.tsx
-components/landing/goal-vignette.tsx
-components/landing/guest-book-vignette.tsx
-components/landing/honour-charity-love-venn.tsx
+components/charity-banner.tsx
 components/pledge-card/index.tsx
-components/pledge-dialog/step-indicator.tsx
-components/ui/field.tsx
-components/ui/form.tsx
-components/ui/occasion-tag.tsx
-components/ui/ticker.tsx
-components/ui/tooltip-icon-button.tsx
+components/ui/separator.tsx
 ```
 
