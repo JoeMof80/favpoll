@@ -34,6 +34,15 @@ import {
   topUpFundAsGuest,
   deleteFavpoll,
 } from "@/app/favpolls/[id]/actions"
+import { unwrap, type ActionResult } from "@/lib/action-result"
+
+// The money path RETURNS its failures (#1105). Every assertion below goes
+// through the caller's own unwrap, so each test exercises the whole round
+// trip — action returns a result, caller turns it back into an Error —
+// rather than either half on its own. The shape itself is asserted in
+// "the money path returns its failures" at the foot of the file.
+const run = <T>(action: Promise<ActionResult<T>>): Promise<T> =>
+  action.then(unwrap)
 
 beforeEach(() => {
   mock = makeSupabaseMock()
@@ -63,7 +72,7 @@ describe("createPledge", () => {
 
   it("throws 'Not authenticated' when userId is null", async () => {
     mockAuth.mockResolvedValueOnce({ userId: null })
-    await expect(createPledge(input)).rejects.toThrow("Not authenticated")
+    await expect(run(createPledge(input))).rejects.toThrow("Not authenticated")
   })
 
   it("verifies the PaymentIntent against the recorded amounts", async () => {
@@ -71,7 +80,7 @@ describe("createPledge", () => {
     mock.queue({ id: "pledge-1" })
     mock.queue(null)
 
-    await createPledge({ ...input, tipAmount: 1 })
+    await run(createPledge({ ...input, tipAmount: 1 }))
 
     expect(mockVerify).toHaveBeenCalledWith({
       paymentIntentId: "pi_test_123",
@@ -84,7 +93,7 @@ describe("createPledge", () => {
   it("records nothing when payment verification fails", async () => {
     mockVerify.mockRejectedValueOnce(new Error("Payment has not completed"))
 
-    await expect(createPledge(input)).rejects.toThrow(
+    await expect(run(createPledge(input))).rejects.toThrow(
       "Payment has not completed"
     )
     expect(mock.callsFor("pledges")).toHaveLength(0)
@@ -94,7 +103,7 @@ describe("createPledge", () => {
   it("rejects a PaymentIntent that was already recorded", async () => {
     mock.queue({ id: "pledge-existing" }) // PI-unused check finds a pledge
 
-    await expect(createPledge(input)).rejects.toThrow(
+    await expect(run(createPledge(input))).rejects.toThrow(
       "This payment has already been recorded."
     )
     expect(
@@ -107,7 +116,7 @@ describe("createPledge", () => {
     mock.queue({ id: "pledge-1" }) // pledge insert → single()
     mock.queue(null) // allocations insert → await
 
-    await createPledge({ ...input, tipAmount: 1 })
+    await run(createPledge({ ...input, tipAmount: 1 }))
 
     const pledgeInsert = mock
       .callsFor("pledges")
@@ -127,7 +136,7 @@ describe("createPledge", () => {
     mock.queue({ id: "pledge-1" })
     mock.queue(null)
 
-    await createPledge({ ...input, potAllocationId: "pot-alloc-1" })
+    await run(createPledge({ ...input, potAllocationId: "pot-alloc-1" }))
 
     const pledgeInsert = mock
       .callsFor("pledges")
@@ -140,7 +149,7 @@ describe("createPledge", () => {
     mock.queue({ id: "pledge-99" })
     mock.queue(null)
 
-    await createPledge(input)
+    await run(createPledge(input))
 
     const allocInsert = mock
       .callsFor("pledge_allocations")
@@ -166,13 +175,15 @@ describe("createPledge", () => {
     mock.queue({ id: "pledge-1" })
     mock.queue(null)
 
-    await createPledge({
-      ...input,
-      allocations: [
-        { favouriteId: "item-a", amount: 10 },
-        { favouriteId: "item-b", amount: 0 }, // should be excluded
-      ],
-    })
+    await run(
+      createPledge({
+        ...input,
+        allocations: [
+          { favouriteId: "item-a", amount: 10 },
+          { favouriteId: "item-b", amount: 0 }, // should be excluded
+        ],
+      })
+    )
 
     const allocInsert = mock
       .callsFor("pledge_allocations")
@@ -185,7 +196,7 @@ describe("createPledge", () => {
     mock.queue(null) // PI-unused check
     mock.queue(null, { message: "duplicate key" })
 
-    await expect(createPledge(input)).rejects.toThrow("duplicate key")
+    await expect(run(createPledge(input))).rejects.toThrow("duplicate key")
   })
 
   it("throws when allocation insert returns an error", async () => {
@@ -194,7 +205,7 @@ describe("createPledge", () => {
     mock.queue(null) // picks-suspended lookup → open
     mock.queue(null, { message: "FK violation" }) // alloc insert fails
 
-    await expect(createPledge(input)).rejects.toThrow("FK violation")
+    await expect(run(createPledge(input))).rejects.toThrow("FK violation")
   })
 
   it("defaults tip_amount to 0 when no tip is passed", async () => {
@@ -202,7 +213,7 @@ describe("createPledge", () => {
     mock.queue({ id: "pledge-1" })
     mock.queue(null)
 
-    await createPledge({ ...input, totalAmount: 25 })
+    await run(createPledge({ ...input, totalAmount: 25 }))
 
     const pledgeInsert = mock
       .callsFor("pledges")
@@ -234,7 +245,7 @@ describe("createPledge — the picks are in", () => {
     mock.queue({ id: "pledge-1" }) // pledge insert
     mock.queue({ favpolls: { picks_suspended_at: "2020-01-01T00:00:00Z" } })
 
-    await createPledge(input)
+    await run(createPledge(input))
 
     expect(mock.callsFor("pledges").some((c) => c.method === "insert")).toBe(
       true
@@ -248,7 +259,7 @@ describe("createPledge — the picks are in", () => {
     mock.queue({ favpolls: { picks_suspended_at: null } })
     mock.queue(null) // allocations insert
 
-    await createPledge(input)
+    await run(createPledge(input))
 
     const insert = mock
       .callsFor("pledge_allocations")
@@ -262,7 +273,7 @@ describe("createPledge — the picks are in", () => {
     mock.queue(null) // PI-unused check
     mock.queue({ id: "pledge-1" })
 
-    await createPledge({ ...input, allocations: [] })
+    await run(createPledge({ ...input, allocations: [] }))
 
     expect(mock.callsFor("favpoll_polls")).toHaveLength(0)
     expect(mock.callsFor("pledge_allocations")).toHaveLength(0)
@@ -280,7 +291,7 @@ describe("createGuestPledge", () => {
 
   it("throws 'Email is required' when guestEmail is empty", async () => {
     await expect(
-      createGuestPledge({ ...input, guestEmail: "" })
+      run(createGuestPledge({ ...input, guestEmail: "" }))
     ).rejects.toThrow("Email is required")
   })
 
@@ -289,7 +300,7 @@ describe("createGuestPledge", () => {
       new Error("Pledge amount does not match the payment")
     )
 
-    await expect(createGuestPledge(input)).rejects.toThrow(
+    await expect(run(createGuestPledge(input))).rejects.toThrow(
       "does not match the payment"
     )
     expect(mock.callsFor("pledges")).toHaveLength(0)
@@ -299,7 +310,7 @@ describe("createGuestPledge", () => {
     mock.queue(null) // PI-unused check
     mock.queue({ id: "existing-pledge" }) // maybeSingle finds existing
 
-    await expect(createGuestPledge(input)).rejects.toThrow(
+    await expect(run(createGuestPledge(input))).rejects.toThrow(
       "You've already pledged on this poll"
     )
   })
@@ -319,7 +330,7 @@ describe("createGuestPledge", () => {
       },
     })
 
-    await createGuestPledge(input)
+    await run(createGuestPledge(input))
 
     const pledgeInsert = mock
       .callsFor("pledges")
@@ -348,7 +359,7 @@ describe("createGuestPledge", () => {
       },
     })
 
-    const token = await createGuestPledge(input)
+    const token = await run(createGuestPledge(input))
 
     expect(typeof token).toBe("string")
     expect(token).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-/)
@@ -368,7 +379,7 @@ describe("createGuestPledge", () => {
       },
     })
 
-    await createGuestPledge(input)
+    await run(createGuestPledge(input))
 
     expect(mockEmail.sendPledgeConfirmation).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -399,7 +410,7 @@ describe("createGuestPledge", () => {
       new Error("Resend down")
     )
 
-    const token = await createGuestPledge(input)
+    const token = await run(createGuestPledge(input))
 
     expect(typeof token).toBe("string") // email failure was swallowed
   })
@@ -409,7 +420,7 @@ describe("createGuestPledge", () => {
     mock.queue(null) // no existing pledge
     mock.queue(null, { message: "insert fail" }) // pledge insert error
 
-    await expect(createGuestPledge(input)).rejects.toThrow("insert fail")
+    await expect(run(createGuestPledge(input))).rejects.toThrow("insert fail")
   })
 })
 
@@ -548,7 +559,7 @@ describe("topUpFundAsGuest", () => {
   it("verifies the top-up payment before crediting the fund", async () => {
     mock.queue("pot-1") // pot_top_up rpc
 
-    await topUpFundAsGuest("favpoll-1", 10, "pi_topup_1")
+    await run(topUpFundAsGuest("favpoll-1", 10, "pi_topup_1"))
 
     expect(mockVerifyTopUp).toHaveBeenCalledWith({
       paymentIntentId: "pi_topup_1",
@@ -570,7 +581,7 @@ describe("topUpFundAsGuest", () => {
     )
 
     await expect(
-      topUpFundAsGuest("favpoll-1", 10, "pi_topup_1")
+      run(topUpFundAsGuest("favpoll-1", 10, "pi_topup_1"))
     ).rejects.toThrow("does not match the payment")
     expect(mock.callsFor("rpc:pot_top_up")).toHaveLength(0)
   })
@@ -582,7 +593,7 @@ describe("topUpFundAsGuest", () => {
     })
 
     await expect(
-      topUpFundAsGuest("favpoll-1", 10, "pi_topup_1")
+      run(topUpFundAsGuest("favpoll-1", 10, "pi_topup_1"))
     ).rejects.toThrow("This payment has already been recorded.")
   })
 
@@ -590,7 +601,7 @@ describe("topUpFundAsGuest", () => {
     mock.queue(null, { message: "Favpoll not found" })
 
     await expect(
-      topUpFundAsGuest("favpoll-1", 10, "pi_topup_1")
+      run(topUpFundAsGuest("favpoll-1", 10, "pi_topup_1"))
     ).rejects.toThrow("Favpoll not found")
   })
 })
@@ -609,14 +620,16 @@ describe("pledgeFromFund", () => {
 
   it("throws 'Not authenticated' when userId is null", async () => {
     mockAuth.mockResolvedValueOnce({ userId: null })
-    await expect(pledgeFromFund(input)).rejects.toThrow("Not authenticated")
+    await expect(run(pledgeFromFund(input))).rejects.toThrow(
+      "Not authenticated"
+    )
   })
 
   it("reserves from the pot, then records the pledge with no card", async () => {
     mock.queue("pot-1") // pot_allocate → truthy means reserved
     mock.queue({ id: "pledge-1" }) // pledge insert
 
-    await pledgeFromFund(input)
+    await run(pledgeFromFund(input))
 
     expect(mock.callsFor("rpc:pot_allocate")[0]!.args[0]).toEqual({
       p_pot_id: "pot-1",
@@ -638,7 +651,7 @@ describe("pledgeFromFund", () => {
   it("refuses when the pot cannot cover it, and records nothing", async () => {
     mock.queue(null) // pot_allocate → not allocated
 
-    await expect(pledgeFromFund(input)).rejects.toThrow(
+    await expect(run(pledgeFromFund(input))).rejects.toThrow(
       "There isn't enough left in the shared pot for that."
     )
     expect(mock.callsFor("pledges")).toHaveLength(0)
@@ -653,7 +666,7 @@ describe("topUpFund", () => {
   it("credits the fund against the signed-in user", async () => {
     mock.queue("pot-1")
 
-    await topUpFund("favpoll-1", 10, "pi_topup_1")
+    await run(topUpFund("favpoll-1", 10, "pi_topup_1"))
 
     expect(mock.callsFor("rpc:pot_top_up")[0]!.args[0]).toEqual({
       p_favpoll_id: "favpoll-1",
@@ -665,7 +678,7 @@ describe("topUpFund", () => {
 
   it("throws 'Not authenticated' when userId is null", async () => {
     mockAuth.mockResolvedValueOnce({ userId: null })
-    await expect(topUpFund("favpoll-1", 10, "pi_topup_1")).rejects.toThrow(
+    await expect(run(topUpFund("favpoll-1", 10, "pi_topup_1"))).rejects.toThrow(
       "Not authenticated"
     )
   })
@@ -698,68 +711,74 @@ describe("the money path refuses a malformed argument", () => {
 
   it("createPledge: an amount that is not a number", async () => {
     await expect(
-      createPledge({ ...cardPledge, totalAmount: "10" as any })
+      run(createPledge({ ...cardPledge, totalAmount: "10" as any }))
     ).rejects.toThrow("That amount isn't a number we can take.")
     expectNothingTouched()
   })
 
   it("createPledge: a negative amount", async () => {
     await expect(
-      createPledge({ ...cardPledge, totalAmount: -10 })
+      run(createPledge({ ...cardPledge, totalAmount: -10 }))
     ).rejects.toThrow("That amount isn't a number we can take.")
     expectNothingTouched()
   })
 
   it("createPledge: no poll", async () => {
     await expect(
-      createPledge({ ...cardPledge, favpollPollId: "" })
+      run(createPledge({ ...cardPledge, favpollPollId: "" }))
     ).rejects.toThrow("Missing the favpoll.")
     expectNothingTouched()
   })
 
   it("createPledge: an allocation that is not a pick", async () => {
     await expect(
-      createPledge({
-        ...cardPledge,
-        allocations: [{ favouriteId: "item-a", amount: "lots" as any }],
-      })
+      run(
+        createPledge({
+          ...cardPledge,
+          allocations: [{ favouriteId: "item-a", amount: "lots" as any }],
+        })
+      )
     ).rejects.toThrow("That amount isn't a number we can take.")
     expectNothingTouched()
   })
 
   it("createGuestPledge: an amount that is not a number", async () => {
     await expect(
-      createGuestPledge({
-        ...cardPledge,
-        guestEmail: "guest@example.com",
-        totalAmount: null as any,
-      })
+      run(
+        createGuestPledge({
+          ...cardPledge,
+          guestEmail: "guest@example.com",
+          totalAmount: null as any,
+        })
+      )
     ).rejects.toThrow("That amount isn't a number we can take.")
     expectNothingTouched()
   })
 
   it("pledgeFromFund: no pot", async () => {
     await expect(
-      pledgeFromFund({
-        favpollPollId: "poll-1",
-        potId: "",
-        totalAmount: 10,
-        allocations: [],
-      })
+      run(
+        pledgeFromFund({
+          favpollPollId: "poll-1",
+          potId: "",
+          totalAmount: 10,
+          allocations: [],
+        })
+      )
     ).rejects.toThrow("Missing the shared pot.")
     expectNothingTouched()
   })
 
   it("topUpFund: an amount that is not a number", async () => {
     await expect(
-      topUpFund("favpoll-1", Number.NaN, "pi_topup_1")
+      run(topUpFund("favpoll-1", Number.NaN, "pi_topup_1"))
     ).rejects.toThrow("That amount isn't a number we can take.")
     expectNothingTouched()
   })
 
   it("topUpFundAsGuest: an infinite amount", async () => {
     await expect(
-      topUpFundAsGuest("favpoll-1", Number.POSITIVE_INFINITY, "pi_topup_1")
+      run(topUpFundAsGuest("favpoll-1", Number.POSITIVE_INFINITY, "pi_topup_1"))
     ).rejects.toThrow("That amount isn't a number we can take.")
     expectNothingTouched()
   })
@@ -770,8 +789,120 @@ describe("the money path refuses a malformed argument", () => {
     mockVerify.mockRejectedValueOnce(new Error("Missing payment reference"))
 
     await expect(
-      createPledge({ ...cardPledge, paymentIntentId: "" })
+      run(createPledge({ ...cardPledge, paymentIntentId: "" }))
     ).rejects.toThrow("Missing payment reference")
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────────────────
+// The money path returns its failures (#1105)
+//
+// Next strips the message from an error THROWN inside a server action in a
+// production build, so the sentences above only reach the guest if they
+// travel as values. These assert the shape directly — no unwrap — because
+// the shape is the fix.
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("the money path returns its failures", () => {
+  const cardPledge = {
+    favpollPollId: "poll-1",
+    potAllocationId: null,
+    totalAmount: 10,
+    allocations: [{ favouriteId: "item-a", amount: 10 }],
+    paymentIntentId: "pi_test_123",
+  }
+
+  it("createPledge resolves to the message rather than throwing it", async () => {
+    mockVerify.mockRejectedValueOnce(new Error("Payment has not completed"))
+
+    await expect(createPledge(cardPledge)).resolves.toEqual({
+      ok: false,
+      error: "Payment has not completed",
+    })
+  })
+
+  it("createPledge returns ok on the happy path", async () => {
+    mock.queue(null) // PI-unused check
+    mock.queue({ id: "pledge-1" })
+
+    await expect(createPledge(cardPledge)).resolves.toEqual({
+      ok: true,
+      value: undefined,
+    })
+  })
+
+  it("createGuestPledge carries the guest token as the result's value", async () => {
+    mock.queue(null) // PI-unused
+    mock.queue(null) // no duplicate pledge for this email
+    mock.queue({ id: "pledge-1" })
+
+    const result = await createGuestPledge({
+      ...cardPledge,
+      guestEmail: "guest@example.com",
+    })
+
+    expect(result.ok).toBe(true)
+    expect(result.ok && result.value).toMatch(/^[0-9a-f-]{36}$/)
+  })
+
+  it("createGuestPledge returns the duplicate-pledge sentence, which is the one the guest must read", async () => {
+    mock.queue(null) // PI-unused
+    mock.queue({ id: "pledge-existing" }) // same email, same poll
+
+    await expect(
+      createGuestPledge({ ...cardPledge, guestEmail: "guest@example.com" })
+    ).resolves.toEqual({
+      ok: false,
+      error: expect.stringContaining("You've already pledged on this poll"),
+    })
+  })
+
+  it("pledgeFromFund returns the not-enough-in-the-pot sentence", async () => {
+    mock.queue(null) // pot_allocate refused
+
+    await expect(
+      pledgeFromFund({
+        favpollPollId: "poll-1",
+        potId: "pot-1",
+        totalAmount: 10,
+        allocations: [],
+      })
+    ).resolves.toEqual({
+      ok: false,
+      error: "There isn't enough left in the shared pot for that.",
+    })
+  })
+
+  it("topUpFundAsGuest returns the already-recorded sentence", async () => {
+    mock.queue(null, {
+      message:
+        'duplicate key value violates unique constraint "pot_topups_payment_intent_id_key"',
+    })
+
+    await expect(
+      topUpFundAsGuest("favpoll-1", 10, "pi_topup_1")
+    ).resolves.toEqual({
+      ok: false,
+      error: "This payment has already been recorded.",
+    })
+  })
+
+  it("topUpFund returns 'Not authenticated' rather than throwing it", async () => {
+    mockAuth.mockResolvedValueOnce({ userId: null })
+
+    await expect(topUpFund("favpoll-1", 10, "pi_topup_1")).resolves.toEqual({
+      ok: false,
+      error: "Not authenticated",
+    })
+  })
+
+  it("a schema refusal travels the same way", async () => {
+    await expect(
+      createPledge({ ...cardPledge, totalAmount: -10 })
+    ).resolves.toEqual({
+      ok: false,
+      error: "That amount isn't a number we can take.",
+    })
   })
 })
 

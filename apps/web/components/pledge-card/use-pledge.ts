@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { unwrap } from "@/lib/action-result"
 import {
   createPledge,
   createGuestPledge,
@@ -228,42 +229,46 @@ export function usePledge({
           }
         : null
     if (clerkUserId) {
-      await createPledge({
-        favpollPollId: pollWithItems.id,
-        potAllocationId: userPotAllocation?.id ?? null,
-        totalAmount: numericPledge,
-        tipAmount: ownTip,
-        isAnonymous,
-        message: pledgeMessage || null,
-        hideAmount,
-        allocations: computePledgeAllocations(
-          selections,
-          pollWithItems.topics.favourites,
-          numericPledge
-        ),
-        paymentIntentId,
-        giftAid: giftAidDeclaration,
-      })
+      unwrap(
+        await createPledge({
+          favpollPollId: pollWithItems.id,
+          potAllocationId: userPotAllocation?.id ?? null,
+          totalAmount: numericPledge,
+          tipAmount: ownTip,
+          isAnonymous,
+          message: pledgeMessage || null,
+          hideAmount,
+          allocations: computePledgeAllocations(
+            selections,
+            pollWithItems.topics.favourites,
+            numericPledge
+          ),
+          paymentIntentId,
+          giftAid: giftAidDeclaration,
+        })
+      )
       return undefined
     } else {
       const email = guestEmailParam ?? guestEmail
-      const token = await createGuestPledge({
-        favpollPollId: pollWithItems.id,
-        guestEmail: email,
-        totalAmount: numericPledge,
-        tipAmount: ownTip,
-        displayName: displayName || null,
-        isAnonymous,
-        message: pledgeMessage || null,
-        hideAmount,
-        allocations: computePledgeAllocations(
-          selections,
-          pollWithItems.topics.favourites,
-          numericPledge
-        ),
-        paymentIntentId,
-        giftAid: giftAidDeclaration,
-      })
+      const token = unwrap(
+        await createGuestPledge({
+          favpollPollId: pollWithItems.id,
+          guestEmail: email,
+          totalAmount: numericPledge,
+          tipAmount: ownTip,
+          displayName: displayName || null,
+          isAnonymous,
+          message: pledgeMessage || null,
+          hideAmount,
+          allocations: computePledgeAllocations(
+            selections,
+            pollWithItems.topics.favourites,
+            numericPledge
+          ),
+          paymentIntentId,
+          giftAid: giftAidDeclaration,
+        })
+      )
       return token
     }
   }
@@ -336,18 +341,20 @@ export function usePledge({
     setError(null)
     setSubmitting(true)
     try {
-      await pledgeFromFund({
-        favpollPollId: pollWithItems.id,
-        potId: pot.id,
-        totalAmount: numericPledge,
-        isAnonymous,
-        message: pledgeMessage || null,
-        allocations: computePledgeAllocations(
-          pollSelections[pollWithItems.id] ?? [],
-          pollWithItems.topics.favourites,
-          numericPledge
-        ),
-      })
+      unwrap(
+        await pledgeFromFund({
+          favpollPollId: pollWithItems.id,
+          potId: pot.id,
+          totalAmount: numericPledge,
+          isAnonymous,
+          message: pledgeMessage || null,
+          allocations: computePledgeAllocations(
+            pollSelections[pollWithItems.id] ?? [],
+            pollWithItems.topics.favourites,
+            numericPledge
+          ),
+        })
+      )
       onPledgeSuccess?.()
       router.refresh()
     } catch (err) {
@@ -406,7 +413,9 @@ export function usePledge({
       // throw AFTER their card was charged.
       if (pendingTopUp) {
         const topUp = clerkUserId ? topUpFund : topUpFundAsGuest
-        await topUp(favpollId, numericTopUp, pledgePaymentIntentId ?? "")
+        unwrap(
+          await topUp(favpollId, numericTopUp, pledgePaymentIntentId ?? "")
+        )
       }
       // Only now unmount the checkout — nulling the secret before saving
       // emptied the dialog and orphaned its submitting flag when the save

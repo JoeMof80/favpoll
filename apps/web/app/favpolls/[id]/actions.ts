@@ -17,6 +17,7 @@ import {
 import { sendPledgeConfirmation, sendGuestItemAdded } from "@/lib/email"
 import { verifyPledgePayment, verifyTopUpPayment } from "@/lib/stripe-verify"
 import { parseInput } from "@/lib/action-input"
+import { asResult } from "@/lib/action-result"
 import {
   createPledgeSchema,
   createGuestPledgeSchema,
@@ -31,6 +32,13 @@ import {
 // Every shape below is declared once, in ./pledge-input, and parsed at
 // the top of the action that takes it: a typed parameter is checked at
 // the call site and nowhere else (#1104 — lib/action-input says why).
+//
+// TWO KINDS OF EXPORT IN THIS FILE, DELIBERATELY (#1105). The money path
+// returns results: Next redacts a thrown message in production, so a
+// failure the guest needs to read has to travel as a value. Those bodies
+// are the `…Inner` functions, wrapped together at the foot of the file —
+// the same shape manage/actions.ts uses. Everything else still throws
+// and is converted file by file; the register tracks the rest.
 
 // Gift Aid declaration (founder go, 2026-09-15): the four fields HMRC's
 // claim schedule needs. The CHARITY claims from HMRC — favpoll is not a
@@ -101,7 +109,7 @@ async function allocationsAllowed(
   return !favpoll || !picksSuspended(favpoll)
 }
 
-export async function createPledge(rawInput: CreatePledgeInput) {
+async function createPledgeInner(rawInput: CreatePledgeInput) {
   const input = parseInput(createPledgeSchema, rawInput, "createPledge")
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
@@ -220,7 +228,7 @@ export async function guestPreflightState(
   return { hasAccount: !!account, hasActivePledge: !!pledge }
 }
 
-export async function createGuestPledge(rawInput: CreateGuestPledgeInput) {
+async function createGuestPledgeInner(rawInput: CreateGuestPledgeInput) {
   const input = parseInput(
     createGuestPledgeSchema,
     rawInput,
@@ -582,7 +590,7 @@ export async function addOrganizerItem(favpollId: string, label: string) {
   return favouriteId
 }
 
-export async function pledgeFromFund(rawInput: PledgeFromFundInput) {
+async function pledgeFromFundInner(rawInput: PledgeFromFundInput) {
   const input = parseInput(pledgeFromFundSchema, rawInput, "pledgeFromFund")
   const { userId } = await auth()
   if (!userId) throw new Error("Not authenticated")
@@ -674,7 +682,7 @@ async function creditFund(
   }
 }
 
-export async function topUpFundAsGuest(
+async function topUpFundAsGuestInner(
   favpollId: string,
   amount: number,
   paymentIntentId: string
@@ -687,7 +695,7 @@ export async function topUpFundAsGuest(
   await creditFund(id, pounds, pi, null)
 }
 
-export async function topUpFund(
+async function topUpFundInner(
   favpollId: string,
   amount: number,
   paymentIntentId: string
@@ -848,4 +856,56 @@ export async function setFavpollVisibility(
     .eq("id", favpollId)
 
   if (error) throw new Error(error.message)
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// THE MONEY PATH'S EXPORT BOUNDARY (#1105)
+//
+// Next strips the message from an error thrown inside a server action in
+// production builds, so every sentence above — "There isn't enough left
+// in the shared pot for that.", "This payment has already been
+// recorded.", "Missing payment reference", a schema's refusal — reached
+// the guest as a paragraph about omitted details. On the money path that
+// is the worst place for it: the card has already been charged, and the
+// guest needs to know whether their pledge landed and what to do if it
+// did not.
+//
+// So the bodies keep throwing where it reads best and `asResult` turns
+// the outcome into a value here; the callers `unwrap` it, which throws a
+// real Error on the client, where the dialogs already show one inline.
+// lib/action-result has the history.
+//
+// guestPledgeExists and guestPreflightState stay as they are: they are
+// pre-payment reads whose return value is structural, not a message, and
+// a result would make every caller unwrap a boolean for nothing.
+// ─────────────────────────────────────────────────────────────────────────
+
+export async function createPledge(input: CreatePledgeInput) {
+  return asResult(() => createPledgeInner(input))
+}
+
+export async function createGuestPledge(input: CreateGuestPledgeInput) {
+  return asResult(() => createGuestPledgeInner(input))
+}
+
+export async function pledgeFromFund(input: PledgeFromFundInput) {
+  return asResult(() => pledgeFromFundInner(input))
+}
+
+export async function topUpFundAsGuest(
+  favpollId: string,
+  amount: number,
+  paymentIntentId: string
+) {
+  return asResult(() =>
+    topUpFundAsGuestInner(favpollId, amount, paymentIntentId)
+  )
+}
+
+export async function topUpFund(
+  favpollId: string,
+  amount: number,
+  paymentIntentId: string
+) {
+  return asResult(() => topUpFundInner(favpollId, amount, paymentIntentId))
 }

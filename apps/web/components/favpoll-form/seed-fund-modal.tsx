@@ -6,6 +6,7 @@ import { formatPoundsExact } from "@/lib/i18n"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { StripeCheckout } from "@/components/stripe-checkout"
 import { topUpFund, topUpFundAsGuest } from "@/app/favpolls/[id]/actions"
+import { unwrap } from "@/lib/action-result"
 
 const PRESETS = [10, 25, 50]
 
@@ -76,10 +77,15 @@ export function SeedFundModal({
 
   async function handlePaymentSuccess() {
     try {
+      // unwrap keeps this a throw: the catch below is the deliberate
+      // decision to let the modal close anyway, and a result would have
+      // dropped the failure without even reaching it.
       if (isGuest) {
-        await topUpFundAsGuest(favpollId, numeric, paymentIntentId ?? "")
+        unwrap(
+          await topUpFundAsGuest(favpollId, numeric, paymentIntentId ?? "")
+        )
       } else {
-        await topUpFund(favpollId, numeric, paymentIntentId ?? "")
+        unwrap(await topUpFund(favpollId, numeric, paymentIntentId ?? ""))
       }
     } catch {
       // Fund recording failed — continue regardless

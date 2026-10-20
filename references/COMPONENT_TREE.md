@@ -611,7 +611,7 @@ app/favpolls/page.tsx
           → components/favpoll-list-card/favpoll-list-card-charity-carousel.tsx  ↑
           → components/favpoll-list-card/favpoll-list-card-results.tsx
               → components/favpoll-card/poll-results.tsx
-              → components/favpoll-list-card/use-favpoll-list-card-pledge.ts
+              → components/favpoll-list-card/use-favpoll-list-card-pledge.ts  ↑
           → components/favpoll-list-card/use-favpoll-list-card-pledge.ts  ↑
           → components/lock-card-content.tsx
           → components/mention-text.tsx  ↑
@@ -635,7 +635,7 @@ app/favpolls/page.tsx
       → components/ui/toolbar-band.tsx *
   → app/favpolls/list-utils.ts  ↑
   → components/favpoll-list-card.tsx *  ↑
-  → components/favpoll-list-card/use-favpoll-list-card-pledge.ts  ↑
+  → components/favpoll-list-card/use-favpoll-list-card-pledge.ts
   → components/new-favpoll-fab.tsx
       → components/new-favpoll-button.tsx  ↑
   → components/page-ground.tsx
@@ -1260,6 +1260,12 @@ components/favpoll-list-card/favpoll-list-card-charity-carousel.tsx
   → components/charity-row.tsx *  ↑
   → components/favpoll-card/types.ts
   → packages/types/ *
+```
+
+### `components/favpoll-list-card/use-favpoll-list-card-pledge.ts` — used by 4
+
+```
+components/favpoll-list-card/use-favpoll-list-card-pledge.ts
 ```
 
 ### `components/landing/hero.tsx` — used by 4

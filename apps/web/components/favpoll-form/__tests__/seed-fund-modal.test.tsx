@@ -172,7 +172,7 @@ describe("SeedFundModal — post-payment", () => {
 
   it("calls topUpFund then onComplete after successful payment", async () => {
     const onComplete = vi.fn()
-    mockTopUpFund.mockResolvedValueOnce(undefined)
+    mockTopUpFund.mockResolvedValueOnce({ ok: true, value: undefined })
 
     await renderToCheckout(onComplete)
     fireEvent.click(screen.getByRole("button", { name: "Pay" }))
@@ -185,7 +185,7 @@ describe("SeedFundModal — post-payment", () => {
 
   it("still calls onComplete even if topUpFund throws", async () => {
     const onComplete = vi.fn()
-    mockTopUpFund.mockRejectedValueOnce(new Error("DB error"))
+    mockTopUpFund.mockResolvedValueOnce({ ok: false, error: "DB error" })
 
     await renderToCheckout(onComplete)
     fireEvent.click(screen.getByRole("button", { name: "Pay" }))
