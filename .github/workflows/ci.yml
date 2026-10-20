@@ -259,5 +259,8 @@ jobs:
       - name: Check formatting
         run: pnpm --filter @favpoll/web exec prettier --check .
 
+      - name: Component tree is current
+        run: node scripts/component-tree.mjs --check
+
       - name: Check for hardcoded hex colours
         run: node scripts/check-hex-colors.mjs
