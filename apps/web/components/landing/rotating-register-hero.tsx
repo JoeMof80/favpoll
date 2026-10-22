@@ -36,6 +36,17 @@
 //   over it, and "pause on hover" meant "never rotate" (founder saw exactly
 //   that on the first preview, 2026-10-15). Auto-advance exists so a visitor
 //   who does nothing still reads all three scenarios — the thing Gary needed.
+//   ASKED AGAIN AND DECLINED AGAIN on 2026-10-21, this time scoped to the
+//   handset rather than the band: a pause still serves only the visitor who
+//   is already served (the chevrons are right there), the paused state is
+//   invisible so resuming reads as a glitch, and a parked pointer stops the
+//   rotation without meaning to. The want behind it was real and separate —
+//   there is not enough time to READ THE LOCK CARD before the beat presses
+//   it — and that is a question for STILL_BEAT in hero.tsx, not for the
+//   dwell. FIXED 2026-10-21 by holding step 1 to 7000ms (STILL_BEAT), not
+//   by pausing anything.
+// - THE DOTS SAY HOW MANY. Three indicators at the band's foot, added
+//   2026-10-21; the rationale is on the element.
 import { useEffect, useRef, useState, useSyncExternalStore } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { LandingHero } from "@/components/landing/hero"
@@ -51,10 +62,23 @@ import { setHeroRegister } from "@/lib/hero-register-store"
 /** How long each register holds before the next fades in. Long enough to
  *  read a two-sentence headline and glance at the phone; the loop's own
  *  scenes ran ~9s each and nobody asked for faster. */
-// 19s since 2026-10-18: the still's five-step beat (hero.tsx STILL_BEAT)
-// runs ~16s with the note typed, and the slide should rest on the result
-// before it turns. Was 8s with frozen stills.
-export const DWELL_MS = 19000
+// 23.5s since 2026-10-21: the still's five-step beat (hero.tsx STILL_BEAT)
+// runs ~19.75s with the note typed, and the slide should rest on the result
+// before it turns — 3.75s here, as close to the old 3.6 as a round number
+// gets. The beat grew because step 1 is a READING beat and was the shortest
+// in the table; the reasoning is on STILL_BEAT.
+//
+// A LONG CYCLE IS NOT THE COST IT LOOKS (founder, 2026-10-21: "is it a
+// problem that each cycle takes a long time?"). The only real cost of a slow
+// rotation was that a visitor might leave before slide 2 and never learn
+// favpoll is not only for funerals — and the dots now say "three of these"
+// in half a second, so the rotation does not have to. Nobody watches three
+// slides anyway: tuning the CYCLE tunes for a visitor who does not exist,
+// where tuning the one slide they do watch is the job. A chevron or a dot
+// restarts the dwell, so nobody impatient is kept waiting either.
+//
+// Was 19s (2026-10-18), 8s before that with frozen stills.
+export const DWELL_MS = 23500
 
 type Palette = "memorial" | "celebration" | "fundraiser"
 
@@ -178,11 +202,19 @@ export function RotatingRegisterHero() {
   }, [inView, active.palette])
   useEffect(() => () => setHeroRegister(undefined), [])
 
-  const at = (by: 1 | -1) => (index + by + SLIDES.length) % SLIDES.length
-  const step = (by: 1 | -1) => {
-    setIndex(at(by))
+  // Every manual move goes through here: it sets the slide and bumps the
+  // epoch, which restarts the dwell from the slide the visitor asked for AND,
+  // passed down as `stillEpoch`, replays that slide's beat. The second half is
+  // what makes pressing the LIT dot mean "show me that again" rather than
+  // "stand on the finished frame for another 23.5 seconds", which is what it
+  // did when only the dwell restarted. `step` is the relative case — a
+  // chevron — and the dots are absolute.
+  const goTo = (to: number) => {
+    setIndex(to)
     setEpoch((e) => e + 1)
   }
+  const step = (by: 1 | -1) =>
+    goTo((index + by + SLIDES.length) % SLIDES.length)
 
   return (
     <div
@@ -231,6 +263,7 @@ export function RotatingRegisterHero() {
               <LandingHero
                 {...slide.hero}
                 stillActive={isActive}
+                stillEpoch={epoch}
                 ctaAfterMedia
                 bandClassName="bg-primary text-primary-foreground sm:px-[30px]"
               />
@@ -275,6 +308,59 @@ export function RotatingRegisterHero() {
           </Button>
         </div>
       ))}
+
+      {/* WHERE YOU ARE IN THE THREE (founder, 2026-10-21: "i'm also wondering
+          if we need indicators to track each demo slide"). The chevrons say
+          the band can move; they never said how far, and at a 19-second dwell
+          a visitor who does not know two more registers are coming can leave
+          believing favpoll is a funeral product. The slides already ANNOUNCE
+          the count — each group is labelled "Memorial (1 of 3)" — so this only
+          gives the eye what the accessibility tree always had.
+
+          THREE BARE DOTS in the chevrons' own grammar (band ink, dimmed until
+          they matter, no circle, no label): the quietest form that still reads
+          as "three". BOTTOM-CENTRE, inside the band's own py — the chevrons
+          keep the sides, where the founder put them ("where they belong"), and
+          a row of controls under the phone was built for them and reverted the
+          same hour ("move the chevrons back!!!!").
+
+          The row is pointer-events-none and the buttons take their own back, so
+          the full-width strip never swallows a tap meant for the CTA pair that
+          sits beneath it on a phone. CLICKABLE, not decoration: a dot that
+          looks like a control and is not reads as broken, and it puts the third
+          register one tap away instead of two. The 24px box around an 8px dot
+          is the tap target (WCAG 2.5.8), not the mark.
+
+          bottom-2, MEASURED (2026-10-21). On a 390px phone the band overflows
+          its min-height, so its py-10 is the only room under the CTA pair that
+          `ctaAfterMedia` puts at the band's foot: at bottom-3 the dot row's
+          24px box came within 4px of "See how it works" — close enough to
+          steal a tap aimed at the button's bottom edge. bottom-2 puts 8px
+          between the boxes and 20px between the button and the visible dot,
+          and costs nothing above sm, where there is ~200px of empty band under
+          the CTAs either way. */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-2 z-10 flex justify-center gap-1">
+        {SLIDES.map((slide, i) => (
+          <Button
+            key={slide.palette}
+            type="button"
+            size="icon"
+            variant="ghost"
+            aria-label={`Show ${slide.label}`}
+            aria-current={i === index ? "true" : undefined}
+            onClick={() => goTo(i)}
+            className="pointer-events-auto size-6 rounded-full p-0 hover:bg-transparent"
+          >
+            <span
+              aria-hidden="true"
+              className={cn(
+                "size-2 rounded-full bg-primary-foreground motion-safe:transition-opacity",
+                i === index ? "opacity-100" : "opacity-40"
+              )}
+            />
+          </Button>
+        ))}
+      </div>
     </div>
   )
 }

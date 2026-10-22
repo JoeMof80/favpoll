@@ -656,6 +656,58 @@ describe("RotatingRegisterHero", () => {
     expect(getHeroRegister()).toBeUndefined()
   })
 
+  it("marks the live slide with a dot, and a dot jumps straight to its slide", () => {
+    render(<RotatingRegisterHero />)
+    const dots = ["Memorial", "Celebration", "Fundraiser"].map((name) =>
+      screen.getByRole("button", { name: `Show ${name}` })
+    )
+    expect(dots.map((d) => d.getAttribute("aria-current"))).toEqual([
+      "true",
+      null,
+      null,
+    ])
+    // Absolute, not relative: one press reaches the third register.
+    fireEvent.click(dots[2])
+    expect(live().map((s) => s.dataset.register)).toEqual(["fundraiser"])
+    expect(dots[2].getAttribute("aria-current")).toBe("true")
+    expect(dots[0].getAttribute("aria-current")).toBeNull()
+  })
+
+  it("a dot restarts the dwell, like a chevron", () => {
+    render(<RotatingRegisterHero />)
+    act(() => {
+      vi.advanceTimersByTime(DWELL_MS - 1000)
+    })
+    fireEvent.click(screen.getByRole("button", { name: "Show Celebration" }))
+    // The old tick is 1s away and must not fire.
+    act(() => {
+      vi.advanceTimersByTime(DWELL_MS - 1000)
+    })
+    expect(live().map((s) => s.dataset.register)).toEqual(["celebration"])
+    act(() => {
+      vi.advanceTimersByTime(1000)
+    })
+    expect(live().map((s) => s.dataset.register)).toEqual(["fundraiser"])
+  })
+
+  it("the lit dot restarts the dwell rather than letting the old tick fire", () => {
+    render(<RotatingRegisterHero />)
+    act(() => {
+      vi.advanceTimersByTime(DWELL_MS - 1000)
+    })
+    // Pressing the slide that is already live: it stays, and gets a full
+    // dwell again (the beat it replays lives in LandingHero's useStillBeat).
+    fireEvent.click(screen.getByRole("button", { name: "Show Memorial" }))
+    act(() => {
+      vi.advanceTimersByTime(DWELL_MS - 1000)
+    })
+    expect(live().map((s) => s.dataset.register)).toEqual(["memorial"])
+    act(() => {
+      vi.advanceTimersByTime(1000)
+    })
+    expect(live().map((s) => s.dataset.register)).toEqual(["celebration"])
+  })
+
   it("never starts under prefers-reduced-motion", () => {
     stubMotion(true)
     render(<RotatingRegisterHero />)

@@ -147,6 +147,21 @@ export default async function MemorialsPage() {
           service isn't the moment — the wake is", which is the heading in a
           sentence. ── */}
         <Fold>
+          {/* NO SECOND CTA HERE (founder, 2026-10-21: "let phone visitors
+                scroll. they will naturally do that anyway"). "See how it
+                works" was restored on 2026-08-26 because the only action in
+                a register hero was "Create a memorial favpoll", and nobody
+                four days into a bereavement clicks create before they have
+                looked. The band it pointed at has since moved directly
+                beneath the hero and `compact` took the band off the
+                viewport floor, so on a laptop the "How it works" heading is
+                already on screen — measured 2026-10-21 at 642px against an
+                800px viewport — and the button scrolled to something the
+                visitor could see. On a phone it is 224px down, one short
+                scroll, which is the gesture a visitor makes anyway. The
+                string stays in en-GB.json: the HOME carousel still renders
+                it, where the fold is a full viewport and the section below
+                is a different one. */}
           <LandingHero
             sceneKind="memorial"
             compact
@@ -156,7 +171,6 @@ export default async function MemorialsPage() {
             subheader={t("memorials.subheader")}
             ctaLabel={t("memorials.cta.primary")}
             ctaHref="/favpolls/new?category=memorial"
-            ctaSecondaryLabel={t("memorials.cta.secondary")}
             hideStats
           />
 

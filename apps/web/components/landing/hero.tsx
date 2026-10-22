@@ -27,7 +27,6 @@ import type {
 } from "@/components/hero-demo-panel/scenes"
 import { Button } from "@/components/ui/button"
 import { withQuietTail } from "@/components/landing/quiet-tail"
-import { RankingBar } from "@/components/ui/ranking-bar"
 import { cn } from "@/lib/utils"
 import { formatCurrency, MARKET_DEFAULTS, t } from "@/lib/i18n"
 import { useDemoLoop, beatForPhase } from "./use-demo-loop"
@@ -41,7 +40,7 @@ const BEATS = ["Pick", "Pledge", "Reveal"] as const
 // already plain — so glyphs beside them decorated three clear verbs while the
 // actual gap (nothing says what a favpoll IS before the button asks you to
 // create one) went untouched. They also added a fourth object to a band that
-// already carries three router cards, and broke the h1's clean left edge,
+// already carried three router cards, and broke the h1's clean left edge,
 // which is the whole mechanism of a poster.
 //
 // This was the second attempt to answer that gap with pictures — HeroBeats,
@@ -88,19 +87,11 @@ type Props = {
    *  (founder, 2026-09-04: the label 'Create a celebration favpoll'
    *  must deliver exactly that). */
   ctaHref?: string
-  /**
-   * Label for the second, quieter path. Home supplies its own via `router`;
-   * a register page passes its own string.
-   */
+  /** Label for the second, quieter path — a register page passes its own
+   *  string. Without one the hero shows a single CTA. */
   ctaSecondaryLabel?: string
   /** Band override — the default is the page palette's primary. */
   bandClassName?: string
-  /**
-   * REVERSIBLE V1 (founder, 2026-08-04): the Goodstack-style register
-   * router replaces the demo column — the demos now live on the register
-   * pages. Remove the prop on the home page to restore the demo hero.
-   */
-  router?: boolean
   /**
    * Show the scene as a STILL PHONE instead of the looping browser demo.
    *
@@ -128,6 +119,9 @@ type Props = {
    *  while it waits its turn. Plays the before/after beat on arrival (see
    *  useStillBeat). Leave undefined for a still that stands alone. */
   stillActive?: boolean
+  /** Bumped by the carousel on every manual move. A change replays the beat
+   *  from the top even when `stillActive` did not move — the lit dot. */
+  stillEpoch?: number
   /** Below md, render the CTA pair after the phone rather than before it
    *  (founder, 2026-10-15, the home carousel): text, handset, buttons. */
   ctaAfterMedia?: boolean
@@ -135,110 +129,22 @@ type Props = {
   children?: React.ReactNode
 }
 
-// Each card WEARS its register's palette (data-register, 2026-08-30): its
-// dot and bars are that palette's --chart-4 — light enough to read on the
-// deep default band in light, deep enough on the pale band in dark — and in
-// dark its ink is the register colour. The retired accent tokens did this by
-// hand for one purple band; the palette does it for any.
+// THE REGISTER ROUTER CARDS WERE DELETED HERE (2026-10-21). With them went
+// the `router` prop, ROUTER_CARDS, and the six derived constants
+// (MEMORIAL/WEDDING/FUNDRAISER _SCENE, _RESULTS and _TOPIC) that nothing
+// else used.
 //
-// Each card carries its OWN miniature poll rather than reading the register's
-// demo scene (founder, 2026-08-05): the topic has to be synonymous with the
-// register at a glance — flower/cake/biscuit — and the scenes are authored
-// stories whose topics serve their own reveal (the memorial scene turns on
-// Belinda's favourite COLOUR, which its reveal quote names). The card is a
-// signpost, not a rerun of the page's story. Charities are short by design:
-// the row sits beside the total at a third of the container's width.
-// DERIVED, not retyped (2026-08-26). This card carried Marie Curie and
-// "£1,005" — Belinda Hartley's charity and her exact total — with results
-// of £350 / £220 / £165 at 100 / 63 / 47%, which are her top three to the
-// pound and the percent. Only the LABELS had drifted, from her colours to
-// flowers, and the comment below still said "scene-sourced". So the card
-// was always meant to be her favpoll.
+// They were unreachable, not merely unused: home stopped passing `router`
+// on 2026-10-15, when the band became the three register heroes rotated
+// (#1043), and no other page ever passed it — so ~210 lines of card render
+// and ~100 of scene derivation sat dead behind a prop defaulting to false.
+// check-dead-messages.mjs could not see it, because home.router.*.body were
+// still REFERENCED from this file; those three strings are retired from
+// messages/en-GB.json with this change. The three .title strings STAY —
+// rotating-register-hero.tsx uses them as its slide labels.
 //
-// It matters because this card opens /memorials, and that page now shows
-// her printed card, her reveal and her keepsake. One favpoll runs from
-// the homepage through every object on the page; a flower poll here broke
-// it at the first click.
-//
-// All three are derived now (2026-08-28) — see FUNDRAISER_SCENE below for the
-// last one.
-const MEMORIAL_SCENE = SCENES.find((s) => s.kind === "memorial") ?? SCENES[0]
-const MEMORIAL_RESULTS = MEMORIAL_SCENE.results.slice(0, 3)
-const MEMORIAL_TOPIC = MEMORIAL_SCENE.poll.topic.title.toLowerCase()
-
-// DERIVED NOW, like the memorial above (2026-08-28). The comment below used
-// to end "The other two cards are still literals... unchecked" — and the
-// celebration one had indeed drifted: it showed cake and Barnardo's while
-// /celebrations showed Poppy's ice cream and Great Ormond Street. Same total,
-// different everything else.
-//
-// Derived, the card follows the scene wherever it goes — which it promptly
-// did, twice in a day: cake became holiday destinations, and Barnardo's
-// became WWF. Neither needed an edit here, which is the point.
-const WEDDING_SCENE =
-  SCENES.find((s) => s.occasion_type === "Wedding") ?? SCENES[0]
-const WEDDING_RESULTS = WEDDING_SCENE.results.slice(0, 3)
-const WEDDING_TOPIC = WEDDING_SCENE.poll.topic.title.toLowerCase()
-
-// AND THE THIRD (2026-08-28), which the comment above had flagged as
-// "unchecked" — rightly. It showed Hobnobs and Macmillan, but its total was
-// "£810" and its bars £240 / £190 / £150 at 100 / 79 / 63%: Marcus Bell's
-// total and his top three to the pound and the percent, the same signature
-// the memorial card carried under its flowers. It was always his favpoll;
-// only the labels and the charity had drifted.
-//
-// Now that /fundraisers opens on his marathon and runs it through the poster,
-// the reveal, the display and the keepsake, a biscuit poll here broke that
-// chain at the first click — exactly as the flowers and the cake did.
-//
-// Found by kind, unambiguously: he is the only "fundraiser" scene, where the
-// faceless cause carries kind "cause".
-const FUNDRAISER_SCENE =
-  SCENES.find((s) => s.kind === "fundraiser") ?? SCENES[0]
-const FUNDRAISER_RESULTS = FUNDRAISER_SCENE.results.slice(0, 3)
-const FUNDRAISER_TOPIC = FUNDRAISER_SCENE.poll.topic.title.toLowerCase()
-
-const ROUTER_CARDS = [
-  {
-    kind: "celebration" as const,
-    href: "/celebration",
-    title: t("home.router.celebrations.title"),
-    body: t("home.router.celebrations.body"),
-    topic: WEDDING_TOPIC,
-    more: `+${WEDDING_SCENE.poll.topic.favourites.length - WEDDING_RESULTS.length} more ${WEDDING_TOPIC}s`,
-    charity: WEDDING_SCENE.charities[0]?.name ?? "",
-    charityLogo: WEDDING_SCENE.charities[0]?.logo_url ?? null,
-    total: WEDDING_SCENE.total,
-    results: WEDDING_RESULTS,
-  },
-  {
-    kind: "fundraiser" as const,
-    href: "/fundraiser",
-    title: t("home.router.fundraisers.title"),
-    body: t("home.router.fundraisers.body"),
-    topic: FUNDRAISER_TOPIC,
-    more: `+${FUNDRAISER_SCENE.poll.topic.favourites.length - FUNDRAISER_RESULTS.length} more ${FUNDRAISER_TOPIC}s`,
-    charity: FUNDRAISER_SCENE.charities[0]?.name ?? "",
-    charityLogo: FUNDRAISER_SCENE.charities[0]?.logo_url ?? null,
-    total: FUNDRAISER_SCENE.total,
-    results: FUNDRAISER_RESULTS,
-  },
-  {
-    kind: "memorial" as const,
-    href: "/memorial",
-    title: t("home.router.memorials.title"),
-    body: t("home.router.memorials.body"),
-    topic: MEMORIAL_TOPIC,
-    // Naive plural, correct for "colour" and for every topic title in the
-    // seed that this card could show. A topic whose plural is irregular
-    // would need the noun back as a literal.
-    more: `+${MEMORIAL_SCENE.poll.topic.favourites.length - MEMORIAL_RESULTS.length} more ${MEMORIAL_TOPIC}s`,
-    charity: MEMORIAL_SCENE.charities[0]?.name ?? "",
-    charityLogo: MEMORIAL_SCENE.charities[0]?.logo_url ?? null,
-    total: MEMORIAL_SCENE.total,
-    results: MEMORIAL_RESULTS,
-  },
-] as const
+// Recover the cards from
+// `git show d446dbf6:apps/web/components/landing/hero.tsx`.
 
 // THE STILL'S BEAT (founder, 2026-10-18: "add animation to the homepage
 // hero vignettes, to express the states before and after pledges"). A still
@@ -251,7 +157,7 @@ const ROUTER_CARDS = [
 // chosen; the sheet confirmed — tick, "Pledge confirmed", "£10 for Marie
 // Curie" — and closing; then the lock gone, the bars climbing from zero
 // and the note typing. Existing demo-card phases at roughly the demo
-// loop's own pacing (use-demo-loop.ts), then slowed: ~16s with the
+// loop's own pacing (use-demo-loop.ts), then slowed: ~19.8s with the
 // note typed, inside the carousel's DWELL_MS, which grew to fit. It
 // replays each time the slide comes round (the phase resets while the
 // slide is inactive and invisible). Reduced motion, or a still outside a
@@ -259,16 +165,33 @@ const ROUTER_CARDS = [
 const STILL_BEAT: { phase: Phase; at: number }[] = [
   // Holds lengthened 2026-10-18 ("give the visitor more time to read"):
   // every screen stands for 1.2–2s after its motion settles.
+  //
+  // STEP 1 IS THE OUTLIER, AND IT IS A READING BEAT (founder, 2026-10-21:
+  // "there isn't enough time to read the lock card instructions"). It was
+  // 2650ms, and the About types over 2200 of them, so the card had ~0.45s
+  // of undivided attention to deliver 34 words — a CTA, three numbered
+  // steps and the shared-pot line — which is eight to ten seconds of
+  // reading. Every other step here is WATCHING (a chip highlights, a preset
+  // fills, a tick appears) and 1.2–2s is right for those; this one is the
+  // only place the hero asks anyone to read, and it was the shortest.
+  //
+  // So step 1 holds to 7000 and everything after shifts by the same 4350.
+  // That leaves ~4.8s of still, fully-typed lock card. The cost is the
+  // whole beat, 15.4s → 19.75s, and DWELL_MS grew with it; the founder
+  // weighed a longer cycle and accepted it, because the dots at the band's
+  // foot now carry "there are three of these" and the rotation no longer
+  // has to. Trimming the 10-18 holds to pay for it was offered and not
+  // taken — they are his, and they were not the problem.
   { phase: "arriving", at: 0 }, // 1. locked: the lock card, the About typing
-  { phase: "triggering", at: 2650 }, //    the lock card is pressed
-  { phase: "picking", at: 3000 }, // 2. the picker opens
-  { phase: "selected", at: 4800 }, //    a favourite is chosen
-  { phase: "pledge-panel", at: 6600 }, // 3. the amount step
-  { phase: "amount-picked", at: 7800 }, //    a preset chosen, £ updates
-  { phase: "confirmed", at: 9800 }, // 4. the receipt
-  { phase: "clearing", at: 11600 }, // 5. the sheet slides down onto the live page:
-  { phase: "results", at: 12600 }, //    bars climbing, note typing
-  { phase: "note", at: 15400 }, //    the note stands typed
+  { phase: "triggering", at: 7000 }, //    the lock card is pressed
+  { phase: "picking", at: 7350 }, // 2. the picker opens
+  { phase: "selected", at: 9150 }, //    a favourite is chosen
+  { phase: "pledge-panel", at: 10950 }, // 3. the amount step
+  { phase: "amount-picked", at: 12150 }, //    a preset chosen, £ updates
+  { phase: "confirmed", at: 14150 }, // 4. the receipt
+  { phase: "clearing", at: 15950 }, // 5. the sheet slides down onto the live page:
+  { phase: "results", at: 16950 }, //    bars climbing, note typing
+  { phase: "note", at: 19750 }, //    the note stands typed
 ]
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)"
 function subscribeReducedMotion(onChange: () => void) {
@@ -276,7 +199,17 @@ function subscribeReducedMotion(onChange: () => void) {
   mq.addEventListener("change", onChange)
   return () => mq.removeEventListener("change", onChange)
 }
-function useStillBeat(active: boolean | undefined, scene: HeroScene) {
+// `epoch` is REPLAY (founder, 2026-10-21). `active` alone cannot express
+// "show me that one again": pressing the carousel's lit dot leaves the live
+// slide live, so nothing in these deps moved and the beat ran on — while the
+// dwell restarted, so the slide stood on its finished frame for a second full
+// dwell (measured: the turn came at 43.3s instead of 23.5). Any manual move
+// bumps the epoch, so the same-slide case restarts here like every other.
+function useStillBeat(
+  active: boolean | undefined,
+  scene: HeroScene,
+  epoch?: number
+) {
   const reduced = useSyncExternalStore(
     subscribeReducedMotion,
     () => window.matchMedia(REDUCED_MOTION_QUERY).matches,
@@ -298,7 +231,7 @@ function useStillBeat(active: boolean | undefined, scene: HeroScene) {
       window.setTimeout(() => setPhase(step.phase), step.at)
     )
     return () => timers.forEach((t) => window.clearTimeout(t))
-  }, [plays, active])
+  }, [plays, active, epoch])
   const final = scene.results.map((r) => r.widthPercent)
   // Zero until "results", so the bars climb from nothing at disclosure.
   const climbed = phase === "results" || phase === "note"
@@ -325,10 +258,10 @@ export function LandingHero({
   ctaHref,
   ctaSecondaryLabel,
   bandClassName,
-  router = false,
   still = false,
   compact = false,
   stillActive,
+  stillEpoch,
   ctaAfterMedia = false,
   children,
 }: Props) {
@@ -352,7 +285,7 @@ export function LandingHero({
     useDemoLoop(scenes)
   const beat = beatForPhase(phase)
   // The still phone's own beat (unused by the animated demo above).
-  const stillBeat = useStillBeat(stillActive, scene)
+  const stillBeat = useStillBeat(stillActive, scene, stillEpoch)
 
   const ctas = (
     <div className="flex flex-wrap items-center gap-x-5 gap-y-3.5">
@@ -399,7 +332,7 @@ export function LandingHero({
           lands: a celebrant or a hospice forwards the link. They now
           pass their own label.
           Ghost in BAND ink — a wash and ring of the band's own
-          foreground, the router cards' idiom — so it reads as the
+          foreground, the retired router cards' idiom — so it reads as the
           quieter of the two without vanishing when the theme flips.
           THE BORDER IS BACK (founder, 2026-09-18: "I'm tempted to make
           See how it works an outline for visibility") — a KNOWING
@@ -429,7 +362,7 @@ export function LandingHero({
           here until hover, so it only rendered the wash lopsided, 24
           left against 8 right. Same variant, same property, declared
           after, so it wins. */}
-      {(router || ctaSecondaryLabel) && (
+      {ctaSecondaryLabel && (
         <Button
           asChild
           size="lg"
@@ -455,7 +388,7 @@ export function LandingHero({
                 ?.scrollIntoView({ behavior: "smooth" })
             }}
           >
-            {ctaSecondaryLabel ?? t("landing.cta.secondary")}
+            {ctaSecondaryLabel}
             <ArrowDown data-icon="inline-end" aria-hidden="true" />
           </Link>
         </Button>
@@ -509,45 +442,36 @@ export function LandingHero({
           // width, and md:max-w-330 still governs above.
           //
           // The cost, accepted: between 640 and 767 the content is no longer
-          // capped at 400, so the router cards stretch to the full padded
-          // width. That is what every other band does there, and md brings the
-          // two-column layout in at 768 regardless.
+          // capped at 400 and stretches to the full padded width. That is what
+          // every other band does there, and md brings the two-column layout
+          // in at 768 regardless.
           "relative mx-auto grid w-full gap-8 px-6 py-10 md:max-w-330",
-          router
-            ? // ROW (founder, 2026-08-05): statement on top, three doors
-              // across the bottom. The cards don't change size doing this —
-              // each was already a third of the container — so this is purely
-              // a restacking, and above md the band's min-height governs, so
-              // the hero height is identical at 1440 and up. py is a floor,
-              // not a look: the content is centred inside the min-height, so
-              // it only shows on a short viewport, where it buys the fit.
-              "md:grid-cols-1 md:gap-y-8 md:py-8"
-            : still
-              ? // STILL: ONE ROW. The demo layout is grid-rows-[auto_auto]
-                // with the media spanning both, which works when the stats
-                // occupy row 2. A register page hides the stats, so row 2 is
-                // empty, the pitch sits in row 1 alone, and items-center
-                // centres it against nothing — every pixel of slack fell
-                // below the text while the phone ran on past it. One row
-                // makes the two columns siblings, so they centre against
-                // each other. The media track is `auto`: the phone is a
-                // fixed chassis and must not be squeezed by a 1fr share.
-                inCarousel
-                ? "md:grid-cols-5 md:items-center md:gap-x-6 md:py-12"
-                : "md:grid-cols-[1fr_auto] md:items-center md:gap-x-12 md:py-12"
-              : // COLUMN: the demo hero the register pages mount — the demo
-                // card is 400px, so the last-of-three column still holds it.
-                // minmax, NOT the bare third (2026-08-22). The demo card is a
-                // FIXED 400px and a grid item cannot shrink below its
-                // min-content, so whenever a third of the container came to
-                // less than 400 — which is every width below about 1300 — the
-                // column refused to shrink and the whole PAGE grew instead.
-                // Measured before: +157px of horizontal scroll at 768, +72 at
-                // 1024, +20 at 1180, on all three register pages.
-                // The floor is the card's own width; above ~1300 the third is
-                // wider and takes over, so the three-column rhythm the original
-                // was reaching for is unchanged where it was ever achieved.
-                "md:grid-cols-[1fr_minmax(25rem,calc((100%-4rem)/3))] md:grid-rows-[auto_auto] md:items-center md:gap-x-12 md:gap-y-8 md:py-12"
+          still
+            ? // STILL: ONE ROW. The demo layout is grid-rows-[auto_auto]
+              // with the media spanning both, which works when the stats
+              // occupy row 2. A register page hides the stats, so row 2 is
+              // empty, the pitch sits in row 1 alone, and items-center
+              // centres it against nothing — every pixel of slack fell
+              // below the text while the phone ran on past it. One row
+              // makes the two columns siblings, so they centre against
+              // each other. The media track is `auto`: the phone is a
+              // fixed chassis and must not be squeezed by a 1fr share.
+              inCarousel
+              ? "md:grid-cols-5 md:items-center md:gap-x-6 md:py-12"
+              : "md:grid-cols-[1fr_auto] md:items-center md:gap-x-12 md:py-12"
+            : // COLUMN: the demo hero the register pages mount — the demo
+              // card is 400px, so the last-of-three column still holds it.
+              // minmax, NOT the bare third (2026-08-22). The demo card is a
+              // FIXED 400px and a grid item cannot shrink below its
+              // min-content, so whenever a third of the container came to
+              // less than 400 — which is every width below about 1300 — the
+              // column refused to shrink and the whole PAGE grew instead.
+              // Measured before: +157px of horizontal scroll at 768, +72 at
+              // 1024, +20 at 1180, on all three register pages.
+              // The floor is the card's own width; above ~1300 the third is
+              // wider and takes over, so the three-column rhythm the original
+              // was reaching for is unchanged where it was ever achieved.
+              "md:grid-cols-[1fr_minmax(25rem,calc((100%-4rem)/3))] md:grid-rows-[auto_auto] md:items-center md:gap-x-12 md:gap-y-8 md:py-12"
         )}
       >
         {/* Pitch (headline + CTA). Stats are a separate cell below, so on
@@ -556,7 +480,7 @@ export function LandingHero({
           className={cn(
             "min-w-0",
             inCarousel && "md:col-span-3",
-            !router && !still && "md:col-start-1 md:row-start-1"
+            !still && "md:col-start-1 md:row-start-1"
           )}
         >
           {/* Single, register-agnostic headline — names the three-beat
@@ -600,8 +524,7 @@ export function LandingHero({
               // beat wraps to exactly two lines — 446-595px is the window
               // where the widest beat (892) does not reach three and the
               // narrowest (595) does not stay on one.
-              sceneKind ? "max-w-[33.75rem]" : "max-w-3xl",
-              router && "2xl:text-6xl"
+              sceneKind ? "max-w-[33.75rem]" : "max-w-3xl"
             )}
           >
             {/* REGISTER HEADLINES DIM AFTER THE FIRST SENTENCE (founder,
@@ -634,7 +557,7 @@ export function LandingHero({
               invariant ? "mb-3" : "mb-8",
               "text-lg leading-relaxed opacity-80",
               // The subheader must not be WIDER than the headline above it.
-              sceneKind ? "max-w-xl" : router ? "max-w-2xl" : "max-w-md"
+              sceneKind ? "max-w-xl" : "max-w-md"
             )}
           >
             {subheader ?? t("landing.subheader")}
@@ -646,7 +569,7 @@ export function LandingHero({
             <p
               className={cn(
                 "mb-8 text-base leading-relaxed font-medium",
-                sceneKind ? "max-w-xl" : router ? "max-w-2xl" : "max-w-md"
+                sceneKind ? "max-w-xl" : "max-w-md"
               )}
             >
               {invariant}
@@ -668,7 +591,7 @@ export function LandingHero({
         <div
           className={cn(
             inCarousel && "md:col-span-2",
-            !router && !still && "md:col-start-2 md:row-span-2 md:row-start-1"
+            !still && "md:col-start-2 md:row-span-2 md:row-start-1"
           )}
         >
           {still ? (
@@ -705,216 +628,6 @@ export function LandingHero({
                 </PhoneFrame>
               </div>
             </div>
-          ) : router ? (
-            /* Register router — one card per register, its accent as the
-               top rule; the demo lives on the page each card opens. */
-            <nav
-              aria-label="Explore favpoll by occasion"
-              className="grid gap-4 md:grid-cols-3 md:gap-8"
-            >
-              {ROUTER_CARDS.map((card) => (
-                <Link
-                  key={card.kind}
-                  href={card.href}
-                  data-register={card.kind}
-                  className={cn(
-                    // WHITE, WITH THE REGISTER AS INK (founder, 2026-08-31:
-                    // "make them white with their brand colors as text,
-                    // similar to how the header behaves on the white
-                    // background, with tinted background on hover"). One
-                    // remap does it (the register-ink utility in globals.css):
-                    // inside the card --primary-foreground IS the register's
-                    // --primary, so every inner class that
-                    // took band ink (text-primary-foreground/75, the bars'
-                    // band tone, the ring) now takes purple, magenta or
-                    // green on white without being touched. Hover is the
-                    // register's --accent tint, the header's ghost hover. In
-                    // dark the scope's --primary is near-white and its
-                    // --background the register's dark page, so the card is
-                    // near-white with that as ink — the same picture,
-                    // inverted the way the pages invert. Glass (2026-08-05),
-                    // tinted glass and a solid band were all rendered on
-                    // #588 before this. ring, not border, so nothing fights
-                    // the accent's border-t-4.
-                    // No accent top rule (founder, 2026-08-05) — the register
-                    // reads from the card's own palette: the dot, the bars,
-                    // and in dark the ink.
-                    // QUIETER (founder, 2026-08-31: "too two-tone — only the
-                    // headers and ranking bars should be in the branding
-                    // colour"). The root keeps the ink remap for the title
-                    // line and the bars; body, topic header and footer are
-                    // overridden to neutral greys in light. Dark keeps the
-                    // full ink scheme untouched — there the card is the
-                    // near-white block with the register as ink, and the
-                    // neutral tokens would vanish against it.
-                    "group register-ink @container block rounded-xl bg-background p-5 text-primary-foreground shadow-sm ring-1 ring-border transition-all hover:bg-accent motion-safe:hover:-translate-y-0.5 dark:bg-primary dark:ring-primary-foreground/20 dark:hover:bg-chart-1"
-                  )}
-                >
-                  {/* Two columns inside the card (founder, 2026-08-05):
-                      the register's text one side, its poll — the
-                      product's core — the other. Scene-sourced, accent
-                      bars, charity + total beneath. */}
-                  {/* Top-aligned (founder, 2026-08-05): the register label and
-                      the topic header then share a top line across the two
-                      columns. Centred, the shorter text column floated below
-                      the topic header and nothing lined up.
-
-                      A CONTAINER query, not a viewport one: the interior has
-                      to answer to the CARD's width, which varies with the
-                      layout and with browser zoom. Keyed to the viewport it
-                      spilled — plain 1fr tracks have min-width:auto, so the
-                      poll could not shrink below its 147px min-content and
-                      burst the card by up to 69px between 768 and 950px (and
-                      at zoom, which is how this was found). minmax(0,…) stops
-                      the burst; the 21rem threshold stacks the interior
-                      before the columns get too mean to read. */}
-                  <div className="flex h-full flex-col gap-5 @min-[21rem]:grid @min-[21rem]:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] @min-[21rem]:items-start">
-                    <div>
-                      {/* The register accent is a DOT, not the ink (the
-                          matrix's grammar). Measured 2026-08-05: as text the
-                          accents fail on every surface we have — gold on the
-                          old white card was 2.14:1, and blue on the dark
-                          theme's purple card 1.95:1. As a dot beside full
-                          band ink the register still reads and the label is
-                          legible. */}
-                      {/* Inline, not a flex child: a long title
-                          wraps to two lines in this column, and a flex dot
-                          centres itself across both. Inline keeps it on the
-                          first line where it reads as a bullet. */}
-                      {/* leading-5 + mb-1.5 puts this column on the poll's
-                          rhythm (founder, 2026-08-05): the same 20px line box
-                          as the topic header, so the two headers share a
-                          baseline rather than just a top edge (12px/16px vs
-                          14px/20px left them ~3px out), and the same 8px gap
-                          the poll uses, so the body starts level with the
-                          first ranking row. */}
-                      <p className="mb-2 text-xs leading-5 font-medium tracking-widest uppercase">
-                        <span
-                          aria-hidden="true"
-                          className={cn(
-                            "mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-primary align-middle dark:bg-primary-foreground"
-                          )}
-                        />
-                        {card.title}
-                      </p>
-                      <p className="text-sm leading-relaxed text-muted-foreground dark:text-primary-foreground/75">
-                        {card.body}
-                      </p>
-                    </div>
-                    {/* Stacked, the bodies run 3 or 4 lines depending on the
-                        register, which left each card's poll starting at a
-                        different height. mt-auto pins the poll to the foot of
-                        the card so the three polls line up across the row
-                        (the cards are equal height already — grid stretch).
-                        Cancelled in two-column mode, where the poll is its
-                        own column and must stay top-aligned with the label. */}
-                    <div
-                      aria-hidden="true"
-                      // The band-tone bars take their label/amount ink and
-                      // track from --primary-foreground, which register-ink
-                      // remapped to the register colour — so the text
-                      // matched the bars (founder, 2026-08-31: it
-                      // shouldn't). Re-point the variable to the neutral
-                      // foreground for this column in light; the bars keep
-                      // their chart fill. Dark restates register-ink's own
-                      // value, so nothing changes there.
-                      className="pointer-events-none mt-auto space-y-1.5 select-none [--primary-foreground:var(--foreground)] @min-[21rem]:mt-0 dark:[--primary-foreground:var(--background)]"
-                    >
-                      {/* text-sm, a step above the register label (founder,
-                          2026-08-05): the poll is the product's core, so its
-                          question shouldn't be the smallest thing on the
-                          card. */}
-                      {/* Broken after "Favourite" on EVERY card (founder,
-                          2026-08-31): left to wrap naturally, two of the
-                          three topics broke and one didn't, so the first
-                          ranking row started at three different heights
-                          across the row. A deliberate two-line header is
-                          uniform whatever the exemplar topic. The first
-                          line sits quieter so the topic word leads. */}
-                      <p className="pb-0.5 text-sm font-medium tracking-[0.09em] text-muted-foreground uppercase dark:text-primary-foreground/70">
-                        <span className="block text-muted-foreground/55 dark:text-primary-foreground/45">
-                          Favourite
-                        </span>
-                        {card.topic}
-                      </p>
-                      {card.results.map((r) => (
-                        <RankingBar
-                          key={r.label}
-                          label={r.label}
-                          amount={r.amount}
-                          widthPercent={r.widthPercent}
-                          barClassName="bg-chart-2 dark:bg-chart-4"
-                          tone="band"
-                        />
-                      ))}
-                      {/* The three bars are a TOP three, and the total is the
-                          whole favpoll's — without this line the figures read
-                          as a column that doesn't add up (£735 shown against
-                          £1,005). The gap is real and correct: more items sit
-                          below, and every favpoll's shared pot takes pledges
-                          that attach to no favourite, so a total can never be
-                          just the sum of its visible rows. */}
-                      <p className="text-xs text-muted-foreground dark:text-primary-foreground/55">
-                        {card.more}
-                      </p>
-                      {/* Where it all goes — charity + running total. No rule
-                          above it (founder, 2026-08-05); the spacing carries
-                          the break. */}
-                      {/* items-center, not items-baseline (2026-08-31): with
-                          the avatar in the row it reads as a media row, and
-                          the tile has no baseline to align to. */}
-                      <div className="flex items-center justify-between gap-2 pt-1.5 text-sm">
-                        {/* text-xs on the charity alone (2026-08-28). The row
-                            was uniform text-sm, which held while both names
-                            were short — "Marie Curie", "WWF-UK" — and broke
-                            the day the fundraiser card started deriving its
-                            own: "British Heart Foundation" needed 159px at
-                            14px and the column gives 133–159 depending on how
-                            the grid is folded, so it truncated mid-word at
-                            three of five widths. At 12px it needs 136 and
-                            fits at every one.
-                            Truncate stays as the fallback — real charity
-                            names run to "Great Ormond Street Hospital
-                            Children's Charity" and nothing sizes for that —
-                            but the card's own exemplar should not need it.
-                            items-baseline, not items-center: two type sizes
-                            on one row centre-align to nothing, and the
-                            baseline is what the eye reads them along. */}
-                        <span className="flex min-w-0 items-center gap-1.5">
-                          {/* CharityRow's avatar idiom: the logo, or the
-                              initial in a primary-tinted tile — which takes
-                              the register hue here, as it does on the
-                              register pages. Dark swaps to the ink tokens:
-                              on the near-white card, primary itself is
-                              near-white. */}
-                          {card.charityLogo ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={card.charityLogo}
-                              alt=""
-                              className="h-6 w-6 shrink-0 rounded object-contain"
-                            />
-                          ) : (
-                            <span
-                              aria-hidden="true"
-                              className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-primary/10 text-xs font-medium text-primary dark:bg-primary-foreground/10 dark:text-primary-foreground"
-                            >
-                              {card.charity.charAt(0)}
-                            </span>
-                          )}
-                          <span className="min-w-0 truncate text-xs text-muted-foreground dark:text-primary-foreground/70">
-                            {card.charity}
-                          </span>
-                        </span>
-                        <span className="shrink-0 font-medium text-foreground dark:text-primary-foreground">
-                          {card.total}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </nav>
           ) : (
             <>
               <span className="sr-only">
@@ -1017,15 +730,15 @@ export function LandingHero({
             how it works" do not share a 390px row without shrinking. */}
         {ctaAfterMedia && <div className="md:hidden">{ctas}</div>}
 
-        {/* In row mode the stats take the cards' own three columns and gutter
-            (founder, 2026-08-05), so each figure sits under a card instead of
-            floating on its own spacing. The demo hero keeps the flex row —
-            there the stats live in the narrow pitch column. */}
+        {/* A flex row: the stats live in the narrow pitch column. The row
+            variant — three columns on the register router cards' own gutter,
+            so each figure sat under a card (founder, 2026-08-05) — went with
+            the cards on 2026-10-21. */}
         {!hideStats && (
           <dl
             className={cn(
               "gap-y-6 border-t border-primary-foreground/20 pt-8",
-              router ? "grid grid-cols-3 gap-x-8" : "flex flex-wrap gap-x-14"
+              "flex flex-wrap gap-x-14"
             )}
           >
             <div>

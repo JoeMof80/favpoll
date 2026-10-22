@@ -1,6 +1,6 @@
 # Component Tree
 
-Generated 2026-10-20 by `node scripts/component-tree.mjs` — do not edit by hand; rerun it (CI: `--check`).
+Generated 2026-10-21 by `node scripts/component-tree.mjs` — do not edit by hand; rerun it (CI: `--check`).
 
 ## Legend
 
@@ -128,14 +128,13 @@ app/celebration/page.tsx
       → components/landing/use-demo-loop.ts
           → components/hero-demo-panel/scenes.ts *  ↑
       → components/ui/button.tsx *
-      → components/ui/ranking-bar.tsx *
   → components/landing/how-it-works-hints.tsx
       → components/charity-row.tsx *  ↑
       → components/hero-demo-panel/scenes.ts *  ↑
       → components/landing/demo-fixture.ts  ↑
       → components/pledge-card/pledge-breakdown.tsx *
       → components/ui/button.tsx *  ↑
-      → components/ui/ranking-bar.tsx *  ↑
+      → components/ui/ranking-bar.tsx *
       → packages/types/ *
   → components/landing/how-it-works-steps.tsx
       → components/landing/how-it-works-hints.tsx  ↑
@@ -727,14 +726,13 @@ app/fundraiser/page.tsx
       → components/landing/use-demo-loop.ts
           → components/hero-demo-panel/scenes.ts *  ↑
       → components/ui/button.tsx *
-      → components/ui/ranking-bar.tsx *
   → components/landing/how-it-works-hints.tsx
       → components/charity-row.tsx *  ↑
       → components/hero-demo-panel/scenes.ts *  ↑
       → components/landing/demo-fixture.ts  ↑
       → components/pledge-card/pledge-breakdown.tsx *
       → components/ui/button.tsx *  ↑
-      → components/ui/ranking-bar.tsx *  ↑
+      → components/ui/ranking-bar.tsx *
       → packages/types/ *
   → components/landing/how-it-works-steps.tsx
       → components/landing/how-it-works-hints.tsx  ↑
@@ -894,7 +892,6 @@ app/memorial/page.tsx
       → components/landing/use-demo-loop.ts
           → components/hero-demo-panel/scenes.ts *  ↑
       → components/ui/button.tsx *
-      → components/ui/ranking-bar.tsx *
   → components/landing/how-it-works-steps.tsx
       → components/landing/how-it-works-hints.tsx  ↑
   → components/landing/ideas-section.tsx
@@ -1284,7 +1281,6 @@ components/landing/hero.tsx
   → components/landing/use-demo-loop.ts
       → components/hero-demo-panel/scenes.ts *  ↑
   → components/ui/button.tsx *
-  → components/ui/ranking-bar.tsx *
 ```
 
 ### `components/landing/keepsake-vignette.tsx` — used by 4
@@ -1599,7 +1595,7 @@ components/ui/input-group.tsx  ← 11
 components/ui/input.tsx *  ← 6
 components/ui/label.tsx  ← 1
 components/ui/popover.tsx  ← 5
-components/ui/ranking-bar.tsx *  ← 6
+components/ui/ranking-bar.tsx *  ← 5
 components/ui/responsive-overlay.tsx *  ← 12
 components/ui/section-eyebrow.tsx *  ← 21
 components/ui/segmented-control.tsx *  ← 6
