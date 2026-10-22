@@ -110,7 +110,9 @@ export type HeroScene = {
 // charities"): each charity's own published mark, taken from its site —
 // Marie Curie's daffodil (its favicon), WWF's panda (its logo), Mind's
 // squiggle, GOSH's child and St Luke's fountain (their touch icons) —
-// served from public/demo. STAGING AND DEV ONLY (founder, same day: "this
+// served from public/demo. St Luke's is kept but UNUSED since 2026-10-22,
+// when the cause scene went back to a fictional hospice (see its note); it
+// is here for the day they say yes. STAGING AND DEV ONLY (founder, same day: "this
 // needs to be staging only"): they are the charities' trademarks and none
 // of them has agreed to anything with favpoll yet, so production (the
 // NEXT_PUBLIC_DEMO_MARKS flag next.config.mjs sets from VERCEL_ENV) shows
@@ -588,7 +590,7 @@ export const SCENES: HeroScene[] = [
     //    charity (mirrors the live subject="cause" shape). ──
     kind: "cause",
     occasion_type: "Cause",
-    // "Walkies for St Luke's" (2026-08-31, founder asked for a better
+    // "Walkies for St Mark's Hospice" (2026-08-31, founder asked for a better
     // opening line than the register's "In support of"). The word every dog
     // in Britain knows, and it makes the card, the wallet card and the
     // keepsake all say what the event is before the context line does. The
@@ -609,13 +611,20 @@ export const SCENES: HeroScene[] = [
     // a number and a logo_url.
     //
     // THE HEADING IS THE CAUSE, the context is the event. "Walking for St
-    // Luke's" rendered as "In support of / Walking for St Luke's" — the
+    // Mark's" rendered as "In support of / Walking for St Mark's" — the
     // register prefix doubled the verb.
-    // ST LUKE'S CHESHIRE HOSPICE, the founder's local hospice and a real
-    // prospect (2026-10-19: "Switch St Mark's to St Luke's"), replacing the
-    // fictional St Mark's. Registered 515595, so the card prints a real
-    // number; its mark is staging-only like the others.
-    heading: "St Luke's Cheshire Hospice",
+    //
+    // ST LUKE'S CHESHIRE HOSPICE WAS HERE 2026-10-19 → 2026-10-22, and the
+    // revert is the rule above being applied rather than changed. The
+    // founder opened the conversation on 2026-10-22 — an enquiries email, a
+    // call with their events team — and the call ended with "someone will
+    // get to the enquiries inbox". So a link to favpoll.com was about to
+    // take that same person to a homepage naming her charity, with their
+    // real number 515595 on the card, before anyone there had agreed to it.
+    // A fundraiser reads that as implied association, which is the one thing
+    // a charity has to police. Permission is a new-year ask, from a
+    // relationship; until it is given the scene wears the made-up hospice.
+    heading: "St Mark's Hospice",
     eyebrow: "A cause",
     // No distance (founder, 2026-08-31): "· 5 miles" wrapped the context
     // line on a phone and added nothing the walk needs.
@@ -625,7 +634,7 @@ export const SCENES: HeroScene[] = [
       // "every penny" → "every pledge" (founder, 2026-10-15): the retired
       // completeness claim, even in a fictional organiser's mouth, sits on
       // favpoll's own landing page.
-      "5 miles for our local hospice. Pledge your favourite biscuit and every pledge goes to St Luke’s.",
+      "5 miles for our local hospice. Pledge your favourite biscuit and every pledge goes to St Mark’s.",
     // BISCUIT, THE THERAPY DOG. A faceless cause has no avatar on the real
     // page unless it uploads one; this one has the thing itself — a beagle
     // mid-walk — which says "sponsored dog walk" before a word is read and
@@ -684,10 +693,12 @@ export const SCENES: HeroScene[] = [
     },
     charities: [
       {
-        id: "ch-stlukes",
-        name: "St Luke's Cheshire Hospice",
-        logo_url: mark("/demo/logo-st-lukes.png"),
-        registered_number: "515595",
+        // Fictional (see the scene note): no number, because the card prints
+        // it and a made-up charity number is worse than none.
+        id: "ch-stmarks",
+        name: "St Mark's Hospice",
+        logo_url: null,
+        registered_number: null,
       },
     ],
     // Hobnob — the runner-up in the standings, so the pick the demo makes is
