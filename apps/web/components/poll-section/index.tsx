@@ -46,6 +46,12 @@ type Props = {
   onOpenStory?: () => void
   hasPledged: boolean
   pledgeJustConfirmed?: boolean
+  /** The sheet read the note out on its way off screen; the page shows it
+   *  standing. pledgeJustConfirmed stays true — it is what flips the view
+   *  to the standings — so this is a separate flag, not its absence. */
+  noteAlreadyRead?: boolean
+  /** The pledge sheet has gone; play the standings' climb. */
+  barsClimb?: boolean
   protagonistName: string
   /** True for cause-type favpolls — suppresses the protagonist name in the unlock copy */
   isCause: boolean
@@ -93,6 +99,8 @@ export function PollSection({
   isClosed,
   hasPledged,
   pledgeJustConfirmed,
+  noteAlreadyRead = false,
+  barsClimb = false,
   protagonistName,
   isCause,
   isOrganiser,
@@ -309,7 +317,7 @@ export function PollSection({
             <div className="pb-2">
               <TypedNote
                 text={personalNote}
-                active={pledgeJustConfirmed ?? false}
+                active={(pledgeJustConfirmed ?? false) && !noteAlreadyRead}
                 protagonistFirstName={personFirstName}
                 mentions={noteMentions}
               />
@@ -326,6 +334,7 @@ export function PollSection({
                 topicId={poll.topic_id}
                 rankingView={rankingView}
                 isOrganiser={isOrganiser}
+                climb={barsClimb}
               />
             </>
           ) : (

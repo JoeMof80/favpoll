@@ -13,6 +13,8 @@ import type {
 import { useFavpollContent } from "./use-favpoll-content"
 import { MobileCharityFooter } from "./mobile-charity-footer"
 import { FavpollSheet, type SheetViewer } from "@/components/favpoll-sheet"
+import { noteMentions as buildNoteMentions } from "@/lib/note-mentions"
+import { protagonistShortName } from "@/lib/display"
 
 // THE GUEST LAYER (2026-09-30): the favpoll page in a guest's hand. The
 // sheet (components/favpoll-sheet) is the favpoll as anyone sees it; this
@@ -91,6 +93,9 @@ export function FavpollContent({
 
   const {
     handlePledgeSuccess,
+    markPledgeFlowDone,
+    noteReadOnSheet,
+    pledgeFlowDone,
     pledgeConfirmed,
     addItemHandler,
     handleViewChange,
@@ -137,6 +142,19 @@ export function FavpollContent({
         pot={pot}
         userPotAllocation={userPotAllocation}
         onPledgeSuccess={handlePledgeSuccess}
+        // The sheet reads the note out before it leaves, so it needs the
+        // same tinting the page gives it (lib/note-mentions) and tells the
+        // page afterwards, which then shows the note standing.
+        noteMentions={buildNoteMentions(
+          favpoll,
+          pollWithItems,
+          (pickerPoll ?? pollWithItems).topics.favourites
+        )}
+        protagonistFirstName={protagonistShortName(
+          favpoll.protagonists?.name ?? ""
+        )}
+        charities={favpoll.favpoll_charities.map((ec) => ec.charities)}
+        onPledgeFlowDone={markPledgeFlowDone}
         // Withheld when the organiser has turned guest additions off. The
         // server action checks this too — hiding a control is not a
         // permission check.
@@ -160,6 +178,8 @@ export function FavpollContent({
     hasNote,
     items: effectiveItems,
     pledgeJustConfirmed: pledgeConfirmed,
+    noteAlreadyRead: noteReadOnSheet,
+    barsClimb: pledgeFlowDone,
     onViewChange: handleViewChange,
     onOpenPledgeDialog:
       !isClosed && !pledgesGated ? () => setPledgeDialogOpen(true) : undefined,

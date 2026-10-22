@@ -3,10 +3,14 @@
 import { useEffect, useRef, useState } from "react"
 import { LockCardContent } from "@/components/lock-card-content"
 import { FavpollLogo } from "@/components/favpoll-logo"
-import { FavpollMarkGlyph } from "@/components/landing/hero-texture"
+import {
+  FavpollMarkGlyph,
+  MonogramWash,
+} from "@/components/landing/hero-texture"
 import { Chip } from "@/components/ui/chip"
 import { PHONE_SAFE_AREA_TOP } from "./phone-frame"
 import { CharityRow } from "@/components/charity-row"
+import { PledgeConfirmedHead } from "@/components/pledge-receipt"
 import { GoalProgress } from "@/components/goal-progress"
 import { buildMechanicSteps } from "@/lib/mechanic-steps"
 import { AnimatePresence, motion } from "framer-motion"
@@ -237,20 +241,39 @@ export function DemoCard({
   // notes on the home hero's beat): at "clearing" the lock card is already
   // gone — it leaves in 0.25s under the sheet — and the page beneath is
   // ALREADY ALIVE: the standings fade in with the bars climbing and the
-  // note typing while the sheet slides down to reveal them, as a real
-  // sheet reveals an updated page. A cut that held an empty page for a
+  // note ALREADY TYPED while the sheet slides down to reveal them, as a
+  // real sheet reveals an updated page. A cut that held an empty page for a
   // second before the standings arrived was built and felt worse.
+  //
+  // The 2026-10-18 ruling said "and the note typing"; only that clause has
+  // changed (2026-10-22). The note is read on the sheet now, so what the
+  // sliding sheet reveals is a page that already holds it — the page is
+  // still alive underneath, which is the part of the ruling that mattered.
   const unlocked =
     phase === "clearing" || phase === "results" || phase === "note"
   const locked = !unlocked
   const disclosed = unlocked
 
-  // About types on arrival; the reveal types at disclosure. They never overlap.
+  // About types on arrival; the note types ON THE SHEET at "confirmed". They
+  // never overlap.
   const aboutShown = useTyped(aboutText, locked, prefersReducedMotion, 2200)
-  const revealActive = phase === "clearing" || phase === "results"
+  // THE NOTE MOVED ONTO THE SHEET (2026-10-22), following the real page
+  // rather than leading it. It used to type on the page beneath, during
+  // "clearing" and "results" — beside climbing bars — and the product now
+  // reads it out on the sheet, alone, before the page is revealed at all
+  // (components/pledge-dialog/step-confirmed.tsx, whose own note says the
+  // reason: "the note had to compete with climbing bars when both landed in
+  // one commit; here there is nothing to compete with"). Same divergence as
+  // the receipt the demo drew before the product had one, and the bars it
+  // climbed before the real ones did.
+  //
+  // ONE typed value serves both surfaces, which is what keeps them honest:
+  // useTyped returns the full text whenever it is not active, so the moment
+  // the sheet leaves the page simply HAS the note — no second typing, which
+  // is exactly what the real page does once noteAlreadyRead is set.
   const revealShown = useTyped(
     noteText,
-    revealActive,
+    confirmedInDialog,
     prefersReducedMotion,
     1900
   )
@@ -702,49 +725,54 @@ export function DemoCard({
                     transition={{ duration: 0.45 }}
                     className="flex min-h-0 flex-1 flex-col"
                   >
-                    {/* A RECEIPT THAT LEADS INTO THE REVEAL (founder,
-                        2026-10-19: "it feels weak. Should we replace the
-                        tick with the favpoll brandmark?"). The mark in a
-                        register-ink circle — favpoll did this — with the
-                        status in words; the pledge as two REAL rows, the
-                        favourite as the picker's own chip and the charity
-                        as the real charity row with the amount. No button
-                        (founder: "get rid of the button") — the sheet
-                        simply slides away onto the reveal. */}
-                    <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-5 px-6 py-6 text-center">
-                      <div className="flex size-16 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                        <svg
-                          viewBox="0 0 10 9"
-                          className="size-8"
-                          aria-hidden="true"
-                        >
-                          <FavpollMarkGlyph />
-                        </svg>
+                    {/* THE SAME COMPOSITION the guest's sheet ends on
+                        (components/pledge-dialog/step-confirmed.tsx): the
+                        confirmation at the top, the topic in PollHeading's
+                        grammar, and the note on a monogram wash at the
+                        optical centre — balanced by an invisible copy of the
+                        head, exactly as the real sheet balances it.
+
+                        NO RECEIPT ROWS (founder, 2026-10-23). They were here
+                        from 2026-10-19 and reached the product on the 22nd;
+                        both lost them on the 23rd, when a real pledge on a
+                        phone showed the note was unheld rather than
+                        uncrowded. Texture holds it now.
+
+                        The demo composes the pieces rather than rendering
+                        StepConfirmed itself: that one owns its own clock and
+                        ends by dismissing a real sheet, where this is driven
+                        by the beat in landing/hero.tsx. */}
+                    <div className="relative flex min-h-0 flex-1 flex-col">
+                      <div className="shrink-0 px-6 pt-6">
+                        <PledgeConfirmedHead />
                       </div>
-                      <SectionEyebrow>Pledge confirmed</SectionEyebrow>
-                      <div className="w-full space-y-4 text-left">
-                        <div className="flex items-center justify-between gap-3">
-                          <span className="text-sm text-muted-foreground">
-                            Your favourite {topicTitle.toLowerCase()}
-                          </span>
-                          <Chip
-                            selected
-                            tabIndex={-1}
-                            className="pointer-events-none"
-                          >
-                            {selected?.label}
-                          </Chip>
+                      <div className="relative flex min-h-0 flex-1 flex-col justify-center gap-4 px-6 py-4">
+                        <MonogramWash id="demo-ceremony-note" />
+                        <div className="relative">
+                          <PollHeading topicTitle={topicTitle} />
                         </div>
-                        <CharityRow
-                          charity={{
-                            ...charity,
-                            description: null,
-                            created_at: "2024-01-01T00:00:00Z",
-                          }}
-                          amountRaised={Number(
-                            scene.pledgeAmount.replace(/[^\d.]/g, "")
-                          )}
-                        />
+                        {/* Reserve the final height so the note does not walk
+                            up the sheet as it types. */}
+                        <div className="relative">
+                          <div className="invisible" aria-hidden="true">
+                            <PollNote
+                              personalNote={noteText}
+                              protagonistFirstName={firstName ?? undefined}
+                            />
+                          </div>
+                          <div className="absolute inset-0">
+                            <PollNote
+                              personalNote={revealShown || "\u00A0"}
+                              protagonistFirstName={firstName ?? undefined}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        className="invisible shrink-0 px-6 pb-6"
+                        aria-hidden="true"
+                      >
+                        <PledgeConfirmedHead />
                       </div>
                     </div>
                   </motion.div>

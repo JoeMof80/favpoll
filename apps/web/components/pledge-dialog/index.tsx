@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import type {
+  Charity,
   FavpollPollWithItems,
   FavpollPot,
   PotAllocation,
@@ -17,7 +18,9 @@ import {
 import { StepAmount, StepAmountHeader } from "./step-amount"
 import { StepPay } from "./step-pay"
 import { StepGuestBook } from "./step-guest-book"
+import { StepConfirmed } from "./step-confirmed"
 import { PollHeading } from "../poll-heading"
+import type { MentionTarget } from "@/lib/mentions"
 
 type Props = {
   favpollId: string
@@ -27,7 +30,9 @@ type Props = {
   pollWithItems: FavpollPollWithItems
   pot: FavpollPot | null
   userPotAllocation: PotAllocation | null
-  onPledgeSuccess?: (guestToken?: string) => void
+  onPledgeSuccess?: (
+    guestToken?: string
+  ) => void | Promise<string | null | void>
   /** Resolves to the new favourite's id so the picker can auto-pick it */
   onAddItem?: (label: string) => Promise<string | void>
   /** false defaults the contribution to None (memorials) */
@@ -40,9 +45,27 @@ type Props = {
   /** The picks are in (lib/picks-suspended): the pick step is gone and
    *  the pledge goes to the pot. */
   picksSuspended?: boolean
+  /** Mentions for the note read out on the sheet (lib/mentions). */
+  noteMentions?: MentionTarget[]
+  /** The real charity rows for the receipt the sheet ends on. */
+  charities?: Charity[]
+  /** First name of whoever is honoured, for the note's own highlighting. */
+  protagonistFirstName?: string
+  /** Fires as the sheet leaves, however it leaves. `true` means it read the
+   *  note out, so the page shows it standing rather than typing it again;
+   *  either way the page may now play the standings' climb. */
+  onPledgeFlowDone?: (noteWasRead: boolean) => void
   /** Controlled mode — if provided, the internal trigger button is suppressed */
   open?: boolean
   onOpenChange?: (open: boolean) => void
+}
+
+function prefersReducedMotion() {
+  return (
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  )
 }
 
 export function PledgeDialog({
@@ -54,6 +77,10 @@ export function PledgeDialog({
   pot,
   userPotAllocation,
   onPledgeSuccess,
+  noteMentions,
+  charities = [],
+  protagonistFirstName,
+  onPledgeFlowDone,
   onAddItem,
   suggestTip,
   showGuestAmounts = false,
@@ -67,6 +94,9 @@ export function PledgeDialog({
   const open = isControlled ? controlledOpen : internalOpen
   const [stripeSubmitting, setStripeSubmitting] = useState(false)
   const [stripeReady, setStripeReady] = useState(false)
+  // Non-null = the terminal note view has taken over the sheet. Not a step:
+  // it leaves the step machine, the header and the footer entirely alone.
+  const [noteOnSheet, setNoteOnSheet] = useState<string | null>(null)
 
   function setOpen(o: boolean) {
     if (isControlled) {
@@ -91,8 +121,23 @@ export function PledgeDialog({
     pollWithItems,
     pot,
     userPotAllocation,
-    onPledgeSuccess: (guestToken) => {
-      onPledgeSuccess?.(guestToken)
+    // THE SHEET HOLDS FOR THE NOTE (founder, 2026-10-22). It used to close
+    // in the same React batch as the page unlocking, so the note began
+    // typing inside a full page of standings that had just appeared whole.
+    // Now the sheet stays up, reads the note out with nothing else on
+    // screen, and its exit IS the reveal of the page beneath.
+    //
+    // The hostage rule lives in the caller (use-favpoll-content's
+    // NOTE_FETCH_TIMEOUT_MS): it hands back null on a slow or failed
+    // request, and null here means close exactly as before. Reduced motion
+    // never holds — the note is simply present on the page.
+    onPledgeSuccess: async (guestToken) => {
+      const note = await onPledgeSuccess?.(guestToken)
+      if (typeof note === "string" && note && !prefersReducedMotion()) {
+        setNoteOnSheet(note)
+        return
+      }
+      onPledgeFlowDone?.(false)
       setOpen(false)
     },
     onAddItem,
@@ -311,14 +356,16 @@ export function PledgeDialog({
         dataRegister={dataRegister}
         hideCloseButton
         header={
-          dialog.step === 1
-            ? step1Header
-            : dialog.step === 2
-              ? step2Header
-              : // Steps 3 and 4's eyebrows live INSIDE the scrolling body
-                // (the header slot pins, which is right for search fields
-                // and wrong for a label — founder, 2026-09-16)
-                undefined
+          noteOnSheet
+            ? undefined
+            : dialog.step === 1
+              ? step1Header
+              : dialog.step === 2
+                ? step2Header
+                : // Steps 3 and 4's eyebrows live INSIDE the scrolling body
+                  // (the header slot pins, which is right for search fields
+                  // and wrong for a label — founder, 2026-09-16)
+                  undefined
         }
         hideTitle
         /* Transactions commit at the BOTTOM (overlay doctrine,
@@ -327,14 +374,14 @@ export function PledgeDialog({
            Pay is the convention guests know. No top-bar actions: the
            fullscreen bar carries the title alone, and the keyboard
            inset keeps the footer above the keys. */
-        footer={footerByStep[dialog.step]}
+        footer={noteOnSheet ? undefined : footerByStep[dialog.step]}
         fullscreenOnMobile
         /* Step 1's search header gets a hairline + air before the pills —
            the field-not-subtitle treatment (founder, 2026-09-16). ALL
            steps suppress the mobile title bar: every step's header slot
            carries its ask as an eyebrow (step 3 gets a plain eyebrow),
            so a visible title above it said the same thing twice. */
-        separators={dialog.step === 1 && !inAddView}
+        separators={!noteOnSheet && dialog.step === 1 && !inAddView}
         /* The footer's hairline on EVERY step (founder, 2026-09-30:
            "inconsistent styling") — only the header's comes and goes. */
         footerSeparator
@@ -345,108 +392,127 @@ export function PledgeDialog({
         bodyClassName="p-0"
         dialogContentClassName="flex-1 overflow-y-auto"
       >
-        {dialog.step === 1 && !inAddView && (
-          // min-h: searching filters the pills down and the bottom sheet
-          // would shrink with them — on iOS the whole sheet then sinks
-          // behind the keyboard. A stable floor keeps the input in view.
-          <div className="min-h-80 px-5 pt-4 pb-4">
-            <PickerPills
-              filteredItems={dialog.filteredItems}
-              selectedIds={dialog.selectedIds}
-              search={dialog.search}
-              isInfinite={!pollWithItems.topics.is_finite}
-              hasAddItem={!!onAddItem}
-              canAdd={dialog.canAdd}
-              onToggle={dialog.toggleFavourite}
-              onEnterAdd={dialog.enterAddView}
-            />
-          </div>
-        )}
-        {inAddView && (
-          <div className="min-h-80">
-            <AddFavouriteView
-              topicTitle={topicTitle}
-              addText={dialog.addText}
-              onAddTextChange={dialog.setAddText}
-              addingItem={dialog.addingItem}
-              addError={dialog.addError}
-              onAdd={dialog.handleAdd}
-            />
-          </div>
-        )}
-
-        {dialog.step === 2 && (
-          <StepAmount
-            pledgeAmount={dialog.pledgeAmount}
-            updatePledgeAmount={dialog.handleFavChange}
-            useSharedFund={dialog.useSharedFund}
-            // No favourite to put pot money on once the picks are in.
-            hasFund={dialog.hasFund && !picksSuspended}
-            toggleFund={dialog.toggleFund}
-            picksSuspended={picksSuspended}
-            impactStatements={impactStatements}
-            favouriteBreakdown={dialog.favouriteBreakdown}
-            fundPart={dialog.fundPart}
-            onFavShare={dialog.setFavShare}
-            onRemoveFavourite={dialog.removeFavourite}
-            fundAvailable={dialog.available}
+        {/* THE TERMINAL NOTE VIEW takes the whole sheet — no header, no
+            footer, no step. See step-confirmed.tsx for why the phone opens on
+            the note where the room ends on it. */}
+        {noteOnSheet ? (
+          <StepConfirmed
+            note={noteOnSheet}
+            protagonistFirstName={protagonistFirstName}
+            mentions={noteMentions}
+            topicTitle={topicTitle}
+            onDone={() => {
+              onPledgeFlowDone?.(true)
+              setNoteOnSheet(null)
+              setOpen(false)
+            }}
           />
-        )}
+        ) : (
+          <>
+            {dialog.step === 1 && !inAddView && (
+              // min-h: searching filters the pills down and the bottom sheet
+              // would shrink with them — on iOS the whole sheet then sinks
+              // behind the keyboard. A stable floor keeps the input in view.
+              <div className="min-h-80 px-5 pt-4 pb-4">
+                <PickerPills
+                  filteredItems={dialog.filteredItems}
+                  selectedIds={dialog.selectedIds}
+                  search={dialog.search}
+                  isInfinite={!pollWithItems.topics.is_finite}
+                  hasAddItem={!!onAddItem}
+                  canAdd={dialog.canAdd}
+                  onToggle={dialog.toggleFavourite}
+                  onEnterAdd={dialog.enterAddView}
+                />
+              </div>
+            )}
+            {inAddView && (
+              <div className="min-h-80">
+                <AddFavouriteView
+                  topicTitle={topicTitle}
+                  addText={dialog.addText}
+                  onAddTextChange={dialog.setAddText}
+                  addingItem={dialog.addingItem}
+                  addError={dialog.addError}
+                  onAdd={dialog.handleAdd}
+                />
+              </div>
+            )}
 
-        {dialog.step === 3 && (
-          <StepGuestBook
-            isGuest={!clerkUserId}
-            displayName={dialog.displayName}
-            onDisplayNameChange={dialog.setDisplayName}
-            isAnonymous={dialog.isAnonymous}
-            onIsAnonymousChange={dialog.setIsAnonymous}
-            pledgeMessage={dialog.pledgeMessage}
-            onPledgeMessageChange={dialog.setPledgeMessage}
-            showAmountToggle={showGuestAmounts && !dialog.useSharedFund}
-            hideAmount={dialog.hideAmount}
-            onHideAmountChange={dialog.setHideAmount}
-          />
-        )}
+            {dialog.step === 2 && (
+              <StepAmount
+                pledgeAmount={dialog.pledgeAmount}
+                updatePledgeAmount={dialog.handleFavChange}
+                useSharedFund={dialog.useSharedFund}
+                // No favourite to put pot money on once the picks are in.
+                hasFund={dialog.hasFund && !picksSuspended}
+                toggleFund={dialog.toggleFund}
+                picksSuspended={picksSuspended}
+                impactStatements={impactStatements}
+                favouriteBreakdown={dialog.favouriteBreakdown}
+                fundPart={dialog.fundPart}
+                onFavShare={dialog.setFavShare}
+                onRemoveFavourite={dialog.removeFavourite}
+                fundAvailable={dialog.available}
+              />
+            )}
 
-        {dialog.step === 4 && dialog.pledgeClientSecret && (
-          <p className="px-5 pt-4 text-xs font-medium tracking-widest text-muted-foreground uppercase">
-            Review &amp; pay
-          </p>
-        )}
-        {dialog.step === 4 && dialog.pledgeClientSecret && (
-          <StepPay
-            clientSecret={dialog.pledgeClientSecret}
-            chargeAmount={dialog.ownCharge}
-            charityAmount={dialog.numericPledge}
-            ownBreakdown={dialog.ownBreakdown}
-            favouriteBreakdown={dialog.favouriteBreakdown}
-            fundPart={dialog.fundPart}
-            tipAmount={dialog.tipAmount}
-            tipOptions={dialog.tipOptions}
-            onTipChange={dialog.updateTip}
-            refreshingIntent={dialog.refreshingIntent}
-            guestEmail={dialog.guestEmail}
-            onGuestEmailChange={dialog.setGuestEmail}
-            onSuccess={dialog.handlePledgePaymentSuccess}
-            preflight={dialog.pledgePreflight}
-            onBack={dialog.handleBack}
-            onSubmittingChange={setStripeSubmitting}
-            onStripeReadyChange={setStripeReady}
-            showEmailCapture={!clerkUserId}
-            isGuest={!clerkUserId}
-            displayName={dialog.displayName}
-            onDisplayNameChange={dialog.setDisplayName}
-            giftAid={dialog.giftAid}
-            onGiftAidChange={dialog.setGiftAid}
-            giftAidFirstName={dialog.giftAidFirstName}
-            onGiftAidFirstNameChange={dialog.setGiftAidFirstName}
-            giftAidLastName={dialog.giftAidLastName}
-            onGiftAidLastNameChange={dialog.setGiftAidLastName}
-            giftAidHouse={dialog.giftAidHouse}
-            onGiftAidHouseChange={dialog.setGiftAidHouse}
-            giftAidPostcode={dialog.giftAidPostcode}
-            onGiftAidPostcodeChange={dialog.setGiftAidPostcode}
-          />
+            {dialog.step === 3 && (
+              <StepGuestBook
+                isGuest={!clerkUserId}
+                displayName={dialog.displayName}
+                onDisplayNameChange={dialog.setDisplayName}
+                isAnonymous={dialog.isAnonymous}
+                onIsAnonymousChange={dialog.setIsAnonymous}
+                pledgeMessage={dialog.pledgeMessage}
+                onPledgeMessageChange={dialog.setPledgeMessage}
+                showAmountToggle={showGuestAmounts && !dialog.useSharedFund}
+                hideAmount={dialog.hideAmount}
+                onHideAmountChange={dialog.setHideAmount}
+              />
+            )}
+
+            {dialog.step === 4 && dialog.pledgeClientSecret && (
+              <p className="px-5 pt-4 text-xs font-medium tracking-widest text-muted-foreground uppercase">
+                Review &amp; pay
+              </p>
+            )}
+            {dialog.step === 4 && dialog.pledgeClientSecret && (
+              <StepPay
+                clientSecret={dialog.pledgeClientSecret}
+                chargeAmount={dialog.ownCharge}
+                charityAmount={dialog.numericPledge}
+                ownBreakdown={dialog.ownBreakdown}
+                favouriteBreakdown={dialog.favouriteBreakdown}
+                fundPart={dialog.fundPart}
+                tipAmount={dialog.tipAmount}
+                tipOptions={dialog.tipOptions}
+                onTipChange={dialog.updateTip}
+                refreshingIntent={dialog.refreshingIntent}
+                guestEmail={dialog.guestEmail}
+                onGuestEmailChange={dialog.setGuestEmail}
+                onSuccess={dialog.handlePledgePaymentSuccess}
+                preflight={dialog.pledgePreflight}
+                onBack={dialog.handleBack}
+                onSubmittingChange={setStripeSubmitting}
+                onStripeReadyChange={setStripeReady}
+                showEmailCapture={!clerkUserId}
+                isGuest={!clerkUserId}
+                displayName={dialog.displayName}
+                onDisplayNameChange={dialog.setDisplayName}
+                giftAid={dialog.giftAid}
+                onGiftAidChange={dialog.setGiftAid}
+                giftAidFirstName={dialog.giftAidFirstName}
+                onGiftAidFirstNameChange={dialog.setGiftAidFirstName}
+                giftAidLastName={dialog.giftAidLastName}
+                onGiftAidLastNameChange={dialog.setGiftAidLastName}
+                giftAidHouse={dialog.giftAidHouse}
+                onGiftAidHouseChange={dialog.setGiftAidHouse}
+                giftAidPostcode={dialog.giftAidPostcode}
+                onGiftAidPostcodeChange={dialog.setGiftAidPostcode}
+              />
+            )}
+          </>
         )}
       </ResponsiveOverlay>
     </>
