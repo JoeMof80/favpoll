@@ -206,7 +206,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
           turn their pledges into funds for a charity you care about.
         </p>
         <Button asChild className="mt-4">
-          <Link href={`/favpolls/new?topic=${id}`}>Create a favpoll</Link>
+          <Link href={`/favpolls/new?topic=${id}`}>Start a favpoll</Link>
         </Button>
       </div>
     </>

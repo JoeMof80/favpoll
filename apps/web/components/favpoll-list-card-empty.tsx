@@ -30,7 +30,7 @@ export function FavpollListCardEmpty() {
       <p className="mx-auto mb-6 max-w-[280px] text-[13px] text-muted-foreground">
         Be the first to create a favpoll and it will appear here.
       </p>
-      <NewFavpollButton size="lg">Create a favpoll</NewFavpollButton>
+      <NewFavpollButton size="lg">Start a favpoll</NewFavpollButton>
     </div>
   )
 }

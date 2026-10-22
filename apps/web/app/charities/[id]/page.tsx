@@ -372,7 +372,7 @@ export default async function CharityPage({ params }: Props) {
           >
             <Plus className="size-6" aria-hidden="true" />
             <span className="text-sm font-medium">
-              {withQuietTail("Create a favpoll — always free")}
+              {withQuietTail("Start a favpoll — always free")}
             </span>
           </Link>
           {liveFavpolls.map((favpoll) => (

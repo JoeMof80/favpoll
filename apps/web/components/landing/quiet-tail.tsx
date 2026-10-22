@@ -1,4 +1,4 @@
-// The quiet tail: "Create a favpoll — always free" with the reassurance
+// The quiet tail: "Start a favpoll — always free" with the reassurance
 // at a lower weight. Extracted from the hero 2026-09-05 when the close
 // bands took the same idiom (founder: "shall we add 'always free' to
 // the CTA button at the bottom?"). A label with no " — " comes back

@@ -28,7 +28,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
-  args: { children: "Create a favpoll" },
+  args: { children: "Start a favpoll" },
 }
 
 export const Ghost: Story = {

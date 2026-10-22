@@ -109,6 +109,6 @@ describe("t", () => {
   })
 
   it("returns the primary CTA", () => {
-    expect(t("landing.cta.primary")).toBe("Create a favpoll")
+    expect(t("landing.cta.primary")).toBe("Start a favpoll")
   })
 })
