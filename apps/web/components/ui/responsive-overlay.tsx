@@ -57,6 +57,14 @@ type Props = {
    */
   bodyClassName?: string
   /**
+   * Extra classes on the SURFACE itself — the SheetContent or DialogContent
+   * root — for a dialog that changes its own ground. The pledge sheet's last
+   * view wears the register band, and colouring only the body left the
+   * sheet's safe-area padding white above it (founder, 2026-10-24: "resolve
+   * white safe area"). Appended, so the surface keeps its layout classes.
+   */
+  surfaceClassName?: string
+  /**
    * Mobile: take over the whole screen instead of a bottom sheet, with a
    * top action bar (Cancel · title · save). For keyboard-summoning dialogs:
    * content anchors at the TOP, so the keyboard can never cover the input
@@ -178,6 +186,7 @@ export function ResponsiveOverlay({
   footerSeparator = separators,
   headerClassName,
   bodyClassName,
+  surfaceClassName,
   fullscreenOnMobile = false,
   mobileSave,
   mobileBack,
@@ -198,7 +207,7 @@ export function ResponsiveOverlay({
           side="bottom"
           showCloseButton={false}
           onOpenAutoFocus={(e) => e.preventDefault()}
-          className="flex flex-col gap-0 p-0"
+          className={`flex flex-col gap-0 p-0 ${surfaceClassName ?? ""}`}
           // Inline style beats the side-variant's h-auto. Full height with
           // the content at the top. The top bar and inputs never need
           // keyboard dodging here — but the SCROLL BODY and any footer do:
@@ -312,7 +321,7 @@ export function ResponsiveOverlay({
         <SheetContent
           data-register={dataRegister ?? undefined}
           side={mobileSide}
-          className={`flex flex-col gap-0 p-0 ${fromRight ? "data-[side=right]:w-[88%]" : ""}`}
+          className={`flex flex-col gap-0 p-0 ${fromRight ? "data-[side=right]:w-[88%]" : ""} ${surfaceClassName ?? ""}`}
           style={
             fromRight
               ? {
@@ -378,10 +387,10 @@ export function ResponsiveOverlay({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         data-register={dataRegister ?? undefined}
-        className={
+        className={`${
           dialogClassName ??
           "flex flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl"
-        }
+        } ${surfaceClassName ?? ""}`}
         style={{ maxHeight: "min(600px, 80vh)", ...dialogStyle }}
         showCloseButton={!hideCloseButton}
       >

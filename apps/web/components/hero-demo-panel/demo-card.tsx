@@ -707,7 +707,13 @@ export function DemoCard({
                 : { height: dialogH, y: "-50%" }
             }
             className={cn(
-              "absolute z-20 flex flex-col overflow-hidden bg-background",
+              "absolute z-20 flex flex-col overflow-hidden",
+              // The ceremony wears the band on the SHEET, so the notch
+              // padding above it is band-coloured too (founder, 2026-10-24:
+              // "resolve white safe area").
+              confirmedInDialog
+                ? "on-band bg-primary text-primary-foreground"
+                : "bg-background",
               isPhone
                 ? // The real thing on a handset: ResponsiveOverlay renders a
                   // bottom Sheet at 100dvh, so it takes the whole screen with
@@ -762,6 +768,8 @@ export function DemoCard({
                         staggerChildren goes to zero, so the composition
                         simply appears. */}
                     <motion.div
+                      // The band surface, as the real sheet wears it
+                      // (step-confirmed.tsx, founder 2026-10-24).
                       className="relative flex min-h-0 flex-1 flex-col"
                       initial="hidden"
                       animate="shown"
@@ -783,10 +791,10 @@ export function DemoCard({
                             : { duration: PAGE_TURN_MS, ease: PAGE_TURN }
                         }
                       >
-                        <PledgeConfirmedHead />
+                        <PledgeConfirmedHead onBand />
                       </motion.div>
                       <div className="relative flex min-h-0 flex-1 flex-col justify-center gap-4 px-6 py-4">
-                        <MonogramWash id="demo-ceremony-note" />
+                        <MonogramWash id="demo-ceremony-note" onBand />
                         <motion.div
                           className="relative"
                           variants={NOTE_BAND}
@@ -819,7 +827,7 @@ export function DemoCard({
                         className="invisible shrink-0 px-6 pb-6"
                         aria-hidden="true"
                       >
-                        <PledgeConfirmedHead />
+                        <PledgeConfirmedHead onBand />
                       </div>
                     </motion.div>
                   </motion.div>

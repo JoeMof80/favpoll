@@ -107,15 +107,26 @@ export function StepConfirmed({
       // left under the head — which put the note a head's-height low. The
       // mirror costs nothing and cannot drift, which a hardcoded spacer
       // would the first time the head changes.
+      // ON THE BAND (founder, 2026-10-24). This was the dialog's white, the
+      // same surface as the picker and the amount step — so the most
+      // significant screen in the flow arrived looking like one more form
+      // step, and a white sheet rising over a white page gave no sense of
+      // arrival at all. It wears the hero band's surface now, and the
+      // register tints the moment: a memorial note on purple, a celebration
+      // on magenta, a fundraiser on green. `on-band` (globals.css) remaps the
+      // light-ground tokens the shared note, topic and eyebrow components
+      // hardcode.
+      // The surface carries the band and the on-band remap now (the overlay's
+      // surfaceClassName), so this is layout only.
       className="relative flex min-h-[70vh] flex-col sm:min-h-[32rem]"
     >
       <div className="shrink-0 px-6 pt-8">
-        <PledgeConfirmedHead />
+        <PledgeConfirmedHead onBand />
       </div>
 
       {/* min-h-0 + overflow: a long note on a short phone scrolls HERE. */}
       <div className="relative flex min-h-0 flex-1 flex-col justify-center gap-5 overflow-y-auto px-6 py-8">
-        <MonogramWash id="ceremony-note" />
+        <MonogramWash id="ceremony-note" onBand />
         {/* The topic in the grammar it wears everywhere else (founder,
             2026-10-23: "the topic header should match its style everywhere
             else") — PollHeading's quiet default, "Favourite" above the
@@ -137,7 +148,7 @@ export function StepConfirmed({
       {/* The head again, invisible: it balances the real one so the middle
           band centres against the sheet's full height. */}
       <div className="invisible shrink-0 px-6 pb-8" aria-hidden="true">
-        <PledgeConfirmedHead />
+        <PledgeConfirmedHead onBand />
       </div>
     </div>
   )

@@ -111,14 +111,31 @@ const SHIMMER_MASK =
  *  lasts six seconds and nobody is meant to linger, so a repeating sweep
  *  there reads as decoration. Masked top and bottom so the pattern frames
  *  the text rather than running under it. Static under reduced motion. */
-export function MonogramWash({ id }: { id: string }) {
+export function MonogramWash({
+  id,
+  onBand = false,
+}: {
+  id: string
+  /** On the register band the pattern is the band's ink, not the register. */
+  onBand?: boolean
+}) {
   const reduced = useReducedMotion()
   return (
     <div
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_18%,black_82%,transparent)] text-primary"
     >
-      <div className="absolute inset-0 opacity-[0.045]">
+      {/* 0.045 reads as dark ink on white and all but disappears as pale ink
+          on a saturated ground (founder, 2026-10-24: "Add monogram" — it was
+          there, at an alpha that showed nothing on green). The band variant
+          sits near where the hero's own shimmer peaks. */}
+      <div
+        className={
+          onBand
+            ? "absolute inset-0 opacity-[0.12]"
+            : "absolute inset-0 opacity-[0.045]"
+        }
+      >
         <MonogramTiles patternId={id} />
       </div>
       {!reduced && (

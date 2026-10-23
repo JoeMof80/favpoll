@@ -354,6 +354,12 @@ export function PledgeDialog({
         onOpenChange={handleOpenChange}
         title={titleByStep[dialog.step]}
         dataRegister={dataRegister}
+        // The ceremony wears the register band. On the SURFACE, not the body:
+        // the sheet carries env(safe-area-inset-top) of padding for the
+        // notch, and colouring only the body left that strip white above it.
+        surfaceClassName={
+          noteOnSheet ? "on-band bg-primary text-primary-foreground" : undefined
+        }
         hideCloseButton
         header={
           noteOnSheet

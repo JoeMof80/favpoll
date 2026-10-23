@@ -25,19 +25,49 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 // needs to be front and centre").
 
 /** The mark and the words. Answers the only urgent question. */
-export function PledgeConfirmedHead() {
+export function PledgeConfirmedHead({
+  onBand = false,
+}: {
+  /** On the register band the disc inverts: pale ground, register glyph. */
+  onBand?: boolean
+} = {}) {
   return (
     <div className="flex flex-col items-center gap-4">
       {/* The mark, not a tick (founder, 2026-10-19: "it feels weak. Should we
           replace the tick with the favpoll brandmark?") — favpoll did this.
           Smaller below sm: at 64px it ate the top of a phone and pushed the
           note down the screen. */}
-      <div className="flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground sm:size-16">
-        <svg viewBox="0 0 10 9" className="size-6 sm:size-8" aria-hidden="true">
+      {/* NO DISC ON THE BAND (founder, 2026-10-24: "Don't put brandmark in a
+          circle"). The disc existed to give the mark a ground on white; on
+          the band the mark simply IS the ink, the way the wordmark sits in
+          the header. Larger, because without the disc it has to hold the top
+          of the sheet on its own. */}
+      {onBand ? (
+        <svg
+          viewBox="0 0 10 9"
+          className="size-10 text-primary-foreground sm:size-12"
+          aria-hidden="true"
+        >
           <FavpollMarkGlyph />
         </svg>
-      </div>
-      <SectionEyebrow>Pledge confirmed</SectionEyebrow>
+      ) : (
+        <div className="flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground sm:size-16">
+          <svg
+            viewBox="0 0 10 9"
+            className="size-6 sm:size-8"
+            aria-hidden="true"
+          >
+            <FavpollMarkGlyph />
+          </svg>
+        </div>
+      )}
+      {/* `brand` is text-primary, which is invisible ON primary — the status
+          line disappeared entirely the first time this went on the band.
+          `muted` is text-muted-foreground, which .on-band remaps to the
+          band's ink. */}
+      <SectionEyebrow variant={onBand ? "muted" : "brand"}>
+        Pledge confirmed
+      </SectionEyebrow>
     </div>
   )
 }
