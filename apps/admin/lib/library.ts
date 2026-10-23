@@ -71,10 +71,10 @@ export const LIBRARY: LibraryEntry[] = [
   {
     title: "Expected donation volume — for PPGF",
     summary:
-      "The £10k-a-year question answered through funeral directors: one relationship at modest uptake clears it. First row needs your names.",
+      "The £10k-a-year question answered through funeral directors: one relationship at modest uptake clears it. Direct cremations are inside the market, not outside it, and the £20 leg is conservative by half.",
     kind: "reference",
     source: "ppgf-volume-note-2026-10.md",
-    date: "2026-10-14",
+    date: "2026-10-21",
     section: "The rail & the law",
   },
   {
@@ -252,6 +252,33 @@ export const LIBRARY: LibraryEntry[] = [
   },
 
   // ── Channels & outreach ─────────────────────────────────────────────────
+  {
+    title: "The funeral sector map",
+    summary:
+      "Who to approach and in what order: OurCoop first (150+ homes, 16,966 funerals), East of England and Scotmid as the easier yes, Co-op Funeralcare as the prize not the first call, SAIF/NAFD for the 4,000 independents.",
+    kind: "reference",
+    source: "co-operative-funeral-societies-2026-10-21.md",
+    date: "2026-10-21",
+    section: "Channels & outreach",
+  },
+  {
+    title: "How to approach a funeral society",
+    summary:
+      "The five-part shape that reached a stranger cold, the never-in-a-first-approach list, and the Glenn Barsby InMail as sent — with the subject lines that were rejected and why.",
+    kind: "reference",
+    source: "funeral-society-approaches-2026-10-21.md",
+    date: "2026-10-21",
+    section: "Channels & outreach",
+  },
+  {
+    title: "The will-directed favpoll",
+    summary:
+      "A favpoll specified in a will or letter of wishes, written by the person themselves and created by an executor when the time comes. The first-person note is the point of it.",
+    kind: "reference",
+    source: "will-directed-favpoll-2026-10-21.md",
+    date: "2026-10-21",
+    section: "Channels & outreach",
+  },
   {
     title: "The exemplar for Palins",
     summary:
