@@ -21,9 +21,13 @@ type Row = LibraryEntry & { href: string }
 // it could not show. Search already answers "where is the thing about X",
 // which was most of what the sections were for.
 //
-// GROUPED BY MONTH, not a flat list: 39 rows in date order is the same
-// undifferentiated scroll in a different sequence. The months run 21 / 9 /
-// 2 / 6 / 1, so the headings land where the work actually happened.
+// GROUPED BY WEEK (founder, 2026-10-23: "month isn't granular enough").
+// Measured across all three: by DAY is 23 groups for 39 entries and 16 of
+// them hold one row, so the headings become the noise; by MONTH is 5 groups
+// and one of them is 21 rows, which is the undifferentiated scroll again. By
+// week is 12 groups averaging 3.3 — 4 / 14 / 4 / 2 / 2 / 2 / 2 / 2 / 1 / 2 /
+// 3 / 1. The fourteen is the week PPGF reopened and Joe Metcalfe replied; a
+// real week of work, not a layout failure.
 //
 // ONE COLUMN (founder, 2026-10-23: "single column again please"). Two were
 // tried on this branch and taken out: with the months grouped, a second
@@ -61,11 +65,26 @@ const SECTION_MARK: Record<
   },
 }
 
-const MONTH = new Intl.DateTimeFormat("en-GB", {
+const WEEK_OF = new Intl.DateTimeFormat("en-GB", {
+  day: "numeric",
   month: "long",
   year: "numeric",
   timeZone: "UTC",
 })
+/** Within a week the day alone is ambiguous across a month boundary — the
+ *  week of 28 September holds the 1st of October. */
+const DAY = new Intl.DateTimeFormat("en-GB", {
+  day: "numeric",
+  month: "short",
+  timeZone: "UTC",
+})
+
+/** The Monday of an entry's week, as YYYY-MM-DD. */
+function weekStart(date: string): string {
+  const d = new Date(`${date}T00:00:00Z`)
+  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7))
+  return d.toISOString().slice(0, 10)
+}
 
 export function LibraryIndex({ entries }: { entries: Row[] }) {
   const [q, setQ] = useState("")
@@ -82,10 +101,10 @@ export function LibraryIndex({ entries }: { entries: Row[] }) {
     .sort((a, b) => b.date.localeCompare(a.date))
 
   // Insertion order is already newest-first, so the map preserves it.
-  const months = new Map<string, Row[]>()
+  const weeks = new Map<string, Row[]>()
   for (const e of shown) {
-    const key = e.date.slice(0, 7)
-    months.set(key, [...(months.get(key) ?? []), e])
+    const key = weekStart(e.date)
+    weeks.set(key, [...(weeks.get(key) ?? []), e])
   }
 
   return (
@@ -106,8 +125,8 @@ export function LibraryIndex({ entries }: { entries: Row[] }) {
         />
       </label>
 
-      {[...months].map(([key, rows]) => {
-        const heading = MONTH.format(new Date(`${key}-01T00:00:00Z`))
+      {[...weeks].map(([key, rows]) => {
+        const heading = `Week of ${WEEK_OF.format(new Date(`${key}T00:00:00Z`))}`
         return (
           <section key={key} aria-labelledby={`lib-${key}`}>
             <h2
@@ -147,14 +166,13 @@ export function LibraryIndex({ entries }: { entries: Row[] }) {
                     {/* The section rides the right rail rather than sitting
                         under the summary: at full width a third line per row
                         made 39 of them tall for nothing. Hidden on a narrow
-                        screen, where the icon's colour carries it alone. The
-                        month is the heading, so the day is enough date. */}
+                        screen, where the icon's colour carries it alone. */}
                     <span className="mt-0.5 shrink-0 text-right text-xs text-muted-foreground">
                       <span className="hidden text-[11px] tracking-wide uppercase sm:block">
                         {e.section}
                       </span>
                       <span className="block tabular-nums">
-                        {Number(e.date.slice(8, 10))}
+                        {DAY.format(new Date(`${e.date}T00:00:00Z`))}
                       </span>
                     </span>
                   </>
