@@ -1,18 +1,14 @@
 import { LibraryIndex } from "@/components/library-index"
-import { LIBRARY, SECTIONS, entriesIn, slugFor } from "@/lib/library"
+import { LIBRARY, slugFor } from "@/lib/library"
 
-// THE LIBRARY: the documents that matter, in the sections the founder
-// reaches for them by, each readable here or one click away. The registry
-// is lib/library.ts; this page only lays it out.
+// THE LIBRARY: the documents that matter, newest first, each readable here
+// or one click away. The registry is lib/library.ts; this page only lays it
+// out. Sorting and grouping live in the index component.
 export default function LibraryPage() {
-  const sections = SECTIONS.map((section) => ({
-    section,
-    entries: entriesIn(section).map((e) => ({
-      ...e,
-      href: e.kind === "reference" ? `/library/${slugFor(e)}` : e.source,
-    })),
+  const entries = LIBRARY.map((e) => ({
+    ...e,
+    href: e.kind === "reference" ? `/library/${slugFor(e)}` : e.source,
   }))
-  const latest = [...LIBRARY].sort((a, b) => b.date.localeCompare(a.date))[0]
 
   return (
     <div className="space-y-6">
@@ -27,13 +23,10 @@ export default function LibraryPage() {
           </code>
           .
         </p>
-        {latest && (
-          <p className="mt-2 text-xs text-muted-foreground">
-            Most recent: {latest.title} · {latest.date}
-          </p>
-        )}
+        {/* No "Most recent" line any more: the list is newest first, so the
+            first row is the answer. */}
       </div>
-      <LibraryIndex sections={sections} />
+      <LibraryIndex entries={entries} />
     </div>
   )
 }
