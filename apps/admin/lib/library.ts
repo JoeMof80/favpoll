@@ -405,9 +405,3 @@ export function slugFor(entry: LibraryEntry): string {
 export function findBySlug(slug: string): LibraryEntry | undefined {
   return LIBRARY.find((e) => e.kind === "reference" && slugFor(e) === slug)
 }
-
-export function entriesIn(section: LibrarySection): LibraryEntry[] {
-  return LIBRARY.filter((e) => e.section === section).sort((a, b) =>
-    b.date.localeCompare(a.date)
-  )
-}

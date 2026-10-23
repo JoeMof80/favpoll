@@ -18,6 +18,10 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-destructive: var(--destructive);
+  --color-library-rail: var(--library-rail);
+  --color-library-product: var(--library-product);
+  --color-library-channel: var(--library-channel);
+  --color-library-company: var(--library-company);
 }
 
 :root {
@@ -36,6 +40,22 @@
   --input: oklch(0.91 0.02 278);
   --ring: oklch(0.62 0.14 278);
   --radius: 0.5rem;
+
+  /* LIBRARY SECTION MARKS (founder, 2026-10-23: "coloured dot is fine or
+     icons. we just need to easily identify the group"). The library sorts
+     by date now, so the section it belongs to has to be readable without
+     re-sorting — each entry's icon wears its section's colour.
+
+     The admin is deliberately one hue (278) and these are the only
+     exception, so they are kept LOW CHROMA: tags, not a rainbow. Four
+     hues rather than four lightnesses because four steps of one hue are
+     not tellable apart at a 14px icon. Colour is never the only signal —
+     the section is also printed as a word, and the icon's shape differs
+     — so nothing is lost to a colour-blind reader. */
+  --library-rail: oklch(0.5 0.14 278);
+  --library-product: oklch(0.5 0.12 200);
+  --library-channel: oklch(0.52 0.13 40);
+  --library-company: oklch(0.48 0.11 150);
 }
 
 .dark {
@@ -53,6 +73,11 @@
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 10%);
   --ring: oklch(0.75 0.1 278);
+  /* Lifted for the charcoal ground; same hues, same low chroma. */
+  --library-rail: oklch(0.76 0.11 278);
+  --library-product: oklch(0.76 0.1 200);
+  --library-channel: oklch(0.78 0.11 40);
+  --library-company: oklch(0.74 0.1 150);
 }
 
 @layer base {

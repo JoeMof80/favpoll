@@ -2,44 +2,85 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { ArrowUpRight, Search } from "lucide-react"
+import {
+  ArrowUpRight,
+  Building2,
+  FlaskConical,
+  Megaphone,
+  Scale,
+  Search,
+} from "lucide-react"
 import type { LibraryEntry, LibrarySection } from "@/lib/library"
 
 type Row = LibraryEntry & { href: string }
 
-// AN INDEX IS FOR SCANNING (founder, 2026-10-23: "its slightly hard to read
-// organised like it is"). Three things were fighting it, and the registry's
-// own numbers say so: 39 entries, summaries running to 108 characters median
-// and 215 at the longest, and 35 of the 39 the same kind.
+// THE LIBRARY IS A RECORD, SO IT READS NEWEST FIRST (founder, 2026-10-23:
+// "i feel like they should be organised by date and colour code to
+// categorise"). The page used to group by section and carry a "Most recent:"
+// line above it — which was the design admitting that recency was the thing
+// it could not show. Search already answers "where is the thing about X",
+// which was most of what the sections were for.
 //
-// - THE KIND LABEL IS GONE. It said "Note" thirty-five times out of
-//   thirty-nine and distinguished nothing. What matters is only whether a
-//   row LEAVES this page, so the four that do carry an arrow after the
-//   title — the web's own convention — and the rest carry nothing. That
-//   also removed a leading icon from every row, which was indenting the
-//   titles away from the eye for no information.
-// - THE SUMMARY IS CLAMPED TO ONE LINE. At 108 characters in a full-width
-//   row it wrapped to two or three, so the page was a wall of grey prose
-//   with the titles buried in it. Nothing is lost: /library/[slug] prints
-//   the summary in full above the document, which is where you are going.
-// - TWO COLUMNS from lg. The sections run 13 / 10 / 11 / 5, so one column
-//   put a heading every twelve rows; paired up they read as landmarks.
+// GROUPED BY MONTH, not a flat list: 39 rows in date order is the same
+// undifferentiated scroll in a different sequence. The months run 21 / 9 /
+// 2 / 6 / 1, so the headings land where the work actually happened.
 //
-// A table was considered and refused: this is browsed, not queried, and a
-// sortable grid of filenames stops being a library.
+// THE SECTION SURVIVES AS A MARK, because sorting by date loses it
+// otherwise. Each row's icon wears its section's colour (tokens in
+// globals.css, the admin's only departure from its single hue) and the
+// section is printed as a word beside it. Colour is never the only signal:
+// the shapes differ and the word is there, so nothing is lost to a
+// colour-blind reader, and no legend is needed.
+//
+// Kept from the density pass: no kind label (it said "Note" 35 times in 39),
+// the summary clamped to one line (/library/[slug] prints it in full above
+// the document, which is where the click was going), and two columns from lg.
 
-export function LibraryIndex({
-  sections,
-}: {
-  sections: { section: LibrarySection; entries: Row[] }[]
-}) {
+const SECTION_MARK: Record<
+  LibrarySection,
+  { Icon: typeof Scale; className: string }
+> = {
+  "The rail & the law": { Icon: Scale, className: "text-library-rail" },
+  "Product & research": {
+    Icon: FlaskConical,
+    className: "text-library-product",
+  },
+  "Channels & outreach": {
+    Icon: Megaphone,
+    className: "text-library-channel",
+  },
+  "Running the company": {
+    Icon: Building2,
+    className: "text-library-company",
+  },
+}
+
+const MONTH = new Intl.DateTimeFormat("en-GB", {
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+})
+
+export function LibraryIndex({ entries }: { entries: Row[] }) {
   const [q, setQ] = useState("")
   const needle = q.trim().toLowerCase()
   const matches = (e: Row) =>
     !needle ||
     e.title.toLowerCase().includes(needle) ||
     e.summary.toLowerCase().includes(needle) ||
-    e.source.toLowerCase().includes(needle)
+    e.source.toLowerCase().includes(needle) ||
+    e.section.toLowerCase().includes(needle)
+
+  const shown = entries
+    .filter(matches)
+    .sort((a, b) => b.date.localeCompare(a.date))
+
+  // Insertion order is already newest-first, so the map preserves it.
+  const months = new Map<string, Row[]>()
+  for (const e of shown) {
+    const key = e.date.slice(0, 7)
+    months.set(key, [...(months.get(key) ?? []), e])
+  }
 
   return (
     <div className="space-y-10">
@@ -53,31 +94,36 @@ export function LibraryIndex({
           type="search"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Search titles and summaries"
+          placeholder="Search titles, summaries and sections"
           aria-label="Search the library"
           className="w-full rounded-md border border-border bg-background py-2 pr-3 pl-9 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
         />
       </label>
 
-      {sections.map(({ section, entries }) => {
-        const shown = entries.filter(matches)
-        if (shown.length === 0) return null
+      {[...months].map(([key, rows]) => {
+        const heading = MONTH.format(new Date(`${key}-01T00:00:00Z`))
         return (
-          <section key={section} aria-labelledby={`lib-${section}`}>
+          <section key={key} aria-labelledby={`lib-${key}`}>
             <h2
-              id={`lib-${section}`}
+              id={`lib-${key}`}
               className="mb-1 text-xs font-semibold tracking-widest text-muted-foreground uppercase"
             >
-              {section}
+              {heading}
             </h2>
-            {/* border-t on every item rather than an outer card: in two
-                columns a bordered box leaves a stray cell when the count is
-                odd, and a divide-y does not cross the gutter. */}
+            {/* border-t per item rather than an outer card: in two columns a
+                card leaves a stray cell on an odd count, and a divide-y does
+                not cross the gutter. */}
             <ul className="grid gap-x-10 lg:grid-cols-2">
-              {shown.map((e) => {
+              {rows.map((e) => {
+                const { Icon, className } = SECTION_MARK[e.section]
                 const external = e.kind !== "reference"
                 const inner = (
                   <>
+                    <Icon
+                      size={15}
+                      className={`mt-1 shrink-0 ${className}`}
+                      aria-hidden="true"
+                    />
                     <span className="min-w-0 flex-1">
                       <span className="block font-medium">
                         {e.title}
@@ -92,14 +138,19 @@ export function LibraryIndex({
                       <span className="mt-0.5 block truncate text-sm text-muted-foreground">
                         {e.summary}
                       </span>
+                      <span className="mt-1 block text-[11px] tracking-wide text-muted-foreground uppercase">
+                        {e.section}
+                      </span>
                     </span>
-                    <span className="mt-0.5 shrink-0 text-xs text-muted-foreground tabular-nums">
-                      {e.date}
+                    {/* The month is the heading, so the row needs only the
+                        day. */}
+                    <span className="mt-1 shrink-0 text-xs text-muted-foreground tabular-nums">
+                      {Number(e.date.slice(8, 10))}
                     </span>
                   </>
                 )
                 const cls =
-                  "flex items-start gap-4 rounded-md px-2 py-2.5 transition-colors hover:bg-muted/60"
+                  "flex items-start gap-3 rounded-md px-2 py-2.5 transition-colors hover:bg-muted/60"
                 return (
                   <li key={e.source} className="border-t border-border">
                     {external ? (
@@ -125,12 +176,11 @@ export function LibraryIndex({
         )
       })}
 
-      {needle &&
-        sections.every((s) => s.entries.filter(matches).length === 0) && (
-          <p className="text-sm text-muted-foreground">
-            Nothing in the library matches “{q}”.
-          </p>
-        )}
+      {needle && shown.length === 0 && (
+        <p className="text-sm text-muted-foreground">
+          Nothing in the library matches “{q}”.
+        </p>
+      )}
     </div>
   )
 }
