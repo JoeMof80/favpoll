@@ -34,7 +34,9 @@ export type UsePledgeOptions = {
   userPotAllocation: PotAllocation | null
   pollSelections: Record<string, string[]>
   onPledgeAmountChange: (amount: string) => void
-  onPledgeSuccess?: (guestToken?: string) => void
+  onPledgeSuccess?: (
+    guestToken?: string
+  ) => void | Promise<string | null | void>
   /** false = default the contribution to None (memorial favpolls —
    *  the quietest ask for the most sensitive register). When true the
    *  suggestion scales with the pledge (see tipOptionsFor). */

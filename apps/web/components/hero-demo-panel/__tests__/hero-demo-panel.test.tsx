@@ -202,10 +202,16 @@ describe("DemoCard — topic pill", () => {
       const { unmount } = renderCard(phase)
       // Two lines since the eyebrow split (2026-09-01): the quiet
       // "Favourite" above the topic word at full size.
-      expect(screen.getByText("Favourite", { exact: true })).toBeInTheDocument()
+      //
+      // getAll, because at "confirmed" the sheet carries its OWN heading as
+      // well as the card's (2026-10-23) — on a real phone the sheet covers
+      // the page, but in the demo's one frame both are in the DOM.
       expect(
-        screen.getByText(scene.poll.topic.title, { exact: true })
-      ).toBeInTheDocument()
+        screen.getAllByText("Favourite", { exact: true }).length
+      ).toBeGreaterThan(0)
+      expect(
+        screen.getAllByText(scene.poll.topic.title, { exact: true }).length
+      ).toBeGreaterThan(0)
       unmount()
     }
   })
@@ -213,8 +219,12 @@ describe("DemoCard — topic pill", () => {
   it("renders the topic as a header ribbon, not a button (2026-08-02)", () => {
     for (const phase of [...LOCKED_PHASES, ...UNLOCKED_PHASES]) {
       const { unmount } = renderCard(phase)
-      const label = screen.getByText(scene.poll.topic.title, { exact: true })
-      expect(label.closest("button")).toBeNull()
+      // Every one of them, card and sheet alike — none is a button.
+      for (const label of screen.getAllByText(scene.poll.topic.title, {
+        exact: true,
+      })) {
+        expect(label.closest("button")).toBeNull()
+      }
       unmount()
     }
   })
@@ -350,17 +360,19 @@ describe("DemoCard — dialog mimics", () => {
     ).toBeNull()
   })
 
-  it("the confirmation is a receipt: status, the favourite's chip under the topic, the charity row", () => {
-    renderCard("confirmed")
-    expect(screen.getByText("Pledge confirmed")).toBeInTheDocument()
+  it("the confirmation is the note on a wash — status and topic, no receipt rows", () => {
+    renderCard("confirmed", DECOY_WIDTHS, true)
+    // Two: the head, and the invisible copy that balances it so the note
+    // sits at the optical centre (as components/pledge-dialog/step-confirmed
+    // does it).
+    expect(screen.getAllByText("Pledge confirmed")).toHaveLength(2)
+    // The receipt rows were here from 2026-10-19 and went on 2026-10-23,
+    // on both surfaces at once.
     expect(
-      screen.getAllByText(
-        scene.poll.topic.favourites[scene.selectedIndex].label
-      ).length
-    ).toBeGreaterThanOrEqual(1)
-    expect(
-      screen.getByText(`Your favourite ${scene.poll.topic.title.toLowerCase()}`)
-    ).toBeInTheDocument()
+      screen.queryByText(
+        `Your favourite ${scene.poll.topic.title.toLowerCase()}`
+      )
+    ).toBeNull()
   })
 
   it("picker not shown in amount phases", () => {
@@ -716,4 +728,48 @@ describe("RotatingRegisterHero", () => {
     })
     expect(live().map((s) => s.dataset.register)).toEqual(["memorial"])
   })
+})
+
+// ── The demo follows the real page ────────────────────────────────────────────
+
+// THE DEMO HAS DRIFTED FROM THE PRODUCT THREE TIMES (2026-10-22): it drew a
+// receipt the guest's sheet did not have, climbed bars the real page never
+// climbed, and typed the note on the page beneath while the real page had
+// moved it onto the sheet. Each one advertised something favpoll did not do.
+// These pin the third, which is the one with a visible order to get wrong.
+describe("DemoCard — the note is read on the sheet, not the page", () => {
+  const note = scene.poll.personal_note
+
+  // The note is drawn TWICE wherever it appears — an invisible full-height
+  // reserve so nothing below it walks as the text arrives, and the live copy
+  // over it. Only the live copy says anything about typing, so every
+  // assertion here reads that one; `container.textContent` would pass on the
+  // reserve alone and pin nothing.
+  // The reserve is rendered first and the live copy over it, so the LAST
+  // poll-reveal is the one that shows typing.
+  const live = (c: HTMLElement) => {
+    const all = Array.from(c.querySelectorAll('[data-testid="poll-reveal"]'))
+    return all[all.length - 1]?.textContent ?? ""
+  }
+
+  it("shows the note inside the sheet at 'confirmed'", () => {
+    const { container } = renderCard("confirmed", DECOY_WIDTHS, true)
+    expect(live(container)).toContain(note)
+    // And the confirmation it sits under, which is the top band.
+    expect(container.textContent).toContain("Pledge confirmed")
+  })
+
+  it("has the note ALREADY COMPLETE on the page once the sheet leaves", () => {
+    // Motion is ON here, so a note still typing would render a prefix — at
+    // this instant, an empty one. It was read on the sheet, so the page
+    // simply holds it, which is what noteAlreadyRead does on the real page.
+    // Move typing back onto the page and this fails.
+    const { container } = renderCard("clearing")
+    expect(live(container)).toContain(note)
+  })
+
+  // No test here that the bars hold at zero while the sheet is up: DemoCard
+  // renders whatever barWidths it is handed, so the invariant lives in
+  // landing/hero.tsx's `climbed` (results | note), not in this component. A
+  // test here would only assert that a prop arrives.
 })

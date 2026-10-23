@@ -1,6 +1,10 @@
 "use client"
 
 import type { MentionTarget } from "@/lib/mentions"
+import {
+  aboutMentions as buildAboutMentions,
+  noteMentions as buildNoteMentions,
+} from "@/lib/note-mentions"
 import { useCallback, useState, useSyncExternalStore } from "react"
 import { useScrollEdges } from "@/components/shell-scroller"
 import { Countdown } from "@/components/countdown"
@@ -66,6 +70,12 @@ export type SheetViewer = {
   /** The real item list — may be zeroed until entitled. */
   items: Favourite[]
   pledgeJustConfirmed: boolean
+  /** The pledge sheet read the note out before it left, so the page shows
+   *  it already standing rather than typing it a second time
+   *  (pledge-dialog/step-note.tsx). */
+  noteAlreadyRead?: boolean
+  /** The pledge sheet has left; the standings may play their climb. */
+  barsClimb?: boolean
   onViewChange?: (view: "pledge" | "results") => void
   /** Undefined withholds every pledge entry point (closed, or gated). */
   onOpenPledgeDialog?: () => void
@@ -316,33 +326,12 @@ export function FavpollSheet({
 
   // MENTIONS (lib/mentions): the charities and the topic under the name
   // on the card, lit in the About; the favourites join them in the note.
-  const aboutMentions: MentionTarget[] = [
-    ...favpoll.favpoll_charities.map((ec) => ({
-      kind: "charity" as const,
-      label: ec.charities.name,
-      id: ec.charities.id,
-    })),
-    ...(pollWithItems
-      ? [
-          {
-            kind: "topic" as const,
-            label: pollWithItems.topics.title,
-            id: pollWithItems.topic_id,
-          },
-        ]
-      : []),
-  ]
-  // The favourites come from the FULL list (the picker's), not the
-  // standings' — those are filtered to pledged items, and a note names
-  // its favourite before anyone has pledged (founder, 2026-09-28: "no
-  // noticeable changes!!!" on a favpoll with no pledges yet).
-  const noteMentions: MentionTarget[] = [
-    ...aboutMentions,
-    ...(pickerPoll?.topics.favourites ?? standing.items).map((i) => ({
-      kind: "item" as const,
-      label: i.label,
-    })),
-  ]
+  const aboutMentions = buildAboutMentions(favpoll, pollWithItems)
+  const noteMentions = buildNoteMentions(
+    favpoll,
+    pollWithItems,
+    pickerPoll?.topics.favourites ?? standing.items
+  )
 
   const left = (
     <>
@@ -394,6 +383,8 @@ export function FavpollSheet({
             isClosed={isClosed}
             hasPledged={standing.entitled}
             pledgeJustConfirmed={standing.pledgeJustConfirmed}
+            noteAlreadyRead={standing.noteAlreadyRead}
+            barsClimb={standing.barsClimb}
             protagonistName={
               isCause
                 ? (favpoll.cause_label ?? "")

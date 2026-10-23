@@ -105,6 +105,42 @@ export function MonogramTiles({ patternId }: { patternId: string }) {
 const SHIMMER_MASK =
   "linear-gradient(105deg, transparent 38%, black 50%, transparent 62%)"
 
+/** The monogram as a faint WASH over a light surface, with one shimmer pass
+ *  (founder, 2026-10-23: "single shimmer"). The hero's own texture repeats
+ *  forever because the band is permanent furniture; the pledge ceremony
+ *  lasts six seconds and nobody is meant to linger, so a repeating sweep
+ *  there reads as decoration. Masked top and bottom so the pattern frames
+ *  the text rather than running under it. Static under reduced motion. */
+export function MonogramWash({ id }: { id: string }) {
+  const reduced = useReducedMotion()
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_18%,black_82%,transparent)] text-primary"
+    >
+      <div className="absolute inset-0 opacity-[0.045]">
+        <MonogramTiles patternId={id} />
+      </div>
+      {!reduced && (
+        <motion.div
+          className="absolute inset-0 opacity-[0.11]"
+          style={{
+            maskImage: SHIMMER_MASK,
+            WebkitMaskImage: SHIMMER_MASK,
+            maskSize: "300% 100%",
+            WebkitMaskSize: "300% 100%",
+          }}
+          initial={{ maskPosition: "120% 0%" }}
+          animate={{ maskPosition: "-20% 0%" }}
+          transition={{ duration: 5, ease: "easeInOut" }}
+        >
+          <MonogramTiles patternId={`${id}-shimmer`} />
+        </motion.div>
+      )}
+    </div>
+  )
+}
+
 export function HeroTexture() {
   const reduced = useReducedMotion()
 

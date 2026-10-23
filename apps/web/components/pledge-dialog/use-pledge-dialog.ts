@@ -20,7 +20,9 @@ export type UsePledgeDialogOptions = {
   pollWithItems: FavpollPollWithItems
   pot: FavpollPot | null
   userPotAllocation: PotAllocation | null
-  onPledgeSuccess?: (guestToken?: string) => void
+  onPledgeSuccess?: (
+    guestToken?: string
+  ) => void | Promise<string | null | void>
   /** Resolves to the new favourite's id so the picker can auto-pick it */
   onAddItem?: (label: string) => Promise<string | void>
   /** false defaults the contribution to None (memorials) */

@@ -188,10 +188,27 @@ const STILL_BEAT: { phase: Phase; at: number }[] = [
   { phase: "selected", at: 9150 }, //    a favourite is chosen
   { phase: "pledge-panel", at: 10950 }, // 3. the amount step
   { phase: "amount-picked", at: 12150 }, //    a preset chosen, £ updates
-  { phase: "confirmed", at: 14150 }, // 4. the receipt
-  { phase: "clearing", at: 15950 }, // 5. the sheet slides down onto the live page:
-  { phase: "results", at: 16950 }, //    bars climbing, note typing
-  { phase: "note", at: 19750 }, //    the note stands typed
+  //
+  // THE NOTE MOVED ONTO THE SHEET (founder, 2026-10-22: "make the real page
+  // lead and the demo follow"). The product reads the note out on the sheet
+  // and reveals the page afterwards; the demo had it typing on the page
+  // beneath, beside climbing bars, which is the sequence the real page was
+  // deliberately changed away from. So "confirmed" now holds 3300ms — the
+  // note types over 1900 of them and the record rows land for the last 1400
+  // — and the page beneath is revealed with the note already in place.
+  //
+  // THE CYCLE DOES NOT GROW AGAIN. The 2800ms that "results" held for the
+  // note's typing pays for the sheet's longer hold; clearing and results
+  // each shift by 1500 and the beat still ends at 19750, so DWELL_MS is
+  // untouched. Lengthening to give the note its real 6.4s was the other
+  // option and was not taken: this is a watched loop, not someone's own
+  // pledge, and 19.75s was already a considered ceiling.
+  { phase: "confirmed", at: 14150 }, // 4. the sheet: confirmation, the note
+  //                                       types, then the record
+  { phase: "clearing", at: 17450 }, // 5. the sheet slides down onto the live
+  //                                       page, the note already on it
+  { phase: "results", at: 18450 }, //    the bars climb, alone
+  { phase: "note", at: 19750 }, //    everything stands
 ]
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)"
 function subscribeReducedMotion(onChange: () => void) {

@@ -263,9 +263,34 @@ test.describe("reveal after pledge", () => {
     // This submits form#pledge-checkout-form which Stripe's Elements handles.
     await dialog.getByRole("button", { name: /pay now/i }).click()
 
-    // ── 8. Wait for payment to succeed and dialog to close ────────────────────
-    // Stripe test-mode cards process synchronously (redirect: "if_required"
-    // and 4242 never triggers 3DS, so no redirect occurs).
+    // ── 8. The sheet HOLDS, and reads the note out ────────────────────────────
+    // THE PHONE OPENS ON THE NOTE (founder, 2026-10-22). The sheet used to
+    // close in the same React batch as the page unlocking, so the note began
+    // typing inside a full page of standings that had just appeared whole.
+    // Now it stays up, reads the note with nothing else on screen, and its
+    // exit is the reveal of the page beneath.
+    //
+    // THIS IS THE ASSERTION THAT CATCHES A SILENT FALL-THROUGH. Every way out
+    // of the ceremony — no note, reduced motion, the hostage timeout in
+    // use-favpoll-content — closes the sheet exactly as it did before, and the
+    // checks below this point would pass identically. Only this one says the
+    // note was read on the sheet at all.
+    // .first() because TypedNote renders TWO blockquotes — the typed,
+    // aria-hidden copy and an invisible full-height reserve beneath it, so the
+    // quote border spans the final height from the first keystroke. The first
+    // is the typing surface (typed-note.tsx), as everywhere else in this spec.
+    //
+    // The first two words, not the whole note: they are on screen about half a
+    // second into the typing, where the full text lands at ~1.9s and the sheet
+    // leaves ~4s after that. The complete text is asserted on the PAGE below.
+    await expect(dialog.locator("blockquote").first()).toContainText(
+      "Cornflower blue",
+      { timeout: 30_000 }
+    )
+    await expect(dialog).toBeVisible()
+
+    // ── 8b. Then it leaves on its own ─────────────────────────────────────────
+    // Typing (~1.9s) plus StepNote's hold, with no tap or key to cut it short.
     await expect(dialog).not.toBeVisible({ timeout: 30_000 })
 
     // ── 9. Confirm the reveal is now visible ──────────────────────────────────
