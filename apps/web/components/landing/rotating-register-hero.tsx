@@ -243,17 +243,23 @@ export function RotatingRegisterHero() {
                 // THE THREE REGISTERS ENTER GENTLY (2026-10-23). It was a
                 // 700ms opacity crossfade on the default curve — correct but
                 // characterless, and these three cards are the first thing
-                // anyone sees. Now 900ms on the page-turn curve with a 6px
-                // rise, so the arriving register settles rather than simply
-                // appears. The slides are stacked in ONE grid cell, so the
-                // transform moves nothing but itself and the band's height
-                // never depends on it (the hero's layout-never-depends-on-
-                // animation invariant holds).
+                // anyone sees. It is 900ms on the page-turn curve now, which
+                // is the whole change.
+                //
+                // NO TRAVEL, and this was tried and taken out the same day
+                // (founder: "is the bounce between demo registers
+                // deliberate? i'm not sure its an improvement" — it was not
+                // deliberate). A 6px rise was added to the incoming slide,
+                // but the slides CROSSFADE: for most of the 900ms both are
+                // partly visible, and with a transform on each they sit at
+                // different heights, so the headline is drawn twice six
+                // pixels apart, sliding against itself. On display type that
+                // reads as a bounce. A cross-dissolve is the one entrance
+                // that cannot carry travel — the two states have to occupy
+                // the same place.
                 "col-start-1 row-start-1",
-                "motion-safe:transition-[opacity,transform] motion-safe:duration-900 motion-safe:ease-[cubic-bezier(0.32,0.72,0,1)]",
-                isActive
-                  ? "opacity-100 motion-safe:translate-y-0"
-                  : "pointer-events-none opacity-0 motion-safe:translate-y-1.5"
+                "motion-safe:transition-opacity motion-safe:duration-900 motion-safe:ease-[cubic-bezier(0.32,0.72,0,1)]",
+                isActive ? "opacity-100" : "pointer-events-none opacity-0"
               )}
             >
               {/* THE RAIL MEETS THE WORDMARK'S INK (founder, 2026-10-15:
