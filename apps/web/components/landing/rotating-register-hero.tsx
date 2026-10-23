@@ -240,8 +240,20 @@ export function RotatingRegisterHero() {
               aria-hidden={!isActive}
               inert={!isActive}
               className={cn(
-                "col-start-1 row-start-1 motion-safe:transition-opacity motion-safe:duration-700",
-                isActive ? "opacity-100" : "pointer-events-none opacity-0"
+                // THE THREE REGISTERS ENTER GENTLY (2026-10-23). It was a
+                // 700ms opacity crossfade on the default curve — correct but
+                // characterless, and these three cards are the first thing
+                // anyone sees. Now 900ms on the page-turn curve with a 6px
+                // rise, so the arriving register settles rather than simply
+                // appears. The slides are stacked in ONE grid cell, so the
+                // transform moves nothing but itself and the band's height
+                // never depends on it (the hero's layout-never-depends-on-
+                // animation invariant holds).
+                "col-start-1 row-start-1",
+                "motion-safe:transition-[opacity,transform] motion-safe:duration-900 motion-safe:ease-[cubic-bezier(0.32,0.72,0,1)]",
+                isActive
+                  ? "opacity-100 motion-safe:translate-y-0"
+                  : "pointer-events-none opacity-0 motion-safe:translate-y-1.5"
               )}
             >
               {/* THE RAIL MEETS THE WORDMARK'S INK (founder, 2026-10-15:

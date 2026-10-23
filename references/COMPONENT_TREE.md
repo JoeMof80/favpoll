@@ -1,6 +1,6 @@
 # Component Tree
 
-Generated 2026-10-22 by `node scripts/component-tree.mjs` — do not edit by hand; rerun it (CI: `--check`).
+Generated 2026-10-23 by `node scripts/component-tree.mjs` — do not edit by hand; rerun it (CI: `--check`).
 
 ## Legend
 
@@ -1393,6 +1393,7 @@ components/hero-demo-panel/demo-card.tsx *
   → components/hero-demo-panel/scenes.ts *
       → components/favpoll-card/types.ts
   → components/hero-demo-panel/variants.ts
+  → components/landing/fade-in.tsx
   → components/landing/hero-texture.tsx
   → components/lock-card-content.tsx
   → components/pledge-dialog/step-amount.tsx

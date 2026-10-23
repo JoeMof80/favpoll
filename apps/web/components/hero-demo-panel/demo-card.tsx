@@ -42,6 +42,7 @@ import { PollHeading } from "@/components/poll-heading"
 import type { Favourite } from "@favpoll/types"
 import type { HeroScene, Phase } from "./scenes"
 import { FAST } from "./variants"
+import { PAGE_TURN, PAGE_TURN_MS } from "@/components/landing/fade-in"
 import { formatPounds } from "@/lib/i18n"
 
 // Eight, not five (founder, 2026-08-09): the reveal beat left a band of
@@ -135,6 +136,12 @@ const phoneSheetVariant = {
     y: "100%",
     transition: { duration: 0.6, ease: "easeInOut" as const },
   },
+}
+
+/** One band of the confirmed sheet: a short rise, no overshoot. */
+const NOTE_BAND = {
+  hidden: { opacity: 0, y: 8 },
+  shown: { opacity: 1, y: 0 },
 }
 
 const scrimVariant = {
@@ -742,15 +749,55 @@ export function DemoCard({
                         StepConfirmed itself: that one owns its own clock and
                         ends by dismissing a real sheet, where this is driven
                         by the beat in landing/hero.tsx. */}
-                    <div className="relative flex min-h-0 flex-1 flex-col">
-                      <div className="shrink-0 px-6 pt-6">
+                    {/* THE NOTE IS THE MOST CRAFTED MOMENT ON THE PAGE
+                        (2026-10-23). Everything used to arrive at once with
+                        the sheet. Now the three bands settle in reading
+                        order on the page-turn curve, 90ms apart: the
+                        confirmation answers "did my card work", the topic
+                        frames what is coming, and only then does the note
+                        begin. It is the same stagger the landing's type
+                        uses, spent on the beat that matters most.
+
+                        Reduced motion collapses it: FAST is a 0.2s cut and
+                        staggerChildren goes to zero, so the composition
+                        simply appears. */}
+                    <motion.div
+                      className="relative flex min-h-0 flex-1 flex-col"
+                      initial="hidden"
+                      animate="shown"
+                      variants={{
+                        hidden: {},
+                        shown: {
+                          transition: {
+                            staggerChildren: prefersReducedMotion ? 0 : 0.09,
+                          },
+                        },
+                      }}
+                    >
+                      <motion.div
+                        className="shrink-0 px-6 pt-6"
+                        variants={NOTE_BAND}
+                        transition={
+                          prefersReducedMotion
+                            ? FAST
+                            : { duration: PAGE_TURN_MS, ease: PAGE_TURN }
+                        }
+                      >
                         <PledgeConfirmedHead />
-                      </div>
+                      </motion.div>
                       <div className="relative flex min-h-0 flex-1 flex-col justify-center gap-4 px-6 py-4">
                         <MonogramWash id="demo-ceremony-note" />
-                        <div className="relative">
+                        <motion.div
+                          className="relative"
+                          variants={NOTE_BAND}
+                          transition={
+                            prefersReducedMotion
+                              ? FAST
+                              : { duration: PAGE_TURN_MS, ease: PAGE_TURN }
+                          }
+                        >
                           <PollHeading topicTitle={topicTitle} />
-                        </div>
+                        </motion.div>
                         {/* Reserve the final height so the note does not walk
                             up the sheet as it types. */}
                         <div className="relative">
@@ -774,7 +821,7 @@ export function DemoCard({
                       >
                         <PledgeConfirmedHead />
                       </div>
-                    </div>
+                    </motion.div>
                   </motion.div>
                 ) : pickerOpen ? (
                   <motion.div
