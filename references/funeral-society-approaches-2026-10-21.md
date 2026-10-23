@@ -44,17 +44,51 @@ aimed rather than guessed.
   a referral that does not exist, invites "came up where?", and is the line
   every recruiter writes. Replace it with the true reason — a named, dated,
   verifiable thing the person said or did.
-- **Direct cremation.** A market-size argument for PPGF, not a pitch to a
-  funeral director. A direct cremation's whole value to a family is that there
-  is less of it, so offering to add something to a director's lowest-margin
-  service helps them least, and risks sounding like an upsell to the bereaved
-  or a criticism of their service.
+- **Direct cremation — NARROWED 2026-10-23, see below.** Still never as a
+  market-size argument, never as an upsell, and never to an independent whose
+  business is attended funerals. But the original reasoning does not survive
+  contact with a provider that sells direct cremation itself, and the
+  societies all do.
 - **PPGF**, by name or implication.
 - **Hospice introductions.** A month-three ask at the earliest, and the Hospice
   UK connection is thinner than it first appeared (see the sector map).
 - **Any offer to fix their website.** It turns the relationship into a trade
   and makes you their web developer indefinitely.
 - **Attachments, links beyond favpoll.com, or a named example.**
+
+### Direct cremation, narrowed (2026-10-23)
+
+The rule was written as "never mention it", on two legs: it is the director's
+lowest-margin service, so helping there helps them least; and raising it
+"risks sounding like an upsell to the bereaved or a criticism of their
+service."
+
+**The second leg fails when the provider sells it.** Co-op Funeralcare lists
+direct cremation at £1,445 and launched it under the name **"Cremation
+Without Ceremony"** — they named the absence themselves. The societies sell
+it too. You cannot be criticising a service a provider promotes under its own
+brand.
+
+**The first leg is answerable, but not the way the rule frames it.** A Head of
+Funeral is not weighing the margin on one cremation. The worry is that the
+fastest-growing fifth of the market is a product with **no relationship in
+it**: an attended funeral leaves them a room full of people, an order of
+service carrying their name, and a family who remembers them; a direct
+cremation leaves a transaction. And every distribution channel in the sector
+map — the insert card, the order of service, the live screen — is absent from
+precisely that segment.
+
+**So it becomes a QUESTION, not a pitch, which is the shape this file already
+argues for.** *When a family takes a direct cremation, is there anything you
+can offer the people who would have come?* Only they can answer it, it costs
+nothing to ask, and it invites them to reach for the thing rather than be
+sold it.
+
+**Keep one honesty.** A family that chose a direct cremation chose less
+ceremony — sometimes for cost, sometimes because the person wanted no fuss.
+A participation mechanic can read as reintroducing what they declined.
+`ppgf-volume-note-2026-10.md` says that is unsizable in either direction and
+it still is, which is exactly why it is asked rather than asserted.
 
 ---
 

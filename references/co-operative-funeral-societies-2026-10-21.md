@@ -336,6 +336,67 @@ giving or charitable collections at funerals at all.
 That is a co-operative argument, not a technology one. No funeral director has
 ever opened a conversation with them that way.
 
+### What they said they want, and the segment where they have nothing (2026-10-23)
+
+Two findings from after this note was written. Together they change which
+favpoll leads the conversation.
+
+**1. FuneralCoop published what families asked them for.** A press release
+for Dying Matters Awareness Week (centralcoop.co.uk, same wave as the
+5 May membershipmatters piece, and the source of the Barsby quote the InMail
+opens on) reports "new member insight" calling on the sector to lead earlier
+conversations about death. **It carries no numbers at all** — "a significant
+majority", "most people", "many bereaved respondents", no sample size, no
+method — so it is positioning rather than data, and nothing in it is
+citable or replaces the derived £400.
+
+What it does carry is a list. Respondents named what would help them engage:
+simple guides and checklists, **conversation starters**, **real-life stories
+and experiences**, clear information about funeral planning, grief support.
+Two of those five describe a favpoll. "What was their favourite song?" is a
+conversation starter about a person, and the record of what people picked is
+real-life stories. That is their own members telling them what to find, and
+we have one of the things on the list.
+
+The phrase to keep is **"supporting families before need, not just at point
+of need"**, with "discussing funeral arrangements and wishes" named as
+pressure point one. Our funeral-director pitch — insert card, live screen, a
+better collection — is entirely point-of-need. The will-directed favpoll
+(`will-directed-favpoll-2026-10-21.md`) is the one that fits their stated
+strategy.
+
+**Do not read a press release as a buying signal.** It is evidence of
+appetite and vocabulary, not of budget or a procurement route.
+
+**2. They sell direct cremation, and that is where they have nothing to
+give.** Co-op Funeralcare lists it at £1,445 under the name "Cremation
+Without Ceremony"; the societies sell it too. 21% of UK funerals and the
+fastest-growing fifth.
+
+It is the segment where a provider hands the family a transaction rather than
+a relationship — no room, no order of service, no collection, and none of the
+distribution this document assumes. **That is the hole favpoll fits, because
+a favpoll is a page and needs no room.** It is also the same gap as finding 1
+seen from the other end: a direct-cremation family is the family that got the
+fewest conversations, the least ceremony and no real-life story at all.
+
+**And it closes the one hole the volume note is honest about.** That note
+flags distribution, not reach, as the uncertainty for direct cremation — the
+family has to pass the link round themselves. If the provider puts the link
+in the pack it already sends that family, the partner solves it. See
+`ppgf-volume-note-2026-10.md`.
+
+The approach stays a question, not a pitch: *when a family takes a direct
+cremation, is there anything you can offer the people who would have come?*
+Rules and the remaining honesty are in
+`funeral-society-approaches-2026-10-21.md`.
+
+**WHICH FAVPOLL LEADS, REVISED.** Not the collection at the graveside. Either
+the will-directed favpoll (their stated "before need" priority) or the
+direct-cremation one (their fastest-growing segment, and the one where they
+currently offer nothing). Both are untested with them; the direct-cremation
+question is the cheaper of the two to ask first, because it needs no pitch.
+
 ### The plumbing
 
 They run their own funeral management system, **"Our Care Hub"**, rolled out
