@@ -10,6 +10,7 @@ import {
   Scale,
   Search,
 } from "lucide-react"
+import { SECTIONS } from "@/lib/library"
 import type { LibraryEntry, LibrarySection } from "@/lib/library"
 
 type Row = LibraryEntry & { href: string }
@@ -40,7 +41,14 @@ type Row = LibraryEntry & { href: string }
 // globals.css, the admin's only departure from its single hue) and the
 // section is printed as a word beside it. Colour is never the only signal:
 // the shapes differ and the word is there, so nothing is lost to a
-// colour-blind reader, and no legend is needed.
+// colour-blind reader.
+//
+// THE LEGEND (founder, 2026-10-23: "we need a legend somewhere on the
+// page"). I had argued one was unnecessary because every row spells its
+// section out — wrong twice over: the label is hidden below sm, and even
+// with it, you learn the mapping only by reading rows one at a time. The
+// legend teaches all four at once, which is what makes the colours worth
+// having peripherally.
 //
 // Kept from the density pass: no kind label (it said "Note" 35 times in 39),
 // the summary clamped to one line (/library/[slug] prints it in full above
@@ -124,6 +132,27 @@ export function LibraryIndex({ entries }: { entries: Row[] }) {
           className="w-full rounded-md border border-border bg-background py-2 pr-3 pl-9 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
         />
       </label>
+
+      {/* Sits under the search and above the first week: read once, and
+          thereafter the icons carry the section on their own. */}
+      <ul className="flex flex-wrap items-center gap-x-5 gap-y-2">
+        {SECTIONS.map((section) => {
+          const { Icon, className } = SECTION_MARK[section]
+          return (
+            <li
+              key={section}
+              className="flex items-center gap-1.5 text-xs text-muted-foreground"
+            >
+              <Icon
+                size={14}
+                className={`shrink-0 ${className}`}
+                aria-hidden="true"
+              />
+              {section}
+            </li>
+          )
+        })}
+      </ul>
 
       {[...weeks].map(([key, rows]) => {
         const heading = `Week of ${WEEK_OF.format(new Date(`${key}T00:00:00Z`))}`
