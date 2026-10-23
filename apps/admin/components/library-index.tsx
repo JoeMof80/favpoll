@@ -25,6 +25,12 @@ type Row = LibraryEntry & { href: string }
 // undifferentiated scroll in a different sequence. The months run 21 / 9 /
 // 2 / 6 / 1, so the headings land where the work actually happened.
 //
+// ONE COLUMN (founder, 2026-10-23: "single column again please"). Two were
+// tried on this branch and taken out: with the months grouped, a second
+// column reads top-to-bottom per column, so the eye has to run down and
+// back up to stay in date order — which is the one thing this layout is
+// for. The small months left half a row empty too.
+//
 // THE SECTION SURVIVES AS A MARK, because sorting by date loses it
 // otherwise. Each row's icon wears its section's colour (tokens in
 // globals.css, the admin's only departure from its single hue) and the
@@ -110,10 +116,9 @@ export function LibraryIndex({ entries }: { entries: Row[] }) {
             >
               {heading}
             </h2>
-            {/* border-t per item rather than an outer card: in two columns a
-                card leaves a stray cell on an odd count, and a divide-y does
-                not cross the gutter. */}
-            <ul className="grid gap-x-10 lg:grid-cols-2">
+            {/* border-t per item rather than an outer card, so a month with
+                one entry does not render as a lone box. */}
+            <ul>
               {rows.map((e) => {
                 const { Icon, className } = SECTION_MARK[e.section]
                 const external = e.kind !== "reference"
@@ -138,14 +143,19 @@ export function LibraryIndex({ entries }: { entries: Row[] }) {
                       <span className="mt-0.5 block truncate text-sm text-muted-foreground">
                         {e.summary}
                       </span>
-                      <span className="mt-1 block text-[11px] tracking-wide text-muted-foreground uppercase">
+                    </span>
+                    {/* The section rides the right rail rather than sitting
+                        under the summary: at full width a third line per row
+                        made 39 of them tall for nothing. Hidden on a narrow
+                        screen, where the icon's colour carries it alone. The
+                        month is the heading, so the day is enough date. */}
+                    <span className="mt-0.5 shrink-0 text-right text-xs text-muted-foreground">
+                      <span className="hidden text-[11px] tracking-wide uppercase sm:block">
                         {e.section}
                       </span>
-                    </span>
-                    {/* The month is the heading, so the row needs only the
-                        day. */}
-                    <span className="mt-1 shrink-0 text-xs text-muted-foreground tabular-nums">
-                      {Number(e.date.slice(8, 10))}
+                      <span className="block tabular-nums">
+                        {Number(e.date.slice(8, 10))}
+                      </span>
                     </span>
                   </>
                 )
