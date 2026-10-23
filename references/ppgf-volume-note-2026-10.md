@@ -50,6 +50,21 @@ So for that segment the £400 per-favpoll figure is the uncertain number — the
 would have come", which we cannot yet size in either direction. We have not
 adjusted the unit for it, and we would rather flag it than hide it.
 
+**A PROVIDER PARTNERSHIP CLOSES THAT GAP (2026-10-23).** The qualification
+above assumes the family is the distributor. They need not be: the providers
+sell direct cremation themselves — Co-op Funeralcare lists it at £1,445 under
+the name "Cremation Without Ceremony" — and they already send that family a
+pack. A link in it is distribution the family does not have to invent, from
+the partner we are already approaching.
+
+That also turns the segment from a market-size argument into the strongest
+thing we have to say to a society: direct cremation is where they hand a
+family a transaction instead of a relationship, and a favpoll is the only
+thing that works without a room. Sector map in
+`co-operative-funeral-societies-2026-10-21.md`; the approach rules, and what
+stays honest about a family that chose less ceremony, in
+`funeral-society-approaches-2026-10-21.md`.
+
 ## The unit
 
 One funeral favpoll:
