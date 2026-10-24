@@ -65,6 +65,13 @@ type Props = {
    */
   surfaceClassName?: string
   /**
+   * A layer rendered as the surface's FIRST child, behind everything,
+   * covering its padding too — for a texture that has to reach the notch
+   * inset (founder, 2026-10-24: "the monogram doesn't cover the full
+   * screen"). Position it `absolute inset-0` itself.
+   */
+  surfaceLayer?: React.ReactNode
+  /**
    * Mobile: take over the whole screen instead of a bottom sheet, with a
    * top action bar (Cancel · title · save). For keyboard-summoning dialogs:
    * content anchors at the TOP, so the keyboard can never cover the input
@@ -187,6 +194,7 @@ export function ResponsiveOverlay({
   headerClassName,
   bodyClassName,
   surfaceClassName,
+  surfaceLayer,
   fullscreenOnMobile = false,
   mobileSave,
   mobileBack,
@@ -224,6 +232,7 @@ export function ResponsiveOverlay({
             paddingBottom: keyboardInset,
           }}
         >
+          {surfaceLayer}
           {/* Top action bar. Two shapes: with mobileSave it's the
               full-screen-editor pattern (Cancel · title · Save) and the
               footer prop is dropped; without it the bar is a plain centred
@@ -340,6 +349,7 @@ export function ResponsiveOverlay({
           // which fires on mount regardless of this.
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
+          {surfaceLayer}
           <SheetHeader
             className={
               !header && hideTitle
@@ -401,6 +411,7 @@ export function ResponsiveOverlay({
               : `shrink-0 ${separators ? "border-b border-border" : ""} ${headerClassName ?? "px-5 py-4"}`
           }
         >
+          {surfaceLayer}
           {header ? (
             <>
               <DialogTitle className="sr-only">{title}</DialogTitle>

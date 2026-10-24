@@ -78,7 +78,10 @@ import { setHeroRegister } from "@/lib/hero-register-store"
 // restarts the dwell, so nobody impatient is kept waiting either.
 //
 // Was 19s (2026-10-18), 8s before that with frozen stills.
-export const DWELL_MS = 23500
+// 24500 since 2026-10-24: the beat grew by a second so the finished note
+// stands long enough to read (hero.tsx STILL_BEAT), and the dwell keeps the
+// same ~3.75s of still, fully-arrived slide it has always ended on.
+export const DWELL_MS = 24500
 
 type Palette = "memorial" | "celebration" | "fundraiser"
 

@@ -707,13 +707,7 @@ export function DemoCard({
                 : { height: dialogH, y: "-50%" }
             }
             className={cn(
-              "absolute z-20 flex flex-col overflow-hidden",
-              // The ceremony wears the band on the SHEET, so the notch
-              // padding above it is band-coloured too (founder, 2026-10-24:
-              // "resolve white safe area").
-              confirmedInDialog
-                ? "on-band bg-primary text-primary-foreground"
-                : "bg-background",
+              "absolute z-20 flex flex-col overflow-hidden bg-background",
               isPhone
                 ? // The real thing on a handset: ResponsiveOverlay renders a
                   // bottom Sheet at 100dvh, so it takes the whole screen with
@@ -723,6 +717,48 @@ export function DemoCard({
             )}
             aria-hidden="true"
           >
+            {/* THE BAND AS A FADING LAYER, not a class on the sheet
+                (founder, 2026-10-24: "i don't like this transition"). Setting
+                the ground from `confirmedInDialog` switched it the instant
+                the phase changed — but the steps inside crossfade on
+                AnimatePresence `mode="wait"`, so for 450ms the AMOUNT STEP
+                sat on the band with the band's ink tokens: washed-out
+                presets, pale figures. The ground has to arrive WITH the
+                content, not with the phase.
+
+                A sibling layer rather than a background inside the confirmed
+                view, because the sheet carries env(safe-area-inset-top) of
+                notch padding and only a child positioned against the sheet
+                reaches it — which is the whole reason the strip was white
+                before. */}
+            {confirmedInDialog && (
+              <motion.div
+                className="absolute inset-0 bg-primary"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                // WAITS ITS TURN. AnimatePresence `mode="wait"` plays the
+                // outgoing step out over 0.45s BEFORE the confirmed view
+                // mounts, so a ground that starts with the phase spends that
+                // whole time under a departing white step — the two
+                // cross-dissolving was still the transition the founder
+                // objected to, just milder than the first version. Delayed by
+                // the outgoing duration, the band arrives WITH the content.
+                transition={
+                  prefersReducedMotion ? FAST : { duration: 0.45, delay: 0.45 }
+                }
+                aria-hidden="true"
+              >
+                {/* The texture rides the ground, so it reaches the notch
+                    inset and both ends of the sheet. */}
+                <MonogramWash
+                  id="demo-ceremony-note"
+                  onBand
+                  shimmerDelay={1.9}
+                  shimmerSeconds={2}
+                />
+              </motion.div>
+            )}
+
             {/* No top action bar (#887/#889): the real dialog leads with
                 its header slot's eyebrow on every viewport and commits in
                 the bottom footer twins — the phone photograph shows the
@@ -770,7 +806,7 @@ export function DemoCard({
                     <motion.div
                       // The band surface, as the real sheet wears it
                       // (step-confirmed.tsx, founder 2026-10-24).
-                      className="relative flex min-h-0 flex-1 flex-col"
+                      className="on-band relative z-10 flex min-h-0 flex-1 flex-col text-primary-foreground"
                       initial="hidden"
                       animate="shown"
                       variants={{
@@ -794,7 +830,6 @@ export function DemoCard({
                         <PledgeConfirmedHead onBand />
                       </motion.div>
                       <div className="relative flex min-h-0 flex-1 flex-col justify-center gap-4 px-6 py-4">
-                        <MonogramWash id="demo-ceremony-note" onBand />
                         <motion.div
                           className="relative"
                           variants={NOTE_BAND}

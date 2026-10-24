@@ -51,7 +51,6 @@
 import { useEffect, useRef } from "react"
 import { TypedNote } from "@/components/poll-section/typed-note"
 import { PledgeConfirmedHead } from "@/components/pledge-receipt"
-import { MonogramWash } from "@/components/landing/hero-texture"
 import { PollHeading } from "@/components/poll-heading"
 import type { MentionTarget } from "@/lib/mentions"
 
@@ -126,7 +125,6 @@ export function StepConfirmed({
 
       {/* min-h-0 + overflow: a long note on a short phone scrolls HERE. */}
       <div className="relative flex min-h-0 flex-1 flex-col justify-center gap-5 overflow-y-auto px-6 py-8">
-        <MonogramWash id="ceremony-note" onBand />
         {/* The topic in the grammar it wears everywhere else (founder,
             2026-10-23: "the topic header should match its style everywhere
             else") — PollHeading's quiet default, "Favourite" above the
