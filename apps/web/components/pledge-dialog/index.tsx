@@ -19,6 +19,7 @@ import { StepAmount, StepAmountHeader } from "./step-amount"
 import { StepPay } from "./step-pay"
 import { StepGuestBook } from "./step-guest-book"
 import { StepConfirmed } from "./step-confirmed"
+import { MonogramWash } from "@/components/landing/hero-texture"
 import { PollHeading } from "../poll-heading"
 import type { MentionTarget } from "@/lib/mentions"
 
@@ -354,6 +355,34 @@ export function PledgeDialog({
         onOpenChange={handleOpenChange}
         title={titleByStep[dialog.step]}
         dataRegister={dataRegister}
+        // The ceremony wears the register band. On the SURFACE, not the body:
+        // the sheet carries env(safe-area-inset-top) of padding for the
+        // notch, and colouring only the body left that strip white above it.
+        //
+        // A CLASS IS SAFE HERE and a fading layer is not needed, because this
+        // dialog swaps its steps SYNCHRONOUSLY — noteOnSheet and StepConfirmed
+        // arrive in the same render. The landing demo crossfades its steps on
+        // AnimatePresence `mode="wait"`, so there the ground had to fade in
+        // with the content or the outgoing step wore the band for 450ms
+        // (founder saw it, 2026-10-24). Don't unify them: the difference is
+        // structural.
+        surfaceClassName={
+          noteOnSheet ? "on-band bg-primary text-primary-foreground" : undefined
+        }
+        // FULL BLEED, so the texture reaches the notch inset and both ends
+        // of the sheet — inside the body it covered only the middle band.
+        // The sweep starts as the note finishes typing and is short enough
+        // to finish inside the hold.
+        surfaceLayer={
+          noteOnSheet ? (
+            <MonogramWash
+              id="ceremony-note"
+              onBand
+              shimmerDelay={1.9}
+              shimmerSeconds={2}
+            />
+          ) : undefined
+        }
         hideCloseButton
         header={
           noteOnSheet

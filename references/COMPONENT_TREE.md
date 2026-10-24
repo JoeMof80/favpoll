@@ -1,6 +1,6 @@
 # Component Tree
 
-Generated 2026-10-22 by `node scripts/component-tree.mjs` — do not edit by hand; rerun it (CI: `--check`).
+Generated 2026-10-24 by `node scripts/component-tree.mjs` — do not edit by hand; rerun it (CI: `--check`).
 
 ## Legend
 
@@ -419,13 +419,13 @@ app/favpolls/[id]/page.tsx
           → packages/types/ *  ↑
       → components/guest-book.tsx *  ↑
       → components/pledge-dialog/ *
+          → components/landing/hero-texture.tsx
           → components/pledge-dialog/step-amount.tsx
               → components/ui/button.tsx *  ↑
               → components/ui/input-group.tsx  ↑
               → components/ui/slider.tsx
               → components/ui/tabs.tsx
           → components/pledge-dialog/step-confirmed.tsx
-              → components/landing/hero-texture.tsx
               → components/pledge-receipt.tsx
               → components/poll-heading.tsx *  ↑
               → components/poll-section/typed-note.tsx  ↑
@@ -621,6 +621,7 @@ app/favpolls/page.tsx
           → components/lock-card-content.tsx
           → components/mention-text.tsx  ↑
           → components/pledge-dialog/ *
+              → components/landing/hero-texture.tsx
               → components/pledge-dialog/step-amount.tsx
               → components/pledge-dialog/step-confirmed.tsx
               → components/pledge-dialog/step-guest-book.tsx
@@ -1393,6 +1394,7 @@ components/hero-demo-panel/demo-card.tsx *
   → components/hero-demo-panel/scenes.ts *
       → components/favpoll-card/types.ts
   → components/hero-demo-panel/variants.ts
+  → components/landing/fade-in.tsx
   → components/landing/hero-texture.tsx
   → components/lock-card-content.tsx
   → components/pledge-dialog/step-amount.tsx

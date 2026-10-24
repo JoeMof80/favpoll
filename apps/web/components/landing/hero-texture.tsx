@@ -105,20 +105,57 @@ export function MonogramTiles({ patternId }: { patternId: string }) {
 const SHIMMER_MASK =
   "linear-gradient(105deg, transparent 38%, black 50%, transparent 62%)"
 
-/** The monogram as a faint WASH over a light surface, with one shimmer pass
- *  (founder, 2026-10-23: "single shimmer"). The hero's own texture repeats
- *  forever because the band is permanent furniture; the pledge ceremony
- *  lasts six seconds and nobody is meant to linger, so a repeating sweep
- *  there reads as decoration. Masked top and bottom so the pattern frames
- *  the text rather than running under it. Static under reduced motion. */
-export function MonogramWash({ id }: { id: string }) {
+/** The monogram as a faint WASH, with one shimmer pass (founder, 2026-10-23:
+ *  "single shimmer"). The hero's own texture repeats forever because the band
+ *  is permanent furniture; the pledge ceremony lasts a few seconds and nobody
+ *  is meant to linger, so a repeating sweep there reads as decoration.
+ *
+ *  FULL BLEED, no mask (founder, 2026-10-24: "the monogram doesn't cover the
+ *  full screen"). It was masked top and bottom to keep the pattern off the
+ *  text — but the hero band runs its texture edge to edge under display type
+ *  and the brief is to behave like the hero. At 0.05 there is nothing to
+ *  keep it off. Static under reduced motion. */
+export function MonogramWash({
+  id,
+  onBand = false,
+  shimmerDelay = 0,
+  shimmerSeconds = 5,
+}: {
+  id: string
+  /** On the register band the pattern is the band's ink, not the register. */
+  onBand?: boolean
+  /** Seconds to hold before the single sweep, so the caller can time it to
+   *  something — the ceremony fires it as the note finishes typing, which
+   *  makes the shimmer punctuation for the note landing rather than
+   *  decoration that happened to be running (founder, 2026-10-24). */
+  shimmerDelay?: number
+  /** How long the sweep takes. The hero's is 7s because it loops forever and
+   *  nothing waits for it; a single pass that has to finish inside a hold
+   *  needs to be shorter than that hold. */
+  shimmerSeconds?: number
+}) {
   const reduced = useReducedMotion()
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_18%,black_82%,transparent)] text-primary"
+      className={`pointer-events-none absolute inset-0 overflow-hidden ${
+        onBand ? "text-primary-foreground" : "text-primary"
+      }`}
     >
-      <div className="absolute inset-0 opacity-[0.045]">
+      {/* BARELY THERE UNTIL IT SHIMMERS (founder, 2026-10-24: "the monogram
+          should behave like the homepage hero. barely noticeable until it
+          shimmers"). So the band variant takes the hero band's own pair
+          exactly — 0.05 at rest, 0.11 under the sweep. It briefly sat at
+          0.12 at rest, which made the pattern the thing you noticed instead
+          of the note. The white variant keeps 0.045: dark ink on white
+          carries further than pale ink on a saturated ground. */}
+      <div
+        className={
+          onBand
+            ? "absolute inset-0 opacity-[0.05]"
+            : "absolute inset-0 opacity-[0.045]"
+        }
+      >
         <MonogramTiles patternId={id} />
       </div>
       {!reduced && (
@@ -132,7 +169,11 @@ export function MonogramWash({ id }: { id: string }) {
           }}
           initial={{ maskPosition: "120% 0%" }}
           animate={{ maskPosition: "-20% 0%" }}
-          transition={{ duration: 5, ease: "easeInOut" }}
+          transition={{
+            duration: shimmerSeconds,
+            delay: shimmerDelay,
+            ease: "easeInOut",
+          }}
         >
           <MonogramTiles patternId={`${id}-shimmer`} />
         </motion.div>

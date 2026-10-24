@@ -57,6 +57,21 @@ type Props = {
    */
   bodyClassName?: string
   /**
+   * Extra classes on the SURFACE itself — the SheetContent or DialogContent
+   * root — for a dialog that changes its own ground. The pledge sheet's last
+   * view wears the register band, and colouring only the body left the
+   * sheet's safe-area padding white above it (founder, 2026-10-24: "resolve
+   * white safe area"). Appended, so the surface keeps its layout classes.
+   */
+  surfaceClassName?: string
+  /**
+   * A layer rendered as the surface's FIRST child, behind everything,
+   * covering its padding too — for a texture that has to reach the notch
+   * inset (founder, 2026-10-24: "the monogram doesn't cover the full
+   * screen"). Position it `absolute inset-0` itself.
+   */
+  surfaceLayer?: React.ReactNode
+  /**
    * Mobile: take over the whole screen instead of a bottom sheet, with a
    * top action bar (Cancel · title · save). For keyboard-summoning dialogs:
    * content anchors at the TOP, so the keyboard can never cover the input
@@ -178,6 +193,8 @@ export function ResponsiveOverlay({
   footerSeparator = separators,
   headerClassName,
   bodyClassName,
+  surfaceClassName,
+  surfaceLayer,
   fullscreenOnMobile = false,
   mobileSave,
   mobileBack,
@@ -198,7 +215,7 @@ export function ResponsiveOverlay({
           side="bottom"
           showCloseButton={false}
           onOpenAutoFocus={(e) => e.preventDefault()}
-          className="flex flex-col gap-0 p-0"
+          className={`flex flex-col gap-0 p-0 ${surfaceClassName ?? ""}`}
           // Inline style beats the side-variant's h-auto. Full height with
           // the content at the top. The top bar and inputs never need
           // keyboard dodging here — but the SCROLL BODY and any footer do:
@@ -215,6 +232,7 @@ export function ResponsiveOverlay({
             paddingBottom: keyboardInset,
           }}
         >
+          {surfaceLayer}
           {/* Top action bar. Two shapes: with mobileSave it's the
               full-screen-editor pattern (Cancel · title · Save) and the
               footer prop is dropped; without it the bar is a plain centred
@@ -312,7 +330,7 @@ export function ResponsiveOverlay({
         <SheetContent
           data-register={dataRegister ?? undefined}
           side={mobileSide}
-          className={`flex flex-col gap-0 p-0 ${fromRight ? "data-[side=right]:w-[88%]" : ""}`}
+          className={`flex flex-col gap-0 p-0 ${fromRight ? "data-[side=right]:w-[88%]" : ""} ${surfaceClassName ?? ""}`}
           style={
             fromRight
               ? {
@@ -331,6 +349,7 @@ export function ResponsiveOverlay({
           // which fires on mount regardless of this.
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
+          {surfaceLayer}
           <SheetHeader
             className={
               !header && hideTitle
@@ -378,10 +397,10 @@ export function ResponsiveOverlay({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         data-register={dataRegister ?? undefined}
-        className={
+        className={`${
           dialogClassName ??
           "flex flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl"
-        }
+        } ${surfaceClassName ?? ""}`}
         style={{ maxHeight: "min(600px, 80vh)", ...dialogStyle }}
         showCloseButton={!hideCloseButton}
       >
@@ -392,6 +411,7 @@ export function ResponsiveOverlay({
               : `shrink-0 ${separators ? "border-b border-border" : ""} ${headerClassName ?? "px-5 py-4"}`
           }
         >
+          {surfaceLayer}
           {header ? (
             <>
               <DialogTitle className="sr-only">{title}</DialogTitle>
