@@ -85,22 +85,48 @@ export default async function globalTeardown() {
     Date.now() - PRUNE_AFTER_DAYS * 24 * 60 * 60 * 1000
   ).toISOString()
 
-  const staleIds = new Set<string>()
-  const { data: staleCause } = await supabase
-    .from("favpolls")
-    .select("id")
-    .like("cause_label", "E2E%")
-    .lt("created_at", cutoff)
-  for (const r of staleCause ?? []) staleIds.add(r.id)
-
-  if (protagonistIds.length > 0) {
-    const { data: staleProtagonist } = await supabase
-      .from("favpolls")
-      .select("id")
-      .in("protagonist_id", protagonistIds)
-      .lt("created_at", cutoff)
-    for (const r of staleProtagonist ?? []) staleIds.add(r.id)
+  // PAGED, because PostgREST caps a select at 1,000 rows and truncates
+  // silently — staging held 3,548 favpolls when this was written, so an
+  // unpaged prune would have deleted a thousand a run and looked complete.
+  // The protagonist side filters through an inner join rather than an `in`
+  // list, so no id list crosses the wire either.
+  const PAGE = 1000
+  const pageIds = async (
+    build: (
+      from: number,
+      to: number
+    ) => PromiseLike<{
+      data: { id: string }[] | null
+    }>
+  ) => {
+    const out: string[] = []
+    for (let from = 0; ; from += PAGE) {
+      const { data } = await build(from, from + PAGE - 1)
+      const page = data ?? []
+      out.push(...page.map((r) => r.id))
+      if (page.length < PAGE) break
+    }
+    return out
   }
+
+  const staleIds = new Set<string>([
+    ...(await pageIds((from, to) =>
+      supabase
+        .from("favpolls")
+        .select("id")
+        .like("cause_label", "E2E%")
+        .lt("created_at", cutoff)
+        .range(from, to)
+    )),
+    ...(await pageIds((from, to) =>
+      supabase
+        .from("favpolls")
+        .select("id, protagonists!inner(name)")
+        .like("protagonists.name", "E2E%")
+        .lt("created_at", cutoff)
+        .range(from, to)
+    )),
+  ])
 
   if (staleIds.size > 0) {
     const ids = [...staleIds]

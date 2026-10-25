@@ -115,33 +115,83 @@ export async function restoreWithdrawnPledges(
 // guest-book entries. That is the point here and it is why the production
 // refusal matters more than it does for the withdrawal above.
 
+// EVERY SELECT HERE IS PAGED. PostgREST caps a select at 1,000 rows and
+// truncates SILENTLY — and the platform turned out to hold 3,548 favpolls,
+// not the 200 the capped admin list implied (founder, 2026-10-25). Unpaged,
+// this would have counted 1,000, deleted 1,000, reported success, and left
+// thousands behind looking like it had worked. Same trap as the web app's
+// lib/supabase/paginate, written for the same reason.
+const PAGE = 1000
+
+// EVERY SELECT HERE IS PAGED. PostgREST caps a select at 1,000 rows and
+// truncates SILENTLY — and the platform turned out to hold 3,548 favpolls,
+// not the 200 the capped admin list implied (founder, 2026-10-25). Unpaged,
+// this would have counted 1,000, deleted 1,000, reported success, and left
+// thousands behind looking like it had worked. Same trap as the web app's
+// lib/supabase/paginate, written for the same reason.
+//
+// The two shapes are filtered SERVER-SIDE, including the protagonist one via
+// an inner join, so no list of protagonist ids ever crosses the wire. That
+// also lets the count be a head count rather than an enumeration — it runs on
+// every dashboard render and has no business fetching thousands of rows to
+// label a button.
+type IdQuery = (
+  from: number,
+  to: number
+) => PromiseLike<{ data: { id: string }[] | null; error: unknown }>
+
+async function pagedIds(makeQuery: IdQuery): Promise<string[]> {
+  const ids: string[] = []
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await makeQuery(from, from + PAGE - 1)
+    if (error) throw new Error(String((error as { message?: string }).message))
+    const page = data ?? []
+    ids.push(...page.map((r) => r.id))
+    if (page.length < PAGE) break
+  }
+  return ids
+}
+
 async function e2eFavpollIds(
   supabase: ReturnType<typeof createAdminClient>
 ): Promise<string[]> {
-  const [{ data: byCause }, { data: protagonists }] = await Promise.all([
-    supabase.from("favpolls").select("id").like("cause_label", "E2E%"),
-    supabase.from("protagonists").select("id").like("name", "E2E%"),
+  const [byCause, byProtagonist] = await Promise.all([
+    pagedIds((from, to) =>
+      supabase
+        .from("favpolls")
+        .select("id")
+        .like("cause_label", "E2E%")
+        .range(from, to)
+    ),
+    pagedIds((from, to) =>
+      supabase
+        .from("favpolls")
+        .select("id, protagonists!inner(name)")
+        .like("protagonists.name", "E2E%")
+        .range(from, to)
+    ),
   ])
-
-  const ids = new Set((byCause ?? []).map((r: { id: string }) => r.id))
-
-  const protagonistIds = (protagonists ?? []).map((p: { id: string }) => p.id)
-  if (protagonistIds.length > 0) {
-    const { data: byProtagonist } = await supabase
-      .from("favpolls")
-      .select("id")
-      .in("protagonist_id", protagonistIds)
-    for (const r of byProtagonist ?? []) ids.add((r as { id: string }).id)
-  }
-
-  return [...ids]
+  return [...new Set([...byCause, ...byProtagonist])]
 }
 
 /** How many E2E favpolls are on the platform — for the button's label, so it
  *  never offers to delete nothing. */
 export async function countE2eFavpolls(): Promise<number> {
   if (isProduction()) return 0
-  return (await e2eFavpollIds(createAdminClient())).length
+  const supabase = createAdminClient()
+  const [cause, protagonist] = await Promise.all([
+    supabase
+      .from("favpolls")
+      .select("id", { count: "exact", head: true })
+      .like("cause_label", "E2E%"),
+    supabase
+      .from("favpolls")
+      .select("id, protagonists!inner(name)", { count: "exact", head: true })
+      .like("protagonists.name", "E2E%"),
+  ])
+  // The two sets cannot overlap: a favpoll has a protagonist or a cause
+  // label, never both.
+  return (cause.count ?? 0) + (protagonist.count ?? 0)
 }
 
 /** Delete every E2E favpoll. Cascades. Not reversible. */
