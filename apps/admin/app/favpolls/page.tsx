@@ -2,7 +2,7 @@ import { getAllFavpolls } from "@/lib/actions/favpolls"
 import { FavpollsTable } from "@/components/favpolls-table"
 
 export default async function FavpollsPage() {
-  const { data: favpolls, error } = await getAllFavpolls()
+  const { data: favpolls, error, total } = await getAllFavpolls()
   const webBaseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? null
 
   return (
@@ -19,7 +19,11 @@ export default async function FavpollsPage() {
       {error ? (
         <p className="text-sm text-destructive">{error}</p>
       ) : (
-        <FavpollsTable favpolls={favpolls ?? []} webBaseUrl={webBaseUrl} />
+        <FavpollsTable
+          favpolls={favpolls ?? []}
+          total={total}
+          webBaseUrl={webBaseUrl}
+        />
       )}
     </div>
   )
