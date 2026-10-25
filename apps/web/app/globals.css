@@ -207,6 +207,12 @@
    and written at the same specificity for the same reason. */
 .on-band {
   --foreground: var(--primary-foreground);
+  /* Mention ink is `text-primary` (components/mention-text.tsx, ink alone
+     since 2026-09-29) — on a primary ground that is the register on the
+     register, and the founder found the note with a HOLE in it where the
+     favourite should be. The ground is set on an ancestor, not on this
+     element, so remapping --primary here is safe. */
+  --primary: var(--primary-foreground);
   --muted-foreground: color-mix(
     in oklab,
     var(--primary-foreground) 88%,

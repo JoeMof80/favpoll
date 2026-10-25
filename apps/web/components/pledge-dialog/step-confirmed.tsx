@@ -117,7 +117,13 @@ export function StepConfirmed({
       // hardcode.
       // The surface carries the band and the on-band remap now (the overlay's
       // surfaceClassName), so this is layout only.
-      className="relative flex min-h-[70vh] flex-col sm:min-h-[32rem]"
+      // min-h-FULL, not 70vh (founder on iOS Safari, 2026-10-24: "also not
+      // central"). The overlay's body is the whole sheet; at min-h-[70vh] this
+      // occupied the top 70% of it and centred the note inside THAT, which put
+      // it around 40% down the screen. `on-band` lives here rather than on the
+      // surface so the scope can remap --primary — mention ink is
+      // `text-primary` and was magenta on magenta.
+      className="on-band relative flex min-h-full flex-col sm:min-h-[32rem]"
     >
       <div className="shrink-0 px-6 pt-8">
         <PledgeConfirmedHead onBand />

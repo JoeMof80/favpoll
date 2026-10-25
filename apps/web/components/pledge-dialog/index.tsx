@@ -367,7 +367,7 @@ export function PledgeDialog({
         // (founder saw it, 2026-10-24). Don't unify them: the difference is
         // structural.
         surfaceClassName={
-          noteOnSheet ? "on-band bg-primary text-primary-foreground" : undefined
+          noteOnSheet ? "bg-primary text-primary-foreground" : undefined
         }
         // FULL BLEED, so the texture reaches the notch inset and both ends
         // of the sheet — inside the body it covered only the middle band.
