@@ -1,8 +1,21 @@
 import { getAllFavpolls } from "@/lib/actions/favpolls"
 import { FavpollsTable } from "@/components/favpolls-table"
 
-export default async function FavpollsPage() {
-  const { data: favpolls, error } = await getAllFavpolls()
+// The query lives in the URL: the search runs in the database now, so a
+// result is a page you can send to someone or reload into.
+export default async function FavpollsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; status?: string }>
+}) {
+  const sp = await searchParams
+  const status =
+    sp.status === "open" || sp.status === "closed" ? sp.status : "all"
+  const {
+    data: favpolls,
+    error,
+    total,
+  } = await getAllFavpolls({ q: sp.q, status })
   const webBaseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? null
 
   return (
@@ -19,7 +32,13 @@ export default async function FavpollsPage() {
       {error ? (
         <p className="text-sm text-destructive">{error}</p>
       ) : (
-        <FavpollsTable favpolls={favpolls ?? []} webBaseUrl={webBaseUrl} />
+        <FavpollsTable
+          favpolls={favpolls ?? []}
+          total={total}
+          q={sp.q ?? ""}
+          status={status}
+          webBaseUrl={webBaseUrl}
+        />
       )}
     </div>
   )

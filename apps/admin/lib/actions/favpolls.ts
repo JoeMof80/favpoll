@@ -17,45 +17,137 @@ export type OversightFavpoll = {
   charities: { id: string; name: string }[]
 }
 
-export async function getAllFavpolls(): Promise<{
+/** What one page of the oversight list holds. The list is a slice and says
+ *  so; search is what finds things beyond it. */
+const PAGE_LIMIT = 200
+
+type RawRow = {
+  id: string
+  category: string | null
+  total_raised: number | null
+  is_listed: boolean | null
+  is_exemplar: boolean | null
+  closed_at: string | null
+  closes_at: string | null
+  created_at: string
+  cause_label: string | null
+  protagonist: { name: string } | { name: string }[] | null
+  favpoll_charities?: {
+    charity_id: string
+    charities: { name: string } | null
+  }[]
+}
+
+function toRows(data: unknown[]): OversightFavpoll[] {
+  return (data as RawRow[]).map((ev) => {
+    const p = Array.isArray(ev.protagonist) ? ev.protagonist[0] : ev.protagonist
+    return {
+      id: ev.id,
+      display_name: p?.name ?? ev.cause_label ?? "—",
+      category: ev.category,
+      total_raised: ev.total_raised ?? 0,
+      is_listed: ev.is_listed ?? true,
+      is_exemplar: ev.is_exemplar ?? false,
+      closed_at: ev.closed_at,
+      closes_at: ev.closes_at,
+      created_at: ev.created_at,
+      charities: (ev.favpoll_charities ?? [])
+        .map((fc) => ({ id: fc.charity_id, name: fc.charities?.name ?? "—" }))
+        .sort((a, b) => a.id.localeCompare(b.id)),
+    }
+  })
+}
+
+export type FavpollQuery = {
+  /** Matches the display name — a protagonist's name OR a cause label. */
+  q?: string
+  status?: "all" | "open" | "closed"
+}
+
+// THE SEARCH RUNS IN THE DATABASE (founder, 2026-10-25: "why does the favpoll
+// page only show one page of 200?"). The 200 came in with the page itself
+// (#179) when the platform held a dozen favpolls; by October it held 3,548.
+// The list being a slice was the visible half of that. The DANGEROUS half was
+// the search box, which filtered the 200 rows already loaded — so anything
+// created more than two hundred favpolls ago returned nothing, which looks
+// exactly like an answer.
+//
+// TWO QUERIES, NOT ONE `or`. A favpoll's name is its protagonist's name or
+// its cause label, and PostgREST cannot put an embedded resource's column
+// inside an `or` — so the protagonist side filters through an inner join and
+// the two result sets are merged. They cannot overlap: a favpoll has one or
+// the other, never both.
+export async function getAllFavpolls(query: FavpollQuery = {}): Promise<{
   data: OversightFavpoll[] | null
   error: string | null
+  /** Every favpoll MATCHING THE QUERY, not just the page below — the list is
+   *  capped, and the footer printed that cap as if it were the total. */
+  total: number
 }> {
   const supabase = createAdminClient()
+  const q = query.q?.trim()
+  const status = query.status ?? "all"
 
-  const { data, error } = await supabase
-    .from("favpolls")
-    .select(
-      `id, category, total_raised, is_listed, is_exemplar, closed_at,
+  const SELECT = `id, category, total_raised, is_listed, is_exemplar, closed_at,
        closes_at, created_at, cause_label, protagonist:protagonists ( name ),
        favpoll_charities ( charity_id, charities ( name ) )`
-    )
-    .order("created_at", { ascending: false })
-    .limit(200)
 
-  if (error) return { data: null, error: error.message }
+  /** The status predicate, applied to whichever builder is being assembled.
+   *  Typed structurally rather than with the client's generated builder
+   *  types, which do not survive the `select(…)` string being a variable. */
+  type StatusFilterable<T> = {
+    is: (column: string, value: null) => T
+    not: (column: string, operator: string, value: null) => T
+  }
+  const withFilters = <T extends StatusFilterable<T>>(b: T): T => {
+    if (status === "open") return b.is("closed_at", null)
+    if (status === "closed") return b.not("closed_at", "is", null)
+    return b
+  }
 
-  const rows = (data ?? []).map((ev) => ({
-    id: ev.id,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    display_name: (ev.protagonist as any)?.name ?? ev.cause_label ?? "—",
-    category: ev.category,
-    total_raised: ev.total_raised ?? 0,
-    is_listed: ev.is_listed ?? true,
-    is_exemplar: ev.is_exemplar ?? false,
-    closed_at: ev.closed_at,
-    closes_at: ev.closes_at,
-    created_at: ev.created_at,
-    charities: (
-      (ev.favpoll_charities ?? []) as unknown as {
-        charity_id: string
-        charities: { name: string } | null
-      }[]
+  // Without a search term one query answers it.
+  if (!q) {
+    const { data, error, count } = await withFilters(
+      supabase.from("favpolls").select(SELECT, { count: "exact" })
     )
-      .map((fc) => ({ id: fc.charity_id, name: fc.charities?.name ?? "—" }))
-      .sort((a, b) => a.id.localeCompare(b.id)),
-  }))
-  return { data: rows, error: null }
+      .order("created_at", { ascending: false })
+      .limit(PAGE_LIMIT)
+
+    if (error) return { data: null, error: error.message, total: count ?? 0 }
+    return { data: toRows(data ?? []), error: null, total: count ?? 0 }
+  }
+
+  const like = `%${q}%`
+  const [byCause, byProtagonist] = await Promise.all([
+    withFilters(supabase.from("favpolls").select(SELECT, { count: "exact" }))
+      .ilike("cause_label", like)
+      .order("created_at", { ascending: false })
+      .limit(PAGE_LIMIT),
+    withFilters(
+      supabase
+        .from("favpolls")
+        .select(
+          `${SELECT.replace("protagonist:protagonists ( name )", "protagonist:protagonists!inner ( name )")}`,
+          {
+            count: "exact",
+          }
+        )
+    )
+      .ilike("protagonists.name", like)
+      .order("created_at", { ascending: false })
+      .limit(PAGE_LIMIT),
+  ])
+
+  const error = byCause.error ?? byProtagonist.error
+  if (error) return { data: null, error: error.message, total: 0 }
+
+  const rows = toRows([...(byCause.data ?? []), ...(byProtagonist.data ?? [])])
+  rows.sort((a, b) => b.created_at.localeCompare(a.created_at))
+  return {
+    data: rows.slice(0, PAGE_LIMIT),
+    error: null,
+    total: (byCause.count ?? 0) + (byProtagonist.count ?? 0),
+  }
 }
 
 export async function setListed(
