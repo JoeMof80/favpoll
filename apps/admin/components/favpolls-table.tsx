@@ -1,6 +1,7 @@
 "use client"
 
-import { useMemo, useState, useTransition } from "react"
+import { useEffect, useState, useTransition } from "react"
+import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { ExternalLink } from "lucide-react"
 import type { OversightFavpoll } from "@/lib/actions/favpolls"
 import { setListed, closeFavpollNow } from "@/lib/actions/favpolls"
@@ -190,27 +191,45 @@ function FavpollRow({
 export function FavpollsTable({
   favpolls,
   total,
+  q,
+  status,
   webBaseUrl,
 }: {
   favpolls: OversightFavpoll[]
-  /** Every favpoll on the platform. The query is capped at 200, so this is
-   *  the only honest denominator — the footer printed the cap as the total
-   *  and a backlog of 199 E2E rows read as a full house. */
+  /** Every favpoll MATCHING THE QUERY, which may exceed the page below — the
+   *  only honest denominator. The footer printed the cap as the total, and a
+   *  backlog of 199 E2E rows read as a full house. */
   total: number
+  q: string
+  status: StatusFilter
   webBaseUrl: string | null
 }) {
-  const [search, setSearch] = useState("")
-  const [status, setStatus] = useState<StatusFilter>("all")
+  // THE QUERY LIVES IN THE URL (2026-10-25). Search used to filter the rows
+  // already loaded, so anything beyond the 200-row page returned nothing —
+  // which looks exactly like an answer. It runs in the database now, and the
+  // input only has to keep the URL up to date.
+  const router = useRouter()
+  const pathname = usePathname()
+  const params = useSearchParams()
+  const [search, setSearch] = useState(q)
+  const [navigating, startNavigate] = useTransition()
 
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase()
-    return favpolls.filter((f) => {
-      if (status === "open" && f.closed_at) return false
-      if (status === "closed" && !f.closed_at) return false
-      if (q && !f.display_name.toLowerCase().includes(q)) return false
-      return true
-    })
-  }, [favpolls, search, status])
+  const push = (next: { q?: string; status?: StatusFilter }) => {
+    const sp = new URLSearchParams(params.toString())
+    for (const [k, v] of Object.entries(next)) {
+      if (!v || v === "all") sp.delete(k)
+      else sp.set(k, v)
+    }
+    startNavigate(() => router.replace(`${pathname}?${sp.toString()}`))
+  }
+
+  // Debounced: a keystroke a query would hammer the database, and an admin
+  // typing a name does not need the list to chase every letter.
+  useEffect(() => {
+    if (search === q) return
+    const id = window.setTimeout(() => push({ q: search }), 350)
+    return () => window.clearTimeout(id)
+  }, [search, q]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="space-y-4">
@@ -218,7 +237,7 @@ export function FavpollsTable({
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search by name…"
+          placeholder="Search every favpoll by name…"
           className="max-w-xs"
           aria-label="Search favpolls by name"
         />
@@ -229,19 +248,22 @@ export function FavpollsTable({
               type="button"
               size="sm"
               variant={status === value ? "secondary" : "ghost"}
-              onClick={() => setStatus(value)}
+              onClick={() => push({ status: value })}
             >
               {value === "all" ? "All" : value === "open" ? "Open" : "Closed"}
             </Button>
           ))}
         </div>
         <p className="ml-auto text-xs text-muted-foreground">
-          {filtered.length} of {favpolls.length}
-          {total > favpolls.length ? ` (${total} on the platform)` : ""}
+          {navigating
+            ? "Searching…"
+            : total > favpolls.length
+              ? `Showing ${favpolls.length} of ${total} matches`
+              : `${favpolls.length} match${favpolls.length === 1 ? "" : "es"}`}
         </p>
       </div>
 
-      {filtered.length === 0 ? (
+      {favpolls.length === 0 ? (
         <p className="text-sm text-muted-foreground">No favpolls match.</p>
       ) : (
         <div className="rounded-lg border border-border">
@@ -258,7 +280,7 @@ export function FavpollsTable({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((favpoll) => (
+              {favpolls.map((favpoll) => (
                 <FavpollRow
                   key={favpoll.id}
                   favpoll={favpoll}
