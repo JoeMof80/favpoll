@@ -78,7 +78,10 @@ import { setHeroRegister } from "@/lib/hero-register-store"
 // restarts the dwell, so nobody impatient is kept waiting either.
 //
 // Was 19s (2026-10-18), 8s before that with frozen stills.
-export const DWELL_MS = 23500
+// 24500 since 2026-10-24: the beat grew by a second so the finished note
+// stands long enough to read (hero.tsx STILL_BEAT), and the dwell keeps the
+// same ~3.75s of still, fully-arrived slide it has always ended on.
+export const DWELL_MS = 24500
 
 type Palette = "memorial" | "celebration" | "fundraiser"
 
@@ -240,7 +243,25 @@ export function RotatingRegisterHero() {
               aria-hidden={!isActive}
               inert={!isActive}
               className={cn(
-                "col-start-1 row-start-1 motion-safe:transition-opacity motion-safe:duration-700",
+                // THE THREE REGISTERS ENTER GENTLY (2026-10-23). It was a
+                // 700ms opacity crossfade on the default curve — correct but
+                // characterless, and these three cards are the first thing
+                // anyone sees. It is 900ms on the page-turn curve now, which
+                // is the whole change.
+                //
+                // NO TRAVEL, and this was tried and taken out the same day
+                // (founder: "is the bounce between demo registers
+                // deliberate? i'm not sure its an improvement" — it was not
+                // deliberate). A 6px rise was added to the incoming slide,
+                // but the slides CROSSFADE: for most of the 900ms both are
+                // partly visible, and with a transform on each they sit at
+                // different heights, so the headline is drawn twice six
+                // pixels apart, sliding against itself. On display type that
+                // reads as a bounce. A cross-dissolve is the one entrance
+                // that cannot carry travel — the two states have to occupy
+                // the same place.
+                "col-start-1 row-start-1",
+                "motion-safe:transition-opacity motion-safe:duration-900 motion-safe:ease-[cubic-bezier(0.32,0.72,0,1)]",
                 isActive ? "opacity-100" : "pointer-events-none opacity-0"
               )}
             >

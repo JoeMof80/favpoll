@@ -42,6 +42,7 @@ import { PollHeading } from "@/components/poll-heading"
 import type { Favourite } from "@favpoll/types"
 import type { HeroScene, Phase } from "./scenes"
 import { FAST } from "./variants"
+import { PAGE_TURN, PAGE_TURN_MS } from "@/components/landing/fade-in"
 import { formatPounds } from "@/lib/i18n"
 
 // Eight, not five (founder, 2026-08-09): the reveal beat left a band of
@@ -135,6 +136,12 @@ const phoneSheetVariant = {
     y: "100%",
     transition: { duration: 0.6, ease: "easeInOut" as const },
   },
+}
+
+/** One band of the confirmed sheet: a short rise, no overshoot. */
+const NOTE_BAND = {
+  hidden: { opacity: 0, y: 8 },
+  shown: { opacity: 1, y: 0 },
 }
 
 const scrimVariant = {
@@ -710,6 +717,48 @@ export function DemoCard({
             )}
             aria-hidden="true"
           >
+            {/* THE BAND AS A FADING LAYER, not a class on the sheet
+                (founder, 2026-10-24: "i don't like this transition"). Setting
+                the ground from `confirmedInDialog` switched it the instant
+                the phase changed — but the steps inside crossfade on
+                AnimatePresence `mode="wait"`, so for 450ms the AMOUNT STEP
+                sat on the band with the band's ink tokens: washed-out
+                presets, pale figures. The ground has to arrive WITH the
+                content, not with the phase.
+
+                A sibling layer rather than a background inside the confirmed
+                view, because the sheet carries env(safe-area-inset-top) of
+                notch padding and only a child positioned against the sheet
+                reaches it — which is the whole reason the strip was white
+                before. */}
+            {confirmedInDialog && (
+              <motion.div
+                className="absolute inset-0 bg-primary"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                // WAITS ITS TURN. AnimatePresence `mode="wait"` plays the
+                // outgoing step out over 0.45s BEFORE the confirmed view
+                // mounts, so a ground that starts with the phase spends that
+                // whole time under a departing white step — the two
+                // cross-dissolving was still the transition the founder
+                // objected to, just milder than the first version. Delayed by
+                // the outgoing duration, the band arrives WITH the content.
+                transition={
+                  prefersReducedMotion ? FAST : { duration: 0.45, delay: 0.45 }
+                }
+                aria-hidden="true"
+              >
+                {/* The texture rides the ground, so it reaches the notch
+                    inset and both ends of the sheet. */}
+                <MonogramWash
+                  id="demo-ceremony-note"
+                  onBand
+                  shimmerDelay={1.9}
+                  shimmerSeconds={2}
+                />
+              </motion.div>
+            )}
+
             {/* No top action bar (#887/#889): the real dialog leads with
                 its header slot's eyebrow on every viewport and commits in
                 the bottom footer twins — the phone photograph shows the
@@ -742,15 +791,56 @@ export function DemoCard({
                         StepConfirmed itself: that one owns its own clock and
                         ends by dismissing a real sheet, where this is driven
                         by the beat in landing/hero.tsx. */}
-                    <div className="relative flex min-h-0 flex-1 flex-col">
-                      <div className="shrink-0 px-6 pt-6">
-                        <PledgeConfirmedHead />
-                      </div>
+                    {/* THE NOTE IS THE MOST CRAFTED MOMENT ON THE PAGE
+                        (2026-10-23). Everything used to arrive at once with
+                        the sheet. Now the three bands settle in reading
+                        order on the page-turn curve, 90ms apart: the
+                        confirmation answers "did my card work", the topic
+                        frames what is coming, and only then does the note
+                        begin. It is the same stagger the landing's type
+                        uses, spent on the beat that matters most.
+
+                        Reduced motion collapses it: FAST is a 0.2s cut and
+                        staggerChildren goes to zero, so the composition
+                        simply appears. */}
+                    <motion.div
+                      // The band surface, as the real sheet wears it
+                      // (step-confirmed.tsx, founder 2026-10-24).
+                      className="on-band relative z-10 flex min-h-0 flex-1 flex-col text-primary-foreground"
+                      initial="hidden"
+                      animate="shown"
+                      variants={{
+                        hidden: {},
+                        shown: {
+                          transition: {
+                            staggerChildren: prefersReducedMotion ? 0 : 0.09,
+                          },
+                        },
+                      }}
+                    >
+                      <motion.div
+                        className="shrink-0 px-6 pt-6"
+                        variants={NOTE_BAND}
+                        transition={
+                          prefersReducedMotion
+                            ? FAST
+                            : { duration: PAGE_TURN_MS, ease: PAGE_TURN }
+                        }
+                      >
+                        <PledgeConfirmedHead onBand />
+                      </motion.div>
                       <div className="relative flex min-h-0 flex-1 flex-col justify-center gap-4 px-6 py-4">
-                        <MonogramWash id="demo-ceremony-note" />
-                        <div className="relative">
+                        <motion.div
+                          className="relative"
+                          variants={NOTE_BAND}
+                          transition={
+                            prefersReducedMotion
+                              ? FAST
+                              : { duration: PAGE_TURN_MS, ease: PAGE_TURN }
+                          }
+                        >
                           <PollHeading topicTitle={topicTitle} />
-                        </div>
+                        </motion.div>
                         {/* Reserve the final height so the note does not walk
                             up the sheet as it types. */}
                         <div className="relative">
@@ -772,9 +862,9 @@ export function DemoCard({
                         className="invisible shrink-0 px-6 pb-6"
                         aria-hidden="true"
                       >
-                        <PledgeConfirmedHead />
+                        <PledgeConfirmedHead onBand />
                       </div>
-                    </div>
+                    </motion.div>
                   </motion.div>
                 ) : pickerOpen ? (
                   <motion.div
