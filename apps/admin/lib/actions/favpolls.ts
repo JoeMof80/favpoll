@@ -80,8 +80,10 @@ export type FavpollQuery = {
 export async function getAllFavpolls(query: FavpollQuery = {}): Promise<{
   data: OversightFavpoll[] | null
   error: string | null
-  /** Every favpoll MATCHING THE QUERY, not just the page below — the list is
-   *  capped, and the footer printed that cap as if it were the total. */
+  /** Every favpoll MATCHING THE QUERY, not just the page below. The list is
+   *  capped and the footer used to print that cap as if it were the total —
+   *  so 199 E2E rows plus one real one read as "200 of 200" and the backlog
+   *  behind it was invisible (founder, 2026-10-25). */
   total: number
 }> {
   const supabase = createAdminClient()

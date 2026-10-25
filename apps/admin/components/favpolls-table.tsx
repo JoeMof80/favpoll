@@ -196,7 +196,9 @@ export function FavpollsTable({
   webBaseUrl,
 }: {
   favpolls: OversightFavpoll[]
-  /** Every favpoll matching the query, which may exceed the page below. */
+  /** Every favpoll MATCHING THE QUERY, which may exceed the page below — the
+   *  only honest denominator. The footer printed the cap as the total, and a
+   *  backlog of 199 E2E rows read as a full house. */
   total: number
   q: string
   status: StatusFilter

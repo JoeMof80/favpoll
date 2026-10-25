@@ -62,7 +62,7 @@ export type HeroScene = {
   eyebrow?: string
   /**
    * Sub-heading line for no-protagonist scenes — the cause's equivalent of a
-   * protagonist's `context` ("1945 - 2024", "London Marathon run").
+   * protagonist's `context` ("1945–2024", "London Marathon run").
    * The real product stores this on favpolls.context for cause favpolls (see
    * the favpoll_cause_photo_context migration); the scene type had it only
    * inside `protagonist`, so cause scenes could not show one at all.
@@ -127,7 +127,10 @@ export const SCENES: HeroScene[] = [
     opening_line: null,
     protagonist: {
       name: "Belinda Hartley",
-      context: "1945 - 2024",
+      // EN DASH, CLOSED UP (founder, 2026-10-23). A range takes an en
+      // dash with no spaces; this was a hyphen with spaces, and it is the
+      // first typography a visitor reads on the homepage.
+      context: "1945–2024",
       about:
         "A headmistress for forty-one years with a gift for knowing every pupil's name. She had a signature colour that she loved.",
       photo_url: "/demo/belinda.jpg",
