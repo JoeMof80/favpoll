@@ -189,9 +189,14 @@ function FavpollRow({
 
 export function FavpollsTable({
   favpolls,
+  total,
   webBaseUrl,
 }: {
   favpolls: OversightFavpoll[]
+  /** Every favpoll on the platform. The query is capped at 200, so this is
+   *  the only honest denominator — the footer printed the cap as the total
+   *  and a backlog of 199 E2E rows read as a full house. */
+  total: number
   webBaseUrl: string | null
 }) {
   const [search, setSearch] = useState("")
@@ -232,6 +237,7 @@ export function FavpollsTable({
         </div>
         <p className="ml-auto text-xs text-muted-foreground">
           {filtered.length} of {favpolls.length}
+          {total > favpolls.length ? ` (${total} on the platform)` : ""}
         </p>
       </div>
 

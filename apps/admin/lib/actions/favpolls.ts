@@ -20,20 +20,33 @@ export type OversightFavpoll = {
 export async function getAllFavpolls(): Promise<{
   data: OversightFavpoll[] | null
   error: string | null
+  /** Every favpoll on the platform, not just the page below. The list is
+   *  capped at 200 and the footer used to print that cap as if it were the
+   *  total — so 199 E2E rows plus one real one read as "200 of 200" and the
+   *  backlog behind it was invisible (founder, 2026-10-25). */
+  total: number
 }> {
   const supabase = createAdminClient()
 
-  const { data, error } = await supabase
+  const {
+    data,
+    error,
+    count: total,
+  } = await supabase
     .from("favpolls")
     .select(
       `id, category, total_raised, is_listed, is_exemplar, closed_at,
        closes_at, created_at, cause_label, protagonist:protagonists ( name ),
-       favpoll_charities ( charity_id, charities ( name ) )`
+       favpoll_charities ( charity_id, charities ( name ) )`,
+      // The count comes back with the page — PostgREST counts every matching
+      // row, not just the limited slice — so the honest total costs no extra
+      // round trip and the mocked call order in the tests is unchanged.
+      { count: "exact" }
     )
     .order("created_at", { ascending: false })
     .limit(200)
 
-  if (error) return { data: null, error: error.message }
+  if (error) return { data: null, error: error.message, total: total ?? 0 }
 
   const rows = (data ?? []).map((ev) => ({
     id: ev.id,
@@ -55,7 +68,7 @@ export async function getAllFavpolls(): Promise<{
       .map((fc) => ({ id: fc.charity_id, name: fc.charities?.name ?? "—" }))
       .sort((a, b) => a.id.localeCompare(b.id)),
   }))
-  return { data: rows, error: null }
+  return { data: rows, error: null, total: total ?? rows.length }
 }
 
 export async function setListed(

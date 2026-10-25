@@ -5,6 +5,8 @@ import {
   getRecentPledges,
 } from "@/lib/actions/dashboard"
 import { StatusBadge } from "@/components/ui/status-badge"
+import { ResetPledges } from "@/components/reset-pledges"
+import { countE2eFavpolls } from "@/lib/actions/pledges"
 import {
   Table,
   TableBody,
@@ -63,10 +65,11 @@ function formatDate(iso: string): string {
 }
 
 export default async function DashboardPage() {
-  const [stats, favpolls, pledges] = await Promise.all([
+  const [stats, favpolls, pledges, e2eCount] = await Promise.all([
     getDashboardStats(),
     getRecentFavpolls(),
     getRecentPledges(),
+    countE2eFavpolls(),
   ])
 
   if (stats.error || !stats.data) {
@@ -84,7 +87,16 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-2xl font-semibold">Dashboard</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-semibold">Dashboard</h1>
+        {/* PUT STAGING BACK (founder, 2026-10-25). Hidden in production as
+            well as refused there — the action is the permission check, this
+            is only courtesy. lib/actions/pledges.ts explains why it withdraws
+            rather than deletes. */}
+        {process.env.VERCEL_ENV !== "production" && (
+          <ResetPledges e2eCount={e2eCount} />
+        )}
+      </div>
 
       {/* Platform stats */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">

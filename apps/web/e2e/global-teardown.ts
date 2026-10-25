@@ -11,11 +11,24 @@
  * evidence trail of a run. The global-setup fixture is created unlisted
  * already; this also sweeps up rows left behind by previously failed runs.
  *
+ * AND THEN IT PRUNES (2026-10-25). Keeping the evidence trail was right;
+ * never deciding when to stop keeping it was not. By October staging held
+ * 199 E2E favpolls against one real one (founder: "all of the favpolls in
+ * the admin are E2E tests except Michael Mensah"). Anything E2E older than
+ * PRUNE_AFTER_DAYS is deleted here, so the last week of runs stays
+ * inspectable and the archaeology goes. The delete cascades to the row's
+ * polls, pledges and guest-book entries, which is what we want for débris —
+ * and it is why this never runs without the E2E name pattern.
+ *
  * Requirements: same env as global-setup (NEXT_PUBLIC_SUPABASE_URL,
  * SUPABASE_SERVICE_ROLE_KEY) — skips gracefully without them.
  */
 
 import { createClient } from "@supabase/supabase-js"
+
+/** How much evidence trail is worth keeping. A week covers "what did
+ *  yesterday's failing run leave behind" without becoming an archive. */
+const PRUNE_AFTER_DAYS = 7
 
 export default async function globalTeardown() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -67,15 +80,68 @@ export default async function globalTeardown() {
     protagonistRows = data ?? []
   }
 
+  // ── Prune the old ones ────────────────────────────────────────────────
+  const cutoff = new Date(
+    Date.now() - PRUNE_AFTER_DAYS * 24 * 60 * 60 * 1000
+  ).toISOString()
+
+  const staleIds = new Set<string>()
+  const { data: staleCause } = await supabase
+    .from("favpolls")
+    .select("id")
+    .like("cause_label", "E2E%")
+    .lt("created_at", cutoff)
+  for (const r of staleCause ?? []) staleIds.add(r.id)
+
+  if (protagonistIds.length > 0) {
+    const { data: staleProtagonist } = await supabase
+      .from("favpolls")
+      .select("id")
+      .in("protagonist_id", protagonistIds)
+      .lt("created_at", cutoff)
+    for (const r of staleProtagonist ?? []) staleIds.add(r.id)
+  }
+
+  if (staleIds.size > 0) {
+    const ids = [...staleIds]
+    let deleted = 0
+    for (let i = 0; i < ids.length; i += 100) {
+      const { error } = await supabase
+        .from("favpolls")
+        .delete()
+        .in("id", ids.slice(i, i + 100))
+      if (error) {
+        console.warn(`[e2e/global-teardown] ⚠ prune failed: ${error.message}`)
+        break
+      }
+      deleted += ids.slice(i, i + 100).length
+    }
+    console.log(
+      `[e2e/global-teardown] ✓ Pruned ${deleted} E2E favpoll${deleted === 1 ? "" : "s"} older than ${PRUNE_AFTER_DAYS} days`
+    )
+  }
+
   const unlisted = (causeRows?.length ?? 0) + protagonistRows.length
   console.log(
     `[e2e/global-teardown] ✓ Unlisted ${unlisted} E2E favpoll${unlisted === 1 ? "" : "s"} in ${projectRef}`
   )
-  if (unlisted === 0) {
-    console.warn(
-      "[e2e/global-teardown] ⚠ Nothing to unlist. If the suite published " +
-        "favpolls this run, they are in a DIFFERENT database from the one " +
-        "swept above — check PLAYWRIGHT_BASE_URL against these credentials."
-    )
+  // The warning used to fire whenever nothing was unlisted — which is the
+  // NORMAL state, because global-setup creates its fixture unlisted and a
+  // clean previous run leaves nothing behind. It cried wolf on most runs.
+  // The signal that actually means "wrong database" is finding no E2E rows
+  // AT ALL, listed or not.
+  if (unlisted === 0 && staleIds.size === 0) {
+    const { count } = await supabase
+      .from("favpolls")
+      .select("id", { count: "exact", head: true })
+      .like("cause_label", "E2E%")
+    if ((count ?? 0) === 0 && protagonistIds.length === 0) {
+      console.warn(
+        "[e2e/global-teardown] ⚠ No E2E favpolls here at all. If the suite " +
+          "published any this run, they are in a DIFFERENT database from " +
+          "the one swept above — check PLAYWRIGHT_BASE_URL against these " +
+          "credentials."
+      )
+    }
   }
 }
