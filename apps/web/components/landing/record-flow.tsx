@@ -129,7 +129,13 @@ const RECORD_ROW_H = 36
 const GLOW = "border-primary ring-4 ring-primary/15 shadow-lg shadow-primary/25"
 // Bar-level sync: the favpoll's item fill and the record's same item fill
 // flip to primary and pulse together while the pledge lands.
-const ACTIVE_FILL = "bg-primary motion-safe:animate-pulse"
+// NO PULSE (2026-10-23). This was `motion-safe:animate-pulse` — Tailwind's
+// generic two-second opacity breathe, running without pause through every
+// step, and the busiest thing on the homepage. The bar is already saying it
+// is the active one twice over: it carries the primary fill while the others
+// are muted, and the +£ pill is sitting beside its label. A third signal that
+// never stops is noise, not emphasis.
+const ACTIVE_FILL = "bg-primary"
 
 function PlusPill({ amount }: { amount: number }) {
   return (
@@ -214,7 +220,7 @@ export function RecordFlow() {
         return (
           <div
             key={mini.title}
-            className={`absolute w-40 -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-background p-2.5 transition-all duration-300 ${
+            className={`absolute w-40 -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-background p-2.5 transition-[border-color,box-shadow] duration-300 ${
               isActive
                 ? `z-20 scale-105 ${GLOW}`
                 : "z-0 border-border shadow-sm"
@@ -282,7 +288,7 @@ export function RecordFlow() {
       {/* ── The record — centred; card and bar glow in sync with the
           active favpoll ── */}
       <div
-        className={`absolute top-1/2 left-1/2 z-10 w-56 -translate-x-1/2 -translate-y-1/2 rounded-xl border bg-background p-4 transition-all duration-300 ${
+        className={`absolute top-1/2 left-1/2 z-10 w-56 -translate-x-1/2 -translate-y-1/2 rounded-xl border bg-background p-4 transition-[border-color,box-shadow] duration-300 ${
           active ? GLOW : "border-border shadow-md"
         }`}
       >
@@ -306,9 +312,15 @@ export function RecordFlow() {
               <div
                 key={item}
                 className="absolute inset-x-0"
+                // TRANSFORM, NOT `top` (2026-10-23). The overtake used to
+                // animate `top`, a layout property: a re-layout every frame,
+                // off the compositor, and against the transform/opacity
+                // rule. translateY is the same movement on the GPU.
                 style={{
-                  top: rank * RECORD_ROW_H,
-                  transition: reduced ? "none" : "top 700ms ease-out",
+                  transform: `translateY(${rank * RECORD_ROW_H}px)`,
+                  transition: reduced
+                    ? "none"
+                    : "transform 700ms cubic-bezier(0.32, 0.72, 0, 1)",
                 }}
               >
                 <div className="flex items-baseline justify-between text-xs">

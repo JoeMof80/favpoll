@@ -8,7 +8,7 @@ import { RotatingRegisterHero } from "@/components/landing/rotating-register-her
 import { OpenRightNow } from "@/components/landing/open-right-now"
 import { HeroTexture } from "@/components/landing/hero-texture"
 import { RecordFlow } from "@/components/landing/record-flow"
-import { FadeIn } from "@/components/landing/fade-in"
+import { FadeIn, FadeInItem } from "@/components/landing/fade-in"
 import { t } from "@/lib/i18n"
 
 // The landing renders live data (open-favpoll count, raised total, the
@@ -69,17 +69,26 @@ export default async function HomePage() {
         <div className="mx-auto w-full max-w-330 px-6 py-16">
           <FadeIn>
             <div className="grid items-center gap-8 lg:grid-cols-2">
-              <div className="max-w-md">
-                <h2 className="mb-4 text-3xl font-light tracking-tight text-foreground">
-                  The record
-                </h2>
-                <p className="text-base leading-relaxed text-muted-foreground">
-                  {t("landing.record.principle")}
-                </p>
-                <p className="mt-3 text-sm font-medium tracking-widest text-primary-muted uppercase">
-                  {t("landing.record.status")}
-                </p>
-              </div>
+              {/* Staggered type (2026-10-23): heading, principle and
+                  status arrive in reading order, 80ms apart — close enough
+                  to be one movement, far enough to be a sequence. */}
+              <FadeIn stagger className="max-w-md">
+                <FadeInItem>
+                  <h2 className="mb-4 text-3xl font-light tracking-tight text-foreground">
+                    The record
+                  </h2>
+                </FadeInItem>
+                <FadeInItem>
+                  <p className="text-base leading-relaxed text-muted-foreground">
+                    {t("landing.record.principle")}
+                  </p>
+                </FadeInItem>
+                <FadeInItem>
+                  <p className="mt-3 text-sm font-medium tracking-widest text-primary-muted uppercase">
+                    {t("landing.record.status")}
+                  </p>
+                </FadeInItem>
+              </FadeIn>
               <RecordFlow />
             </div>
           </FadeIn>
@@ -118,25 +127,29 @@ export default async function HomePage() {
       <section className="relative w-full bg-primary text-primary-foreground">
         <HeroTexture />
         <div className="relative mx-auto w-full max-w-330 px-6 py-16">
-          <FadeIn>
-            <h2 className="mb-5 max-w-2xl text-3xl font-light tracking-tight">
-              {t("landing.subheader")}
-            </h2>
+          <FadeIn stagger>
+            <FadeInItem>
+              <h2 className="mb-5 max-w-2xl text-3xl font-light tracking-tight">
+                {t("landing.subheader")}
+              </h2>
+            </FadeInItem>
             {/* No caption under this button any more (2026-08-08). It read
                 "Free to create · 100% goes to charity", which the trust grid
                 now directly above says at more length — and the fee was
                 being stated three times on one page (hero button, that grid,
                 here). landing.cta.caption is retired with it. */}
-            <Button
-              asChild
-              size="lg"
-              variant="secondary"
-              className="h-auto min-h-11 px-6 py-2 text-base"
-            >
-              <Link href="/favpolls/new">
-                {withQuietTail(t("landing.cta.primaryFree"))}
-              </Link>
-            </Button>
+            <FadeInItem>
+              <Button
+                asChild
+                size="lg"
+                variant="secondary"
+                className="h-auto min-h-11 px-6 py-2 text-base"
+              >
+                <Link href="/favpolls/new">
+                  {withQuietTail(t("landing.cta.primaryFree"))}
+                </Link>
+              </Button>
+            </FadeInItem>
           </FadeIn>
         </div>
       </section>

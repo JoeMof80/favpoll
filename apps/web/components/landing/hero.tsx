@@ -205,10 +205,21 @@ const STILL_BEAT: { phase: Phase; at: number }[] = [
   // pledge, and 19.75s was already a considered ceiling.
   { phase: "confirmed", at: 14150 }, // 4. the sheet: confirmation, the note
   //                                       types, then the record
-  { phase: "clearing", at: 17450 }, // 5. the sheet slides down onto the live
+  //
+  // A SECOND TO READ IT (founder, 2026-10-24: "the demo should pause after it
+  // is written for a second to read it"). `confirmed` held 3300ms — 1900 of
+  // typing and 1400 standing — and the note is the one thing on the page
+  // anyone is asked to READ rather than watch. It holds 4300ms now, so the
+  // finished note stands for 2.4s, and the monogram's single shimmer fires
+  // at the 1.9s mark as punctuation for it landing.
+  //
+  // This one DOES cost the cycle a second: 19750 → 20750, and DWELL_MS with
+  // it. The tail was already compressed to pay for the last change and there
+  // is nothing left in it to take.
+  { phase: "clearing", at: 18450 }, // 5. the sheet slides down onto the live
   //                                       page, the note already on it
-  { phase: "results", at: 18450 }, //    the bars climb, alone
-  { phase: "note", at: 19750 }, //    everything stands
+  { phase: "results", at: 19450 }, //    the bars climb, alone
+  { phase: "note", at: 20750 }, //    everything stands
 ]
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)"
 function subscribeReducedMotion(onChange: () => void) {

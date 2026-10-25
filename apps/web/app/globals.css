@@ -186,6 +186,46 @@
   --skeleton-soft: oklch(0.24 0 0);
 }
 
+/* THE CEREMONY ON THE BAND (founder, 2026-10-24: "i'm wondering if we should
+   make the receipt/note match the theme monogram background color"). The
+   pledge sheet's last view — components/pledge-dialog/step-confirmed.tsx —
+   now wears the hero band's surface rather than the dialog's white, so the
+   most significant screen in the flow stops looking like one more form step
+   and the register tints the moment.
+
+   Not a breach of the register-ink idiom below: that governs an ELEMENT that
+   stands for a register on a neutral page (a header link, a router card).
+   This is a SURFACE, like the hero band and the closing CTA, both of which
+   have always been solid --primary.
+
+   The remap, rather than props threaded through five shared components: the
+   note is drawn by PollNote/TypedNote, the topic by PollHeading and the
+   status by SectionEyebrow, all of which hardcode tokens tuned for a light
+   ground. Inside this scope those tokens become the band's ink at the weights
+   the band uses elsewhere — the quote at 88%, the topic's quiet default and
+   the quote's rule at 55%, hairlines at 22%. Same mechanism as register-ink,
+   and written at the same specificity for the same reason. */
+.on-band {
+  --foreground: var(--primary-foreground);
+  /* Mention ink is `text-primary` (components/mention-text.tsx, ink alone
+     since 2026-09-29) — on a primary ground that is the register on the
+     register, and the founder found the note with a HOLE in it where the
+     favourite should be. The ground is set on an ancestor, not on this
+     element, so remapping --primary here is safe. */
+  --primary: var(--primary-foreground);
+  --muted-foreground: color-mix(
+    in oklab,
+    var(--primary-foreground) 88%,
+    transparent
+  );
+  --primary-muted: color-mix(
+    in oklab,
+    var(--primary-foreground) 55%,
+    transparent
+  );
+  --border: color-mix(in oklab, var(--primary-foreground) 22%, transparent);
+}
+
 /* A register-scoped element whose ink is its OWN colour (2026-08-31) — the
    home router cards: white, with the register as text, the way the header
    links behave. Inside it --primary-foreground is the register's --primary
