@@ -36,6 +36,7 @@ import type {
   WizardAppeal,
   WizardData,
   WizardEditConfig,
+  WizardDraftValues,
 } from "./use-wizard-state"
 import type { Charity, FavpollCategory } from "@favpoll/types"
 import { FIELD_RULE } from "@/lib/field-rule"
@@ -53,6 +54,10 @@ type Props = {
   /** consent-first posture (server env): unapproved charities gate
    *  pledges, and the card says so at the point of choice. */
   consentGatingActive?: boolean
+  /** Restored after the sign-in round trip — see lib/actions/wizard-draft. */
+  draft?: WizardDraftValues | null
+  /** Publish asks for an account when this is false. */
+  isSignedIn?: boolean
 }
 
 export function NewFavpollWizard({
@@ -62,6 +67,8 @@ export function NewFavpollWizard({
   consentGatingActive = false,
   appeal,
   initialCharityId,
+  draft,
+  isSignedIn = true,
 }: Props) {
   // Register-added charities (consent-gate) — appended to the catalogue
   // for this wizard session, and folded into the data handed to the hook
@@ -86,7 +93,9 @@ export function NewFavpollWizard({
     edit,
     initialCategory,
     appeal,
-    initialCharityId
+    initialCharityId,
+    draft,
+    isSignedIn
   )
   const [topicSearch, setTopicSearch] = useState("")
   const [charitySearch, setCharitySearch] = useState("")

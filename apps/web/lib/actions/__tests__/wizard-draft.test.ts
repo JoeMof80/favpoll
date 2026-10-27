@@ -59,6 +59,8 @@ import {
   saveWizardDraft,
   loadWizardDraft,
   claimWizardDraft,
+  finishWizardDraft,
+  releaseWizardDraft,
   discardWizardDraft,
   uploadDraftPhoto,
 } from "../wizard-draft"
@@ -175,7 +177,10 @@ describe("the wizard draft that outlives the sign-in", () => {
     expect(result).toEqual({ ok: false, error: "Not authenticated" })
   })
 
-  it("claims once and clears the cookie", async () => {
+  // The cookie SURVIVES the claim. A create can fail after the guard has
+  // been taken, and a visitor whose cookie was already thrown away would
+  // have no way back to what they wrote.
+  it("claims without throwing the cookie away", async () => {
     jar.store.set(COOKIE, "draft-1")
     mock.queue({ id: "draft-1", photo_path: null })
 
@@ -185,7 +190,34 @@ describe("the wizard draft that outlives the sign-in", () => {
       ok: true,
       value: { claimed: true, photoUrl: null },
     })
+    expect(jar.store.get(COOKIE)).toBe("draft-1")
+  })
+
+  it("finishing is what forgets the draft, once the favpoll exists", async () => {
+    jar.store.set(COOKIE, "draft-1")
+
+    await finishWizardDraft()
+
     expect(jar.store.has(COOKIE)).toBe(false)
+  })
+
+  // Without this, a crash between claim and create leaves the draft claimed
+  // for ever: the next load reads it as absent and the visitor finds an
+  // empty wizard.
+  it("releases a claim when the create that followed failed", async () => {
+    jar.store.set(COOKIE, "draft-1")
+    mock.queue(null)
+
+    await releaseWizardDraft()
+
+    const update = mock
+      .callsFor("wizard_drafts")
+      .find((c) => c.method === "update")
+    expect(update?.args[0]).toMatchObject({
+      claimed_at: null,
+      claimed_by: null,
+    })
+    expect(jar.store.get(COOKIE)).toBe("draft-1")
   })
 
   it("moves the draft's photo under the organiser who claimed it", async () => {

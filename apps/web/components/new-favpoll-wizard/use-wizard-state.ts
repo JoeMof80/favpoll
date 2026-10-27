@@ -5,6 +5,13 @@ import { createFavpoll, uploadPersonPhoto } from "@/app/favpolls/new/actions"
 import { toast } from "sonner"
 import { TOAST_ERROR_STYLE } from "@/lib/toast-styles"
 import { updateFavpoll } from "@/app/favpolls/[id]/edit/actions"
+import {
+  saveWizardDraft,
+  uploadDraftPhoto,
+  claimWizardDraft,
+  finishWizardDraft,
+  releaseWizardDraft,
+} from "@/lib/actions/wizard-draft"
 import type { FavpollLocks } from "@/lib/favpoll-locks"
 import {
   safeGenerateDraft,
@@ -18,6 +25,7 @@ import {
   pronounForWho,
 } from "@/lib/who"
 import { deriveRegister } from "@/lib/registers"
+import { unwrap } from "@/lib/action-result"
 import type {
   Category,
   Charity,
@@ -79,6 +87,18 @@ export type WizardEditConfig = {
   }
 }
 
+/**
+ * A draft restored after the sign-in round trip.
+ *
+ * Deliberately the same shape as WizardEditConfig["initial"]: every piece
+ * of state below already reads `init?.x ?? fallback`, so a draft seeds the
+ * wizard through the slot edit mode built, rather than a second mechanism
+ * that would drift from it.
+ */
+export type WizardDraftValues = WizardEditConfig["initial"] & {
+  closesAt: string | null
+}
+
 /** A parent appeal, joined via the appeal link. Charity locked to the
  * appeal's; close date inherited (and locked) when the appeal has an
  * end; members default unlisted. Concept:
@@ -126,10 +146,16 @@ export function useWizardState(
   appeal?: WizardAppeal | null,
   /** Create-mode charity preselect (the charity page's tile) —
       preselected, never locked; the appeal's charity wins. */
-  initialCharityId?: string | null
+  initialCharityId?: string | null,
+  /** What the visitor had filled in before they went to sign in. */
+  draft?: WizardDraftValues | null,
+  /** Whether there is an account yet. Publish asks for one if not. */
+  isSignedIn: boolean = true
 ) {
   const isEdit = !!edit
-  const init = edit?.initial
+  // Edit wins: a draft only exists in create mode, but being explicit here
+  // is cheaper than reasoning about it at every call site.
+  const init = edit?.initial ?? draft ?? undefined
   const router = useRouter()
 
   const [step, setStep] = useState<WizardStep>("event")
@@ -174,9 +200,11 @@ export function useWizardState(
   const [closesAt, setClosesAt] = useState<Date | undefined>(
     edit?.initialClosesAt
       ? new Date(edit.initialClosesAt)
-      : appeal?.closesAt
-        ? new Date(appeal.closesAt)
-        : undefined
+      : draft?.closesAt
+        ? new Date(draft.closesAt)
+        : appeal?.closesAt
+          ? new Date(appeal.closesAt)
+          : undefined
   )
   const [allowGuestItems, setAllowGuestItems] = useState(
     init?.allowGuestItems ?? true
@@ -227,9 +255,43 @@ export function useWizardState(
   // is prefilled.
   const [detailsSeen, setDetailsSeen] = useState(isEdit)
 
+  /** Everything worth carrying across a sign-in, in the shape that seeds
+   *  the wizard back. */
+  function toDraftValues(): WizardDraftValues {
+    return {
+      category,
+      grouping,
+      subject,
+      pronoun,
+      charityIds,
+      topics,
+      openingLine,
+      name,
+      context,
+      photoUrl,
+      about,
+      note,
+      goalAmount,
+      isListed,
+      isPrivate,
+      allowGuestItems,
+      showGuestAmounts,
+      closesAt: closesAt ? closesAt.toISOString() : null,
+    }
+  }
+
   function changeStep(next: WizardStep) {
     if (next === "details") setDetailsSeen(true)
     setStep(next)
+
+    // SAVED ON THE STEP, not on the keystroke. A signed-out visitor is one
+    // navigation away from losing everything, and a step change is the
+    // moment they have finished saying something. Per-field autosave would
+    // be kinder to a closed tab mid-sentence and much chattier; this is the
+    // cheaper half of it, and the half the sign-in round trip needs.
+    //
+    // Signed in there is nothing to carry: publish happens in this tab.
+    if (!isSignedIn && !isEdit) void saveWizardDraft(toDraftValues())
   }
 
   const register = deriveRegister(category, grouping, subject)
@@ -622,9 +684,63 @@ export function useWizardState(
       setError(firstGap[1])
       return
     }
+    // PUBLISH IS WHERE THE ACCOUNT IS ASKED FOR (2026-10-27). Everything
+    // before this point works signed out, so "Create a favpoll" no longer
+    // puts a login in front of an invented noun. The ask lands here because
+    // this is the only moment that explains itself: the favpoll is about to
+    // become something they own and manage.
+    //
+    // The photo goes up first. It is a File, and a File does not survive
+    // the navigation to /sign-up — only a URL on the draft does.
+    if (!isSignedIn && !isEdit) {
+      setSubmitting(true)
+      try {
+        let draftPhotoUrl = photoUrl
+        if (photo) {
+          const fd = new FormData()
+          fd.append("photo", photo)
+          draftPhotoUrl = unwrap(await uploadDraftPhoto(fd))
+        }
+        unwrap(
+          await saveWizardDraft(
+            { ...toDraftValues(), photoUrl: draftPhotoUrl },
+            null
+          )
+        )
+      } catch (e) {
+        setSubmitting(false)
+        setError(e instanceof Error ? e.message : "Couldn't save — try again.")
+        return
+      }
+      // Back to the wizard, which rehydrates from the draft. They press
+      // Publish again rather than it firing on arrival: landing on a
+      // published favpoll you did not press anything for is a worse
+      // surprise than one more click, and it leaves room to change
+      // something after signing up.
+      router.push(
+        `/sign-up?redirect_url=${encodeURIComponent("/favpolls/new")}`
+      )
+      return
+    }
+
+    // Declared out here so the catch can put the claim back.
+    let claimedDraft = false
+    let claimedPhotoUrl: string | null = null
+
     setSubmitting(true)
     try {
-      let resolvedPhotoUrl = photoUrl
+      // CLAIM BEFORE CREATE: the claim is the atomic guard against two tabs
+      // publishing one draft, and it hands back the photo moved under this
+      // organiser. Released again if the create below fails.
+      if (!isEdit) {
+        const claim = await claimWizardDraft()
+        if (claim.ok && claim.value.claimed) {
+          claimedDraft = true
+          claimedPhotoUrl = claim.value.photoUrl
+        }
+      }
+
+      let resolvedPhotoUrl = claimedPhotoUrl ?? photoUrl
       if (photo) {
         const fd = new FormData()
         fd.append("photo", photo)
@@ -734,8 +850,16 @@ export function useWizardState(
           addedItems: isCustomTopic ? [] : (selected.customLabels ?? []),
         },
       })
+      // The favpoll exists, so the draft can stop following the browser.
+      // The ROW stays: it is the double-submit guard, and its photo may
+      // still be the live file if the move failed.
+      if (claimedDraft) void finishWizardDraft()
       setSeedFavpollId(favpollId)
     } catch (err) {
+      // Put the claim back, or a crash here would leave the draft claimed
+      // for ever and the next load would show an empty wizard with
+      // everything they wrote gone.
+      if (claimedDraft) void releaseWizardDraft()
       if (!(err instanceof Error)) throw err
       setError(err.message || "Something went wrong")
     } finally {

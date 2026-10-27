@@ -125,11 +125,20 @@ export async function loadWizardDraft(): Promise<WizardDraft | null> {
 }
 
 /**
- * Mark the draft published and stop the browser pointing at it.
+ * Mark the draft as being published, and hand back its photo.
  *
- * Returns false when there was nothing to claim — no cookie, a pruned row,
- * or a draft already claimed. That last one is the double-submit case, and
- * false is how the caller knows not to create a second favpoll.
+ * CLAIM BEFORE CREATE, and the cookie survives it. Claiming is the atomic
+ * guard: `is("claimed_at", null)` makes two tabs race for one row, and the
+ * loser matches nothing rather than both creating a favpoll. But a create
+ * can still fail after the guard has been taken, so the cookie stays until
+ * finishWizardDraft says the favpoll exists, and releaseWizardDraft puts
+ * the row back if it does not. Losing a claim to a crashed create would
+ * cost someone their whole favpoll with no way back to it.
+ *
+ * Returns claimed: false when there was nothing to claim — no cookie, a
+ * pruned row, or a draft someone else already took. That last one is the
+ * double-submit case, and it is how the caller knows not to create a
+ * second favpoll.
  */
 export async function claimWizardDraft(): Promise<ActionResult<DraftClaim>> {
   return asResult(async () => {
@@ -152,7 +161,6 @@ export async function claimWizardDraft(): Promise<ActionResult<DraftClaim>> {
       .select("id, photo_path")
       .maybeSingle()
 
-    jar.delete(COOKIE)
     if (!data) return { claimed: false, photoUrl: null }
 
     const photoUrl = data.photo_path
@@ -183,6 +191,37 @@ async function moveDraftPhotoToOrganiser(
 
   const path = error ? fromPath : to
   return supabase.storage.from(PHOTO_BUCKET).getPublicUrl(path).data.publicUrl
+}
+
+/**
+ * The favpoll exists: stop the browser pointing at the draft.
+ *
+ * The row stays. It is the double-submit guard, and its photo may still be
+ * the live file if the move failed — the pruner skips claimed rows for
+ * exactly that reason.
+ */
+export async function finishWizardDraft(): Promise<ActionResult<void>> {
+  return asResult(async () => {
+    ;(await cookies()).delete(COOKIE)
+  })
+}
+
+/**
+ * Put a claimed draft back, because the create that followed failed.
+ *
+ * Without this a crash between claim and create would leave the draft
+ * claimed for ever: the next load would read it as absent and the visitor
+ * would find an empty wizard with everything they wrote gone.
+ */
+export async function releaseWizardDraft(): Promise<ActionResult<void>> {
+  return asResult(async () => {
+    const id = (await cookies()).get(COOKIE)?.value
+    if (!id) return
+    await createAdminClient()
+      .from("wizard_drafts")
+      .update({ claimed_at: null, claimed_by: null })
+      .eq("id", id)
+  })
 }
 
 /** Abandon the draft: the visitor started again, or published elsewhere. */

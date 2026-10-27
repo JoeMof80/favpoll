@@ -1,9 +1,10 @@
 import { auth } from "@clerk/nextjs/server"
-import { redirect } from "next/navigation"
 import { NewFavpollWizard } from "@/components/new-favpoll-wizard"
 import type { FavpollCategory } from "@favpoll/types"
 import { getWizardData } from "./wizard-data"
 import { consentPosture } from "@/lib/charity-consent"
+import { loadWizardDraft } from "@/lib/actions/wizard-draft"
+import type { WizardDraftValues } from "@/components/new-favpoll-wizard/use-wizard-state"
 
 const CATEGORIES: FavpollCategory[] = ["celebration", "memorial", "fundraiser"]
 
@@ -28,17 +29,11 @@ export default async function NewFavpollPage({
     ? (category as FavpollCategory)
     : undefined
 
+  // NO REDIRECT (2026-10-27). The wizard runs signed out and asks for an
+  // account at Publish; what was typed before that is carried in a draft
+  // row, which this reads back after the round trip.
   const { userId } = await auth()
-  if (!userId) {
-    // Keep the preselects through the sign-in round trip.
-    const params = new URLSearchParams()
-    if (initialCategory) params.set("category", initialCategory)
-    if (appealSlug) params.set("appeal", appealSlug)
-    if (charityParam) params.set("charity", charityParam)
-    const qs = params.toString()
-    const dest = qs ? `/favpolls/new?${qs}` : "/favpolls/new"
-    redirect(`/sign-in?redirect_url=${encodeURIComponent(dest)}`)
-  }
+  const draft = await loadWizardDraft()
 
   const data = await getWizardData()
 
@@ -84,6 +79,8 @@ export default async function NewFavpollPage({
       initialCharityId={initialCharityId}
       appeal={appeal}
       consentGatingActive={consentPosture() === "consent-first"}
+      draft={(draft?.payload as WizardDraftValues | undefined) ?? null}
+      isSignedIn={!!userId}
     />
   )
 }
