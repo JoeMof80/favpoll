@@ -389,13 +389,23 @@ export function LandingHero({
           button, where the eye reads the filled edge. There is no edge
           here until hover, so it only rendered the wash lopsided, 24
           left against 8 right. Same variant, same property, declared
-          after, so it wins. */}
+          after, so it wins.
+
+          GONE ON PHONES (founder, 2026-10-27: "we don't need the See How
+          button on mobile because the section immediately follows"). The
+          same call the register pages took on 2026-10-21 ("let phone
+          visitors scroll. they will naturally do that anyway"). It is a
+          button that scrolls to something one short gesture away, and on a
+          phone the two CTAs stack full-width, so it also costs the fold a
+          whole row. max-sm: rather than a matchMedia test, so the
+          breakpoint cannot drift from the w-full/sm:w-auto pair beside
+          it. */}
       {ctaSecondaryLabel && (
         <Button
           asChild
           size="lg"
           variant="ghost"
-          className="h-11 w-full border border-primary-foreground/40 px-6 text-base text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground has-data-[icon=inline-end]:pr-6 sm:w-auto"
+          className="h-11 w-full border border-primary-foreground/40 px-6 text-base text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground has-data-[icon=inline-end]:pr-6 max-sm:hidden sm:w-auto"
         >
           {/* The arrow says WHERE it goes (founder, 2026-08-17): every
               other button on this page navigates, and this one scrolls
