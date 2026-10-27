@@ -58,6 +58,10 @@ export function makeSupabaseMock() {
         rec("lte", a)
         return b
       },
+      lt: (...a: any[]) => {
+        rec("lt", a)
+        return b
+      },
       gte: (...a: any[]) => {
         rec("gte", a)
         return b

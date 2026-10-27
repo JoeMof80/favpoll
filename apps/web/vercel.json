@@ -8,6 +8,10 @@
     {
       "path": "/api/cron/reconcile-payments",
       "schedule": "30 * * * *"
+    },
+    {
+      "path": "/api/cron/prune-wizard-drafts",
+      "schedule": "15 4 * * *"
     }
   ]
 }

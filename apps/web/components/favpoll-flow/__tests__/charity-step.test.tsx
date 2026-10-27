@@ -325,3 +325,48 @@ describe("CharityStep — an off-register number", () => {
     })
   })
 })
+
+// A FAILED SEARCH IS NOT A MISS (2026-10-27). Every non-ok response used
+// to become an empty result, so while the route was signed-in only, a
+// signed-out visitor searching for a real hospice was told no registered
+// charity matched it.
+describe("CharityStep — the register could not be searched", () => {
+  it("says so, rather than reporting a miss", async () => {
+    fetchMock.mockResolvedValue({
+      ok: false,
+      status: 429,
+      json: async () => ({ error: "Too many requests" }),
+    })
+    render(
+      <CharityStep
+        charities={[]}
+        value={[]}
+        onPick={vi.fn()}
+        search="St Luke's"
+        onRegisterAdd={vi.fn()}
+      />
+    )
+    await screen.findByText(/couldn’t be searched just now/, undefined, {
+      timeout: 2000,
+    })
+    expect(
+      screen.queryByText(/No registered charity matches/)
+    ).not.toBeInTheDocument()
+  })
+
+  it("says so when the request never lands", async () => {
+    fetchMock.mockRejectedValue(new Error("network"))
+    render(
+      <CharityStep
+        charities={[]}
+        value={[]}
+        onPick={vi.fn()}
+        search="St Luke's"
+        onRegisterAdd={vi.fn()}
+      />
+    )
+    await screen.findByText(/couldn’t be searched just now/, undefined, {
+      timeout: 2000,
+    })
+  })
+})

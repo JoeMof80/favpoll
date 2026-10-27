@@ -2,7 +2,7 @@
 
 import { lockReason } from "@/lib/favpoll-locks"
 
-import { Info, Search } from "lucide-react"
+import { Info, Loader2, Search } from "lucide-react"
 
 import { useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
@@ -36,6 +36,7 @@ import type {
   WizardAppeal,
   WizardData,
   WizardEditConfig,
+  WizardDraftValues,
 } from "./use-wizard-state"
 import type { Charity, FavpollCategory } from "@favpoll/types"
 import { FIELD_RULE } from "@/lib/field-rule"
@@ -53,6 +54,12 @@ type Props = {
   /** consent-first posture (server env): unapproved charities gate
    *  pledges, and the card says so at the point of choice. */
   consentGatingActive?: boolean
+  /** Restored after the sign-in round trip — see lib/actions/wizard-draft. */
+  draft?: WizardDraftValues | null
+  /** Publish asks for an account when this is false. */
+  isSignedIn?: boolean
+  /** Back from Clerk: publish the draft on arrival, without asking again. */
+  publishOnReturn?: boolean
 }
 
 export function NewFavpollWizard({
@@ -62,6 +69,9 @@ export function NewFavpollWizard({
   consentGatingActive = false,
   appeal,
   initialCharityId,
+  draft,
+  isSignedIn = true,
+  publishOnReturn = false,
 }: Props) {
   // Register-added charities (consent-gate) — appended to the catalogue
   // for this wizard session, and folded into the data handed to the hook
@@ -86,7 +96,10 @@ export function NewFavpollWizard({
     edit,
     initialCategory,
     appeal,
-    initialCharityId
+    initialCharityId,
+    draft,
+    isSignedIn,
+    publishOnReturn
   )
   const [topicSearch, setTopicSearch] = useState("")
   const [charitySearch, setCharitySearch] = useState("")
@@ -200,6 +213,20 @@ export function NewFavpollWizard({
           onComplete={w.completeSeed}
         />
       </RegisterScope>
+    )
+  }
+
+  // Back from Clerk with the promise still owed. Nothing to decide here,
+  // so the wizard is not what to show: the next thing they see is the
+  // shared pot dialog above, which this holds the place of.
+  if (w.returningToPublish) {
+    return (
+      <div className="flex items-center justify-center px-4 py-24">
+        <p className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+          Publishing…
+        </p>
+      </div>
     )
   }
 
@@ -394,6 +421,17 @@ export function NewFavpollWizard({
                 isLast={w.isLast}
                 nextDisabled={w.nextDisabled}
                 submitting={w.submitting}
+                /* ONE WORD FOR BOTH DOORS (founder, 2026-10-27). This said
+                   "Sign up to publish" for a day, on the reasoning that a
+                   button should name its destination. It bought honesty
+                   about one screen and paid for it twice: the label is
+                   wrong for an organiser who already has an account, and
+                   it talks about accounts at the moment they are thinking
+                   about their favpoll. "Publish" keeps its word because of
+                   where the trip ENDS — the account screen is a step inside
+                   publishing, and what comes back is the shared pot dialog,
+                   not the wizard again. Clerk's own screen offers both
+                   doors, so the label does not have to choose one. */
                 finishLabel={w.isEdit ? "Save" : "Publish"}
                 submittingLabel={w.isEdit ? "Saving…" : "Publishing…"}
                 onBack={w.handleBack}

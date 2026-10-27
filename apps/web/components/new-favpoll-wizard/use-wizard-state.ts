@@ -5,6 +5,13 @@ import { createFavpoll, uploadPersonPhoto } from "@/app/favpolls/new/actions"
 import { toast } from "sonner"
 import { TOAST_ERROR_STYLE } from "@/lib/toast-styles"
 import { updateFavpoll } from "@/app/favpolls/[id]/edit/actions"
+import {
+  saveWizardDraft,
+  uploadDraftPhoto,
+  claimWizardDraft,
+  finishWizardDraft,
+  releaseWizardDraft,
+} from "@/lib/actions/wizard-draft"
 import type { FavpollLocks } from "@/lib/favpoll-locks"
 import {
   safeGenerateDraft,
@@ -18,6 +25,11 @@ import {
   pronounForWho,
 } from "@/lib/who"
 import { deriveRegister } from "@/lib/registers"
+import { unwrap } from "@/lib/action-result"
+
+/** Set on the return from Clerk, and only then: the promise the button
+ *  made, carried through a redirect the wizard does not control. */
+const PUBLISH_ON_RETURN = "publish"
 import type {
   Category,
   Charity,
@@ -79,6 +91,22 @@ export type WizardEditConfig = {
   }
 }
 
+/**
+ * A draft restored after the sign-in round trip.
+ *
+ * Deliberately the same shape as WizardEditConfig["initial"]: every piece
+ * of state below already reads `init?.x ?? fallback`, so a draft seeds the
+ * wizard through the slot edit mode built, rather than a second mechanism
+ * that would drift from it.
+ */
+export type WizardDraftValues = WizardEditConfig["initial"] & {
+  closesAt: string | null
+  /** WHERE THEY WERE, not just what they said. Without this someone coming
+   *  back from signing up lands on step one with every field filled and has
+   *  to press Next five times to reach the Publish they already pressed. */
+  step?: WizardStep
+}
+
 /** A parent appeal, joined via the appeal link. Charity locked to the
  * appeal's; close date inherited (and locked) when the appeal has an
  * end; members default unlisted. Concept:
@@ -126,13 +154,21 @@ export function useWizardState(
   appeal?: WizardAppeal | null,
   /** Create-mode charity preselect (the charity page's tile) —
       preselected, never locked; the appeal's charity wins. */
-  initialCharityId?: string | null
+  initialCharityId?: string | null,
+  /** What the visitor had filled in before they went to sign in. */
+  draft?: WizardDraftValues | null,
+  /** Whether there is an account yet. Publish asks for one if not. */
+  isSignedIn: boolean = true,
+  /** The return from Clerk, carrying the promise Publish made. */
+  publishOnReturn: boolean = false
 ) {
   const isEdit = !!edit
-  const init = edit?.initial
+  // Edit wins: a draft only exists in create mode, but being explicit here
+  // is cheaper than reasoning about it at every call site.
+  const init = edit?.initial ?? draft ?? undefined
   const router = useRouter()
 
-  const [step, setStep] = useState<WizardStep>("event")
+  const [step, setStep] = useState<WizardStep>(draft?.step ?? "event")
   const [category, setCategory] = useState<FavpollCategory | null>(
     init?.category ?? initialCategory ?? null
   )
@@ -174,9 +210,11 @@ export function useWizardState(
   const [closesAt, setClosesAt] = useState<Date | undefined>(
     edit?.initialClosesAt
       ? new Date(edit.initialClosesAt)
-      : appeal?.closesAt
-        ? new Date(appeal.closesAt)
-        : undefined
+      : draft?.closesAt
+        ? new Date(draft.closesAt)
+        : appeal?.closesAt
+          ? new Date(appeal.closesAt)
+          : undefined
   )
   const [allowGuestItems, setAllowGuestItems] = useState(
     init?.allowGuestItems ?? true
@@ -218,6 +256,13 @@ export function useWizardState(
   } | null>(null)
   const ghostRequestId = useRef(0)
   const [submitting, setSubmitting] = useState(false)
+  // THE RETURN TRIP IS ALREADY PUBLISHING. The publish runs in an effect,
+  // so without this the wizard paints once before it starts — a surface
+  // they have finished with, offering the button they already pressed.
+  // Held from the first frame, and dropped when the publish settles.
+  const [returningToPublish, setReturningToPublish] = useState(
+    publishOnReturn && isSignedIn && !isEdit
+  )
   const [error, setError] = useState<string | null>(null)
   const [seedFavpollId, setSeedFavpollId] = useState<string | null>(null)
   // The Settings defaults (visibility follows the register) join the
@@ -227,9 +272,71 @@ export function useWizardState(
   // is prefilled.
   const [detailsSeen, setDetailsSeen] = useState(isEdit)
 
+  // PUBLISH ON RETURN, ONCE. The ref, not the marker, is what guarantees
+  // the "once": StrictMode runs effects twice in development, and the
+  // marker is still set on the second pass — router.replace is
+  // asynchronous, and the prop only changes when the server re-renders.
+  // Reading the ref first means the second pass does nothing.
+  const publishedOnReturn = useRef(false)
+  useEffect(() => {
+    if (publishedOnReturn.current) return
+    if (!isSignedIn || isEdit || !publishOnReturn) return
+    publishedOnReturn.current = true
+    const params = new URLSearchParams(window.location.search)
+
+    // Strip it first. A refresh must not fire this again, and handleFinish
+    // walks back to the first gap if the draft no longer validates, which
+    // is a better landing than a loop.
+    params.delete(PUBLISH_ON_RETURN)
+    const qs = params.toString()
+    router.replace(qs ? `/favpolls/new?${qs}` : "/favpolls/new", {
+      scroll: false,
+    })
+    void handleFinish()
+    // handleFinish closes over the hydrated state, which is settled by the
+    // time this runs: the draft seeds useState initialisers, not an effect.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSignedIn, isEdit])
+
+  /** Everything worth carrying across a sign-in, in the shape that seeds
+   *  the wizard back. */
+  function toDraftValues(): WizardDraftValues {
+    return {
+      category,
+      grouping,
+      subject,
+      pronoun,
+      charityIds,
+      topics,
+      openingLine,
+      name,
+      context,
+      photoUrl,
+      about,
+      note,
+      goalAmount,
+      isListed,
+      isPrivate,
+      allowGuestItems,
+      showGuestAmounts,
+      closesAt: closesAt ? closesAt.toISOString() : null,
+      step,
+    }
+  }
+
   function changeStep(next: WizardStep) {
     if (next === "details") setDetailsSeen(true)
     setStep(next)
+
+    // SAVED ON THE STEP, not on the keystroke. A signed-out visitor is one
+    // navigation away from losing everything, and a step change is the
+    // moment they have finished saying something. Per-field autosave would
+    // be kinder to a closed tab mid-sentence and much chattier; this is the
+    // cheaper half of it, and the half the sign-in round trip needs.
+    //
+    // Signed in there is nothing to carry: publish happens in this tab.
+    if (!isSignedIn && !isEdit)
+      void saveWizardDraft({ ...toDraftValues(), step: next })
   }
 
   const register = deriveRegister(category, grouping, subject)
@@ -620,11 +727,76 @@ export function useWizardState(
     if (firstGap) {
       changeStep(firstGap[0])
       setError(firstGap[1])
+      setReturningToPublish(false)
       return
     }
+    // PUBLISH IS WHERE THE ACCOUNT IS ASKED FOR (2026-10-27). Everything
+    // before this point works signed out, so "Create a favpoll" no longer
+    // puts a login in front of an invented noun. The ask lands here because
+    // this is the only moment that explains itself: the favpoll is about to
+    // become something they own and manage.
+    //
+    // The photo goes up first. It is a File, and a File does not survive
+    // the navigation to /sign-up — only a URL on the draft does.
+    if (!isSignedIn && !isEdit) {
+      setSubmitting(true)
+      try {
+        let draftPhotoUrl = photoUrl
+        if (photo) {
+          const fd = new FormData()
+          fd.append("photo", photo)
+          draftPhotoUrl = unwrap(await uploadDraftPhoto(fd))
+        }
+        unwrap(
+          await saveWizardDraft(
+            { ...toDraftValues(), photoUrl: draftPhotoUrl },
+            null
+          )
+        )
+      } catch (e) {
+        setSubmitting(false)
+        setError(e instanceof Error ? e.message : "Couldn't save — try again.")
+        return
+      }
+      // THE INTENT TRAVELS WITH THEM. The button said "Publish", and this
+      // is how it keeps its word: the account screen is a step inside
+      // publishing, and what comes back is the favpoll published and the
+      // shared pot offered. Asking them to press it a second time on
+      // arrival would be the broken half.
+      //
+      // The marker is what makes that safe, and it is deliberately NOT the
+      // draft's existence: somebody coming back to an abandoned draft days
+      // later must not have a favpoll published at them on arrival.
+      //
+      // Sign-UP is the landing because almost everyone here is new, and
+      // Clerk's own screen carries the sign-in link for the organiser who
+      // is not. The button names neither door, so it promises neither.
+      router.push(
+        `/sign-up?redirect_url=${encodeURIComponent(
+          `/favpolls/new?${PUBLISH_ON_RETURN}=1`
+        )}`
+      )
+      return
+    }
+
+    // Declared out here so the catch can put the claim back.
+    let claimedDraft = false
+    let claimedPhotoUrl: string | null = null
+
     setSubmitting(true)
     try {
-      let resolvedPhotoUrl = photoUrl
+      // CLAIM BEFORE CREATE: the claim is the atomic guard against two tabs
+      // publishing one draft, and it hands back the photo moved under this
+      // organiser. Released again if the create below fails.
+      if (!isEdit) {
+        const claim = await claimWizardDraft()
+        if (claim.ok && claim.value.claimed) {
+          claimedDraft = true
+          claimedPhotoUrl = claim.value.photoUrl
+        }
+      }
+
+      let resolvedPhotoUrl = claimedPhotoUrl ?? photoUrl
       if (photo) {
         const fd = new FormData()
         fd.append("photo", photo)
@@ -734,12 +906,21 @@ export function useWizardState(
           addedItems: isCustomTopic ? [] : (selected.customLabels ?? []),
         },
       })
+      // The favpoll exists, so the draft can stop following the browser.
+      // The ROW stays: it is the double-submit guard, and its photo may
+      // still be the live file if the move failed.
+      if (claimedDraft) void finishWizardDraft()
       setSeedFavpollId(favpollId)
     } catch (err) {
+      // Put the claim back, or a crash here would leave the draft claimed
+      // for ever and the next load would show an empty wizard with
+      // everything they wrote gone.
+      if (claimedDraft) void releaseWizardDraft()
       if (!(err instanceof Error)) throw err
       setError(err.message || "Something went wrong")
     } finally {
       setSubmitting(false)
+      setReturningToPublish(false)
     }
   }
 
@@ -828,6 +1009,7 @@ export function useWizardState(
     setEnacted,
     cachedGhosts,
     submitting,
+    returningToPublish,
     error,
     seedFavpollId,
     completeSeed,

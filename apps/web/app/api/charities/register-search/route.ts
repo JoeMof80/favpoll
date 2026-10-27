@@ -4,7 +4,11 @@ import {
   searchApiAsMirror,
   searchMirrorWithPlaceRetry,
 } from "@/lib/register-mirror"
-import { isRateLimited, RATE_LIMIT_MESSAGE } from "@/lib/rate-limit"
+import {
+  ipFromHeaders,
+  isRateLimited,
+  RATE_LIMIT_MESSAGE,
+} from "@/lib/rate-limit"
 import { offRegisterNumber } from "@/lib/off-register"
 
 // The wizard's any-charity typeahead, over the REGISTER MIRROR
@@ -12,12 +16,23 @@ import { offRegisterNumber } from "@/lib/off-register"
 // charity's place and website from the register (founder, 2026-09-08:
 // names alone are ambiguous — many St Luke's), with the place-aware retry
 // for "st lukes winsford" (founder, 2026-09-09) and the Commission's API
-// only for what the mirror lacks. Signed-in only — an organiser surface.
+// only for what the mirror lacks.
+//
+// OPEN TO EVERYONE SINCE 2026-10-27, because the wizard is. Signed out,
+// the step showed only the consented shelf and answered everything else
+// with "No registered charity matches" — a hospice typing its own name
+// was told it did not exist. The session was never the abuse control
+// here either: this reads our own mirror, and the rate limit is what
+// protects it. A typeahead fires on every keystroke after a 200ms
+// debounce, so the minute window has to allow real typing; the hour is
+// the one that stops a script, since 20 a minute sustained is 1,200.
+const ANON_SEARCH_LIMITS = [
+  { name: "1m", max: 20, windowSeconds: 60 },
+  { name: "1h", max: 200, windowSeconds: 3600 },
+]
+
 export async function GET(req: Request) {
   const { userId } = await auth()
-  if (!userId) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
-  }
   const url = new URL(req.url)
   const q = url.searchParams.get("q") ?? ""
   // The More row re-asks the SAME query with a wider window; enrichment
@@ -37,9 +52,15 @@ export async function GET(req: Request) {
   // limited request still pays for one cheap mirror query and nothing
   // more — the Commission's API is only asked for a request being served.
   const [limited, mirror] = await Promise.all([
-    isRateLimited("register-search", userId, [
-      { name: "1m", max: 20, windowSeconds: 60 },
-    ]),
+    userId
+      ? isRateLimited("register-search", userId, [
+          { name: "1m", max: 20, windowSeconds: 60 },
+        ])
+      : isRateLimited(
+          "register-search-anon-ip",
+          ipFromHeaders(req.headers),
+          ANON_SEARCH_LIMITS
+        ),
     searchMirrorWithPlaceRetry(q, limit),
   ])
   if (limited) {

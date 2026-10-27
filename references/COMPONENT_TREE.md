@@ -1,6 +1,6 @@
 # Component Tree
 
-Generated 2026-10-24 by `node scripts/component-tree.mjs` — do not edit by hand; rerun it (CI: `--check`).
+Generated 2026-10-27 by `node scripts/component-tree.mjs` — do not edit by hand; rerun it (CI: `--check`).
 
 ## Legend
 
@@ -592,6 +592,10 @@ app/favpolls/new/page.tsx
       → components/ui/input-group.tsx  ↑
       → components/ui/responsive-overlay.tsx *  ↑
       → packages/types/ *  ↑
+  → components/new-favpoll-wizard/use-wizard-state.ts
+      → components/favpoll-form/schema.ts  ↑
+      → packages/types/ *  ↑
+  → lib/actions/wizard-draft.ts  (server action)
   → lib/charity-consent.ts  (lib)
   → lib/supabase/admin.ts  (lib)
   → packages/types/ *  ↑
@@ -1206,6 +1210,14 @@ components/print-pack/pack-card.tsx *
   → components/branded-qr.tsx
 ```
 
+### `components/new-favpoll-wizard/use-wizard-state.ts` — used by 6
+
+```
+components/new-favpoll-wizard/use-wizard-state.ts
+  → components/favpoll-form/schema.ts
+  → packages/types/ *
+```
+
 ### `components/favpoll-form/edit-helpers.tsx` — used by 5
 
 ```
@@ -1233,14 +1245,6 @@ components/keepsake/keepsake-document.tsx *
 
 ```
 components/mention-text.tsx
-```
-
-### `components/new-favpoll-wizard/use-wizard-state.ts` — used by 5
-
-```
-components/new-favpoll-wizard/use-wizard-state.ts
-  → components/favpoll-form/schema.ts
-  → packages/types/ *
 ```
 
 ### `components/page-layout.tsx` — used by 5

@@ -18,6 +18,12 @@ import { OCCASION_TYPES_BY_REGISTER } from "@/lib/registers"
 import { parseFormData, parseInput } from "@/lib/action-input"
 import { insertSubsetMembers } from "@/lib/subset-members"
 import {
+  ipFromHeaders,
+  isRateLimited,
+  RATE_LIMIT_MESSAGE,
+} from "@/lib/rate-limit"
+import { headers } from "next/headers"
+import {
   createFavpollSchema,
   personPhotoSchema,
   photoExtension,
@@ -422,13 +428,37 @@ export async function createFavpoll(
  * otherwise verifies against the register and creates the charity
  * OFF the public catalogue (is_active false) and consent 'pending' —
  * approval flips both.
+ *
+ * OPEN TO EVERYONE SINCE 2026-10-27, with the register search it serves.
+ * This one WRITES, so it is the half that needed thinking about rather
+ * than just unlocking: an anonymous caller can create a charity row. What
+ * makes that safe is what the row is. It only happens for a number the
+ * catalogue does not already hold, only after verifyOnMirror confirms the
+ * charity is on the register under that name, and it lands is_active
+ * false with consent 'pending', so it appears on no public surface until
+ * an admin approves it. The cost of abuse is rows in the outreach queue,
+ * which is also the cost of a real organiser being enthusiastic. The
+ * limits below are what bound it.
  */
+const REGISTER_ADD_LIMITS = [{ name: "1h", max: 60, windowSeconds: 3600 }]
+const ANON_REGISTER_ADD_LIMITS = [
+  { name: "5m", max: 10, windowSeconds: 300 },
+  { name: "1h", max: 40, windowSeconds: 3600 },
+]
+
 export async function findOrCreateRegisterCharity(rawInput: {
   registeredNumber: string
   displayName: string
 }): Promise<Charity> {
   const { userId } = await auth()
-  if (!userId) throw new Error("Not authenticated")
+  const limited = userId
+    ? await isRateLimited("register-add", userId, REGISTER_ADD_LIMITS)
+    : await isRateLimited(
+        "register-add-anon-ip",
+        ipFromHeaders(await headers()),
+        ANON_REGISTER_ADD_LIMITS
+      )
+  if (limited) throw new Error(RATE_LIMIT_MESSAGE)
 
   const input = parseInput(
     registerCharitySchema,
