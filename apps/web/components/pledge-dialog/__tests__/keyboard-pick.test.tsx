@@ -139,14 +139,19 @@ describe("pledge dialog — picking a favourite from the keyboard", () => {
     expect(document.activeElement).toBe(search)
   })
 
-  it("the search field shows a focus ring from the keyboard", () => {
+  it("the search field sits on a rule that lights on focus", () => {
     renderDialog()
     const search = screen.getByRole("textbox", {
       name: /pick your favourite colour/i,
     })
     // Bare outline-none left no visible focus at all (a11y audit,
-    // 2026-10-19); the project's focus-visible ring tokens replace it.
-    expect(search.className).toMatch(/focus-visible:ring-3/)
-    expect(search.className).toMatch(/focus-visible:ring-ring\/50/)
+    // 2026-10-19). A focus-visible RING replaced it, and on 2026-10-25 a
+    // rule under the whole row replaced that — the ring boxed the input
+    // and left the search glyph outside it (lib/field-rule). The guarantee
+    // is the same; only its shape moved.
+    const row = search.parentElement!
+    // The guarantee, not the treatment — see lib/field-rule.
+    expect(row.className).toMatch(/has-\[:focus-visible\]:/)
+    expect(search.className).not.toMatch(/ring-3/)
   })
 })

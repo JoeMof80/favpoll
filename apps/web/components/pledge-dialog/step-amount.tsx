@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { InputGroup, InputGroupAddon } from "@/components/ui/input-group"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Sparkles, X } from "lucide-react"
+import { FIELD_RULE } from "@/lib/field-rule"
 
 const PRESETS = [5, 10, 20, 50]
 
@@ -57,9 +58,17 @@ export function StepAmountHeader({
         align="block-start"
         className="justify-between px-5 pt-4 pb-0"
       >
+        {/* HALF EACH, not hugging their text (founder, 2026-10-27).
+            These were already <label htmlFor> pairs, so clicking the words
+            focused the right field — but the words are narrow and the rest
+            of the row was dead. Matching the figures' basis-1/2 below makes
+            the whole left half focus the favourite and the whole right half
+            focus the pot. */}
         <label
           htmlFor="dialog-pledge-amount"
-          className="text-xs font-medium tracking-widest text-muted-foreground uppercase"
+          className={`text-xs font-medium tracking-widest text-muted-foreground uppercase ${
+            twoUp ? "basis-1/2" : "w-full"
+          }`}
         >
           {twoUp
             ? favouriteCount === 1
@@ -70,7 +79,7 @@ export function StepAmountHeader({
         {twoUp && (
           <label
             htmlFor="dialog-fund-amount"
-            className="text-xs font-medium tracking-widest text-muted-foreground uppercase"
+            className="basis-1/2 text-right text-xs font-medium tracking-widest text-muted-foreground uppercase"
           >
             Shared pot
           </label>
@@ -84,7 +93,20 @@ export function StepAmountHeader({
             : "flex w-full items-baseline gap-4 px-5 pt-3 pb-4"
         }
       >
-        <div className="flex min-w-0 flex-1 items-baseline gap-1.5">
+        {/* The focus indicator lives in lib/field-rule: nothing at rest,
+            a pale register tint on the WRAPPER so the £ and the figure light
+            together rather than the box starting after the £. Its history
+            and its honest weakness are recorded there, not here. */}
+        {/* A LABEL, not a div (founder, 2026-10-27). The header halves
+            focus their fields because labels are click targets; this row
+            did not, so the empty space in a half was dead and the £ was
+            dead with it. Wrapping each figure in its own label makes the
+            whole half focus its input, £ included. cursor-text says so
+            before you click. */}
+        <label
+          htmlFor="dialog-pledge-amount"
+          className={`flex min-w-0 basis-1/2 cursor-text items-baseline gap-1.5 ${FIELD_RULE}`}
+        >
           <span
             className="text-2xl text-muted-foreground select-none"
             aria-hidden="true"
@@ -104,11 +126,14 @@ export function StepAmountHeader({
                 ? "Amount your favourites are worth, in pounds"
                 : "Pledge amount in pounds"
             }
-            className="w-full min-w-0 border-0 bg-transparent text-3xl text-foreground outline-none placeholder:text-muted-foreground focus-visible:ring-3 focus-visible:ring-ring/50 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            className="w-full min-w-0 border-0 bg-transparent text-3xl text-foreground outline-none placeholder:text-muted-foreground [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           />
-        </div>
+        </label>
         {twoUp && (
-          <div className="flex shrink-0 items-baseline justify-end gap-1.5">
+          <label
+            htmlFor="dialog-fund-amount"
+            className={`flex min-w-0 basis-1/2 cursor-text items-baseline justify-end gap-1.5 ${FIELD_RULE}`}
+          >
             <span
               className="text-2xl text-muted-foreground select-none"
               aria-hidden="true"
@@ -124,15 +149,20 @@ export function StepAmountHeader({
               onChange={(e) => onFundAmountChange!(e.target.value)}
               placeholder="0"
               aria-label="Shared pot amount in pounds, on top of your pledge"
-              // Sized to its digits so the figure sits flush right; quiet
-              // ink until the fund actually holds money (founder,
-              // 2026-09-06).
+              // SIZED TO ITS DIGITS (founder, 2026-09-06), and it has to
+              // stay that way. The halves are 50/50 on the WRAPPER above;
+              // a full-width field inside one leaves justify-end nothing to
+              // pack, so the £ pins to the half's left edge and the digits
+              // to its right, stranding the £ in the middle of the dialog
+              // (founder, 2026-10-27). Hugging the digits keeps the pair
+              // together at the right-hand edge, which is where it has
+              // always sat. Quiet ink until the fund actually holds money.
               style={{ width: `${Math.max(1, fundAmount.length)}ch` }}
-              className={`border-0 bg-transparent text-right text-3xl outline-none placeholder:text-muted-foreground focus:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${
+              className={`border-0 bg-transparent text-3xl outline-none placeholder:text-muted-foreground focus:text-foreground [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${
                 fundQuiet ? "text-muted-foreground" : "text-foreground"
               }`}
             />
-          </div>
+          </label>
         )}
       </div>
 
