@@ -38,6 +38,7 @@ import type {
   WizardEditConfig,
 } from "./use-wizard-state"
 import type { Charity, FavpollCategory } from "@favpoll/types"
+import { FIELD_RULE } from "@/lib/field-rule"
 
 type Props = {
   data: WizardData
@@ -428,9 +429,11 @@ export function NewFavpollWizard({
               <span className="mb-2 block text-xs font-medium tracking-widest text-muted-foreground uppercase">
                 Pick a topic
               </span>
-              <div className="flex items-center gap-2">
+              <div className={`flex items-center gap-2 ${FIELD_RULE}`}>
                 {/* Field-not-subtitle treatment (2026-09-16): search glyph
-                  + hairline give the bare input shape across pickers */}
+                  + hairline give the bare input shape across pickers. The
+                  rule under the row is the focus indicator too
+                  (lib/field-rule). */}
                 <Search
                   className="size-4 shrink-0 text-muted-foreground/50"
                   aria-hidden="true"
@@ -441,7 +444,7 @@ export function NewFavpollWizard({
                   placeholder="Search topics…"
                   value={topicSearch}
                   onChange={(e) => setTopicSearch(e.target.value)}
-                  className="flex-1 bg-transparent text-lg outline-none placeholder:text-muted-foreground/50 focus-visible:ring-3 focus-visible:ring-ring/50"
+                  className="flex-1 bg-transparent text-lg outline-none placeholder:text-muted-foreground/50"
                 />
               </div>
             </div>
@@ -503,7 +506,7 @@ export function NewFavpollWizard({
               <span className="mb-2 block text-xs font-medium tracking-widest text-muted-foreground uppercase">
                 Pick a charity
               </span>
-              <div className="flex items-center gap-2">
+              <div className={`flex items-center gap-2 ${FIELD_RULE}`}>
                 <Search
                   className="size-4 shrink-0 text-muted-foreground/50"
                   aria-hidden="true"
@@ -514,7 +517,7 @@ export function NewFavpollWizard({
                   placeholder="Search charities…"
                   value={charitySearch}
                   onChange={(e) => setCharitySearch(e.target.value)}
-                  className="w-full bg-transparent text-lg outline-none placeholder:text-muted-foreground/50 focus-visible:ring-3 focus-visible:ring-ring/50"
+                  className="w-full bg-transparent text-lg outline-none placeholder:text-muted-foreground/50"
                 />
               </div>
             </div>
@@ -586,32 +589,35 @@ export function NewFavpollWizard({
             <span className="mb-2 block text-xs font-medium tracking-widest text-muted-foreground uppercase">
               Add your own topic
             </span>
-            <input
-              type="text"
-              value={topicAddText}
-              onChange={(e) => setTopicAddText(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && topicAddText.trim()) {
-                  e.preventDefault()
-                  handleCreateTopic()
+            {/* Wrapped so the rule has something to sit on (lib/field-rule). */}
+            <div className={FIELD_RULE}>
+              <input
+                type="text"
+                value={topicAddText}
+                onChange={(e) => setTopicAddText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && topicAddText.trim()) {
+                    e.preventDefault()
+                    handleCreateTopic()
+                  }
+                }}
+                // The organiser CHOSE to add — the keyboard is wanted
+                autoFocus
+                placeholder={
+                  // Flavoured by the Event, like the charity seed searches —
+                  // each example is plausibly OFF-catalogue (the point of a
+                  // custom topic)
+                  w.category === "fundraiser"
+                    ? "e.g. Marathon snack"
+                    : w.category === "memorial"
+                      ? "e.g. Roast-dinner side"
+                      : w.category === "celebration"
+                        ? "e.g. Party game"
+                        : "e.g. Walking route"
                 }
-              }}
-              // The organiser CHOSE to add — the keyboard is wanted
-              autoFocus
-              placeholder={
-                // Flavoured by the Event, like the charity seed searches —
-                // each example is plausibly OFF-catalogue (the point of a
-                // custom topic)
-                w.category === "fundraiser"
-                  ? "e.g. Marathon snack"
-                  : w.category === "memorial"
-                    ? "e.g. Roast-dinner side"
-                    : w.category === "celebration"
-                      ? "e.g. Party game"
-                      : "e.g. Walking route"
-              }
-              className="w-full bg-transparent text-lg outline-none placeholder:text-muted-foreground/50 focus-visible:ring-3 focus-visible:ring-ring/50"
-            />
+                className="w-full bg-transparent text-lg outline-none placeholder:text-muted-foreground/50"
+              />
+            </div>
             <p className="mt-3 text-sm text-muted-foreground">
               Your topic is created with this favpoll — you’ll add its items
               next. Catalogue topics feed the all-time record; your own stays

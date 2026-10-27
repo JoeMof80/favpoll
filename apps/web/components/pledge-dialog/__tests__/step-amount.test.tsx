@@ -87,8 +87,14 @@ describe("StepAmount — presets and calm", () => {
   })
 })
 
+// The GUARANTEE is cf836977's — a keyboard user can see where focus is on a
+// field stripped of chrome. Only its shape changed on 2026-10-25: the ring
+// boxed the number and started after the £, so the rule under the whole
+// figure replaced it. The assertion follows the mechanism because there is
+// nothing else to assert in jsdom, which computes no styles — so it checks
+// the figure and its £ share one element that reacts to :focus-visible.
 describe("StepAmount — visible focus on the bare amount fields", () => {
-  it("both figures carry the focus-visible ring tokens", () => {
+  it("each figure sits on a rule that lights on focus, £ included", () => {
     render(
       <StepAmountHeader
         pledgeAmount="18"
@@ -103,8 +109,17 @@ describe("StepAmount — visible focus on the bare amount fields", () => {
     )
     const pot = screen.getByLabelText(/shared pot amount/i)
     for (const el of [favourites, pot]) {
-      expect(el.className).toMatch(/focus-visible:ring-3/)
-      expect(el.className).toMatch(/focus-visible:ring-ring\/50/)
+      const rule = el.parentElement!
+      // The £ is inside the ruled element — the old ring's chief sin was
+      // starting after it.
+      expect(rule.textContent).toContain("£")
+      // The GUARANTEE, not the treatment: the wrapper reacts to
+      // :focus-visible. The treatment has been a ring, a rule and a tint
+      // inside a day (lib/field-rule) — pinning the property churned this
+      // test each time and proved nothing extra.
+      expect(rule.className).toMatch(/has-\[:focus-visible\]:/)
+      // And the input itself no longer draws a box of its own.
+      expect(el.className).not.toMatch(/ring-3/)
     }
   })
 })

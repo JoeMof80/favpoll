@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
+import { FIELD_TINT } from "@/lib/field-rule"
 import {
   PaymentElement,
   ExpressCheckoutElement,
@@ -199,7 +200,7 @@ export function CheckoutForm({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
-            className="w-full bg-transparent px-4 py-2.5 text-base outline-none placeholder:text-muted-foreground/50 focus-visible:ring-3 focus-visible:ring-ring/50"
+            className={`w-full bg-transparent px-4 py-2.5 text-base outline-none placeholder:text-muted-foreground/50 ${FIELD_TINT}`}
             aria-label="Email address for receipt and withdrawal link"
           />
           <p className="border-t border-border px-4 py-2.5 text-[11px] text-muted-foreground">
