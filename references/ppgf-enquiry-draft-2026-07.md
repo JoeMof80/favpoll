@@ -1472,3 +1472,77 @@ which sends no confirmation unless the owner enables it. Silence after
 submitting is expected behaviour, not evidence of failure, and there is no way
 to verify it from our side. DO NOT RESUBMIT — a duplicate from the same company
 reads as disorganised to a small team. The thread reply is the provable contact.
+
+---
+
+## 2026-10-27 — WHO IS ACTUALLY ON PPGF UK, and whether info@ is live
+
+The founder emailed `info@paypalgivingfund.org` on **Thursday 22 October 2026**
+and was worried about the silence five days later. Two findings, one
+reassuring and one that gives the escalation a name.
+
+### info@ is a live contact, not a stale listing
+
+The Fundraising Regulator entry PPGF declares is **current**: registered
+1 September 2025 to 31 August 2026, showing **"Processing renewal"** with a
+grace period, and registered continuously since 2016/17. So the mailbox the
+founder wrote to is a contact PPGF itself maintains with its regulator. The
+email went somewhere monitored.
+
+**Read this next to the note at the end of the previous section:** the
+"Become a Partner" form is a Microsoft Form that sends no confirmation unless
+its owner enabled one, so silence after submitting is expected behaviour and
+not evidence of failure. The anxiety is about an unverifiable submission, and
+that unverifiability is a property of their form, not a sign anything went
+wrong.
+
+### The register entries
+
+- **Charity 1110538** (England and Wales, registered 22 July 2005)
+- **Company 05507404**
+- Registered address: Whittaker House, Richmond upon Thames
+
+### The board, from Companies House
+
+Seven current officers:
+
+| Name | Role | Appointed |
+|---|---|---|
+| **Nicholas Russell Aldridge** | **Secretary** | **6 November 2007** |
+| Amitava Ghosh | Director | 20 April 2018 |
+| Sukhraj Singh Dhadwar | Director | 12 November 2019 |
+| Vanessa Onyemem | Director | 15 September 2023 |
+| Andrew John Seager | Director | 22 February 2024 |
+| Simon Daniel Bladon | Director | 8 September 2025 |
+| David John Jones | Director | 31 March 2026 |
+
+### Aldridge is the escalation, and he is NOT a trustee
+
+The rule at the end of the previous section — *LinkedIn last, and to a
+PARTNERSHIPS title, never a trustee* — still stands, and the six directors
+above ARE the trustees. They govern. They do not process partner
+applications, so none of them is a door.
+
+Aldridge is different, and the distinction is the reason he is usable:
+
+- **Company secretary since 6 November 2007 — nineteen years.** This is hard
+  fact from the Companies House filing.
+- **Chief executive of MissionFish UK**, which is what PPGF UK was before the
+  rebrand, then CEO of PayPal Giving Fund UK, and **global CEO since 2015**.
+  This part is **aggregator-sourced** (RocketReach, Me.sh, TheOfficialBoard)
+  and corroborated independently by a 2021 Council on Foundations interview
+  that calls him CEO of the PayPal Giving Fund. Treat the present-day title
+  as **likely, not confirmed** — check before writing, because a wrong title
+  in the first line is the one mistake that cannot be recovered (see the
+  Glenn Barsby quoted-versus-authored lesson in
+  `references/funeral-society-approaches-2026-10-21.md`).
+
+So he is an executive of nineteen years' standing, not a governance seat, and
+he will know exactly what happens to an application like this one.
+
+### NOT YET
+
+Five days does not justify writing to a global chief executive, and if the
+application is in a queue it reads as impatience. **Chase info@ at about two
+weeks — 5 November 2026 — and make Aldridge the escalation after that**, in
+preference to sending the same mailbox a second email.
