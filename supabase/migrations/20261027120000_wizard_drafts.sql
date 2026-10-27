@@ -52,3 +52,6 @@ create index wizard_drafts_created_at_idx on public.wizard_drafts (created_at);
 -- carry names, photos and the About text before anybody has agreed to
 -- publish them.
 alter table public.wizard_drafts enable row level security;
+
+comment on table public.wizard_drafts is
+  'The wizard''s waiting room: what a signed-out visitor typed, carried across the sign-in by an id in an httpOnly cookie. RLS on with no policies - server actions reach it through the service role, the browser key gets nothing. Claimed rows are kept as the double-submit guard and are never pruned, because their photo may still be the live file of a published favpoll.';
