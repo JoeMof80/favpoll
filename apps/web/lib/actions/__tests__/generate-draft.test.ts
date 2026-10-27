@@ -669,10 +669,12 @@ describe("safeGenerateDraft", () => {
     consoleSpy.mockRestore()
   })
 
-  it("returns null when unauthenticated", async () => {
+  // WAS "returns null when unauthenticated", and it had stopped meaning
+  // that: /favpolls/new runs signed out now, so the gate is gone and this
+  // was only still passing because the model call failed afterwards.
+  it("no longer refuses a visitor without an account", async () => {
     mockAuth.mockResolvedValueOnce({ userId: null })
-
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
+    mock.queue({ about: "Cached about.", note: "Cached note — Red." })
 
     const result = await safeGenerateDraft({
       register: "celebrating_one",
@@ -680,12 +682,7 @@ describe("safeGenerateDraft", () => {
       topicId: TOPIC_ID,
     })
 
-    expect(result).toEqual({ error: "failed" })
-    expect(consoleSpy).toHaveBeenCalledWith(
-      expect.stringContaining("generateDraft failed, using fallback:"),
-      expect.any(String)
-    )
-    consoleSpy.mockRestore()
+    expect(result).toMatchObject({ about: "Cached about." })
   })
 
   it("reports rate_limit when the limiter says no", async () => {
@@ -1807,5 +1804,84 @@ describe("the silent surfaces refuse silently", () => {
       })
     ).resolves.toBe(true)
     expect(mock.from).toHaveBeenCalled()
+  })
+})
+
+// ---------------------------------------------------------------------------
+// The wizard runs signed out (2026-10-27) — what bounds the spend is the
+// address, not the account.
+// ---------------------------------------------------------------------------
+
+describe("generateDraft — with no account", () => {
+  it("holds a visitor to the anonymous allowance, on its own bucket", async () => {
+    mockAuth.mockResolvedValue({ userId: null })
+    mock.queue(null) // cache miss, so a model call is about to happen
+    mockMessagesCreate.mockResolvedValue({
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify({ about: "An about.", note: "A note — Red." }),
+        },
+      ],
+    })
+
+    await safeGenerateDraft({
+      register: "celebrating_one",
+      subject: "someone",
+      topicId: TOPIC_ID,
+    })
+
+    const scopes = mockIsRateLimited.mock.calls.map((c) => c[0])
+    // Its own scope, so a signed-in household does not spend a visitor's
+    // allowance, and the per-account bucket is never consulted.
+    expect(scopes).toContain("generate-draft-anon-ip")
+    expect(scopes).not.toContain("generate-draft")
+
+    const anon = mockIsRateLimited.mock.calls.find(
+      (c) => c[0] === "generate-draft-anon-ip"
+    )!
+    expect(anon[2]).toEqual([
+      { name: "5m", max: 4, windowSeconds: 300 },
+      { name: "1h", max: 20, windowSeconds: 3600 },
+    ])
+  })
+
+  it("still checks both buckets once there is an account", async () => {
+    mockAuth.mockResolvedValue({ userId: "user-1" })
+    mock.queue(null)
+    mockMessagesCreate.mockResolvedValue({
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify({ about: "An about.", note: "A note — Red." }),
+        },
+      ],
+    })
+
+    await safeGenerateDraft({
+      register: "celebrating_one",
+      subject: "someone",
+      topicId: TOPIC_ID,
+    })
+
+    const scopes = mockIsRateLimited.mock.calls.map((c) => c[0])
+    expect(scopes).toContain("generate-draft")
+    expect(scopes).toContain("generate-draft-ip")
+    expect(scopes).not.toContain("generate-draft-anon-ip")
+  })
+
+  it("refuses when the visitor's address has generated too often", async () => {
+    mockAuth.mockResolvedValue({ userId: null })
+    mock.queue(null)
+    mockIsRateLimited.mockResolvedValue(true)
+
+    const result = await safeGenerateDraft({
+      register: "celebrating_one",
+      subject: "someone",
+      topicId: TOPIC_ID,
+    })
+
+    expect(result).toEqual({ error: "rate_limit" })
+    expect(mockMessagesCreate).not.toHaveBeenCalled()
   })
 })

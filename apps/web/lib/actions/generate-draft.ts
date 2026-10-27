@@ -143,8 +143,29 @@ const GENERATION_LIMITS = [
   { name: "1h", max: 40, windowSeconds: 3600 },
 ]
 
-async function assertGenerationAllowed(userId: string) {
+// TIGHTER WITH NO ACCOUNT (2026-10-27), now the wizard runs signed out.
+// Someone looking at what Generate does needs a few; an organiser working
+// on their own About needs more. Its own scope rather than the signed-in
+// IP bucket, so a household does not spend a visitor's allowance.
+//
+// This is not a new abuse surface so much as an honestly named one. The
+// comment above already concedes that signup is open and a per-account
+// limit is "a limit on patience rather than on volume" — the address was
+// always what bounded the spend.
+const ANON_GENERATION_LIMITS = [
+  { name: "5m", max: 4, windowSeconds: 300 },
+  { name: "1h", max: 20, windowSeconds: 3600 },
+]
+
+async function assertGenerationAllowed(userId: string | null) {
   const ip = ipFromHeaders(await headers())
+  if (!userId) {
+    if (
+      await isRateLimited("generate-draft-anon-ip", ip, ANON_GENERATION_LIMITS)
+    )
+      throw new RateLimitError()
+    return
+  }
   if (await isRateLimited("generate-draft", userId, GENERATION_LIMITS))
     throw new RateLimitError()
   if (await isRateLimited("generate-draft-ip", ip, GENERATION_LIMITS))
@@ -219,11 +240,14 @@ export type GeneratedDraftResult = {
 export async function generateDraft(
   rawInput: GenerateDraftInput
 ): Promise<GeneratedDraftResult> {
+  // NO ACCOUNT REQUIRED (2026-10-27). The wizard runs signed out and asks
+  // at Publish, and Generate is the moment an invented noun turns into a
+  // real favpoll in front of someone — walling it off walls off the
+  // demonstration. What bounds the spend is the address, not the account:
+  // see assertGenerationAllowed.
   const { userId } = await auth()
-  if (!userId) throw new Error("Not authenticated")
 
-  // THE SHAPE, BEFORE ANY OF IT IS USED (#1109). Authenticate first so a
-  // stranger learns nothing about the fields, then parse before the rate
+  // THE SHAPE, BEFORE ANY OF IT IS USED (#1109). Parse before the rate
   // limit, so a malformed request never counts against an organiser.
   // The ids matter most: buildCacheKey joins topicId and primaryCharityId
   // into a ":"-separated string, so a value carrying its own ":" shifts
@@ -451,8 +475,9 @@ export async function safeGenerateDraft(
 export async function getCachedDraftGhosts(
   rawInput: GenerateDraftInput
 ): Promise<{ about: string; note: string } | null> {
-  const { userId } = await auth()
-  if (!userId) return null
+  // Signed out too: this reads the cache and never calls the model, so it
+  // costs nothing and its absence would make the signed-out wizard quietly
+  // worse than the signed-in one.
   // A SILENT REFUSAL, DELIBERATELY: this is a speculative prefetch with no
   // surface of its own, so a malformed argument means "no ghosts" exactly
   // as a cache miss does. It uses the schema directly rather than
@@ -529,8 +554,7 @@ export async function pairingIsEnacted(rawInput: {
   subsetId?: string | null
   occasionType?: string | null
 }): Promise<boolean> {
-  const { userId } = await auth()
-  if (!userId) return false
+  // Signed out too: a topic flag lookup, no model call.
   // Also a silent surface: the wizard asks alongside the ghost prefetch to
   // pre-set a switch, so "we could not tell" and "not enacted" are the
   // same answer. The schema subsumes the old `if (!input.topicId)` guard.
