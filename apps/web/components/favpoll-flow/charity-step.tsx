@@ -105,6 +105,12 @@ export function CharityStep({
   const [registerResults, setRegisterResults] = useState<RegisterPick[]>([])
   const [registerTotal, setRegisterTotal] = useState(0)
   const [registerLoading, setRegisterLoading] = useState(false)
+  // A SEARCH THAT FAILED IS NOT A SEARCH THAT FOUND NOTHING (2026-10-27).
+  // Every non-ok response used to become an empty result, so a 401 or a
+  // 429 read as "No registered charity matches" — the register saying a
+  // real charity does not exist. Tracked so the message can tell the
+  // truth instead.
+  const [registerFailed, setRegisterFailed] = useState(false)
   const [registerLimit, setRegisterLimit] = useState(20)
   const [busyNumber, setBusyNumber] = useState<string | null>(null)
   const registerActive = !!onRegisterAdd && trimmed.length >= 3
@@ -118,10 +124,12 @@ export function CharityStep({
     if (!registerActive) {
       setRegisterResults([])
       setRegisterTotal(0)
+      setRegisterFailed(false)
       return
     }
     let cancelled = false
     setRegisterLoading(true)
+    setRegisterFailed(false)
     const id = setTimeout(async () => {
       try {
         const res = await fetch(
@@ -129,11 +137,13 @@ export function CharityStep({
         )
         const data = res.ok ? await res.json() : { results: [], total: 0 }
         if (!cancelled) {
+          setRegisterFailed(!res.ok)
           setRegisterResults(data.results ?? [])
           setRegisterTotal(data.total ?? 0)
         }
       } catch {
         if (!cancelled) {
+          setRegisterFailed(true)
           setRegisterResults([])
           setRegisterTotal(0)
         }
@@ -234,11 +244,13 @@ export function CharityStep({
     <div>
       {noMatches && (trimmed || !onRegisterAdd) ? (
         <p className="px-5 py-3 text-center text-sm text-muted-foreground">
-          {offRegister
-            ? OFF_REGISTER_MESSAGE[offRegister]
-            : registerActive
-              ? `No registered charity matches “${trimmed}”.`
-              : "No results."}
+          {registerFailed
+            ? "The register couldn’t be searched just now. Try again in a moment."
+            : offRegister
+              ? OFF_REGISTER_MESSAGE[offRegister]
+              : registerActive
+                ? `No registered charity matches “${trimmed}”.`
+                : "No results."}
         </p>
       ) : noMatches ? (
         /* The empty shelf — a cold start, so the prompt comes with seed
