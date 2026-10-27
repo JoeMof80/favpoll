@@ -26,6 +26,10 @@ import {
 } from "@/lib/who"
 import { deriveRegister } from "@/lib/registers"
 import { unwrap } from "@/lib/action-result"
+
+/** Set on the return from Clerk, and only then: the promise the button
+ *  made, carried through a redirect the wizard does not control. */
+const PUBLISH_ON_RETURN = "publish"
 import type {
   Category,
   Charity,
@@ -258,6 +262,32 @@ export function useWizardState(
   // step (founder, 2026-09-02). Edit mode counts as seen: everything
   // is prefilled.
   const [detailsSeen, setDetailsSeen] = useState(isEdit)
+
+  // PUBLISH ON RETURN, ONCE. The ref rather than the stripped URL is what
+  // guarantees the "once": StrictMode runs effects twice in development,
+  // and router.replace is asynchronous, so the param is still there on the
+  // second pass. Reading the ref first means the second pass does nothing.
+  const publishedOnReturn = useRef(false)
+  useEffect(() => {
+    if (publishedOnReturn.current) return
+    if (!isSignedIn || isEdit) return
+    const params = new URLSearchParams(window.location.search)
+    if (params.get(PUBLISH_ON_RETURN) !== "1") return
+    publishedOnReturn.current = true
+
+    // Strip it first. A refresh must not fire this again, and handleFinish
+    // walks back to the first gap if the draft no longer validates, which
+    // is a better landing than a loop.
+    params.delete(PUBLISH_ON_RETURN)
+    const qs = params.toString()
+    router.replace(qs ? `/favpolls/new?${qs}` : "/favpolls/new", {
+      scroll: false,
+    })
+    void handleFinish()
+    // handleFinish closes over the hydrated state, which is settled by the
+    // time this runs: the draft seeds useState initialisers, not an effect.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSignedIn, isEdit])
 
   /** Everything worth carrying across a sign-in, in the shape that seeds
    *  the wizard back. */
@@ -718,13 +748,18 @@ export function useWizardState(
         setError(e instanceof Error ? e.message : "Couldn't save — try again.")
         return
       }
-      // Back to the wizard, which rehydrates from the draft. They press
-      // Publish again rather than it firing on arrival: landing on a
-      // published favpoll you did not press anything for is a worse
-      // surprise than one more click, and it leaves room to change
-      // something after signing up.
+      // THE INTENT TRAVELS WITH THEM. The button said "Sign up to
+      // publish", so publishing on return is keeping that promise, not
+      // springing something — asking them to press it a second time would
+      // be the broken half.
+      //
+      // The marker is what makes that safe, and it is deliberately NOT the
+      // draft's existence: somebody coming back to an abandoned draft days
+      // later must not have a favpoll published at them on arrival.
       router.push(
-        `/sign-up?redirect_url=${encodeURIComponent("/favpolls/new")}`
+        `/sign-up?redirect_url=${encodeURIComponent(
+          `/favpolls/new?${PUBLISH_ON_RETURN}=1`
+        )}`
       )
       return
     }

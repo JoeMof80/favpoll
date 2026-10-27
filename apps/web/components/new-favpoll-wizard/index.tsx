@@ -403,8 +403,24 @@ export function NewFavpollWizard({
                 isLast={w.isLast}
                 nextDisabled={w.nextDisabled}
                 submitting={w.submitting}
-                finishLabel={w.isEdit ? "Save" : "Publish"}
-                submittingLabel={w.isEdit ? "Saving…" : "Publishing…"}
+                /* SAY WHERE IT GOES (2026-10-27). Signed out, this button
+                   does not publish — it saves the draft and goes to Clerk.
+                   "Publish" would be the same broken promise the hero's
+                   arrow exists to avoid: a different destination from the
+                   one the label names. Naming the sign-up also makes the
+                   trip expected rather than a swerve, and someone who
+                   already has an account is not stranded, since Clerk's
+                   sign-up page carries a sign-in link. */
+                finishLabel={
+                  w.isEdit
+                    ? "Save"
+                    : isSignedIn
+                      ? "Publish"
+                      : "Sign up to publish"
+                }
+                submittingLabel={
+                  w.isEdit ? "Saving…" : isSignedIn ? "Publishing…" : "Saving…"
+                }
                 onBack={w.handleBack}
                 onNext={w.handleNext}
                 onFinish={w.handleFinish}
