@@ -4,6 +4,7 @@ import { Search } from "lucide-react"
 import { Chip } from "@/components/ui/chip"
 import type { Favourite } from "@favpoll/types"
 import { hasFinePointer } from "@/lib/pointer"
+import { FIELD_RULE } from "@/lib/field-rule"
 
 // The settled picker (founder, 2026-09-16, after a tap-advance audition):
 // chips TOGGLE — multi-select visible and self-evident — and the footer's
@@ -40,7 +41,7 @@ export function PickerHeader({
           borderless input at the top of a busy list lacked shape
           (founder, 2026-09-16; same treatment across the picker
           overlays). */}
-      <div className="flex items-center gap-2">
+      <div className={`flex items-center gap-2 ${FIELD_RULE}`}>
         <Search
           className="size-4 shrink-0 text-muted-foreground/50"
           aria-hidden="true"
@@ -52,7 +53,7 @@ export function PickerHeader({
           onChange={(e) => onSearchChange(e.target.value)}
           autoFocus={hasFinePointer()}
           placeholder="Search…"
-          className="w-full bg-transparent text-lg outline-none placeholder:text-muted-foreground/50 focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="w-full bg-transparent text-lg outline-none placeholder:text-muted-foreground/50"
         />
       </div>
     </div>
@@ -170,22 +171,25 @@ export function AddFavouriteView({
       >
         {topic ? `Add your own ${topic}` : "Add your own"}
       </label>
-      <input
-        id="pledge-picker-add"
-        type="text"
-        value={addText}
-        onChange={(e) => onAddTextChange(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && addText.trim() && !addingItem) {
-            e.preventDefault()
-            onAdd()
-          }
-        }}
-        // The guest CHOSE to add — the keyboard is wanted, every pointer
-        autoFocus
-        placeholder="Type a favourite…"
-        className="w-full bg-transparent text-lg outline-none placeholder:text-muted-foreground/50 focus-visible:ring-3 focus-visible:ring-ring/50"
-      />
+      {/* Wrapped so the rule has something to sit on — the field is bare. */}
+      <div className={FIELD_RULE}>
+        <input
+          id="pledge-picker-add"
+          type="text"
+          value={addText}
+          onChange={(e) => onAddTextChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && addText.trim() && !addingItem) {
+              e.preventDefault()
+              onAdd()
+            }
+          }}
+          // The guest CHOSE to add — the keyboard is wanted, every pointer
+          autoFocus
+          placeholder="Type a favourite…"
+          className="w-full bg-transparent text-lg outline-none placeholder:text-muted-foreground/50"
+        />
+      </div>
       <p className="mt-3 text-sm text-muted-foreground">
         Your favourite joins the poll for everyone to pick, and the organiser
         will see it.

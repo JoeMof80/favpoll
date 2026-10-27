@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { formatPoundsExact } from "@/lib/i18n"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import { StripeCheckout } from "@/components/stripe-checkout"
+import { FIELD_RULE } from "@/lib/field-rule"
 import { topUpFund, topUpFundAsGuest } from "@/app/favpolls/[id]/actions"
 import { unwrap } from "@/lib/action-result"
 
@@ -186,7 +187,7 @@ export function SeedFundModal({
       footer={footer}
     >
       {/* Amount field */}
-      <div className="flex items-baseline gap-1.5 py-4">
+      <div className={`flex items-baseline gap-1.5 pt-4 pb-4 ${FIELD_RULE}`}>
         <span
           className="text-2xl text-muted-foreground select-none"
           aria-hidden="true"
@@ -202,7 +203,7 @@ export function SeedFundModal({
           onChange={(e) => setAmount(e.target.value)}
           placeholder="0"
           aria-label="Amount in pounds"
-          className="w-full border-0 bg-transparent text-3xl text-foreground outline-none placeholder:text-muted-foreground/50 focus-visible:ring-3 focus-visible:ring-ring/50 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          className="w-full border-0 bg-transparent text-3xl text-foreground outline-none placeholder:text-muted-foreground/50 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         />
       </div>
 
