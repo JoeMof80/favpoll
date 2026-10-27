@@ -8,3 +8,12 @@ export type WizardDraft = {
   payload: unknown
   photoPath: string | null
 }
+
+/**
+ * What a claim hands back. `photoUrl` is the organiser-scoped URL once the
+ * draft's photo has moved, or null when there was no photo.
+ */
+export type DraftClaim = {
+  claimed: boolean
+  photoUrl: string | null
+}
