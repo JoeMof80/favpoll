@@ -3,7 +3,6 @@
 import { Search } from "lucide-react"
 import { Chip } from "@/components/ui/chip"
 import type { Favourite } from "@favpoll/types"
-import { hasFinePointer } from "@/lib/pointer"
 import { FIELD_RULE } from "@/lib/field-rule"
 
 // The settled picker (founder, 2026-09-16, after a tap-advance audition):
@@ -41,6 +40,14 @@ export function PickerHeader({
           borderless input at the top of a busy list lacked shape
           (founder, 2026-09-16; same treatment across the picker
           overlays). */}
+      {/* NO AUTOFOCUS HERE (founder, 2026-10-27), against the
+          fine-pointer rule in lib/pointer that the wizard's searches keep.
+          Those run to thousands of charities, where typing is the only
+          practical route in. A topic's items fit on one screen and the
+          chips are the designed path (#885–#893), so landing with the
+          field lit puts a filter in front of a list you can already read.
+          The behaviour is not new; the tint made it visible.
+          The focus treatment itself lives in lib/field-rule. */}
       <div className={`flex items-center gap-2 ${FIELD_RULE}`}>
         <Search
           className="size-4 shrink-0 text-muted-foreground/50"
@@ -51,7 +58,6 @@ export function PickerHeader({
           type="text"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          autoFocus={hasFinePointer()}
           placeholder="Search…"
           className="w-full bg-transparent text-lg outline-none placeholder:text-muted-foreground/50"
         />
