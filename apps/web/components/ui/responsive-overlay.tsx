@@ -403,6 +403,13 @@ export function ResponsiveOverlay({
         } ${surfaceClassName ?? ""}`}
         style={{ maxHeight: "min(600px, 80vh)", ...dialogStyle }}
         showCloseButton={!hideCloseButton}
+        // Same rule as the sheet above, now on desktop too (founder,
+        // 2026-10-27). The sheet prevented this for the iOS keyboard, so
+        // desktop kept Radix's default and every dialog opened with its
+        // first text input focused. A picker should open on its list, not
+        // on a filter. Writing-first overlays are unaffected: their own
+        // autoFocus fires on mount regardless of this.
+        onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <DialogHeader
           className={
