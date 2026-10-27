@@ -97,6 +97,10 @@ export type WizardEditConfig = {
  */
 export type WizardDraftValues = WizardEditConfig["initial"] & {
   closesAt: string | null
+  /** WHERE THEY WERE, not just what they said. Without this someone coming
+   *  back from signing up lands on step one with every field filled and has
+   *  to press Next five times to reach the Publish they already pressed. */
+  step?: WizardStep
 }
 
 /** A parent appeal, joined via the appeal link. Charity locked to the
@@ -158,7 +162,7 @@ export function useWizardState(
   const init = edit?.initial ?? draft ?? undefined
   const router = useRouter()
 
-  const [step, setStep] = useState<WizardStep>("event")
+  const [step, setStep] = useState<WizardStep>(draft?.step ?? "event")
   const [category, setCategory] = useState<FavpollCategory | null>(
     init?.category ?? initialCategory ?? null
   )
@@ -277,6 +281,7 @@ export function useWizardState(
       allowGuestItems,
       showGuestAmounts,
       closesAt: closesAt ? closesAt.toISOString() : null,
+      step,
     }
   }
 
@@ -291,7 +296,8 @@ export function useWizardState(
     // cheaper half of it, and the half the sign-in round trip needs.
     //
     // Signed in there is nothing to carry: publish happens in this tab.
-    if (!isSignedIn && !isEdit) void saveWizardDraft(toDraftValues())
+    if (!isSignedIn && !isEdit)
+      void saveWizardDraft({ ...toDraftValues(), step: next })
   }
 
   const register = deriveRegister(category, grouping, subject)
