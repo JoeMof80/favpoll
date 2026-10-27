@@ -2,7 +2,7 @@
 
 import { lockReason } from "@/lib/favpoll-locks"
 
-import { Info, Search } from "lucide-react"
+import { Info, Loader2, Search } from "lucide-react"
 
 import { useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
@@ -58,6 +58,8 @@ type Props = {
   draft?: WizardDraftValues | null
   /** Publish asks for an account when this is false. */
   isSignedIn?: boolean
+  /** Back from Clerk: publish the draft on arrival, without asking again. */
+  publishOnReturn?: boolean
 }
 
 export function NewFavpollWizard({
@@ -69,6 +71,7 @@ export function NewFavpollWizard({
   initialCharityId,
   draft,
   isSignedIn = true,
+  publishOnReturn = false,
 }: Props) {
   // Register-added charities (consent-gate) — appended to the catalogue
   // for this wizard session, and folded into the data handed to the hook
@@ -95,7 +98,8 @@ export function NewFavpollWizard({
     appeal,
     initialCharityId,
     draft,
-    isSignedIn
+    isSignedIn,
+    publishOnReturn
   )
   const [topicSearch, setTopicSearch] = useState("")
   const [charitySearch, setCharitySearch] = useState("")
@@ -209,6 +213,20 @@ export function NewFavpollWizard({
           onComplete={w.completeSeed}
         />
       </RegisterScope>
+    )
+  }
+
+  // Back from Clerk with the promise still owed. Nothing to decide here,
+  // so the wizard is not what to show: the next thing they see is the
+  // shared pot dialog above, which this holds the place of.
+  if (w.returningToPublish) {
+    return (
+      <div className="flex items-center justify-center px-4 py-24">
+        <p className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+          Publishing…
+        </p>
+      </div>
     )
   }
 
@@ -403,24 +421,19 @@ export function NewFavpollWizard({
                 isLast={w.isLast}
                 nextDisabled={w.nextDisabled}
                 submitting={w.submitting}
-                /* SAY WHERE IT GOES (2026-10-27). Signed out, this button
-                   does not publish — it saves the draft and goes to Clerk.
-                   "Publish" would be the same broken promise the hero's
-                   arrow exists to avoid: a different destination from the
-                   one the label names. Naming the sign-up also makes the
-                   trip expected rather than a swerve, and someone who
-                   already has an account is not stranded, since Clerk's
-                   sign-up page carries a sign-in link. */
-                finishLabel={
-                  w.isEdit
-                    ? "Save"
-                    : isSignedIn
-                      ? "Publish"
-                      : "Sign up to publish"
-                }
-                submittingLabel={
-                  w.isEdit ? "Saving…" : isSignedIn ? "Publishing…" : "Saving…"
-                }
+                /* ONE WORD FOR BOTH DOORS (founder, 2026-10-27). This said
+                   "Sign up to publish" for a day, on the reasoning that a
+                   button should name its destination. It bought honesty
+                   about one screen and paid for it twice: the label is
+                   wrong for an organiser who already has an account, and
+                   it talks about accounts at the moment they are thinking
+                   about their favpoll. "Publish" keeps its word because of
+                   where the trip ENDS — the account screen is a step inside
+                   publishing, and what comes back is the shared pot dialog,
+                   not the wizard again. Clerk's own screen offers both
+                   doors, so the label does not have to choose one. */
+                finishLabel={w.isEdit ? "Save" : "Publish"}
+                submittingLabel={w.isEdit ? "Saving…" : "Publishing…"}
                 onBack={w.handleBack}
                 onNext={w.handleNext}
                 onFinish={w.handleFinish}

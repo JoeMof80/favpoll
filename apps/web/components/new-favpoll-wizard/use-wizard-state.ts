@@ -158,7 +158,9 @@ export function useWizardState(
   /** What the visitor had filled in before they went to sign in. */
   draft?: WizardDraftValues | null,
   /** Whether there is an account yet. Publish asks for one if not. */
-  isSignedIn: boolean = true
+  isSignedIn: boolean = true,
+  /** The return from Clerk, carrying the promise Publish made. */
+  publishOnReturn: boolean = false
 ) {
   const isEdit = !!edit
   // Edit wins: a draft only exists in create mode, but being explicit here
@@ -254,6 +256,13 @@ export function useWizardState(
   } | null>(null)
   const ghostRequestId = useRef(0)
   const [submitting, setSubmitting] = useState(false)
+  // THE RETURN TRIP IS ALREADY PUBLISHING. The publish runs in an effect,
+  // so without this the wizard paints once before it starts — a surface
+  // they have finished with, offering the button they already pressed.
+  // Held from the first frame, and dropped when the publish settles.
+  const [returningToPublish, setReturningToPublish] = useState(
+    publishOnReturn && isSignedIn && !isEdit
+  )
   const [error, setError] = useState<string | null>(null)
   const [seedFavpollId, setSeedFavpollId] = useState<string | null>(null)
   // The Settings defaults (visibility follows the register) join the
@@ -263,17 +272,17 @@ export function useWizardState(
   // is prefilled.
   const [detailsSeen, setDetailsSeen] = useState(isEdit)
 
-  // PUBLISH ON RETURN, ONCE. The ref rather than the stripped URL is what
-  // guarantees the "once": StrictMode runs effects twice in development,
-  // and router.replace is asynchronous, so the param is still there on the
-  // second pass. Reading the ref first means the second pass does nothing.
+  // PUBLISH ON RETURN, ONCE. The ref, not the marker, is what guarantees
+  // the "once": StrictMode runs effects twice in development, and the
+  // marker is still set on the second pass — router.replace is
+  // asynchronous, and the prop only changes when the server re-renders.
+  // Reading the ref first means the second pass does nothing.
   const publishedOnReturn = useRef(false)
   useEffect(() => {
     if (publishedOnReturn.current) return
-    if (!isSignedIn || isEdit) return
-    const params = new URLSearchParams(window.location.search)
-    if (params.get(PUBLISH_ON_RETURN) !== "1") return
+    if (!isSignedIn || isEdit || !publishOnReturn) return
     publishedOnReturn.current = true
+    const params = new URLSearchParams(window.location.search)
 
     // Strip it first. A refresh must not fire this again, and handleFinish
     // walks back to the first gap if the draft no longer validates, which
@@ -718,6 +727,7 @@ export function useWizardState(
     if (firstGap) {
       changeStep(firstGap[0])
       setError(firstGap[1])
+      setReturningToPublish(false)
       return
     }
     // PUBLISH IS WHERE THE ACCOUNT IS ASKED FOR (2026-10-27). Everything
@@ -748,14 +758,19 @@ export function useWizardState(
         setError(e instanceof Error ? e.message : "Couldn't save — try again.")
         return
       }
-      // THE INTENT TRAVELS WITH THEM. The button said "Sign up to
-      // publish", so publishing on return is keeping that promise, not
-      // springing something — asking them to press it a second time would
-      // be the broken half.
+      // THE INTENT TRAVELS WITH THEM. The button said "Publish", and this
+      // is how it keeps its word: the account screen is a step inside
+      // publishing, and what comes back is the favpoll published and the
+      // shared pot offered. Asking them to press it a second time on
+      // arrival would be the broken half.
       //
       // The marker is what makes that safe, and it is deliberately NOT the
       // draft's existence: somebody coming back to an abandoned draft days
       // later must not have a favpoll published at them on arrival.
+      //
+      // Sign-UP is the landing because almost everyone here is new, and
+      // Clerk's own screen carries the sign-in link for the organiser who
+      // is not. The button names neither door, so it promises neither.
       router.push(
         `/sign-up?redirect_url=${encodeURIComponent(
           `/favpolls/new?${PUBLISH_ON_RETURN}=1`
@@ -905,6 +920,7 @@ export function useWizardState(
       setError(err.message || "Something went wrong")
     } finally {
       setSubmitting(false)
+      setReturningToPublish(false)
     }
   }
 
@@ -993,6 +1009,7 @@ export function useWizardState(
     setEnacted,
     cachedGhosts,
     submitting,
+    returningToPublish,
     error,
     seedFavpollId,
     completeSeed,

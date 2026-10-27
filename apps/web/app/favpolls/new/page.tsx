@@ -15,12 +15,14 @@ export default async function NewFavpollPage({
     category?: string
     appeal?: string
     charity?: string
+    publish?: string
   }>
 }) {
   const {
     category,
     appeal: appealSlug,
     charity: charityParam,
+    publish,
   } = await searchParams
   // The register CTAs preselect their event (founder, 2026-09-04:
   // "Create a celebration favpoll" must deliver exactly that). Anything
@@ -81,6 +83,10 @@ export default async function NewFavpollPage({
       consentGatingActive={consentPosture() === "consent-first"}
       draft={(draft?.payload as WizardDraftValues | undefined) ?? null}
       isSignedIn={!!userId}
+      /* The marker Publish set on its way to Clerk. Read on the server so
+         the wizard can hold the publishing state from its first frame
+         rather than painting a finished surface for one beat. */
+      publishOnReturn={publish === "1"}
     />
   )
 }
