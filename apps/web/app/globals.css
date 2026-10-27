@@ -255,6 +255,31 @@
      scrollIntoView({behavior:"smooth"}), each checking
      prefers-reduced-motion itself (the opt-out the CSS used to give
      for free). */
+  /* A ROUTE CHANGE LANDS AT THE TOP OF THE PAGE, NOT 56px DOWN IT
+     (founder bug report, 2026-10-27: "sometimes clicking the link back to
+     the homepage starts from this position rather than the top"). The
+     header is `fixed`, so a 56px spacer holds its place in flow and every
+     page's <main id="main"> begins at document y=56. After a client
+     navigation the App Router focuses that main and scrolls it into view,
+     which aligns ITS top with the viewport's — leaving the document at 56
+     with main's first 56px hidden behind the header. On the landing page,
+     whose hero is cut to the fold, that shows as a strip of the next
+     section at the bottom.
+
+     scroll-margin-top of the header's own height moves the scroll target
+     56px up, so the same scrollIntoView lands at 0. Measured both ways on
+     the production build: /favpolls and / both 56 without it, both 0 with.
+
+     This is the SKIP LINK's target too, and it gains the same correction:
+     "Skip to main content" used to put the heading under the header.
+
+     Sections keep their own scroll-mt-* for in-page anchors (see
+     features/page.tsx, which tunes that to 56px exactly). Those are
+     unaffected: scroll-margin belongs to the element being scrolled TO,
+     and an anchor jump targets the section, never #main. */
+  #main {
+    scroll-margin-top: 3.5rem;
+  }
   body {
     @apply bg-background text-foreground;
   }
