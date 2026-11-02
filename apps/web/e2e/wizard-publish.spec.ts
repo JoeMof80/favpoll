@@ -145,6 +145,11 @@ test.describe("wizard → publish flow", () => {
       buffer: Buffer.from(PHOTO_PNG, "base64"),
     })
     await page.getByRole("button", { name: /^crop$/i }).click()
+    // Crop returns the overlay to its preview; Save is what hands the
+    // photo to the wizard, and only then does the picker read "Change
+    // photo". (Reproduced locally 2026-11-02: the spec stopped at Crop
+    // and waited on a label that never came.)
+    await page.getByRole("button", { name: /^save$/i }).click()
     await expect(
       page.getByRole("button", { name: /change photo/i })
     ).toBeVisible({ timeout: 10_000 })
