@@ -1546,3 +1546,192 @@ Five days does not justify writing to a global chief executive, and if the
 application is in a queue it reads as impatience. **Chase info@ at about two
 weeks — 5 November 2026 — and make Aldridge the escalation after that**, in
 preference to sending the same mailbox a second email.
+
+## 2026-10-30 — THE UK TEAM, FROM THEIR OWN ANNUAL REPORT. Aldridge is off the list.
+
+Founder: "I don't think I can escalate to Nick Aldridge. He's the CEO.
+Surely I need a contact lower down the food chain." Correct, and the
+27 October section above is RETRACTED on that point: Aldridge is not the
+escalation. The "no partnerships staff are publicly indexed" finding of
+15 October was a search of LinkedIn; the primary source was sitting on
+paypalobjects.com.
+
+**Source: PayPal Giving Fund UK Annual Report and Financial Statements
+2024** (`paypalobjects.com/marketing/web/PPGF/UK/PPGF_UK_Annual_Report_and_FS_2024.pdf`),
+"Reference and Administrative Details", list of Other Officers. Nine
+people. Titles are listed in order and names in the same order; the two
+that matter are independently confirmed.
+
+| Title                                  | Name                                     | Confirmed by                                                                                                                                                      |
+| -------------------------------------- | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CEO (Global)                           | Nick Aldridge                            | the report; Companies House (secretary)                                                                                                                           |
+| **Country Manager, UK and Ireland**    | **Vanessa Babouram**                     | signs the report's opening letter as Country Manager; Loss Foundation trustee page and Charities Institute Ireland list her as **Vice-President, UK and Ireland** |
+| UK & IE Financial Controller           | Anya Milligan                            | table order only                                                                                                                                                  |
+| Marketing and Communications Executive | Mimi Anim-Nyame (resigned 28 March 2025) | table order only                                                                                                                                                  |
+| **UK & Ireland Operations Lead**       | **Frank Barreca**                        | Willow Foundation's partnerships page quotes him as "Operations Lead" on Give at Checkout; the 2022 report has him joining 4 July 2022 in the role                |
+| Client Services Manager                | Sharnie McCourt                          | table order only                                                                                                                                                  |
+| Data and Operations Manager            | Tawheed Rahim                            | table order only                                                                                                                                                  |
+| Senior Accountant                      | Dahnish Shiraz                           | table order only                                                                                                                                                  |
+| Senior Accountant                      | Vini Wilson (appointed 6 January 2025)   | table order only                                                                                                                                                  |
+
+Three things the report says in its own words:
+
+- "Key management personnel comprise the CEO, Financial Controller and
+  VP UK and Ireland". So Babouram is the UK decision-maker, one rung
+  below Aldridge, and the report is signed by her.
+- "Our principal activity to achieve these objects is the development of
+  partnerships with PayPal Inc and its subsidiaries, and with other
+  leading internet businesses, such as Meta, GoFundMe, eBay, Humble
+  Bundle, GoFundraise, Virtue, Deed and Twitch." Partnerships IS the
+  charity's activity, and with nine staff there is no partnerships
+  department beneath the country manager to find. Joe's "just a small
+  team" is now a number.
+- "Staff are employed by PayPal Ltd UK Branch and formally seconded to
+  PPGF UK." Explains why LinkedIn searches found PayPal titles.
+
+**THE ORDER NOW.** Hold the 5 November chase. When it goes, it goes TO A
+NAME, not to the mailbox again:
+
+1. **Frank Barreca, UK & Ireland Operations Lead.** The right altitude and
+   the right function: a partner integration at PPGF is operations (Joe:
+   mass payment files, semi-automated), he speaks publicly for a partner
+   programme, and a founder writing to an operations lead about an
+   operational question is proportionate. Reference the 22 October email
+   to info@ and the 13 October survey; ask who handles platform-partner
+   applications and whether a call is possible.
+2. **Vanessa Babouram, VP and Country Manager UK and Ireland** if Barreca
+   is silent at two weeks. She owns the decision; she is still not the
+   CEO.
+3. Aldridge: no.
+
+**BEFORE WRITING, check the current title on LinkedIn.** The report is
+the year to 31 December 2024, published 2025; one of the nine had already
+left by March 2025. The Glenn Barsby rule applies: a wrong title in the
+first line is the unrecoverable mistake.
+
+### The Barreca message, drafted 2026-10-30 (send today, not 5 November)
+
+Founder: "Can I send it today or is it too soon?" Today. The 5 November
+date was for a second message to the SAME mailbox. A connection request to
+a named person is a different door, carries almost nothing until accepted,
+and the message lands at his pace. His "Open to work" banner (founder's
+observation, 2026-10-30) is a reason not to wait a week, and a thing never
+to mention.
+
+Connection note (LinkedIn's 300-character cap):
+
+> Hi Frank, I run favpoll, a small UK giving platform. I applied to PPGF's
+> partner programme on 13 October and wrote to info@ on the 22nd, and I'd
+> like to make sure it reaches the right person. Could I ask you one
+> routing question? Joseph
+
+Message once accepted:
+
+> Thanks for connecting, Frank.
+>
+> favpoll is a UK platform where guests at an occasion pick a favourite and
+> pledge to a registered charity as they do. It's live at favpoll.com. We
+> charge no platform fee and take nothing from a pledge.
+>
+> I'd like to become a PPGF partner. The shape is the simple one: we
+> collect through Stripe and would grant onward to PPGF with a per-charity
+> recommendation, so on your side it's a payment file, not an integration.
+> We've mirrored the whole Register of Charities already, so the
+> charity-data work is done.
+>
+> I submitted the Become a Partner form on 13 October and emailed
+> info@paypalgivingfund.org on 22 October, and I haven't heard back yet,
+> which I expect is just the queue. My question is only this: who looks at
+> platform-partner applications in the UK team, and is a short call
+> possible? Happy to send a one-page summary first if that's easier.
+>
+> Joseph Moffatt
+> Founder, favpoll (Josmo Services Ltd)
+
+Left out on purpose: volume, Joe Metcalfe, Bates Wells, the $10m line, his
+job status. The ask is routing plus a call, which an operations lead can
+grant without authority he may not have. Check the current title on his
+profile before sending; change the one word if it differs.
+
+#### CORRECTION, same day: InMail, not a connection note
+
+Founder, 2026-10-30: "Joe Metcalfe was InMail and Goodstack only happened
+once I emailed Josh." So the 13 October line above ("LinkedIn connection
+note SENT") is WRONG on the channel, and the two precedents point the
+other way: InMail got Joe's reply; the Goodstack connection request did
+nothing until an email to Josh. Premium runs out in about two weeks.
+
+Barreca therefore gets ONE INMAIL now, not the two-step draft above.
+Subject: "Platform-partner application: one routing question". Body: the
+follow-up message above, with one sentence added before the ask: "I'm
+writing to you because the annual report lists you as Operations Lead,
+and this is an operations-shaped question". About 1,000 characters.
+
+#### FINAL, same day: no pitch
+
+Founder: "I don't want to pitch him. I just want to find out if my
+application has been seen and who to talk to about it." The InMail is now
+three sentences. Subject "Did our partner application reach the right
+person?". Body: founder of favpoll, a small UK giving platform; form on
+13 October, info@ on 22 October, nothing heard; the annual report lists
+him as UK operations lead, so can he say whether it has been seen and
+who in the UK team to talk to. Nothing about the product, the fee or the
+rail. The one-page who-we-are note is for when he asks.
+
+#### The founder's own version (2026-10-30), the one being sent
+
+> Hi Frank,
+>
+> I'm the founder of favpoll, a young fundraising platform.
+>
+> I applied to become a PPGF partner a few weeks ago but haven't heard
+> anything back yet.
+>
+> I saw your name in the annual report and thought I would reach out - I
+> hope you don't mind.
+>
+> Please can you advise who best to talk to about this?
+>
+> Many Thanks
+>
+> Joe Moffatt
+
+Shorter than any draft above and sent by InMail. Two optional edits
+suggested, neither a rewrite: the dates (13 October form, 22 October
+info@) so he has something to look up, and "Many thanks".
+
+**SENT 2026-10-31, by InMail, the founder's version above.** Premium
+expires in about two weeks, so a reply after that lands in the ordinary
+inbox. Next: nothing until **Friday 7 November**. If silent then, Vanessa
+Babouram (VP and Country Manager, UK and Ireland) is the next name, by the
+same route while Premium lasts. The info@ chase planned for 5 November is
+DROPPED: a second message into the same mailbox adds nothing now that a
+named person has one.
+
+#### 2026-11-01 — the contact form has a "Partners and programs" category. CORRECTION to the 2026-10-30 ruling that the form is the charity-help queue only.
+
+The founder opened the PayPal Contact Us form (the one linked from the
+PPGF site) and found two selectors: topic ("Other") and a second one with
+**"Partners and programs"** as an option, plus a 2,500-character message
+box. The charity-name, EIN and transaction-id fields are optional. So the
+form CAN be routed to the partnerships side, which the 27 and 30 October
+notes did not know. It is a ticketed queue with a reference number, which
+neither the Microsoft Form nor info@ gave.
+
+**Not today.** The Barreca InMail went yesterday. A second channel inside
+24 hours splits one application across two people and reads as
+impatience if he forwards it. The plan stands: nothing until **Friday
+7 November**. If he is silent then, **the form (Partners and programs)
+is the next step, BEFORE Babouram** — cheaper, routed, and it leaves a
+ticket; a country manager is the step after that, not instead of it.
+
+**Precedent found by the founder: Virtue** (virtueimpact.com, a Shopify
+giving app, a team of three named in the post), partnered with PPGF in
+**August 2022** — "20,000+ UK for-good organisations", PPGF processes
+the donations and pays out on the 20th of each month. Smaller than
+Thrift+, and the annual report's own principal-activity list names
+"Virtue" among the partners. Barreca joined on 4 July 2022, so that
+onboarding happened in his first weeks. One clause, when the form
+message is written: "a platform of our size, as Virtue did in 2022".
+Not a pitch; a fact that answers "are you too small?" before it is
+asked.

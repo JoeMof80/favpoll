@@ -35,13 +35,16 @@ from its own funds, and does not treat it as its own.
 
 ### 3. favpoll takes no fee
 
-favpoll deducts **nothing** from donations. 100% of every pledge is passed to
-the Charity. There is no platform fee, no commission, no minimum, and no other
-deduction of any kind.
+favpoll charges **no fee**. There is no platform fee, no commission, no
+minimum, and no deduction of favpoll's own. favpoll takes nothing from a
+pledge.
 
-Card processing is charged separately to the donor at the point of giving.
-favpoll retains none of it. If favpoll ever changes who bears that cost, it
-will give the Charity 30 days' written notice before doing so.
+Card processing is charged by the payment processor (Stripe) and is met at
+settlement: the Charity receives each donation less the processing cost
+attributable to it, at no more than the processor's standard UK card rate
+(currently 1.5% plus 20p per donation) and with no mark-up. favpoll retains
+none of it. If favpoll ever changes who bears that cost, it will give the
+Charity 30 days' written notice before doing so.
 
 ### 4. Gift Aid
 
@@ -190,12 +193,17 @@ charity signs quickly. The first sentence is deliberately absolute — no
 minimum, no exceptions — so there is nothing to negotiate.
 
 The second paragraph is there so the model can change without re-papering.
-The card fee currently sits with the donor, which is what keeps "100% to
-charity" literally true. If favpoll later moves it onto the charity — the
-JustGiving model, where the charity receives the donation net of processing —
-that is a variation every signed charity would otherwise have to agree to,
-and a letter telling them they now get less than promised. The notice clause
-turns that into an email. Do not delete it to make the agreement tidier.
+**Corrected 2026-11-01.** Since 2026-09-06 the processing cost is met at
+settlement — the charity receives the donation net of processing, the
+JustGiving model — and the guest pays pledge plus optional tip only
+(`apps/web/lib/card-fee.ts`). Clause 3 had carried the retired "100% of every
+pledge" claim for eight weeks after that; it now says what the live terms
+page says. The rate quoted is Stripe's domestic card rate, which the code
+applies to every card, so "no more than" is literally true and the shortfall
+on foreign cards is favpoll's. If favpoll ever moves the cost back onto the
+donor, or anywhere else, that is a variation every signed charity would
+otherwise have to agree to. The notice clause turns that into an email. Do
+not delete it to make the agreement tidier.
 
 **Clause 4 (Gift Aid)** puts the claim with the Charity, who already has the
 machinery, the staff and the audit history. MuchLoved's published fees put the
