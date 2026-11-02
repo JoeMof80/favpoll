@@ -60,6 +60,7 @@ import {
 import type { RankHistory } from "@/lib/rank-history"
 import type { Favourite } from "@favpoll/types"
 import { PhotoRow } from "@/components/manage/photo-row"
+import { BannerRow } from "@/components/manage/banner-row"
 import { CharityRows } from "@/components/manage/charity-rows"
 import {
   FavouritesGroup,
@@ -106,6 +107,7 @@ export type ManageFavpoll = OrganizerFavpoll & {
   about: string | null
   reveal: string | null
   photoUrl: string | null
+  bannerUrl: string | null
   favourites: ManageFavourite[]
   /** A finite topic takes no organiser additions. */
   topicIsFinite: boolean
@@ -629,6 +631,17 @@ export function ManageClient({
           readOnly={isClosed}
           onSave={saveField("photo_url")}
         />
+        {/* THE BANNER, cause favpolls only: a person's subject is a face,
+            which the square already holds. Optional, so its absence is an
+            invitation rather than a gap (2026-10-30). */}
+        {favpoll.subject === "cause" && (
+          <BannerRow
+            name={name}
+            bannerUrl={favpoll.bannerUrl}
+            readOnly={isClosed}
+            onSave={saveField("banner_url")}
+          />
+        )}
       </SettingsGroup>
     </div>
   )

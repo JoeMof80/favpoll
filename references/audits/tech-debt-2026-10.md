@@ -37,7 +37,7 @@ decision log. That is the single biggest obstacle to a second person
 
 ## Tier 1 — correctness, security, trust
 
-### 1.1 Three database views bypass row-level security · S · low risk · FIX NOW
+### 1.1 Three database views bypass row-level security · S · low risk · DONE (#1096)
 
 The July survey recorded "no RLS anywhere". **That is now out of date and
 was corrected by measurement:** RLS is enabled on 34 of 38 relations on
@@ -63,6 +63,15 @@ created them and by nothing in the application.
 
 Fix: `alter view … set (security_invoker = on)` on all three, or
 `revoke all on … from anon, authenticated`. Drop the two unused ones.
+
+**DONE 2026-10-20 (#1096, `20261020034000_views_respect_rls.sql`), verified
+on both databases 2026-11-01:** `charity_profiles_stale` and
+`charity_profiles_unkeyable` are dropped, `register_profile_floor` carries
+`security_invoker = on` on staging and production, and the materialised
+view `register_search_rows` has no grant to anon or authenticated at all.
+The "34 of 38" count above was 34 tables and 4 views; today every table
+has RLS on. The full picture, including what this entry did not look at,
+is 1.5.
 
 ### 1.2 The route that decides what a card is charged has no test · M · low risk · FIX NOW
 
@@ -381,6 +390,112 @@ comparison.
 
 Still to do: the wizard and the remaining action files, one per PR.
 
+### 1.5 RLS, the service-role key and the buckets, audited 2026-11-01 · S · low risk · two small fixes, one LEAVE
+
+A read-only pass over `supabase/migrations/` and the catalogues of both
+live databases (staging `eotqyintgusvzidymumb`, production
+`kgwkpibkoecvwcundqtm`), run because 1.1 had only looked at the views.
+**Nothing was changed.**
+
+**RLS is on for every table in `public` on both databases** — 36 on
+production, 37 on staging — and nothing is `FORCE`d, so the owner and the
+service role bypass it as intended. The migrations folder is not where
+most of it was switched on: only 12 tables have their
+`enable row level security` in a migration file; the other 24 were
+enabled in the dashboard before the chain began (the chain is not
+self-contained — production was baselined from a staging dump on
+2026-07-28).
+
+| Migration file                                              | Tables enabled there                 |
+| ----------------------------------------------------------- | ------------------------------------ |
+| `20260805100000_enable_rls_disbursements_rate_limits.sql`   | disbursements, rate_limits           |
+| `20260905120000_appeals.sql`                                | appeals                              |
+| `20260915120000_gift_aid_declarations.sql`                  | gift_aid_declarations                |
+| `20260927150000_register_charities.sql`                     | register_charities                   |
+| `20260928090000_topic_subsets.sql`                          | topic_subsets, topic_subset_items    |
+| `20260928150000_subset_totals.sql`                          | topic_subset_totals                  |
+| `20261004160000_charity_profiles.sql`                       | charity_profiles                     |
+| `20261004180000_profile_suggestions.sql`                    | model_spend                          |
+| `20261005120000_register_charity_names.sql`                 | register_charity_names               |
+| `20261027120000_wizard_drafts.sql`                          | wizard_drafts                        |
+| none — dashboard                                            | categories, charities, charity_topics, favourites, favpoll_charities, favpoll_invites, favpoll_poll_favourites, favpoll_polls, favpoll_pots, favpolls, generated_drafts, pledge_allocations, pledges, poll_invites, poll_items, polls, pot_allocations, pot_topups, protagonists, stripe_payment_events, topic_categories, topics, users; and charity_bank_accounts (staging only) |
+
+**Nine policies, identical on both databases, all `SELECT`, all permissive,
+all to `public`.** Every other table has RLS on and no policy, which is a
+full deny for the anon and authenticated keys. There is no INSERT, UPDATE
+or DELETE policy anywhere; every write goes through the service role.
+
+| Table               | Policy                               | USING                                    | Migration file                                                          |
+| ------------------- | ------------------------------------ | ---------------------------------------- | ----------------------------------------------------------------------- |
+| charities           | Anyone can read charities            | `true`                                   | none — dashboard                                                        |
+| favpoll_charities   | Anyone can read favpoll_charities    | `true`                                   | dashboard; renamed in `20260616000000_ubiquitous_language_rename.sql`   |
+| favpoll_polls       | Anyone can read favpoll polls        | `true`                                   | dashboard; renamed in the same file                                     |
+| favpolls            | Anyone can read public open favpolls | `is_private = false AND closed_at IS NULL` | dashboard; renamed in the same file                                   |
+| protagonists        | Anyone can read protagonists         | `true`                                   | none — dashboard                                                        |
+| topics              | Anyone can read topics               | `true`                                   | none — dashboard                                                        |
+| topic_subsets       | Anyone can read topic subsets        | `true`                                   | `20260928090000_topic_subsets.sql`                                      |
+| topic_subset_items  | Anyone can read topic subset items   | `true`                                   | `20260928090000_topic_subsets.sql`                                      |
+| topic_subset_totals | Anyone can read topic subset totals  | `true`                                   | `20260928150000_subset_totals.sql`                                      |
+
+The policies the app actually leans on are none of these: both apps read
+through the service role, and the browser client in `lib/supabase/client.ts`
+is imported only by the Storybook alias file. The SELECT policies matter
+for anyone who finds the anon key, which is by design public.
+
+**Drift between the two databases — the one real finding.** Four
+migrations `revoke all … from public, anon, authenticated` on
+`rate_limits` (`20260705160000`), `disbursements` (`20260706120000`),
+`pot_topups` (`20260720140000`) and `stripe_payment_events`
+(`20260721100000`). Those revokes hold on staging. On production both
+roles have **every privilege back** on all four — the dump-and-restore
+that baselined production re-granted them. No exposure follows: RLS with
+no policy returns nothing and refuses writes regardless of grants. What is
+missing is the second layer those four migrations were written to add,
+and it is missing only on the database that holds real money. Fix: re-run
+the four revokes on production, by hand, and verify by reading
+`information_schema.role_table_grants` (the migration-name rule applies —
+all four are *recorded* as applied there).
+
+Two smaller drifts seen in passing: `charity_bank_accounts` and its view
+`charity_bank_account_current` exist on staging with **no migration file**
+(#1113, hardened by hand on 2026-10-20) and are absent from production; and the `persons` storage bucket (below).
+
+**The service-role key is not exposed.** It is read only as
+`SUPABASE_SERVICE_ROLE_KEY`, never under a `NEXT_PUBLIC_` name; the only
+`NEXT_PUBLIC_` Supabase values are the URL and the anon key, and the `env`
+block in `next.config.mjs` exposes only the demo-marks flag. The two admin
+clients (`apps/web/lib/supabase/admin.ts`, `apps/admin/lib/supabase/admin.ts`)
+are imported by 95 files and not one of them, nor any file reading the
+key, carries `"use client"`. Next inlines only `NEXT_PUBLIC_` values into
+the browser bundle, so a client import would see `undefined`, not the key.
+Hardening, S: neither admin client has `import "server-only"`, so a future
+client import fails at runtime rather than at build — the guard is used
+once in the whole repo (`apps/admin/lib/library-read.ts`). Add it to both.
+
+**Both storage buckets are public; neither has a policy.** RLS is on for
+`storage.objects` and `storage.buckets` on both databases and there are
+zero policies on `storage.objects`, so the anon key can neither list,
+upload nor delete. "Public" means only that anyone holding a URL can read
+the file. Every upload runs through the service role in a server action
+after the MIME check from #1109.
+
+| Bucket       | Staging                | Production            | In code                                                                                                       |
+| ------------ | ---------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------- |
+| protagonists | public, 1,342 objects  | public, 21 objects    | yes — created `{ public: true }` in `app/favpolls/new/actions.ts` and `lib/actions/wizard-draft.ts`           |
+| persons      | absent                 | public, 26 objects    | no — last referenced by the May migration runners deleted in fc061b15                                         |
+
+Object keys embed the Clerk user id (`<userId>/<ts>.<ext>`) or the draft
+id (`drafts/<draftId>/…`), a mild disclosure and the price of the
+public-URL design. **LEAVE** the public buckets: the page that shows the
+photo is itself public. The `persons` bucket on production is a leftover
+with nothing pointing at it — look at the 26 objects before deleting it,
+in case any pre-rename favpoll still carries a `persons` URL in
+`photo_url`.
+
+The order, if anyone picks these up: the four revokes on production
+(minutes, closes the only drift that touches money tables), then
+`server-only` on both admin clients, then the `persons` bucket.
+
 ---
 
 ## Tier 2 — structure (what makes this codebase hard to learn)
@@ -656,7 +771,7 @@ into issues with `/to-issues`, then work them with `tdd`.
 
 ## Recommended order
 
-1. **1.1** views (an afternoon, closes the only security finding)
+1. **1.1** views (an afternoon, closes the only security finding) — DONE; its successor is **1.5** (three small items, 2026-11-01)
 2. **2.4 + 2.5** dead code and dead keys (first issues, ~1,100 lines out)
 3. **3.1** build in CI, **3.3** one alias map
 4. **3.4** process skeleton, then **2.1** ADRs as you touch each area

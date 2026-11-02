@@ -56,6 +56,8 @@ type CreateFavpollInput = {
   protagonistName: string
   protagonistAbout: string | null
   photoUrl: string | null
+  /** The cause hero's wide image, optional. */
+  bannerUrl?: string | null
   dateLabel: string | null
   category: string | null
   grouping: string
@@ -391,6 +393,9 @@ export async function createFavpoll(
       // Cause favpolls keep photo/context on the favpoll row — person
       // favpolls store them on the protagonist created above.
       photo_url: input.subject === "cause" ? input.photoUrl || null : null,
+      // The banner is the cause hero's alone: a person favpoll's subject
+      // is a face, which the square already holds.
+      banner_url: input.subject === "cause" ? input.bannerUrl || null : null,
       context: input.subject === "cause" ? input.dateLabel || null : null,
     })
     .select("id")

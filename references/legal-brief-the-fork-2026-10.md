@@ -170,4 +170,44 @@ the structure makes it the wrong document.
 
 ---
 
+---
+
+## Addendum, 29 October 2026 — a comparable platform's own position on Part II
+
+**A drafting note, not yet part of the instruction. Fold into question 1 when
+this is sent.**
+
+**easyfundraising states in its own supporter terms that it is a Professional
+Fundraiser under the Charities Act 1992.** It is a for-profit private limited
+company operating since the mid-2000s. Its model is affiliate commission:
+retailers pay a commission on purchases made through its site, and it passes an
+agreed proportion of that commission to the nominated good cause. Shoppers pay
+nothing extra. Causes need **not** be registered charities, and payment is made
+directly to the cause, quarterly by BACS or cheque, with a £15 minimum carried
+forward — **no charitable intermediary, and no PayPal Giving Fund**.
+
+Why it is worth putting in front of counsel:
+
+1. **It is evidence that PF status is a regime to operate inside, not a
+   verdict.** A mainstream UK platform has concluded it sits within Part II,
+   says so publicly, and has run at scale for two decades.
+2. **favpoll's position should read better than theirs**, which sharpens
+   question 3. easyfundraising **retains a share** of what it collects;
+   favpoll takes nothing from a pledge. If a company that keeps a cut can make
+   a workable s.60 statement, ours should be more favourable, not less — and we
+   want it accurate rather than flattering.
+3. **It is a third structure, distinct from A and B above**: direct payment to
+   an unincorporated good cause with no agency framing and no intermediary.
+   Not one we are proposing, but worth knowing it exists and is tolerated.
+
+*Found while researching Wistaston Memorial Hall's donations page, which lists
+easyfundraising alongside SumUp and bank transfer. Source: easyfundraising's
+published cause and supporter terms. The company's incorporation details come
+from a business-directory aggregator and are **not** verified at Companies
+House.*
+
+See `channel-strategy-2026-10-29.md` §3 for why that hall matters.
+
+---
+
 *Joseph Moffatt, Founder — Josmo Services Limited, trading as favpoll*

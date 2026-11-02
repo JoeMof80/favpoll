@@ -69,7 +69,7 @@ const COMPLETE_DRAFT: WizardDraftValues = {
   openingLine: "Celebrating",
   name: "Poppy Chen",
   context: "Sweet Sixteen",
-  photoUrl: null,
+  photoUrl: "https://cdn/photo.jpg",
   about: "Sixteen on Saturday.",
   note: "Mint choc chip.",
   isPrivate: false,

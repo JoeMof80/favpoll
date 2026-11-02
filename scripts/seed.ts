@@ -95,7 +95,12 @@ const charities = [
     registered_number: "1082947",
   },
   {
-    name: "Trussell Trust",
+    // Trussell since the 2024 rebrand (trusselltrust.org.uk redirects to
+    // trussell.org.uk), though the register still reads THE TRUSSELL
+    // TRUST. The two now differ under normaliseName, so the page shows
+    // the legal name on its own muted line — which is what that line is
+    // for.
+    name: "Trussell",
     description: "Supporting food banks across the UK",
     registered_number: "1110522",
   },

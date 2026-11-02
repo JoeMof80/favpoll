@@ -102,6 +102,10 @@ export const favpollScalars = {
   protagonistName: text(200, "That name is too long."),
   protagonistAbout: prose(2000, TOO_LONG).nullable(),
   photoUrl: text(2000, "That photo link is too long.").nullable(),
+  /** THE BANNER: the wide image above the hero's text, cause favpolls
+   *  only. Optional by design — photo_url became mandatory on
+   *  2026-10-29 and one required crop per favpoll is enough. */
+  bannerUrl: text(2000, "That banner link is too long.").nullable().optional(),
   dateLabel: text(200, TOO_LONG).nullable(),
   causeLabel: text(200, "That cause name is too long.").nullable(),
   pronoun: pronoun.nullable().optional(),

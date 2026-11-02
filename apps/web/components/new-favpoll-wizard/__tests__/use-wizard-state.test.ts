@@ -121,6 +121,8 @@ function advanceToDetails(
   act(() => result.current.setTopics([EXISTING_TOPIC]))
   act(() => result.current.handleNext())
   act(() => result.current.setName("Poppy Chen"))
+  // A photo is mandatory since 2026-10-29 — the publish tests need one.
+  act(() => result.current.setPhotoUrl("https://cdn/photo.jpg"))
   act(() => result.current.handleNext())
   act(() => result.current.setAbout("Sixteen on Saturday."))
   act(() => result.current.handleNext())
@@ -485,6 +487,7 @@ describe("useWizardState — handleFinish publishes", () => {
     )
     act(() => result.current.handleNext())
     act(() => result.current.setName("Poppy"))
+    act(() => result.current.setPhotoUrl("https://cdn/photo.jpg"))
     act(() => result.current.handleNext())
     act(() => result.current.setAbout("About."))
     act(() => result.current.handleNext())
@@ -514,6 +517,18 @@ describe("useWizardState — handleFinish publishes", () => {
     expect(mockUploadPersonPhoto).toHaveBeenCalledOnce()
     const input = mockCreateFavpoll.mock.calls[0][0]
     expect(input.photoUrl).toBe("https://cdn/photo.jpg")
+  })
+
+  it("holds a photoless favpoll at the info step and publishes nothing", async () => {
+    const { result } = renderHook(() => useWizardState(DATA))
+    advanceToDetails(result)
+    act(() => result.current.setPhotoUrl(null))
+    await act(async () => {
+      await result.current.handleFinish()
+    })
+    expect(result.current.error).toBe("A photo is required before publishing.")
+    expect(result.current.step).toBe("info")
+    expect(mockCreateFavpoll).not.toHaveBeenCalled()
   })
 
   it("surfaces a create failure as error, no navigation", async () => {
@@ -557,7 +572,7 @@ describe("useWizardState — edit mode (Phase 2)", () => {
       openingLine: "In loving memory of",
       name: "Mary Whitfield",
       context: "1941 – 2026",
-      photoUrl: null,
+      photoUrl: "https://cdn/mary.jpg",
       about: "A headmistress.",
       note: "Autumn, always.",
       goalAmount: 250,
@@ -590,6 +605,19 @@ describe("useWizardState — edit mode (Phase 2)", () => {
     const { result } = renderHook(() => useWizardState(DATA, EDIT))
     expect(result.current.canJumpTo("details")).toBe(true)
     expect(result.current.canJumpTo("story")).toBe(true)
+  })
+
+  // The rule is unconditional (founder, 2026-10-29): an edit cannot save
+  // its way past it either, and the message says "saving", not "publishing".
+  it("an edit with its photo cleared cannot be saved", async () => {
+    const { result } = renderHook(() => useWizardState(DATA, EDIT))
+    act(() => result.current.setPhotoUrl(null))
+    await act(async () => {
+      await result.current.handleFinish()
+    })
+    expect(result.current.error).toBe("A photo is required before saving.")
+    expect(result.current.step).toBe("info")
+    expect(mockUpdateFavpoll).not.toHaveBeenCalled()
   })
 
   it("Save calls updateFavpoll with the existing ids and navigates back", async () => {

@@ -22,6 +22,7 @@ export const FIELD_LABELS = {
   openingLine: "Opening line",
   context: "Context",
   photo: "Photo",
+  banner: "Banner",
   about: "About",
   note: "Personal note",
   goal: "Pledge goal",
