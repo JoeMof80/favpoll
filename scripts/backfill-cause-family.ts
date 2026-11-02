@@ -58,7 +58,7 @@ const CONFIRMED: Record<string, CauseFamily> = {
   Shelter: "homelessness",
   Crisis: "homelessness",
   "St Mungo's": "homelessness",
-  "Trussell Trust": "food_poverty",
+  Trussell: "food_poverty",
   "National Trust": "environment_heritage",
   RNLI: "sea_rescue",
   Oxfam: "international",
