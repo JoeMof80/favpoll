@@ -135,10 +135,11 @@ test.describe("wizard → publish flow", () => {
     await nameInput.fill(TEST_PROTAGONIST_NAME)
 
     // The avatar IS the picker, and the overlay's file input is hidden —
-    // setInputFiles drives a hidden input fine. The footer button reads
+    // setInputFiles drives a hidden input fine. By label, because the
+    // banner's overlay mounts a second hidden input beside it. The footer button reads
     // "Crop" once an image is loaded, "Save" before that.
     await page.getByRole("button", { name: /add a photo/i }).click()
-    await page.locator('input[type="file"]').setInputFiles({
+    await page.getByLabel("Upload photo").setInputFiles({
       name: "e2e.png",
       mimeType: "image/png",
       buffer: Buffer.from(PHOTO_PNG, "base64"),

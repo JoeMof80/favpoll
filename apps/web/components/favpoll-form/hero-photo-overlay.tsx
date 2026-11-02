@@ -348,6 +348,10 @@ export function HeroPhotoOverlay({
         type="file"
         accept="image/*"
         className="hidden"
+        // Named by what it uploads: the wizard mounts two of these
+        // overlays (photo and banner), and both inputs are in the DOM
+        // whichever is open, so a bare input[type="file"] is ambiguous.
+        aria-label={`Upload ${lower}`}
         onChange={(e) => {
           const file = e.target.files?.[0]
           if (!file) return
