@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { useFormContext, useWatch } from "react-hook-form"
 import Cropper from "react-easy-crop"
 import type { Area } from "react-easy-crop"
-import { Trash2, Upload } from "lucide-react"
+import { ImagePlus, Trash2, Upload } from "lucide-react"
 import { ResponsiveOverlay } from "@/components/ui/responsive-overlay"
 import {
   InputGroup,
@@ -54,9 +54,38 @@ async function getCroppedBlob(
 type Props = {
   open: boolean
   onOpenChange: (open: boolean) => void
+  /** THE CROP'S SHAPE. Square by default, which is every caller but one:
+   *  the hero's photo hangs off the band as an 80px square. The BANNER
+   *  (2026-10-30) is the exception — a wide image above the hero's text,
+   *  cropped at 3:1 so the organiser sees roughly what a phone will show;
+   *  wider columns crop the sides further via object-cover. */
+  aspect?: number
+  /** A FIXED crop box, in pixels. Normally left off: react-easy-crop
+   *  fits the IMAGE to the container when given an explicit size and
+   *  floats the box on top, so minimum zoom can only ever reach the
+   *  middle of the picture (founder, 2026-10-30: "scaling down images
+   *  that are too large", first on the banner and then on the square,
+   *  whose 132px box — the avatar's size — cut the edges off a square
+   *  logo). With no size the box fills the container and the image
+   *  COVERS it, so zoom 1 is the whole picture. The box's size on screen
+   *  never changes what is saved: the crop is read in the image's own
+   *  pixels. */
+  cropSize?: { width: number; height: number }
+  /** What this overlay is editing, in the organiser's words. "Photo"
+   *  everywhere but the banner, which borrows the same machinery and
+   *  would otherwise call itself Photo and preview itself square
+   *  (founder, 2026-10-30). */
+  label?: string
 }
 
-export function HeroPhotoOverlay({ open, onOpenChange }: Props) {
+export function HeroPhotoOverlay({
+  open,
+  onOpenChange,
+  aspect = 1,
+  cropSize,
+  label = "Photo",
+}: Props) {
+  const lower = label.toLowerCase()
   const form = useFormContext<FavpollFormValues>()
   const name = useWatch({ control: form.control, name: "name" }) ?? ""
   const photo = useWatch({ control: form.control, name: "photo" }) as
@@ -155,13 +184,13 @@ export function HeroPhotoOverlay({ open, onOpenChange }: Props) {
         onOpenChange={(o) => {
           if (!o) cancel()
         }}
-        title="Photo"
+        title={label}
         {...FIELD_OVERLAY_PROPS}
         dialogContentClassName="flex-1 overflow-y-auto px-5 py-4"
         header={
           <InputGroup className={INPUT_GROUP_CLS}>
             <InputGroupAddon align="block-start" className="px-5 pt-4 pb-0">
-              <InputGroupText>Photo</InputGroupText>
+              <InputGroupText>{label}</InputGroupText>
             </InputGroupAddon>
             {/* Status only — picking moved onto the image itself (founder,
                 2026-09-01: "click the avatar or image to select an image
@@ -170,14 +199,14 @@ export function HeroPhotoOverlay({ open, onOpenChange }: Props) {
             <div className="flex w-full items-center gap-2 px-5 py-3">
               <span className="min-w-0 flex-1 truncate text-sm text-muted-foreground">
                 {originalFilename ||
-                  (dialogPhotoUrl ? "Current photo" : "No photo yet")}
+                  (dialogPhotoUrl ? `Current ${lower}` : `No ${lower} yet`)}
               </span>
               {(originalFilename || dialogPhotoUrl) && (
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
-                  aria-label="Remove photo"
+                  aria-label={`Remove ${lower}`}
                   onClick={clearPhoto}
                 >
                   <Trash2 className="h-4 w-4" />
@@ -209,15 +238,24 @@ export function HeroPhotoOverlay({ open, onOpenChange }: Props) {
       >
         {cropSrc ? (
           <div className="space-y-4">
-            <div className="relative h-40 w-full overflow-hidden rounded-lg">
+            <div
+              className={
+                aspect === 1
+                  ? "relative h-40 w-full overflow-hidden rounded-lg"
+                  : "relative w-full overflow-hidden rounded-lg"
+              }
+              /* A wide crop gets a surface its own shape, so the box
+                 fills it instead of floating in dead space. */
+              style={aspect === 1 ? undefined : { aspectRatio: aspect }}
+            >
               <Cropper
                 image={cropSrc}
                 crop={crop}
                 zoom={zoom}
-                aspect={1}
+                aspect={aspect}
                 cropShape="rect"
                 showGrid={false}
-                cropSize={{ width: 132, height: 132 }}
+                cropSize={cropSize}
                 style={{ cropAreaStyle: { borderRadius: "12px" } }}
                 onCropChange={setCrop}
                 onZoomChange={setZoom}
@@ -266,18 +304,40 @@ export function HeroPhotoOverlay({ open, onOpenChange }: Props) {
               onClick={() => fileInputRef.current?.click()}
               aria-label={
                 (photoDraft?.previewUrl ?? dialogPhotoUrl)
-                  ? "Choose a different photo"
-                  : "Choose a photo"
+                  ? `Choose a different ${lower}`
+                  : `Choose a ${lower}`
               }
-              className="h-auto rounded-xl p-0"
+              className={
+                aspect === 1 ? "h-auto rounded-xl p-0" : "h-auto w-full p-0"
+              }
             >
-              <ProtagonistAvatar
-                name={name || "Name"}
-                photoUrl={photoDraft?.previewUrl ?? dialogPhotoUrl ?? null}
-              />
+              {aspect === 1 ? (
+                <ProtagonistAvatar
+                  name={name || "Name"}
+                  photoUrl={photoDraft?.previewUrl ?? dialogPhotoUrl ?? null}
+                />
+              ) : (photoDraft?.previewUrl ?? dialogPhotoUrl) ? (
+                /* A WIDE PREVIEW FOR A WIDE IMAGE: the square avatar
+                   showed the banner as a crop of itself, which is the
+                   one thing this overlay must not do. */
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={photoDraft?.previewUrl ?? dialogPhotoUrl ?? ""}
+                  alt=""
+                  className="w-full rounded-lg object-cover"
+                  style={{ aspectRatio: aspect }}
+                />
+              ) : (
+                <div
+                  className="flex w-full items-center justify-center rounded-lg border border-dashed border-border-strong text-muted-foreground"
+                  style={{ aspectRatio: aspect }}
+                >
+                  <ImagePlus className="size-6" aria-hidden="true" />
+                </div>
+              )}
             </Button>
             <p className="text-xs text-muted-foreground">
-              Tap the photo to choose an image
+              Tap the {lower} to choose an image
             </p>
           </div>
         )}

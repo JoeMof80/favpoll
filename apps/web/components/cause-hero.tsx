@@ -105,6 +105,8 @@ export function CauseHero({
       subtitle={subtitle}
       avatar={avatar}
       about={hideAbout ? undefined : about}
+      bannerUrl={favpoll.banner_url}
+      photoUrl={favpoll.photo_url}
       pins={pins}
       banner={banner}
     />

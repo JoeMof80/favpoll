@@ -30,10 +30,11 @@ export type StoryField =
   | "note"
   | "goal_amount"
   | "photo_url"
+  | "banner_url"
 
 // The wizard's own limits (wizard-info-step, wizard-story-step).
 const LIMITS: Record<
-  Exclude<StoryField, "goal_amount" | "photo_url">,
+  Exclude<StoryField, "goal_amount" | "photo_url" | "banner_url">,
   number
 > = {
   opening_line: 50,
@@ -79,6 +80,20 @@ async function updateStoryFieldInner(
           .from("protagonists")
           .update({ photo_url: url })
           .eq("id", favpoll.protagonist_id!)
+    if (error) throw new Error(error.message)
+    return
+  }
+
+  // THE BANNER is the cause hero's alone, and lives on the favpoll
+  // rather than the protagonist: a person favpoll's subject is a face,
+  // which the square already holds
+  // (references/hero-banner-2026-10-29.md).
+  if (field === "banner_url") {
+    if (!isCause) throw new Error("Only a cause favpoll has a banner.")
+    const { error } = await supabase
+      .from("favpolls")
+      .update({ banner_url: value ? String(value) : null })
+      .eq("id", favpollId)
     if (error) throw new Error(error.message)
     return
   }

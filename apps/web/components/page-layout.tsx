@@ -221,7 +221,13 @@ export function PageLayout({
             // (its --rail at rest, half the sheet expanded), less half the
             // handle. The rule itself passes behind. Eased with the grid.
             <div
-              className="absolute top-[76px] z-20 hidden transition-[right] duration-300 ease-out motion-reduce:transition-none shell:block"
+              // z-40, the mark's tier: page chrome above the hero (its
+              // pinned box is z-30). At z-20 the hero painted over the
+              // handle's left half once a BANNER sat beneath the band and
+              // bled across the boundary at 76px — the band alone ends
+              // at 56px and never reached it (founder, 2026-10-30:
+              // "expand button is obscured").
+              className="absolute top-[76px] z-40 hidden transition-[right] duration-300 ease-out motion-reduce:transition-none shell:block"
               style={{
                 right: railExpanded
                   ? "calc(50% - 12px)"

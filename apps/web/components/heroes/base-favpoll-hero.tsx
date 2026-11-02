@@ -116,6 +116,7 @@ export function BaseFavpollHero({
       subtitle={subtitle}
       avatar={avatar}
       about={hideAbout ? undefined : about}
+      photoUrl={protagonist.photo_url}
       pins={pins}
       banner={banner}
     />

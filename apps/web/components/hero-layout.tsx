@@ -5,6 +5,8 @@ import { createPortal } from "react-dom"
 import Link from "next/link"
 import { useScrollEdges, useScrollRoot } from "@/components/shell-scroller"
 import { FavpollLogo } from "@/components/favpoll-logo"
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 
 type HeroLayoutProps = {
   eyebrowText: React.ReactNode
@@ -22,6 +24,20 @@ type HeroLayoutProps = {
    *  close — "only visible as the favpoll approaches its deadline". Hidden
    *  from the shell breakpoint, where the rail has the countdown. */
   banner?: React.ReactNode
+  /** THE BANNER IMAGE (founder, 2026-10-29/30) — not to be confused with
+   *  `banner` above, which is the countdown line. A wide photograph under
+   *  the band and ABOVE the hero's text, never behind it. It sits in
+   *  ordinary flow, so it pushes the text down by its own height and a
+   *  hero without one is unchanged: the offset belongs to the image, not
+   *  to the hero. See references/hero-banner-2026-10-29.md. */
+  bannerUrl?: string | null
+  /** THE AVATAR'S IMAGE, for the lightbox (founder, 2026-10-30: "make
+   *  the image and banner open in dialog on click"). The avatar arrives
+   *  as a node; this is the URL behind it, so a tap can show it large.
+   *  What is stored is the crop, so the dialog shows the crop larger —
+   *  80px on a phone hides most of a face, which is the point. Tapping
+   *  is on the guest page only (`pins`): nobody taps a projector. */
+  photoUrl?: string | null
 }
 
 // THE STACKED HEADER (founder, 2026-10-15/16). A LinkedIn profile header
@@ -76,6 +92,18 @@ const STRIP = 16
  *  own tone, so the header stays one colour (founder, 2026-10-16: "I
  *  don't like how the countdown makes the header two tone"). */
 const BANNER = 28
+/** The banner image's height. Fixed rather than an aspect ratio: vertical
+ *  space is the scarce axis here — every pixel pushes the standings and
+ *  the pledge button down — so the cost should not change with the
+ *  viewport's width. Crops horizontally instead. */
+/** WHAT THE ORGANISER CROPPED IS WHAT THE PAGE SHOWS (founder,
+ *  2026-10-30: "this is the image i uploaded after being cropped").
+ *  The crop overlay works at 3:1, so the banner is drawn at 3:1 — a
+ *  fixed HEIGHT re-framed their crop at every width (4.5:1 on the shell,
+ *  2.7:1 on a phone) and object-cover quietly trimmed whatever did not
+ *  fit. The cost moves with the column instead: 130px on a phone, less
+ *  than the 144 it replaces, and more where there is room for it. */
+const BANNER_ASPECT = 3
 
 export function HeroLayout({
   eyebrowText,
@@ -85,7 +113,48 @@ export function HeroLayout({
   about,
   pins = false,
   banner,
+  bannerUrl,
+  photoUrl,
 }: HeroLayoutProps) {
+  // THE LIGHTBOX: one dialog for the avatar and the banner. The tap
+  // targets are real buttons; the dialog's title is for screen readers
+  // and the image is decorative there — the title says what it is.
+  const [lightbox, setLightbox] = useState<{
+    src: string
+    title: string
+  } | null>(null)
+  // FOCUS GOES BACK TO THE BUTTON THAT OPENED IT. Measured on the page
+  // (2026-10-30): after Escape, focus landed on <body>, not the trigger,
+  // so a keyboard user closing the dialog was dropped at the top of the
+  // document. The dialog is controlled from plain buttons rather than a
+  // DialogTrigger, so the trigger is remembered here and restored by
+  // hand in onCloseAutoFocus.
+  const lightboxTriggerRef = useRef<HTMLElement | null>(null)
+  const openLightbox = (
+    e: React.MouseEvent<HTMLElement>,
+    src: string,
+    title: string
+  ) => {
+    lightboxTriggerRef.current = e.currentTarget
+    setLightbox({ src, title })
+  }
+  const tappable = pins
+  /** The avatar node, wrapped as a tap target when there is a URL to
+   *  show and a page that is tapped. Both placements use it. */
+  const avatarSlot =
+    tappable && photoUrl ? (
+      <Button
+        type="button"
+        variant="ghost"
+        aria-label="View photo"
+        onClick={(e) => openLightbox(e, photoUrl, "Photo")}
+        className="block h-full w-full rounded-none p-0 hover:bg-transparent"
+      >
+        {avatar}
+      </Button>
+    ) : (
+      avatar
+    )
   // headerInset = 56 (the h-14 header) when the document scrolls, 0 inside
   // the shell's scroller (one provider at every width). The favpoll page
   // has no header at any width now, so in practice 0.
@@ -206,7 +275,7 @@ export function HeroLayout({
             }`}
             aria-hidden={avatar ? undefined : true}
           />
-          {avatar && (
+          {avatar && !bannerUrl && (
             /* 80px at every width, its top on the mark's line (16 into the
              56 row). Size and position inline as well as by class: a stale
              stylesheet once drew it full width over the name (iOS,
@@ -220,7 +289,7 @@ export function HeroLayout({
                 top: PHOTO_TOP,
               }}
             >
-              {avatar}
+              {avatarSlot}
             </div>
           )}
         </div>
@@ -262,6 +331,92 @@ export function HeroLayout({
           document.body
         )}
 
+      {/* THE BANNER, beneath the band and in ordinary flow (founder,
+          2026-10-30, settling it: "keep the band. banner underneath").
+          In flow on purpose: the text below is pushed down by the
+          image's own height, so a favpoll without one is unchanged and
+          needs no empty state. Drawn at the crop's 3:1 — a fixed height
+          re-framed the organiser's crop at every width. Text is never
+          drawn over it: tried six ways and rejected, because a veil tuned
+          for one photograph cannot be trusted on an unvetted upload. The
+          avatar is the sticky block just below, not a child of this one
+          (references/hero-banner-2026-10-29.md). A sticky collapse and a
+          scroll fade were built and withdrawn the same night. */}
+      {bannerUrl && (
+        /* Positioned block inside the column's padding, so the avatar's
+           right-0 is the content's edge at every width; only the image
+           bleeds. */
+        <div className="relative">
+          <div className="-mx-6 shell:-mr-8 shell:-ml-16">
+            {tappable ? (
+              <Button
+                type="button"
+                variant="ghost"
+                aria-label="View banner"
+                onClick={(e) => openLightbox(e, bannerUrl, "Banner")}
+                className="block h-auto w-full rounded-none p-0 hover:bg-transparent"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={bannerUrl}
+                  alt=""
+                  className="block w-full object-cover"
+                  style={{ aspectRatio: BANNER_ASPECT }}
+                />
+              </Button>
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={bannerUrl}
+                alt=""
+                className="block w-full object-cover"
+                style={{ aspectRatio: BANNER_ASPECT }}
+              />
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* THE AVATAR PINS, SO SCROLLING ARRIVES AT THE NO-BANNER PAGE
+          (founder, 2026-10-30: "can we pin the avatar so scrolling
+          achieves the effect of no banner?"). At rest it sits where it
+          did as the banner's child: overlapping the banner's lower edge
+          by PHOTO/2 and hanging PHOTO/2 below — off the band it landed on
+          the roofline the organiser had just framed. It is STICKY at the
+          band's own avatar line (PHOTO_TOP), so as the banner slides
+          under the band the avatar rises until it reaches that line and
+          holds, and from there the page is the no-banner page to the
+          pixel: band, avatar hanging 40 below it, the poll heading's
+          pt-10 clearing it. CSS alone. It is a top-level sibling here on
+          purpose: a sticky element is confined to its parent's box, and
+          this fragment's parent is the column's content wrapper (page-
+          layout, `max-shell:contents` / `shell:flex-col`), which the band
+          already relies on as its containing block — so the avatar stays
+          until the whole column has passed, as the band does, rather
+          than peeling off when the About goes by. Margins of -PHOTO/2
+          above and below make its height in flow zero, so nothing
+          beneath it moves. z-30 is the band's tier: it paints over the
+          tint it comes to rest on and over the poll heading (z-20) it
+          hangs into. ml-auto pushes it to the content's right edge in
+          both the phone's block flow and the shell's flex column. On
+          the phone the window is the scroller, so it rides iOS
+          overscroll where the band (fixed) does not — the same trade
+          the banner itself makes. */}
+      {bannerUrl && avatar && (
+        <div
+          className="sticky z-30 ml-auto size-20 overflow-hidden rounded-xl border-4 border-background bg-background shadow-sm"
+          style={{
+            width: PHOTO,
+            height: PHOTO,
+            top: inset + PHOTO_TOP,
+            marginTop: -PHOTO / 2,
+            marginBottom: -PHOTO / 2,
+          }}
+        >
+          {avatarSlot}
+        </div>
+      )}
+
       <div style={{ height: STRIP }} aria-hidden="true" />
 
       {/* The opening line, beside the hanging photo (pr-28 keeps it clear),
@@ -293,6 +448,38 @@ export function HeroLayout({
           {about}
         </div>
       )}
+
+      {/* The lightbox. The image is the content and is unlabelled; the
+          sr-only title names it. aria-describedby is set to nothing on
+          purpose — there is no description, and Radix would otherwise
+          warn about the one it expects. */}
+      <Dialog
+        open={lightbox !== null}
+        onOpenChange={(open) => {
+          if (!open) setLightbox(null)
+        }}
+      >
+        <DialogContent
+          aria-describedby={undefined}
+          className="max-w-3xl overflow-hidden p-0"
+          onCloseAutoFocus={(e) => {
+            e.preventDefault()
+            lightboxTriggerRef.current?.focus()
+          }}
+        >
+          <DialogTitle className="sr-only">
+            {lightbox?.title ?? "Image"}
+          </DialogTitle>
+          {lightbox && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={lightbox.src}
+              alt=""
+              className="block max-h-[85vh] w-full object-contain"
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

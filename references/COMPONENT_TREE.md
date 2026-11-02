@@ -1,6 +1,6 @@
 # Component Tree
 
-Generated 2026-10-27 by `node scripts/component-tree.mjs` — do not edit by hand; rerun it (CI: `--check`).
+Generated 2026-10-30 by `node scripts/component-tree.mjs` — do not edit by hand; rerun it (CI: `--check`).
 
 ## Legend
 
@@ -11,7 +11,7 @@ Generated 2026-10-27 by `node scripts/component-tree.mjs` — do not edit by han
 ↑  already expanded above, or a shared subtree (see its section)
 ```
 
-Counts: 30 routes · 194 component files · 45 with stories · 0 unused in production
+Counts: 30 routes · 195 component files · 45 with stories · 0 unused in production
 
 ---
 
@@ -282,9 +282,14 @@ app/favpolls/[id]/manage/page.tsx
           → components/favpoll-card/types.ts
           → components/ui/section-eyebrow.tsx *
       → components/guest-book.tsx *  ↑
+      → components/manage/banner-row.tsx
+          → components/favpoll-form/hero-photo-overlay.tsx  ↑
+          → components/favpoll-form/schema.ts
+          → components/manage/settings-rows.tsx  ↑
+          → components/ui/button.tsx *
       → components/manage/charity-rows.tsx
           → components/favpoll-flow/charity-step.tsx
-              → components/ui/button.tsx *
+              → components/ui/button.tsx *  ↑
               → components/ui/chip.tsx *  ↑
               → packages/types/ *
           → components/new-favpoll-wizard/wizard-charity-card.tsx *  ↑
@@ -311,7 +316,7 @@ app/favpolls/[id]/manage/page.tsx
               → components/ui/input-group.tsx  ↑
               → components/ui/responsive-overlay.tsx *  ↑
           → components/favpoll-flow/topic-step.tsx
-              → components/favpoll-form/schema.ts
+              → components/favpoll-form/schema.ts  ↑
               → components/ui/button.tsx *  ↑
               → components/ui/chip.tsx *  ↑
               → packages/types/ *  ↑
@@ -1270,6 +1275,18 @@ components/charity-row.tsx *
   → packages/types/ *
 ```
 
+### `components/favpoll-form/hero-photo-overlay.tsx` — used by 4
+
+```
+components/favpoll-form/hero-photo-overlay.tsx
+  → components/favpoll-form/edit-helpers.tsx  ↑
+  → components/favpoll-form/schema.ts
+  → components/favpoll-hero-avatar.tsx *
+  → components/ui/button.tsx *
+  → components/ui/input-group.tsx  ↑
+  → components/ui/responsive-overlay.tsx *  ↑
+```
+
 ### `components/favpoll-list-card/favpoll-list-card-charity-carousel.tsx` — used by 4
 
 ```
@@ -1339,6 +1356,14 @@ components/landing/open-right-now.tsx
   → components/ui/section-eyebrow.tsx *
 ```
 
+### `components/manage/settings-rows.tsx` — used by 4
+
+```
+components/manage/settings-rows.tsx
+  → components/new-favpoll-wizard/wizard-field.tsx  ↑
+  → components/new-favpoll-wizard/wizard-step-shell.tsx
+```
+
 ### `components/favpoll-card/poll-note.tsx` — used by 3
 
 ```
@@ -1357,18 +1382,6 @@ components/favpoll-form/date-time-picker.tsx *
   → components/ui/card.tsx *
   → components/ui/input-group.tsx  ↑
   → components/ui/popover.tsx
-  → components/ui/responsive-overlay.tsx *  ↑
-```
-
-### `components/favpoll-form/hero-photo-overlay.tsx` — used by 3
-
-```
-components/favpoll-form/hero-photo-overlay.tsx
-  → components/favpoll-form/edit-helpers.tsx  ↑
-  → components/favpoll-form/schema.ts
-  → components/favpoll-hero-avatar.tsx *
-  → components/ui/button.tsx *
-  → components/ui/input-group.tsx  ↑
   → components/ui/responsive-overlay.tsx *  ↑
 ```
 
@@ -1482,14 +1495,6 @@ components/list-controls.tsx
   → components/ui/segmented-control.tsx *
 ```
 
-### `components/manage/settings-rows.tsx` — used by 3
-
-```
-components/manage/settings-rows.tsx
-  → components/new-favpoll-wizard/wizard-field.tsx  ↑
-  → components/new-favpoll-wizard/wizard-step-shell.tsx
-```
-
 ### `components/new-favpoll-wizard/wizard-charity-card.tsx` — used by 3
 
 ```
@@ -1529,6 +1534,8 @@ components/room-shell/
           → components/hero-layout.tsx
               → components/favpoll-logo.tsx  ↑
               → components/shell-scroller.tsx
+              → components/ui/button.tsx *
+              → components/ui/dialog.tsx
           → components/mention-text.tsx  ↑
           → components/ui/section-eyebrow.tsx *
           → packages/types/ *
@@ -1566,7 +1573,7 @@ components/room-shell/
               → packages/types/ *  ↑
           → components/standings-skeleton.tsx
           → components/ui/badge.tsx
-          → components/ui/button.tsx *
+          → components/ui/button.tsx *  ↑
           → components/ui/dropdown-menu.tsx
           → packages/types/ *  ↑
           → packages/ui/
@@ -1603,11 +1610,11 @@ components/share-favpoll-button.tsx
 components/ui/alert.tsx  ← 1
 components/ui/badge.tsx  ← 3
 components/ui/button-group.tsx  ← 1
-components/ui/button.tsx *  ← 74
+components/ui/button.tsx *  ← 76
 components/ui/calendar.tsx  ← 1
 components/ui/card.tsx *  ← 1
 components/ui/chip.tsx *  ← 9
-components/ui/dialog.tsx  ← 1
+components/ui/dialog.tsx  ← 2
 components/ui/dropdown-menu.tsx  ← 6
 components/ui/input-group.tsx  ← 11
 components/ui/input.tsx *  ← 6

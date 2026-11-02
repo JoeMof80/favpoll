@@ -54,6 +54,7 @@ export default async function ManageFavpollPage({
       created_by,
       description,
       photo_url,
+      banner_url,
       is_private,
       show_guest_amounts,
       appeal_id,
@@ -86,6 +87,7 @@ export default async function ManageFavpollPage({
     created_by: string
     description: string | null
     photo_url: string | null
+    banner_url: string | null
     is_private: boolean | null
     appeal_id: string | null
     appeals: {
@@ -309,6 +311,7 @@ export default async function ManageFavpollPage({
     about: (isCause ? ev.description : ev.protagonists?.about) ?? null,
     reveal: ev.favpoll_polls?.personal_note ?? null,
     photoUrl: (isCause ? ev.photo_url : ev.protagonists?.photo_url) ?? null,
+    bannerUrl: ev.banner_url ?? null,
     favourites: (ev.favpoll_polls?.favpoll_poll_favourites ?? [])
       .filter((f) => f.favourites)
       .map((f) => ({

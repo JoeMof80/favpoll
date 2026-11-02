@@ -81,6 +81,11 @@ export type WizardEditConfig = {
     name: string
     context: string
     photoUrl: string | null
+    /** The cause hero's wide image. Optional in every sense: absent on a
+     *  person favpoll, absent on most cause ones, and absent from older
+     *  drafts — one mandatory crop per favpoll is enough (the square
+     *  became mandatory 2026-10-29). */
+    bannerUrl?: string | null
     about: string
     note: string
     goalAmount: number | undefined
@@ -196,6 +201,13 @@ export function useWizardState(
   const [photoUrl, setPhotoUrl] = useState<string | null>(
     init?.photoUrl ?? null
   )
+  const [bannerUrl, setBannerUrl] = useState<string | null>(
+    init?.bannerUrl ?? null
+  )
+  // THE BANNER'S FILE WAITS FOR AN ACCOUNT, as the photo's does: the
+  // wizard runs signed out (#1160) and uploadPersonPhoto needs a user.
+  // Held here, uploaded at publish, discarded if the create fails.
+  const [bannerFile, setBannerFile] = useState<File | null>(null)
   const [about, setAbout] = useState(init?.about ?? "")
   const [note, setNote] = useState(init?.note ?? "")
   const [who, setWho] = useState<WhoValue | "">(
@@ -312,6 +324,7 @@ export function useWizardState(
       name,
       context,
       photoUrl,
+      bannerUrl,
       about,
       note,
       goalAmount,
@@ -711,19 +724,32 @@ export function useWizardState(
     // gates — an appeal seed marks Details done at birth, so the rail
     // could carry a jump past unfilled steps straight to Publish.
     // Check every step here and walk back to the first gap.
+    //
+    // A PHOTO IS REQUIRED TOO (founder, 2026-10-29). It never was: this
+    // gate checked six things and a photo was not among them, so all six
+    // favpolls on production had none. The hatched-initials fallback in
+    // favpoll-hero-avatar stays — old rows and previews still reach it —
+    // but a new favpoll no longer can. Unconditional on purpose, edits
+    // included: a rule that exempts the rows already here is one nobody
+    // can rely on, and production was small enough to backfill by hand.
+    // Either half counts: `photo` is a File not yet uploaded, `photoUrl`
+    // an upload already done (or a blob: preview from the crop overlay).
+    const act = isEdit ? "saving" : "publishing"
     const firstGap: [WizardStep, string] | null = !category
-      ? ["event", "Pick an event type before publishing."]
+      ? ["event", `Pick an event type before ${act}.`]
       : charityIds.length === 0
-        ? ["charity", "Pick a charity before publishing."]
+        ? ["charity", `Pick a charity before ${act}.`]
         : !topicDone
-          ? ["topic", "Pick a topic before publishing."]
+          ? ["topic", `Pick a topic before ${act}.`]
           : !name.trim()
-            ? ["info", "A name is required before publishing."]
-            : !about.trim()
-              ? ["story", "The About is required before publishing."]
-              : !closesAt
-                ? ["details", "Pick a close date before publishing."]
-                : null
+            ? ["info", `A name is required before ${act}.`]
+            : !photo && !photoUrl
+              ? ["info", `A photo is required before ${act}.`]
+              : !about.trim()
+                ? ["story", `The About is required before ${act}.`]
+                : !closesAt
+                  ? ["details", `Pick a close date before ${act}.`]
+                  : null
     if (firstGap) {
       changeStep(firstGap[0])
       setError(firstGap[1])
@@ -803,6 +829,15 @@ export function useWizardState(
         resolvedPhotoUrl = await uploadPersonPhoto(fd)
       }
 
+      // The banner takes the same road, and the same bucket. Optional, so
+      // nothing here is reached on most favpolls.
+      let resolvedBannerUrl = bannerUrl
+      if (bannerFile) {
+        const fd = new FormData()
+        fd.append("photo", bannerFile)
+        resolvedBannerUrl = await uploadPersonPhoto(fd)
+      }
+
       const selected = topics[0]
       if (!selected) throw new Error("Missing topic")
       const topicMeta = data.topics.find((t) => t.id === selected.topicId)
@@ -819,6 +854,7 @@ export function useWizardState(
           protagonistName: isCause ? "" : name,
           protagonistAbout: isCause ? null : about || null,
           photoUrl: resolvedPhotoUrl,
+          bannerUrl: resolvedBannerUrl,
           dateLabel: context || null,
           category: category ?? null,
           grouping,
@@ -864,6 +900,7 @@ export function useWizardState(
         protagonistName: isCause ? "" : name,
         protagonistAbout: isCause ? null : about || null,
         photoUrl: resolvedPhotoUrl,
+        bannerUrl: resolvedBannerUrl,
         dateLabel: context || null,
         category: category ?? null,
         grouping,
@@ -977,6 +1014,10 @@ export function useWizardState(
     setPhoto,
     photoUrl,
     setPhotoUrl,
+    bannerUrl,
+    setBannerUrl,
+    bannerFile,
+    setBannerFile,
     about,
     setAbout,
     note,

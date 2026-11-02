@@ -20,6 +20,7 @@ import { FIELD_LABELS, FIELD_LIMITS, nameLabel } from "@/lib/favpoll-fields"
 
 export function WizardInfoStep({ w }: { w: WizardState }) {
   const [photoOpen, setPhotoOpen] = useState(false)
+  const [bannerOpen, setBannerOpen] = useState(false)
 
   // The photo flow (HeroPhotoOverlay + crop) reads a form context; this
   // scoped form carries just photo/photoUrl/name for it.
@@ -47,6 +48,38 @@ export function WizardInfoStep({ w }: { w: WizardState }) {
     return () => sub.unsubscribe()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [photoForm])
+
+  // THE BANNER's own scoped form. The overlay only speaks in
+  // photo/photoUrl, so the banner borrows those names and this watch
+  // translates — the same trick manage/banner-row uses. Its File waits
+  // for an account like the photo's: the wizard runs signed out (#1160).
+  const bannerForm = useForm<FavpollFormValues>({
+    defaultValues: { name: "" },
+  })
+  useEffect(() => {
+    const sub = bannerForm.watch((v) => {
+      w.setBannerFile((v.photo as File | undefined) ?? null)
+      w.setBannerUrl(v.photoUrl ?? null)
+    })
+    return () => sub.unsubscribe()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bannerForm])
+
+  /** What the organiser has chosen, before any upload has happened.
+   *  Made once per File and revoked after: calling createObjectURL in
+   *  render mints a new blob on every keystroke elsewhere on the step and
+   *  never releases one. */
+  const [bannerObjectUrl, setBannerObjectUrl] = useState<string | null>(null)
+  useEffect(() => {
+    if (!w.bannerFile) {
+      setBannerObjectUrl(null)
+      return
+    }
+    const url = URL.createObjectURL(w.bannerFile)
+    setBannerObjectUrl(url)
+    return () => URL.revokeObjectURL(url)
+  }, [w.bannerFile])
+  const bannerPreview = bannerObjectUrl ?? w.bannerUrl
 
   const ph = ghostsFor(w.category)
   const nameLabelText = nameLabel(w.who, w.category)
@@ -131,8 +164,57 @@ export function WizardInfoStep({ w }: { w: WizardState }) {
         </Button>
       </div>
 
+      {/* THE BANNER, cause favpolls only and never required: the subject
+          of a cause is a hall, a band, a room — the shapes the 80px square
+          cannot hold — while a person's subject is a face, which it can.
+          One mandatory crop per favpoll is enough (the photo became
+          mandatory 2026-10-29), so this says "Optional" and means it:
+          a favpoll without one renders exactly as it did before banners
+          existed. See references/hero-banner-2026-10-29.md. */}
+      {w.isCause && (
+        <div className="block space-y-1.5 text-sm sm:grid sm:grid-cols-[180px_1fr] sm:items-center sm:space-y-0 sm:gap-x-6">
+          <span className="block font-medium">
+            {FIELD_LABELS.banner}
+            <span className="ml-1 font-normal text-muted-foreground">
+              Optional
+            </span>
+          </span>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setBannerOpen(true)}
+            aria-label={bannerPreview ? "Change banner" : "Add a banner"}
+            className={cn(
+              "h-16 w-48 shrink-0 overflow-hidden rounded-lg p-0",
+              !bannerPreview &&
+                "border-dashed border-border-strong text-muted-foreground"
+            )}
+          >
+            {bannerPreview ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={bannerPreview}
+                alt=""
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <ImagePlus className="size-6" aria-hidden="true" />
+            )}
+          </Button>
+        </div>
+      )}
+
       <FormProvider {...photoForm}>
         <HeroPhotoOverlay open={photoOpen} onOpenChange={setPhotoOpen} />
+      </FormProvider>
+
+      <FormProvider {...bannerForm}>
+        <HeroPhotoOverlay
+          open={bannerOpen}
+          onOpenChange={setBannerOpen}
+          aspect={3}
+          label="Banner"
+        />
       </FormProvider>
     </div>
   )

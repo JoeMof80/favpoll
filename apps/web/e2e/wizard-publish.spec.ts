@@ -11,7 +11,7 @@
  *   3. Event step: Memorial
  *   4. Charity step: Marie Curie
  *   5. Topic step: Colour
- *   6. Header step: fill the protagonist name
+ *   6. Header step: fill the protagonist name and add a photo
  *   7. Story step: fill the About
  *   8. Settings step: close date via the dropdown's "1 month" preset →
  *      Publish
@@ -30,6 +30,12 @@
 import { test, expect } from "@playwright/test"
 
 const TEST_PROTAGONIST_NAME = `E2E Wizard Test ${new Date().toISOString().slice(0, 10)}`
+// A photo is mandatory at publish since 2026-10-29 (the firstGap check in
+// use-wizard-state). A 32px PNG built inline rather than a committed
+// fixture: nothing to keep in step, and the crop only needs an image that
+// decodes.
+const PHOTO_PNG =
+  "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAKklEQVR4nGNwi1pAU8QwasGoBaMWjFowasGoBaMWjFowasGoBaMWDBULAGrQAExVK5M9AAAAAElFTkSuQmCC"
 
 // ── Guard: skip if auth wasn't set up ────────────────────────────────────────
 test.beforeAll(() => {
@@ -127,6 +133,20 @@ test.describe("wizard → publish flow", () => {
     const nameInput = page.getByPlaceholder(/mary whitfield/i)
     await expect(nameInput).toBeVisible({ timeout: 5_000 })
     await nameInput.fill(TEST_PROTAGONIST_NAME)
+
+    // The avatar IS the picker, and the overlay's file input is hidden —
+    // setInputFiles drives a hidden input fine. The footer button reads
+    // "Crop" once an image is loaded, "Save" before that.
+    await page.getByRole("button", { name: /add a photo/i }).click()
+    await page.locator('input[type="file"]').setInputFiles({
+      name: "e2e.png",
+      mimeType: "image/png",
+      buffer: Buffer.from(PHOTO_PNG, "base64"),
+    })
+    await page.getByRole("button", { name: /^crop$/i }).click()
+    await expect(
+      page.getByRole("button", { name: /change photo/i })
+    ).toBeVisible({ timeout: 10_000 })
 
     await page.getByRole("button", { name: /^next$/i }).click()
 

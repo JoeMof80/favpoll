@@ -28,6 +28,7 @@ export const storyField = z.enum(
     "about",
     "goal_amount",
     "photo_url",
+    "banner_url",
     "note",
   ],
   FIELD_MESSAGE

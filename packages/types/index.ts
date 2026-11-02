@@ -240,6 +240,12 @@ export type Favpoll = {
   description: string | null
   /** Cause favpolls only — person favpolls keep these on the protagonist. */
   photo_url?: string | null
+  /** THE BANNER: an optional wide image above the hero's text, for a
+   *  subject the 80px square cannot hold — a hall, a band, a room
+   *  (references/hero-banner-2026-10-29.md). Never drawn behind text, so
+   *  there is no veil to store beside it. Absent on most favpolls, and
+   *  absent renders exactly as the hero did before it existed. */
+  banner_url?: string | null
   context?: string | null
   created_at: string
 }
@@ -402,6 +408,8 @@ export type CanvasSubmitData = {
   protagonistAbout?: string | null
   dateLabel: string | null
   photoUrl?: string | null
+  /** The cause hero's wide image above the text, optional. */
+  bannerUrl?: string | null
   category: FavpollCategory | null
   grouping: FavpollGrouping
   subject: FavpollSubject

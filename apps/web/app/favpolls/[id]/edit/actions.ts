@@ -453,6 +453,7 @@ export async function updateFavpoll(
       // Cause favpolls keep photo/context on the favpoll row — person
       // favpolls store them on the protagonist (updated above).
       photo_url: input.subject === "cause" ? input.photoUrl || null : null,
+      banner_url: input.subject === "cause" ? input.bannerUrl || null : null,
       context: input.subject === "cause" ? input.dateLabel || null : null,
       ...(isExtension && {
         extension_count: (favpoll.extension_count ?? 0) + 1,
