@@ -732,3 +732,43 @@ lines in FUTURE tense ("will be handled", "will be claimed"); the demo
 composite (desktop + phone in a bezel, amber SAMPLE stamp and label).
 Ask: who best to speak to, and which events would suit. Next: wait for
 a reply; nothing else to the Friends until then.
+
+**Berkeley twin BUILT 2026-11-03, staging only.** The Friends of Berkeley
+School (1110904, Laidon Avenue, CW2 6RU) is the PTA of the founder's own
+primary school: active, £5,360 income to 31 August 2025, no Gift Aid, and
+Facebook and Instagram very inactive, so reach would come through the
+school's own channels and the register's Yahoo address may be unwatched.
+A warmer door than Church Lane (an old pupil, not a cold email), so the
+approach goes to Berkeley as well, same World Book Day template, with the
+school office as a second recipient. "World Book Day at Berkeley" is the
+Church Lane demo with the school's name swapped: same About (the
+founder's wording, now carried in the script for both schools), same
+fourteen fictional pledges, no note shown (Church Lane's was removed on
+manage; the twin matches), the generated portrait rather than a school
+mark, a DEMO charity row that has agreed nothing. Script:
+`scripts/demo-world-book-day.ts berkeley` (one script, a SCHOOLS map).
+Paths: `/favpolls/65b7a1d1-59b5-4abe-ad17-303ef5bee6a6`, `/p/df9e3dbb5d61`,
+`/live/e5f10303-6b9e-4feb-8516-f0277eeaf39a`. Composite with the amber
+SAMPLE stamp made the same day for the email. Still to write: the
+founder's own pick as a Berkeley pupil, as the note, which only he can.
+
+**The Meadows, Madeley Heath, twin BUILT 2026-11-03, staging only.** Via
+the founder's sister, who has a friend on the school council. Shaw
+Education Trust academy (CW3 9JX, Ofsted Outstanding, February 2024). No
+registered PTA, and an academy trust is an EXEMPT charity (regulated by
+the DfE, never on the Commission's register), so the trust cannot be a
+favpoll recipient as the product stands. The recipient is MADELEY
+SCHOOLS CHARITY (1068236, registered 1998): objects are "special benefits
+of any kind not normally provided by the local education authority" for
+schools in the parish of Madeley; income £10,541 to 31 December 2025; no
+Gift Aid; no logo found. The trustees would have to agree that a
+favpoll's proceeds go to The Meadows' library, and they have been asked
+nothing. Alternatives noted: the parents register a CIO (any income, but
+months), or favpoll one day admits exempt charities, which is every
+academy trust in England and a product decision, not one favpoll's.
+"World Book Day at The Meadows" is the Church Lane demo with the school's
+name swapped, the school crest as the photo, no note shown, the charity
+row DEMO ONLY. Script: `scripts/demo-world-book-day.ts meadows`. Paths:
+`/favpolls/66bf78df-d0d5-4406-9b2d-b87152cb1cc0`, `/p/dcd2d225dfca`,
+`/live/47c0417a-f626-4b21-a150-bb99b21283d3`. Composite stamped the
+same day.
