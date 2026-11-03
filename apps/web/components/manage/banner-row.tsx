@@ -79,8 +79,14 @@ export function BannerRow({
           const uploaded = await uploadPersonPhoto(fd)
           await onSave(uploaded)
           setCurrent(uploaded)
-          form.setValue("photoUrl", uploaded)
+          // lastRef BEFORE setValue: react-hook-form notifies watchers
+          // synchronously inside setValue, so with the order the other
+          // way round the watcher re-entered with the same File and a
+          // URL lastRef had not seen yet, and uploaded again, and again
+          // (467 copies of one crest on 2026-11-03, one every second or
+          // two until the tab closed).
           lastRef.current = { photo, url: uploaded }
+          form.setValue("photoUrl", uploaded)
         } else if (!url) {
           await onSave(null)
           setCurrent(null)
