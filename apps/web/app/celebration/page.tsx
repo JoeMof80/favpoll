@@ -25,7 +25,7 @@ import {
   WEDDING_KEEPSAKE_DATA,
 } from "@/components/landing/demo-fixture"
 import { t } from "@/lib/i18n"
-import { fetchLiveFavpolls, REGISTERS_BY_PAGE } from "@/lib/live-favpolls"
+import { fetchOpenFavpollCards, REGISTERS_BY_PAGE } from "@/lib/favpoll-cards"
 import { OpenRightNow } from "@/components/landing/open-right-now"
 
 // Register landing #2 (see /memorials for the pattern notes). ACCENT,
@@ -170,7 +170,7 @@ const IDEAS = [
 ]
 
 export default async function CelebrationsPage() {
-  const live = await fetchLiveFavpolls({
+  const live = await fetchOpenFavpollCards({
     registers: REGISTERS_BY_PAGE.celebrations,
   })
 
@@ -230,7 +230,7 @@ export default async function CelebrationsPage() {
 
         <IdeasSection title={t("celebrations.artefacts.title")} ideas={IDEAS} />
 
-        <OpenRightNow favpolls={live} />
+        <OpenRightNow favpolls={live} ground="background" />
 
         {/* ── Close — the landing's purple monogram close, one line.
           MATCHED TO /memorials (founder, 2026-08-28) in all three ways it

@@ -1,4 +1,3 @@
-import { pollTitle } from "@/lib/poll-title"
 import Link from "next/link"
 import { auth } from "@clerk/nextjs/server"
 import { createAdminClient } from "@/lib/supabase/admin"
@@ -6,6 +5,12 @@ import { FavpollListCard } from "@/components/favpoll-list-card"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import type { CardResultItem } from "@/components/favpoll-list-card/use-favpoll-list-card-pledge"
 import { withLiveTotals } from "@/lib/live-totals"
+import {
+  FAVPOLL_CARD_SELECT,
+  normaliseFavpollCard,
+  type RawFavpoll,
+  type RawPoll,
+} from "@/lib/favpoll-cards"
 import { pollSetStandings } from "@/lib/poll-standings"
 import { NewFavpollFab } from "@/components/new-favpoll-fab"
 import { FavpollsListClient } from "./favpolls-list-client"
@@ -42,83 +47,6 @@ function applyKindFilter<Q extends { eq: any; neq: any }>(
   return query.eq("category", kind)
 }
 
-const FAVPOLL_SELECT = `
-  id,
-  subject,
-  cause_label,
-  category,
-  opening_line,
-  description,
-  closes_at,
-  closed_at,
-  created_at,
-  occasion_type,
-  total_raised,
-  is_exemplar,
-  allow_guest_items,
-  show_guest_amounts,
-  photo_url,
-  protagonist:protagonists ( name, photo_url, about ),
-  charities:favpoll_charities (
-    charity:charities ( id, name, logo_url, registered_number, impact_statement )
-  ),
-  favpoll_polls (
-    id,
-    topic_id,
-    subset_id,
-    personal_note,
-    topics (
-      title,
-      is_finite,
-      favourites ( id, label )
-    ),
-    topic_subsets ( title ),
-    favpoll_poll_favourites (
-      favourites ( id, label )
-    )
-  )
-`
-
-type RawFavourite = { id: string; label: string }
-type RawEpf = { favourites: RawFavourite }
-type RawPoll = {
-  id: string
-  topic_id: string | null
-  subset_id?: string | null
-  topic_subsets?: { title: string } | { title: string }[] | null
-  personal_note: string | null
-  topics: {
-    title: string
-    is_finite: boolean
-    favourites: RawFavourite[]
-  } | null
-  favpoll_poll_favourites: RawEpf[]
-}
-type RawFavpoll = {
-  id: string
-  subject: string
-  cause_label: string | null
-  category: string | null
-  opening_line: string
-  description: string | null
-  closes_at: string
-  closed_at: string | null
-  created_at: string
-  occasion_type: string | null
-  total_raised: number
-  is_exemplar: boolean
-  allow_guest_items: boolean | null
-  show_guest_amounts: boolean | null
-  photo_url: string | null
-  protagonist: {
-    name: string
-    photo_url: string | null
-    about: string | null
-  } | null
-  charities: { charity: import("@favpoll/types").Charity }[]
-  favpoll_polls: RawPoll | null
-}
-
 export default async function FavpollsPage({
   searchParams,
 }: {
@@ -151,7 +79,7 @@ export default async function FavpollsPage({
   // Build favpoll query — live and closed together; the client filters
   let favpollsQuery = supabase
     .from("favpolls")
-    .select(FAVPOLL_SELECT)
+    .select(FAVPOLL_CARD_SELECT)
     .eq("is_private", false)
     .eq("is_listed", true)
 
@@ -176,7 +104,7 @@ export default async function FavpollsPage({
   if (hasFilter && (favpolls?.length ?? 0) === 0) {
     let exemplarQuery = supabase
       .from("favpolls")
-      .select(FAVPOLL_SELECT)
+      .select(FAVPOLL_CARD_SELECT)
       .eq("is_private", false)
       .eq("is_listed", true)
       .eq("is_exemplar", true)
@@ -263,52 +191,7 @@ export default async function FavpollsPage({
   }
 
   // Normalise once for the client list (and the exemplar shelf)
-  const cardFavpolls = displayFavpolls.map((fp) => {
-    const rawPoll = fp.favpoll_polls ?? null
-    let poll: {
-      id: string
-      topic_id: string | null
-      /** Content-free: the flip card's step 3 promises the personal
-       *  note when one exists (2026-09-17). Never the text itself. */
-      has_note: boolean
-      topic: {
-        title: string
-        is_finite: boolean
-        favourites: RawFavourite[]
-      } | null
-    } | null = null
-    if (rawPoll) {
-      const isFinite = rawPoll.topics?.is_finite ?? false
-      const epiItems = (rawPoll.favpoll_poll_favourites ?? [])
-        .map((epf) => epf.favourites)
-        .filter(Boolean)
-      // Catalogue fallback: non-finite topics with no poll-specific items
-      // fall back to the catalogue's own favourites (same fix as the
-      // detail page — founder, 2026-09-22).
-      // A subset poll carries its rows whatever the parent's openness.
-      const favourites =
-        isFinite && !rawPoll.subset_id
-          ? (rawPoll.topics?.favourites ?? [])
-          : epiItems.length > 0
-            ? epiItems
-            : (rawPoll.topics?.favourites ?? [])
-      poll = {
-        id: rawPoll.id,
-        topic_id: rawPoll.topic_id,
-        has_note: !!rawPoll.personal_note,
-        topic: rawPoll.topics
-          ? {
-              // The subset's name (favpoll-topic-rules §1, ruling 4).
-              title: pollTitle(rawPoll) ?? rawPoll.topics.title,
-              is_finite: isFinite,
-              favourites,
-            }
-          : null,
-      }
-    }
-    const { favpoll_polls: _stripped, ...rest } = fp
-    return { ...rest, poll }
-  })
+  const cardFavpolls = displayFavpolls.map(normaliseFavpollCard)
 
   // Register rail — the record's category rail, for occasions. Link-driven
   // so the server keeps doing the filtering and the exemplar fallback.

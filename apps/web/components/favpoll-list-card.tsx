@@ -6,15 +6,12 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { favpollEyebrow } from "@/lib/favpoll-eyebrow"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { PledgeDialog } from "@/components/pledge-dialog"
 import { ChevronLeft, ChevronRight, Gift } from "lucide-react"
 import { Tooltip, TooltipProvider } from "@/components/ui/tooltip"
 import { PollHeading } from "@/components/poll-heading"
-import { ClosingLabel } from "@/components/closing-label"
-import { ProtagonistAvatar } from "@/components/favpoll-hero-avatar"
-import { FavpollHeader } from "./favpoll-card/favpoll-header"
+import { FavpollCardBand } from "./favpoll-card/favpoll-card-band"
 import type { FavpollCardSize } from "./favpoll-card/types"
 import { FavpollListCardResults } from "./favpoll-list-card/favpoll-list-card-results"
 import { FavpollListCardCharityCarousel } from "./favpoll-list-card/favpoll-list-card-charity-carousel"
@@ -50,6 +47,8 @@ type FavpollListCardFavpoll = {
   show_guest_amounts?: boolean | null
   /** Cause favpolls carry their own photo; person favpolls keep it on the protagonist. */
   photo_url?: string | null
+  /** The hero banner (#1162), shown at the top of the story face. */
+  banner_url?: string | null
   protagonist: {
     name: string
     photo_url?: string | null
@@ -206,8 +205,10 @@ export function FavpollListCard({
     subject: (favpoll.subject ?? undefined) as FavpollSubject | undefined,
   })
 
+  // On the band's tint, so the card closes the way it opens (founder,
+  // 2026-11-04).
   const charityFooter = favpoll.charities.length > 0 && (
-    <div className="mt-auto border-t border-border px-4 py-3">
+    <div className="mt-auto rounded-b-xl border-t border-border bg-muted px-4 py-3">
       <FavpollListCardCharityCarousel
         charities={favpoll.charities}
         perCharity={perCharity}
@@ -216,25 +217,22 @@ export function FavpollListCard({
     </div>
   )
 
-  // withPhoto: the flip card's front already carries the large avatar, so
-  // its header goes without one (founder, 2026-09-01); entitled cards keep
-  // the header thumb — it is their only picture.
-  const headerFor = (withPhoto: boolean) => (
-    <div className="p-3">
-      <FavpollHeader
-        linkCue
-        hideEmptyAvatar
-        protagonist={{
-          name: displayName,
-          photo_url:
-            withPhoto && !isCause
-              ? (favpoll.protagonist?.photo_url ?? null)
-              : null,
-        }}
-        eyebrow={favpollEyebrow(favpoll)}
-        size={size}
-      />
-    </div>
+  // The shared card header (favpoll-card-band.tsx): band with the
+  // countdown and the Example badge, the mark offset on its edge, eyebrow,
+  // name. The same on the flipping card and on the entitled/closed card
+  // that has no body, and the same as the summary card (founder,
+  // 2026-11-04). The mark replaced the floated avatar on the story face
+  // (founder, 2026-11-04: "always have the offset image").
+  const header = (
+    <FavpollCardBand
+      closesAt={favpoll.closes_at}
+      isExemplar={favpoll.is_exemplar}
+      markPhoto={frontPhoto}
+      name={displayName}
+      eyebrow={favpollEyebrow(favpoll)}
+      size={size}
+      linkCue
+    />
   )
 
   const canFlip = !!pollWithItems && topicItems.length > 0
@@ -277,15 +275,6 @@ export function FavpollListCard({
           aria-label={`View favpoll: ${displayName}`}
           className="absolute inset-0 rounded-xl"
         />
-        {favpoll.is_exemplar && (
-          <Badge
-            variant="secondary"
-            className="pointer-events-none absolute top-3 right-3 z-10"
-          >
-            Example
-          </Badge>
-        )}
-
         {canFlip ? (
           /* The established card shape holds (founder, 2026-09-01, v3):
              header, topic row and charity footer are STATIC — only the
@@ -294,11 +283,11 @@ export function FavpollListCard({
              and a quiet named action ("How to pledge" / "Back to the
              story"). The lock pill and CTA button auditions both lost. */
           <>
-            {headerFor(false)}
-            {/* items-start: the closing label sits level with the
-                FAVOURITE eyebrow line, not centred against the two-line
-                header (founder, 2026-09-01). */}
-            <div className="relative border-t border-border px-3 py-2">
+            {header}
+            {/* The topic row. No rule above it and no countdown in it any
+                more: the band is the header's edge and carries the
+                countdown (founder, 2026-11-04). */}
+            <div className="relative px-3 pt-1 pb-2">
               <PollHeading
                 topicTitle={pollWithItems!.topics.title}
                 size="md"
@@ -306,12 +295,8 @@ export function FavpollListCard({
               />
               {/* Overlaid on the EYEBROW line only (founder, 2026-09-01:
                   the topic line owns the FULL card width — no shrinking
-                  while there is space to its right). The countdown always
-                  lives here; the pledge-again gift is in the step row. */}
-              <ClosingLabel
-                closesAt={favpoll.closes_at}
-                className="absolute top-2 right-3 whitespace-nowrap"
-              />
+                  while there is space to its right). The pledge-again gift
+                  is in the step row. */}
             </div>
             {/* ONE FIXED BODY HEIGHT for every card (founder, 2026-09-01:
                "the favpoll height varies" — content-driven heights read
@@ -352,14 +337,16 @@ export function FavpollListCard({
                       whole block SCROLLS instead of truncating (founder,
                       2026-09-01) — the step row stays pinned beneath. */}
                   <div className="min-h-0 flex-1 overflow-y-auto px-3 pt-2 pb-1">
-                    {/* A photo only — no hatched initials placeholder on
-                        the shop window (founder, 2026-09-30); the about
-                        takes the full width without one. */}
-                    {frontPhoto && (
-                      <ProtagonistAvatar
-                        name={displayName}
-                        photoUrl={frontPhoto}
-                        className="float-right mb-1 ml-3 h-24 w-24 md:h-24 md:w-24"
+                    {/* The hero banner leads the story, as it does on the
+                        page (founder, 2026-11-04: "if there is a banner,
+                        put it with the story"). 3:1, the crop's own shape. */}
+                    {favpoll.banner_url && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={favpoll.banner_url}
+                        alt=""
+                        className="mb-2 w-full rounded-md object-cover"
+                        style={{ aspectRatio: 3 }}
                       />
                     )}
                     {aboutText && (
@@ -508,7 +495,7 @@ export function FavpollListCard({
         ) : (
           /* No poll body at all — header and charities only. */
           <>
-            {headerFor(true)}
+            {header}
             {charityFooter}
           </>
         )}

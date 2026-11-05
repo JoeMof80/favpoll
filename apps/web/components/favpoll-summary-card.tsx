@@ -1,14 +1,12 @@
 "use client"
 
-import { ClosingLabel } from "@/components/closing-label"
-import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { favpollEyebrow } from "@/lib/favpoll-eyebrow"
 import type { Charity, FavpollCategory, FavpollSubject } from "@favpoll/types"
 import { paletteForFavpoll } from "@/lib/register-palette"
 import Link from "next/link"
 import { FavpollListCardCharityCarousel } from "./favpoll-list-card/favpoll-list-card-charity-carousel"
-import { FavpollHeader } from "./favpoll-card/favpoll-header"
+import { FavpollCardBand } from "./favpoll-card/favpoll-card-band"
 import { PollHeading } from "@/components/poll-heading"
 
 export type FavpollSummaryCardFavpoll = {
@@ -22,6 +20,9 @@ export type FavpollSummaryCardFavpoll = {
   closed_at?: string | null
   total_raised: number
   is_exemplar?: boolean
+  /** The cause favpoll's own photo, for the mark; person favpolls keep
+   *  it on the protagonist. */
+  photo_url?: string | null
   protagonist: { name: string; photo_url?: string | null } | null // null for cause favpolls
   charities: { charity: Charity }[]
   poll: { topic: { title: string } | null } | null
@@ -39,6 +40,10 @@ export function FavpollSummaryCard({ favpoll, className }: Props) {
     favpoll.subject === "cause"
       ? (favpoll.cause_label ?? "")
       : (favpoll.protagonist?.name ?? "")
+  const markPhoto =
+    favpoll.subject === "cause"
+      ? (favpoll.photo_url ?? null)
+      : (favpoll.protagonist?.photo_url ?? null)
   const perCharity =
     favpoll.charities.length > 0
       ? favpoll.total_raised / favpoll.charities.length
@@ -62,46 +67,34 @@ export function FavpollSummaryCard({ favpoll, className }: Props) {
         className
       )}
     >
-      {/* Header */}
-      <div className="relative p-3">
-        {favpoll.is_exemplar && (
-          <Badge variant="secondary" className="absolute top-3 right-3">
-            Example
-          </Badge>
-        )}
-        <FavpollHeader
-          hideEmptyAvatar
-          protagonist={{
-            name: displayName,
-            photo_url:
-              favpoll.subject === "cause"
-                ? null
-                : (favpoll.protagonist?.photo_url ?? null),
-          }}
-          eyebrow={favpollEyebrow(favpoll)}
-          size="md"
-        />
-      </div>
+      {/* The shared card header (favpoll-card-band.tsx): band, mark,
+          eyebrow, name. The summary card and the list card wear the same
+          one so the home shelf, the charity page and the appeal page
+          match /favpolls (founder, 2026-11-04). */}
+      <FavpollCardBand
+        closesAt={favpoll.closes_at}
+        isExemplar={favpoll.is_exemplar}
+        markPhoto={markPhoto}
+        name={displayName}
+        eyebrow={favpollEyebrow(favpoll)}
+        size="md"
+      />
 
-      {/* Topic + countdown. The label overlays the EYEBROW line only
-          (founder, 2026-09-01): the topic line owns the full card width
-          and never shrinks while there is space to its right — matching
-          the list cards. */}
+      {/* Topic. The countdown moved up into the band (founder,
+          2026-11-04); the topic line owns the full card width. No rule
+          above it: the band is the header's edge now. */}
       {topicTitle && (
-        <div className="relative border-t border-border px-3 py-2">
+        <div className="relative px-3 pt-1 pb-2">
           {/* The Favourite eyebrow (founder, 2026-09-01) — PollHeading's
               default mode, in the shared two-line grammar. */}
           <PollHeading topicTitle={topicTitle} size="md" />
-          <ClosingLabel
-            closesAt={favpoll.closes_at}
-            className="absolute top-2 right-3 whitespace-nowrap"
-          />
         </div>
       )}
 
-      {/* Charity */}
+      {/* Charity, on the band's tint so the card closes the way it opens
+          (founder, 2026-11-04). */}
       {favpoll.charities.length > 0 && (
-        <div className="border-t border-border px-3 py-2">
+        <div className="rounded-b-xl border-t border-border bg-muted px-3 py-2">
           <FavpollListCardCharityCarousel
             charities={favpoll.charities}
             perCharity={perCharity}
