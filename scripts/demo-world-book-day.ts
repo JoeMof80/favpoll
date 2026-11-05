@@ -1,23 +1,27 @@
 /**
  * scripts/demo-world-book-day.ts
  * ---------------------------------------------------------------------------
- * DEV ONLY. One demo favpoll the founder can show a PTA chair on a phone:
- * World Book Day at Church Lane, a cause favpoll in support of The Friends
- * of Wistaston Church Lane Academy (1046749), topic Children's book,
- * fourteen fictional pledges so the standings and the guest book read as
- * a week in progress. Owned by the founder's dev user so it appears in
- * his /my-favpolls and he can add a banner or change the photo from the
- * manage page. See references/channel-strategy-2026-10-29.md, the
- * 2026-11-01 Wistaston cluster entry.
+ * DEV ONLY. One demo favpoll per school the founder can show a PTA chair
+ * on a phone: World Book Day at Church Lane (in support of The Friends of
+ * Wistaston Church Lane Academy, 1046749) and, since 2026-11-03, its twin
+ * at Berkeley (The Friends of Berkeley School, 1110904, the founder's own
+ * primary school). Topic Children's book, fourteen fictional pledges so
+ * the standings and the guest book read as a week in progress. Owned by
+ * the founder's dev user so each appears in his /my-favpolls and he can
+ * add a banner or change the photo from the manage page. See
+ * references/channel-strategy-2026-10-29.md, the 2026-11-01 Wistaston
+ * cluster entry.
  *
  * The charity row is the same shape as the October hall demos: verified
  * and approved so the page renders, with an impact_statement that says
- * DEMO ONLY. The charity has agreed nothing.
+ * DEMO ONLY. Neither charity has agreed anything.
  *
  * Delete this script when the demos go.
  *
  *   cd apps/web
- *   pnpm tsx --env-file=.env.local ../../scripts/demo-world-book-day.ts
+ *   pnpm tsx --env-file=.env.local ../../scripts/demo-world-book-day.ts church-lane
+ *   pnpm tsx --env-file=.env.local ../../scripts/demo-world-book-day.ts berkeley
+ *   pnpm tsx --env-file=.env.local ../../scripts/demo-world-book-day.ts meadows
  *
  * IDEMPOTENT by cause_label + owner. SAFETY: refuses to run against
  * anything but the staging/dev project.
@@ -43,33 +47,109 @@ const supabase = createClient(
 )
 
 const FOUNDER = "user_3DV8OnUNVvsWvF0AnF4D7EiXPWs"
-const LABEL = "World Book Day at Church Lane"
 const CONTEXT = "Thursday 5 March 2027"
 const TOPIC_TITLE = "Children's book"
 const CLOSES_AT = "2027-03-05T15:30:00.000Z"
 
-// Cause register: an instruction to the reader, the favourite withheld,
-// the outcome named (an enacted favpoll: the winner goes on the library
-// plaque, founder's choice 2026-11-02; "read in assembly" before that).
-const ABOUT =
-  "Every class at Church Lane has a book it asks for again and again. " +
-  "Pick the one you would read tonight if it were up to you, and give what " +
-  "it is worth to the Friends. Whichever is on top on World Book Day goes " +
-  "on the plaque in the library: Church Lane's favourite book, 2027."
+type School = {
+  label: string
+  /** Cause register: an instruction to the reader, the favourite
+   *  withheld, the outcome named (an enacted favpoll). */
+  about: string
+  /** Cause reveal shape, per the topic rules: "Our pick to start: …" */
+  note: string
+  charity: {
+    name: string
+    registered_number: string
+    verified_name: string
+    description: string
+  }
+}
 
-// Cause reveal shape, per the topic rules: "Our pick to start: …"
-const NOTE =
-  "Our pick to start: The Gruffalo. Twelve years of Reception and they " +
-  "still shout the last line."
+const SCHOOLS: Record<string, School> = {
+  // The About is the founder's own wording, written on manage 2026-11-02
+  // and copied back here so the script and the row agree. "Read in
+  // assembly" and then "the plaque" came before it.
+  "church-lane": {
+    label: "World Book Day at Church Lane",
+    about:
+      "Every Church Lane pupil should have a favourite book. Pick yours and " +
+      "give what it is worth. All money raised will go to the school library " +
+      "and when the poll closes on World Book Day, we'll frame a copy of the " +
+      "winner on the wall.",
+    note:
+      "Our pick to start: The Gruffalo. Twelve years of Reception and they " +
+      "still shout the last line.",
+    charity: {
+      name: "The Friends of Wistaston Church Lane Academy",
+      registered_number: "1046749",
+      verified_name: "THE FRIENDS OF WISTASTON CHURCH LANE ACADEMY",
+      description:
+        "The parents' and teachers' association for Church Lane Academy, " +
+        "Wistaston. It raises money through the school year for the things " +
+        "the budget does not stretch to.",
+    },
+  },
+  // The same About with the school's name swapped. The note is a
+  // placeholder for the founder's own pick as a Berkeley pupil, which
+  // only he can write.
+  berkeley: {
+    label: "World Book Day at Berkeley",
+    about:
+      "Every Berkeley pupil should have a favourite book. Pick yours and " +
+      "give what it is worth. All money raised will go to the school library " +
+      "and when the poll closes on World Book Day, we'll frame a copy of the " +
+      "winner on the wall.",
+    note:
+      "Our pick to start: Danny the Champion of the World. The pheasants " +
+      "and the raisins, every time.",
+    charity: {
+      name: "The Friends of Berkeley School",
+      registered_number: "1110904",
+      verified_name: "THE FRIENDS OF BERKELEY SCHOOL",
+      description:
+        "The parents' and teachers' association for The Berkeley Academy, " +
+        "Wistaston. It raises money through the school year for the things " +
+        "the budget does not stretch to.",
+    },
+  },
+  // The Meadows, Madeley Heath (Shaw Education Trust) has no registered
+  // PTA and an academy trust is an exempt charity, so the recipient is
+  // MADELEY SCHOOLS CHARITY, whose objects are special benefits for the
+  // parish's schools. The trustees have agreed nothing (2026-11-03).
+  meadows: {
+    label: "World Book Day at The Meadows",
+    about:
+      "Every Meadows pupil should have a favourite book. Pick yours and " +
+      "give what it is worth. All money raised will go to the school library " +
+      "and when the poll closes on World Book Day, we'll frame a copy of the " +
+      "winner on the wall.",
+    note:
+      "Our pick to start: The Gruffalo. Twelve years of Reception and they " +
+      "still shout the last line.",
+    charity: {
+      name: "Madeley Schools Charity",
+      registered_number: "1068236",
+      verified_name: "MADELEY SCHOOLS CHARITY",
+      description:
+        "A charity for the schools of Madeley, Staffordshire. It provides " +
+        "the special benefits the local authority does not, and helps young " +
+        "people of the parish into education and training.",
+    },
+  },
+}
 
+const key = process.argv[2] ?? "church-lane"
+const school = SCHOOLS[key]
+if (!school) {
+  console.error(
+    `Unknown school "${key}". One of: ${Object.keys(SCHOOLS).join(", ")}`
+  )
+  process.exit(1)
+}
+const { label: LABEL, about: ABOUT, note: NOTE } = school
 const CHARITY = {
-  name: "The Friends of Wistaston Church Lane Academy",
-  registered_number: "1046749",
-  verified_name: "THE FRIENDS OF WISTASTON CHURCH LANE ACADEMY",
-  description:
-    "The parents' and teachers' association for Church Lane Academy, " +
-    "Wistaston. It raises money through the school year for the things " +
-    "the budget does not stretch to.",
+  ...school.charity,
   impact_statement:
     "DEMO ONLY — this charity has agreed nothing. Remove before any real use.",
   cause_family: "children",
@@ -77,6 +157,7 @@ const CHARITY = {
 
 const STARTERS = [
   "The Gruffalo",
+  "Fantastic Mr Fox",
   "Matilda",
   "The BFG",
   "Where the Wild Things Are",
