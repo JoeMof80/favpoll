@@ -1735,3 +1735,30 @@ onboarding happened in his first weeks. One clause, when the form
 message is written: "a platform of our size, as Virtue did in 2022".
 Not a pitch; a fact that answers "are you too small?" before it is
 asked.
+
+#### 2026-11-05 — SENT via the contact form, "Partners and programs"
+
+The founder brought the 7 November date forward: "Barreca has had long
+enough. its frustrating waiting forever." Five days after the InMail, not
+one, so the splitting worry from 1 November no longer applied.
+
+Form: https://www.paypal.com/smarthelp/contact-us/ppgf (the one the help
+article help1078 links to). First dropdown "Other", second "Partners and
+programs"; charity name, EIN and transaction fields left empty. The
+message was the founder's own 22 October info@ email with three
+additions, not the longer draft of the same day: one sentence saying what
+kind of partner (platform; collect through Stripe, grant onward to PPGF
+with a per-charity recommendation), which is the line that stops general
+PayPal support reading it as charity enrolment as they did in July; the
+22 October email and the July reference C826-L003-TPPGF001-S999-W000000
+so a ticket agent can find the history; and the ask of who in the UK team
+looks after platform-partner applications. Barreca not named (a ticket
+that names a member of staff reads as going round him and gives the
+agent nothing to act on). Virtue not mentioned; that clause is for the
+one-page summary.
+
+Open channels now, same application: the 13 October Become a Partner
+form, the 22 October info@ email, the 31 October Barreca InMail, this
+ticket. Next: Babouram only if all four are silent; nothing else until a
+reply or a reference number arrives. If the form's auto-reply gives a
+ticket reference, record it here.
