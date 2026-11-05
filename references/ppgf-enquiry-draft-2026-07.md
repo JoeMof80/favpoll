@@ -1735,3 +1735,64 @@ onboarding happened in his first weeks. One clause, when the form
 message is written: "a platform of our size, as Virtue did in 2022".
 Not a pitch; a fact that answers "are you too small?" before it is
 asked.
+
+#### 2026-11-05 — SENT via the contact form, "Partners and programs"
+
+The founder brought the 7 November date forward: "Barreca has had long
+enough. its frustrating waiting forever." Five days after the InMail, not
+one, so the splitting worry from 1 November no longer applied.
+
+Form: https://www.paypal.com/smarthelp/contact-us/ppgf (the one the help
+article help1078 links to). First dropdown "Other", second "Partners and
+programs"; charity name, EIN and transaction fields left empty. The
+message was the founder's own 22 October info@ email with three
+additions, not the longer draft of the same day: one sentence saying what
+kind of partner (platform; collect through Stripe, grant onward to PPGF
+with a per-charity recommendation), which is the line that stops general
+PayPal support reading it as charity enrolment as they did in July; the
+22 October email and the July reference C826-L003-TPPGF001-S999-W000000
+so a ticket agent can find the history; and the ask of who in the UK team
+looks after platform-partner applications. Barreca not named (a ticket
+that names a member of staff reads as going round him and gives the
+agent nothing to act on). Virtue not mentioned; that clause is for the
+one-page summary.
+
+Open channels now, same application: the 13 October Become a Partner
+form, the 22 October info@ email, the 31 October Barreca InMail, this
+ticket. Next: Babouram only if all four are silent; nothing else until a
+reply or a reference number arrives. If the form's auto-reply gives a
+ticket reference, record it here.
+
+#### 2026-11-05 — the form's reply: "can you confirm your organization is a registered charity?"
+
+PayPal Customer Support replied within a day, reading it as charity
+enrolment, exactly as on 6 July. Three facts from the headers:
+
+- The message that went was the founder's 22 October text UNCHANGED (no
+  "platform partner" sentence, no July reference, no 22 October line).
+  The form stamped it Topic "Enrollment process" despite select_2
+  "Partners and programs"; the sub-select did not route it anywhere
+  different.
+- The "ID: C826-L003-TPPGF001-S999-W000000" is the SAME string as July's,
+  so it is the form template's code, NOT a case number. CORRECTION to
+  the 1 November entry: this form leaves no ticket. The email thread is
+  the only thing that carries continuity, so replies go on the thread,
+  never back through the form.
+- The echo at the bottom of their email carries the founder's phone
+  number; trim the quoted history before forwarding anything.
+
+**REPLIED on the thread, SENT 2026-11-05.** Thanks first; No, a company
+(Josmo Services Ltd t/a favpoll), a fundraising platform; asking about
+the platform-partner programme on the partner page (Virtue, GoFundMe),
+collect and grant onward with a per-charity recommendation, "a platform
+of about Virtue's size"; could they pass it to PPGF partnerships or name
+the contact; the 13 October form mentioned only as "in case that is
+already with them". Founder: "I don't want to sound annoyed in case it
+puts them off partnering with me", so NOTHING in it says he has been
+waiting: no "unanswered", no count of attempts, the 22 October email
+left out. Keep that register on this thread: dates as pointers, never
+as a tally.
+
+Open channels on the one application: 13 October form, 22 October
+info@, 31 October Barreca InMail, this thread. Babouram only if all are
+silent.
