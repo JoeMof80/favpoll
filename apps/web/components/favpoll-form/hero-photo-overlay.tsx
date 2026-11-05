@@ -30,6 +30,13 @@ async function getCroppedBlob(
   canvas.width = pixelCrop.width
   canvas.height = pixelCrop.height
   const ctx = canvas.getContext("2d")!
+  // The crop is exported as JPEG, which has no alpha: a transparent PNG
+  // (a school crest, a charity's mark on a clear background) came out on
+  // BLACK (founder, 2026-11-03: "why is the area around the image
+  // black?"). Paint the canvas white first so transparency reads as
+  // paper, the way the page's own surfaces do.
+  ctx.fillStyle = "white"
+  ctx.fillRect(0, 0, canvas.width, canvas.height)
   ctx.drawImage(
     image,
     pixelCrop.x,
