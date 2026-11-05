@@ -205,10 +205,10 @@ export function FavpollListCard({
     subject: (favpoll.subject ?? undefined) as FavpollSubject | undefined,
   })
 
-  // On the band's tint, so the card closes the way it opens (founder,
-  // 2026-11-04).
+  // White behind a hairline, like the band (founder, 2026-11-06; the
+  // tint lasted a day — see favpoll-card-band.tsx).
   const charityFooter = favpoll.charities.length > 0 && (
-    <div className="mt-auto rounded-b-xl border-t border-border bg-muted px-4 py-3">
+    <div className="mt-auto rounded-b-xl border-t border-border px-4 py-3">
       <FavpollListCardCharityCarousel
         charities={favpoll.charities}
         perCharity={perCharity}

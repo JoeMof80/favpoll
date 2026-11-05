@@ -204,7 +204,7 @@ export default async function MemorialsPage() {
           ideas={ARTEFACTS}
         />
 
-        <OpenRightNow favpolls={live} ground="background" />
+        <OpenRightNow favpolls={live} />
 
         {/* ── For the gatekeepers this page is forwarded by ── */}
         <ProSection

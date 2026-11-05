@@ -91,10 +91,10 @@ export function FavpollSummaryCard({ favpoll, className }: Props) {
         </div>
       )}
 
-      {/* Charity, on the band's tint so the card closes the way it opens
-          (founder, 2026-11-04). */}
+      {/* Charity, behind a hairline (founder, 2026-11-06: white, not the
+          band's tint — see favpoll-card-band.tsx). */}
       {favpoll.charities.length > 0 && (
-        <div className="rounded-b-xl border-t border-border bg-muted px-3 py-2">
+        <div className="rounded-b-xl border-t border-border px-3 py-2">
           <FavpollListCardCharityCarousel
             charities={favpoll.charities}
             perCharity={perCharity}

@@ -470,9 +470,10 @@ export function FavpollSheet({
         // of its HEIGHT, not its tone: 64px of inset under the row made
         // it well over twice the band's 56. The inset is 20 now — the
         // row's own top padding mirrored — so the block sits near the
-        // band's weight, muted, no hairline: the tone step is the edge,
-        // as it is on the band and the phone's footer.
-        className={`z-30 mt-8 hidden bg-muted pt-5 pb-[var(--shell-inset)] shell:-mr-8 shell:-ml-16 shell:block shell:pr-8 shell:pl-16 ${
+        // band's weight. WHITE with a hairline since 2026-11-06 (founder:
+        // the tints clashed with organisers' images; register as ink
+        // only), so the rule is the edge the tone step used to be.
+        className={`z-30 mt-8 hidden border-t border-border bg-background pt-5 pb-[var(--shell-inset)] shell:-mr-8 shell:-ml-16 shell:block shell:pr-8 shell:pl-16 ${
           still ? "" : "sticky bottom-0"
         }`}
       >
@@ -514,9 +515,9 @@ export function FavpollSheet({
           <GoalProgress
             totalRaised={totalRaised}
             goalAmount={favpoll.goal_amount}
-            // bg-primary/15: the track on the MUTED footer — bg-muted on
-            // bg-muted was invisible, leaving the fill (and the pace tick)
-            // floating on nothing. The ring's own track tone.
+            // bg-primary/15: the ring's own track tone. (Chosen when the
+            // footer was muted and bg-muted on bg-muted vanished; kept on
+            // the white footer because it still reads as the track.)
             className="mt-4 h-1 bg-primary/15"
           />
         ) : null}

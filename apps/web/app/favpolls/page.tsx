@@ -14,7 +14,6 @@ import {
 import { pollSetStandings } from "@/lib/poll-standings"
 import { NewFavpollFab } from "@/components/new-favpoll-fab"
 import { FavpollsListClient } from "./favpolls-list-client"
-import { PageGround } from "@/components/page-ground"
 import type { PublicStatusFilter } from "./list-utils"
 
 export const metadata = {
@@ -223,11 +222,13 @@ export default async function FavpollsPage({
     </div>
   )
 
+  // WHITE GROUND since 2026-11-06 (founder: register as ink, never as a
+  // background). The cards' border and shadow lift them; the PageGround
+  // that painted the pastel under the list is gone with it.
   return (
-    <main id="main" tabIndex={-1} className="bg-muted">
-      <PageGround color="var(--muted)" />
+    <main id="main" tabIndex={-1} className="bg-background">
       {showingExemplars && (
-        <div className="sticky top-14 z-30 border-b border-border bg-muted">
+        <div className="sticky top-14 z-30 border-b border-border bg-background">
           {rail}
         </div>
       )}

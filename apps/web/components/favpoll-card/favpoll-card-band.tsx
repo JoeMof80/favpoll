@@ -24,6 +24,15 @@ import type { FavpollCardSize } from "./types"
 // banner" — the banner lives on the list card's story face instead.
 //
 // No rule between the header and the topic row (founder, 2026-11-04).
+//
+// WHITE, WITH A HAIRLINE UNDER THE BAND (founder, 2026-11-06). The band
+// and the footer shipped in the register's tint and lasted a day: "images
+// and logos clashing with the muted backgrounds … it feels too indulgent
+// to extend the theme to the background." The register-ink idiom (#587,
+// #588) was always white surface, register as ink, tint on hover only;
+// the tinted bands were the drift. So the band is the card's own white,
+// the rule is its edge, and the register stays in the countdown, the
+// eyebrow and the chips.
 
 type Props = {
   closesAt: string
@@ -48,15 +57,10 @@ export function FavpollCardBand({
   return (
     <>
       <div className="relative">
-        <div className="flex h-10 items-center gap-2 rounded-t-xl bg-muted px-3 pr-20">
+        <div className="flex h-10 items-center gap-2 rounded-t-xl border-b border-border bg-background px-3 pr-20">
           <ClosingLabel closesAt={closesAt} className="whitespace-nowrap" />
           {isExemplar && (
-            /* An edge, because secondary's fill is the band's own tint and
-               the chip vanished into it (mock 11). */
-            <Badge
-              variant="secondary"
-              className="pointer-events-none border border-border bg-background"
-            >
+            <Badge variant="secondary" className="pointer-events-none">
               Example
             </Badge>
           )}

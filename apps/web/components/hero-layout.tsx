@@ -258,7 +258,7 @@ export function HeroLayout({
       >
         {banner && (
           <div
-            className="-mx-6 flex items-center justify-center bg-muted px-6 text-xs text-muted-foreground shell:hidden"
+            className="-mx-6 flex items-center justify-center border-b border-border bg-background px-6 text-xs text-muted-foreground shell:hidden"
             style={{ height: BANNER }}
           >
             {banner}
@@ -270,7 +270,12 @@ export function HeroLayout({
             absolute child). */}
         <div className="relative">
           <div
-            className={`relative -mx-6 h-14 bg-muted transition-shadow duration-300 shell:-mr-8 shell:-ml-16 ${
+            // WHITE since 2026-11-06 (founder: "images and logos clashing
+            // with the muted backgrounds"). The band is still the page's
+            // top row and still 56px; at rest it is the sheet's own
+            // surface with the mark on it, and the shadow is its edge
+            // once the page scrolls. See favpoll-card-band.tsx.
+            className={`relative -mx-6 h-14 bg-background transition-shadow duration-300 shell:-mr-8 shell:-ml-16 ${
               bandShadow ? "shadow-[0_6px_12px_-6px_rgb(0_0_0/0.18)]" : ""
             }`}
             aria-hidden={avatar ? undefined : true}
