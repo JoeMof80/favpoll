@@ -678,7 +678,6 @@ app/favpolls/page.tsx
   → components/favpoll-list-card/use-favpoll-list-card-pledge.ts
   → components/new-favpoll-fab.tsx
       → components/new-favpoll-button.tsx  ↑
-  → components/page-ground.tsx
   → components/ui/section-eyebrow.tsx *
   → lib/favpoll-cards.ts  (lib)
   → lib/live-totals.ts  (lib)
