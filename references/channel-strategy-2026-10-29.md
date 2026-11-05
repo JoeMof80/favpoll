@@ -772,3 +772,46 @@ row DEMO ONLY. Script: `scripts/demo-world-book-day.ts meadows`. Paths:
 `/favpolls/66bf78df-d0d5-4406-9b2d-b87152cb1cc0`, `/p/dcd2d225dfca`,
 `/live/47c0417a-f626-4b21-a150-bb99b21283d3`. Composite stamped the
 same day.
+
+## 2026-11-05 — Craft Barber Co, Nantwich: "24 Hours of Haircuts" for Mind
+
+Seen as a poster in the shop window. Brandon Kelly and Adam cutting hair
+for 24 hours straight on Saturday 6 February 2027 for Mind (219830),
+target £1,500, Instagram post of 20 October (137 likes), four local
+sponsors on the strip (a production company, a bar, The Cheese Shop,
+Bondies Bagels) and "more businesses to follow". Sponsorship at this
+level is £50 to £250 or in kind, so the strip is open.
+
+**Why it is the best live candidate:** real, local, three months out,
+before World Book Day, and the organisers are already asking businesses
+for help. A 24-hour room with a waiting area and a screen is the live
+display's natural habitat.
+
+**The shape (settled in conversation):** topic Song, the shop's own
+playlist as a CLOSED list (guest additions off), the pledger's pick plays
+while they are in the chair. The enacted ending (the song on top at hour
+24 plays the last cut out) was DROPPED the same day on the founder's
+call: a promise the shop keeps at hour 24 for a moment most pledgers are
+not there for, and the standings on the wall already say it; the one
+case for it, the finish-line clip they will film, is Brandon's to add.
+Not a replacement for their own donation
+page; the favpoll is the thing on the wall for the 24 hours. The pot is
+the sponsorship: favpoll's money goes into the shared pot, which every
+customer in the chair can spend, and the QR on the poster is what the
+pot earns. Haircut (enacted: one of them gets the winning cut) was the
+louder alternative; take both in and let Brandon pick.
+
+**Approach:** book a haircut and ask in the chair. Say it plainly: a
+small giving site, fifth sponsor, show it working on the wall. The
+legal brief's commercial-participation question (Q8) applies here with
+a logo strip, so it wants answering before February.
+
+**Example favpoll BUILT on staging** by `scripts/demo-craft-barber.ts`
+(mark and banner cropped from their poster, fourteen fictional pledges,
+Mr Brightside and Don't Look Back in Anger racing):
+/favpolls/d2fc0c35-c2c5-4869-9b90-6cf9da6505d4, live
+/live/2be01ad2-ecdd-489b-adf2-a502ca0421de. The playlist is twenty from
+the canon standing in for theirs.
+
+**Wizard copy it surfaced:** a sentence beside the guest-additions
+switch, "a shorter list makes a closer race". On the don't-forget list.
