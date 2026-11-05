@@ -1762,3 +1762,37 @@ form, the 22 October info@ email, the 31 October Barreca InMail, this
 ticket. Next: Babouram only if all four are silent; nothing else until a
 reply or a reference number arrives. If the form's auto-reply gives a
 ticket reference, record it here.
+
+#### 2026-11-05 — the form's reply: "can you confirm your organization is a registered charity?"
+
+PayPal Customer Support replied within a day, reading it as charity
+enrolment, exactly as on 6 July. Three facts from the headers:
+
+- The message that went was the founder's 22 October text UNCHANGED (no
+  "platform partner" sentence, no July reference, no 22 October line).
+  The form stamped it Topic "Enrollment process" despite select_2
+  "Partners and programs"; the sub-select did not route it anywhere
+  different.
+- The "ID: C826-L003-TPPGF001-S999-W000000" is the SAME string as July's,
+  so it is the form template's code, NOT a case number. CORRECTION to
+  the 1 November entry: this form leaves no ticket. The email thread is
+  the only thing that carries continuity, so replies go on the thread,
+  never back through the form.
+- The echo at the bottom of their email carries the founder's phone
+  number; trim the quoted history before forwarding anything.
+
+**REPLIED on the thread, SENT 2026-11-05.** Thanks first; No, a company
+(Josmo Services Ltd t/a favpoll), a fundraising platform; asking about
+the platform-partner programme on the partner page (Virtue, GoFundMe),
+collect and grant onward with a per-charity recommendation, "a platform
+of about Virtue's size"; could they pass it to PPGF partnerships or name
+the contact; the 13 October form mentioned only as "in case that is
+already with them". Founder: "I don't want to sound annoyed in case it
+puts them off partnering with me", so NOTHING in it says he has been
+waiting: no "unanswered", no count of attempts, the 22 October email
+left out. Keep that register on this thread: dates as pointers, never
+as a tally.
+
+Open channels on the one application: 13 October form, 22 October
+info@, 31 October Barreca InMail, this thread. Babouram only if all are
+silent.
