@@ -11,6 +11,10 @@ type FavpollHeaderProps = {
   /** Public cards: no photo → no avatar at all (founder, 2026-08-02),
    * matching the hero's no-empty-avatar rule. */
   hideEmptyAvatar?: boolean
+  /** Under a FavpollCardBand the mark hangs into the header beside the
+   *  eyebrow; the gap under the eyebrow lets the name start below the
+   *  mark and run the full width before it truncates (2026-11-04). */
+  nameBelowMark?: boolean
 }
 
 function getInitials(name: string, override?: string): string {
@@ -30,6 +34,7 @@ export function FavpollHeader({
   size = "lg",
   linkCue = false,
   hideEmptyAvatar = false,
+  nameBelowMark = false,
 }: FavpollHeaderProps) {
   const avatarSize = size === "lg" ? 56 : size === "md" ? 36 : 32
   // Rounded square, matching the favpoll page hero (rounded-xl) and the
@@ -59,7 +64,11 @@ export function FavpollHeader({
                the card's header line in its register's ink: purple on a
                memorial, magenta on a celebration, green on a fundraiser,
                brand blue on a neutral favpoll. */
-            <span className="text-[11px] font-medium tracking-[0.08em] text-primary uppercase">
+            <span
+              className={`text-[11px] font-medium tracking-[0.08em] text-primary uppercase${
+                nameBelowMark ? "mb-2.5 pr-20" : ""
+              }`}
+            >
               {eyebrow}
             </span>
           )}

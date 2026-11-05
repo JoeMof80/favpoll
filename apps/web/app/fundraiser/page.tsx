@@ -24,7 +24,7 @@ import {
   FUNDRAISER_TOPIC_PICKER,
 } from "@/components/landing/demo-fixture"
 import { t } from "@/lib/i18n"
-import { fetchLiveFavpolls, REGISTERS_BY_PAGE } from "@/lib/live-favpolls"
+import { fetchOpenFavpollCards, REGISTERS_BY_PAGE } from "@/lib/favpoll-cards"
 import { OpenRightNow } from "@/components/landing/open-right-now"
 
 // Register landing #3 (see /memorials for the pattern notes; /celebrations
@@ -182,7 +182,7 @@ const IDEAS = [
 ]
 
 export default async function FundraisersPage() {
-  const live = await fetchLiveFavpolls({
+  const live = await fetchOpenFavpollCards({
     registers: REGISTERS_BY_PAGE.fundraisers,
   })
 
@@ -231,7 +231,7 @@ export default async function FundraisersPage() {
 
         <IdeasSection title={t("fundraisers.artefacts.title")} ideas={IDEAS} />
 
-        <OpenRightNow favpolls={live} />
+        <OpenRightNow favpolls={live} ground="background" />
 
         {/* ── Close — matched to the other two registers: max-w-330,
           left-aligned, and variant="secondary" because a default Button is

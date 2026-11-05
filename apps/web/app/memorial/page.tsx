@@ -14,7 +14,7 @@ import { withQuietTail } from "@/components/landing/quiet-tail"
 import { HowItWorksSteps } from "@/components/landing/how-it-works-steps"
 import { IdeasSection } from "@/components/landing/ideas-section"
 import { t } from "@/lib/i18n"
-import { fetchLiveFavpolls, REGISTERS_BY_PAGE } from "@/lib/live-favpolls"
+import { fetchOpenFavpollCards, REGISTERS_BY_PAGE } from "@/lib/favpoll-cards"
 import { OpenRightNow } from "@/components/landing/open-right-now"
 
 // The first register landing page (sequencing decision 2026-08-01:
@@ -123,7 +123,7 @@ const ARTEFACTS = [
 ]
 
 export default async function MemorialsPage() {
-  const live = await fetchLiveFavpolls({
+  const live = await fetchOpenFavpollCards({
     registers: REGISTERS_BY_PAGE.memorials,
   })
 
@@ -204,7 +204,7 @@ export default async function MemorialsPage() {
           ideas={ARTEFACTS}
         />
 
-        <OpenRightNow favpolls={live} />
+        <OpenRightNow favpolls={live} ground="background" />
 
         {/* ── For the gatekeepers this page is forwarded by ── */}
         <ProSection

@@ -1,7 +1,7 @@
 import { CapabilityGrid } from "@/components/landing/capability-grid"
 import { ProcessOverview } from "@/components/landing/process-overview"
 import Link from "next/link"
-import { fetchLiveFavpolls } from "@/lib/live-favpolls"
+import { fetchOpenFavpollCards } from "@/lib/favpoll-cards"
 import { Button } from "@/components/ui/button"
 import { withQuietTail } from "@/components/landing/quiet-tail"
 import { RotatingRegisterHero } from "@/components/landing/rotating-register-hero"
@@ -19,12 +19,12 @@ import { t } from "@/lib/i18n"
 export const revalidate = 60
 
 export default async function HomePage() {
-  // The shelf's query lives in lib/live-favpolls now, shared with the three
-  // register pages, which show the same shelf filtered to their own register
-  // (2026-08-28). It was ~90 lines of select, row types and topic
-  // normalisation; four copies would have drifted the first time a column
-  // moved.
-  const normalised = await fetchLiveFavpolls()
+  // The shelf shows a sample of the /favpolls cards themselves — two rows,
+  // soonest to close first — in place of the summary-card carousel
+  // (founder, 2026-11-05). Its query is lib/favpoll-cards, shared with
+  // /favpolls and the three register pages, which show the same shelf
+  // filtered to their own register.
+  const normalised = await fetchOpenFavpollCards({ limit: 8 })
 
   return (
     <main id="main" tabIndex={-1} className="flex flex-col">
