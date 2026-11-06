@@ -273,9 +273,11 @@ export function HeroLayout({
             // WHITE since 2026-11-06 (founder: "images and logos clashing
             // with the muted backgrounds"). The band is still the page's
             // top row and still 56px; at rest it is the sheet's own
-            // surface with the mark on it, and the shadow is its edge
-            // once the page scrolls. See favpoll-card-band.tsx.
-            className={`relative -mx-6 h-14 bg-background transition-shadow duration-300 shell:-mr-8 shell:-ml-16 ${
+            // surface with a hairline as its edge, the mark straddling
+            // the line as it does on the card band (founder, same day:
+            // "the header needs a border, like the footer has"), and the
+            // shadow takes over once the page scrolls.
+            className={`relative -mx-6 h-14 border-b border-border bg-background transition-shadow duration-300 shell:-mr-8 shell:-ml-16 ${
               bandShadow ? "shadow-[0_6px_12px_-6px_rgb(0_0_0/0.18)]" : ""
             }`}
             aria-hidden={avatar ? undefined : true}
