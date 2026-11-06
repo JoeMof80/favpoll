@@ -1851,3 +1851,34 @@ describes, checked 15 October); if that menu has no such branch either,
 the phone is finished and nothing is lost. Open channels on the one
 application: 13 October form, 22 October info@, 31 October Barreca
 InMail. This thread is closed.
+
+#### 2026-11-06, evening — a human: Paul at PayPal escalated it to PPGF. BABOURAM HELD.
+
+The founder got through to a person ("Paul at PayPal and he was very
+helpful"). Paul has escalated the enquiry to PayPal Giving Fund, so the
+next contact should come from PPGF itself. This is the first time the
+application has been moved by someone inside PayPal rather than by the
+founder, and it supersedes the thread, which stays closed.
+
+**What Paul's screen said, as the founder heard it:** PPGF is reluctant
+to take on partners at the beginning; companies already raising funds
+become eligible once they have proved capability. Second-hand, read off a
+screen, not a document we hold — but it matches the partner page's own
+"$10m a year" wording and the Virtue precedent (a live Shopify app when
+it partnered, not a pre-launch one). The founder's expectation, and the
+right one: a "come back when you are raising" answer is the likely
+outcome, and it is not a refusal. It is the order the channel strategy
+already settled on 29 October: proof before partnership. Launch does not
+wait on PPGF.
+
+**Babouram HELD.** An escalation is now inside PayPal with a name on it.
+A cold InMail to the UK country manager while her own organisation is
+already processing it would read as going round that process, which is
+the one thing the 30 October entry warned against. The Premium window
+(about 14 November) lapses; that is the cost, and it is the right cost.
+Barreca's InMail stands as sent; no chase.
+
+**Next:** wait for PPGF. If nothing by **Friday 20 November**, one short
+call back to the same line to ask for the escalation's status, naming
+Paul and the date. Record the reply from PPGF here when it comes, whatever
+it says — a "not yet" with a stated threshold is worth having in writing.
