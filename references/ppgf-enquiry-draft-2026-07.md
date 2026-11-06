@@ -1842,9 +1842,12 @@ are each with people who could act on it. This thread never was.
 
 **Next, unchanged from 31 October:** Friday 7 November. If Barreca is
 silent, Vanessa Babouram by InMail while Premium lasts (about 14
-November), checking her current title first. One more call is worth
-making, at 08:00 when the lines open, "charity" at the voice menu and
-"PayPal Giving Fund partnerships" as the first words, not "partner
-application"; a short hold, not a long one. Open channels on the one
+November), checking her current title first. **The 020 3467 8315 line
+is dead for this:** the founder called again the same evening and "none
+of the options at that phone number are relevant" — a menu with no
+charity or partner branch. One try of the other number the note holds,
+0800 587 0461, saying "charity" (the route PPGF's own contact page
+describes, checked 15 October); if that menu has no such branch either,
+the phone is finished and nothing is lost. Open channels on the one
 application: 13 October form, 22 October info@, 31 October Barreca
 InMail. This thread is closed.
