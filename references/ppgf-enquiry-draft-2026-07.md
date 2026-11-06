@@ -1796,3 +1796,55 @@ as a tally.
 Open channels on the one application: 13 October form, 22 October
 info@, 31 October Barreca InMail, this thread. Babouram only if all are
 silent.
+
+#### 2026-11-06 — the thread is exhausted. CORRECTION: the 13 October thread reply WAS answered, on 22 October, with a misroute
+
+**The 22 October reply the record missed.** PayPal Customer Support
+answered the 13 October thread reply on 22 October (subject
+"Verification/Become a partner") with two account-verification links on
+the founder's own PayPal account (policydashboard compliance `mdc` and
+`kycenhanced`) and https://www.paypal.com/uk/enterprise/become-a-partner.
+Checked 2026-11-06: that page is the **PayPal Partner Program** for
+eCommerce platforms, marketplaces, POS resellers and systems integrators,
+and mentions neither PayPal Giving Fund, charities nor donations. General
+support read "partner" as merchant partnerships. So the 27 October and
+later entries that treat the thread as unanswered are wrong on that
+point: what arrived was a misroute, not silence. The verification links
+are benign and optional (any PayPal product needs them eventually) and
+are not what unblocks this. **The enterprise partner form is NOT to be
+submitted**: wrong programme, no receipt, and it routes to merchant
+sales.
+
+**Two more replies on 2026-11-06, both pointing at a phone.** First, to
+the founder's 5 November message: "You will need to call us and speak to
+the relevant team regarding the application. +44 20 34 67 83 15", where
+"the application" means the enterprise partner application the agent's
+colleague had steered him towards. The founder called; no answer. He
+replied on the thread in his own words: the link was the enterprise
+partner programme, he wants to be a PayPal Giving Fund partner, he runs a
+fundraising company, and he applied on 13 October at
+https://www.paypal.com/uk/paypal-giving-fund/partner. (Verified
+2026-11-06: that UK page exists, is partner-facing — "fundraising and
+social giving platforms" — and its two Become a Partner buttons open the
+same Microsoft Form. This supersedes the 15 October line that the US
+page is the only partner intake; the UK URL carries the same form. The
+charity-facing page is the different `paypal-partner` URL.) Second reply,
+same day: "the phone number is for the relevant team. If you are on hold
+there may be a high volume of calls sorry."
+
+**Ruling: nothing further on this thread.** Three replies in two days,
+each boilerplate, none routed anywhere. It is the charity-help queue
+wearing a PPGF template code, and it has now said everything it can.
+Replying again only restarts the loop. Founder: "i feel like i'm in a
+kafka novel" — accurate about the thread, not about the application: the
+13 October form, the 22 October info@ email and the 31 October InMail
+are each with people who could act on it. This thread never was.
+
+**Next, unchanged from 31 October:** Friday 7 November. If Barreca is
+silent, Vanessa Babouram by InMail while Premium lasts (about 14
+November), checking her current title first. One more call is worth
+making, at 08:00 when the lines open, "charity" at the voice menu and
+"PayPal Giving Fund partnerships" as the first words, not "partner
+application"; a short hold, not a long one. Open channels on the one
+application: 13 October form, 22 October info@, 31 October Barreca
+InMail. This thread is closed.
