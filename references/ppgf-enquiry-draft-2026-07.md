@@ -1878,7 +1878,8 @@ the one thing the 30 October entry warned against. The Premium window
 (about 14 November) lapses; that is the cost, and it is the right cost.
 Barreca's InMail stands as sent; no chase.
 
-**Next:** wait for PPGF. If nothing by **Friday 20 November**, one short
+**Next:** wait for PPGF. Paul said to give it 5 to 7 days, which is
+**Friday 13 November**. If nothing by **Monday 16 November**, one short
 call back to the same line to ask for the escalation's status, naming
-Paul and the date. Record the reply from PPGF here when it comes, whatever
+Paul and 6 November. Record the reply from PPGF here when it comes, whatever
 it says — a "not yet" with a stated threshold is worth having in writing.
