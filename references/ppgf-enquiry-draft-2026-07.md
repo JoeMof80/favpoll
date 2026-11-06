@@ -1863,8 +1863,9 @@ founder, and it supersedes the thread, which stays closed.
 **What Paul's screen said, as the founder heard it:** PPGF is reluctant
 to take on partners at the beginning; companies already raising funds
 become eligible once they have proved capability. Second-hand, read off a
-screen, not a document we hold — but it matches the partner page's own
-"$10m a year" wording and the Virtue precedent (a live Shopify app when
+screen, not a document we hold — but it matches the Become a Partner
+form's own wording (the 13 October entry: "particularly interested …
+raise more than $10m for charity each year") and the Virtue precedent (a live Shopify app when
 it partnered, not a pre-launch one). The founder's expectation, and the
 right one: a "come back when you are raising" answer is the likely
 outcome, and it is not a refusal. It is the order the channel strategy
