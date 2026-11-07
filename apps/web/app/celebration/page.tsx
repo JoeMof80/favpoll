@@ -230,7 +230,7 @@ export default async function CelebrationsPage() {
 
         <IdeasSection title={t("celebrations.artefacts.title")} ideas={IDEAS} />
 
-        <OpenRightNow favpolls={live} ground="background" />
+        <OpenRightNow favpolls={live} />
 
         {/* ── Close — the landing's purple monogram close, one line.
           MATCHED TO /memorials (founder, 2026-08-28) in all three ways it

@@ -231,7 +231,7 @@ export default async function FundraisersPage() {
 
         <IdeasSection title={t("fundraisers.artefacts.title")} ideas={IDEAS} />
 
-        <OpenRightNow favpolls={live} ground="background" />
+        <OpenRightNow favpolls={live} />
 
         {/* ── Close — matched to the other two registers: max-w-330,
           left-aligned, and variant="secondary" because a default Button is

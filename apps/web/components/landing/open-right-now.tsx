@@ -4,7 +4,6 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { FadeIn } from "@/components/landing/fade-in"
 import { FavpollListCard } from "@/components/favpoll-list-card"
 import type { FavpollCard } from "@/lib/favpoll-cards"
-import { cn } from "@/lib/utils"
 
 /**
  * The "Open right now" shelf, as the home page has carried since #—, now
@@ -24,9 +23,8 @@ import { cn } from "@/lib/utils"
  * rows on a marketing page, and no launch-day switch to remember. It appears
  * on its own once there is something worth showing.
  *
- * bg-muted, not bg-primary/5: real favpoll cards always sit on the brand
- * pastel, matching /favpolls and the home shelf. The fainter tint belongs to
- * the illustration vignettes.
+ * White ground since 2026-11-06 (it was the brand pastel, "real favpoll
+ * cards always sit on bg-muted"); the cards carry their own edges.
  */
 
 /**
@@ -40,28 +38,19 @@ export function OpenRightNow({
   favpolls,
   title = "Open right now",
   minimum = OPEN_NOW_MINIMUM,
-  ground = "muted",
 }: {
   favpolls: FavpollCard[]
   title?: string
   minimum?: number
-  /** On a register page bg-muted IS the register's tint, the same one
-   *  the cards' band and footer wear, so the cards vanished into the
-   *  ground (founder, 2026-11-05). Those pages sit the shelf on white;
-   *  home keeps the brand pastel. There is no token for "the default
-   *  tint inside a register page", so this is a prop, not a class. */
-  ground?: "muted" | "background"
 }) {
   if (favpolls.length < minimum) return null
 
+  // WHITE since 2026-11-06. The shelf sat on the brand pastel, and on a
+  // register page on that register's tint, where the cards vanished into
+  // it (2026-11-05, a one-day prop). The founder then took the tint off
+  // every surface: register as ink, never as a background.
   return (
-    <section
-      id="live"
-      className={cn(
-        "w-full scroll-mt-20",
-        ground === "muted" ? "bg-muted" : "bg-background"
-      )}
-    >
+    <section id="live" className="w-full scroll-mt-20 bg-background">
       <div className="mx-auto w-full max-w-330 px-6 py-16">
         <FadeIn>
           <div className="mb-6 flex items-baseline justify-between">
