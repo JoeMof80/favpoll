@@ -82,7 +82,7 @@ describe("HeroLayout — the banner image", () => {
     const { container } = render(
       <HeroLayout {...BASE} pins bannerUrl={BANNER} />
     )
-    const band = container.querySelector(".h-14.bg-muted")
+    const band = container.querySelector(".h-14.bg-background")
     expect(band).not.toBeNull()
     const img = bannerImage(container)!
     expect(band!.compareDocumentPosition(img)).toBe(
@@ -115,7 +115,7 @@ describe("HeroLayout — the banner image", () => {
     expect(av.closest("[class*='max-shell:fixed']")).toBeNull()
     expect(
       container
-        .querySelector(".h-14.bg-muted")
+        .querySelector(".h-14.bg-background")
         ?.parentElement?.querySelector("[class*='size-20']")
     ).toBeNull()
     // Zero height in flow: nothing beneath it moves.
@@ -125,7 +125,7 @@ describe("HeroLayout — the banner image", () => {
 
   it("keeps the tinted band when there is no banner", () => {
     const { container } = render(<HeroLayout {...BASE} pins />)
-    expect(container.querySelector(".h-14.bg-muted")).not.toBeNull()
+    expect(container.querySelector(".h-14.bg-background")).not.toBeNull()
   })
 })
 

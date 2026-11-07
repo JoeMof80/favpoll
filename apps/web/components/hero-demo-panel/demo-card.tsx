@@ -418,7 +418,7 @@ export function DemoCard({
           it runs up behind the island as it would on the device. */}
       {isPhone && (
         <div
-          className="-mx-5 -mt-5 shrink-0 bg-muted"
+          className="-mx-5 -mt-5 shrink-0 bg-background"
           style={{ height: PHONE_SAFE_AREA_TOP }}
           aria-hidden="true"
         />
@@ -435,7 +435,9 @@ export function DemoCard({
           full width"). Size and position inline as well as by class — the
           hero's lesson. */}
       <div className={cn("relative -mx-5 shrink-0", isPhone ? "" : "-mt-5")}>
-        <div className="h-14 bg-muted" aria-hidden="true" />
+        {/* White since 2026-11-06, as the page's band is (founder: the
+            tints clashed with organisers' images). */}
+        <div className="h-14 bg-background" aria-hidden="true" />
         <div className="absolute inset-y-0 left-0 flex items-center px-5">
           <FavpollLogo />
         </div>
@@ -653,7 +655,7 @@ export function DemoCard({
         className={cn(
           "shrink-0",
           isPhone
-            ? "-mx-5 -mb-5 bg-muted px-5 pt-3 pb-5"
+            ? "-mx-5 -mb-5 border-t border-border bg-background px-5 pt-3 pb-5"
             : "border-t border-border pt-3"
         )}
       >

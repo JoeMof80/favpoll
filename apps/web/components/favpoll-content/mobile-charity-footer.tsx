@@ -80,11 +80,11 @@ export function MobileCharityFooter({
     <div
       ref={ref}
       // THE BAND'S PARTNER (founder, 2026-10-16: "match the footer background
-      // color to the header"): muted, no top border, as the band at the top
-      // is — the page's two fixed surfaces in one tone, the content white
-      // between them. The tone step hides the lock card's shadow passing
-      // beneath better than a hairline did.
-      className={`fixed right-0 bottom-0 left-0 z-20 bg-muted px-4 py-3 transition-transform duration-300 shell:hidden ${
+      // color to the header"). Both were muted until 2026-11-06, when the
+      // founder took the tint off every surface ("images and logos
+      // clashing with the muted backgrounds"): white, with a hairline as
+      // the edge the tone step used to be.
+      className={`fixed right-0 bottom-0 left-0 z-20 border-t border-border bg-background px-4 py-3 transition-transform duration-300 shell:hidden ${
         hidden ? "translate-y-full" : "translate-y-0"
       }`}
       style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}

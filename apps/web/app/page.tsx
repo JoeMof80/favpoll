@@ -47,11 +47,10 @@ export default async function HomePage() {
           `git show main~1:apps/web/components/landing/anyone-can-answer.tsx`
           if they are wanted on /features. ── */}
 
-      {/* ── The shelf: real favpoll cards always sit on the brand pastel
-          (bg-muted), matching /favpolls — white cards on light purple is the
-          convention wherever the actual product appears; the illustration
-          vignettes above keep the fainter bg-primary/5. In dark mode both
-          resolve to cards lifted off the purple page. ── */}
+      {/* ── The shelf: white ground since 2026-11-06 (it was the brand
+          pastel, matching /favpolls, until the founder took the tint off
+          every surface: register as ink, never as a background). The
+          illustration vignettes above keep their fainter bg-primary/5. ── */}
       {/* minimum={1}, keeping home's own threshold. The component's default
           of three is for the REGISTER pages, which show a slice that can be
           thin long after the whole is healthy. Home shows every open favpoll
