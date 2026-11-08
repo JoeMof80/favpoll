@@ -957,7 +957,11 @@ Their events page (hopesandbeams.org/events) is a list of favpoll shapes:
 
 The choir favpoll carries the encore (the founder's settled enacted ruling
 for bands), which means the Gift Aid caution in §4a applies to it; the other
-two are plain.
+two are plain. Mark and banner added the same day with the founder's
+go-ahead: their white logo on a tile in the site's own purple, and their
+"inspire / shine / laugh" wall photo (the only usable photo on the site; the
+one of children was not used) cropped 3:1. Both uploaded under `seed/` in
+the protagonists bucket, so the orphan sweep never touches them.
 
 **Also found: Nantwich Food Bank quiz night**, Wed 11 November 2026, Crewe
 Vagrants Sports Club, Newcastle Road, Nantwich CW5 7EP, with a curry and a
