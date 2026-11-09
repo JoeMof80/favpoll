@@ -815,3 +815,156 @@ the canon standing in for theirs.
 
 **Wizard copy it surfaced:** a sentence beside the guest-additions
 switch, "a shorter list makes a closer race". On the don't-forget list.
+
+## 2026-11-08 — the plan if PPGF says "establish first"; the niche; Givey; Hopes and Beams
+
+### The premise
+
+Paul at PayPal (call of 6 November, see the PPGF note) read from his
+screen that PPGF is reluctant to take on partners at the beginning, and
+that companies already raising become eligible once they have proved
+capability. The founder's call, 8 November: assume that is the answer and
+plan for it. So the first favpolls run on the legal brief's **Structure A**
+(favpoll collects through Stripe and remits to each charity under a written
+agreement with that charity), which is what the consent gate was built for.
+The first closed and settled favpolls are also what unlocks PPGF later, so
+the two tracks are one.
+
+### The action plan
+
+1. **Legal, now.** The hold on Pippa Garland (Russell-Cooke, Hannah's
+   referral) was "until PPGF's agreement and wording are in hand". The
+   expected PPGF answer lifts that hold. Send the 13 October brief
+   (`legal-brief-the-fork-2026-10.md`) with Structure A as the live case and
+   B as the later one; ask for the three things already listed: the
+   collection agreement drafted to s.59 whether or not favpoll is a CP, the
+   solicitation statement, terms of service. Fixed fee, honest status line.
+   Nothing needs her before talking to anyone; everything needs her before
+   the first pound reaches a charity.
+2. **Craft first, Mind straight after, before anything is announced.**
+   Mind's community fundraising team handles "in aid of" events daily and
+   has regional fundraisers who can say yes to a named local event; a
+   platform with no history and no named event goes to their compliance
+   queue. Ask Brandon only what Brandon controls (the wall, the fifth
+   sponsor slot); say plainly that Mind must agree to receive through
+   favpoll and that this is favpoll's job. Mind probably has its own
+   third-party fundraising agreement, which is paper for Pippa to review
+   rather than draft. Cutoff mid-January: if Mind has not agreed, sponsor
+   the event plainly and drop the favpoll. No Gift Aid to either of them.
+3. **Local-signatory track in parallel.** Craft is the showcase but its
+   recipient is national. The fastest closed favpoll is one where the
+   charity signs its own agreement: Wistaston Memorial Hall, South Cheshire
+   Orchestra, Friends of Berkeley, and now Hopes and Beams (below).
+4. **Finding more Crafts, as a weekly half hour.** The pattern: a dated
+   event one to three months out, in aid of a named registered charity, in
+   a room with a wall and a waiting crowd, run by a business or group
+   rather than by the charity, already recruiting sponsors. Sources: shop
+   windows and noticeboards in Nantwich and Crewe; local Facebook groups
+   and Instagram for "in aid of" plus the town, Facebook Events within ten
+   miles; Nantwich News, Crewe Nub News, Cheshire Live; Eventbrite's
+   charity category; the sponsor strips themselves (The Cheese Shop and
+   Bondies Bagels will be on the next poster too); venue types that run
+   these (barbers, tattoo studios, gyms, rugby and football clubs, Round
+   Table and Rotary, church halls). Score each find on those five criteria.
+
+### The niche: where the poll beats a page
+
+Prompted by the Little Princess Trust's white-label JustGiving sign-up
+(fundraise.littleprincesses.org.uk). A fundraising page banks the EFFORT of
+a person; the donor's motive is the runner, the head-shaver, the hair donor.
+favpoll has no runner, so its niche is wherever the favourite itself is the
+motive and JustGiving has nothing to put on the page. Three conditions, best
+cases have all three:
+
+- **The favourite is the cause's own subject.** Song for a music charity,
+  book for a library, bird for a reserve, carol for a church roof. Pledging
+  is participation, not sponsorship.
+- **A room and a moment.** Standings on a wall, a witnessed close, something
+  that happens because of the result: the encore, the song in the chair,
+  the winner framed in the library. A page has no moment.
+- **Many people, small sums, no athlete.** Coffee mornings, carol services,
+  school fairs, pub nights. The coin-jar vote (1 November entry) is the
+  proof people already run this.
+
+**Charities that will get it in one sentence:** dementia and reminiscence
+(Playlist for Life, Alzheimer's Society's singing groups, hospice memory
+work); music and literacy (Nordoff Robbins, school libraries, the Poetry
+Society); nature charities that already run favourite votes as marketing
+(Woodland Trust's Tree of the Year, the RSPB's 2015 national bird vote);
+funerals (funeral song, the Co-op chart). **Little Princess Trust**: they run
+thousands of hair-cut events a year through barbers and salons, and the
+Craft shape (the pick plays in the chair) transfers to every one unchanged,
+so Craft is a pilot of a repeatable event type. LPT is a POST-PROOF target;
+the rule on national cold approaches stands.
+
+**Topics that beg for it:** Song, Carol, Hymn, Children's book, Poem, Bird,
+Flower, Tree, Walk, Dog breed, Biscuit and Cake (coffee mornings), Comfort
+food (food banks), Seaside town (RNLI), Christmas film and Christmas song in
+December. The test each time: does the pick belong to the cause, and is
+there a moment when the standings are seen? Biscuit at a Macmillan coffee
+morning passes; favourite colour for a marathon runner fails, and that is
+the favpoll that looks like a worse JustGiving page.
+
+Design question parked: the register pages could lead with these pairings
+instead of occasions.
+
+### Givey (found via Hopes and Beams' Donate button)
+
+Givey's one real difference is who pays: the charity pays nothing, the
+donor pays 5% added on top (£10 costs £10.50; the charity gets £10 plus Gift
+Aid untouched). JustGiving charges the charity 1.9% plus pence per gift,
+keeps 5% of reclaimed Gift Aid and asks the donor for a tip. GoFundMe's UK
+charity route goes through PPGF. Comparison pages are dated and Givey's own
+fees page is a dead link (checked 8 November): verify at a live checkout
+before quoting. Why a small charity picks Givey: it courts them (free social
+collaborations, one-to-one Zooms, QR codes, a private Facebook group), "100%
+of your donation" is a clean sentence, and it is a Donate button, not a
+fundraising engine. Hopes and Beams' Givey page shows £6,212 from 118
+donations lifetime and no fundraisers listed; their money comes from the
+bingo, the fair and the concert, in cash on the night. Givey reports £4.8m
+across 5,000 charities lifetime. Lesson for favpoll: charity-pays-nothing
+lands with small charities, and the optional contribution is gentler than a
+compulsory 5% on top.
+
+### Hopes and Beams, Crewe — found by the sweep, 8 November
+
+**Charity 1201764**, a CIO registered 30 January 2023, Broad Street, Crewe
+CW1 3UD, income £127,154 (FY to 5 April 2025, register mirror extract
+19 October). Objects: social inclusion for children and young people with
+physical, learning or sensory disabilities (disability sport, education,
+advocacy) AND "to relieve the needs of elderly people and in particular
+those with dementia" through recreational activities. Runs the community
+restaurant Poppy's. Phone 01270 255355, info@hopesandbeams.org. Organiser
+and recipient in ONE body, ten minutes from the founder, and dementia is in
+its objects: the best cause fit in this file. Not contacted; nothing agreed.
+
+Their events page (hopesandbeams.org/events) is a list of favpoll shapes:
+
+| Event | Date | Favpoll |
+| --- | --- | --- |
+| Spoken Word Open Mic Night (£2 entry) | Fri 13 Nov 2026 | Poem |
+| Xmas Fair | Sat 21 Nov 2026 | none, no favourite belongs to it |
+| Xmas Grand Charity Bingo (£1 a game) | Fri 27 Nov 2026 | none |
+| Breakfast with Santa | Sat 5 Dec 2026 | Christmas song, the leader opens the playlist |
+| Crewe Male Voice Choir Xmas Concert | Mon 14 Dec 2026 | Carol, the leader sung as the encore |
+
+**Demo favpolls BUILT on dev, 8 November** by `scripts/demo-hopes-and-beams.ts`
+(`open-mic`, `choir`, `santa`; fictional pledges; charity row DEMO ONLY):
+
+- Open mic: /favpolls/0399e55d-ed68-4915-9bcb-9bee6d919c2e
+- Choir: /favpolls/ff879e24-9b0b-48d0-8b63-04d1d3a0d185
+- Santa: /favpolls/c34eb06d-9623-4068-b96e-b016d928852f
+
+The choir favpoll carries the encore (the founder's settled enacted ruling
+for bands), which means the Gift Aid caution in §4a applies to it; the other
+two are plain. Mark and banner added the same day with the founder's
+go-ahead: their white logo on a tile in the site's own purple, and their
+"inspire / shine / laugh" wall photo (the only usable photo on the site; the
+one of children was not used) cropped 3:1. Both uploaded under `seed/` in
+the protagonists bucket, so the orphan sweep never touches them.
+
+**Also found: Nantwich Food Bank quiz night**, Wed 11 November 2026, Crewe
+Vagrants Sports Club, Newcastle Road, Nantwich CW5 7EP, with a curry and a
+raffle, sold out on Eventbrite. The food bank gave no charity number on the
+listing; check the register before anything. Shape: Comfort food in a room.
+Too soon for this one; the next one.
